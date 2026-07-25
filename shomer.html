@@ -2906,16 +2906,16 @@ function renderPastEvents(){
   if(typeof MAP==='undefined' || !MAP){ return; }
   if(_pastLayer){ try{ MAP.removeLayer(_pastLayer); }catch(e){} _pastLayer=null; }
   if(!_pastOn){ return; }
-  _pastLayer=L.layerGroup();
+  _pastLayer=window.L.layerGroup();
   var he=(typeof currentLang!=='undefined' && currentLang==='he');
   PAST_EVENTS.forEach(function(ev){
-    var icon=L.divIcon({html:pastMarkerHTML(ev),className:'past-div',iconSize:[38,48],iconAnchor:[19,48]});
+    var icon=window.L.divIcon({html:pastMarkerHTML(ev),className:'past-div',iconSize:[38,48],iconAnchor:[19,48]});
     var srcTxt = ev.src==='cbs' ? (he?'מקור: הלמ״ס':'Source: CBS') : (he?'מבוסס על דיווחים ציבוריים':'Based on public reports');
     var pop='<div style="font:600 13px Heebo,sans-serif;color:#111;max-width:220px">'
       + '<div style="display:inline-block;background:'+PAST_EVT_COLOR+';color:#0A1628;font-size:10px;font-weight:800;padding:2px 7px;border-radius:6px;margin-bottom:6px">'
       + (he?'אירוע עבר · '+ev.yr:'Past event · '+ev.yr)+'</div><br>'
       + ev.he + '<div style="font-size:10.5px;color:#888;margin-top:6px">'+srcTxt+' · '+(he?'למודעות בלבד — אינו אירוע חי':'awareness only')+'</div></div>';
-    L.marker([ev.lat,ev.lng],{icon:icon}).bindPopup(pop).addTo(_pastLayer);
+    window.L.marker([ev.lat,ev.lng],{icon:icon}).bindPopup(pop).addTo(_pastLayer);
   });
   _pastLayer.addTo(MAP);
 }
@@ -2933,7 +2933,7 @@ function togglePastEvents(){
   }
   var he=(typeof currentLang!=='undefined' && currentLang==='he');
   try{ if(typeof toast==='function') toast(_pastOn?(he?'אירועי עבר מוצגים':'Past events shown'):(he?'אירועי עבר הוסתרו':'Past events hidden'),''); }catch(e){}
-  if(_pastOn){ try{ if(MAP && window.L){ var pts=PAST_EVENTS.map(function(e){return [e.lat,e.lng];}); MAP.fitBounds(L.latLngBounds(pts).pad(0.3),{maxZoom:12,animate:true}); } }catch(e){} }
+  if(_pastOn){ try{ if(MAP && window.L){ var pts=PAST_EVENTS.map(function(e){return [e.lat,e.lng];}); MAP.fitBounds(window.L.latLngBounds(pts).pad(0.3),{maxZoom:12,animate:true}); } }catch(e){} }
 }
 
 function sosTypeLabel(t){const he=currentLang==='he',ar=currentLang==='ar';if(!t||t==='unknown')return he?'לא ידוע':ar?'غير معروف':'Unknown';return (TYPES[t]&&TYPES[t].label())||(he?'אחר':ar?'أخرى':'Other');}
@@ -8330,7 +8330,7 @@ try{ hydrateIcons(document); }catch(e){}
 /* Loaded-build version — shown in the diagnostic panel so a phone can prove
    whether it's on the latest build or a STALE cached one. Keep in lock-step
    with sw.js SW_VERSION on every deploy. */
-var APP_VER='v202';
+var APP_VER='v203';
 var FB={ready:false,uid:null,db:null,_presTimer:null,connected:false,listening:false,pushState:'default',near:0,swVer:'?',
   authState:'connecting',sdkLoaded:false,persist:'',permErr:null,err:null,wsProbe:'',csp:''};
 /* Always log connection diagnostics to the console so the real failure can be SEEN in Chrome. */
