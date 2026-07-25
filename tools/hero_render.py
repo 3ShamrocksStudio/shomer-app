@@ -17,7 +17,9 @@ PORT = 8899
 URL = f"http://127.0.0.1:{PORT}/shomer.html"
 OUT = sys.argv[1] if len(sys.argv) > 1 else "/tmp/hero_real.png"
 ZOOM = float(sys.argv[2]) if len(sys.argv) > 2 else 13
-LAT, LNG = 32.0853, 34.7818          # Tel Aviv — same area as the previous shot
+STATS_ON = (sys.argv[5].lower() != 'off') if len(sys.argv) > 5 else True
+LAT = float(sys.argv[3]) if len(sys.argv) > 3 else 32.0853
+LNG = float(sys.argv[4]) if len(sys.argv) > 4 else 34.7818
 
 STATE = {
     "onboarded": True,
@@ -60,36 +62,40 @@ async def main():
 
         # ── everything below calls the APP's own functions ──────────────────
         await pg.evaluate(
-            """async ([lat, lng, zoom]) => {
+            """async ([lat, lng, zoom, statsOn]) => {
             MAP.setView([lat, lng], zoom, {animate:false});
 
             // police crime-stat circles — the app's own loader + renderer
             if (typeof statsLoad === 'function') { await statsLoad(); }
-            if (typeof STATS !== 'undefined') { STATS.on = true; }
-            if (typeof statsRender === 'function') statsRender();
+            if (typeof STATS !== 'undefined') { STATS.on = statsOn; }
+            if (statsOn && typeof statsRender === 'function') statsRender();
+            if (!statsOn && typeof statsClear === 'function') statsClear();
             if (typeof statsLegPaint === 'function') { try { statsLegPaint(); } catch(e){} }
 
             // past events — the app's own layer
             window._pastOn = true;
             if (typeof renderPastEvents === 'function') renderPastEvents();
 
-            // live SOS + converging responders, drawn with the app's own icons
+            // live SOS + converging responders, drawn with the app's own icons.
+            // Positions are chosen in SCREEN space and converted to lat/lng so the
+            // composition fills the frame instead of clustering in one band.
             window.__demo = [];
-            const ev = [lat + 0.0090, lng + 0.0075];
+            const pt = (x, y) => MAP.containerPointToLatLng(window.L.point(x, y));
+            const evPt = pt(216, 292);
+            const ev = [evPt.lat, evPt.lng];
             if (typeof sosIcon === 'function') {
               window.__demo.push(window.L.marker(ev, {icon: sosIcon(), zIndexOffset: 1100}).addTo(MAP));
             }
             if (typeof responderIcon === 'function') {
-              [[lat+0.0155, lng+0.0020],
-               [lat+0.0035, lng+0.0170],
-               [lat+0.0020, lng-0.0035]].forEach(c => {
+              [[104, 176], [300, 402], [142, 520]].forEach(([x, y]) => {
+                 const q = pt(x, y), c = [q.lat, q.lng];
                  window.__demo.push(window.L.marker(c, {icon: responderIcon(), zIndexOffset: 600}).addTo(MAP));
                  window.__demo.push(window.L.polyline([c, ev], {
                    color:'#37D98A', weight:2, opacity:.55, dashArray:'7 7'}).addTo(MAP));
               });
             }
         }""",
-            [LAT, LNG, ZOOM],
+            [LAT, LNG, ZOOM, STATS_ON],
         )
 
         await pg.wait_for_timeout(4500)          # tiles + CSS animations settle
