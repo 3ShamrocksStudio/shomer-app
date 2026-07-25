@@ -3534,6 +3534,7 @@ function applyTranslations(){
  setText('ob-h1',T('ob_h1')); setText('ob-d1',T('ob_d1'));
  setText('ob-h2',T('ob_h2')); setText('ob-d2',T('ob_d2'));
  setText('ob-cta0-t',currentLang==='he'?'המשך':currentLang==='ar'?'متابعة':'Continue');
+ if(typeof obApplyMode==='function') obApplyMode();
  setText('ob-finish-t',currentLang==='he'?'כניסה':currentLang==='ar'?'دخول':'Enter');
  setText('ob-settings-t',currentLang==='he'?'הגדרות':currentLang==='ar'?'الإعدادات':'Settings');
  setText('ob-back1-t',currentLang==='he'?'חזרה':currentLang==='ar'?'رجوع':'Back');
@@ -3713,13 +3714,45 @@ function genVerifyCode(){ return String(Math.floor(1000+Math.random()*9000)); }
    proof they still control the phone. Skip the name/profile step entirely —
    completeRegistration() detects the existing registry entry, adopts the new
    uid and drops them straight into the app. */
-function obReturningUser(){
+/* ── step0 has two modes: create an account, or sign back into an existing one.
+      The link used to call obStep0() straight away, which just failed validation
+      on the empty phone field and left the user staring at the same screen.
+      It now switches the panel into sign-in mode instead. ── */
+var _obMode='signup';
+function obTx(he,en,ar){ return currentLang==='ar'?ar:(currentLang==='en'?en:he); }
+function obApplyMode(){
   try{
-    var he=currentLang==='he';
-    var nm=document.getElementById('ob-name');
-    if(nm && !nm.value.trim()){ nm.value=he?'שומר':'Shomer'; }
-    if(typeof obStep0==='function'){ obStep0(); return; }
+    var signin=(_obMode==='signin');
+    var wrap=document.querySelector('#step0 .name-field-wrap');
+    var hint=document.getElementById('name-hint');
+    var nerr=document.getElementById('name-err');
+    if(wrap) wrap.style.display = signin?'none':'';
+    if(hint) hint.style.display = signin?'none':'';
+    if(signin && nerr) nerr.style.display='none';
+
+    setText('ob-h0', signin
+      ? obTx('כניסה לחשבון קיים','Sign in to your account','تسجيل الدخول إلى حسابك')
+      : T('ob_h0'));
+    setText('ob-d0', signin
+      ? obTx('הזן/י את מספר הטלפון שאיתו נרשמת','Enter the number you registered with','أدخل الرقم الذي سجّلت به')
+      : T('ob_d0'));
+    setText('ob-why', signin
+      ? obTx('נשלח קוד אימות ב-SMS למספר הזה.','We will send a verification code to this number.','سنرسل رمز تحقق إلى هذا الرقم.')
+      : T('ob_why'));
+    setText('ob-cta0-t', signin
+      ? obTx('התחבר/י','Sign in','تسجيل الدخول')
+      : obTx('המשך','Continue','متابعة'));
+
+    var lk=document.getElementById('ob-returning');
+    if(lk) lk.textContent = signin
+      ? obTx('משתמש חדש? יצירת חשבון','New here? Create an account','مستخدم جديد؟ إنشاء حساب')
+      : obTx('כבר יש לך חשבון שומר? התחבר/י','Already a SH✡MER user? Sign in','لديك حساب شومير؟ تسجيل الدخول');
   }catch(e){}
+}
+function obReturningUser(){
+  _obMode = (_obMode==='signin') ? 'signup' : 'signin';
+  obApplyMode();
+  try{ var ph=document.getElementById('ob-phone'); if(ph) ph.focus(); }catch(e){}
 }
 function obStep0(){
  const he=currentLang==="he";
@@ -8330,7 +8363,7 @@ try{ hydrateIcons(document); }catch(e){}
 /* Loaded-build version — shown in the diagnostic panel so a phone can prove
    whether it's on the latest build or a STALE cached one. Keep in lock-step
    with sw.js SW_VERSION on every deploy. */
-var APP_VER='v203';
+var APP_VER='v204';
 var FB={ready:false,uid:null,db:null,_presTimer:null,connected:false,listening:false,pushState:'default',near:0,swVer:'?',
   authState:'connecting',sdkLoaded:false,persist:'',permErr:null,err:null,wsProbe:'',csp:''};
 /* Always log connection diagnostics to the console so the real failure can be SEEN in Chrome. */
