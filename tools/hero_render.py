@@ -76,22 +76,26 @@ async def main():
             window._pastOn = true;
             if (typeof renderPastEvents === 'function') renderPastEvents();
 
-            // live SOS + converging responders, drawn with the app's own icons.
-            // Positions are chosen in SCREEN space and converted to lat/lng so the
-            // composition fills the frame instead of clustering in one band.
+            // Pins only. The app never draws connector lines between responders and
+            // an event — its only route line is showRespToPerson(), a cyan OSRM
+            // walking route for the ONE user who tapped "אני בדרך". So: no lines.
             window.__demo = [];
             const pt = (x, y) => MAP.containerPointToLatLng(window.L.point(x, y));
-            const evPt = pt(216, 292);
-            const ev = [evPt.lat, evPt.lng];
+            const P = (x, y) => { const q = pt(x, y); return [q.lat, q.lng]; };
+
+            // live event
             if (typeof sosIcon === 'function') {
-              window.__demo.push(window.L.marker(ev, {icon: sosIcon(), zIndexOffset: 1100}).addTo(MAP));
+              window.__demo.push(window.L.marker(P(214, 286), {icon: sosIcon(), zIndexOffset: 1100}).addTo(MAP));
             }
-            if (typeof responderIcon === 'function') {
-              [[104, 176], [300, 402], [142, 520]].forEach(([x, y]) => {
-                 const q = pt(x, y), c = [q.lat, q.lng];
-                 window.__demo.push(window.L.marker(c, {icon: responderIcon(), zIndexOffset: 600}).addTo(MAP));
-                 window.__demo.push(window.L.polyline([c, ev], {
-                   color:'#37D98A', weight:2, opacity:.55, dashArray:'7 7'}).addTo(MAP));
+            // other SH✡MER users — the app's own circle-member pin
+            if (typeof circleIcon === 'function') {
+              [[108, 178, 'יוסי', '#37D98A', '🛡'],
+               [296, 372, 'מיכל', '#4EA8FF', '👮'],
+               [134, 486, 'אבי',  '#E0A828', '🚑'],
+               [268, 556, 'נועה', '#37D98A', '🛡']].forEach(([x, y, nm, col, em]) => {
+                 window.__demo.push(window.L.marker(P(x, y), {
+                   icon: circleIcon({name: nm, color: col, emoji: em, sos: false}),
+                   zIndexOffset: 600}).addTo(MAP));
               });
             }
         }""",
@@ -109,7 +113,22 @@ async def main():
             demo: (window.__demo||[]).length,
             appVer: (typeof APP_VER!=='undefined') ? APP_VER : '?',
             zoom: MAP.getZoom(),
-            onboarding: (document.getElementById('ob')||{}).style ? document.getElementById('ob').style.display : 'n/a'
+            onboarding: (document.getElementById('ob')||{}).style ? document.getElementById('ob').style.display : 'n/a',
+            lines: document.querySelectorAll('.leaflet-overlay-pane path').length,
+            pins: Array.from(document.querySelectorAll('.leaflet-marker-icon')).map(el=>{
+                const r=el.getBoundingClientRect();
+                if(r.width===0) return null;
+                const x=Math.round(r.left+r.width/2), y=Math.round(r.top+r.height/2);
+                if(x<0||x>innerWidth||y<0||y>innerHeight) return null;
+                const h=el.innerHTML||'';
+                let k='other';
+                if(h.includes('mk-sos')) k='EVENT';
+                else if(h.includes('mk-circle')) k='shomer-user';
+                else if((el.className||'').includes('past-div')) k='past-event';
+                else if(h.includes('mk3')) k='ME';
+                else if(h.includes('aed')) k='AED';
+                return k+'@'+x+','+y;
+            }).filter(Boolean)
         })""")
         print("state:", st)
         await b.close()
