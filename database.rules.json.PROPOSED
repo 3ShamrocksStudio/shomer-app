@@ -1,0 +1,115 @@
+{
+  "rules": {
+    "registry": {
+      "$hash": {
+        ".read": false,
+        ".write": "auth != null && newData.child('uid').val() === auth.uid && (!data.exists() || data.child('uid').val() === auth.uid)",
+        ".validate": "newData.hasChildren(['uid'])"
+      }
+    },
+    "pairs": {
+      "$uid": {
+        ".read": "auth != null && auth.uid == $uid",
+        ".write": "auth != null && auth.uid == $uid"
+      }
+    },
+    "invites": {
+      "$token": {
+        ".read": "auth != null",
+        ".write": "auth != null",
+        ".validate": "newData.hasChildren(['fromUid','ts'])"
+      }
+    },
+    "presence": {
+      "$uid": {
+        ".read": "auth != null && ($uid === auth.uid || root.child('pairs').child(auth.uid).child($uid).exists())",
+        ".write": "auth != null && auth.uid == $uid"
+      }
+    },
+    "ping": {
+      "$uid": {
+        ".read": "auth != null && auth.uid == $uid",
+        ".write": "auth != null"
+      }
+    },
+    "sos": {
+      ".read": "auth != null",
+      ".write": "auth != null"
+    },
+
+    "responders": {
+      "$sosId": {
+        ".read": "auth != null",
+        "$uid": {
+          ".write": "auth != null && $uid === auth.uid",
+          ".validate": "!newData.exists() || newData.hasChildren(['ts'])"
+        }
+      }
+    },
+
+    "tombstones": {
+      "$uid": {
+        ".read": "auth != null",
+        ".write": "auth != null && auth.uid == $uid"
+      }
+    },
+
+    "theft": {
+      "$uid": {
+        ".read": "auth != null && auth.uid == $uid",
+        ".write": "auth != null && auth.uid == $uid"
+      }
+    },
+
+    "tokens": {
+      "$uid": {
+        ".read": false,
+        ".write": "auth != null && auth.uid == $uid"
+      }
+    },
+
+    "alarms": {
+      ".read": false,
+      "$id": {
+        ".write": "auth != null && (!data.exists() || data.child('fromUid').val() === auth.uid)",
+        ".validate": "newData.hasChildren(['fromUid','toUid','ts']) && newData.child('fromUid').val() === auth.uid"
+      }
+    },
+
+    "founders": {
+      ".read": "auth != null",
+      ".write": false
+    },
+
+    "analytics": {
+      "installs": {
+        "$uid": {
+          ".read": false,
+          ".write": "auth != null && auth.uid == $uid"
+        }
+      },
+      "seen": {
+        "$day": {
+          "$uid": {
+            ".read": false,
+            ".write": "auth != null && auth.uid == $uid"
+          }
+        }
+      }
+    },
+
+    "aeds": {
+      ".read": "auth != null",
+      "$id": {
+        ".write": "auth != null && (!data.exists() || data.child('by').val() == auth.uid)",
+        ".validate": "newData.hasChildren(['lat','lng','by','ts'])"
+      }
+    },
+    "inbox": {
+      "$phoneHash": {
+        ".read": "auth != null",
+        ".write": "auth != null"
+      }
+    }
+  }
+}
