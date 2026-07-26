@@ -43,7 +43,7 @@
   --grey:#7C828F;
   --navy-text:#CDD6EC;
   --white:#fff;
-  --maxw:1180px;
+  --maxw:1550px;
 }
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 html{scroll-behavior:smooth;overflow-x:hidden;-webkit-text-size-adjust:100%}
@@ -112,18 +112,18 @@ header.bar{position:relative;z-index:60;background:var(--bar)}
   aspect-ratio:1/1;object-fit:cover;box-shadow:0 24px 50px -20px rgba(0,0,0,.38);max-width:410px}
 
 /* ══ ADVANTAGES ══ */
-.adv{background:var(--navy);color:#fff;padding:clamp(58px,7vw,92px) 0 clamp(64px,8vw,100px);background-image:linear-gradient(180deg,rgba(12,27,58,0) 55%,#08152F 100%)}
-.adv h2{text-align:center;font-size:clamp(25px,3vw,38px);font-weight:800;margin-bottom:clamp(40px,5vw,64px);color:#fff}
+.adv{background:var(--navy);color:#fff;padding:clamp(58px,7vw,140px) 0 clamp(64px,9.6vw,185px);background-image:linear-gradient(180deg,rgba(12,27,58,0) 55%,#08152F 100%)}
+.adv h2{text-align:center;font-size:clamp(25px,3.1vw,60px);font-weight:800;margin-bottom:clamp(40px,5vw,96px);color:#fff}
 .adv-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:46px;direction:ltr}
 .adv-col{text-align:center;direction:rtl}
-.adv-ic{width:110px;height:110px;margin:0 auto 26px;border:3px solid var(--orange);border-radius:50%;
+.adv-ic{width:clamp(110px,7.9vw,152px);height:clamp(110px,7.9vw,152px);margin:0 auto clamp(26px,2.2vw,40px);border:3px solid var(--orange);border-radius:50%;
   display:flex;align-items:center;justify-content:center}
-.adv-ic svg{width:56px;height:56px;fill:none;stroke:var(--orange);stroke-width:2.6;stroke-linecap:round;stroke-linejoin:round}
+.adv-ic svg{width:clamp(56px,3.15vw,60px);height:clamp(56px,3.15vw,60px);fill:none;stroke:var(--orange);stroke-width:2.6;stroke-linecap:round;stroke-linejoin:round}
 /* 3rd icon: the circle is an open arc broken by the pointing hand */
 
 .adv-ic.open svg{width:56px;height:56px;stroke-width:2.6}
-.adv-col h3{font-size:clamp(19px,1.7vw,23px);font-weight:800;margin-bottom:12px;color:#fff}
-.adv-col p{font-size:16px;color:var(--navy-text);max-width:300px;margin:0 auto;line-height:1.7}
+.adv-col h3{font-size:clamp(19px,2vw,38px);font-weight:800;margin-bottom:clamp(12px,1vw,20px);color:#fff}
+.adv-col p{font-size:clamp(16px,1.35vw,26px);color:var(--navy-text);max-width:300px;margin:0 auto;line-height:1.7}
 
 /* ══ APP SCREENS ══ */
 .screens{background:linear-gradient(180deg,var(--light) 0%,#E6EAF2 100%);padding:clamp(54px,6.5vw,84px) 0 clamp(58px,7vw,90px)}
@@ -287,6 +287,11 @@ footer.foot{background:var(--foot);color:#C3CCDF;padding:clamp(56px,7vw,84px) 0 
   .arrive-big{font-size:clamp(78px,13vw,220px);line-height:.92}
   .hero-bg{object-position:38% 38%}
   .disc-wrap{padding:0 0 clamp(96px,13vw,140px)}
+}
+
+/* desktop only — reference body columns are ~460px wide; mobile stays at 300px */
+@media (min-width:621px){
+  .adv-col p{max-width:clamp(300px,24vw,460px)}
 }
 </style>
 </head>
