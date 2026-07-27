@@ -4057,6 +4057,7 @@ async function registerPush(){
  // real config is provided (see FIREBASE-SETUP.md). Fully gated: with no config this is a
  // clean no-op and the app behaves exactly as before (no network calls, no console errors).
  try{ await initFCM(); }catch(e){}
+ try{ await initNativeAlerts(); }catch(e){}
 }
 
 /* ── Firebase Cloud Messaging (real, gated) ──
@@ -4088,7 +4089,63 @@ async function initFCM(){
  try{ toast((n.title||'SHMER')+(n.body?' — '+n.body:''),'red'); }catch(e){}
  });
 }
+/* ══ NATIVE ALERTS — the app must reach the user with the app CLOSED ══
+   The Web Notification API does nothing inside an Android WebView, and nothing at
+   all once the app is backgrounded. So on native every notification is routed
+   through Capacitor LocalNotifications, which posts to the real Android system
+   tray on a MAX-importance channel — it fires with the app in the background and
+   the screen locked, driven by the live /sos RTDB listener.
+   PushNotifications is registered alongside it. That path stays inert until
+   google-services.json is added to the Android project; once it is, the token
+   lands in tokens/<uid> and the sosFanout Cloud Function reaches users even after
+   the process has been killed. ══ */
+var _ln=null,_pn=null,_lnId=1,_naReady=false;
+function _isNative(){ try{ return !!(window.Capacitor&&window.Capacitor.isNativePlatform&&window.Capacitor.isNativePlatform()); }catch(e){ return false; } }
+async function initNativeAlerts(){
+ if(_naReady||!_isNative())return; _naReady=true;
+ var P=(window.Capacitor&&window.Capacitor.Plugins)||{};
+ _ln=P.LocalNotifications||null; _pn=P.PushNotifications||null;
+ try{
+  if(_ln){
+   var perm=await _ln.checkPermissions();
+   if(perm&&perm.display!=='granted'){ try{ perm=await _ln.requestPermissions(); }catch(e){} }
+   /* MAX importance + its own channel so Android will not silence or defer it */
+   try{ await _ln.createChannel({id:'shomer-sos',name:'SH\u2721MER SOS',
+     description:'Emergency alerts from nearby SH\u2721MER users',
+     importance:5,visibility:1,sound:'default',vibration:true,lights:true,lightColor:'#FF1A40'}); }catch(e){}
+   try{ _ln.addListener('localNotificationActionPerformed',function(){ try{ window.focus(); }catch(e){} }); }catch(e){}
+  }
+ }catch(e){}
+ try{
+  if(_pn){
+   var pp=await _pn.checkPermissions();
+   if(pp&&pp.receive!=='granted'){ try{ pp=await _pn.requestPermissions(); }catch(e){} }
+   if(pp&&pp.receive==='granted'){
+    _pn.addListener('registration',function(t){
+      try{ fcmToken=(t&&t.value)||null; if(fcmToken){ SS.fcmToken=fcmToken; saveStore(); fbRegisterToken(fcmToken); } }catch(e){}
+    });
+    _pn.addListener('registrationError',function(){});
+    _pn.addListener('pushNotificationReceived',function(n){
+      try{ pushNotify((n&&n.title)||'SH\u2721MER',(n&&n.body)||'','fcm'); }catch(e){}
+    });
+    try{ await _pn.register(); }catch(e){}
+   }
+  }
+ }catch(e){}
+}
 function pushNotify(title,body,tag){
+ /* native first — this is the path that works when the app is not on screen */
+ if(_ln){
+  try{
+   _ln.schedule({notifications:[{
+    id:(_lnId=(_lnId%2000000)+1),
+    title:title||'SH\u2721MER', body:body||'',
+    channelId:'shomer-sos', autoCancel:true, ongoing:false,
+    extra:{tag:tag||'shomer'}
+   }]});
+   return;
+  }catch(e){}
+ }
  if('Notification' in window && Notification.permission==='granted'){
  try{new Notification(title,{body,icon:'data:image/png;base64,iVBORw0KGgo=',tag:tag||'shomer',requireInteraction:false});}catch(e){}
  }
@@ -8363,7 +8420,7 @@ try{ hydrateIcons(document); }catch(e){}
 /* Loaded-build version — shown in the diagnostic panel so a phone can prove
    whether it's on the latest build or a STALE cached one. Keep in lock-step
    with sw.js SW_VERSION on every deploy. */
-var APP_VER='v204';
+var APP_VER='v205';
 var FB={ready:false,uid:null,db:null,_presTimer:null,connected:false,listening:false,pushState:'default',near:0,swVer:'?',
   authState:'connecting',sdkLoaded:false,persist:'',permErr:null,err:null,wsProbe:'',csp:''};
 /* Always log connection diagnostics to the console so the real failure can be SEEN in Chrome. */
