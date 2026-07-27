@@ -1,8 +1,12 @@
 package il.co.shomerapp;
 
 import android.Manifest;
+import android.content.Context;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Build;
+import android.os.PowerManager;
+import android.provider.Settings;
 
 import com.getcapacitor.JSObject;
 import com.getcapacitor.Plugin;
@@ -58,6 +62,35 @@ public class ShomerNativePlugin extends Plugin {
   public void disableBackgroundShake(PluginCall call) {
     getContext().stopService(new Intent(getContext(), ShakeService.class));
     call.resolve();
+  }
+
+  /**
+   * Ask Android to exempt SHOMER from battery optimisation. Without this, Doze and the
+   * aggressive OEM battery managers (Xiaomi, Samsung, Huawei, Oppo) suspend the process
+   * after the screen has been off for a while, and an incoming SOS never arrives.
+   * Resolves {granted:true} if already exempt, otherwise opens the system dialog.
+   */
+  @PluginMethod
+  public void requestBatteryExemption(PluginCall call) {
+    JSObject r = new JSObject();
+    try {
+      if (Build.VERSION.SDK_INT < 23) { r.put("granted", true); call.resolve(r); return; }
+      Context ctx = getContext();
+      PowerManager pm = (PowerManager) ctx.getSystemService(Context.POWER_SERVICE);
+      String pkg = ctx.getPackageName();
+      if (pm != null && pm.isIgnoringBatteryOptimizations(pkg)) {
+        r.put("granted", true); call.resolve(r); return;
+      }
+      Intent i = new Intent(Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS);
+      i.setData(Uri.parse("package:" + pkg));
+      i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+      ctx.startActivity(i);
+      r.put("granted", false); r.put("prompted", true);
+      call.resolve(r);
+    } catch (Exception e) {
+      r.put("granted", false); r.put("error", String.valueOf(e.getMessage()));
+      call.resolve(r);
+    }
   }
 
   @PluginMethod

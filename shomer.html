@@ -4116,6 +4116,18 @@ async function initNativeAlerts(){
    try{ _ln.addListener('localNotificationActionPerformed',function(){ try{ window.focus(); }catch(e){} }); }catch(e){}
   }
  }catch(e){}
+ /* Doze and the OEM battery managers (Xiaomi, Samsung, Huawei, Oppo — most of the
+    Israeli handset market) suspend a backgrounded process after the screen has been
+    off a while, and the SOS never lands. Ask for the exemption once. */
+ try{
+  var np=(window.Capacitor&&window.Capacitor.Plugins&&window.Capacitor.Plugins.ShomerNative)||null;
+  if(np&&np.requestBatteryExemption&&!SS._battAsked){
+   SS._battAsked=true; try{ saveStore(); }catch(e){}
+   np.requestBatteryExemption().then(function(r){
+     try{ SS._battOk=!!(r&&r.granted); saveStore(); }catch(e){}
+   }).catch(function(){});
+  }
+ }catch(e){}
  try{
   if(_pn){
    var pp=await _pn.checkPermissions();
@@ -8420,7 +8432,7 @@ try{ hydrateIcons(document); }catch(e){}
 /* Loaded-build version — shown in the diagnostic panel so a phone can prove
    whether it's on the latest build or a STALE cached one. Keep in lock-step
    with sw.js SW_VERSION on every deploy. */
-var APP_VER='v205';
+var APP_VER='v206';
 var FB={ready:false,uid:null,db:null,_presTimer:null,connected:false,listening:false,pushState:'default',near:0,swVer:'?',
   authState:'connecting',sdkLoaded:false,persist:'',permErr:null,err:null,wsProbe:'',csp:''};
 /* Always log connection diagnostics to the console so the real failure can be SEEN in Chrome. */
