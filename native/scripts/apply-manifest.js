@@ -35,5 +35,16 @@ for (const s of services) {
     svc++;
   }
 }
+/* Receivers (boot restart) — same SHOMER-owned filter as services. */
+const receivers = (additions.match(/<receiver\b[^>]*\/>|<receiver\b[\s\S]*?<\/receiver>/g) || []);
+let rcv = 0;
+for (const rr of receivers) {
+  const nm = rr.match(/android:name="([^"]+)"/);
+  if (nm && nm[1].indexOf('il.co.shomerapp.') === 0 && manifest.indexOf(nm[1]) === -1) {
+    manifest = manifest.replace('</application>', '        ' + rr + '\n    </application>');
+    rcv++;
+  }
+}
+console.log('applied', rcv, 'receiver(s)');
 fs.writeFileSync(manifestPath, manifest);
 console.log('applied', added, 'permission(s) and', svc, 'service(s) to AndroidManifest.xml');

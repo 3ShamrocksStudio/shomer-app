@@ -43,3 +43,15 @@
         android:name="android.app.PROPERTY_SPECIAL_USE_FGS_SUBTYPE"
         android:value="Background shake-to-SOS emergency trigger for a personal-safety app" />
 </service>
+
+<!-- ── Resume guarding after a reboot ── -->
+<receiver
+    android:name="il.co.shomerapp.BootReceiver"
+    android:enabled="true"
+    android:exported="true">
+    <intent-filter android:priority="1000">
+        <action android:name="android.intent.action.BOOT_COMPLETED" />
+        <action android:name="android.intent.action.QUICKBOOT_POWERON" />
+        <action android:name="com.htc.intent.action.QUICKBOOT_POWERON" />
+    </intent-filter>
+</receiver>
