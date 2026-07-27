@@ -91,6 +91,14 @@ jobs:
           else
             echo "no SHOMER native sources found at $SRC"
           fi
+          # AlarmForegroundService references R.raw.sos_alarm. Copy ONLY res/raw —
+          # mipmap/drawable are produced by capacitor-assets and must not be clobbered.
+          RAW=shomer-android/android/app/src/main/res/raw
+          if [ -d "$RAW" ]; then
+            mkdir -p android/app/src/main/res/raw
+            cp -v "$RAW"/* android/app/src/main/res/raw/ || true
+            ls -la android/app/src/main/res/raw
+          fi
 
       - name: Merge Android manifest additions (permissions)
         working-directory: native
