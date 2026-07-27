@@ -20,7 +20,10 @@ for (const p of perms) {
 }
 /* SHOMER's own foreground services live in android-config too — the merger used to
    drop them, so AlarmForegroundService and ShakeService never reached the APK. */
-const services = (additions.match(/<service[\s\S]*?(?:\/>|<\/service>)/g) || []);
+/* Self-closing form first (bounded so it cannot run past its own '>'), otherwise the
+   full block. A single non-greedy pattern stopped at the <property/> INSIDE
+   ShakeService and emitted an unterminated <service>, which broke manifest merge. */
+const services = (additions.match(/<service\b[^>]*\/>|<service\b[\s\S]*?<\/service>/g) || []);
 let svc = 0;
 for (const s of services) {
   const nm = s.match(/android:name="([^"]+)"/);
