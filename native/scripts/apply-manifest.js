@@ -18,5 +18,16 @@ for (const p of perms) {
     added++;
   }
 }
+/* SHOMER's own foreground services live in android-config too — the merger used to
+   drop them, so AlarmForegroundService and ShakeService never reached the APK. */
+const services = (additions.match(/<service[\s\S]*?(?:\/>|<\/service>)/g) || []);
+let svc = 0;
+for (const s of services) {
+  const nm = s.match(/android:name="([^"]+)"/);
+  if (nm && manifest.indexOf(nm[1]) === -1) {
+    manifest = manifest.replace('</application>', '        ' + s + '\n    </application>');
+    svc++;
+  }
+}
 fs.writeFileSync(manifestPath, manifest);
-console.log('applied', added, 'permission(s) to AndroidManifest.xml');
+console.log('applied', added, 'permission(s) and', svc, 'service(s) to AndroidManifest.xml');

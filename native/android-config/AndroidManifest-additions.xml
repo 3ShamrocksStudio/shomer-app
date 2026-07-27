@@ -15,6 +15,13 @@
 <uses-permission android:name="android.permission.WAKE_LOCK" />
 <uses-permission android:name="android.permission.VIBRATE" />
 <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+<uses-permission android:name="android.permission.REQUEST_IGNORE_BATTERY_OPTIMIZATIONS" />
+<uses-permission android:name="android.permission.USE_FULL_SCREEN_INTENT" />
+<uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM" />
+<uses-permission android:name="android.permission.USE_EXACT_ALARM" />
+<uses-permission android:name="android.permission.FOREGROUND_SERVICE_MEDIA_PLAYBACK" />
+<uses-permission android:name="android.permission.FOREGROUND_SERVICE_SPECIAL_USE" />
+<uses-permission android:name="android.permission.HIGH_SAMPLING_RATE_SENSORS" />
 
 <!-- ── BACKGROUND GEOLOCATION SERVICE (place inside <application>) ── -->
 <service
@@ -22,3 +29,17 @@
     android:foregroundServiceType="location"
     android:enabled="true"
     android:exported="false" />
+
+<!-- ── SH✡MER native services (copied into the generated project by CI) ── -->
+<service
+    android:name="il.co.shomerapp.AlarmForegroundService"
+    android:exported="false"
+    android:foregroundServiceType="mediaPlayback" />
+<service
+    android:name="il.co.shomerapp.ShakeService"
+    android:exported="false"
+    android:foregroundServiceType="specialUse">
+    <property
+        android:name="android.app.PROPERTY_SPECIAL_USE_FGS_SUBTYPE"
+        android:value="Background shake-to-SOS emergency trigger for a personal-safety app" />
+</service>

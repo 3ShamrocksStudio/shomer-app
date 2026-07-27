@@ -77,6 +77,21 @@ jobs:
         working-directory: native
         run: npx cap sync android
 
+      - name: Copy SHOMER native sources into the generated project
+        working-directory: native
+        run: |
+          # `npx cap add android` regenerates native/android from Capacitor's template,
+          # so SHOMER's own plugin and services were never compiled in. Copy them.
+          SRC=shomer-android/android/app/src/main/java/il/co/shomerapp
+          DST=android/app/src/main/java/il/co/shomerapp
+          if [ -d "$SRC" ]; then
+            mkdir -p "$DST"
+            cp -v "$SRC"/*.java "$DST"/ || true
+            ls -la "$DST"
+          else
+            echo "no SHOMER native sources found at $SRC"
+          fi
+
       - name: Merge Android manifest additions (permissions)
         working-directory: native
         run: node scripts/apply-manifest.js || echo "manifest merge optional"
