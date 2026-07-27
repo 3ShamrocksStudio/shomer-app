@@ -27,7 +27,10 @@ const services = (additions.match(/<service\b[^>]*\/>|<service\b[\s\S]*?<\/servi
 let svc = 0;
 for (const s of services) {
   const nm = s.match(/android:name="([^"]+)"/);
-  if (nm && manifest.indexOf(nm[1]) === -1) {
+  /* Only inject SHOMER's OWN services. Plugin services (e.g. the background-geolocation
+     one) already come from the plugin's AAR manifest; re-declaring them here makes the
+     merger fail on conflicting attributes. */
+  if (nm && nm[1].indexOf('il.co.shomerapp.') === 0 && manifest.indexOf(nm[1]) === -1) {
     manifest = manifest.replace('</application>', '        ' + s + '\n    </application>');
     svc++;
   }
