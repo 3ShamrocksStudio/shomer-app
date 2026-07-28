@@ -48,6 +48,37 @@
         ".read": "auth != null",
         ".write": "auth != null"
       }
+    },
+    "tokens": {
+      "$uid": {
+        ".read": "auth != null && auth.uid == $uid",
+        ".write": "auth != null && auth.uid == $uid"
+      }
+    },
+    "alarms": {
+      ".read": false,
+      "$id": {
+        ".write": "auth != null && (newData.child('toUid').val() === auth.uid || root.child('pairs').child(auth.uid).child(newData.child('toUid').val()).exists())",
+        ".validate": "newData.hasChildren(['toUid'])"
+      }
+    },
+    "positions": {
+      "$uid": {
+        ".read": "auth != null && ($uid === auth.uid || root.child('pairs').child(auth.uid).child($uid).exists())",
+        ".write": "auth != null && auth.uid == $uid"
+      }
+    },
+    "geo": {
+      "$uid": {
+        ".read": "auth != null && ($uid === auth.uid || root.child('pairs').child(auth.uid).child($uid).exists())",
+        ".write": "auth != null && auth.uid == $uid"
+      }
+    },
+    "checkin": {
+      "$uid": {
+        ".read": "auth != null && ($uid === auth.uid || root.child('pairs').child(auth.uid).child($uid).exists())",
+        ".write": "auth != null && auth.uid == $uid"
+      }
     }
   }
 }

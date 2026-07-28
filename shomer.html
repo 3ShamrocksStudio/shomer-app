@@ -4884,8 +4884,33 @@ function checkinPrompt(){ if(!SS.checkin.enabled)return; var he=currentLang==='h
  _ciCountdown=setInterval(function(){ left--; upd(); if(left<=0){ clearInterval(_ciCountdown); checkinMiss(); } },1000);
 }
 function checkinOk(){ var he=currentLang==='he'; SS.checkin.awaiting=false; saveStore(); if(_ciCountdown){clearInterval(_ciCountdown);_ciCountdown=null;} cl2('checkin-prompt'); toast(he?'✓ נרשם — הכל טוב?':'✓ Logged — you are OK','grn'); checkinSchedule(); }
+/* Resolve the check-in guardian to a PAIRED partner's uid (so we can actually reach their
+   phone). The guardian field is a free-text name; match it to a linked pair by name, else
+   fall back to the first linked pair. Returns null if the user has no linked guardian. */
+function checkinGuardianUid(){
+ try{ var pairs=(gdState().pairs||[]).filter(function(p){return p&&p.linked&&p.partnerUid;});
+  if(!pairs.length) return null;
+  var nm=((SS.checkin&&SS.checkin.guardian)||'').trim().toLowerCase();
+  var match=pairs.filter(function(p){return ((p.name||'').trim().toLowerCase())===nm;})[0];
+  return (match||pairs[0]).partnerUid;
+ }catch(e){ return null; }
+}
 function checkinMiss(){ var he=currentLang==='he'; SS.checkin.awaiting=false; saveStore(); cl2('checkin-prompt');
- setText('ci-miss-sub',(he?'לא אישרת „הכל טוב?”. '+SS.checkin.guardian+' קיבל/ה התראה.':'You didn\'t confirm. '+SS.checkin.guardian+' was alerted.'));
+ /* Real cross-device alert to the guardian's phone (even when closed) via /alarms -> alarmFanout. */
+ var guid=checkinGuardianUid(), sent=false;
+ if(guid && typeof FB!=='undefined' && FB.ready){
+  try{ var _nm=(SS.user&&SS.user.name)||'שומר';
+   FB.db.ref('alarms').push({toUid:guid, fromUid:FB.uid,
+    title:(he?'שומר — צ׳ק-אין הוחמץ':'SHOMER — missed check-in'),
+    body:(_nm+(he?' לא אישר/ה „הכל טוב?”':" didn't confirm they're OK")),
+    tag:'checkin-miss', ts:Date.now()});
+   sent=true;
+  }catch(e){}
+ }
+ /* HONEST UI: only claim the guardian was alerted if we actually dispatched. */
+ setText('ci-miss-sub', sent
+   ? (he?'לא אישרת „הכל טוב?”. '+SS.checkin.guardian+' קיבל/ה התראה.':'You didn\'t confirm. '+SS.checkin.guardian+' was alerted.')
+   : (he?'לא אישרת „הכל טוב?”. חבר/י שומר/ת מקושר/ת כדי שיקבלו התראה אוטומטית.':'You didn\'t confirm. Link a guardian so they\'re alerted automatically.'));
  var ov=document.getElementById('checkin-miss'); if(ov){ov.classList.add('on');ov.setAttribute('aria-hidden','false');}
  try{pushNotify(he?'שומר — '+SS.checkin.guardian+' לא הגיב/ה':'SHOMER — '+SS.checkin.guardian+' missed check-in',he?'אפשר לשלוח SOS עבורם':'You can send an SOS on their behalf','checkin-miss');}catch(e){}
 }
@@ -8432,7 +8457,7 @@ try{ hydrateIcons(document); }catch(e){}
 /* Loaded-build version — shown in the diagnostic panel so a phone can prove
    whether it's on the latest build or a STALE cached one. Keep in lock-step
    with sw.js SW_VERSION on every deploy. */
-var APP_VER='v208';
+var APP_VER='v209';
 var FB={ready:false,uid:null,db:null,_presTimer:null,connected:false,listening:false,pushState:'default',near:0,swVer:'?',
   authState:'connecting',sdkLoaded:false,persist:'',permErr:null,err:null,wsProbe:'',csp:''};
 /* Always log connection diagnostics to the console so the real failure can be SEEN in Chrome. */
