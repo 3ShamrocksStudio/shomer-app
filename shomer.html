@@ -1420,6 +1420,21 @@ body.otp-active .ob-steps{display:none!important;}
  </div>
  </div>
 
+ <!-- SIGN IN: existing users. A separate screen, not a mode of the sign-up form. -->
+ <div class="ob-panel" id="step-signin">
+ <div class="ob-card">
+ <h3 id="si-h">כניסה לחשבון קיים</h3>
+ <p class="desc" id="si-d">הזן/י את מספר הטלפון שאיתו נרשמת. נשלח קוד אימות ב-SMS ונשחזר את החשבון שלך.</p>
+ <div style="display:flex;gap:8px;margin-bottom:10px">
+ <input class="ob-f" id="si-phone" style="flex:1;margin-bottom:0;text-align:start" type="tel" autocomplete="tel" maxlength="18" placeholder="50 000 0000" inputmode="tel" dir="ltr" aria-label="מספר טלפון">
+ <select class="ob-f" id="si-cc" aria-label="Country code" dir="ltr" style="flex:0 0 auto;width:104px;margin-bottom:0;text-align:left"></select>
+ </div>
+ <p style="font-size:11px;color:var(--tx3);margin:-4px 0 14px;line-height:1.6" id="si-why">נשחזר את השם, מעגלי האמון והשומרים השמורים שלך.</p>
+ <button class="ob-cta" id="si-submit-btn" onclick="obSignIn()"><span id="si-cta-t">התחבר/י</span></button>
+ <button class="ob-returning" id="si-back" onclick="obShowSignUp()">משתמש חדש? יצירת חשבון</button>
+ </div>
+ </div>
+
  <!-- STEP 1: Geolocation -->
  <div class="ob-panel" id="step1">
  <div class="ob-card">
@@ -3534,7 +3549,7 @@ function applyTranslations(){
  setText('ob-h1',T('ob_h1')); setText('ob-d1',T('ob_d1'));
  setText('ob-h2',T('ob_h2')); setText('ob-d2',T('ob_d2'));
  setText('ob-cta0-t',currentLang==='he'?'המשך':currentLang==='ar'?'متابعة':'Continue');
- if(typeof obApplyMode==='function') obApplyMode();
+ if(typeof obPaintSignIn==='function') obPaintSignIn();
  setText('ob-finish-t',currentLang==='he'?'כניסה':currentLang==='ar'?'دخول':'Enter');
  setText('ob-settings-t',currentLang==='he'?'הגדרות':currentLang==='ar'?'الإعدادات':'Settings');
  setText('ob-back1-t',currentLang==='he'?'חזרה':currentLang==='ar'?'رجوع':'Back');
@@ -3714,46 +3729,59 @@ function genVerifyCode(){ return String(Math.floor(1000+Math.random()*9000)); }
    proof they still control the phone. Skip the name/profile step entirely —
    completeRegistration() detects the existing registry entry, adopts the new
    uid and drops them straight into the app. */
-/* ── step0 has two modes: create an account, or sign back into an existing one.
-      The link used to call obStep0() straight away, which just failed validation
-      on the empty phone field and left the user staring at the same screen.
-      It now switches the panel into sign-in mode instead. ── */
-var _obMode='signup';
+/* ── Sign-up and sign-in are two SEPARATE screens. The previous build toggled
+      fields inside the sign-up form, which read as "the link just bounced me to
+      the phone box". ── */
 function obTx(he,en,ar){ return currentLang==='ar'?ar:(currentLang==='en'?en:he); }
-function obApplyMode(){
+var _obSignIn=false;
+function _obPanel(id){
   try{
-    var signin=(_obMode==='signin');
-    var wrap=document.querySelector('#step0 .name-field-wrap');
-    var hint=document.getElementById('name-hint');
-    var nerr=document.getElementById('name-err');
-    if(wrap) wrap.style.display = signin?'none':'';
-    if(hint) hint.style.display = signin?'none':'';
-    if(signin && nerr) nerr.style.display='none';
-
-    setText('ob-h0', signin
-      ? obTx('כניסה לחשבון קיים','Sign in to your account','تسجيل الدخول إلى حسابك')
-      : T('ob_h0'));
-    setText('ob-d0', signin
-      ? obTx('הזן/י את מספר הטלפון שאיתו נרשמת','Enter the number you registered with','أدخل الرقم الذي سجّلت به')
-      : T('ob_d0'));
-    setText('ob-why', signin
-      ? obTx('נשלח קוד אימות ב-SMS למספר הזה.','We will send a verification code to this number.','سنرسل رمز تحقق إلى هذا الرقم.')
-      : T('ob_why'));
-    setText('ob-cta0-t', signin
-      ? obTx('התחבר/י','Sign in','تسجيل الدخول')
-      : obTx('המשך','Continue','متابعة'));
-
-    var lk=document.getElementById('ob-returning');
-    if(lk) lk.textContent = signin
-      ? obTx('משתמש חדש? יצירת חשבון','New here? Create an account','مستخدم جديد؟ إنشاء حساب')
-      : obTx('כבר יש לך חשבון שומר? התחבר/י','Already a SH✡MER user? Sign in','لديك حساب شومير؟ تسجيل الدخول');
+    document.querySelectorAll('#ob .ob-panel').forEach(function(p){
+      p.classList.remove('active'); p.style.display='none';
+    });
+    var el=document.getElementById(id);
+    if(el){ el.classList.add('active'); el.style.display='block'; }
   }catch(e){}
 }
-function obReturningUser(){
-  _obMode = (_obMode==='signin') ? 'signup' : 'signin';
-  obApplyMode();
-  try{ var ph=document.getElementById('ob-phone'); if(ph) ph.focus(); }catch(e){}
+function obPaintSignIn(){
+  try{
+    setText('si-h',  obTx('כניסה לחשבון קיים','Sign in to your account','تسجيل الدخول إلى حسابك'));
+    setText('si-d',  obTx('הזן/י את מספר הטלפון שאיתו נרשמת. נשלח קוד אימות ב-SMS ונשחזר את החשבון שלך.','Enter the number you registered with. We will text you a code and restore your account.','أدخل الرقم الذي سجّلت به. سنرسل رمز تحقق ونستعيد حسابك.'));
+    setText('si-why',obTx('נשחזר את השם, מעגלי האמון והשומרים השמורים שלך.','We will restore your name, circles of trust and saved guardians.','سنستعيد اسمك ودوائر الثقة والحراس المحفوظين.'));
+    setText('si-cta-t',obTx('התחבר/י','Sign in','تسجيل الدخول'));
+    var b=document.getElementById('si-back');
+    if(b) b.textContent=obTx('משתמש חדש? יצירת חשבון','New here? Create an account','مستخدم جديد؟ إنشاء حساب');
+  }catch(e){}
 }
+function obShowSignIn(){
+  _obSignIn=true;
+  obPaintSignIn();
+  /* mirror the country-code list and any number already typed */
+  try{
+    var a=document.getElementById('ob-cc'), b=document.getElementById('si-cc');
+    if(a&&b&&!b.options.length){ b.innerHTML=a.innerHTML; b.value=a.value; }
+    var pa=document.getElementById('ob-phone'), pb=document.getElementById('si-phone');
+    if(pa&&pb&&pa.value&&!pb.value) pb.value=pa.value;
+  }catch(e){}
+  _obPanel('step-signin');
+  try{ var f=document.getElementById('si-phone'); if(f) f.focus(); }catch(e){}
+}
+function obShowSignUp(){ _obSignIn=false; _obPanel('step0'); }
+function obReturningUser(){ obShowSignIn(); }
+function obSignIn(){
+  var he=currentLang==='he';
+  var raw=(document.getElementById('si-phone')||{}).value||'';
+  var ccEl=document.getElementById('si-cc');
+  var cc=(ccEl&&ccEl.value)||myDial();
+  if(!String(raw).replace(/\D/g,'')){ toast(he?'נא להזין מספר טלפון נייד':'Please enter a mobile number','amb'); shakeField('si-phone'); return; }
+  var canon=phoneCanon(raw,cc);
+  if(!phoneIsValid(canon)){ toast(he?'מספר לא תקין — כלול/י קידומת מדינה':'Invalid number — include your country code','amb'); shakeField('si-phone'); return; }
+  /* no name is collected — completeRegistration() restores it from the registry */
+  _obvName=(he?'שומר':'Shomer');
+  user={name:_obvName,phone:canon,city:''};
+  enterAppAnonymously();
+}
+
 function obStep0(){
  const he=currentLang==="he";
  const raw=document.getElementById("ob-phone").value;
@@ -8457,7 +8485,7 @@ try{ hydrateIcons(document); }catch(e){}
 /* Loaded-build version — shown in the diagnostic panel so a phone can prove
    whether it's on the latest build or a STALE cached one. Keep in lock-step
    with sw.js SW_VERSION on every deploy. */
-var APP_VER='v209';
+var APP_VER='v210';
 var FB={ready:false,uid:null,db:null,_presTimer:null,connected:false,listening:false,pushState:'default',near:0,swVer:'?',
   authState:'connecting',sdkLoaded:false,persist:'',permErr:null,err:null,wsProbe:'',csp:''};
 /* Always log connection diagnostics to the console so the real failure can be SEEN in Chrome. */
