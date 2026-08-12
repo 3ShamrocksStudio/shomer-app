@@ -111,6 +111,20 @@ button{font-family:var(--fb);cursor:pointer;border:none;background:none}
 }
 .nav-dl:hover{filter:brightness(1.08);transform:translateY(-1px)}
 
+/* ── MOBILE NAV FIT ──────────────────────────────────────────────────────
+   The page is mobile-first, so the rules above WERE the phone styles and the
+   row did not fit: brand + 3 language buttons + a 184px download pill came to
+   ~331px of .nav-r alone, pushing the CTA off the left edge of the screen.
+   Compacted here and restored at 800px. The download CTA is hidden on phones
+   because the hero carries a far larger one a few pixels below it. ── */
+.nav-in{gap:10px}
+.nav-brand{min-width:0}
+.nav-wm{font-size:13px;letter-spacing:.10em}
+.nav-r{gap:6px;flex-shrink:0}
+.lang-sw{gap:3px}
+.lang-btn{height:34px;padding:0 9px;font-size:10px}
+.nav-dl{display:none}
+
 /* ═══ HERO ════════════════════════════════════════════════ */
 .hero{
   min-height:100svh;
@@ -460,6 +474,14 @@ button{font-family:var(--fb);cursor:pointer;border:none;background:none}
 
 /* ═══ DESKTOP 800px+ ════════════════════════════════════ */
 @media(min-width:800px){
+  /* full-size nav returns once there is room for it */
+  .nav-in{gap:var(--s2)}
+  .nav-wm{font-size:16px;letter-spacing:.16em}
+  .nav-r{gap:var(--s2)}
+  .lang-sw{gap:4px}
+  .lang-btn{height:40px;padding:0 12px;font-size:11px}
+  .nav-dl{display:inline-flex}
+
   :root{--pad:40px}
   .hero-inner{grid-template-columns:1fr 1fr;align-items:end;gap:var(--s8)}
   .hero-mockup{
