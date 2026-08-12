@@ -11186,10 +11186,6 @@ function _otpCooldown(btn,secs){
  lbl();
  _otpCoolT=setInterval(function(){ s--; if(s<=0){clearInterval(_otpCoolT);_otpCoolT=null;btn.disabled=false;btn.textContent=he?"לא קיבלת/ה קוד? שלח/י שוב":"No code? Send again";}else lbl(); },1000);
 }
-/* founderFastPath REMOVED before public launch — it bypassed SMS verification for one
-   phone hash while Twilio had Dave's prefix blocked. That block is gone, Lookup is enabled,
-   and Fraud Guard is back on. Nobody skips verification. */
-function founderFastPath(){ return Promise.resolve(false); }
 /* ══ VERIFICATION RESILIENCE ══
    SMS is the least reliable channel on earth. Israeli carriers silently drop messages from
    unregistered alphanumeric sender IDs; other countries filter foreign long-codes. If SMS is
@@ -11229,9 +11225,7 @@ async function sendTwilioOTP(channel){
     stored phone), there is no reason to ever send another OTP — the session is device-bound.
     This is the ultimate cost protection: a returning/verified user can NEVER trigger an SMS. */
  try{ if(SS && SS.onboarded && SS.user && SS.user.phone && !window._reverifyIntent){ return; } }catch(e){}
- /* SYNCHRONOUS guard FIRST — before any await. The previous version placed this after
-    'await founderFastPath()'; because await yields the event loop, two rapid calls both
-    passed the guard before either set the flag, so BOTH sent → the SAME code arrived twice
+ /* SYNCHRONOUS guard FIRST — before any await. The previous version placed this after    passed the guard before either set the flag, so BOTH sent → the SAME code arrived twice
     and drained the SMS balance. Setting the flag synchronously on the first line makes a
     second call in the same tick return immediately. */
  var _now=Date.now();
@@ -11239,8 +11233,7 @@ async function sendTwilioOTP(channel){
  if(window._lastOtpSend && (_now - window._lastOtpSend) < 8000) return;  // sent <8s ago
  window._otpSending=true;
  window._lastOtpSend=_now;
- if(await founderFastPath()){ window._otpSending=false; return; }
- OTP_CHANNEL = channel || PRIMARY_OTP_CHANNEL || 'sms';
+  OTP_CHANNEL = channel || PRIMARY_OTP_CHANNEL || 'sms';
  const he=currentLang==="he";
  const btn=document.getElementById("ob-resend-btn");
  if(_otpSends>=4){ const st=document.getElementById("ob-sms-status"); if(st)st.textContent=he?"יותר מדי ניסיונות — נסה/י שוב מאוחר יותר (הגנת דיוור)":"Too many attempts — try again later (anti-abuse protection)"; if(btn)btn.disabled=true; return; }
