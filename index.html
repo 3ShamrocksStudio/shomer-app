@@ -112,7 +112,7 @@ header.bar{position:relative;z-index:60;background:var(--bar)}
   aspect-ratio:1/1;object-fit:cover;box-shadow:0 24px 50px -20px rgba(0,0,0,.38);max-width:410px}
 
 /* ══ ADVANTAGES ══ */
-.adv{background:var(--navy);color:#fff;padding:clamp(58px,7vw,140px) 0 clamp(64px,9.6vw,185px);background-image:linear-gradient(180deg,rgba(12,27,58,0) 55%,#08152F 100%)}
+.adv{background:var(--navy);color:#fff;padding:clamp(58px,7vw,140px) 0 clamp(58px,7vw,140px);background-image:linear-gradient(180deg,rgba(12,27,58,0) 55%,#08152F 100%)}
 .adv h2{text-align:center;font-size:clamp(25px,3.1vw,60px);font-weight:800;margin-bottom:clamp(40px,5vw,96px);color:#fff}
 .adv-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:46px;direction:ltr}
 .adv-col{text-align:center;direction:rtl}
@@ -355,20 +355,21 @@ footer.foot{background:var(--foot);color:#C3CCDF;padding:clamp(56px,7vw,84px) 0 
 <section class="adv">
   <div class="wrap">
     <h2><span data-i="advt">היתרונות של</span> <span class="wordmark">SH<span class="star">✡</span>MER</span></h2>
-    <div class="adv-grid"><div class="adv-col">
+    <div class="adv-grid">
+<div class="adv-col">
         <div class="adv-ic open"><svg viewBox="0 0 100 100"><path d="M45 56V33a5 5 0 0 1 10 0v18" stroke-width="4.6"/><path d="M55 49a5 5 0 0 1 10 0v6" stroke-width="4.6"/><path d="M65 53a5 5 0 0 1 10 0v13c0 10-6.6 18-17 18h-5c-6 0-9.2-3.2-13.4-9.2l-5.8-8.6a5 5 0 0 1 7.8-4.9l4.4 4.4" stroke-width="4.6"/></svg></div>
         <h3 data-i="a3t">לחיצה אחת=שמירה מקסימלית!</h3>
         <p data-i="a3x">משמיעה אזעקה קולנית, שולחת התראה לכל המשתמשים, מציגה מסלול מהיר לאירוע, ועוד…</p>
       </div>
     <div class="adv-col">
-        <div class="adv-ic"><svg viewBox="0 0 48 48"><circle cx="19" cy="24" r="11"/><circle cx="29" cy="24" r="11"/></svg></div>
-        <h3 data-i="a1t">מעגלי שומרים</h3>
-        <p data-i="a1x">יצירת מעגלי שומרים וחלוקה לפי קבוצות מוגדרות אישית</p>
-      </div>
-      <div class="adv-col">
         <div class="adv-ic"><svg viewBox="0 0 48 48"><circle cx="24" cy="18" r="7.5"/><path d="M11 38c0-7.5 5.9-12.5 13-12.5S37 30.5 37 38"/></svg></div>
         <h3 data-i="a2t">השומר שלי</h3>
         <p data-i="a2x">התרעות SOS נשלחות למשתמשים מוגדרים, גם כשהם לא בסביבה הקרובה</p>
+      </div>
+      <div class="adv-col">
+        <div class="adv-ic"><svg viewBox="0 0 48 48"><circle cx="19" cy="24" r="11"/><circle cx="29" cy="24" r="11"/></svg></div>
+        <h3 data-i="a1t">מעגלי שומרים</h3>
+        <p data-i="a1x">יצירת מעגלי שומרים וחלוקה לפי קבוצות מוגדרות אישית</p>
       </div>
       </div>
   </div>
@@ -381,6 +382,16 @@ footer.foot{background:var(--foot);color:#C3CCDF;padding:clamp(56px,7vw,84px) 0 
     <div class="car"><div class="car-track" id="cartrack"><div class="shot"><img src="app-shots-map-v2.jpg" alt="מפה חיה עם כפתור SOS" loading="lazy"></div><div class="shot"><img src="app-shots-circles-v2.jpg" alt="מעגלי השומרים שלי" loading="lazy"></div><div class="shot"><img src="app-shots-guide-v2.jpg" alt="מדריך חירום" loading="lazy"></div><div class="shot"><img src="app-shots-profile-v2.jpg" alt="הפרופיל שלי" loading="lazy"></div></div><div class="car-dots" id="cardots"></div></div></div></section>
 
 <!-- ══ CLOSING CTA ══ -->
+<section class="close-cta">
+  <div class="wrap">
+    <p data-i="closing">הצטרפו עכשיו לרשת השומרים הראשונה בישראל של אזרחים למען אזרחים. הצטרפו אלינו, וביחד נוכל להחזיר את הביטחון לרחובות בישראל.</p>
+    <a class="btn-orange" href="SHOMER.apk" download>
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v12m0 0l-4-4m4 4l4-4M4 21h16"/></svg>
+      <span data-i="cta2">להורדה - חינם!</span>
+    </a>
+  </div>
+</section>
+
 <!-- ══ SH✡MER NATURE ══ -->
 <section class="nat-band">
   <img class="nat-photo" src="SHOMERNature_BannerBIG.jpg" alt="" aria-hidden="true">
@@ -392,16 +403,6 @@ footer.foot{background:var(--foot);color:#C3CCDF;padding:clamp(56px,7vw,84px) 0 
     <a class="btn-green" href="nature.html" data-i="ncta">גלה/י עוד</a>
   </div>
 </section>
-<section class="close-cta">
-  <div class="wrap">
-    <p data-i="closing">הצטרפו עכשיו לרשת השומרים הראשונה בישראל של אזרחים למען אזרחים. הצטרפו אלינו, וביחד נוכל להחזיר את הביטחון לרחובות בישראל.</p>
-    <a class="btn-orange" href="SHOMER.apk" download>
-      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v12m0 0l-4-4m4 4l4-4M4 21h16"/></svg>
-      <span data-i="cta2">להורדה - חינם!</span>
-    </a>
-  </div>
-</section>
-
 <!-- ══ FOOTER ══ -->
 <div class="disc-wrap"><div class="wrap"><div class="disc-card"><p class="disc-txt" data-i-html="disc"><strong>SH✡MER מחזק את הביטחון האישי — הוא אינו תחליף לשירותי החירום.</strong><br>במצב חירום אמיתי חייגו תמיד <span class="foot-nums">101</span> (מד״א) · <span class="foot-nums">100</span> (משטרה) · <span class="foot-nums">102</span> (כבאות).</p>
     </div></div></div>
