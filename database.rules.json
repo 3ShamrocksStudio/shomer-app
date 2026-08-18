@@ -34,7 +34,64 @@
     },
     "sos": {
       ".read": "auth != null",
-      ".write": "auth != null"
+      "$id": {
+        ".write": "auth != null && ((!data.exists() && newData.child('uid').val() === auth.uid) || (data.exists() && data.child('uid').val() === auth.uid))",
+        ".validate": "!newData.exists() || (newData.hasChildren(['uid','lat','lng','ts']) && newData.child('uid').val() === auth.uid && newData.child('lat').isNumber() && newData.child('lng').isNumber() && newData.child('ts').isNumber())"
+      }
+    },
+    "responders": {
+      "$sosId": {
+        ".read": "auth != null",
+        "$uid": {
+          ".write": "auth != null && $uid === auth.uid",
+          ".validate": "!newData.exists() || newData.hasChildren(['ts'])"
+        }
+      }
+    },
+    "tombstones": {
+      "$uid": {
+        ".read": "auth != null",
+        ".write": "auth != null && auth.uid == $uid"
+      }
+    },
+    "theft": {
+      "$uid": {
+        ".read": "auth != null && auth.uid == $uid",
+        ".write": "auth != null && auth.uid == $uid"
+      }
+    },
+    "tokens": {
+      "$uid": {
+        ".read": false,
+        ".write": "auth != null && auth.uid == $uid"
+      }
+    },
+    "alarms": {
+      ".read": false,
+      "$id": {
+        ".write": "auth != null && (!data.exists() || data.child('fromUid').val() === auth.uid)",
+        ".validate": "newData.hasChildren(['fromUid','toUid','ts']) && newData.child('fromUid').val() === auth.uid"
+      }
+    },
+    "founders": {
+      ".read": "auth != null",
+      ".write": false
+    },
+    "analytics": {
+      "installs": {
+        "$uid": {
+          ".read": false,
+          ".write": "auth != null && auth.uid == $uid"
+        }
+      },
+      "seen": {
+        "$day": {
+          "$uid": {
+            ".read": false,
+            ".write": "auth != null && auth.uid == $uid"
+          }
+        }
+      }
     },
     "aeds": {
       ".read": "auth != null",
@@ -47,37 +104,6 @@
       "$phoneHash": {
         ".read": "auth != null",
         ".write": "auth != null"
-      }
-    },
-    "tokens": {
-      "$uid": {
-        ".read": "auth != null && auth.uid == $uid",
-        ".write": "auth != null && auth.uid == $uid"
-      }
-    },
-    "alarms": {
-      ".read": false,
-      "$id": {
-        ".write": "auth != null && (newData.child('toUid').val() === auth.uid || root.child('pairs').child(auth.uid).child(newData.child('toUid').val()).exists())",
-        ".validate": "newData.hasChildren(['toUid'])"
-      }
-    },
-    "positions": {
-      "$uid": {
-        ".read": "auth != null && ($uid === auth.uid || root.child('pairs').child(auth.uid).child($uid).exists())",
-        ".write": "auth != null && auth.uid == $uid"
-      }
-    },
-    "geo": {
-      "$uid": {
-        ".read": "auth != null && ($uid === auth.uid || root.child('pairs').child(auth.uid).child($uid).exists())",
-        ".write": "auth != null && auth.uid == $uid"
-      }
-    },
-    "checkin": {
-      "$uid": {
-        ".read": "auth != null && ($uid === auth.uid || root.child('pairs').child(auth.uid).child($uid).exists())",
-        ".write": "auth != null && auth.uid == $uid"
       }
     }
   }
