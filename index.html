@@ -67,13 +67,13 @@ h1,h2,h3{line-height:1.2;font-weight:800}
 /* ══ TOP BAR ══ */
 header.bar{position:relative;z-index:60;background:var(--bar)}
 .bar-inner{position:relative;display:flex;align-items:center;justify-content:space-between;
-  gap:18px;height:96px;direction:ltr}
+  gap:18px;height:72px;direction:ltr}
 .bar-left{display:flex;align-items:center;gap:22px}
 .langs{display:flex;align-items:center;gap:16px;font-size:15px;color:#E7ECF7;font-weight:700}
 .langs button{background:none;border:0;font:inherit;color:inherit;cursor:pointer;opacity:.7;transition:.15s;padding:2px}
 .langs button:hover{opacity:1}
 .langs button.on{opacity:1;color:var(--orange)}
-.bar-badge{position:absolute;left:50%;top:10px;transform:translateX(-50%);height:190px;width:auto;
+.bar-badge{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);height:clamp(72px,9.5vw,130px);width:auto;
   filter:drop-shadow(0 8px 20px rgba(0,0,0,.55));pointer-events:none;z-index:2}
 
 /* ══ HERO ══ */
@@ -90,7 +90,7 @@ header.bar{position:relative;z-index:60;background:var(--bar)}
 .hero-phone img{border-radius:26px;width:100%;aspect-ratio:9/19.5;object-fit:cover;object-position:top}
 .hero-text{direction:rtl;text-align:right;color:#fff}
 .hero-text h1{font-size:clamp(27px,3.1vw,44px);font-weight:800;line-height:1.26;color:#fff;
-  max-width:15ch;margin-inline-start:auto;text-shadow:0 2px 16px rgba(0,0,0,.55)}
+  max-width:none;margin-inline-start:0;text-shadow:0 2px 16px rgba(0,0,0,.55)}
 .hero-text p{margin-top:18px;font-size:clamp(16px,1.35vw,20px);color:#E8EDF8;max-width:34ch;
   margin-inline-start:auto;text-shadow:0 2px 12px rgba(0,0,0,.55)}
 .hero-cta{display:none;margin-top:24px}
@@ -113,10 +113,10 @@ header.bar{position:relative;z-index:60;background:var(--bar)}
 
 /* ══ ADVANTAGES ══ */
 .adv{background:var(--navy);color:#fff;padding:clamp(58px,7vw,140px) 0 clamp(58px,7vw,140px);background-image:linear-gradient(180deg,rgba(12,27,58,0) 55%,#08152F 100%)}
-.adv h2{text-align:center;font-size:clamp(25px,3.1vw,60px);font-weight:800;margin-bottom:clamp(40px,5vw,96px);color:#fff}
-.adv-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:46px;direction:ltr}
-.adv-col{text-align:center;direction:rtl}
-.adv-ic{width:clamp(110px,7.9vw,152px);height:clamp(110px,7.9vw,152px);margin:0 auto clamp(26px,2.2vw,40px);border:3px solid var(--orange);border-radius:50%;
+.adv h2{text-align:right;font-size:clamp(25px,3.1vw,60px);font-weight:800;margin-bottom:clamp(40px,5vw,96px);color:#fff}
+.adv-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:clamp(24px,3.5vw,56px);direction:rtl}
+.adv-col{text-align:right;direction:rtl}
+.adv-ic{width:clamp(110px,7.9vw,152px);height:clamp(110px,7.9vw,152px);margin:0 0 clamp(26px,2.2vw,40px);border:3px solid var(--orange);border-radius:50%;
   display:flex;align-items:center;justify-content:center}
 .adv-ic svg{width:clamp(56px,3.15vw,60px);height:clamp(56px,3.15vw,60px);fill:none;stroke:var(--orange);stroke-width:2.6;stroke-linecap:round;stroke-linejoin:round}
 /* 3rd icon: the circle is an open arc broken by the pointing hand */
@@ -127,7 +127,7 @@ header.bar{position:relative;z-index:60;background:var(--bar)}
 
 /* ══ APP SCREENS ══ */
 .screens{background:linear-gradient(180deg,var(--light) 0%,#E6EAF2 100%);padding:clamp(54px,6.5vw,84px) 0 clamp(58px,7vw,90px)}
-.screens h2{text-align:center;font-size:clamp(24px,3vw,38px);font-weight:800;color:var(--navy);
+.screens h2{text-align:right;font-size:clamp(24px,3vw,38px);font-weight:800;color:var(--navy);
   margin-bottom:clamp(38px,4.5vw,58px)}
 .screens-row{display:grid;grid-template-columns:repeat(4,1fr);gap:22px;max-width:980px;margin:0 auto;direction:ltr}
 .shot{background:#0a1628;border-radius:22px;padding:7px;box-shadow:0 18px 38px -18px rgba(20,30,60,.5)}
@@ -177,7 +177,7 @@ footer.foot{background:var(--foot);color:#C3CCDF;padding:clamp(56px,7vw,84px) 0 
   .bar-left{gap:10px}
 
   /* ── 1. no download button in the mobile header ── */
-  .bar-left .btn-orange{display:none}
+  .bar-left .btn-orange{font-size:13px;min-height:44px;padding:0 14px;gap:6px}
   /* ── 2. bigger badge, blue stripe centred on the logo ── */
   .bar-inner{height:124px}
   .bar-badge{height:116px;top:50%;transform:translate(-50%,-50%)}
@@ -252,6 +252,12 @@ footer.foot{background:var(--foot);color:#C3CCDF;padding:clamp(56px,7vw,84px) 0 
   height:7px;border-radius:99px;background:#CBD3E4;transition:.25s}
 .car-dots button.on::after{background:var(--orange);inset-inline:12px}
 
+
+/* ── bar right: wordmark ── */
+.bar-right{display:flex;align-items:center}
+.bar-wm{font-size:clamp(16px,2vw,22px);font-weight:700;letter-spacing:.04em;color:#fff}
+.bar-wm .star{color:#FAAC22}
+@media(max-width:620px){.bar-right{display:none}}
 /* SHOMER wordmark — Marion Bold, everywhere the name appears with the ✡ */
 @font-face{font-family:'Marion';src:local('Marion Bold'),local('Marion-Bold'),local('Marion');font-weight:700;font-display:swap}
 .wordmark{font-family:'Marion','Alef',serif;font-weight:700;letter-spacing:.01em}
@@ -312,7 +318,9 @@ footer.foot{background:var(--foot);color:#C3CCDF;padding:clamp(56px,7vw,84px) 0 
       </a>
     </div>
     <img class="bar-badge" src="SHOMER_logo_big.png" alt="" aria-hidden="true">
-    
+    <div class="bar-right">
+      <span class="wordmark bar-wm">SH<span class="star">✡</span>MER</span>
+    </div>
   </div>
 </header>
 
