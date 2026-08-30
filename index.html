@@ -135,8 +135,6 @@ header.bar{position:relative;z-index:60;background:var(--bar)}
 
 /* ══ CLOSING CTA ══ */
 .close-cta{background:var(--white);padding:clamp(54px,6.5vw,86px) 0;text-align:center}
-.close-cta p{max-width:20ch;margin:0 auto 30px;font-size:clamp(21px,3.4vw,30px);line-height:1.35;
-  font-weight:800;color:var(--ink);letter-spacing:-.02em;text-wrap:balance}
 .close-cta p{font-size:clamp(17px,1.6vw,21px);color:var(--ink-2);max-width:820px;margin:0 auto 30px;line-height:1.75;font-weight:500}
 
 /* ══ FOOTER (badge straddles the boundary) ══ */
@@ -179,8 +177,8 @@ footer.foot{background:var(--foot);color:#C3CCDF;padding:clamp(56px,7vw,84px) 0 
   /* ── 1. no download button in the mobile header ── */
   .bar-left .btn-orange{font-size:13px;min-height:44px;padding:0 14px;gap:6px}
   /* ── 2. bigger badge, blue stripe centred on the logo ── */
-  .bar-inner{height:124px}
-  .bar-badge{height:116px;top:50%;transform:translate(-50%,-50%)}
+  .bar-inner{height:80px}
+  .bar-badge{height:72px;top:50%;transform:translate(-50%,-50%)}
   /* ── 3. hero CTA clear and large (not oversized) ── */
   .hero-cta{font-size:17px;min-height:56px;padding:0 30px}
   /* ── 4. hero image ends at the fold; phone 3/4 above it, 1/4 below ── */
@@ -404,7 +402,7 @@ footer.foot{background:var(--foot);color:#C3CCDF;padding:clamp(56px,7vw,84px) 0 
 <section class="nat-band">
   <img class="nat-photo" src="SHOMERNature_BannerBIG.jpg" alt="" aria-hidden="true">
   <div class="wrap nat-in">
-    <img class="nat-logo" src="nature-badge.png" alt="SH✡MER Nature">
+    <img class="nat-logo" src="nature-badge.png" alt="SH✡MER Nature" onerror="this.style.display='none'">
     <span class="nat-soon" data-i="nsoon">בקרוב · COMING SOON</span>
     <div class="nat-h"><span class="wordmark">SH<span class="star" style="color:#50DB0F">✡</span>MER</span> <em>Nature</em></div>
     <p class="nat-p" data-i="np">אותה רשת שמירה — הפעם ליער, לחוף, לחי ולסביבה.</p>
