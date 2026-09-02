@@ -3434,6 +3434,10 @@ function injectReportCard(rep,silent){
 
 /* ── DMS resume after reload ── */
 function resumeDMS(){
+ /* Safety: DMS never auto-arms after app restart — user must explicitly
+    re-enable it each session to prevent surprise alarms. */
+ SS.dms.active=false; if(SS.dms)SS.dms.active=false; try{saveStore();}catch(e){}
+ return;
  if(!SS.dms.active||!SS.dms.deadline)return;
  const remain=Math.floor((SS.dms.deadline-Date.now())/1000);
  if(remain>0){
@@ -4173,6 +4177,23 @@ async function initNativeAlerts(){
   }
  }catch(e){}
 }
+function pushNotifyQuiet(title,body,tag){
+ /* Uses 'shomer-alerts' channel — standard priority, no alarm sound */
+ if(_ln){
+  try{
+   _ln.schedule({notifications:[{
+    id:(_lnId=(_lnId%2000000)+1),
+    title:title||'SH✡MER', body:body||'',
+    channelId:'shomer-alerts', autoCancel:true, ongoing:false,
+    extra:{tag:tag||'shomer'}
+   }]});
+   return;
+  }catch(e){}
+ }
+ if('Notification' in window && Notification.permission==='granted'){
+  try{new Notification(title,{body,tag:tag||'shomer',requireInteraction:false});}catch(e){}
+ }
+}
 function pushNotify(title,body,tag){
  /* native first — this is the path that works when the app is not on screen */
  if(_ln){
@@ -4298,7 +4319,7 @@ function dmsTick(){
  if(dmsCountdown<=60&&!dmsWarning){
  dmsWarning=true;
  document.getElementById('dms-strip').classList.add('warn');
- pushNotify('שומר — Dead Man\'s Switch',currentLang==='he'?'האם הכל טוב?? לחץ לאישור':'Are you OK? Tap to confirm','dms');
+ pushNotifyQuiet('שומר — Dead Man\'s Switch',currentLang==='he'?'האם הכל טוב?? לחץ לאישור':'Are you OK? Tap to confirm','dms');
  toast(currentLang==='he'?' DMS — 60 שניות לאישור!':' DMS — 60 seconds to confirm!','amb');
  }
  if(dmsCountdown<=0){
@@ -4593,10 +4614,12 @@ function sosRecentFires(win){ var now=Date.now(); SS.sos._fires=(SS.sos._fires||
 function sosAbuseOver(){ return sosRecentFires(1800000)>=3; }
 function beginSOS(trigger){
  if(sosPhase!=='idle')return;
+ /* Guard: DMS-triggered SOS only fires if DMS is actually running this session */
+ if(trigger==='dms'&&!dmsActive)return;
  sosPhase='countdown'; sosActive=true; curSosTrigger=trigger||'manual';
  const btn=document.getElementById('sos-btn');
  if(btn){btn.classList.add('active');btn.setAttribute('aria-pressed','true');}
- try{ startSosAlarm(); }catch(e){} // loud LOOPING signature alarm + vibration, right now (audio failure must never block the countdown/broadcast)
+ try{ startSosAlarm(); }catch(e){} // loud LOOPING signature alarm + vibration, right now
  startCountdown();
 }
 let curSosTrigger='manual';
@@ -12305,6 +12328,21 @@ html[dir="rtl"] .sh-back svg{transform:scaleX(-1)}
 </script>
 <script defer src="https://static.cloudflareinsights.com/beacon.min.js/v4513226cdae34746b4dedf0b4dfa099e1781791509496" integrity="sha512-ZE9pZaUXND66v380QUtch/5sE9tPFh2zg45pR2PB0CVkCtOREv2AJKkSidISWkysEuQ0EH8faUU5du78bx87UQ==" data-cf-beacon='{"version":"2024.11.0","token":"cb798ec108614ddcb55eacf0c7b5bf23","r":1,"server_timing":{"name":{"cfCacheStatus":true,"cfEdge":true,"cfExtPri":true,"cfL4":true,"cfOrigin":true,"cfSpeedBrain":true},"location_startswith":null}}' crossorigin="anonymous"></script>
 <script defer src="https://static.cloudflareinsights.com/beacon.min.js/v4513226cdae34746b4dedf0b4dfa099e1781791509496" integrity="sha512-ZE9pZaUXND66v380QUtch/5sE9tPFh2zg45pR2PB0CVkCtOREv2AJKkSidISWkysEuQ0EH8faUU5du78bx87UQ==" data-cf-beacon='{"version":"2024.11.0","token":"cb798ec108614ddcb55eacf0c7b5bf23","r":1,"server_timing":{"name":{"cfCacheStatus":true,"cfEdge":true,"cfExtPri":true,"cfL4":true,"cfOrigin":true,"cfSpeedBrain":true},"location_startswith":null}}' crossorigin="anonymous"></script>
-<script defer src="https://static.cloudflareinsights.com/beacon.min.js/v4513226cdae34746b4dedf0b4dfa099e1781791509496" integrity="sha512-ZE9pZaUXND66v380QUtch/5sE9tPFh2zg45pR2PB0CVkCtOREv2AJKkSidISWkysEuQ0EH8faUU5du78bx87UQ==" data-cf-beacon='{"version":"2024.11.0","token":"cb798ec108614ddcb55eacf0c7b5bf23","r":1,"server_timing":{"name":{"cfCacheStatus":true,"cfEdge":true,"cfExtPri":true,"cfL4":true,"cfOrigin":true,"cfSpeedBrain":true},"location_startswith":null}}' crossorigin="anonymous"></script>
+<script defer src="https://static.cloudflareinsights.com/beacon.min.js/v4513226cdae34746b4dedf0b4dfa099e1781791509496" integrity="sha512-ZE9pZaUXND66v380QUtch/5sE9tPFh2zg45pR2PB0CVkCtOREv2AJKkSidISWkysEuQ0EH8faUU5du78bx87UQ==" data-cf-beacon='{"version":"2024.11.0","token":"cb798ec108614ddcb55eacf0c7b5bf23","r":1,"server_timing":{"name":{"cfCacheStatus":true,"cfEdge":true,"cfExtPri":true,"cfL4":true,"cfOrigin":true,"cfSpeedBrain":true},"location_startswith":null}}' crossorigin="anonymous">
+/* ── ONE-TIME MIGRATION: clear stale DMS active state ──
+   Prevents users who had DMS accidentally enabled from getting surprise alarms.
+   Runs once, sets a flag so it never runs again. */
+(function clearStaleDMS(){
+  try{
+    var raw=localStorage.getItem('sh-store');
+    if(!raw)return;
+    var st=JSON.parse(raw);
+    if(st&&st.dms&&st.dms.active){
+      st.dms.active=false; st.dms.deadline=0;
+      localStorage.setItem('sh-store',JSON.stringify(st));
+    }
+  }catch(e){}
+})();
+</script>
 </body>
 </html>
