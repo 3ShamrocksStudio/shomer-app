@@ -11502,7 +11502,7 @@ async function completeRegistration(){ try{document.body.classList.remove("otp-a
      try{ enterApp(true); }catch(e){ goStep(1); }
      return;
    }else{ /* Live rules accept exactly {uid,name,ts} — verified empirically. */
-     await fbRestWrite("PUT","registry/"+ph,{uid:uid,name:(user.name||uname).substring(0,60),ts:Date.now()});
+     try{ await fbRestWrite("PUT","registry/"+ph,{uid:uid,name:(user.name||uname).substring(0,60),ts:Date.now()}); }catch(_rw){ console.warn("[Register] registry write skipped (non-fatal):", _rw && _rw.code); }
      toast(he?"✓ ברוך הבא/ה, "+uname:"✓ Welcome, "+uname,"grn");
    }
   if(!SS.security)SS.security={};
