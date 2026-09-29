@@ -823,7 +823,7 @@ body.sheet-open .ff-fab{opacity:0;pointer-events:none;}
 #map{position:absolute;inset:0;background:#20242b;z-index:1;}
 /* BRANDED basemap: recolour the dark base tiles into the SHOMER navy world,
  keep the label tiles crisp & untinted (class-scoped, base only). */
-.tiles-base{filter:brightness(.85) sepia(.75) hue-rotate(192deg) saturate(2) brightness(.4) contrast(.9);}
+.tiles-base{filter:invert(1) hue-rotate(180deg) brightness(.92) contrast(.9) saturate(.85);}
 .tiles-labels{filter:brightness(1.12) saturate(.6);}
 .leaflet-container{background:#20242b;font-family:var(--font-main);outline:none;}
 
@@ -1851,11 +1851,11 @@ body.otp-active .ob-steps{display:none!important;}
  </nav>
 
  <!-- ═══ UPDATES ═══ -->
- <!-- ═══ תזכורות הגעה ═══ -->
+ <!-- ═══ התראות מיקום השומרים שלי ═══ -->
  <div class="sheet" id="sh-arrivals" role="dialog" aria-modal="true" aria-labelledby="arr-ttl">
   <div class="sh-pill" aria-hidden="true"></div>
   <div class="sh-head">
-   <span class="sh-ttl" id="arr-ttl">תזכורות הגעה</span>
+   <span class="sh-ttl" id="arr-ttl">התראות מיקום השומרים שלי</span>
    
   </div>
   <div class="sh-body">
@@ -1864,11 +1864,11 @@ body.otp-active .ob-steps{display:none!important;}
   </div>
  </div>
 
- <!-- ═══ תזכורות הגעה (wireframe) ═══ -->
+ <!-- ═══ התראות מיקום השומרים שלי (wireframe) ═══ -->
  <div class="sheet" id="sh-arrivals" role="dialog" aria-modal="true" aria-labelledby="arr-ttl">
   <div class="sh-pill" aria-hidden="true"></div>
   <div class="sh-head">
-   <span class="sh-ttl" id="arr-ttl">תזכורות הגעה</span>
+   <span class="sh-ttl" id="arr-ttl">התראות מיקום השומרים שלי</span>
    <button class="sh-x" onclick="cl('sh-arrivals')" aria-label="סגור">
     <svg class="ic" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg>
    </button>
@@ -2323,7 +2323,7 @@ body.otp-active .ob-steps{display:none!important;}
    <!-- 3. הוספה לשומרים שלי -->
    <button class="arr-open" onclick="openArrivals()">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s7-5.6 7-11a7 7 0 1 0-14 0c0 5.4 7 11 7 11Z"/><circle cx="12" cy="10" r="2.6"/></svg>
-    <span>תזכורות הגעה</span>
+    <span>התראות מיקום השומרים שלי</span>
     <span class="arr-chev">›</span>
    </button>
 
@@ -5125,7 +5125,7 @@ let MAP=null;
 const mapLayers={stats:[],reports:{},sosMarker:null,meMarker:null,circle:{},guardian:{},radar:null};
 /* BRANDED basemap — CARTO dark base recoloured to the SHOMER navy world via a
  class-scoped CSS filter, with crisp labels layered on top (untinted). */
-const TILE_BASE='https://{s}.basemaps.cartocdn.com/dark_nolabels/{z}/{x}/{y}{r}.png';
+const TILE_BASE='https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png';
 const TILE_LABELS='https://{s}.basemaps.cartocdn.com/dark_only_labels/{z}/{x}/{y}{r}.png';
 
 /* ── Crafted brand markers (DivIcons, no default images) ── */
@@ -5354,9 +5354,9 @@ function initMap(){
  MAP=window.L.map('map',{preferCanvas:true,zoomControl:false,attributionControl:true,
  center:[32.0853,34.7818],zoom:14,minZoom:3,maxZoom:19,
  zoomSnap:.5,worldCopyJump:true});
- window.L.tileLayer(TILE_BASE,{maxZoom:20,subdomains:'abcd',className:'tiles-base',
+ window.L.tileLayer(TILE_BASE,{maxZoom:19,subdomains:'abc',className:'tiles-base',
  attribution:' <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap</a> · <a href="https://carto.com/attributions" target="_blank" rel="noopener">CARTO</a>'}).addTo(MAP);
- window.L.tileLayer(TILE_LABELS,{maxZoom:20,subdomains:'abcd',className:'tiles-labels'}).addTo(MAP);
+ /* labels baked into OSM base */
  buildStatMarkers(); try{ checkInbox(); }catch(e){} try{ communityNudge(); }catch(e){} try{ setTimeout(communityNudge, 8000); }catch(e){} try{ renderPastEvents(); }catch(e){}
  // The container may have been laid out while hidden — recalc once visible.
  [120,400,900].forEach(ms=>setTimeout(()=>{if(MAP)MAP.invalidateSize(false);},ms));
@@ -6345,7 +6345,7 @@ function paintMapCount(){
   var total=((SS.circleMembers||[]).filter(function(m){return !m.pending;})).length;
   el.textContent = total ? (he?(live+' מתוך '+total+' משתפים מיקום'):(live+' of '+total+' sharing location')) : '';
 }
-/* ══ תזכורות הגעה ══
+/* ══ התראות מיקום השומרים שלי ══
    5 guardians x 4 places = 20 = the iOS ceiling on monitored regions. Past 20 iOS silently
    stops firing, so the limit is enforced here rather than discovered in an emergency. */
 var ARR_G=5, ARR_P=4;
