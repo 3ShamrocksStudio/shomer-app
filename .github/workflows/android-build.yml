@@ -116,3 +116,23 @@ jobs:
           name: shomer-android-debug
           path: native/android/app/build/outputs/apk/debug/app-debug.apk
           if-no-files-found: warn
+
+      - name: Decode upload keystore
+        working-directory: native/android
+        run: echo "${{ secrets.ANDROID_KEYSTORE_B64 }}" | base64 -d > app/shomer-upload.jks
+
+      - name: Build signed release AAB (Google Play)
+        working-directory: native/android
+        run: |
+          ./gradlew bundleRelease --stacktrace \
+            -Pandroid.injected.signing.store.file=$(pwd)/app/shomer-upload.jks \
+            -Pandroid.injected.signing.store.password="${{ secrets.ANDROID_KEYSTORE_PW }}" \
+            -Pandroid.injected.signing.key.alias="${{ secrets.ANDROID_KEY_ALIAS }}" \
+            -Pandroid.injected.signing.key.password="${{ secrets.ANDROID_KEYSTORE_PW }}"
+
+      - name: Upload AAB artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: shomer-release-aab
+          path: native/android/app/build/outputs/bundle/release/app-release.aab
+          if-no-files-found: warn
