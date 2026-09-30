@@ -31,9 +31,9 @@ public class ShakeService extends Service implements SensorEventListener {
   private float gx, gy, gz;
   private int count;
   private long firstT, lastPeak;
-  private static final int REQUIRED = 5;
-  private static final long WINDOW = 1600, MIN_GAP = 110;
-  private static final double THRESHOLD = 14.0; // m/s^2 (gravity removed)
+  private static final int REQUIRED = 6;
+  private static final long WINDOW = 1500, MIN_GAP = 120;
+  private static final double THRESHOLD = 19.0; // m/s^2 (gravity removed) — raised so casual movement never triggers
 
   @Override
   public int onStartCommand(Intent intent, int flags, int startId) {
@@ -69,10 +69,10 @@ public class ShakeService extends Service implements SensorEventListener {
   }
 
   private void fireSos() {
-    // 1) Sound the un-silenceable alarm right now.
-    Intent al = new Intent(this, AlarmForegroundService.class);
-    if (Build.VERSION.SDK_INT >= 26) startForegroundService(al); else startService(al);
-    // 2) Launch the app so it performs the real SOS broadcast (REST/SSE).
+    // Do NOT sound the alarm here. Launch the app so the web layer runs the
+    // CANCELLABLE countdown (a few seconds to abort a false alarm before anything is
+    // broadcast or the loud alarm sounds). An accidental shake must never fire an
+    // un-cancellable alarm.
     Intent open = new Intent(this, MainActivity.class);
     open.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_SINGLE_TOP);
     open.putExtra("shomer_sos", "shake");
