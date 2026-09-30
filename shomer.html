@@ -4491,6 +4491,7 @@ function stopSosAlarm(){
  clearInterval(_alarmVibeTimer); _alarmVibeTimer=null;
  try{ navigator.vibrate&&navigator.vibrate(0); }catch(e){}
  try{ alarmResilienceStop(); }catch(e){}
+ try{ nativeAlarmStop(); }catch(e){}
  stopAlarm();
 }
 /* ── ALARM RESILIENCE (P0) ───────────────────────────────────────────────────────
@@ -4672,6 +4673,7 @@ function activateSOS(){
  const ov=document.getElementById('sos-cd');
  if(ov){ov.classList.remove('on');ov.setAttribute('aria-hidden','true');}
  sosPhase='active';
+ try{ nativeAlarmStart(); }catch(e){}   // confirmed SOS -> un-silenceable native alarm
  const he=currentLang==='he';
  sosRollDay();
  SS.sos._fires=(SS.sos._fires||[]); SS.sos._fires.push(Date.now());
