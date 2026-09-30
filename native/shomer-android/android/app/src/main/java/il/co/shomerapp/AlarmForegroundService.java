@@ -35,6 +35,12 @@ public class AlarmForegroundService extends Service {
 
   @Override
   public int onStartCommand(Intent intent, int flags, int startId) {
+    // STOP action from the notification (always-reachable kill switch).
+    if (intent != null && "STOP".equals(intent.getAction())) {
+      stopForeground(true);
+      stopSelf();
+      return START_NOT_STICKY;
+    }
     Notification n = buildNotification();
     if (Build.VERSION.SDK_INT >= 34) {
       startForeground(1, n, android.content.pm.ServiceInfo.FOREGROUND_SERVICE_TYPE_MEDIA_PLAYBACK);
@@ -92,12 +98,18 @@ public class AlarmForegroundService extends Service {
     open.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
     PendingIntent pi = PendingIntent.getActivity(this, 0, open,
         PendingIntent.FLAG_IMMUTABLE);
+    // Always-reachable STOP button on the alarm notification.
+    Intent stopI = new Intent(this, AlarmForegroundService.class);
+    stopI.setAction("STOP");
+    PendingIntent stopPi = PendingIntent.getService(this, 1, stopI, PendingIntent.FLAG_IMMUTABLE);
     return new NotificationCompat.Builder(this, CH)
         .setContentTitle("🚨 SHOMER — SOS")
-        .setContentText("Alarm active — tap to open")
+        .setContentText("Alarm active — tap STOP to silence, or open the app")
         .setSmallIcon(R.mipmap.ic_launcher)
         .setOngoing(true)
         .setContentIntent(pi)
+        .setFullScreenIntent(pi, true)
+        .addAction(0, "⛔ STOP / \u05e2\u05e6\u05d5\u05e8 \u05d0\u05d6\u05e2\u05e7\u05d4", stopPi)
         .setPriority(NotificationCompat.PRIORITY_MAX)
         .setCategory(NotificationCompat.CATEGORY_ALARM)
         .build();
