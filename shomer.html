@@ -203,11 +203,11 @@ body:not(.lb-on){--hdr-top:0px;}
 .ob-cta{width:100%;padding:13px;background:linear-gradient(135deg,#C09020 0%,#C9A84C 60%,#F5C840 100%);border-radius:var(--r12);color:var(--n0);font-size:15px;font-weight:800;letter-spacing:.3px;box-shadow:0 4px 24px var(--gg);transition:all .15s;display:flex;align-items:center;justify-content:center;gap:8px;margin-top:4px;}
 .ob-cta:hover{filter:brightness(1.08);transform:translateY(-1px);box-shadow:0 6px 28px var(--gg);}
 .ob-cta:active{transform:scale(.97);}
-.ob-back{width:100%;padding:9px;background:var(--n4);border:1px solid var(--b1);border-radius:var(--r12);color:var(--tx2);font-size:13px;font-weight:600;display:flex;align-items:center;justify-content:center;gap:6px;margin-top:6px;transition:background .15s;}
+.ob-back{background:none;border:none;color:var(--tx2);font-size:13px;font-weight:600;display:flex;align-items:center;justify-content:center;gap:6px;margin-top:10px;cursor:pointer;text-decoration:underline;}
 .ob-back:hover{background:var(--n5);}
 /* Geo */
-.geo-box{background:var(--n4);border:1px solid var(--b2);border-radius:var(--r12);padding:18px;text-align:center;margin-bottom:16px;transition:all .3s;}
-.geo-ic{font-size:36px;margin-bottom:8px;}
+.geo-box{background:transparent;border:none;padding:4px 0;text-align:center;margin-bottom:10px;transition:all .3s;}
+.geo-ic{font-size:22px;margin-bottom:6px;}.geo-ic svg{width:30px!important;height:30px!important;}
 .geo-t{font-size:14px;font-weight:700;color:var(--tx0);margin-bottom:4px;}
 .geo-s{font-size:12px;color:var(--tx2);line-height:1.7;}
 .geo-ok{border-color:rgba(14,136,64,.4);background:rgba(14,136,64,.1);}
@@ -1442,7 +1442,7 @@ body.otp-active .ob-steps{display:none!important;}
  <p class="desc" id="ob-d1">נדרש לשליחת SOS מיידי לשומרים בקרבתך ולמיפוי אירועים.</p>
  <div class="geo-box" id="geo-box">
  <div class="geo-ic" aria-hidden="true"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 22s7-6.4 7-12a7 7 0 1 0-14 0c0 5.6 7 12 7 12Z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><circle cx="12" cy="10" r="2.6" fill="currentColor"/></svg></div>
- <div class="geo-t" id="geo-t">נדרש אישור מיקום</div>
+ <div class="geo-t" id="geo-t"></div>
  <div class="geo-s" id="geo-s">לחץ 'אפשר' ואשר בחלון שיפתח.<br>המיקום משמש אך ורק לצורכי בטיחות.</div>
  </div>
  <button class="ob-cta" id="geo-btn" onclick="requestGeo()"><span id="geo-btn-t">שתף מיקום</span></button>
