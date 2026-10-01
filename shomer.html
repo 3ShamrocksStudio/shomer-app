@@ -5545,7 +5545,7 @@ function openDetail(idx){
         ? '\u25CF ארכיון - האירוע הזה אינו פעיל. מוצג לצורך מודעות בלבד.'
         : (currentLang==='ar'
           ? '\u25CF الأرشيف - هذا الحدث لم يعد نشطًا. يُعرض للعلم فقط.'
-          : '\u25CF Archive \u2014 this event is no longer active. Shown for awareness only.'));
+          : '\u25CF Archive - this event is no longer active. Shown for awareness only.'));
       body.insertBefore(_n, body.firstChild);
     }catch(e){}
   }
@@ -6774,7 +6774,7 @@ function agPickContact(){
      if(np&&tel)np.value=(''+tel).trim(); if(nn&&nm&&!nn.value)nn.value=(''+nm).trim(); agPhoneHint();
    }).catch(function(){});
  } else {
-   toast(he?'\u05d1\u05d7\u05d9\u05e8\u05d4 \u05de\u05d0\u05e0\u05e9\u05d9 \u05e7\u05e9\u05e8 \u05dc\u05d0 \u05e0\u05ea\u05de\u05db\u05ea \u05db\u05d0\u05df \u2014 \u05d4\u05d6\u05df/\u05d9 \u05d9\u05d3\u05e0\u05d9\u05ea':'Contact picker unsupported here \u2014 type the number','amb');
+   toast(he?'\u05d1\u05d7\u05d9\u05e8\u05d4 \u05de\u05d0\u05e0\u05e9\u05d9 \u05e7\u05e9\u05e8 \u05dc\u05d0 \u05e0\u05ea\u05de\u05db\u05ea \u05db\u05d0\u05df - \u05d4\u05d6\u05df/\u05d9 \u05d9\u05d3\u05e0\u05d9\u05ea':'Contact picker unsupported here - type the number','amb');
    var np=document.getElementById('ag-phone'); if(np)np.focus();
  }
 }
@@ -6964,7 +6964,7 @@ async function addGuardian(){
  var canon=phoneCanon(raw,_cc);
  if(!name){ toast(he?'\u05d4\u05d6\u05df/\u05d9 \u05e9\u05dd':'Enter a name','amb'); if(typeof shakeField==='function')shakeField('ag-name'); return; }
  var validPhone=raw && phoneIsValid(canon);
- if(raw && !validPhone){ toast(he?'\u05de\u05e1\u05e4\u05e8 \u05dc\u05d0 \u05ea\u05e7\u05d9\u05df \u2014 \u05db\u05dc\u05d5\u05dc/\u05d9 \u05e7\u05d9\u05d3\u05d5\u05de\u05ea \u05de\u05d3\u05d9\u05e0\u05d4 (\u05dc\u05de\u05e9\u05dc +81)':'Invalid number \u2014 include the country code (e.g. +81)','amb'); if(typeof shakeField==='function')shakeField('ag-phone'); return; }
+ if(raw && !validPhone){ toast(he?'\u05de\u05e1\u05e4\u05e8 \u05dc\u05d0 \u05ea\u05e7\u05d9\u05df - \u05db\u05dc\u05d5\u05dc/\u05d9 \u05e7\u05d9\u05d3\u05d5\u05de\u05ea \u05de\u05d3\u05d9\u05e0\u05d4 (\u05dc\u05de\u05e9\u05dc +81)':'Invalid number - include the country code (e.g. +81)','amb'); if(typeof shakeField==='function')shakeField('ag-phone'); return; }
  if(go){go.disabled=true;go.style.opacity='.6';}
  if(validPhone){
    var dup=(SS.circleMembers||[]).find(function(m){return m.phoneCanon===canon;});
@@ -7021,8 +7021,8 @@ async function addGuardian(){
    sendInviteSMS(canon, name, agToken);
    showInvitePanel(name, canon, agToken, agCode);
  } else if(validPhone){
-   var invMsg=encodeURIComponent(he?('\u05d4\u05d9\u05d9! \u05d4\u05e6\u05d8\u05e8\u05e3/\u05d9 \u05d0\u05dc\u05d9\u05d9 \u05d1-SH\u2721MER \u2014 \u05d0\u05e4\u05dc\u05d9\u05e7\u05e6\u05d9\u05d9\u05ea \u05d1\u05d8\u05d9\u05d7\u05d5\u05ea \u05e7\u05d4\u05d9\u05dc\u05ea\u05d9\u05ea. \u05d7\u05d9\u05e0\u05dd: https://www.shomer-app.co.il/'):('Join me on SH\u2721MER: https://www.shomer-app.co.il/'));
-   toast(he?('\u2713 '+name+' \u05e0\u05d5\u05e1\u05e3/\u05d4. \u05d8\u05e8\u05dd \u05d1-SH\u2721MER \u2014 \u05d4\u05e7\u05e9/\u05d9 \u05dc\u05d4\u05d6\u05de\u05e0\u05d4'):('\u2713 '+name+' added. Tap to invite'),'amb',function(){ try{ window.open('https://wa.me/'+canon+'?text='+invMsg,'_blank'); }catch(e){} });
+   var invMsg=encodeURIComponent(he?('\u05d4\u05d9\u05d9! \u05d4\u05e6\u05d8\u05e8\u05e3/\u05d9 \u05d0\u05dc\u05d9\u05d9 \u05d1-SH\u2721MER - \u05d0\u05e4\u05dc\u05d9\u05e7\u05e6\u05d9\u05d9\u05ea \u05d1\u05d8\u05d9\u05d7\u05d5\u05ea \u05e7\u05d4\u05d9\u05dc\u05ea\u05d9\u05ea. \u05d7\u05d9\u05e0\u05dd: https://www.shomer-app.co.il/'):('Join me on SH\u2721MER: https://www.shomer-app.co.il/'));
+   toast(he?('\u2713 '+name+' \u05e0\u05d5\u05e1\u05e3/\u05d4. \u05d8\u05e8\u05dd \u05d1-SH\u2721MER - \u05d4\u05e7\u05e9/\u05d9 \u05dc\u05d4\u05d6\u05de\u05e0\u05d4'):('\u2713 '+name+' added. Tap to invite'),'amb',function(){ try{ window.open('https://wa.me/'+canon+'?text='+invMsg,'_blank'); }catch(e){} });
  } else {
    toast(he?('\u2713 '+name+' \u05e0\u05d5\u05e1\u05e3/\u05d4 \u05dc\u05de\u05e2\u05d2\u05dc'):('\u2713 '+name+' added'),'grn');
  }
@@ -9435,7 +9435,7 @@ function fbWatchApproval(token, theirUid){
       saveStore();
       try{ fbListenPeerLoc(puid); }catch(e){}
       try{ gdRenderMarkers(); renderCircles(); }catch(e){}
-      toast(he?('\u2713 '+(p.name||'')+' \u05d0\u05d9\u05e9\u05e8/\u05d4 \u2014 \u05ea\u05e8\u05d0\u05d5 \u05d6\u05d4 \u05d0\u05ea \u05d6\u05d4 \u05e2\u05dc \u05d4\u05de\u05e4\u05d4'):('\u2713 '+(p.name||'')+' approved \u2014 you can see each other'),'grn');
+      toast(he?('\u2713 '+(p.name||'')+' \u05d0\u05d9\u05e9\u05e8/\u05d4 - \u05ea\u05e8\u05d0\u05d5 \u05d6\u05d4 \u05d0\u05ea \u05d6\u05d4 \u05e2\u05dc \u05d4\u05de\u05e4\u05d4'):('\u2713 '+(p.name||'')+' approved - you can see each other'),'grn');
       try{ pushNotify('SHOMER', he?((p.name||'')+' \u05d0\u05d9\u05e9\u05e8/\u05d4 \u05d0\u05ea \u05d4\u05d1\u05e7\u05e9\u05d4'):((p.name||'')+' approved your request'),'gd-appr'); }catch(e){}
     }, function(){});
   }catch(e){}
@@ -10083,7 +10083,7 @@ async function sosBroadcast(sosId, type){
     var n=(SS.circleMembers||[]).filter(function(m){return !m.pending;}).length;
     toast(he?('\u2713 נשלחה התרעה ל'+n+' שומרים'):('\u2713 Alert sent to '+n+' guardians'),'grn');
     sosWatchMyResponders();
-  } else { /* Queue it, keep retrying, and tell the user to call 100 NOW. */ try{ sosQueuePush(sosChan(FB.uid, sosSalt()), payload); }catch(e){} toast(he?'\u26A0 ההתרעה טרם נשלחה - ננסה שוב אוטומטית. התקשר/י 100 עכשיו':'\u26A0 Alert not sent yet \u2014 retrying automatically. Call 100 now','sos'); }
+  } else { /* Queue it, keep retrying, and tell the user to call 100 NOW. */ try{ sosQueuePush(sosChan(FB.uid, sosSalt()), payload); }catch(e){} toast(he?'\u26A0 ההתרעה טרם נשלחה - ננסה שוב אוטומטית. התקשר/י 100 עכשיו':'\u26A0 Alert not sent yet - retrying automatically. Call 100 now','sos'); }
   return ok;
 }
 async function sosClearBroadcast(){
