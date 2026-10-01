@@ -22,6 +22,8 @@
 <uses-permission android:name="android.permission.FOREGROUND_SERVICE_MEDIA_PLAYBACK" />
 <uses-permission android:name="android.permission.FOREGROUND_SERVICE_SPECIAL_USE" />
 <uses-permission android:name="android.permission.HIGH_SAMPLING_RATE_SENSORS" />
+<!-- Theft-protection selfie (front camera via getUserMedia in the WebView) -->
+<uses-permission android:name="android.permission.CAMERA" />
 
 <!-- ── BACKGROUND GEOLOCATION SERVICE (place inside <application>) ── -->
 <service
