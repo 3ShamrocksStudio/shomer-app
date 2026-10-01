@@ -10119,7 +10119,7 @@ function showIncomingSOS(puid, nm, v){
   function nav(){
     try{
       if(v.lat&&v.lng){
-        window.open('https://www.google.com/maps/dir/?api=1&destination='+v.lat+','+v.lng,'_blank','noopener');
+        navChoice(v.lat,v.lng);
       }
     }catch(e){}
   }
@@ -10529,9 +10529,26 @@ function essRender(){
     });
   });
 }
-function essNav(lat,lng){
-  try{ window.open('https://www.google.com/maps/dir/?api=1&destination='+lat+','+lng+'&travelmode=walking','_blank'); }catch(e){}
+function navChoice(lat,lng){
+  try{
+    var ex=document.getElementById('nav-choice'); if(ex) ex.remove();
+    var he=currentLang==='he';
+    var ov=document.createElement('div'); ov.id='nav-choice';
+    ov.style.cssText='position:fixed;inset:0;z-index:100001;display:flex;align-items:flex-end;justify-content:center;background:rgba(5,10,20,.55)';
+    ov.innerHTML='<div style="background:#0F1F3D;border:1px solid rgba(255,255,255,.12);border-radius:18px 18px 0 0;width:100%;max-width:480px;padding:18px 16px calc(18px + env(safe-area-inset-bottom));text-align:center">'
+      +'<div style="font-weight:800;color:#F1F5F9;margin-bottom:12px">'+(he?"\u05e0\u05d5\u05d5\u05d8 \u05e2\u05dd":"Navigate with")+'</div>'
+      +'<button id="nav-waze" style="width:100%;padding:13px;margin-bottom:9px;border:0;border-radius:12px;background:#33ccff;color:#042a33;font-family:inherit;font-weight:800;font-size:15px;cursor:pointer">Waze</button>'
+      +'<button id="nav-gmaps" style="width:100%;padding:13px;margin-bottom:9px;border:0;border-radius:12px;background:#4285F4;color:#fff;font-family:inherit;font-weight:800;font-size:15px;cursor:pointer">Google Maps</button>'
+      +'<button id="nav-cancel" style="width:100%;padding:11px;border:1px solid rgba(255,255,255,.15);border-radius:12px;background:transparent;color:#9fb0c8;font-family:inherit;font-weight:700;font-size:13px;cursor:pointer">'+(he?"\u05d1\u05d9\u05d8\u05d5\u05dc":"Cancel")+'</button></div>';
+    document.body.appendChild(ov);
+    var close=function(){ try{ov.remove();}catch(e){} };
+    ov.addEventListener('click',function(e){ if(e.target===ov) close(); });
+    document.getElementById('nav-waze').onclick=function(){ window.open('https://waze.com/ul?ll='+lat+','+lng+'&navigate=yes','_blank','noopener'); close(); };
+    document.getElementById('nav-gmaps').onclick=function(){ window.open('https://www.google.com/maps/dir/?api=1&destination='+lat+','+lng,'_blank','noopener'); close(); };
+    document.getElementById('nav-cancel').onclick=close;
+  }catch(e){ try{ window.open('https://www.google.com/maps/dir/?api=1&destination='+lat+','+lng,'_blank','noopener'); }catch(_){} }
 }
+function essNav(lat,lng){ navChoice(lat,lng); }
 function essToggle(kind){
   ESS.on[kind]=!ESS.on[kind];
   essSave();
