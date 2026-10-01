@@ -300,88 +300,60 @@ footer.foot{background:var(--foot);color:#C3CCDF;padding:clamp(56px,7vw,84px) 0 
   .adv-col p{max-width:clamp(300px,24vw,460px)}
 }
 
-/* ════════════════════════════════════════════════════════════════════
-   3SDS PREMIUM REFINEMENT LAYER - layout · spacing · branding discipline
-   (appended last so it governs; structure/content untouched)
-   ════════════════════════════════════════════════════════════════════ */
-:root{
-  --gold:#FAAC22; --gold-d:#E0912A; --gold-l:#F5C840;
-  --navy-0:#0A1630; --navy-1:#0C1B3A; --navy-2:#14295A; --navy-3:#1C356E;
-  --gold-grad:linear-gradient(135deg,#C0901F 0%,#E0A828 52%,#F5C840 100%);
-  --section-pad:clamp(72px,9vw,132px);
-}
-/* tighter, more deliberate content column */
-.wrap{max-width:1200px!important;padding:0 clamp(20px,4vw,40px)!important}
 
-/* ── unified PREMIUM gold CTA (ink on gold gradient) ── */
-.btn-orange{background:var(--gold-grad)!important;color:#23170a!important;font-weight:800!important;
-  letter-spacing:.01em;border-radius:14px!important;min-height:58px!important;padding:0 40px!important;
-  box-shadow:0 10px 30px -10px rgba(224,168,40,.6),inset 0 1px 0 rgba(255,255,255,.35)!important;
-  transition:transform .15s ease,box-shadow .2s ease!important}
-.btn-orange:hover{transform:translateY(-2px)!important;
-  box-shadow:0 16px 40px -12px rgba(224,168,40,.75),inset 0 1px 0 rgba(255,255,255,.4)!important;background:var(--gold-grad)!important}
-.btn-orange svg{stroke:#23170a!important}
+/* ════════ REFERENCE-MATCH LAYER — alternating light/dark, orange accents, Figma-grade ════════ */
+:root{ --ink:#16202E; --ink-soft:#44506A; }
+.wrap{max-width:1240px!important;padding:0 clamp(20px,4vw,44px)!important}
 
-/* ── top bar: cleaner, balanced, subtle divider ── */
-header.bar{background:var(--navy-1)!important;border-bottom:1px solid rgba(250,172,34,.16)}
-.bar-inner{height:78px!important}
-.bar-badge{height:clamp(58px,7vw,92px)!important}
+/* top bar polish */
+header.bar{border-bottom:1px solid rgba(250,172,34,.14)}
+.wm-app{color:#FAAC22;font-size:.6em;font-weight:700;margin-inline-start:1px;letter-spacing:.02em}
+.bar-badge{height:clamp(66px,8vw,112px)!important;filter:drop-shadow(0 10px 24px rgba(0,0,0,.6))}
 
-/* ── HERO: premium scrim, stronger type, gold eyebrow rule ── */
-.hero{background:var(--navy-0)!important}
-.hero-shade{background:
-  linear-gradient(270deg,rgba(8,16,36,.95) 0%,rgba(9,18,40,.78) 40%,rgba(10,20,44,.30) 78%,rgba(10,20,44,.12) 100%),
-  linear-gradient(180deg,rgba(8,16,36,.55) 0%,rgba(8,16,36,.05) 40%,rgba(8,16,36,.72) 100%)!important}
-.hero-inner{gap:56px!important;padding:clamp(72px,8vw,120px) 0 clamp(60px,7vw,100px)!important}
-.hero-text h1{font-size:clamp(30px,3.4vw,52px)!important;font-weight:900!important;line-height:1.16!important;
-  letter-spacing:-.01em!important;text-shadow:0 4px 24px rgba(0,0,0,.8)!important;position:relative}
-.hero-text h1::after{content:"";display:block;width:72px;height:4px;border-radius:2px;
-  background:var(--gold-grad);margin:22px 0 0 auto}
-.hero-text p{color:#EAF0FB!important;font-weight:500!important;font-size:clamp(16px,1.4vw,21px)!important;
-  margin-top:22px!important;line-height:1.7!important}
-.hero-cta{margin-top:30px!important}
-.hero-phone{border:1px solid rgba(250,172,34,.22)!important;
-  box-shadow:0 40px 80px -24px rgba(0,0,0,.8),0 0 0 1px rgba(255,255,255,.04)!important}
+/* HERO: wordmark above headline */
+.hero-wm{font-family:'Marion','Alef',serif;font-weight:700;font-size:clamp(30px,3.1vw,48px);
+  color:#fff;line-height:1;margin-bottom:14px;letter-spacing:.01em;text-shadow:0 3px 18px rgba(0,0,0,.6)}
+.hero-wm .star{color:#FAAC22}
+.hero-text h1{font-size:clamp(25px,2.7vw,40px)!important;line-height:1.3!important;font-weight:800!important;
+  text-shadow:0 3px 18px rgba(0,0,0,.7)!important}
+.hero-text p{color:#EAF0FB!important;text-shadow:0 2px 12px rgba(0,0,0,.6)!important}
 
-/* ── section rhythm: generous, consistent vertical cadence ── */
-.arrive{padding:var(--section-pad) 0!important;background:var(--navy-0)!important}
-.adv{padding:var(--section-pad) 0!important}
-.screens{padding:var(--section-pad) 0!important}
-.close-cta{padding:var(--section-pad) 0!important}
+/* ═══ ARRIVE → WHITE, image LEFT / text RIGHT, orange blocks behind image ═══ */
+.arrive{background:#FFFFFF!important;padding:clamp(66px,8.5vw,124px) 0!important}
+.arrive-inner{direction:rtl!important;gap:clamp(36px,5vw,80px)!important;align-items:center!important}
+.arrive-kicker{color:var(--orange)!important;font-weight:700!important;letter-spacing:.06em!important;margin-bottom:14px!important}
+.arrive-kicker .wordmark{color:var(--ink)!important}
+.arrive-kicker .wordmark .star{color:#FAAC22!important}
+.arrive-lead{color:var(--ink)!important;font-weight:800!important}
+.arrive-big{color:var(--orange)!important;letter-spacing:-2px!important}
+.arrive-figure{min-height:auto!important}
+.arrive-figure .blk{display:block!important;position:absolute!important;border-radius:28px!important;z-index:0!important}
+.arrive-figure .blk.b1{left:-5%!important;top:9%!important;width:46%!important;height:82%!important;
+  background:var(--orange)!important;transform:none!important}
+.arrive-figure .blk.b2{right:-4%!important;top:24%!important;width:20%!important;height:56%!important;
+  background:#FBB63F!important;transform:none!important}
+.arrive-figure img{position:relative!important;z-index:1!important;max-width:430px!important;
+  box-shadow:0 30px 64px -18px rgba(20,28,39,.4)!important}
 
-/* ── eyebrow kicker treated as a real label ── */
-.arrive-kicker{font-size:12.5px!important;letter-spacing:.16em!important;color:var(--gold)!important;
-  font-weight:700!important;display:inline-flex;align-items:center;gap:10px;margin-bottom:16px!important}
-.arrive-kicker::before{content:"";width:26px;height:2px;background:var(--gold);display:inline-block;border-radius:2px}
-.arrive-big{color:var(--gold)!important;letter-spacing:-.03em!important}
-.arrive-figure img{box-shadow:0 30px 70px -14px rgba(0,0,0,.72),0 0 0 1px rgba(250,172,34,.28)!important}
+/* ═══ ADVANTAGES → navy, CENTERED flat icons (reference) ═══ */
+.adv h2{text-align:center!important;margin-bottom:clamp(44px,5vw,78px)!important;font-weight:900!important}
+.adv{padding:clamp(66px,8.5vw,120px) 0!important}
+.adv-grid{gap:clamp(28px,3vw,52px)!important}
+.adv-col{text-align:center!important}
+.adv-ic{margin-left:auto!important;margin-right:auto!important;border-color:var(--orange)!important}
+.adv-col h3{color:#fff!important}
+.adv-col p{color:#B9C6E0!important;line-height:1.7!important;max-width:34ch;margin-inline:auto}
 
-/* ── section headings: unified scale + gold star kept ── */
-.adv h2,.screens h2{font-weight:900!important;letter-spacing:-.01em!important}
-.adv h2{margin-bottom:clamp(44px,5vw,80px)!important}
+/* ═══ SCREENS → LIGHT band ═══ */
+.screens{background:#F3F4F8!important;padding:clamp(60px,8vw,110px) 0!important}
+.screens h2{color:#16202E!important;text-align:center!important;font-weight:900!important}
+.car-dots button::after{background:#C4CBD8}
 
-/* ── ADVANTAGES as premium cards ── */
-.adv-grid{gap:clamp(20px,2.4vw,34px)!important}
-.adv-col{background:linear-gradient(170deg,rgba(255,255,255,.055),rgba(255,255,255,.015))!important;
-  border:1px solid rgba(250,172,34,.16)!important;border-radius:20px!important;
-  padding:clamp(28px,2.6vw,40px) clamp(24px,2.2vw,34px)!important;
-  transition:transform .2s ease,border-color .2s ease,box-shadow .2s ease}
-.adv-col:hover{transform:translateY(-4px);border-color:rgba(250,172,34,.4)!important;
-  box-shadow:0 24px 50px -24px rgba(0,0,0,.6)}
-.adv-ic{margin:0 0 22px auto!important;border-color:var(--gold)!important;
-  width:clamp(78px,6vw,104px)!important;height:clamp(78px,6vw,104px)!important;
-  background:radial-gradient(circle at 50% 40%,rgba(250,172,34,.14),transparent 70%)}
-.adv-ic svg{stroke:var(--gold)!important;width:clamp(42px,2.6vw,52px)!important;height:clamp(42px,2.6vw,52px)!important}
-.adv-col h3{font-size:clamp(19px,1.5vw,23px)!important;font-weight:800!important;margin-bottom:12px!important;color:#fff!important}
-.adv-col p{color:#B9C6E0!important;line-height:1.75!important;font-size:15px!important}
+/* ═══ CLOSING → WHITE ═══ */
+.close-cta{background:#FFFFFF!important;padding:clamp(62px,8vw,110px) 0!important}
+.close-cta p{color:var(--ink)!important;font-weight:600!important}
 
-/* ── closing CTA: centred, airy, premium ── */
-.close-cta p{font-weight:700!important;color:#EAF0FB!important}
-
-/* ── footer: refined ── */
-.foot{border-top:1px solid rgba(250,172,34,.14)}
-.foot-meta img{height:20px;width:auto;opacity:.9}
-.foot-meta{opacity:.82}
+/* disclaimer already white; badge wrap already white → seamless */
 
 </style>
 </head>
@@ -403,7 +375,7 @@ header.bar{background:var(--navy-1)!important;border-bottom:1px solid rgba(250,1
     </div>
     <img class="bar-badge" src="SHOMER_logo_big.png" alt="" aria-hidden="true">
     <div class="bar-right">
-      <span class="wordmark bar-wm">SH<span class="star">✡</span>MER</span>
+      <span class="wordmark bar-wm">SH<span class="star">✡</span>MER<span class="wm-app">.app</span></span>
     </div>
   </div>
 </header>
@@ -417,6 +389,7 @@ header.bar{background:var(--navy-1)!important;border-bottom:1px solid rgba(250,1
       <img src="app-shots-map-v6.jpg" alt="מסך המפה של SH✡MER - אירוע חי, שומרים בסביבה ואירועי עבר" loading="eager" fetchpriority="high">
     </div>
     <div class="hero-text">
+      <div class="hero-wm wordmark">SH<span class="star">✡</span>MER</div>
       <h1 data-i="h1">הרשת החברתית הראשונה בישראל של אזרחים למען אזרחים</h1>
       <p data-i="hsub">פועלים יחד לערבות הדדית<br>מחויבות חברתית ואהבת חינם</p>
       <a class="btn-orange hero-cta" href="SHOMER.apk" download>
