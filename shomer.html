@@ -1448,8 +1448,12 @@ body.otp-active .ob-steps{display:none!important;}
  <div class="geo-t" id="geo-t"></div>
  <div class="geo-s" id="geo-s">לחץ 'אפשר' ואשר בחלון שיפתח.<br>המיקום משמש אך ורק לצורכי בטיחות.</div>
  </div>
+ <div class="ob-agree-row" id="ob-agree-row" style="margin:12px 0 2px">
+     <input type="checkbox" id="ob-agree-chk" aria-labelledby="ob-agree-lbl">
+     <label id="ob-agree-lbl" for="ob-agree-chk"><span id="ob-agree-txt">קראתי ואני מסכים/ה ל<a href="terms.html" target="_blank" rel="noopener">תנאי השימוש</a> ול<a href="privacy.html" target="_blank" rel="noopener">מדיניות הפרטיות</a></span></label>
+    </div>
  <button class="ob-cta" id="geo-btn" onclick="requestGeo()"><span id="geo-btn-t">שתף מיקום</span></button>
- <button class="ob-cta" style="background:var(--n4);color:var(--tx1);box-shadow:none;margin-top:8px;border:1px solid var(--b2);" onclick="goStep(2)" id="geo-skip-btn"><span id="geo-skip-t">דלג – המשך בלי שיתוף מיקום</span></button>
+ <button class="ob-cta" style="background:var(--n4);color:var(--tx1);box-shadow:none;margin-top:8px;border:1px solid var(--b2);" onclick="obFinish()" id="geo-skip-btn"><span id="geo-skip-t">דלג – המשך בלי שיתוף מיקום</span></button>
  <button class="ob-back" onclick="goStep(0)" id="ob-back1"><svg class="ic ob-bk" viewBox="0 0 24 24" width="15" height="15" aria-hidden="true"><path d="M10 6l6 6-6 6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg><span id="ob-back1-t">חזרה</span></button>
  </div>
  </div>
@@ -1460,10 +1464,6 @@ body.otp-active .ob-steps{display:none!important;}
    <div class="ob-card">
     <h3 id="ob-h2">כמעט שם</h3>
     <p class="desc" id="ob-d2">SH✡MER חינמי, לתמיד. המיקום שלך משותף רק עם השומרים שאת/ה מאשר/ת - ולעולם לא נמכר.</p>
-    <div class="ob-agree-row" id="ob-agree-row">
-     <input type="checkbox" id="ob-agree-chk" aria-labelledby="ob-agree-lbl">
-     <label id="ob-agree-lbl" for="ob-agree-chk"><span id="ob-agree-txt">קראתי ואני מסכים/ה ל<a href="terms.html" target="_blank" rel="noopener">תנאי השימוש</a> ול<a href="privacy.html" target="_blank" rel="noopener">מדיניות הפרטיות</a></span></label>
-    </div>
     <button class="cta-gold" id="ob-finish-btn" onclick="obFinish()" style="width:100%;margin-top:14px"><span id="ob-finish-t">כניסה למפה</span></button>
    </div>
   </div>
@@ -1788,8 +1788,9 @@ body.otp-active .ob-steps{display:none!important;}
  <div class="sh-head"><span class="sh-ttl" id="ci-ttl" data-he="צ׳ק-אין הדדי" data-en="Mutual check-in">צ׳ק-אין הדדי</span><button class="sh-x" onclick="cl('sh-checkin')" aria-label="close"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg></button></div>
  <div class="sh-body">
  <p class="set-help" data-he="מתג-מת חברתי דו-כיווני: האפליקציה תשאל אותך מדי פעם „הכל טוב??”. אם לא תאשר/י בזמן - השומר/ת המקושר/ת מקבל/ת אזעקה ויכול/ה לשלוח SOS בשמך." data-en="A two-way social שומר אוטומטי: the app periodically asks 'Are you OK?'. If you don't confirm in time, your paired guardian is alerted and can send an SOS on your behalf.">מתג-מת חברתי דו-כיווני.</p><p id="obv-cap-note" style="font-size:11px;color:var(--tx3);text-align:center;margin:4px 0 0" data-he="אשר/י שאינך רובוט, ואז תשלח לך SMS" data-en="Verify you're human, then SMS is sent">אשר/י שאינך רובוט, ואז תשלח לך SMS</p>
- <div class="sec-cap mb12" data-he="שומר/ת מקושר/ת" data-en="Paired guardian">שומר/ת מקושר/ת</div>
- <input class="ob-f" id="ci-guardian" type="text" maxlength="40" placeholder="שם השומר/ת" aria-label="guardian">
+ <div class="sec-cap mb12" data-he="שומרים מקושרים (עד 5)" data-en="Paired guardians (up to 5)">שומרים מקושרים (עד 5)</div>
+ <div id="ci-guardians-list" role="group" aria-label="Paired guardians"></div>
+ <p class="set-help" id="ci-guardians-note" style="margin:6px 0 0" data-he="בחר/י עד 5 שומרים מהרשימה השמורה שלך." data-en="Choose up to 5 guardians from your saved list.">בחר/י עד 5 שומרים מהרשימה השמורה שלך.</p>
  <div class="sec-cap mb12" style="margin-top:6px" data-he="תדירות" data-en="Frequency">תדירות</div>
  <div class="dms-intervals" id="ci-freq" role="group">
  <div class="dms-iv" data-min="15" onclick="ciPick('freq',15,this)" tabindex="0"><div class="dms-iv-n">15</div><div class="dms-iv-l" data-he="דק׳" data-en="min">דק׳</div></div>
@@ -2045,7 +2046,7 @@ body.otp-active .ob-steps{display:none!important;}
  <div class="set-row"><div class="sr-l"><div class="sr-ic"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="7" width="18" height="13" rx="2.5" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="12" cy="13.5" r="3.2" fill="none" stroke="currentColor" stroke-width="2"/><path d="M9 7l1.5-2h3L15 7" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></svg></div><div><div class="sr-nm" id="selfie-tog-lbl" data-he="הגנת גנב - סלפי" data-en="Theft protection - selfie" data-ar="حماية السرقة - سيلفي">הגנת גנב - סלפי</div><div class="sr-sb" id="selfie-tog-sub" data-he="אחרי 3 קודים שגויים: צילום סלפי של מי שמחזיק את הטלפון + שליחת מיקום חי לשומרים שלך. דורש הרשאת מצלמה. פועל רק כשהאפליקציה פתוחה." data-en="After 3 wrong codes: snap a selfie of whoever holds the phone + send live location to your SHOMERs. Needs camera permission. Works only while the app is open.">אחרי 3 קודים שגויים: סלפי + מיקום חי לשומרים שלך.</div></div></div><div class="tog" id="selfie-tog" onclick="toggleSelfie(this)" role="switch" aria-label="הגנה מפני גניבת מכשיר - צילום סלפי אוטומטי"></div></div>
  <div class="set-row" onclick="openTheftEvidence()" role="button" tabindex="0"><div class="sr-l"><div class="sr-ic"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="5" width="16" height="14" rx="2" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="12" cy="12" r="3" fill="none" stroke="currentColor" stroke-width="2"/></svg></div><div><div class="sr-nm" data-he="ראיות גניבה" data-en="Theft evidence" data-ar="أدلة السرقة">ראיות גניבה</div><div class="sr-sb" data-he="סלפי ומיקום שנלכדו - ראיה מתועדת למשטרה." data-en="Captured selfies + locations - documented proof for police.">סלפי ומיקום שנלכדו - ראיה למשטרה.</div></div></div><span id="theft-ev-state" style="font-size:12px;font-weight:700;color:var(--g3);white-space:nowrap"></span></div>
  </div>
- <div class="set-grp"><div class="set-row" onclick="opFrom('sh-checkin','dd')" role="button" tabindex="0"><div class="sr-l"><div class="sr-ic"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3l7 3v5c0 5-3.4 8.5-7 10-3.6-1.5-7-5-7-10V6Z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><path d="M9 12l2 2 4-4" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div><div class="sr-nm" data-he="צ׳ק-אין הדדי (עם שומר/ת)" data-en="Mutual check-in (with a guardian)">צ׳ק-אין הדדי</div><div class="sr-sb" data-he="„הכל טוב??” תקופתי - אם לא תאשר/י, השומר/ת מקבל/ה אזעקה." data-en="Periodic 'Are you OK?' - if you don't confirm, your guardian is alerted.">„הכל טוב??” תקופתי.</div></div></div><span id="ci-set-state" style="font-size:12px;font-weight:700;color:var(--tx3);white-space:nowrap">כבוי</span></div></div>
+ <div class="set-grp"><div class="set-row" onclick="opFrom('sh-checkin','dd');try{reflectCheckin()}catch(e){}" role="button" tabindex="0"><div class="sr-l"><div class="sr-ic"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3l7 3v5c0 5-3.4 8.5-7 10-3.6-1.5-7-5-7-10V6Z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><path d="M9 12l2 2 4-4" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div><div class="sr-nm" data-he="צ׳ק-אין הדדי (עם שומר/ת)" data-en="Mutual check-in (with a guardian)">צ׳ק-אין הדדי</div><div class="sr-sb" data-he="„הכל טוב??” תקופתי - אם לא תאשר/י, השומר/ת מקבל/ה אזעקה." data-en="Periodic 'Are you OK?' - if you don't confirm, your guardian is alerted.">„הכל טוב??” תקופתי.</div></div></div><span id="ci-set-state" style="font-size:12px;font-weight:700;color:var(--tx3);white-space:nowrap">כבוי</span></div></div>
  <div class="sec-cap mb12" id="shake-set-lbl">Shake-to-SOS</div>
  <div class="set-grp">
  <div class="set-row"><div class="sr-l"><div class="sr-ic"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M13 2L4 14h6l-1 8 9-12h-6Z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></svg></div><div><div class="sr-nm" id="shake-tog-lbl">הפעל Shake-to-SOS</div><div class="sr-sb" id="shake-tog-sub">5 ניעורים חזקים → SOS</div></div></div><div class="tog on" id="shake-tog" onclick="toggleShake(this)" role="switch"></div></div>
@@ -2094,19 +2095,6 @@ body.otp-active .ob-steps{display:none!important;}
  </div>
  </div>
  <div class="set-cat"><div class="set-cat-ic"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="3" fill="none" stroke="currentColor" stroke-width="2"/><path d="M12 2.5l1.3 2.3 2.6-.4.5 2.6 2.3 1.3-1 2.4 1 2.4-2.3 1.3-.5 2.6-2.6-.4L12 21.5l-1.3-2.3-2.6.4-.5-2.6L5.3 15.7l1-2.4-1-2.4 2.3-1.3.5-2.6 2.6.4Z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></svg></div><div class="set-cat-t" data-he="חשבון ומידע" data-en="Account &amp; About">חשבון ומידע</div></div>
- <div class="sec-cap mb12" data-he="אודות שומר" data-en="About SH✡MER">אודות שומר</div>
- <div class="set-grp surf-light">
- <div class="ai-row"><span class="ai-l" data-he="מוצר" data-en="Product" data-ar="المنتج">מוצר / Product</span><span class="ai-v" dir="ltr">SH✡MER<span class="tm"></span> (שומר)</span></div>
- <div class="ai-row"><span class="ai-l" data-he="גרסה" data-en="Version" data-ar="الإصدار">גרסה</span><span class="ai-v" dir="ltr" id="set-ver">–</span></div>
- <div class="ai-row"><span class="ai-l" data-he="מוטו" data-en="Motto" data-ar="الشعار">מוטו</span><span class="ai-v">שׁוֹמֵר אָחִי אָנֹכִי</span></div>
- </div>
- <button class="test-alarm-btn" style="margin-top:12px" onclick="updCheck(true)" id="set-upd-btn"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 11a8 8 0 1 0-.6 4" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M20 4v5h-5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg><span data-he="בדיקת עדכונים" data-en="Check for updates" data-ar="التحقق من التحديثات">בדיקת עדכונים</span></button>
- <div class="sec-cap mb12" style="margin-top:18px" id="set-legal-cap">בטיחות ומשפט</div>
- <div class="set-grp mb20">
- 
- 
- 
- </div>
  <div class="sec-cap mb12" style="margin-top:18px" id="datasrc-cap">נתונים ומקורות</div>
  <div class="set-grp surf-light" style="padding:13px 14px;">
  <p style="font-size:11.5px;color:var(--tx2);line-height:1.75" id="datasrc-txt">
@@ -2114,6 +2102,13 @@ body.otp-active .ob-steps{display:none!important;}
  <span style="color:var(--tx3)">מקורות: הלמ"ס · משטרת ישראל (data.gov.il) · מרכז טאוב.</span>
  </p>
  </div>
+ <div class="sec-cap mb12" data-he="אודות שומר" data-en="About SH✡MER">אודות שומר</div>
+ <div class="set-grp surf-light">
+ <div class="ai-row"><span class="ai-l" data-he="מוצר" data-en="Product" data-ar="المنتج">מוצר / Product</span><span class="ai-v" dir="ltr">SH✡MER<span class="tm"></span> (שומר)</span></div>
+ <div class="ai-row"><span class="ai-l" data-he="גרסה" data-en="Version" data-ar="الإصدار">גרסה</span><span class="ai-v" dir="ltr" id="set-ver">–</span></div>
+ <div class="ai-row"><span class="ai-l" data-he="מוטו" data-en="Motto" data-ar="الشعار">מוטו</span><span class="ai-v">שׁוֹמֵר אָחִי אָנֹכִי</span></div>
+ </div>
+ <p class="set-help" id="set-upd-note" style="margin:8px 2px 0;display:flex;align-items:center;gap:7px"><svg class="ic" viewBox="0 0 24 24" width="15" height="15" aria-hidden="true" style="flex:0 0 auto"><path d="M20 11a8 8 0 1 0-.6 4" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M20 4v5h-5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg><span data-he="האפליקציה מתעדכנת אוטומטית דרך Google Play." data-en="This app updates automatically via Google Play." data-ar="يُحدَّث التطبيق تلقائيًا عبر Google Play.">האפליקציה מתעדכנת אוטומטית דרך Google Play.</span></p>
  <div class="sec-cap mb12" style="margin-top:18px" id="reset-cap" data-he="חשבון" data-en="Account" data-ar="الحساب">חשבון</div>
  <div class="set-grp" style="border-color:var(--b4);">
  <button style="width:100%;padding:14px;background:var(--rb);border:none;font-size:14px;font-weight:800;color:#FF7080;display:flex;align-items:center;justify-content:center;gap:8px;cursor:pointer;" onclick="deleteAccount()" id="delete-account-btn"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 7h14M9 7V5.5A1.5 1.5 0 0 1 10.5 4h3A1.5 1.5 0 0 1 15 5.5V7M6.5 7l.8 12a2 2 0 0 0 2 1.9h5.4a2 2 0 0 0 2-1.9L17.5 7" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg><span data-he="מחיקת חשבון" data-en="Delete account" data-ar="حذف الحساب">מחיקת חשבון</span></button>
@@ -3043,7 +3038,7 @@ let SS={
  geoReminders:[], // {id,memberId,memberName,label,lat,lng,radius,done} - My SHOMER arrival reminders
  /* Mutual "Are you OK?" check-in - two-way social שומר אוטומטי with a paired guardian.
     Cross-DEVICE alarm to the guardian needs the realtime backend (Firebase) - flagged. */
- checkin:{enabled:false,guardian:'',freqMin:30,windowSec:120,due:0,awaiting:false},
+ checkin:{enabled:false,guardians:[],freqMin:30,windowSec:120,due:0,awaiting:false},
  /* ── SOS anti-abuse / safety config (front-end sim - server must enforce for real) ── */
  sos:{
  countdown:10, // cancel-window seconds before broadcast. Default 10; user may lower (5/7) for high-risk.
@@ -3139,6 +3134,11 @@ function makeThumb(src){return new Promise(res=>{
 
 /* Apply stored settings to globals + UI on load (before app shows). */
 function applyStoredSettings(){
+ /* Mutual check-in: migrate legacy single free-text guardian -> array of saved-SHOMER ids. */
+ try{ if(SS.checkin){ if(!Array.isArray(SS.checkin.guardians)) SS.checkin.guardians=[];
+   if(SS.checkin.guardian){ var _gm=(SS.circleMembers||[]).filter(function(m){return (m.name||'').trim().toLowerCase()===String(SS.checkin.guardian).trim().toLowerCase();})[0];
+     if(_gm && SS.checkin.guardians.indexOf(_gm.id)<0) SS.checkin.guardians.push(_gm.id); delete SS.checkin.guardian; }
+ } }catch(e){}
  // ONE signature alarm now - migrate any legacy saved type (siren/horn/pulse) to it.
  alarmType='shomer'; if(SS.alarm.type!=='shomer'){ SS.alarm.type='shomer'; }
  alarmVol=(SS.alarm.vol!=null?SS.alarm.vol:1);
@@ -3913,7 +3913,7 @@ function requestGeo(){
  const btn=document.getElementById('geo-btn');
  btn.disabled=false;
  btn.innerHTML=`<span>${ESC(T('geo_next'))}</span>`;
- btn.onclick=()=>goStep(2);
+ btn.onclick=()=>obFinish();
  const skipBtn=document.getElementById('geo-skip-btn');
  if(skipBtn)skipBtn.style.display='none';
  },
@@ -4922,10 +4922,32 @@ function minimizeStrobe(){ var ov=document.getElementById('sos-strobe'); if(ov){
 let _ciTimer=null, _ciCountdown=null;
 function cl2(id){ var ov=document.getElementById(id); if(ov){ov.classList.remove('on');ov.setAttribute('aria-hidden','true');} }
 function ciPick(kind,val,el){ el.parentNode.querySelectorAll('.dms-iv').forEach(function(b){b.classList.remove('sel');}); el.classList.add('sel'); if(kind==='freq')SS.checkin.freqMin=val; else SS.checkin.windowSec=val; saveStore(); }
-function reflectCheckin(){ var c=SS.checkin,he=currentLang==='he'; setText('ci-toggle-btn', c.enabled?(he?'עצור צ׳ק-אין':'Stop check-in'):(he?'הפעל צ׳ק-אין':'Start check-in')); var g=document.getElementById('ci-guardian'); if(g&&c.guardian&&!g.value)g.value=c.guardian; var st=document.getElementById('ci-set-state'); if(st){st.textContent=c.enabled?(he?'פעיל ✓':'On ✓'):(he?'כבוי':'Off'); st.style.color=c.enabled?'var(--grn)':'var(--tx3)';} }
+var CHECKIN_MAX=5;
+/* Saved SHOMERs the user can pick as check-in partners (source: SS.circleMembers, non-pending). */
+function checkinSavedShomers(){ return (SS.circleMembers||[]).filter(function(m){return m && !m.pending;}); }
+function checkinGuardianNames(){ var ids=(SS.checkin&&SS.checkin.guardians)||[]; var names=checkinSavedShomers().filter(function(m){return ids.indexOf(m.id)>=0;}).map(function(m){return m.name||'';}).filter(Boolean); return names; }
+/* All reachable (paired) uids for the selected check-in guardians. */
+function checkinGuardianUids(){ var ids=(SS.checkin&&SS.checkin.guardians)||[]; var out=[];
+ checkinSavedShomers().forEach(function(m){ if(ids.indexOf(m.id)>=0 && m.partnerUid && out.indexOf(m.partnerUid)<0) out.push(m.partnerUid); });
+ return out; }
+function ciToggleGuardian(id){ var c=SS.checkin; if(!Array.isArray(c.guardians))c.guardians=[]; var i=c.guardians.indexOf(id);
+ if(i>=0){ c.guardians.splice(i,1); }
+ else { if(c.guardians.length>=CHECKIN_MAX){ var he=currentLang==='he'; try{ toast(he?('אפשר לבחור עד '+CHECKIN_MAX+' שומרים'):('You can choose up to '+CHECKIN_MAX+' guardians'),'amb'); }catch(e){} return; } c.guardians.push(id); }
+ saveStore(); renderCiGuardians(); }
+function renderCiGuardians(){ var host=document.getElementById('ci-guardians-list'); if(!host)return; var he=currentLang==='he';
+ var list=checkinSavedShomers(), sel=(SS.checkin&&SS.checkin.guardians)||[];
+ if(!list.length){ host.innerHTML='<div class="set-help" style="padding:4px 2px">'+(he?'אין שומרים שמורים עדיין - הוסף/י שומרים במסך „השומרים שלי”.':'No saved guardians yet - add some in "My SHOMER".')+'</div>'; return; }
+ host.innerHTML=list.map(function(m){ var on=sel.indexOf(m.id)>=0;
+   return '<button type="button" class="ci-gd-row'+(on?' sel':'')+'" onclick="ciToggleGuardian(\''+m.id+'\')" aria-pressed="'+on+'" style="display:flex;align-items:center;gap:10px;width:100%;text-align:start;padding:11px 12px;margin-bottom:7px;border-radius:var(--r12);border:1px solid '+(on?'var(--g3)':'var(--b2)')+';background:'+(on?'rgba(224,168,40,.12)':'var(--n4)')+';color:var(--tx1);cursor:pointer">'
+    +'<span style="width:18px;height:18px;flex:0 0 auto;border-radius:5px;border:2px solid '+(on?'var(--g3)':'var(--b3)')+';background:'+(on?'var(--g3)':'transparent')+';display:flex;align-items:center;justify-content:center;color:#23170a;font-weight:900;font-size:12px">'+(on?'✓':'')+'</span>'
+    +'<span style="flex:1;font-weight:700;font-size:13.5px">'+ESC(m.name||(he?'שומר/ת':'Guardian'))+'</span>'
+    +(m.partnerUid?'':'<span style="font-size:10.5px;color:var(--tx3)">'+(he?'לא מקושר':'not linked')+'</span>')
+    +'</button>'; }).join('');
+}
+function reflectCheckin(){ var c=SS.checkin,he=currentLang==='he'; setText('ci-toggle-btn', c.enabled?(he?'עצור צ׳ק-אין':'Stop check-in'):(he?'הפעל צ׳ק-אין':'Start check-in')); try{ renderCiGuardians(); }catch(e){} var st=document.getElementById('ci-set-state'); if(st){st.textContent=c.enabled?(he?'פעיל ✓':'On ✓'):(he?'כבוי':'Off'); st.style.color=c.enabled?'var(--grn)':'var(--tx3)';} }
 function checkinToggle(){ var c=SS.checkin,he=currentLang==='he';
  if(c.enabled){ c.enabled=false; saveStore(); checkinStop(); reflectCheckin(); toast(he?'צ׳ק-אין הופסק':'Check-in stopped',''); return; }
- c.guardian=(document.getElementById('ci-guardian').value||'').trim()||(he?'השומר/ת שלי':'My guardian');
+ if(!Array.isArray(c.guardians)||!c.guardians.length){ toast(he?'בחר/י לפחות שומר/ת אחד/ת מהרשימה':'Choose at least one guardian from your list','amb'); return; }
  c.enabled=true; saveStore(); reflectCheckin(); checkinSchedule();
  toast(he?'✓ צ׳ק-אין הדדי פעיל - נשאל כל '+c.freqMin+' דק׳':'✓ Mutual check-in on - every '+c.freqMin+' min','grn'); cl('sh-checkin');
 }
@@ -4936,7 +4958,8 @@ function checkinPrompt(){ if(!SS.checkin.enabled)return; var he=currentLang==='h
  var ov=document.getElementById('checkin-prompt'); if(ov){ov.classList.add('on');ov.setAttribute('aria-hidden','false');}
  try{pushNotify(he?'שומר - הכל טוב??':'SHOMER - Are you OK?',he?'אשר/י אחרת תישלח התראה לשומר/ת':'Confirm, or your guardian is alerted','checkin');}catch(e){}
  var left=SS.checkin.windowSec||120;
- var upd=function(){ setText('ci-prompt-sub',(he?'אשר/י תוך ':'Confirm within ')+Math.max(0,left)+(he?' שנ׳ - אחרת '+SS.checkin.guardian+' יקבל/ה אזעקה':'s - or '+SS.checkin.guardian+' is alerted')); };
+ var _gn=checkinGuardianNames(); var _gstr=_gn.length?_gn.join(', '):(he?'השומרים שלך':'your guardians');
+ var upd=function(){ setText('ci-prompt-sub',(he?'אשר/י תוך ':'Confirm within ')+Math.max(0,left)+(he?' שנ׳ - אחרת '+_gstr+' יקבלו אזעקה':'s - or '+_gstr+' is alerted')); };
  upd(); if(_ciCountdown)clearInterval(_ciCountdown);
  _ciCountdown=setInterval(function(){ left--; upd(); if(left<=0){ clearInterval(_ciCountdown); checkinMiss(); } },1000);
 }
@@ -4944,32 +4967,28 @@ function checkinOk(){ var he=currentLang==='he'; SS.checkin.awaiting=false; save
 /* Resolve the check-in guardian to a PAIRED partner's uid (so we can actually reach their
    phone). The guardian field is a free-text name; match it to a linked pair by name, else
    fall back to the first linked pair. Returns null if the user has no linked guardian. */
-function checkinGuardianUid(){
- try{ var pairs=(gdState().pairs||[]).filter(function(p){return p&&p.linked&&p.partnerUid;});
-  if(!pairs.length) return null;
-  var nm=((SS.checkin&&SS.checkin.guardian)||'').trim().toLowerCase();
-  var match=pairs.filter(function(p){return ((p.name||'').trim().toLowerCase())===nm;})[0];
-  return (match||pairs[0]).partnerUid;
- }catch(e){ return null; }
-}
+/* Back-compat single-uid resolver: first reachable selected guardian (or null). */
+function checkinGuardianUid(){ var u=checkinGuardianUids(); return u.length?u[0]:null; }
 function checkinMiss(){ var he=currentLang==='he'; SS.checkin.awaiting=false; saveStore(); cl2('checkin-prompt');
- /* Real cross-device alert to the guardian's phone (even when closed) via /alarms -> alarmFanout. */
- var guid=checkinGuardianUid(), sent=false;
- if(guid && typeof FB!=='undefined' && FB.ready){
-  try{ var _nm=(SS.user&&SS.user.name)||'שומר';
+ /* Real cross-device alert to EVERY selected guardian's phone (even when closed) via /alarms -> alarmFanout. */
+ var uids=checkinGuardianUids(), sent=0;
+ if(uids.length && typeof FB!=='undefined' && FB.ready){
+  var _nm=(SS.user&&SS.user.name)||'שומר';
+  uids.forEach(function(guid){ try{
    FB.db.ref('alarms').push({toUid:guid, fromUid:FB.uid,
     title:(he?'שומר - צ׳ק-אין הוחמץ':'SHOMER - missed check-in'),
     body:(_nm+(he?' לא אישר/ה „הכל טוב?”':" didn't confirm they're OK")),
     tag:'checkin-miss', ts:Date.now()});
-   sent=true;
-  }catch(e){}
+   sent++;
+  }catch(e){} });
  }
- /* HONEST UI: only claim the guardian was alerted if we actually dispatched. */
+ var _gn=checkinGuardianNames(), _gstr=_gn.length?_gn.join(', '):(he?'השומרים שלך':'your guardians');
+ /* HONEST UI: only claim guardians were alerted if we actually dispatched. */
  setText('ci-miss-sub', sent
-   ? (he?'לא אישרת „הכל טוב?”. '+SS.checkin.guardian+' קיבל/ה התראה.':'You didn\'t confirm. '+SS.checkin.guardian+' was alerted.')
+   ? (he?'לא אישרת „הכל טוב?”. '+_gstr+' קיבלו התראה.':'You didn\'t confirm. '+_gstr+' were alerted.')
    : (he?'לא אישרת „הכל טוב?”. חבר/י שומר/ת מקושר/ת כדי שיקבלו התראה אוטומטית.':'You didn\'t confirm. Link a guardian so they\'re alerted automatically.'));
  var ov=document.getElementById('checkin-miss'); if(ov){ov.classList.add('on');ov.setAttribute('aria-hidden','false');}
- try{pushNotify(he?'שומר - '+SS.checkin.guardian+' לא הגיב/ה':'SHOMER - '+SS.checkin.guardian+' missed check-in',he?'אפשר לשלוח SOS עבורם':'You can send an SOS on their behalf','checkin-miss');}catch(e){}
+ try{pushNotify(he?'שומר - צ׳ק-אין הוחמץ':'SHOMER - missed check-in',he?'אפשר לשלוח SOS עבורם':'You can send an SOS on their behalf','checkin-miss');}catch(e){}
 }
 /* Guardian-side: send an SOS on the user's behalf after a missed check-in. */
 function guardianActivateForUser(){ cl2('checkin-miss'); try{ beginSOS('checkin'); activateSOS(); }catch(e){} }
@@ -7511,16 +7530,44 @@ function geoCountry(){
   return null;
 }
 
+var TZ_CC={
+ 'Asia/Jerusalem':'IL','Asia/Tel_Aviv':'IL','Asia/Hebron':'IL','Asia/Gaza':'IL',
+ 'Asia/Tokyo':'JP','Asia/Shanghai':'CN','Asia/Hong_Kong':'HK','Asia/Taipei':'TW','Asia/Seoul':'KR',
+ 'Asia/Bangkok':'TH','Asia/Ho_Chi_Minh':'VN','Asia/Saigon':'VN','Asia/Manila':'PH','Asia/Jakarta':'ID',
+ 'Asia/Kuala_Lumpur':'MY','Asia/Singapore':'SG','Asia/Kolkata':'IN','Asia/Calcutta':'IN',
+ 'Asia/Dubai':'AE','Asia/Riyadh':'SA','Asia/Qatar':'QA','Asia/Amman':'JO','Asia/Istanbul':'TR','Europe/Istanbul':'TR',
+ 'Asia/Nicosia':'CY','Asia/Famagusta':'CY','Asia/Tbilisi':'GE','Asia/Yerevan':'AM','Asia/Baku':'AZ','Asia/Tashkent':'UZ',
+ 'Europe/London':'GB','Europe/Dublin':'IE','Europe/Paris':'FR','Europe/Berlin':'DE','Europe/Madrid':'ES',
+ 'Europe/Rome':'IT','Europe/Lisbon':'PT','Europe/Amsterdam':'NL','Europe/Brussels':'BE','Europe/Zurich':'CH',
+ 'Europe/Vienna':'AT','Europe/Stockholm':'SE','Europe/Oslo':'NO','Europe/Copenhagen':'DK','Europe/Helsinki':'FI',
+ 'Atlantic/Reykjavik':'IS','Europe/Luxembourg':'LU','Europe/Malta':'MT','Europe/Warsaw':'PL','Europe/Prague':'CZ',
+ 'Europe/Bratislava':'SK','Europe/Ljubljana':'SI','Europe/Zagreb':'HR','Europe/Belgrade':'RS','Europe/Sofia':'BG',
+ 'Europe/Athens':'GR','Europe/Bucharest':'RO','Europe/Budapest':'HU','Europe/Kiev':'UA','Europe/Kyiv':'UA',
+ 'Europe/Minsk':'BY','Europe/Chisinau':'MD','Europe/Riga':'LV','Europe/Vilnius':'LT','Europe/Tallinn':'EE',
+ 'Europe/Moscow':'RU','Europe/Samara':'RU',
+ 'America/New_York':'US','America/Chicago':'US','America/Denver':'US','America/Los_Angeles':'US','America/Phoenix':'US','America/Anchorage':'US','Pacific/Honolulu':'US',
+ 'America/Toronto':'CA','America/Vancouver':'CA','America/Edmonton':'CA','America/Winnipeg':'CA','America/Halifax':'CA',
+ 'America/Mexico_City':'MX','America/Sao_Paulo':'BR','America/Bahia':'BR','America/Argentina/Buenos_Aires':'AR',
+ 'America/Santiago':'CL','America/Bogota':'CO','America/Lima':'PE','America/Montevideo':'UY','America/Asuncion':'PY',
+ 'America/La_Paz':'BO','America/Guayaquil':'EC','America/Caracas':'VE','America/Panama':'PA','America/Costa_Rica':'CR','America/Guatemala':'GT',
+ 'Australia/Sydney':'AU','Australia/Melbourne':'AU','Australia/Brisbane':'AU','Australia/Perth':'AU','Australia/Adelaide':'AU',
+ 'Pacific/Auckland':'NZ',
+ 'Africa/Johannesburg':'ZA','Africa/Casablanca':'MA','Africa/Tunis':'TN','Africa/Algiers':'DZ','Africa/Cairo':'EG',
+ 'Africa/Addis_Ababa':'ET','Africa/Lagos':'NG','Africa/Nairobi':'KE'
+};
+function tzCountry(){ try{ var tz=(Intl.DateTimeFormat().resolvedOptions().timeZone||''); if(TZ_CC[tz]) return TZ_CC[tz];
+   if(/Jerusalem|Tel_Aviv/.test(tz)) return 'IL'; var reg=tz.split('/')[0];
+   if(reg==='Europe') return null; } catch(e){} return null; }
 function myCountry(){
   try{
+    /* Priority: live GPS -> saved country -> device-locale region -> timezone -> IL default.
+       All front-end, no network; only sets a DEFAULT the user can still change. */
     var _g=geoCountry(); if(_g) return _g; if(SS && SS.country) return SS.country;
     var r=(navigator.language||navigator.userLanguage||'').split('-')[1];
-    if(r && /^[A-Za-z]{2}$/.test(r)) return r.toUpperCase();
-    var tz=(Intl.DateTimeFormat().resolvedOptions().timeZone||'');
-    if(/Jerusalem|Tel_Aviv/.test(tz)) return 'IL';
-    if(/Tokyo/.test(tz)) return 'JP';
-    if(/New_York|Chicago|Denver|Los_Angeles/.test(tz)) return 'US';
-    if(/London/.test(tz)) return 'GB';
+    if(r && /^[A-Za-z]{2}$/.test(r) && DIAL[r.toUpperCase()]) return r.toUpperCase();
+    var _tz=tzCountry(); if(_tz && DIAL[_tz]) return _tz;
+    /* last resort: scan all device locales for a usable region */
+    try{ var langs=navigator.languages||[]; for(var i=0;i<langs.length;i++){ var rr=(langs[i]||'').split('-')[1]; if(rr && DIAL[rr.toUpperCase()]) return rr.toUpperCase(); } }catch(e){}
   }catch(e){}
   return 'IL';
 }
@@ -8265,7 +8312,6 @@ function legalApplyI18n(){
  setText('disc-ttl',he?' כתב ויתור חירום':' Emergency disclaimer');
  setText('tos-ttl',he?'תנאי שימוש':'Terms of Service');
  setText('priv-ttl',he?'מדיניות פרטיות':'Privacy Policy');
- setText('set-legal-cap',he?'בטיחות ומשפט':'Safety & legal');
  setText('set-legal-help',he?'המידע המשפטי וכתב הוויתור. שומר הוא כלי לבטיחות אישית - לא תחליף לשירותי חירום.':'Legal info and the disclaimer. Shomer is a personal-safety tool - not a replacement for emergency services.');
  setText('set-disc-row',he?'כתב ויתור חירום':'Emergency disclaimer');
  setText('set-tos-row',he?'תנאי שימוש':'Terms of Service');
