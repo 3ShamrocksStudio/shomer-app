@@ -514,14 +514,16 @@ body.sheet-open .diag-panel{display:none;}
 .sos-hold-ring.on{opacity:1;}
 
 /* DMS strip */
-.dms-strip{position:absolute;top:calc(var(--hdr-top,0px) + var(--hdr));left:0;right:0;z-index:585;background:var(--blu);padding:10px 14px;display:none;align-items:center;gap:10px;}
+.dms-strip{position:absolute;top:calc(var(--hdr-top,0px) + var(--hdr) + 86px);left:0;right:0;z-index:585;background:var(--blu);padding:15px 16px;display:none;align-items:center;gap:12px;box-shadow:0 6px 18px rgba(0,0,0,.45);}
 .dms-strip.on{display:flex;}
 .dms-strip.warn{background:#B06000;animation:dw .9s ease-in-out infinite;}
 @keyframes dw{0%,100%{background:#B06000}50%{background:#804400}}
 .dms-bar{flex:1;}
-.dms-t{color:#fff;font-size:12px;font-weight:800;}
-.dms-s{color:rgba(255,255,255,.7);font-size:10px;margin-top:1px;}
-.dms-ok{background:rgba(255,255,255,.2);border:1px solid rgba(255,255,255,.35);border-radius:var(--r8);padding:6px 14px;color:#fff;font-size:12px;font-weight:800;white-space:nowrap;flex-shrink:0;}
+.dms-t{color:#fff;font-size:15px;font-weight:800;}
+.dms-s{color:rgba(255,255,255,.85);font-size:12px;margin-top:2px;}
+.dms-ok{background:rgba(255,255,255,.2);border:1px solid rgba(255,255,255,.35);border-radius:var(--r8);padding:10px 18px;color:#fff;font-size:14px;font-weight:800;white-space:nowrap;flex-shrink:0;}
+.dms-stop{background:#C42A3B;border:1px solid #ff6b7d;border-radius:var(--r8);padding:10px 16px;color:#fff;font-size:14px;font-weight:900;white-space:nowrap;flex-shrink:0;cursor:pointer;box-shadow:0 0 0 2px rgba(196,42,59,.35);}
+.dms-stop:hover{background:#E5484D;}
 .dms-ok:hover{background:rgba(255,255,255,.3);}
 .dms-prog{height:3px;background:rgba(255,255,255,.15);position:absolute;bottom:0;left:0;right:0;}
 .dms-prog-fill{height:100%;background:rgba(255,255,255,.7);transition:width 1s linear;}
@@ -1836,6 +1838,7 @@ body.otp-active .ob-steps{display:none!important;}
  <div class="dms-s" id="dms-strip-s">בדיקה הבאה בעוד 5:00</div>
  </div>
  <button class="dms-ok" onclick="dmsConfirm()" id="dms-ok-btn" data-he="✓ הכל טוב?" data-en="✓ I'm OK">✓ הכל טוב?</button>
+ <button class="dms-stop" onclick="stopDMS()" id="dms-stop-btn" aria-label="עצור שומר אוטומטי" data-he="עצור" data-en="Stop">עצור</button>
  <div class="dms-prog"><div class="dms-prog-fill" id="dms-prog-fill" style="width:100%"></div></div>
  </div>
 
@@ -2927,10 +2930,10 @@ function renderPastEvents(){
   PAST_EVENTS.forEach(function(ev){
     var icon=window.L.divIcon({html:pastMarkerHTML(ev),className:'past-div',iconSize:[38,48],iconAnchor:[19,48]});
     var srcTxt = ev.src==='cbs' ? (he?'מקור: הלמ״ס':'Source: CBS') : (he?'מבוסס על דיווחים ציבוריים':'Based on public reports');
-    var pop='<div style="font:600 13px Heebo,sans-serif;color:#111;max-width:220px">'
+    var pop='<div style="font:600 13px Heebo,sans-serif;color:#E8EDF6;max-width:220px">'
       + '<div style="display:inline-block;background:'+PAST_EVT_COLOR+';color:#0A1628;font-size:10px;font-weight:800;padding:2px 7px;border-radius:6px;margin-bottom:6px">'
       + (he?'אירוע עבר · '+ev.yr:'Past event · '+ev.yr)+'</div><br>'
-      + ev.he + '<div style="font-size:10.5px;color:#888;margin-top:6px">'+srcTxt+' · '+(he?'למודעות בלבד - אינו אירוע חי':'awareness only')+'</div></div>';
+      + ev.he + '<div style="font-size:10.5px;color:#9FB0D0;margin-top:6px">'+srcTxt+' · '+(he?'למודעות בלבד - אינו אירוע חי':'awareness only')+'</div></div>';
     window.L.marker([ev.lat,ev.lng],{icon:icon}).bindPopup(pop).addTo(_pastLayer);
   });
   _pastLayer.addTo(MAP);
@@ -10290,7 +10293,27 @@ function statsRadius(total, max){
   var t=Math.sqrt(total)/Math.sqrt(max||1);
   return 900 + t*5200;                          // metres - an AREA, not a point
 }
+function statsMarkUnavailable(){
+  /* Crime data comes from an external source (crime-stats.json via data.gov.il).
+     When it cannot load (e.g. offline), show a clear, readable 'unavailable' state
+     instead of a toggle that silently does nothing. */
+  STATS.on=false;
+  try{ statsClear(); }catch(e){}
+  var he=(typeof currentLang!=='undefined' && currentLang==='he');
+  var sec=document.getElementById('leg-stats-sec');
+  if(sec){ sec.classList.add('dim'); }
+  var btn=document.getElementById('leg-stats');
+  if(btn){
+    btn.disabled=true;
+    btn.style.cursor='default';
+    btn.style.color='#E8EDF6';
+    btn.style.opacity='1';
+    btn.innerHTML='<span style="color:#E8EDF6;font-weight:800">'+(he?'נתונים לא זמינים כעת · בקרוב':'Data unavailable - coming soon')+'</span>';
+    btn.setAttribute('aria-disabled','true');
+  }
+}
 async function statsToggle(){
+  if(!STATS.data){ statsMarkUnavailable(); return; }
   STATS.on=!STATS.on;
   try{ if(STATS.on){ statsRender(); } else { statsClear(); } }catch(e){}
   statsLegPaint();
@@ -10333,7 +10356,11 @@ function statsRender(){
 }
 function statsAutoOn(){
   /* Real police data is a credibility feature - it shows by default, not hidden behind a toggle. */
-  statsLoad().then(function(d){ if(d && STATS.on) statsRender(); statsLegPaint(); });
+  statsLoad().then(function(d){
+    if(!d){ statsMarkUnavailable(); return; }
+    if(STATS.on) statsRender();
+    statsLegPaint();
+  });
 }
 function statsLegPaint(){
   var b=document.getElementById('leg-stats-st'); if(!b) return;
