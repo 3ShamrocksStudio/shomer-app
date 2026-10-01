@@ -6368,7 +6368,7 @@ function renderArrivals(){
     var rows='';
     for(var p=0;p<ARR_P;p++){
       var pl=(sel.places&&sel.places[p])||{};
-      rows+='<div class="arr-row">'
+      rows+='<div class="arr-row'+(p>0&&!(pl.addr)?' arr-hidden':'')+'">'
          +  '<span class="arr-n">'+(he?('מיקום '+(p+1)):('Place '+(p+1)))+'</span>'
          +  '<input class="arr-in" data-g="'+i+'" data-p="'+p+'" data-f="addr" placeholder="'+(he?'תן כתובת':'Address')+'" value="'+ESC(pl.addr||'')+'">'
          +  '</div>';
@@ -6376,7 +6376,7 @@ function renderArrivals(){
     html+='<div class="arr-slot">'
        +  '<div class="arr-hd"><span class="arr-lbl">'+(he?('שומר '+(i+1)):('Guardian '+(i+1)))+'</span>'
        +  '<select class="arr-sel" data-g="'+i+'">'+opts+'</select></div>'
-       +  '<div class="arr-rows">'+rows+'</div>'
+       +  '<div class="arr-rows">'+rows+'</div>'+'<button class="arr-add" type="button" data-g="'+i+'">+ הוסף מיקום</button>'
        +  '</div>';
   }
   host.innerHTML=html;
@@ -6395,6 +6395,12 @@ function renderArrivals(){
       A2['g'+g].places[p]=A2['g'+g].places[p]||{};
       A2['g'+g].places[p].addr=inp.value; saveStore();
     };
+  });
+  host.querySelectorAll('.arr-add').forEach(function(btn){
+    var slot=btn.closest('.arr-slot');
+    var upd=function(){ btn.style.display = slot.querySelector('.arr-row.arr-hidden') ? 'block':'none'; };
+    upd();
+    btn.onclick=function(){ var h=slot.querySelector('.arr-row.arr-hidden'); if(h){ h.classList.remove('arr-hidden'); var inp=h.querySelector('.arr-in'); if(inp) inp.focus(); } upd(); };
   });
   var cap=document.getElementById('arr-cap');
   if(cap) cap.textContent = he
@@ -12013,12 +12019,12 @@ html[dir="rtl"] .sh-back svg{transform:scaleX(-1)}
 .arr-hd{display:flex;align-items:center;gap:9px;margin-bottom:9px}
 .arr-lbl{flex:0 0 auto;font-size:12px;font-weight:900;color:var(--tx3)}
 .arr-sel{flex:1;padding:10px;border-radius:10px;border:1px solid var(--b2);background:var(--n3);color:var(--tx0);font-family:inherit;font-size:13px;font-weight:700}
-.arr-rows{display:grid;grid-template-columns:1fr 1fr;gap:7px}
+.arr-rows{display:flex;flex-direction:column;gap:8px}
 .arr-row{display:flex;align-items:center;gap:6px}
 .arr-n{flex:0 0 auto;font-size:9.5px;color:var(--tx3);font-weight:800;white-space:nowrap}
 .arr-in{flex:1;min-width:0;padding:9px;border-radius:9px;border:1px solid var(--b2);background:var(--n3);color:var(--tx0);font-family:inherit;font-size:12px}
 .arr-in::placeholder{color:var(--tx3)}
-.arr-cap{font-size:11px;color:var(--tx3);text-align:center;margin-top:8px;line-height:1.5}
+.arr-cap{font-size:11px;color:var(--tx3);text-align:center;margin-top:8px;line-height:1.5}.arr-row.arr-hidden{display:none}.arr-add{margin-top:8px;width:100%;padding:9px;border-radius:9px;border:1px dashed var(--b2);background:transparent;color:#C9A84C;font-family:inherit;font-weight:800;font-size:12.5px;cursor:pointer}
 
 /* ══ MAP INDEX ══
    Was a tall column down the side. Now a WIDE panel across the top of the map: three columns,
