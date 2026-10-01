@@ -575,7 +575,7 @@ body.sheet-open .ff-fab{opacity:0;pointer-events:none;}
 /* section label */
 .sec-cap{font-size:10px;font-weight:700;letter-spacing:.9px;text-transform:uppercase;color:var(--g2);margin-bottom:9px;display:flex;align-items:center;gap:7px;}
 /* Settings category band - groups sub-sections into clear, scannable categories */
-.set-cat{display:flex;align-items:center;gap:10px;margin:26px 0 14px;padding-bottom:10px;border-bottom:1px solid var(--b2);}
+.set-cat{display:flex;align-items:center;gap:10px;margin:26px 0 14px;padding-bottom:10px;border-bottom:1px solid var(--b2);}.set-cat{cursor:pointer;-webkit-user-select:none;user-select:none;}.set-cat-caret{margin-inline-start:auto;flex:0 0 auto;color:var(--g3);font-size:13px;transition:transform .2s ease;}.set-cat.collapsed .set-cat-caret{transform:rotate(-90deg);}.set-cat:active{opacity:.85;}.set-collapsible-hidden{display:none!important;}
 .set-cat:first-child{margin-top:2px;}
 .set-cat-ic{width:26px;height:26px;display:flex;align-items:center;justify-content:center;color:var(--g3);flex:0 0 auto;}
 .set-cat-ic .ic{width:23px;height:23px;}
@@ -1668,7 +1668,7 @@ body.otp-active .ob-steps{display:none!important;}
   <div class="dd-ic c-prof" aria-hidden="true"><svg class="ic" viewBox="0 0 24 24"><circle cx="12" cy="8" r="3.7" fill="none" stroke="currentColor" stroke-width="2"/><path d="M5.5 20a6.5 6.5 0 0 1 13 0" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></div>
   <span id="dd-prof" data-he="פרופיל SH✡MER" data-en="SH✡MER Profile">פרופיל SH✡MER</span>
  </button>
- <button class="ddr" onclick="op('sh-set');closeDD()" role="menuitem">
+ <button class="ddr" onclick="op('sh-set');closeDD();setTimeout(setCatInit,30)" role="menuitem">
   <div class="dd-ic c-set" aria-hidden="true"><svg class="ic" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3" fill="none" stroke="currentColor" stroke-width="2"/><path d="M12 2.5l1.3 2.3 2.6-.4.5 2.6 2.3 1.3-1 2.4 1 2.4-2.3 1.3-.5 2.6-2.6-.4L12 21.5l-1.3-2.3-2.6.4-.5-2.6L5.3 15.7l1-2.4-1-2.4 2.3-1.3.5-2.6 2.6.4Z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></svg></div>
   <span id="dd-set" data-he="הגדרות" data-en="Settings">הגדרות</span>
  </button>
@@ -5960,6 +5960,33 @@ document.addEventListener('click',e=>{if(menuOpen&&!e.target.closest('#dd')&&!e.
 /* ═══════════════════════════════════
  UTILS
 ═══════════════════════════════════ */
+/* Settings accordion: each .set-cat is a tap-to-expand header. Collapsed by default
+   (Dave: "one short phrase per item, tap to expand"). Toggling walks the following
+   siblings until the next .set-cat and shows/hides them. */
+function setCatToggle(cat){
+ var collapse=!cat.classList.contains("collapsed");
+ cat.classList.toggle("collapsed",collapse);
+ cat.setAttribute("aria-expanded",collapse?"false":"true");
+ var el=cat.nextElementSibling;
+ while(el && !el.classList.contains("set-cat")){
+  el.classList.toggle("set-collapsible-hidden",collapse);
+  el=el.nextElementSibling;
+ }
+}
+function setCatInit(){
+ var cats=document.querySelectorAll("#sh-set .set-cat");
+ cats.forEach(function(cat){
+  if(!cat.querySelector(".set-cat-caret")){
+   var c=document.createElement("span");c.className="set-cat-caret";c.setAttribute("aria-hidden","true");c.textContent="\u25BE";
+   cat.appendChild(c);
+   cat.setAttribute("role","button");cat.setAttribute("tabindex","0");
+   cat.addEventListener("click",function(){setCatToggle(cat);});
+   cat.addEventListener("keydown",function(e){if(e.key==="Enter"||e.key===" "){e.preventDefault();setCatToggle(cat);}});
+  }
+  /* start collapsed every open */
+  if(!cat.classList.contains("collapsed")) setCatToggle(cat);
+ });
+}
 function callNum(n){
  closeAll();
  toast(` ${currentLang==='he'?'מחייג':'Calling'} ${n}...`,'amb');
