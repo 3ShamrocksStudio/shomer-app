@@ -2048,7 +2048,7 @@ body.otp-active .ob-steps{display:none!important;}
  </div>
  <div class="sl-card mb20">
  <div class="vol-row"><span class="vol-lbl" id="shake-sens-lbl">רגישות ניעור</span><span class="vol-val" id="shake-sens-v">בינונית</span></div>
- <input type="range" id="shake-sens" min="12" max="32" value="22" aria-label="shake sensitivity" oninput="setShakeSens(this.value)">
+ <input type="range" id="shake-sens" min="20" max="38" value="28" aria-label="shake sensitivity" oninput="setShakeSens(this.value)">
  <div style="display:flex;justify-content:space-between;font-size:10px;color:var(--tx3);margin-top:6px"><span>גבוהה</span><span>נמוכה</span></div>
  <button class="test-alarm-btn" style="margin-top:12px" onclick="simulateShake()" id="sim-shake-btn"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M13 2L4 14h6l-1 8 9-12h-6Z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></svg><span id="sim-shake-lbl">סימולציית ניעור (בדיקה)</span></button>
  </div>
@@ -3030,7 +3030,7 @@ let SS={
  lang:'he',
  user:{name:'',phone:'',profession:''},
  alarm:{type:'shomer',vol:0.6},
- shake:{enabled:true,sensitivity:22},
+ shake:{enabled:true,sensitivity:28},
  dms:{interval:5,active:false,deadline:0},
  settings:{radius:5,toggles:{}},
  /* Safety PIN: required to cancel an ACTIVE SOS. NEVER biometric (an unconscious user must
@@ -4237,7 +4237,7 @@ function startShakeDetection(){
  // just yields no events. On everything else, attach now.
  if(typeof DeviceMotionEvent.requestPermission==='function' && SS.shake._perm!=='granted') return;
  shakeStarted=true;
- const WINDOW=1600, REQUIRED=5, MIN_GAP=110;
+ const WINDOW=1400, REQUIRED=6, MIN_GAP=120;
  let count=0, firstT=0, lastPeak=0;
  const handler=e=>{
  if(SS.shake && SS.shake.enabled===false) return;
