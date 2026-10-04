@@ -2,7 +2,7 @@
 <html lang="he" dir="rtl">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
 <meta name="theme-color" content="#0A1628">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -165,8 +165,8 @@ img{display:block;}
 .lbtn.on{background:var(--gd);border-color:var(--b3);color:var(--g3);}
 .lbtn:hover:not(.on){color:var(--tx1);}
 /* When lang bar visible, offset everything */
-body.lb-on{--hdr-top:32px;}
-body:not(.lb-on){--hdr-top:0px;}
+body.lb-on{--hdr-top:calc(env(safe-area-inset-top, 0px) + 32px);}
+body:not(.lb-on){--hdr-top:env(safe-area-inset-top, 0px);}
 
 /* ══════════ ONBOARDING ══════════ */
 #ob{position:fixed;inset:0;z-index:9999;background:#070F1E;overflow-y:auto;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:26px 0;}
@@ -308,7 +308,7 @@ input[type=range]:focus::-webkit-slider-thumb{box-shadow:0 0 0 4px rgba(224,168,
 .pcirc .pc-n{font-size:30px;font-weight:900;line-height:1}
 .pcirc .pc-l{font-size:11.5px;font-weight:700;opacity:.92;margin-top:3px}
 
-.hdr{position:absolute;top:var(--hdr-top,0px);left:0;right:0;z-index:600;height:var(--hdr);background:rgba(8,18,36,.97);backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);border-bottom:1px solid var(--b3);display:flex;align-items:center;padding:0 12px;gap:8px;box-shadow:0 2px 24px rgba(0,0,0,.6);}
+.hdr{position:absolute;top:0;left:0;right:0;z-index:600;height:calc(var(--hdr) + var(--hdr-top,0px));padding-top:var(--hdr-top,0px);background:rgba(8,18,36,.97);backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);border-bottom:1px solid var(--b3);display:flex;align-items:center;padding:0 12px;gap:8px;box-shadow:0 2px 24px rgba(0,0,0,.6);}
 .hdr::after{content:'';position:absolute;bottom:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent 5%,var(--gd) 35%,var(--gd) 65%,transparent 95%);}
 .hdr-left{display:flex;align-items:center;gap:7px;flex:1;justify-content:flex-start;}
 .hdr-guide{position:relative;width:42px;height:42px;border-radius:50%;background:rgba(13,148,82,.16);border:1px solid rgba(20,170,98,.45);display:flex;align-items:center;justify-content:center;transition:all .15s;flex-shrink:0;}
@@ -4178,7 +4178,9 @@ var _ln=null,_pn=null,_lnId=1,_naReady=false;
 function _isNative(){ try{ return !!(window.Capacitor&&window.Capacitor.isNativePlatform&&window.Capacitor.isNativePlatform()); }catch(e){ return false; } }
 async function initNativeAlerts(){
  if(_naReady||!_isNative())return; _naReady=true;
- var P=(window.Capacitor&&window.Capacitor.Plugins)||{};
+  var P=(window.Capacitor&&window.Capacitor.Plugins)||{};
+ /* Android 15 (target SDK 36) forces edge-to-edge - stop the status bar overlaying the header. */
+ try{ var SB=P.StatusBar; if(SB){ if(SB.setOverlaysWebView)SB.setOverlaysWebView({overlay:false}); if(SB.setBackgroundColor)SB.setBackgroundColor({color:'#081224'}); if(SB.setStyle)SB.setStyle({style:'DARK'}); } }catch(e){}
  _ln=P.LocalNotifications||null; _pn=P.PushNotifications||null;
  try{
   if(_ln){
