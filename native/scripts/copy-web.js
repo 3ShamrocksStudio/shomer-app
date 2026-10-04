@@ -9,7 +9,7 @@ const FILES = [
   'shomer.html', 'sw.js', 'manifest.json', 'version.json', 'crime-stats.json',
   'SHOMER_logo_big.png', 'SHOMER-bg.jpg',
   'logo-192.png', 'logo-512.png', 'badge-192.png', 'badge-512.png',
-  'nature-badge.png', 'nature-bg.jpg'
+  'nature-badge.png', 'nature-bg.jpg', '3shamrocks.png'
 ];
 
 fs.mkdirSync(WWW, { recursive: true });
