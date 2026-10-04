@@ -2556,7 +2556,7 @@ const LANGS={
  ob_h1:'אישור מיקום',ob_d1:'נדרש לשליחת SOS מיידי לשומרים בקרבתך.',
  ob_h2:'הגדרות חירום',ob_d2:'הקש אזעקה כדי לשמוע אותה. היא תופעל עם לחיצת SOS.',
  geo_need:'נדרש אישור מיקום',geo_wait:'מחפש מיקום...',geo_ok:'מיקום אושר!',geo_err:'לא ניתן לאתר מיקום',
- geo_allow:'שתף מיקום',geo_next:'← המשך להגדרות חירום',geo_retry:' נסה שוב',geo_skip:'דלג – המשך בלי שיתוף מיקום',
+ geo_allow:'שתף מיקום',geo_next:'← כניסה למפה',geo_retry:' נסה שוב',geo_skip:'דלג – המשך בלי שיתוף מיקום',
  al1:'אזעקת SOS · שומר',al1d:'צליל החירום הייחודי - סירנה מתגברת, דיסוננטית ובלתי-נשכחת',al2:'',al2d:'',al3:'',al3d:'',
  vol:'עוצמת קול',test:'בדוק אזעקה',finish:'✓ כניסה לשומר',back:'← חזרה',
  shake:'<strong>Shake-to-SOS:</strong> 5 ניעורים חזקים מפעילים SOS אוטומטי.',
@@ -2589,7 +2589,7 @@ const LANGS={
  ob_h1:'Location access',ob_d1:'Required to send SOS instantly to guardians nearby.',
  ob_h2:'Emergency settings',ob_d2:'Tap an alarm to hear it. It fires when you trigger SOS.',
  geo_need:'Location access needed',geo_wait:'Locating...',geo_ok:'Location confirmed!',geo_err:'Could not locate you',
- geo_allow:'Share location',geo_next:'Continue →',geo_retry:' Retry',geo_skip:'Skip – continue without sharing',
+ geo_allow:'Share location',geo_next:'Enter the map →',geo_retry:' Retry',geo_skip:'Skip – continue without sharing',
  al1:'SHOMER SOS alarm',al1d:'Our signature emergency sound - escalating, dissonant, unmistakable',al2:'',al2d:'',al3:'',al3d:'',
  vol:'Volume',test:'Test alarm',finish:'✓ Enter Shomer',back:'← Back',
  shake:'<strong>Shake-to-SOS:</strong> 5 hard shakes trigger automatic SOS.',
@@ -2622,7 +2622,7 @@ const LANGS={
  ob_h1:'تحديد الموقع',ob_d1:'مطلوب لإرسال نداء الاستغاثة فوراً للحراس القريبين منك.',
  ob_h2:'إعدادات الطوارئ',ob_d2:'اختر الإنذار - يُفعَّل فوراً عند الضغط على SOS.',
  geo_need:'مطلوب إذن الموقع',geo_wait:'جارٍ التحديد...',geo_ok:'تم تأكيد الموقع!',geo_err:'لا يمكن تحديد موقعك',
- geo_allow:'شارك الموقع',geo_next:'التالي ←',geo_retry:' أعد المحاولة',geo_skip:'تخطّي - المتابعة بدون مشاركة الموقع',
+ geo_allow:'شارك الموقع',geo_next:'ادخل إلى الخريطة ←',geo_retry:' أعد المحاولة',geo_skip:'تخطّي - المتابعة بدون مشاركة الموقع',
  al1:'إنذار SOS · شومير',al1d:'صوت الطوارئ المميّز - تصاعدي، نشاز، لا يُنسى',al2:'',al2d:'',al3:'',al3d:'',
  vol:'مستوى الصوت',test:'اختبار الإنذار',finish:'✓ الدخول لشومير',back:'← رجوع',
  shake:'<strong>هز للاستغاثة:</strong> 5 هزات قوية تُفعّل نداء الاستغاثة تلقائياً.',
@@ -3770,6 +3770,7 @@ function obShowSignIn(){
     if(a&&b&&!b.options.length){ b.innerHTML=a.innerHTML; b.value=a.value; }
     var pa=document.getElementById('ob-phone'), pb=document.getElementById('si-phone');
     if(pa&&pb&&pa.value&&!pb.value) pb.value=pa.value;
+    if(pb&&!pb.value&&typeof SS!=='undefined'&&SS.user&&SS.user.phone) pb.value=SS.user.phone;  /* returning user sees their saved number */
   }catch(e){}
   _obPanel('step-signin');
   try{ var f=document.getElementById('si-phone'); if(f) f.focus(); }catch(e){}
