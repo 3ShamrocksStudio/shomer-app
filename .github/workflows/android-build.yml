@@ -36,6 +36,12 @@ jobs:
         working-directory: native
         run: npx cap add android
 
+      - name: Raise minSdkVersion to 24 (required for Play automatic protection)
+        working-directory: native/android
+        run: |
+          sed -i -E 's/minSdkVersion *= *[0-9]+/minSdkVersion = 24/' variables.gradle
+          echo "--- variables.gradle after patch ---"; cat variables.gradle
+
       - name: Generate branded app icons + splash
         working-directory: native
         run: |
