@@ -1336,6 +1336,8 @@ body.otp-active .ob-steps{display:none!important;}
  Line icons inherit currentColor; use via <svg class="ic"><use href="#i-name"/></svg>. -->
 <svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false"><defs>
  <symbol id="i-menu" viewBox="0 0 24 24"><path d="M4 7h16M4 12h16M4 17h16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></symbol>
+ <symbol id="i-abduct" viewBox="0 0 24 24"><circle cx="9" cy="6" r="2.4" fill="none" stroke="currentColor" stroke-width="2"/><path d="M4 20c0-3.2 2.1-5.6 5-5.6 1.5 0 2.9.7 3.8 1.9" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M18 7v5.5" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round"/><circle cx="18" cy="17" r="1.2" fill="currentColor"/></symbol>
+ <symbol id="i-missing" viewBox="0 0 24 24"><circle cx="11" cy="11" r="6" fill="none" stroke="currentColor" stroke-width="2"/><path d="M15.5 15.5L21 21" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><circle cx="11" cy="9.4" r="1.8" fill="currentColor"/><path d="M7.8 14c.5-1.1 1.7-1.8 3.2-1.8s2.7.7 3.2 1.8" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></symbol>
  <symbol id="i-bell" viewBox="0 0 24 24"><path d="M18 8a6 6 0 1 0-12 0c0 7-3 9-3 9h18s-3-2-3-9" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><path d="M13.7 21a2 2 0 0 1-3.4 0" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></symbol>
  <symbol id="i-close" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></symbol>
  <symbol id="i-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7" fill="none" stroke="currentColor" stroke-width="2"/><path d="M16.5 16.5L21 21" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></symbol>
@@ -3538,6 +3540,8 @@ const TYPES={
  drug: {label:()=>T('l5'),color:'#18C29C',cls:'t-drug', icon:'pill'},
  med: {label:()=>T('l6'),color:'#16A06A',cls:'t-med', icon:'medcross'},
  sos: {label:()=>T('l7'),color:'#FF1A40',cls:'t-sos', icon:'sos'},
+ abduct:{label:()=>currentLang==='he'?'חטיפה':currentLang==='ar'?'اختطاف':'Abduction', color:'#D10029',cls:'t-abduct', icon:'abduct'},
+ missing:{label:()=>currentLang==='he'?'אדם נעדר':currentLang==='ar'?'شخص مفقود':'Missing Person', color:'#6D4AFF',cls:'t-missing', icon:'missing'},
  new: {label:()=>'', color:'#7E8CA0',cls:'t-new', icon:'clipboard'},
 };
 /* Single source of truth for an event glyph anywhere off-map (legend, report, popups). */
@@ -4103,6 +4107,7 @@ function enterApp(returning){
  startGeoWatch();
  try{ fbInit(); }catch(e){} // connect to Firebase RTDB (presence + cross-device SOS) once in-app
  try{ guardianInit(); }catch(e){}
+ try{ fbListenPersonAlerts(); }catch(e){}
  // Re-request durable storage now that the user is engaged (browsers grant it more
  // readily after interaction - helps the installed-PWA path keep the session).
  try{ if(navigator.storage&&navigator.storage.persist){ navigator.storage.persist().then(function(ok){ window.__shomerPersist=ok?'granted':'denied'; },function(){}); } }catch(e){}
@@ -6766,13 +6771,15 @@ function buildMemberRow(m,he){
  <div class="cm-actions">
   <button class="btn-secondary" data-a="rename">${he?'שנה/י שם':'Rename'}</button>
   <button class="btn-danger" data-a="remove">${he?'הסר/י שומר':'Remove guardian'}</button>
- </div>`;
+ </div>
+ ${(m.partnerUid&&!m.pending)?`<button class="cm-palert" data-a="palert">${he?'🚨 דווח/י: חטיפה / אדם נעדר':currentLang==='ar'?'🚨 إبلاغ: اختطاف / شخص مفقود':'🚨 Report: Abduction / Missing'}</button>`:''}`;
  priv.querySelectorAll('.tog').forEach(t=>{
  t.onclick=(e)=>{e.stopPropagation();const k=t.getAttribute('data-k');m[k]=!m[k];t.classList.toggle('on',m[k]);saveStore();renderCircles();};
  });
  priv.querySelector('[data-a="rename"]').onclick=(e)=>{e.stopPropagation();const nn=prompt(he?'שם חדש עבור '+m.name+':':'New name for '+m.name+':',m.name);if(nn&&nn.trim()){m.name=nn.trim().substring(0,40);saveStore();renderCircles();toast(he?'✓ השם עודכן':'✓ Renamed','grn');}};
  priv.querySelectorAll('[data-mv]').forEach(b=>{b.onclick=(e)=>{e.stopPropagation();const tc=b.getAttribute('data-mv');if(tc===m.cid)return;m.cid=tc;saveStore();renderCircles();toast(he?'✓ הועבר/ה למעגל אחר':'✓ Moved to another circle','grn');};});
  priv.querySelector('[data-a="remove"]').onclick=(e)=>{e.stopPropagation();removeMember(m.id);};
+ var _pab=priv.querySelector('[data-a="palert"]'); if(_pab) _pab.onclick=(e)=>{e.stopPropagation(); openPersonAlert(m.id);};
  row.querySelector('.cm-main').onclick=()=>{priv.style.display=priv.style.display==='none'?'block':'none';};
  row.querySelector('.cm-main').style.cursor='pointer';
  wrap.appendChild(row); wrap.appendChild(priv);
@@ -9807,6 +9814,168 @@ var EVT = {
 };
 
 /* ═══════════════════════════════════════════════════════════════════════
+   PERSON ALERTS — third-party ABDUCTION / MISSING-PERSON reports.
+   The SUBJECT cannot report themselves; a LINKED "My SHOMER" reports them.
+   The alert is centred on the SUBJECT's last-known location (from presence on
+   the reporter's pair record), NOT the reporter's. Transport = REST + SSE only.
+   Additive: does not touch the self-SOS or community-event systems.
+   ═══════════════════════════════════════════════════════════════════════ */
+var paMarkers = {};
+function paKindLabel(kind){ var he=currentLang==='he',ar=currentLang==='ar';
+  return kind==='abduct' ? (he?'חטיפה':ar?'اختطاف':'Abduction') : (he?'אדם נעדר':ar?'شخص مفقود':'Missing Person'); }
+function paMember(id){ try{ return (SS.circleMembers||[]).find(function(x){return x.id===id;}); }catch(e){ return null; } }
+function paPinIcon(kind){ var t=(kind==='abduct')?'abduct':'missing';
+  return window.L.divIcon({className:'shomer-marker evpin evpin-sos',html:eventPinHTML(t),iconSize:[40,50],iconAnchor:[20,48],popupAnchor:[0,-46]}); }
+
+/* ── Report sheet: pick kind, add last-seen + description, broadcast ── */
+function openPersonAlert(memberId){
+  var he=currentLang==='he', ar=currentLang==='ar';
+  var m=paMember(memberId);
+  if(!m){ toast(he?'לא נמצא שומר מקושר':'Linked guardian not found','amb'); return; }
+  if(!m.partnerUid || m.pending){ toast(he?'אפשר לדווח רק על אדם מקושר':'You can only report a linked person','amb'); return; }
+  var old=document.getElementById('pa-sheet'); if(old) old.remove();
+  var locKnown=(m.lat!=null && m.lng!=null);
+  var locLine = locKnown
+    ? (he?'מיקום אחרון ידוע יצורף להתראה · ':'Last-known location will be attached · ')+agoTxt(m.ts,he)
+    : (he?'אין מיקום אחרון ידוע — ההתראה תישלח עם הפרטים בלבד':ar?'لا يوجد موقع أخير معروف — سيُرسل التنبيه بالتفاصيل فقط':'No recent location — alert broadcasts with details only');
+  var d=document.createElement('div'); d.id='pa-sheet'; d.className='rep-sheet';
+  d.innerHTML='<div class="rep-card">'
+    +'<div class="rep-h" style="color:#FF5A6E">'+(he?'דיווח חירום על '+ESC(m.name||''):ar?'بلاغ طارئ عن '+ESC(m.name||''):'Emergency report · '+ESC(m.name||''))+'</div>'
+    +'<div class="rep-sub">'+(he?'בחר/י את סוג האירוע. ההתראה מתמקדת במיקום של '+ESC(m.name||'')+', לא שלך.':ar?'اختر نوع الحدث. يتمركز التنبيه على موقع '+ESC(m.name||'')+' وليس موقعك.':'Choose the event. The alert centres on '+ESC(m.name||'')+'’s location, not yours.')+'</div>'
+    +'<div class="rep-grid" id="pa-kinds">'
+      +'<button class="rep-type" data-k="abduct" style="border-color:rgba(209,0,41,.5)"><span class="rep-ic">🚨</span><span>'+(he?'חטיפה':ar?'اختطاف':'Abduction')+'</span></button>'
+      +'<button class="rep-type" data-k="missing" style="border-color:rgba(109,74,255,.5)"><span class="rep-ic">🔎</span><span>'+(he?'אדם נעדר':ar?'شخص مفقود':'Missing Person')+'</span></button>'
+    +'</div>'
+    +'<input id="pa-lastseen" class="rep-note" style="height:auto;min-height:0;padding:10px 12px" maxlength="120" placeholder="'+(he?'נראה/תה לאחרונה (איפה / מתי / לבוש)':ar?'آخر مرة شوهد (أين/متى/الملابس)':'Last seen (where / when / clothing)')+'">'
+    +'<textarea id="pa-desc" class="rep-note" maxlength="200" placeholder="'+(he?'תיאור: גיל, מראה, פרטים מזהים (לא חובה)':ar?'الوصف: العمر، المظهر، تفاصيل (اختياري)':'Description: age, appearance, details (optional)')+'"></textarea>'
+    +'<div style="font-size:11px;color:var(--tx3);margin:2px 2px 8px;line-height:1.5">'+locLine+'</div>'
+    +'<button class="cm-palert" id="pa-send" disabled style="opacity:.5">'+(he?'שדר/י התראה לרשת':ar?'بث التنبيه للشبكة':'Broadcast alert to the network')+'</button>'
+    +'<button class="btn-ghost rep-close">'+(he?'ביטול':ar?'إلغاء':'Cancel')+'</button>'
+    +'</div>';
+  document.body.appendChild(d);
+  var chosen=null;
+  d.querySelectorAll('#pa-kinds .rep-type').forEach(function(b){
+    b.onclick=function(){ chosen=b.getAttribute('data-k');
+      d.querySelectorAll('#pa-kinds .rep-type').forEach(function(x){x.style.background='';x.style.color='';});
+      b.style.background=(chosen==='abduct'?'#D10029':'#6D4AFF'); b.style.color='#fff';
+      var sb=document.getElementById('pa-send'); sb.disabled=false; sb.style.opacity='1';
+    };
+  });
+  d.querySelector('#pa-send').onclick=function(){
+    if(!chosen){ toast(he?'בחר/י סוג אירוע':'Choose an event type','amb'); return; }
+    var ls=(document.getElementById('pa-lastseen')||{}).value||'';
+    var ds=(document.getElementById('pa-desc')||{}).value||'';
+    paCreate(m, chosen, ds, ls).then(function(ok){ if(ok) d.remove(); });
+  };
+  d.querySelector('.rep-close').onclick=function(){ d.remove(); };
+}
+
+/* ── Create + broadcast a person alert (guarded, rate-limited, REST write) ── */
+async function paCreate(m, kind, desc, lastSeen){
+  var he=currentLang==='he';
+  if(!m || !m.partnerUid){ toast(he?'אפשר לדווח רק על אדם מקושר':'Only a linked person can be reported','amb'); return false; }
+  if(typeof FB==='undefined' || !FB.ready || !FB.uid){ toast(he?'אין חיבור':'No connection','amb'); return false; }
+  if(!SS.user || !SS.user.phoneVerified){ toast(he?'צריך אימות טלפון כדי לדווח':'Phone verification required','amb'); return false; }
+  if(typeof MOD!=='undefined'){ var mt=MOD.checkText((desc||'')+' '+(lastSeen||'')); if(mt && !mt.ok){ toast(he?'הטקסט מכיל שפה לא הולמת. נסח/י מחדש.':'The text contains inappropriate language. Please rephrase.','amb'); return false; } }
+  var now=Date.now();
+  if(SS.paLast && (now-SS.paLast)<90000){ toast(he?('המתן/י '+Math.ceil((90000-(now-SS.paLast))/1000)+' שניות'):('Wait '+Math.ceil((90000-(now-SS.paLast))/1000)+'s'),'amb'); return false; }
+  var warn = kind==='abduct'
+    ? (he?'לשדר התראת חטיפה על '+(m.name||'')+' לרשת? זו התראה ברמת חירום הגבוהה ביותר.':'Broadcast an ABDUCTION alert for '+(m.name||'')+' to the network? This is the highest-urgency alert.')
+    : (he?'לשדר התראת אדם נעדר על '+(m.name||'')+' לרשת?':'Broadcast a MISSING-PERSON alert for '+(m.name||'')+' to the network?');
+  if(!confirm(warn+(he?' דיווח כוזב עלול להוביל לחסימת החשבון.':' A false report may get your account blocked.'))) return false;
+  var id='pa_'+FB.uid.slice(0,8)+'_'+now.toString(36);
+  var rec={ kind:kind, subjUid:m.partnerUid||'', subjName:(m.name||'').slice(0,60),
+    desc:String(desc||'').slice(0,200), lastSeen:String(lastSeen||'').slice(0,120),
+    lat:(m.lat!=null?+(+m.lat).toFixed(4):null), lng:(m.lng!=null?+(+m.lng).toFixed(4):null), locTs:m.ts||0,
+    by:FB.uid, byName:((SS.user&&SS.user.name)||'').slice(0,60), ts:now, status:'active' };
+  var ok=false;
+  try{ var w=await fbRestWrite('PUT','palerts/'+id, rec); ok=(w!==false); }catch(e){ ok=false; }
+  if(ok){
+    SS.paLast=now; try{ saveStore(); }catch(e){}
+    toast(he?'🚨 ההתראה שודרה. הרשת תחפש את '+(m.name||'')+'.':'🚨 Alert broadcast. The network is searching for '+(m.name||'')+'.','red');
+  } else {
+    toast(he?'ההתראה לא נשלחה':'Alert not sent','amb');
+  }
+  return ok;
+}
+
+/* ── Live listener (SSE via restRef shim) — mirrors fbListenSOS ── */
+function fbListenPersonAlerts(){
+  if(typeof FB==='undefined' || !FB.ready) return;
+  if(!FB._paAlerted) FB._paAlerted={};
+  if(!FB._paCache) FB._paCache={};
+  FB.db.ref('palerts').on('value', function(snap){
+    var all=snap.val()||{};
+    if(MAP) Object.keys(paMarkers).forEach(function(id){ if(!all[id]||all[id].status==='resolved'){ try{MAP.removeLayer(paMarkers[id]);}catch(e){} delete paMarkers[id]; } });
+    var fresh=[], firstSync=!FB._paInit, now=Date.now(), STALE=24*60*60*1000;
+    FB._paCache={};
+    Object.keys(all).forEach(function(id){ var a=all[id]; if(!a) return;
+      FB._paCache[id]=Object.assign({id:id},a);
+      if(a.status==='resolved') return;
+      if(a.ts && (now-a.ts)>STALE) return;
+      if(MAP && a.lat!=null){
+        if(paMarkers[id]){ paMarkers[id].setLatLng([a.lat,a.lng]); }
+        else { paMarkers[id]=window.L.marker([a.lat,a.lng],{icon:paPinIcon(a.kind),zIndexOffset:1200,alt:paKindLabel(a.kind)+' '+(a.subjName||'')}).addTo(MAP);
+          (function(mid){ paMarkers[mid].on('click',function(){ openPersonAlertDetail(mid); }); })(id); }
+      }
+      if(firstSync){ FB._paAlerted[id]=true; }
+      else if(!FB._paAlerted[id]){ FB._paAlerted[id]=true; if(a.by!==FB.uid) fresh.push(Object.assign({id:id},a)); }
+    });
+    FB._paInit=true;
+    if(fresh.length) paIncomingAlert(fresh[0]);
+  }, function(e){});
+}
+
+function paIncomingAlert(a){
+  var he=currentLang==='he';
+  var kindL=paKindLabel(a.kind), pre=(a.kind==='abduct'?'🚨 ':'🔎 ');
+  try{ if(typeof playSosAlertSound==='function') playSosAlertSound(); }catch(e){}
+  try{ if(navigator.vibrate) navigator.vibrate([240,90,240,90,360]); }catch(e){}
+  try{ if(typeof pushNotify==='function') pushNotify(pre+kindL, (a.subjName||'')+(a.lastSeen?' · '+a.lastSeen:''), 'palert'); }catch(e){}
+  try{ toast(pre+kindL+': '+(a.subjName||''),'red'); }catch(e){}
+  if(MAP && a.lat!=null){ try{ MAP.setView([a.lat,a.lng],14,{animate:true}); }catch(e){} }
+}
+
+/* ── Detail card: who can stand it down = subject, reporter, or a linked guardian ── */
+function paCanResolve(a){ try{ return a && (FB.uid===a.subjUid || FB.uid===a.by || (typeof isGuardianOf==='function' && isGuardianOf(a.subjUid))); }catch(e){ return false; } }
+function openPersonAlertDetail(id){
+  var he=currentLang==='he', ar=currentLang==='ar';
+  var a=(FB._paCache||{})[id]; if(!a) return;
+  var old=document.getElementById('pa-detail'); if(old) old.remove();
+  var kindL=paKindLabel(a.kind), col=(a.kind==='abduct'?'#D10029':'#6D4AFF');
+  var when=a.ts?agoTxt(a.ts,he):'';
+  var locTxt=(a.lat!=null&&a.lng!=null)?((+a.lat).toFixed(4)+', '+(+a.lng).toFixed(4)):(he?'מיקום אחרון לא ידוע':ar?'الموقع الأخير غير معروف':'Last location unknown');
+  var d=document.createElement('div'); d.id='pa-detail'; d.className='rep-sheet';
+  d.innerHTML='<div class="rep-card">'
+    +'<div style="display:inline-block;background:'+col+';color:#fff;font-size:11px;font-weight:800;padding:3px 10px;border-radius:7px;margin-bottom:8px">'+(a.kind==='abduct'?'🚨 ':'🔎 ')+kindL+'</div>'
+    +'<div class="rep-h">'+ESC(a.subjName||'')+'</div>'
+    +(a.lastSeen?'<div class="rep-sub"><b>'+(he?'נראה/תה לאחרונה: ':ar?'آخر ظهور: ':'Last seen: ')+'</b>'+ESC(a.lastSeen)+'</div>':'')
+    +(a.desc?'<div class="rep-sub">'+ESC(a.desc)+'</div>':'')
+    +'<div class="rep-sub" style="direction:ltr;text-align:start">📍 '+ESC(locTxt)+(when?'  ·  '+when:'')+'</div>'
+    +(a.byName?'<div class="rep-sub" style="font-size:11px;opacity:.8">'+(he?'דווח ע״י ':ar?'أبلغ عنه ':'Reported by ')+ESC(a.byName)+'</div>':'')
+    +((a.lat!=null)?'<button class="cm-palert" style="background:linear-gradient(135deg,#0E8840,#14A857);border-color:rgba(20,168,87,.5)" id="pa-nav">'+(he?'נווט/י למיקום':ar?'التوجه إلى الموقع':'Navigate to location')+'</button>':'')
+    +(paCanResolve(a)?'<button class="cm-palert" style="background:linear-gradient(135deg,#0E8840,#14A857);border-color:rgba(20,168,87,.5);margin-top:8px" id="pa-resolve">'+(he?'✓ נמצא/בטוח — סגור התראה':ar?'✓ وُجد/بأمان — إغلاق التنبيه':'✓ Found / safe — stand down')+'</button>':'')
+    +'<button class="btn-ghost rep-close" style="margin-top:8px">'+(he?'סגור':ar?'إغلاق':'Close')+'</button>'
+    +'</div>';
+  document.body.appendChild(d);
+  var nav=d.querySelector('#pa-nav'); if(nav) nav.onclick=function(){ try{ window.open('https://www.google.com/maps?q='+a.lat+','+a.lng,'_blank'); }catch(e){} };
+  var rb=d.querySelector('#pa-resolve'); if(rb) rb.onclick=function(){ paResolve(id); };
+  d.querySelector('.rep-close').onclick=function(){ d.remove(); };
+}
+function paResolve(id){
+  var he=currentLang==='he';
+  var a=(FB._paCache||{})[id]; if(!a) return;
+  if(!paCanResolve(a)){ toast(he?'רק אדם מקושר או הנושא יכול לסגור':'Only a linked person or the subject can close this','amb'); return; }
+  if(!confirm(he?'לסמן שהאדם נמצא / בטוח? פעולה זו תסגור את ההתראה לכולם.':'Mark this person found / safe? This stands the alert down for everyone.')) return;
+  fbRestWrite('PUT','palerts/'+id+'/status','resolved').then(function(){
+    try{ fbRestWrite('PUT','palerts/'+id+'/resolvedBy',FB.uid); fbRestWrite('PUT','palerts/'+id+'/resolvedTs',Date.now()); }catch(e){}
+  });
+  try{ if(paMarkers[id]&&MAP){ MAP.removeLayer(paMarkers[id]); delete paMarkers[id]; } }catch(e){}
+  toast(he?'✓ ההתראה נסגרה · נמצא/בטוח':'✓ Alert stood down · found/safe','grn');
+  var el=document.getElementById('pa-detail'); if(el) el.remove();
+}
+
+/* ═══════════════════════════════════════════════════════════════════════
    CONTENT MODERATION & USER-PROTECTION LAYER
    Protects users from: abusive language, inappropriate images, harassment.
    Client-side first line of defence (server rules are the hard gate).
@@ -12350,6 +12519,8 @@ html[dir="rtl"] .sh-back svg{transform:scaleX(-1)}
 .rep-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:9px;margin-bottom:14px}
 .rep-type{display:flex;flex-direction:column;align-items:center;gap:6px;padding:14px 4px;border-radius:13px;border:1px solid var(--b2);background:var(--n2);color:var(--tx1);font-family:inherit;font-weight:800;font-size:10.5px;cursor:pointer;transition:.12s}
 .rep-type:active{transform:scale(.95);border-color:var(--g3)}
+.cm-palert{width:100%;margin-top:8px;padding:11px;border-radius:12px;border:1px solid rgba(209,0,41,.5);background:linear-gradient(135deg,#8A0C19,#D10029);color:#fff;font-family:inherit;font-weight:800;font-size:12.5px;cursor:pointer;transition:.12s}
+.cm-palert:active{transform:scale(.97)}
 .rep-ic{font-size:22px}
 .rep-note{width:100%;padding:12px;border-radius:12px;border:1px solid var(--b2);background:var(--n3);color:var(--tx0);font-family:inherit;font-size:13.5px;resize:none;height:64px;margin-bottom:10px}
 .rep-note::placeholder{color:var(--tx3)}
