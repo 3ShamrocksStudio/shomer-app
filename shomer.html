@@ -3900,10 +3900,28 @@ function goStep(n){
  if(pb)pb.classList.add('active'); if(sb)sb.classList.add('on');
  var st=document.querySelector('.ob-steps'); if(st)st.setAttribute('aria-valuenow',obCurStep+1);
 }
+/* Native Android: navigator.geolocation in the WebView only works once the OS
+   runtime location permission is granted. Declaring it in the manifest is NOT
+   enough on Android 6+. Request it via the Capacitor Geolocation plugin first;
+   a plain browser skips this and behaves exactly as before. */
+async function ensureNativeGeo(){
+ try{
+  if(!_isNative()) return true;
+  var G=(window.Capacitor&&window.Capacitor.Plugins&&window.Capacitor.Plugins.Geolocation)||null;
+  if(!G) return true;
+  var st=null; try{ st=await G.checkPermissions(); }catch(e){}
+  var ok=function(p){ return p&&(p.location==='granted'||p.coarseLocation==='granted'); };
+  if(!ok(st)){ try{ st=await G.requestPermissions({permissions:['location']}); }catch(e){} }
+  return ok(st);
+ }catch(e){ return true; }
+}
 function requestGeo(){
  const btn=document.getElementById('geo-btn-t');
  if(btn)btn.textContent=T('geo_wait');
  document.getElementById('geo-btn').disabled=true;
+ ensureNativeGeo().then(function(){ _requestGeoWeb(); });
+}
+function _requestGeoWeb(){
  if(!navigator.geolocation){showGeoResult(false,T('geo_err'));return;}
  navigator.geolocation.getCurrentPosition(
  pos=>{
@@ -4008,8 +4026,8 @@ function obFinish(goSettings){
  // setup nudge for the two things that make SHOMER actually work: a trusted circle + a
  // security code (which also arms theft-selfie protection).
  if(goSettings===true){ setTimeout(function(){ try{ op('sh-set'); }catch(e){} }, 450); return; }
- setTimeout(function(){ try{ showSetupPrompt(); }catch(e){ try{ startFeatureTour(); }catch(_){ } } }, 900);
- try{ setTimeout(firstRunTour, 1400); }catch(e){}
+ /* Land cleanly on the map. No stacked modals. Trusted-circle + security-code
+    setup stay one tap away in Settings (and the in-map tour chip). */
 }
 function obFinishToSettings(){ obFinish(true); }
 /* ── Post-entry setup nudge - prominent but NEVER blocking; Enter is always fast ── */
@@ -5427,6 +5445,10 @@ function locMe(){ try{ setTimeout(essRefreshNear, 900); }catch(e){}
 /* Live tracking - the blue "me" dot follows the real device position. */
 let geoWatchId=null;
 function startGeoWatch(){
+ if(!navigator.geolocation||geoWatchId!==null) return;
+ try{ ensureNativeGeo().then(function(){ _startGeoWatchNow(); }); }catch(e){ _startGeoWatchNow(); }
+}
+function _startGeoWatchNow(){
  if(!navigator.geolocation||geoWatchId!==null) return;
  try{
  geoWatchId=navigator.geolocation.watchPosition(
