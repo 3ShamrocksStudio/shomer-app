@@ -36,11 +36,17 @@ jobs:
         working-directory: native
         run: npx cap add android
 
-      - name: Raise minSdkVersion to 24 (required for Play automatic protection)
+      - name: Patch SDK levels + Gradle/AGP for Play (minSdk24, target/compile 36)
         working-directory: native/android
         run: |
           sed -i -E 's/minSdkVersion *= *[0-9]+/minSdkVersion = 24/' variables.gradle
-          echo "--- variables.gradle after patch ---"; cat variables.gradle
+          sed -i -E 's/compileSdkVersion *= *[0-9]+/compileSdkVersion = 36/' variables.gradle
+          sed -i -E 's/targetSdkVersion *= *[0-9]+/targetSdkVersion = 36/' variables.gradle
+          echo "--- variables.gradle ---"; cat variables.gradle
+          sed -i -E 's#com\.android\.tools\.build:gradle:[0-9.]+#com.android.tools.build:gradle:8.11.1#' build.gradle
+          echo "--- build.gradle (AGP) ---"; grep -n "com.android.tools.build:gradle" build.gradle || true
+          sed -i -E 's#gradle-[0-9.]+-all\.zip#gradle-8.13-all.zip#' gradle/wrapper/gradle-wrapper.properties
+          echo "--- gradle wrapper ---"; cat gradle/wrapper/gradle-wrapper.properties
 
       - name: Generate branded app icons + splash
         working-directory: native
