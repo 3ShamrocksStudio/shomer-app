@@ -2344,13 +2344,6 @@ body.otp-active .ob-steps{display:none!important;}
     <div id="circ-members" role="list"></div>
    </div>
 
-   <!-- 3. הוספה לשומרים שלי -->
-   <button class="arr-open" onclick="openArrivals()">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s7-5.6 7-11a7 7 0 1 0-14 0c0 5.4 7 11 7 11Z"/><circle cx="12" cy="10" r="2.6"/></svg>
-    <span>התראות מיקום השומרים שלי</span>
-    <span class="arr-chev">›</span>
-   </button>
-
    <div class="shm-sec">
     <div class="shm-h">הוספה לשומרים שלי</div>
 
@@ -2386,6 +2379,13 @@ body.otp-active .ob-steps{display:none!important;}
      <button class="agf-add" onclick="addGuardian()">הוסף שומר</button>
     </div>
    </div>
+
+   <!-- geo-arrival alerts — distinct blue brand section, below Add -->
+   <button class="arr-open" onclick="openArrivals()">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s7-5.6 7-11a7 7 0 1 0-14 0c0 5.4 7 11 7 11Z"/><circle cx="12" cy="10" r="2.6"/></svg>
+    <span>התראות מיקום השומרים שלי</span>
+    <span class="arr-chev">›</span>
+   </button>
 
    <div id="gd-list" role="list" style="margin-top:10px"></div>
  <div class="ghost-row" id="ghost-row">
@@ -7114,9 +7114,9 @@ async function addGuardian(){
  var raw=((phEl&&phEl.value)||'').trim();
  var _cc=(document.getElementById('ag-cc')||{}).value||myDial();
  var canon=phoneCanon(raw,_cc);
- if(!name){ toast(he?'\u05d4\u05d6\u05df/\u05d9 \u05e9\u05dd':'Enter a name','amb'); if(typeof shakeField==='function')shakeField('ag-name'); return; }
  var validPhone=raw && phoneIsValid(canon);
- if(raw && !validPhone){ toast(he?'\u05de\u05e1\u05e4\u05e8 \u05dc\u05d0 \u05ea\u05e7\u05d9\u05df - \u05db\u05dc\u05d5\u05dc/\u05d9 \u05e7\u05d9\u05d3\u05d5\u05de\u05ea \u05de\u05d3\u05d9\u05e0\u05d4 (\u05dc\u05de\u05e9\u05dc +81)':'Invalid number - include the country code (e.g. +81)','amb'); if(typeof shakeField==='function')shakeField('ag-phone'); return; }
+ if(!validPhone){ toast(he?'\u05d7\u05d5\u05d1\u05d4 \u05de\u05e1\u05e4\u05e8 \u05e0\u05d9\u05d9\u05d3 \u05d0\u05de\u05d9\u05ea\u05d9 \u2014 \u05d4\u05e7\u05dc\u05d3/\u05d9 \u05d0\u05d5 \u05d1\u05d7\u05e8/\u05d9 \u05de\u05d0\u05e0\u05e9\u05d9 \u05e7\u05e9\u05e8':currentLang==='ar'?'\u0645\u0637\u0644\u0648\u0628 \u0631\u0642\u0645 \u062c\u0648\u0627\u0644 \u062d\u0642\u064a\u0642\u064a \u2014 \u0627\u0643\u062a\u0628\u0647 \u0623\u0648 \u0627\u062e\u062a\u0631 \u0645\u0646 \u062c\u0647\u0627\u062a \u0627\u0644\u0627\u062a\u0635\u0627\u0644':'A real mobile number is required \u2014 type it or pick from contacts','amb'); if(typeof shakeField==='function')shakeField('ag-phone'); return; }
+ if(!name){ name=(he?'\u05e9\u05d5\u05de\u05e8':'Guardian'); }
  if(go){go.disabled=true;go.style.opacity='.6';}
  if(validPhone){
    var dup=(SS.circleMembers||[]).find(function(m){return m.phoneCanon===canon;});
@@ -12511,6 +12511,16 @@ html[dir="rtl"] .sh-back svg{transform:scaleX(-1)}
 .agf-hint{font-size:11.5px;color:var(--tx3);min-height:14px;margin-bottom:8px;text-align:center}
 .agf-add{width:100%;padding:14px;border-radius:999px;border:0;background:var(--gold-grad,linear-gradient(135deg,#C09020,#E0A828 60%,#F5C840));color:#23170a;font-family:inherit;font-weight:900;font-size:15px;cursor:pointer}
 .agf-add:active{transform:scale(.98)}
+/* ── Dave feedback: compact My SHOMER + color-separated geo section (brand palette) ── */
+.arr-open{background:rgba(30,49,95,.28)!important;border:1px solid #1e315f!important;color:#cfe0ff!important;padding:11px 13px!important;margin:4px 0 14px!important;font-size:13px!important}
+.arr-open svg{color:#7FA8FF!important}
+.cm-row{padding:8px 10px!important;margin-bottom:6px!important;border-radius:11px!important}
+.cm-av{width:30px!important;height:30px!important}
+.cm-acts{margin-top:7px!important;gap:6px!important}
+.agf-add{padding:11px!important;font-size:13.5px!important}
+.cot-new{padding:8px 4px!important;font-size:13px!important}
+.cm-row .cm-nm{font-size:13.5px!important}
+.cm-row .cm-rel{font-size:11px!important}
 @media(max-width:380px){.agf-row3{grid-template-columns:1fr 76px 82px}}
 
 .arr-open{width:100%;display:flex;align-items:center;gap:10px;padding:14px;margin-bottom:14px;border-radius:14px;border:1px solid var(--b2);background:var(--n2);color:var(--tx1);font-family:inherit;font-weight:800;font-size:13.5px;cursor:pointer}
