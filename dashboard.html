@@ -153,6 +153,31 @@
     .col{min-height:0}.pane{min-height:220px}#map{min-height:300px}
   }
   @media print{body{background:#fff;color:#111;overflow:visible}#app{height:auto}.console{grid-template-columns:1fr}.pane{break-inside:avoid}}
+
+  .pane.light{background:var(--dark)!important;color:var(--tx)!important;border:1px solid var(--db)}
+  .pane.pa-gold{border-top:3px solid var(--gold)}
+  .pane.pa-teal{border-top:3px solid var(--teal)}
+  .pane.pa-blue{border-top:3px solid var(--blue)}
+  .pane.pa-red{border-top:3px solid var(--bad)}
+  .pane.pa-violet{border-top:3px solid var(--violet)}
+  .pane.light .ph{border-bottom:1px solid rgba(255,255,255,.07)!important}
+  .pane.pa-gold .ph .t{color:var(--gold)!important}
+  .pane.pa-teal .ph .t{color:#4fd9bb!important}
+  .pane.light .pill.off{background:rgba(59,130,246,.18);color:#8ab4ff;border:1px solid rgba(59,130,246,.4)}
+  .donut-hero .hint{color:#e0c583;background:rgba(224,168,40,.14)}
+  .dleg .r:hover{background:rgba(255,255,255,.05)}
+  .dleg .r .n{color:var(--tx)} .dleg .r .chev{color:#5f6b85}
+  .dd-back{background:var(--dark2);color:var(--tx2)}
+  .ddr{border-bottom:1px solid rgba(255,255,255,.07)} .ddr span{color:var(--tx2)}
+  .ddh{color:var(--tx3)}
+  .cmp .nm{color:var(--tx2)} .cmp.me .nm{color:var(--tx)} .cmp .tr{background:var(--dark2)} .cmp .vv{color:var(--tx)}
+  .ins{border-bottom:1px solid rgba(255,255,255,.07)}
+  .ins .tt{color:var(--tx)} .ins .dd{color:var(--tx2)} .ins .dd b{color:var(--tx)} .ins .src a{color:#8ab4ff}
+  .ins .ic.up{background:rgba(229,72,77,.16);color:#ff8a98}
+  .ins .ic.info{background:rgba(59,130,246,.16);color:#8ab4ff}
+  .ins .ic.flag{background:rgba(224,168,40,.16);color:#f0c75a}
+  .juris{color:#e8c877;background:rgba(224,168,40,.1)}
+  .foot{color:var(--tx3);border-top:1px solid rgba(255,255,255,.07)}
 </style>
 </head>
 <body>
@@ -194,28 +219,28 @@
   <div class="kpis" id="kpis"></div>
   <div class="console">
     <div class="col">
-      <div class="pane light" style="flex:1">
+      <div class="pane light pa-gold" style="flex:1">
         <div class="ph"><span class="t">פילוח עבירות</span><span style="display:flex;gap:7px;align-items:center"><span class="pill off">ציבורי</span><button class="dd-back" id="donutback" style="display:none" onclick="unfocus()">← הכל</button></span></div>
         <div class="pb" id="donutpane"></div>
       </div>
     </div>
     <div class="col">
-      <div class="pane dark" style="flex:1.2">
+      <div class="pane dark pa-blue" style="flex:1.2">
         <div class="ph"><span class="t">מפת פשיעה · גבול שיפוט <span class="pill off">ציבורי</span></span><span class="maptools"><button class="mini" id="spread-btn">◉ פריסת שומרים</button></span></div>
         <div style="position:relative;flex:1;min-height:0;display:flex;flex-direction:column"><div id="map"></div><div class="insp" id="insp"></div></div>
         <div class="legend" id="legend"></div>
       </div>
-      <div class="pane light" style="flex:1">
+      <div class="pane light pa-teal" style="flex:1">
         <div class="ph"><span class="t">ניתוח בזמן אמת + מענים מבוססי-ראיות</span><span class="pill off">מקורות מאומתים</span></div>
         <div class="pb" id="analysispane"></div>
       </div>
     </div>
     <div class="col">
-      <div class="pane dark" style="flex:1">
+      <div class="pane dark pa-red" style="flex:1">
         <div class="ph"><span class="t" style="color:#ff8a98">⚡ אירועים חיים · רשת שומרים</span><span class="pill live" id="feed-src">רשת שומרים</span></div>
         <div class="pb nopad feed" id="feed"><div class="empty">מתחבר לרשת SH✡MER…</div></div>
       </div>
-      <div class="pane dark" style="flex:1">
+      <div class="pane dark pa-violet" style="flex:1">
         <div class="ph"><span class="t">דירוג ארצי <span class="pill off">ציבורי</span></span></div>
         <div class="rank-note" id="rank-note"></div>
         <div class="pb nopad rank" id="rankbody"></div>
@@ -546,7 +571,7 @@ function donutHero(idx){
  var cats=Object.keys(c.cats).sort(function(a,b){return c.cats[b]-c.cats[a];});
  var r=78,cx=95,cy=95,C=2*Math.PI*r,off=0;
  var arcs=cats.map(function(k){var len=c.cats[k]/tot*C;var el='<circle cx="'+cx+'" cy="'+cy+'" r="'+r+'" fill="none" stroke="'+catCol(k)+'" stroke-width="22" stroke-dasharray="'+len.toFixed(2)+' '+(C-len).toFixed(2)+'" stroke-dashoffset="'+(-off).toFixed(2)+'" transform="rotate(-90 '+cx+' '+cy+')" style="cursor:pointer" onclick="focusCat(\''+k+'\')"><title>'+catShort(k)+'</title></circle>';off+=len;return el;}).join('');
- var svg='<svg viewBox="0 0 190 190" width="186" height="186">'+arcs+'<text x="95" y="90" text-anchor="middle" fill="#191c22" font-size="29" font-weight="800" font-family="Rubik">'+fmt(tot)+'</text><text x="95" y="110" text-anchor="middle" fill="#8a8577" font-size="11">עבירות 2025</text></svg>';
+ var svg='<svg viewBox="0 0 190 190" width="186" height="186">'+arcs+'<text x="95" y="90" text-anchor="middle" fill="#eef1f7" font-size="29" font-weight="800" font-family="Rubik">'+fmt(tot)+'</text><text x="95" y="110" text-anchor="middle" fill="#9aa6bd" font-size="11">עבירות 2025</text></svg>';
  var leg=cats.map(function(k){return '<div class="r" onclick="focusCat(\''+k+'\')"><span class="ico" style="background:'+catCol(k)+'">'+catIcon(k,15)+'</span><span class="n">'+catShort(k)+'</span><span class="v" style="color:'+catCol(k)+'">'+Math.round(c.cats[k]/tot*100)+'%</span><span class="chev">‹</span></div>';}).join('');
  return '<div class="donut-hero"><span class="hint">◉ לחצו על פלח או שורה לצלילה</span><div class="donut-wrap">'+svg+'</div></div><div class="dleg">'+leg+'</div>';
 }
@@ -555,7 +580,7 @@ function focusCat(k){
  var cities=DATA._sorted,c=_curCity;if(!c||!c.cats[k])return;_focus=k;
  var tot=c.total,v=c.cats[k],cs=v/tot,ns=natShare(cities,k);
  var r=78,C=2*Math.PI*r,len=cs*C;
- var svg='<svg viewBox="0 0 190 190" width="186" height="186"><circle cx="95" cy="95" r="78" fill="none" stroke="#e6e0d4" stroke-width="22"/><circle cx="95" cy="95" r="78" fill="none" stroke="'+catCol(k)+'" stroke-width="22" stroke-linecap="round" stroke-dasharray="'+len.toFixed(1)+' '+(C-len).toFixed(1)+'" transform="rotate(-90 95 95)"/><text x="95" y="90" text-anchor="middle" fill="#191c22" font-size="30" font-weight="800" font-family="Rubik">'+Math.round(cs*100)+'%</text><text x="95" y="110" text-anchor="middle" fill="#8a8577" font-size="11">'+catShort(k)+'</text></svg>';
+ var svg='<svg viewBox="0 0 190 190" width="186" height="186"><circle cx="95" cy="95" r="78" fill="none" stroke="#2a3147" stroke-width="22"/><circle cx="95" cy="95" r="78" fill="none" stroke="'+catCol(k)+'" stroke-width="22" stroke-linecap="round" stroke-dasharray="'+len.toFixed(1)+' '+(C-len).toFixed(1)+'" transform="rotate(-90 95 95)"/><text x="95" y="90" text-anchor="middle" fill="#eef1f7" font-size="30" font-weight="800" font-family="Rubik">'+Math.round(cs*100)+'%</text><text x="95" y="110" text-anchor="middle" fill="#9aa6bd" font-size="11">'+catShort(k)+'</text></svg>';
  var arr=cities.map(function(x){return{city:x.city,v:x.cats[k]||0};}).sort(function(a,b){return b.v-a.v;});var cr=1;for(var i=0;i<arr.length;i++){if(arr[i].city===c.city){cr=i+1;break;}}
  var diff=ns?Math.round((cs/ns-1)*100):0;var pcc=POP[c.city]?(v/POP[c.city]*1000).toFixed(2):'—';
  var near=cities.map(function(x){return{x:x,d:Math.hypot(x.lat-c.lat,x.lng-c.lng)};}).sort(function(a,b){return a.d-b.d;}).slice(0,6).map(function(o){return o.x;});
@@ -563,11 +588,12 @@ function focusCat(k){
  var bars=near.map(function(x){var w=Math.round((x.cats[k]||0)/maxN*100);return '<div class="cmp '+(x.city===c.city?'me':'')+'"><span class="nm">'+x.city+'</span><span class="tr"><span class="fl" style="width:'+w+'%;background:'+catCol(k)+'"></span></span><span class="vv">'+fmt(x.cats[k]||0)+'</span></div>';}).join('');
  document.getElementById('donutpane').innerHTML=
   '<div class="donut-hero"><div style="font-weight:800;color:'+catCol(k)+';display:flex;align-items:center;gap:8px;margin-bottom:6px"><span style="width:28px;height:28px;border-radius:8px;background:'+catCol(k)+';color:#fff;display:inline-flex;align-items:center;justify-content:center">'+catIcon(k,16)+'</span>'+k+'</div><div class="donut-wrap" style="cursor:default">'+svg+'</div></div>'+
-  '<div style="margin-top:8px">'+ddr('היקף בטריטוריה',fmt(v)+' עבירות')+ddr('נתח מכלל העבירות',Math.round(cs*100)+'%')+ddr('דירוג ארצי בעבירה זו','#'+cr+' / '+cities.length,cr<=10?'#c23a3f':cr<=30?'#9a7318':'#1a8f63')+ddr('מול הממוצע הארצי',(diff>=0?'+':'')+diff+'%  ('+Math.round(ns*100)+'% ארצי)',diff>12?'#c23a3f':diff<-12?'#1a8f63':'')+ddr('עבירה זו ל-1,000*',pcc)+'</div>'+
-  '<div class="ddh">חלוקה גאוגרפית · ערים סמוכות</div>'+bars;
+  '<div style="margin-top:8px">'+ddr('היקף בטריטוריה',fmt(v)+' עבירות')+ddr('נתח מכלל העבירות',Math.round(cs*100)+'%')+ddr('דירוג ארצי בעבירה זו','#'+cr+' / '+cities.length,cr<=10?'#ff8a98':cr<=30?'#f0c75a':'#6ee7a8')+ddr('מול הממוצע הארצי',(diff>=0?'+':'')+diff+'%  ('+Math.round(ns*100)+'% ארצי)',diff>12?'#ff8a98':diff<-12?'#6ee7a8':'')+ddr('עבירה זו ל-1,000*',pcc)+'</div>'+
+  '<div class="ddh">חלוקה גאוגרפית · ערים סמוכות</div>'+bars+'<div class="ddh">תת-עבירות</div><div style="font-size:11px;color:var(--tx3);line-height:1.55">פילוח תת-עבירות (לדוגמה רצח · תקיפה · שוד) ייטען מנתוני סוג-עבירה גרנולריים (StatisticCrimeType) של משטרת ישראל — בתהליך הטמעה. לא יוצגו מספרים לא-מאומתים.</div>';
+ buildAnalysis(DATA._idx,k);
  document.getElementById('donutback').style.display='inline-block';
 }
-function unfocus(){ if(DATA&&DATA._idx!=null){document.getElementById('donutback').style.display='none';document.getElementById('donutpane').innerHTML=donutHero(DATA._idx);} }
+function unfocus(){ if(DATA&&DATA._idx!=null){document.getElementById('donutback').style.display='none';document.getElementById('donutpane').innerHTML=donutHero(DATA._idx);buildAnalysis(DATA._idx,null);} }
 
 function buildKPIs(idx){
  var cities=DATA._sorted,c=cities[idx],tot=c.total;
@@ -592,29 +618,44 @@ function buildRank(idx){
  document.getElementById('rankbody').innerHTML=cities.map(function(x,i){var w=Math.round(x.total/max*100);return '<div class="row '+(i===idx?'me':'')+'"><span class="pos">'+(i+1)+'</span><span class="city">'+x.city+'</span><span class="bar"><i style="width:'+w+'%"></i></span><span class="tot">'+fmt(x.total)+'</span></div>';}).join('');
 }
 
-function buildAnalysis(idx){
+var CRIME_LEVER={
+ 'עבירות כלפי הרכוש':{d:'סיור ממוקד בנקודות חמות הראה <b>−16% פשיעת רכוש</b> במטא-אנליזה (78 ניסויים), עם גלישת תועלת לסביבה. השלם ב-CPTED: תאורה ושדות ראייה בזירות.',s:'OJP CrimeSolutions (Effective)',u:'https://crimesolutions.ojp.gov/ratedpractices/hot-spots-policing'},
+ 'עבירות נגד גוף':{d:'שילוב "עיר ללא אלימות" (מסגרת מוניציפלית ממומנת) עם סיור ממוקד בזירות — ירידה מוכחת באלימות; הוסף הרתעה ממוקדת (focused deterrence).',s:'הרשות הלאומית לביטחון קהילתי',u:UVZ},
+ 'עבירות סדר ציבורי':{d:'שיטור מכוון-בעיה (POP) ואכיפת אי-סדר ממוקדת בזירות הבולטות מפחיתים עבירות סדר ציבורי באזורים הממוקדים.',s:'College of Policing',u:'https://www.college.police.uk/research/crime-reduction-toolkit/hot-spots-policing'},
+ '_def':{d:'סיור יזום ממוקד בזירות הבולטות + אכיפה ממוקדת — הגישה בעלת בסיס-הראיות החזק ביותר להפחתת פשיעה.',s:'OJP CrimeSolutions',u:'https://crimesolutions.ojp.gov/ratedpractices/hot-spots-policing'}
+};
+function buildAnalysis(idx,fk){
  var cities=DATA._sorted,c=cities[idx],tot=c.total;natShare(cities,'x');
- var ranked=Object.keys(c.cats).map(function(k){var cs=c.cats[k]/tot,ns=natShare(cities,k);return{k:k,cs:cs,ns:ns,gap:cs-ns};}).sort(function(a,b){return b.gap-a.gap;});
- var pc=perCap(c);var pv=cities.map(perCap).filter(function(v){return v!=null;}).sort(function(a,b){return a-b;});var med=pv[Math.floor(pv.length/2)];
- var tc=topCat(c.cats);var out=[];
- var top=ranked[0];var d=top.ns?Math.round((top.cs/top.ns-1)*100):0;
- out.push({cls:'up',i:'▲',t:catShort(top.k)+' — '+Math.round(top.cs*100)+'% מהעבירות',
-  d:'העבירה הדומיננטית, '+(d>0?'<b>+'+d+'%</b> מעל הממוצע הארצי':'קרוב לממוצע הארצי')+' ('+Math.round(top.ns*100)+'%). סיור מכוון לנקודות החמות הראה <b>−16% פשיעה</b> במטא-אנליזה של 78 ניסויים.',
-  src:'OJP CrimeSolutions — Hot Spots (דירוג: Effective)',url:'https://crimesolutions.ojp.gov/ratedpractices/hot-spots-policing'});
- if(pc&&med){var r=pc/med;out.push({cls:'flag',i:'◉',t:'עוצמת פשיעה לנפש',
-  d:'<b>'+pc.toFixed(1)+'</b> עבירות ל-1,000 תושבים — <b>×'+r.toFixed(1)+'</b> החציון הארצי ('+med.toFixed(1)+'). '+(r>1.2?'עוצמה גבוהה — מצדיק הקצאת משאבים מוגברת.':r<0.9?'עוצמה נמוכה יחסית — שמירה על מגמה.':'עוצמה בינונית.'),
-  src:'מחושב מנתוני משטרה + הערכת למ״ס',url:''});}
- var near=cities.map(function(x){return{x:x,d:Math.hypot(x.lat-c.lat,x.lng-c.lng)};}).sort(function(a,b){return a.d-b.d;}).slice(1,7).map(function(o){return o.x;});
- var worse=near.filter(function(x){return (perCap(x)||0)>(pc||0);}).length;
- out.push({cls:'info',i:'⌖',t:'מיקום יחסי',d:'מדורגת <b>#'+(idx+1)+'</b> ארצית בנפח. מבין 6 הערים הסמוכות, <b>'+worse+'</b> חמורות יותר בפשיעה לנפש.',src:'',url:''});
+ var out=[],head;
+ if(fk){
+   var v=c.cats[fk]||0,cs=v/tot,ns=natShare(cities,fk);
+   var arr=cities.map(function(x){return{city:x.city,v:x.cats[fk]||0};}).sort(function(a,b){return b.v-a.v;});var cr=1;for(var i=0;i<arr.length;i++){if(arr[i].city===c.city){cr=i+1;break;}}
+   var diff=ns?Math.round((cs/ns-1)*100):0;
+   var near=cities.map(function(x){return{x:x,d:Math.hypot(x.lat-c.lat,x.lng-c.lng)};}).sort(function(a,b){return a.d-b.d;}).slice(1,7).map(function(o){return o.x;});
+   var worse=near.filter(function(x){return (x.cats[fk]||0)>v;}).length;
+   var lev=CRIME_LEVER[fk]||CRIME_LEVER._def;
+   out.push({cls:'up',i:'▲',t:catShort(fk)+' · '+c.city,d:'<b>'+fmt(v)+'</b> עבירות ('+Math.round(cs*100)+'% מהעיר) · דירוג ארצי <b>#'+cr+'</b> בעבירה זו · '+(diff>=0?'+':'')+diff+'% מול הממוצע הארצי.'});
+   out.push({cls:'flag',i:'⌖',t:'הקשר גאוגרפי',d:'מבין 6 הערים הסמוכות, <b>'+worse+'</b> חמורות יותר בעבירה זו.'+(cr<=10?' מהגבוהות בארץ — עדיפות גבוהה.':'')});
+   out.push({cls:'info',i:'◆',t:'מנוף מומלץ לעבירה זו',d:lev.d,src:lev.s,url:lev.u});
+   head='ניתוח ממוקד · '+catShort(fk)+' · '+c.city;
+ } else {
+   var ranked=Object.keys(c.cats).map(function(k){var kc=c.cats[k]/tot,kn=natShare(cities,k);return{k:k,cs:kc,ns:kn,gap:kc-kn};}).sort(function(a,b){return b.gap-a.gap;});
+   var pc=perCap(c);var pv=cities.map(perCap).filter(function(x){return x!=null;}).sort(function(a,b){return a-b;});var med=pv[Math.floor(pv.length/2)];
+   var top=ranked[0];var d=top.ns?Math.round((top.cs/top.ns-1)*100):0;
+   out.push({cls:'up',i:'▲',t:catShort(top.k)+' — '+Math.round(top.cs*100)+'% מהעבירות',d:'העבירה הדומיננטית, '+(d>0?'<b>+'+d+'%</b> מעל הממוצע הארצי':'קרוב לממוצע הארצי')+' ('+Math.round(top.ns*100)+'%). סיור מכוון לנקודות חמות: <b>−16% פשיעה</b> במטא-אנליזה של 78 ניסויים.',src:'OJP CrimeSolutions — Hot Spots (Effective)',url:'https://crimesolutions.ojp.gov/ratedpractices/hot-spots-policing'});
+   if(pc&&med){var r=pc/med;out.push({cls:'flag',i:'◉',t:'עוצמת פשיעה לנפש',d:'<b>'+pc.toFixed(1)+'</b> ל-1,000 תושבים — <b>×'+r.toFixed(1)+'</b> החציון הארצי ('+med.toFixed(1)+'). '+(r>1.2?'עוצמה גבוהה — מצדיק הקצאת משאבים מוגברת.':r<0.9?'עוצמה נמוכה יחסית.':'עוצמה בינונית.')});}
+   var higher=cities.length-1-idx;
+   out.push({cls:'info',i:'⟳',t:'מתחילת 2025',d:'<b>'+fmt(tot)+'</b> עבירות תועדו בטריטוריה בשנת 2025 (ינואר–דצמבר). מדורגת <b>#'+(idx+1)+'</b> ארצית — גבוה מ-<b>'+higher+'</b> מתוך '+(cities.length-1)+' הערים.'});
+   head='תובנות בזמן אמת';
+ }
  var insHTML=out.map(function(o){return '<div class="ins"><div class="ic '+o.cls+'">'+o.i+'</div><div style="flex:1"><div class="tt">'+o.t+'</div><div class="dd">'+o.d+'</div>'+(o.src?'<div class="src">'+(o.url?'<a href="'+o.url+'" target="_blank" rel="noopener">'+o.src+' ↗</a>':o.src)+'</div>':'')+'</div></div>';}).join('');
- var set=SOLSET[tc.name]||SOLSET['עבירות כלפי הרכוש'];
- var solHTML='<div class="juris">⚖️ תחום שיפוט: ישראל · מותאם לעבירה המובילה: '+catShort(tc.name)+'</div>'+
+ var solKey=fk||topCat(c.cats).name;var set=SOLSET[solKey]||SOLSET['עבירות כלפי הרכוש'];
+ var solHTML='<div class="juris">⚖️ תחום שיפוט: ישראל · '+(fk?'מותאם לעבירה: '+catShort(fk):'מותאם לעבירה המובילה: '+catShort(topCat(c.cats).name))+'</div>'+
   set.map(function(o){return '<div class="ins"><div class="ic flag">'+o.n+'</div><div style="flex:1"><div class="tt">'+o.t+'</div><div class="dd">'+o.d+'</div><div class="src"><a href="'+o.u+'" target="_blank" rel="noopener">'+o.s+' ↗</a></div></div></div>';}).join('');
  document.getElementById('analysispane').innerHTML=
-  '<div class="ddh" style="margin-top:0">תובנות בזמן אמת</div>'+insHTML+
+  '<div class="ddh" style="margin-top:0">'+head+'</div>'+insHTML+
   '<div class="ddh">מענים מבוססי-ראיות</div>'+solHTML+
-  '<div class="foot">המספרים מחושבים בזמן אמת מנתוני משטרת ישראל 2025. המענים מבוססים על מחקר מבוקר בלבד (קישור בכל כרטיס). אין זו המלצה משפטית מחייבת — יישום בתיאום הרשות והמשטרה.</div>';
+  '<div class="foot">מחושב בזמן אמת מנתוני משטרת ישראל 2025. '+(fk?'הניתוח ממוקד לעבירה ולטריטוריה שנבחרו. ':'לחצו על פלח/זירה לניתוח ממוקד. ')+'מגמה רב-שנתית ותת-עבירות יתווספו עם נתוני עבר גרנולריים — בתהליך. אין זו המלצה משפטית מחייבת.</div>';
 }
 
 function renderLegend(){var el=document.getElementById('legend');if(!el)return;el.innerHTML=Object.keys(CAT_META).map(function(k){return '<span><i style="background:'+catCol(k)+'"></i>'+catShort(k)+'</span>';}).join('');}
