@@ -93,6 +93,30 @@
   .ins .ic{width:30px;height:30px;border-radius:8px;background:rgba(250,172,34,.14);color:var(--gold);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:15px}
   .ins .tt{font-size:13px;font-weight:700;color:var(--tx)}
   .ins .dd{font-size:12px;color:var(--tx2);line-height:1.5;margin-top:2px}
+  /* section accent theming — break the blue */
+  .panel{border-top:3px solid var(--b)}
+  .panel.acc-blue{border-top-color:#2f80ed}  .panel.acc-blue h2{color:#6aa6ff;background:linear-gradient(180deg,rgba(47,128,237,.16),transparent)}
+  .panel.acc-violet{border-top-color:#9b6cff} .panel.acc-violet h2{color:#b79bff;background:linear-gradient(180deg,rgba(155,108,255,.16),transparent)}
+  .panel.acc-teal{border-top-color:#18c29c}  .panel.acc-teal h2{color:#4fd9bb;background:linear-gradient(180deg,rgba(24,194,156,.16),transparent)}
+  .panel.acc-amber{border-top-color:#f2b705} .panel.acc-amber h2{color:#ffce4d;background:linear-gradient(180deg,rgba(242,183,5,.16),transparent)}
+  .panel.acc-red{border-top-color:#e5484d}   .panel.acc-red h2{color:#ff8a98;background:linear-gradient(180deg,rgba(229,72,77,.16),transparent)}
+  .panel.acc-gold{border-top-color:var(--gold)} .panel.acc-gold h2{color:var(--gold);background:linear-gradient(180deg,rgba(250,172,34,.14),transparent)}
+  .panel.lite.acc-teal,.panel.lite.acc-violet,.panel.lite.acc-amber{background:linear-gradient(160deg,#16294d,#0f1f3b)}
+  /* KPI cards — varied accents */
+  .cards .stat{border-top:3px solid #2f80ed}
+  .cards .stat:nth-child(1){border-top-color:var(--gold)}
+  .cards .stat:nth-child(2){border-top-color:#18c29c}
+  .cards .stat:nth-child(3){border-top-color:#9b6cff}
+  .cards .stat:nth-child(4){border-top-color:#e5484d}
+  .cards .stat:nth-child(5){border-top-color:#f2b705}
+  /* section titles get a colored tab */
+  .sectitle{border-inline-start:4px solid var(--gold);padding-inline-start:9px}
+  .sectitle.t-teal{border-color:#18c29c}.sectitle.t-blue{border-color:#2f80ed}.sectitle.t-violet{border-color:#9b6cff}.sectitle.t-amber{border-color:#f2b705}
+  /* deep-dive */
+  .ddr{display:flex;justify-content:space-between;font-size:12.5px;padding:6px 0;border-bottom:1px solid rgba(255,255,255,.06)}
+  .ddr span{color:var(--tx2)} .ddr b{font-weight:700}
+  .dd-h{font-size:11px;color:var(--tx3);text-transform:uppercase;letter-spacing:.05em;margin:4px 0 9px;font-weight:700}
+  #donutback{background:var(--card2);border:1px solid var(--b);color:var(--tx2);border-radius:8px;padding:4px 10px;font-size:11px;cursor:pointer}
   @media print{body{background:#fff;color:#111}.topbar{position:static}.signout,.live .d{display:none}.panel,.stat{break-inside:avoid;border-color:#ccc}#map{height:320px}}
 </style>
 </head>
@@ -134,22 +158,22 @@
 <div class="wrap">
   <div class="cards" id="cards"></div>
   <div class="grid">
-    <div class="panel"><h2><span>מפת פשיעה · גבול שיפוט הרשות</span><span class="mapbar"><button class="mini" id="spread-btn">👥 פריסת שומרים</button></span></h2><div style="position:relative"><div id="map"></div><div class="insp" id="insp"></div></div><div class="legend" id="legend"></div></div>
+    <div class="panel acc-blue"><h2><span>מפת פשיעה · גבול שיפוט הרשות</span><span class="mapbar"><button class="mini" id="spread-btn">👥 פריסת שומרים</button></span></h2><div style="position:relative"><div id="map"></div><div class="insp" id="insp"></div></div><div class="legend" id="legend"></div></div>
     <div style="display:flex;flex-direction:column;gap:14px">
-      <div class="panel lite"><h2>פילוח סוגי עבירות</h2><div class="pbody"><div class="donutgrid"><div id="donut"></div><div class="dlegend" id="dlegend"></div></div></div></div>
-      <div class="panel lite"><h2>דירוג עומס עבירות · נתוני משטרה</h2><div class="pbody" style="text-align:center"><div id="ring"></div><div id="ringsub" style="font-size:12px;color:var(--tx2);margin-top:6px"></div></div></div>
+      <div class="panel lite acc-violet"><h2><span>פילוח סוגי עבירות · לחצו לצלילה</span><button id="donutback" style="display:none" onclick="unfocus()">← כל העבירות</button></h2><div class="pbody"><div class="donutgrid"><div id="donut"></div><div class="dlegend" id="dlegend"></div></div><div id="deepdive" style="display:none;margin-top:12px"></div></div></div>
+      <div class="panel lite acc-amber"><h2>דירוג עומס עבירות · נתוני משטרה</h2><div class="pbody" style="text-align:center"><div id="ring"></div><div id="ringsub" style="font-size:12px;color:var(--tx2);margin-top:6px"></div></div></div>
     </div>
   </div>
-  <div class="sectitle">הקשר דמוגרפי · פשיעה לנפש</div>
+  <div class="sectitle t-blue">הקשר דמוגרפי · פשיעה לנפש</div>
   <div class="cards socio" id="socio"></div>
-  <div class="sectitle">תובנות חכמות · ניתוח מבוסס נתוני משטרת ישראל 2025</div>
-  <div class="panel lite"><div class="pbody" id="insights"></div></div>
+  <div class="sectitle t-teal">תובנות חכמות · ניתוח מבוסס נתוני משטרת ישראל 2025</div>
+  <div class="panel lite acc-teal"><div class="pbody" id="insights"></div></div>
   <div class="grid">
-    <div class="panel lite"><h2>השוואה אזורית · פשיעה ל-1,000 תושבים</h2><div class="pbody" id="compare"></div></div>
-    <div class="panel feed"><h2 style="color:#ff8a98">⚡ אירועים חיים · SOS · נעדרים · דיווחים</h2><div id="feed"><div class="empty">מתחבר לרשת SH✡MER…</div></div></div>
+    <div class="panel lite acc-gold"><h2>השוואה אזורית · פשיעה ל-1,000 תושבים</h2><div class="pbody" id="compare"></div></div>
+    <div class="panel feed acc-red"><h2>⚡ אירועים חיים · SOS · נעדרים · דיווחים</h2><div id="feed"><div class="empty">מתחבר לרשת SH✡MER…</div></div></div>
   </div>
-  <div class="sectitle">דירוג ארצי · איפה הטריטוריה שלך עומדת</div>
-  <div class="panel"><div class="rank-wrap"><table><thead><tr><th>#</th><th>עיר</th><th>סה״כ עבירות 2025</th><th>סוג מוביל</th></tr></thead><tbody id="rankbody"></tbody></table></div></div>
+  <div class="sectitle t-violet">דירוג ארצי · איפה הטריטוריה שלך עומדת</div>
+  <div class="panel acc-violet"><div class="rank-wrap"><table><thead><tr><th>#</th><th>עיר</th><th>סה״כ עבירות 2025</th><th>סוג מוביל</th></tr></thead><tbody id="rankbody"></tbody></table></div></div>
   <div class="note" id="note"></div>
 </div>
 </div>
@@ -264,8 +288,47 @@ function toggleSpread(c){
    L.circleMarker([la,ln],{radius:2.6,color:'#18c29c',weight:0,fillColor:'#18c29c',fillOpacity:.65}).addTo(spreadLayer); }
 }
 
+var _focus=null;
+function ddrow(l,v,col){return '<div class="ddr"><span>'+l+'</span><b'+(col?' style="color:'+col+'"':'')+'>'+v+'</b></div>';}
+function focusCat(k){
+  var cities=DATA._sorted, c=_curCity; if(!c||!c.cats[k])return; _focus=k;
+  var tot=c.total, v=c.cats[k]||0, cs=v/tot, ns=natShare(cities,k);
+  // donut: this category vs the rest
+  var segs=[{val:v,color:CAT_COL[k]||'#888',label:k},{val:Math.max(0,tot-v),color:'#243352',label:'שאר העבירות'}];
+  document.getElementById('donut').innerHTML=donutSVG(segs, Math.round(cs*100)+'%', k.replace('עבירות ',''));
+  // national rank for THIS category (100% from police data)
+  var arr=cities.map(function(x){return {city:x.city,v:x.cats[k]||0};}).sort(function(a,b){return b.v-a.v;});
+  var cr=1; for(var i=0;i<arr.length;i++){ if(arr[i].city===c.city){cr=i+1;break;} }
+  var diff=ns?Math.round((cs/ns-1)*100):0;
+  var pcCat=POP[c.city]?(v/POP[c.city]*1000).toFixed(2):'—';
+  document.getElementById('dlegend').innerHTML=
+    '<div style="font-weight:800;color:'+(CAT_COL[k]||'#fff')+';font-size:14px;margin-bottom:8px">'+k+'</div>'+
+    ddrow('היקף בטריטוריה',fmt(v)+' עבירות')+
+    ddrow('נתח מכלל העבירות',Math.round(cs*100)+'%')+
+    ddrow('דירוג ארצי בעבירה זו','#'+cr+' / '+cities.length, cr<=10?'#e5484d':cr<=30?'#f2b705':'#18c29c')+
+    ddrow('מול הממוצע הארצי',(diff>=0?'+':'')+diff+'%  ('+Math.round(ns*100)+'% ארצי)', diff>12?'#e5484d':diff<-12?'#18c29c':'')+
+    ddrow('עבירה זו ל-1,000 תושבים*',pcCat);
+  // geographic division: this category across nearest cities (real data)
+  var near=cities.map(function(x){return {x:x,d:Math.hypot(x.lat-c.lat,x.lng-c.lng)};}).sort(function(a,b){return a.d-b.d;}).slice(0,6).map(function(o){return o.x;});
+  var maxN=Math.max.apply(null,near.map(function(x){return x.cats[k]||0;}))||1;
+  var bars=near.map(function(x){var w=Math.round((x.cats[k]||0)/maxN*100);return '<div class="cmp '+(x.city===c.city?'me':'')+'"><span class="nm">'+x.city+'</span><span class="tr"><span class="fl" style="width:'+w+'%'+(x.city===c.city?'':';background:'+(CAT_COL[k]||'#888'))+'"></span></span><span class="vv">'+fmt(x.cats[k]||0)+'</span></div>';}).join('');
+  var dd=document.getElementById('deepdive');
+  dd.innerHTML='<div class="dd-h">חלוקה גאוגרפית · '+k.replace('עבירות ','')+' בערים סמוכות (נתוני משטרה)</div>'+bars+
+    '<div class="dd-h" style="margin-top:12px">המלצת פעולה</div><div style="font-size:12.5px;color:var(--tx2);line-height:1.6">'+focusAdvice(k,diff,cr,cities.length)+'</div>';
+  dd.style.display='block';
+  document.getElementById('donutback').style.display='inline-block';
+}
+function focusAdvice(k,diff,cr,n){
+  var sev=cr<=10?'עומס ארצי גבוה. ':'';
+  if(diff>12) return sev+'עבירות אלו נפוצות בטריטוריה מעל הממוצע הארצי (+'+diff+'%). מומלץ: מיקוד סיורים ותאורה באזורים החמים, קמפיין מניעה ממוקד, והפעלת רשת השומרים לדיווח מהיר.';
+  if(diff<-12) return sev+'שיעור נמוך מהממוצע הארצי ('+diff+'%). שמרו על המגמה — נטרו נקודות חמות מקומיות והמשיכו אכיפה מונעת.';
+  return sev+'שיעור קרוב לממוצע הארצי. נטרו שינויים רבעוניים ומקדו משאבים בנקודות החמות שבמפה.';
+}
+function unfocus(){ if(DATA&&DATA._idx!=null)render(DATA._idx); }
 function render(idx){
-  var cities=DATA._sorted, c=cities[idx]; if(!c)return; _curCity=c;
+  var cities=DATA._sorted, c=cities[idx]; if(!c)return; _curCity=c; DATA._idx=idx; _focus=null;
+  var db=document.getElementById('donutback'); if(db)db.style.display='none';
+  var dd=document.getElementById('deepdive'); if(dd)dd.style.display='none';
   var rank=idx+1, tot=c.total, tc=topCat(c.cats);
   var natTotal=cities.reduce(function(s,x){return s+x.total;},0), pct=((tot/natTotal)*100).toFixed(1);
   var pc=perCap(c), pcTxt=pc?pc.toFixed(1):'—', cov=(CLIENT&&CLIENT.demo)?214:'—';
@@ -285,12 +348,13 @@ function render(idx){
     mk.on('mouseover',function(){ insp('<b style="color:'+(CAT_COL[k])+'">'+k+'</b><br>'+fmt(c.cats[k])+' עבירות · '+Math.round(c.cats[k]/tot*100)+'% · '+c.city); });
     mk.on('mouseout',function(){ insp(null); });
     var ns=natShare(cities,k), cs=c.cats[k]/tot, flag=cs>ns*1.12?' ⚠️ מעל הממוצע':(cs<ns*0.88?' ✓ מתחת לממוצע':'');
-    mk.bindPopup('<div style="min-width:170px"><b style="color:'+(CAT_COL[k])+'">'+k+'</b><br>'+fmt(c.cats[k])+' עבירות · '+Math.round(cs*100)+'% מהעיר<br><span style="color:#8aa">ארצי: '+Math.round(ns*100)+'%'+flag+'</span></div>');
+    mk.bindPopup('<div style="min-width:170px"><b style="color:'+(CAT_COL[k])+'">'+k+'</b><br>'+fmt(c.cats[k])+' עבירות · '+Math.round(cs*100)+'% מהעיר<br><span style="color:#8aa">ארצי: '+Math.round(ns*100)+'%'+flag+'</span><br><span style="color:'+CAT_COL[k]+';font-size:11px">▸ לחצו לצלילה לעומק</span></div>');
+    mk.on('click',function(){ focusCat(k); });
     mk.addTo(cityLayer);});
   // donut + legend
   var segs=cats.slice().sort(function(a,b){return c.cats[b]-c.cats[a];}).map(function(k){return {val:c.cats[k],color:CAT_COL[k]||'#888',label:k};});
   document.getElementById('donut').innerHTML=donutSVG(segs,fmt(tot),'עבירות 2025');
-  document.getElementById('dlegend').innerHTML=segs.map(function(sg){return '<div class="r"><i style="background:'+sg.color+'"></i><span class="n">'+sg.label+'</span><span class="v">'+Math.round(sg.val/tot*100)+'%</span></div>';}).join('');
+  document.getElementById('dlegend').innerHTML=segs.map(function(sg){return '<div class="r" style="cursor:pointer" title="לחצו לצלילה" onclick="focusCat(\''+sg.label+'\')"><i style="background:'+sg.color+'"></i><span class="n">'+sg.label+'</span><span class="v">'+Math.round(sg.val/tot*100)+'%</span></div>';}).join('');
   // ring = national rank (100% from police data: position among all cities by total offences)
   var rFrac=(cities.length-rank+1)/cities.length;
   document.getElementById('ring').innerHTML=ringSVG(rFrac, '#'+rank, 'דירוג ארצי', rank<=10?'#e5484d':rank<=30?'#f2b705':'#18c29c');
