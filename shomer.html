@@ -166,7 +166,7 @@ img{display:block;}
 .lbtn:hover:not(.on){color:var(--tx1);}
 /* When lang bar visible, offset everything */
 body.lb-on{--hdr-top:calc(env(safe-area-inset-top, 0px) + 32px);}
-body:not(.lb-on){--hdr-top:env(safe-area-inset-top, 0px);}
+body:not(.lb-on){--hdr-top:max(env(safe-area-inset-top, 0px), 28px);}
 
 /* ══════════ ONBOARDING ══════════ */
 #ob{position:fixed;inset:0;z-index:9999;background:#070F1E;overflow-y:auto;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:26px 0;}
@@ -187,6 +187,12 @@ body:not(.lb-on){--hdr-top:env(safe-area-inset-top, 0px);}
 .ob-st{width:32px;height:3px;border-radius:2px;background:var(--n5);transition:background .3s;}
 .ob-st.on{background:var(--g3);}
 .ob-panel{width:100%;max-width:390px;padding:0 20px;display:none!important;}
+.nudge-bar{position:absolute;top:calc(var(--hdr-top,0px) + var(--hdr) + 8px);left:12px;right:12px;z-index:560;display:flex;align-items:center;gap:10px;padding:11px 12px;border-radius:14px;background:linear-gradient(135deg,#132742,#0e1d35);border:1px solid rgba(250,172,34,.4);box-shadow:0 10px 30px rgba(0,0,0,.45);animation:nudgeIn .3s ease;max-width:520px;margin-inline:auto}
+@keyframes nudgeIn{from{opacity:0;transform:translateY(-8px)}to{opacity:1;transform:none}}
+.nudge-ic{font-size:18px;flex:0 0 auto}
+.nudge-tx{flex:1;font-size:12.5px;font-weight:600;color:var(--tx1);line-height:1.4}
+.nudge-cta{flex:0 0 auto;font-size:11.5px;font-weight:800;color:#1a1206;background:linear-gradient(135deg,#E0A828,#F5C840);border:0;border-radius:9px;padding:7px 11px;cursor:pointer}
+.nudge-x{flex:0 0 auto;width:26px;height:26px;border-radius:8px;border:1px solid var(--b2);background:transparent;color:var(--tx3);cursor:pointer;font-size:13px}
 .ob-panel.active{display:block!important;animation:pfade .25s ease;}
 /* ── Country-code button + searchable picker ── */
 .cc-btn{display:flex;align-items:center;justify-content:center;gap:6px;cursor:pointer;background:var(--n3,#16233f);border:1px solid var(--b2,#2a3a5c);color:var(--tx1,#e8eefc);border-radius:12px;height:52px;font-size:15px}
@@ -4080,6 +4086,53 @@ function setupDo(what){
 }
 function setupDone(silent){ var ov=document.getElementById('setup-prompt'); if(ov)ov.classList.remove('on'); if(!silent){ setTimeout(function(){ try{ startFeatureTour(); }catch(e){} }, 350); } }
 /* Shared app-entry path - used by fresh onboarding AND by returning users on load. */
+/* ═══ RETENTION / GUIDANCE NUDGES — contextual in-app prompts (additive, dismissible) ═══ */
+var NUDGE_TIPS=[
+ {k:'cpr',   he:'יודע/ת לבצע החייאה?',            en:'Know how to do CPR?',               ar:'هل تعرف الإنعاش القلبي؟'},
+ {k:'choke', he:'מה עושים כשמישהו נחנק?',          en:'What to do if someone is choking?',  ar:'ماذا تفعل عند الاختناق؟'},
+ {k:'bleed', he:'איך עוצרים דימום חמור?',          en:'How to stop severe bleeding?',       ar:'كيف توقف نزيفاً شديداً؟'},
+ {k:'stroke',he:'לזהות שבץ בזמן (FAST)',           en:'Spot a stroke in time (FAST)',       ar:'تعرّف على السكتة (FAST)'},
+ {k:'heart', he:'סימני התקף לב — מה עושים?',       en:'Heart-attack signs — what to do?',   ar:'علامات النوبة القلبية؟'},
+ {k:'drown', he:'חילוץ טביעה — הצעדים',            en:'Drowning rescue — the steps',        ar:'إنقاذ من الغرق؟'}
+];
+function nudgeState(){ if(!SS.nudge) SS.nudge={lastTs:0,tipIdx:0,dismissed:{}}; return SS.nudge; }
+function _nudgeDismissed(kind,days){ var n=nudgeState(); var t=n.dismissed[kind]||0; return (Date.now()-t) < (days*86400000); }
+function nudgePick(){
+ var he=currentLang==='he', ar=currentLang==='ar';
+ var hasCircle=(SS.circleMembers||[]).some(function(m){return m && !m.pending;});
+ var hasCode=!!(SS.security&&/^\d{4,6}$/.test((SS.security.pin)||''));
+ var hasGeo=(typeof userLat!=='undefined'&&userLat!=null);
+ if(!hasCircle && !_nudgeDismissed('circle',2))
+   return {kind:'circle', ic:'🛡️', tx:(he?'הגדרת את מעגל השומרים שלך? זה מי שיקבל את ה-SOS.':ar?'هل أضفت دائرة حُرّاسك؟ هم من يتلقّى استغاثتك.':'Set up your SHOMER circle? They receive your SOS.'), cta:(he?'הוסף/י':ar?'أضف':'Add'), act:function(){ try{openCircles();}catch(e){} }};
+ if(!hasCode && !_nudgeDismissed('code',2))
+   return {kind:'code', ic:'🔒', tx:(he?'הגדר/י קוד אבטחה — לביטול SOS והגנת גנב.':ar?'اضبط رمز الأمان — لإلغاء الاستغاثة وحماية السرقة.':'Set a security code — to cancel SOS + arm theft protection.'), cta:(he?'הגדר/י':ar?'اضبط':'Set'), act:function(){ try{openSetPin();}catch(e){} }};
+ if(!hasGeo && !_nudgeDismissed('geo',1))
+   return {kind:'geo', ic:'📍', tx:(he?'שתף/י מיקום כדי שעזרה תגיע אליך מהר.':ar?'شارك موقعك ليصلك العون بسرعة.':'Share your location so help reaches you fast.'), cta:(he?'שתף/י':ar?'شارك':'Share'), act:function(){ try{ nudgeAskGeo(); }catch(e){} }};
+ var n=nudgeState(); var tip=NUDGE_TIPS[(n.tipIdx||0)%NUDGE_TIPS.length];
+ return {kind:'tip', ic:'💡', tx:(he?tip.he:ar?tip.ar:tip.en), cta:(he?'קרא/י':ar?'اقرأ':'Read'), act:function(){ try{ openGuideTopic(tip.k); }catch(e){} }, tip:true};
+}
+function nudgeAskGeo(){
+ try{ if(typeof ensureNativeGeo==='function'){ ensureNativeGeo().then(function(){ _nudgeGeoNow(); }); } else { _nudgeGeoNow(); } }catch(e){ _nudgeGeoNow(); }
+}
+function _nudgeGeoNow(){
+ try{ navigator.geolocation.getCurrentPosition(function(p){ userLat=p.coords.latitude; userLng=p.coords.longitude; try{ccSyncFromGeo&&ccSyncFromGeo();}catch(e){} try{moveUserDot(userLat,userLng);}catch(e){} try{startGeoWatch();}catch(e){} try{ if(MAP) MAP.setView([userLat,userLng], Math.max(MAP.getZoom?MAP.getZoom():14,15)); }catch(e){} }, function(){}, {enableHighAccuracy:true,timeout:15000,maximumAge:0}); }catch(e){}
+}
+function nudgeMaybeShow(){
+ try{
+  if(document.getElementById('nudge-bar')) return;
+  var n=nudgeState();
+  if(n.lastTs && (Date.now()-n.lastTs) < 18*3600000) return;   /* at most ~once / 18h */
+  var pick=nudgePick(); if(!pick) return;
+  var bar=document.createElement('div'); bar.id='nudge-bar'; bar.className='nudge-bar';
+  bar.innerHTML='<span class="nudge-ic" aria-hidden="true">'+pick.ic+'</span><span class="nudge-tx">'+ESC(pick.tx)+'</span><button class="nudge-cta">'+ESC(pick.cta)+'</button><button class="nudge-x" aria-label="dismiss">✕</button>';
+  var app=document.getElementById('app')||document.body; app.appendChild(bar);
+  n.lastTs=Date.now(); if(pick.tip){ n.tipIdx=((n.tipIdx||0)+1)%NUDGE_TIPS.length; } try{saveStore();}catch(e){}
+  bar.querySelector('.nudge-cta').onclick=function(){ try{pick.act();}catch(e){} bar.remove(); };
+  bar.querySelector('.nudge-x').onclick=function(){ var st=nudgeState(); st.dismissed[pick.kind]=Date.now(); try{saveStore();}catch(e){} bar.remove(); };
+  setTimeout(function(){ try{ if(bar&&bar.parentNode){ bar.style.transition='opacity .4s'; bar.style.opacity='0'; setTimeout(function(){bar.remove();},400);} }catch(e){} }, 14000);
+ }catch(e){}
+}
+
 function enterApp(returning){
  const profNm=document.getElementById('profNm');
  if(profNm)profNm.textContent=(SS.user&&SS.user.username)||user.name||localizedGuardian();
@@ -4108,6 +4161,7 @@ function enterApp(returning){
  try{ fbInit(); }catch(e){} // connect to Firebase RTDB (presence + cross-device SOS) once in-app
  try{ guardianInit(); }catch(e){}
  try{ fbListenPersonAlerts(); }catch(e){}
+ try{ setTimeout(nudgeMaybeShow, 4500); }catch(e){}
  // Re-request durable storage now that the user is engaged (browsers grant it more
  // readily after interaction - helps the installed-PWA path keep the session).
  try{ if(navigator.storage&&navigator.storage.persist){ navigator.storage.persist().then(function(ok){ window.__shomerPersist=ok?'granted':'denied'; },function(){}); } }catch(e){}
