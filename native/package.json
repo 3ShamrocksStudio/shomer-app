@@ -2,7 +2,7 @@
   "name": "shomer-app",
   "version": "1.0.0",
   "private": true,
-  "description": "SH✡MER — Citizens for Citizens. Community safety app.",
+  "description": "SH\u2721MER \u2014 Citizens for Citizens. Community safety app.",
   "scripts": {
     "sync:web": "node scripts/copy-web.js",
     "build": "npm run sync:web && npx cap sync",
@@ -13,6 +13,7 @@
   },
   "dependencies": {
     "@capacitor-community/background-geolocation": "^1.2.20",
+    "@capacitor-community/contacts": "^6.0.0",
     "@capacitor/android": "^6.1.2",
     "@capacitor/app": "^6.0.1",
     "@capacitor/core": "^6.1.2",
