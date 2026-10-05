@@ -9018,6 +9018,11 @@ function fbRestWrite(method,path,val){
     return r.json().catch(function(){ return null; });
   });
 }
+/* ── Sanitized PII-free municipal dashboard feed (coarse coords, no name/photo) ── */
+function dashFeedPush(id,type,lat,lng){
+  try{ if(typeof FB==='undefined'||!FB.ready||!FB.uid||lat==null||lng==null) return;
+    fbRestWrite('PUT','dashfeed/'+id,{type:String(type||'event'),lat:+(+lat).toFixed(2),lng:+(+lng).toFixed(2),ts:Date.now(),status:'active',by:FB.uid}); }catch(e){}
+}
 /* ── SSE live stream (mimics ref.on('value')) ── */
 function fbStream(path,cb,errCb){
   var st=FB_STREAMS[path];
@@ -9337,7 +9342,7 @@ function fbPublishSOS(){ if(!FB.ready||!curSosId)return;
   // landed yet (rare; ~1–3s on Android), QUEUE the broadcast and flush it the instant
   // auth is ready (fbOnAuthed) - the SOS is never silently dropped.
   if(!FB._authReady){ FB._pendingSOS=1; fbLog('SOS queued - securing identity, will broadcast on auth'); return; }
-  try{ FB.db.ref('sos/'+curSosId).set({uid:FB.uid,lat:(userLat!=null?userLat:32.07),lng:(userLng!=null?userLng:34.78),type:curSosType||'unknown',typeState:'self',ts:Date.now(),resolved:false,name:(SS.user&&SS.user.name)||'Shomer'}).then(function(){ fbTriggerPush(curSosId); },function(e){ FB.permErr=(e&&e.code)||'sos-denied'; fbLog('SOS write denied:', FB.permErr); renderFbStatus(); }); }catch(e){} }
+  try{ FB.db.ref('sos/'+curSosId).set({uid:FB.uid,lat:(userLat!=null?userLat:32.07),lng:(userLng!=null?userLng:34.78),type:curSosType||'unknown',typeState:'self',ts:Date.now(),resolved:false,name:(SS.user&&SS.user.name)||'Shomer'}).then(function(){ fbTriggerPush(curSosId); try{dashFeedPush(curSosId,curSosType||'sos',(userLat!=null?userLat:null),(userLng!=null?userLng:null));}catch(e){} },function(e){ FB.permErr=(e&&e.code)||'sos-denied'; fbLog('SOS write denied:', FB.permErr); renderFbStatus(); }); }catch(e){} }
 /* Fire the FREE background-push fan-out (Cloudflare Worker) for this SOS so paired /
    nearby SHOMERs get a notification even when their app is closed or the phone is
    locked. No-op (and no error) until window.SHOMER_PUSH_URL is configured. The live
@@ -10001,6 +10006,7 @@ async function paCreate(m, kind, desc, lastSeen, photo){
   var ok=false;
   try{ var w=await fbRestWrite('PUT','palerts/'+id, rec); ok=(w!==false); }catch(e){ ok=false; }
   if(ok){
+    try{ dashFeedPush(id,(kind==='abduct'?'abduct':'missing'),rec.lat,rec.lng); }catch(e){}
     SS.paLast=now; try{ saveStore(); }catch(e){}
     toast(he?'🚨 ההתראה שודרה. הרשת תחפש את '+(m.name||'')+'.':'🚨 Alert broadcast. The network is searching for '+(m.name||'')+'.','red');
   } else {
@@ -10200,6 +10206,7 @@ async function evtCreate(type, note){
   var ok=false;
   try{ var w=await fbRestWrite('PUT','events/'+id, ev); ok=(w!==false); }catch(e){}
   if(ok){
+    try{ dashFeedPush(id,ev.type,ev.lat,ev.lng); }catch(e){}
     var r=repState(); r.made=(r.made||0)+1; r._posts=(r._posts||[]); r._posts.push(Date.now()); saveStore();
     toast(he?'הדיווח נשלח לשומרים שלך. יתפרסם לאזור רק לאחר אישור של שכנים.':'Sent to your guardians. Goes area-wide only after neighbours confirm.','grn');
     try{ evtRenderMine(); }catch(e){}
