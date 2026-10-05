@@ -527,14 +527,20 @@ function card(l,v,m,cls){return '<div class="stat"><div class="l">'+l+'</div><di
 function haversine(la1,lo1,la2,lo2){var R=6371,r=Math.PI/180,dLa=(la2-la1)*r,dLo=(lo2-lo1)*r;var a=Math.sin(dLa/2)**2+Math.cos(la1*r)*Math.cos(la2*r)*Math.sin(dLo/2)**2;return 2*R*Math.asin(Math.min(1,Math.sqrt(a)));}
 function loadLive(c){
   if(CLIENT&&CLIENT.demo){ return demoLive(c); }
-  var feed=document.getElementById('feed'), within=[], DB='https://shomergency-default-rtdb.firebaseio.com';
-  Promise.all([fetch(DB+'/sos.json').then(function(r){return r.ok?r.json():null;}).catch(function(){return null;}),fetch(DB+'/palerts.json').then(function(r){return r.ok?r.json():null;}).catch(function(){return null;}),fetch(DB+'/events.json').then(function(r){return r.ok?r.json():null;}).catch(function(){return null;})]).then(function(res){
-    [['sos',res[0]],['palert',res[1]],['event',res[2]]].forEach(function(pr){var kind=pr[0],obj=pr[1];if(!obj)return;Object.keys(obj).forEach(function(id){var e=obj[id];if(!e||e.lat==null)return;if(e.resolved||e.status==='resolved')return;if(haversine(c.lat,c.lng,e.lat,e.lng)<=18)within.push({kind:kind,e:e});});});
-    if(!within.length){feed.innerHTML='<div class="empty">אין אירועים חיים בטריטוריה כעת.<br>הזרם מתעדכן אוטומטית ממשתמשי SH✡MER באזור הלקוח.</div>';return;}
-    within.sort(function(a,b){return (b.e.ts||0)-(a.e.ts||0);});
-    feed.innerHTML=within.slice(0,30).map(function(w){var ic=w.kind==='palert'?(w.e.kind==='abduct'?'🚨':'🔎'):(w.kind==='sos'?'🆘':'📍');var nm=w.kind==='palert'?(w.e.subjName||'התראת אדם'):(w.kind==='sos'?'קריאת SOS':(w.e.type||'דיווח'));var ph=w.e.subjPhoto?'<img src="'+w.e.subjPhoto+'" style="width:34px;height:34px;border-radius:9px;object-fit:cover">':'<div class="dot">'+ic+'</div>';var when=w.e.ts?new Date(w.e.ts).toLocaleString('he-IL'):'';return '<div class="item">'+ph+'<div style="flex:1"><div class="nm">'+ic+' '+String(nm).replace(/[<>]/g,'')+'</div><div class="mt">'+when+' · '+(+w.e.lat).toFixed(3)+','+(+w.e.lng).toFixed(3)+'</div></div></div>';}).join('');
+  var feed=document.getElementById('feed'), DB='https://shomergency-default-rtdb.firebaseio.com';
+  // Reads the SANITIZED public feed only (no names/photos/PII). Coarse coords.
+  fetch(DB+'/dashfeed.json').then(function(r){return r.ok?r.json():null;}).catch(function(){return null;}).then(function(obj){
+    var now=Date.now(), DAY=24*60*60*1000, within=[];
+    if(obj){ Object.keys(obj).forEach(function(id){ var e=obj[id]; if(!e||e.lat==null||e.lng==null)return; if(e.status==='resolved')return; if((now-(e.ts||0))>DAY)return; if(haversine(c.lat,c.lng,e.lat,e.lng)<=18) within.push(e); }); }
+    if(!within.length){ feed.innerHTML='<div class="empty">אין אירועים חיים בטריטוריה כעת.<br>הזרם מתעדכן אוטומטית ומוצפן ממשתמשי SH✡MER באזור — ללא פרטים מזהים.</div>'; return; }
+    within.sort(function(a,b){return (b.ts||0)-(a.ts||0);});
+    var META={sos:{i:'🆘',t:'קריאת SOS',c:'#e5484d'},abduct:{i:'🚨',t:'חטיפה',c:'#e5484d'},missing:{i:'🔎',t:'אדם נעדר',c:'#9b6cff'}};
+    feed.innerHTML=within.slice(0,40).map(function(e){ var m=META[e.type]||{i:'📍',t:String(e.type||'דיווח'),c:'#f2b705'}; var mins=Math.round((now-(e.ts||now))/60000); var ago=mins<1?'עכשיו':mins<60?('לפני '+mins+' דק׳'):('לפני '+Math.round(mins/60)+' שע׳');
+      return '<div class="item"><span class="sev" style="background:'+m.c+'"></span><div class="dot">'+m.i+'</div><div style="flex:1"><div class="nm">'+m.i+' '+m.t+'</div><div class="mt">'+ago+' · '+(+e.lat).toFixed(2)+','+(+e.lng).toFixed(2)+' · אזור</div></div></div>';
+    }).join('');
   });
 }
+
 /* ===================== CONSOLE RENDER MODULE (overrides) ===================== */
 var CAT_META={
  'עבירות כלפי הרכוש':{s:'רכוש',c:'#2f80ed',i:'<path d="M3 10l9-7 9 7"/><path d="M5 9v11h14V9"/><rect x="10" y="14" width="4" height="6"/>'},
