@@ -79,6 +79,7 @@
       <label>אימייל ארגוני</label><input id="email" type="email" dir="ltr" placeholder="you@municipality.gov.il">
       <label>סיסמה</label><input id="pass" type="password" dir="ltr" placeholder="••••••••">
       <button class="btn" id="login-btn">כניסה</button>
+      <button class="btn" id="demo-btn" style="background:transparent;border:1px solid var(--gold);color:var(--gold);margin-top:10px">👁  כניסה לדמו · See a live demo</button>
       <button class="lnk" id="to-signup">אין לך גישה עדיין? <b>בקשת גישת לקוח</b></button>
     </div>
     <div id="view-signup" class="hidden">
@@ -145,7 +146,40 @@ document.getElementById('signup-btn').onclick=async function(){
   if(r.data && r.data.session){ boot(); }
   else { gerr('✓ נוצרה גישה. בדוק/י את האימייל לאישור, ואז היכנס/י.'); document.getElementById('to-login').click(); }
 };
-document.getElementById('signout').onclick=async function(){ await sb.auth.signOut(); location.reload(); };
+document.getElementById('signout').onclick=async function(){ try{ if(!(CLIENT&&CLIENT.demo)) await sb.auth.signOut(); }catch(e){} location.reload(); };
+document.getElementById('demo-btn').onclick=function(){ demoBoot(); };
+var DEMO_INC=[
+ {kind:'sos',   nm:'קריאת SOS · אישה',        dlat:0.000,  dlng:-0.006, mins:3},
+ {kind:'palert',k:'missing', nm:'אדם נעדר · דנה ל.', dlat:-0.016, dlng:0.002, mins:24},
+ {kind:'palert',k:'abduct',  nm:'חשד לחטיפה · קטין', dlat:0.009,  dlng:0.012, mins:47},
+ {kind:'event', t:'עבירות נגד גוף', dlat:-0.004, dlng:-0.010, mins:72},
+ {kind:'event', t:'עבירות כלפי הרכוש', dlat:0.013, dlng:0.004, mins:118},
+ {kind:'event', t:'עבירות סדר ציבורי', dlat:-0.011, dlng:0.009, mins:205}
+];
+async function demoBoot(){
+  await loadData();
+  CLIENT={org:'עיריית תל אביב-יפו · דמו', territory:'תל אביב יפו', email:'demo', demo:true};
+  document.getElementById('gate').classList.add('hidden');
+  document.getElementById('app').classList.remove('hidden');
+  document.getElementById('terr-name').textContent=CLIENT.territory;
+  document.getElementById('org-name').textContent='· '+CLIENT.org;
+  if(!MAP) initMap(); renderLegend();
+  var idx=DATA._sorted.findIndex(function(c){return c.city===CLIENT.territory;});
+  render(idx>=0?idx:0);
+  document.getElementById('note').innerHTML='מצב דמו · נתוני פשיעה אמיתיים (משטרת ישראל 2025) + אירועים חיים לדוגמה · 3Shamrocks Studio.';
+}
+function demoLive(c){
+  var feed=document.getElementById('feed'); var now=Date.now();
+  var rows=DEMO_INC.map(function(w){ return {kind:w.kind,k:w.k,nm:w.nm,t:w.t,lat:c.lat+w.dlat,lng:c.lng+w.dlng,ts:now-w.mins*60000}; });
+  // map markers (pulsing live pins over the hotspots)
+  rows.forEach(function(w){ var col=w.kind==='sos'?'#ff1a40':(w.kind==='palert'?(w.k==='abduct'?'#D10029':'#6D4AFF'):'#f2b705');
+    L.circleMarker([w.lat,w.lng],{radius:8,color:'#fff',weight:2,fillColor:col,fillOpacity:.95}).bindPopup('<b>'+w.nm+'</b>').addTo(cityLayer);
+  });
+  feed.innerHTML=rows.map(function(w){ var ic=w.kind==='palert'?(w.k==='abduct'?'🚨':'🔎'):(w.kind==='sos'?'🆘':'📍');
+    var nm=w.nm||w.t; var mins=Math.round((now-w.ts)/60000); var ago=mins<60?('לפני '+mins+' דק׳'):('לפני '+Math.round(mins/60)+' שע׳');
+    return '<div class="item"><div class="dot">'+ic+'</div><div style="flex:1"><div class="nm">'+ic+' '+nm+'</div><div class="mt">'+ago+' · '+w.lat.toFixed(3)+','+w.lng.toFixed(3)+'</div></div></div>';
+  }).join('');
+}
 
 /* ---- boot: load data + client, route ---- */
 async function loadData(){ if(DATA)return DATA; var r=await fetch('crime-stats.json?v=3'); DATA=await r.json(); DATA._sorted=DATA.cities.slice().sort(function(a,b){return b.total-a.total;}); return DATA; }
@@ -191,6 +225,7 @@ function render(idx){
 function card(l,v,m,cls){return '<div class="stat"><div class="l">'+l+'</div><div class="v '+(cls||'')+'">'+v+'</div><div class="m">'+(m||'')+'</div></div>';}
 function haversine(la1,lo1,la2,lo2){var R=6371,r=Math.PI/180,dLa=(la2-la1)*r,dLo=(lo2-lo1)*r;var a=Math.sin(dLa/2)**2+Math.cos(la1*r)*Math.cos(la2*r)*Math.sin(dLo/2)**2;return 2*R*Math.asin(Math.min(1,Math.sqrt(a)));}
 function loadLive(c){
+  if(CLIENT&&CLIENT.demo){ return demoLive(c); }
   var feed=document.getElementById('feed'), within=[], DB='https://shomergency-default-rtdb.firebaseio.com';
   Promise.all([fetch(DB+'/sos.json').then(function(r){return r.ok?r.json():null;}).catch(function(){return null;}),fetch(DB+'/palerts.json').then(function(r){return r.ok?r.json():null;}).catch(function(){return null;}),fetch(DB+'/events.json').then(function(r){return r.ok?r.json():null;}).catch(function(){return null;})]).then(function(res){
     [['sos',res[0]],['palert',res[1]],['event',res[2]]].forEach(function(pr){var kind=pr[0],obj=pr[1];if(!obj)return;Object.keys(obj).forEach(function(id){var e=obj[id];if(!e||e.lat==null)return;if(e.resolved||e.status==='resolved')return;if(haversine(c.lat,c.lng,e.lat,e.lng)<=18)within.push({kind:kind,e:e});});});
