@@ -7,140 +7,152 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 <style>
-  :root{--gold:#faac22;--blue:#1e315f;--dark:#0c1b39;--ink:#081222;--card:#0f1f3b;--card2:#15284b;--b:#223a63;--tx:#e8eefc;--tx2:#9fb2d4;--tx3:#6b82ab;}
+  :root{
+    --gold:#e0a828;--brass:#c2a661;
+    --bg0:#161a22;--bg1:#0f1218;           /* warm graphite, not navy */
+    --dark:#1b2030;--dark2:#222a3d;--db:#2d3650;  /* monitoring panes */
+    --ivory:#f4f1ea;--ivory2:#eae5da;--ink:#191c22; /* light action panes */
+    --tx:#eef1f7;--tx2:#9aa6bd;--tx3:#6d7893;
+    --ok:#2bb673;--warn:#f2b705;--bad:#e5484d;
+    --blue:#3b82f6;--violet:#9b6cff;--teal:#15b79e;--pink:#e5468e;
+  }
   *{box-sizing:border-box;margin:0;padding:0}
-  body{background:linear-gradient(180deg,#0c1d3a 0%,#081222 55%);color:var(--tx);font-family:'Segoe UI',system-ui,-apple-system,Arial,sans-serif;min-height:100vh}
-  .gate{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px;background:radial-gradient(ellipse at 50% -10%,#16294d,#081222 60%)}
-  .gate .box{width:100%;max-width:400px;background:var(--card);border:1px solid var(--b);border-radius:18px;padding:26px 22px;box-shadow:0 18px 50px rgba(0,0,0,.5)}
-  .gate h1{text-align:center;font-size:22px;font-weight:800;margin-bottom:4px}
+  html,body{height:100%}
+  body{background:radial-gradient(1200px 600px at 80% -5%,#1c2333,var(--bg1) 60%);color:var(--tx);font-family:'Rubik',system-ui,-apple-system,Arial,sans-serif;overflow:hidden}
+  .hidden{display:none!important}
+  /* ---------- GATE ---------- */
+  .gate{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px;background:radial-gradient(ellipse at 50% -10%,#20283c,var(--bg1) 60%)}
+  .gate .box{width:100%;max-width:400px;background:var(--dark);border:1px solid var(--db);border-radius:18px;padding:28px 24px;box-shadow:0 24px 60px rgba(0,0,0,.55)}
+  .gate h1{text-align:center;font-size:23px;font-weight:800;margin-bottom:4px}
   .gate h1 .s{color:var(--gold)}
   .gate .tag{text-align:center;font-size:11px;color:var(--tx3);letter-spacing:.14em;text-transform:uppercase;margin-bottom:22px}
   label{display:block;font-size:12px;color:var(--tx2);margin:12px 0 5px}
-  input,select{width:100%;height:50px;background:var(--ink);border:1px solid var(--b);border-radius:12px;color:var(--tx);padding:0 14px;font-size:15px;outline:none}
+  input,select{width:100%;height:48px;background:var(--bg1);border:1px solid var(--db);border-radius:11px;color:var(--tx);padding:0 14px;font-size:15px;outline:none;font-family:inherit}
   input:focus,select:focus{border-color:var(--gold)}
-  .btn{width:100%;height:52px;border:0;border-radius:12px;background:linear-gradient(135deg,#C09020,#E0A828 60%,#F5C840);color:#23170a;font-weight:800;font-size:16px;cursor:pointer;margin-top:18px}
+  .btn{width:100%;height:50px;border:0;border-radius:11px;background:linear-gradient(135deg,#b8841c,#e0a828 60%,#f3cf6a);color:#231806;font-weight:800;font-size:16px;cursor:pointer;margin-top:18px;font-family:inherit}
   .btn:active{transform:scale(.99)}
-  .lnk{display:block;text-align:center;margin-top:14px;color:var(--tx2);font-size:13px;cursor:pointer;background:none;border:0;width:100%}
+  .lnk{display:block;text-align:center;margin-top:14px;color:var(--tx2);font-size:13px;cursor:pointer;background:none;border:0;width:100%;font-family:inherit}
   .lnk b{color:var(--gold)}
   .err{color:#ff6b7d;font-size:13px;margin-top:12px;min-height:16px;text-align:center}
-  .hidden{display:none!important}
-  .topbar{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 18px;background:linear-gradient(180deg,#0e1d38,#0a1628);border-bottom:1px solid var(--b);position:sticky;top:0;z-index:30;flex-wrap:wrap}
-  .brand{display:flex;align-items:center;gap:10px;font-weight:800;font-size:17px;letter-spacing:.4px}
+  /* ---------- APP SHELL (no-scroll console) ---------- */
+  #app{height:100vh;display:flex;flex-direction:column;overflow:hidden}
+  .topbar{display:flex;align-items:center;gap:14px;padding:0 18px;height:52px;flex:0 0 52px;background:linear-gradient(180deg,#1b2233,#141a27);border-bottom:1px solid var(--db)}
+  .brand{display:flex;align-items:baseline;gap:8px;font-weight:800;font-size:17px;letter-spacing:.3px;white-space:nowrap}
   .brand .s{color:var(--gold)}
-  .brand small{display:block;font-weight:500;font-size:10px;color:var(--tx3);letter-spacing:.14em;text-transform:uppercase}
-  .terrbox{font-size:13px;color:var(--tx2)}
-  .terrbox b{color:var(--gold)}
-  .live{display:flex;align-items:center;gap:6px;font-size:11px;color:var(--tx2)}
-  .live .d{width:8px;height:8px;border-radius:50%;background:#2ecc71;box-shadow:0 0 8px #2ecc71;animation:pulse 1.6s infinite}
+  .brand small{font-weight:500;font-size:10px;color:var(--tx3);letter-spacing:.12em;text-transform:uppercase}
+  .tb-sp{flex:1}
+  .terr-pick{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--tx2)}
+  .terr-pick select{height:34px;width:auto;min-width:150px;background:var(--dark2);border-color:var(--db);font-size:13px;font-weight:600;color:var(--tx);border-radius:9px;padding:0 10px}
+  .live{display:flex;align-items:center;gap:6px;font-size:11px;color:var(--tx2);white-space:nowrap}
+  .live .d{width:8px;height:8px;border-radius:50%;background:var(--ok);box-shadow:0 0 8px var(--ok);animation:pulse 1.6s infinite}
   @keyframes pulse{50%{opacity:.4}}
-  .signout{background:var(--card2);border:1px solid var(--b);color:var(--tx2);border-radius:8px;padding:6px 11px;font-size:12px;cursor:pointer}
-  .wrap{max-width:1280px;margin:0 auto;padding:16px}
-  .cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px;margin-bottom:14px}
-  .stat{background:var(--card);border:1px solid var(--b);border-radius:14px;padding:15px 16px}
-  .stat .l{font-size:11px;color:var(--tx3);letter-spacing:.05em;text-transform:uppercase;margin-bottom:7px}
-  .stat .v{font-size:26px;font-weight:800;line-height:1}
-  .stat .m{font-size:11.5px;color:var(--tx2);margin-top:6px}
-  .stat .v.gold{color:var(--gold)}
-  .grid{display:grid;grid-template-columns:1.4fr 1fr;gap:14px}
-  @media(max-width:880px){.grid{grid-template-columns:1fr}}
-  .panel{background:var(--card);border:1px solid var(--b);border-radius:16px;overflow:hidden}
-  .panel h2{font-size:12.5px;font-weight:800;color:var(--gold);letter-spacing:.06em;text-transform:uppercase;padding:14px 16px;border-bottom:1px solid var(--b);display:flex;align-items:center;justify-content:space-between;gap:8px}
-  #map{height:460px;width:100%}
-  .pbody{padding:14px 16px}
-  .bar{margin-bottom:11px}
-  .bar .t{display:flex;justify-content:space-between;font-size:12.5px;margin-bottom:5px}
-  .bar .t .n{color:var(--tx2)}
-  .bar .track{height:9px;background:var(--card2);border-radius:6px;overflow:hidden}
-  .bar .fill{height:100%;border-radius:6px}
-  table{width:100%;border-collapse:collapse;font-size:13px}
-  th,td{text-align:start;padding:9px 16px;border-bottom:1px solid rgba(255,255,255,.05)}
-  th{font-size:11px;color:var(--tx3);text-transform:uppercase;letter-spacing:.05em}
-  tr.me{background:rgba(250,172,34,.1)}tr.me td{font-weight:800;color:var(--gold)}
-  .rank-wrap{max-height:360px;overflow-y:auto}
-  .feed .item{display:flex;gap:11px;padding:11px 16px;border-bottom:1px solid rgba(255,255,255,.05);align-items:center}
-  .feed .dot{width:34px;height:34px;border-radius:9px;background:var(--card2);display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0}
-  .feed .nm{font-size:13.5px;font-weight:600}.feed .mt{font-size:11px;color:var(--tx3)}
-  .empty{color:var(--tx3);font-size:12.5px;padding:18px 16px;text-align:center;line-height:1.6}
-  .note{color:var(--tx3);font-size:11px;text-align:center;padding:18px 10px;line-height:1.7}
-  .legend{display:flex;flex-wrap:wrap;gap:10px;padding:0 16px 14px;font-size:11px;color:var(--tx2)}
-  .legend span{display:inline-flex;align-items:center;gap:5px}.legend i{width:10px;height:10px;border-radius:3px;display:inline-block}
-  .sectitle{font-size:12px;color:var(--tx3);margin:18px 2px 10px;letter-spacing:.06em;text-transform:uppercase;font-weight:700}
-  .panel.lite{background:linear-gradient(160deg,#16294d,#0f1f3b)}
-  .donutgrid{display:flex;align-items:center;gap:16px;flex-wrap:wrap}
-  .dlegend{flex:1;min-width:150px}
-  .dlegend .r{display:flex;align-items:center;gap:8px;font-size:12px;padding:4px 0}
-  .dlegend .r i{width:10px;height:10px;border-radius:3px;flex:0 0 auto}
-  .dlegend .r .n{flex:1;color:var(--tx2)}
-  .dlegend .r .v{font-weight:700}
-  .socio .stat{border-left:3px solid var(--gold)}
-  .socio .stat:nth-child(2){border-left-color:#18c29c}.socio .stat:nth-child(3){border-left-color:#2f80ed}.socio .stat:nth-child(4){border-left-color:#e5468e}
-  .cmp{display:flex;align-items:center;gap:10px;margin-bottom:9px;font-size:12.5px}
-  .cmp .nm{width:110px;color:var(--tx2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-  .cmp .tr{flex:1;height:14px;background:var(--card2);border-radius:7px;overflow:hidden}
-  .cmp .fl{height:100%;border-radius:7px;background:linear-gradient(90deg,#2f80ed,#18c29c)}
-  .cmp.me .fl{background:linear-gradient(90deg,#E0A828,#F5C840)}
-  .cmp .vv{width:70px;text-align:end;font-weight:700}
-  .mapbar{display:flex;gap:8px;align-items:center}
-  .mini{background:var(--card2);border:1px solid var(--b);color:var(--tx2);border-radius:8px;padding:5px 10px;font-size:11.5px;cursor:pointer}
-  .mini.on{background:var(--gold);color:#23170a;border-color:var(--gold);font-weight:700}
-  .leaflet-pulse{border-radius:50%;box-shadow:0 0 0 rgba(255,26,64,.6);animation:lpulse 1.6s infinite}
-  @keyframes lpulse{0%{box-shadow:0 0 0 0 rgba(255,26,64,.55)}70%{box-shadow:0 0 0 14px rgba(255,26,64,0)}100%{box-shadow:0 0 0 0 rgba(255,26,64,0)}}
-  .insp{position:absolute;bottom:10px;inset-inline-start:10px;z-index:500;background:rgba(10,20,38,.92);border:1px solid var(--b);border-radius:10px;padding:8px 12px;font-size:12px;max-width:60%;pointer-events:none;display:none}
+  .tbtn{background:var(--dark2);border:1px solid var(--db);color:var(--tx2);border-radius:9px;padding:7px 12px;font-size:12px;cursor:pointer;font-family:inherit;white-space:nowrap}
+  .tbtn:hover{border-color:var(--gold);color:var(--tx)}
+  /* ---------- KPI STRIP (de-boxed) ---------- */
+  .kpis{flex:0 0 auto;display:flex;align-items:stretch;gap:0;padding:0 18px;height:70px;background:rgba(255,255,255,.015);border-bottom:1px solid var(--db)}
+  .kpi{flex:1;display:flex;flex-direction:column;justify-content:center;padding:0 20px;border-inline-start:1px solid rgba(255,255,255,.06)}
+  .kpi:first-child{border-inline-start:0}
+  .kpi .kl{font-size:10.5px;color:var(--tx3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:3px;display:flex;align-items:center;gap:5px}
+  .kpi .kv{font-size:25px;font-weight:800;line-height:1}
+  .kpi .km{font-size:11px;color:var(--tx2);margin-top:3px}
+  .kpi .kv.gold{color:var(--gold)}.kpi .kv.bad{color:var(--bad)}.kpi .kv.ok{color:var(--ok)}
+  .kchip{font-size:10px;font-weight:700;padding:1px 7px;border-radius:10px;margin-inline-start:6px}
+  .kchip.up{background:rgba(229,72,77,.16);color:#ff8a98}.kchip.dn{background:rgba(43,182,115,.16);color:#6ee7a8}
+  /* ---------- CONSOLE GRID ---------- */
+  .console{flex:1;min-height:0;display:grid;grid-template-columns:360px 1fr 340px;gap:14px;padding:14px 18px}
+  .col{display:flex;flex-direction:column;gap:14px;min-height:0}
+  .pane{border-radius:16px;min-height:0;display:flex;flex-direction:column;overflow:hidden}
+  .pane.dark{background:var(--dark);border:1px solid var(--db)}
+  .pane.light{background:var(--ivory);color:var(--ink)}
+  .ph{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:11px 15px;flex:0 0 auto}
+  .ph .t{font-size:12px;font-weight:700;letter-spacing:.04em;text-transform:uppercase}
+  .pane.dark .ph{border-bottom:1px solid rgba(255,255,255,.07)}
+  .pane.light .ph{border-bottom:1px solid var(--ivory2)}
+  .pane.light .ph .t{color:#6a5a2a}
+  .pb{flex:1;min-height:0;overflow:auto;padding:13px 15px}
+  .pb.nopad{padding:0}
+  /* scrollbars */
+  .pb::-webkit-scrollbar{width:7px}.pb::-webkit-scrollbar-thumb{background:rgba(255,255,255,.12);border-radius:4px}
+  .pane.light .pb::-webkit-scrollbar-thumb{background:rgba(0,0,0,.14)}
+  /* provenance pill */
+  .pill{font-size:9px;font-weight:700;letter-spacing:.04em;padding:2px 8px;border-radius:20px;text-transform:uppercase;white-space:nowrap}
+  .pill.off{background:rgba(59,130,246,.18);color:#8ab4ff;border:1px solid rgba(59,130,246,.4)}
+  .pill.live{background:rgba(229,72,77,.18);color:#ff8a98;border:1px solid rgba(229,72,77,.4)}
+  .pane.light .pill.off{background:rgba(59,130,246,.12);color:#2563cc;border-color:rgba(59,130,246,.3)}
+  /* ---------- DONUT HERO ---------- */
+  .donut-hero{display:flex;flex-direction:column;align-items:center;gap:4px}
+  .donut-hero .hint{font-size:11px;color:#8a7a45;background:rgba(224,168,40,.12);padding:3px 11px;border-radius:20px;display:inline-flex;align-items:center;gap:5px;font-weight:600}
+  .donut-wrap{position:relative;cursor:pointer}
+  .dleg{width:100%;margin-top:8px}
+  .dleg .r{display:flex;align-items:center;gap:9px;padding:7px 8px;border-radius:9px;cursor:pointer;transition:background .12s}
+  .dleg .r:hover{background:rgba(0,0,0,.05)}
+  .dleg .r .ico{width:26px;height:26px;border-radius:7px;display:flex;align-items:center;justify-content:center;flex:0 0 auto;color:#fff}
+  .dleg .r .ico svg{width:15px;height:15px}
+  .dleg .r .n{flex:1;font-size:13px;color:var(--ink);font-weight:500}
+  .dleg .r .v{font-weight:800;font-size:14px}
+  .dleg .r .chev{color:#b9b0a0;font-size:12px}
+  /* deep dive */
+  .dd-back{background:var(--ivory2);border:0;color:#6a5a2a;border-radius:8px;padding:4px 10px;font-size:11px;cursor:pointer;font-family:inherit;font-weight:600}
+  .ddr{display:flex;justify-content:space-between;align-items:center;font-size:13px;padding:8px 0;border-bottom:1px solid var(--ivory2)}
+  .ddr span{color:#5c636e}.ddr b{font-weight:700}
+  .ddh{font-size:10.5px;color:#8a8577;text-transform:uppercase;letter-spacing:.05em;margin:12px 0 7px;font-weight:700}
+  .cmp{display:flex;align-items:center;gap:9px;margin-bottom:7px;font-size:12px}
+  .cmp .nm{width:78px;color:#5c636e;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .cmp .tr{flex:1;height:11px;background:var(--ivory2);border-radius:6px;overflow:hidden}
+  .cmp .fl{height:100%;border-radius:6px}
+  .cmp.me .nm{color:var(--ink);font-weight:800}
+  .cmp .vv{width:52px;text-align:end;font-weight:700;color:var(--ink)}
+  /* ---------- MAP ---------- */
+  #map{flex:1;min-height:0;width:100%}
+  .maptools{display:flex;gap:7px}
+  .mini{background:var(--dark2);border:1px solid var(--db);color:var(--tx2);border-radius:8px;padding:5px 10px;font-size:11px;cursor:pointer;font-family:inherit}
+  .mini.on{background:var(--gold);color:#231806;border-color:var(--gold);font-weight:700}
+  .legend{display:flex;flex-wrap:wrap;gap:9px;padding:9px 15px;font-size:10.5px;color:var(--tx2);border-top:1px solid rgba(255,255,255,.06);flex:0 0 auto}
+  .legend span{display:inline-flex;align-items:center;gap:5px}.legend i{width:9px;height:9px;border-radius:3px}
+  .insp{position:absolute;bottom:10px;inset-inline-start:10px;z-index:500;background:rgba(20,26,39,.94);border:1px solid var(--db);border-radius:10px;padding:8px 12px;font-size:12px;max-width:62%;pointer-events:none;display:none}
   .insp.on{display:block}
-  .ins{display:flex;gap:11px;padding:10px 0;border-bottom:1px solid rgba(255,255,255,.05)}
+  .leaflet-pulse{border-radius:50%;animation:lpulse 1.6s infinite}
+  @keyframes lpulse{0%{box-shadow:0 0 0 0 rgba(229,72,77,.55)}70%{box-shadow:0 0 0 13px rgba(229,72,77,0)}100%{box-shadow:0 0 0 0 rgba(229,72,77,0)}}
+  /* ---------- INSIGHTS + SOLUTIONS (light action pane) ---------- */
+  .ins{display:flex;gap:11px;padding:10px 0;border-bottom:1px solid var(--ivory2)}
   .ins:last-child{border-bottom:0}
-  .ins .ic{width:30px;height:30px;border-radius:8px;background:rgba(250,172,34,.14);color:var(--gold);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:15px}
-  .ins .tt{font-size:13px;font-weight:700;color:var(--tx)}
-  .ins .dd{font-size:12px;color:var(--tx2);line-height:1.5;margin-top:2px}
-  /* section accent theming — break the blue */
-  .panel{border-top:3px solid var(--b)}
-  .panel.acc-blue{border-top-color:#2f80ed}  .panel.acc-blue h2{color:#6aa6ff;background:linear-gradient(180deg,rgba(47,128,237,.16),transparent)}
-  .panel.acc-violet{border-top-color:#9b6cff} .panel.acc-violet h2{color:#b79bff;background:linear-gradient(180deg,rgba(155,108,255,.16),transparent)}
-  .panel.acc-teal{border-top-color:#18c29c}  .panel.acc-teal h2{color:#4fd9bb;background:linear-gradient(180deg,rgba(24,194,156,.16),transparent)}
-  .panel.acc-amber{border-top-color:#f2b705} .panel.acc-amber h2{color:#ffce4d;background:linear-gradient(180deg,rgba(242,183,5,.16),transparent)}
-  .panel.acc-red{border-top-color:#e5484d}   .panel.acc-red h2{color:#ff8a98;background:linear-gradient(180deg,rgba(229,72,77,.16),transparent)}
-  .panel.acc-gold{border-top-color:var(--gold)} .panel.acc-gold h2{color:var(--gold);background:linear-gradient(180deg,rgba(250,172,34,.14),transparent)}
-  .panel.lite.acc-teal,.panel.lite.acc-violet,.panel.lite.acc-amber{background:linear-gradient(160deg,#16294d,#0f1f3b)}
-  /* KPI cards — varied accents */
-  .cards .stat{border-top:3px solid #2f80ed}
-  .cards .stat:nth-child(1){border-top-color:var(--gold)}
-  .cards .stat:nth-child(2){border-top-color:#18c29c}
-  .cards .stat:nth-child(3){border-top-color:#9b6cff}
-  .cards .stat:nth-child(4){border-top-color:#e5484d}
-  .cards .stat:nth-child(5){border-top-color:#f2b705}
-  /* section titles get a colored tab */
-  .sectitle{border-inline-start:4px solid var(--gold);padding-inline-start:9px}
-  .sectitle.t-teal{border-color:#18c29c}.sectitle.t-blue{border-color:#2f80ed}.sectitle.t-violet{border-color:#9b6cff}.sectitle.t-amber{border-color:#f2b705}
-  /* deep-dive */
-  .ddr{display:flex;justify-content:space-between;font-size:12.5px;padding:6px 0;border-bottom:1px solid rgba(255,255,255,.06)}
-  .ddr span{color:var(--tx2)} .ddr b{font-weight:700}
-  .dd-h{font-size:11px;color:var(--tx3);text-transform:uppercase;letter-spacing:.05em;margin:4px 0 9px;font-weight:700}
-  #donutback{background:var(--card2);border:1px solid var(--b);color:var(--tx2);border-radius:8px;padding:4px 10px;font-size:11px;cursor:pointer}
-  /* data provenance */
-  .srckey{display:flex;flex-wrap:wrap;gap:14px;align-items:center;background:var(--card);border:1px solid var(--b);border-radius:12px;padding:10px 14px;margin-bottom:14px;font-size:12px}
-  .srckey .sk{display:inline-flex;align-items:center;gap:7px;color:var(--tx2)}
-  .srckey .sk b{color:var(--tx)}
-  .srckey .dot2{width:11px;height:11px;border-radius:50%;flex:0 0 auto}
-  .srckey .off .dot2{background:#2f80ed;box-shadow:0 0 7px #2f80ed}
-  .srckey .live2 .dot2{background:#e5484d;box-shadow:0 0 7px #e5484d}
-  .srckey .sep{flex:1}
-  .srcpill{font-size:9.5px;font-weight:700;letter-spacing:.04em;padding:2px 8px;border-radius:20px;text-transform:uppercase;white-space:nowrap}
-  .srcpill.off{background:rgba(47,128,237,.16);color:#6aa6ff;border:1px solid rgba(47,128,237,.4)}
-  .srcpill.live{background:rgba(229,72,77,.16);color:#ff8a98;border:1px solid rgba(229,72,77,.4)}
-  .zonelbl{display:flex;align-items:center;gap:9px;margin:22px 2px 11px;font-size:13px;font-weight:800;letter-spacing:.03em}
-  .zonelbl .zdot{width:13px;height:13px;border-radius:50%;flex:0 0 auto}
-  .zonelbl.off{color:#6aa6ff} .zonelbl.off .zdot{background:#2f80ed;box-shadow:0 0 8px #2f80ed}
-  .zonelbl.live{color:#ff8a98} .zonelbl.live .zdot{background:#e5484d;box-shadow:0 0 8px #e5484d}
-  .zonelbl .zsub{font-size:11px;font-weight:500;color:var(--tx3);letter-spacing:.02em}
-  .sol{display:flex;gap:12px;padding:13px 0;border-bottom:1px solid rgba(255,255,255,.06)}
-  .sol:last-child{border-bottom:0}
-  .sol .sn{width:30px;height:30px;border-radius:9px;background:rgba(24,194,156,.14);color:#4fd9bb;display:flex;align-items:center;justify-content:center;font-weight:800;flex:0 0 auto;font-size:14px}
-  .sol .st{font-size:13.5px;font-weight:700;color:var(--tx)}
-  .sol .sd{font-size:12.5px;color:var(--tx2);line-height:1.55;margin-top:3px}
-  .sol .src{font-size:11px;margin-top:5px}
-  .sol .src a{color:#6aa6ff;text-decoration:none}.sol .src a:hover{text-decoration:underline}
-  @media print{body{background:#fff;color:#111}.topbar{position:static}.signout,.live .d{display:none}.panel,.stat{break-inside:avoid;border-color:#ccc}#map{height:320px}}
+  .ins .ic{width:30px;height:30px;border-radius:8px;display:flex;align-items:center;justify-content:center;flex:0 0 auto;font-size:14px;font-weight:800}
+  .ins .ic.up{background:rgba(229,72,77,.14);color:#c23a3f}
+  .ins .ic.info{background:rgba(59,130,246,.13);color:#2563cc}
+  .ins .ic.flag{background:rgba(224,168,40,.16);color:#9a7318}
+  .ins .tt{font-size:13px;font-weight:700;color:var(--ink)}
+  .ins .dd{font-size:12px;color:#4d5563;line-height:1.5;margin-top:2px}
+  .ins .dd b{color:var(--ink)}
+  .ins .src{font-size:10.5px;margin-top:4px}
+  .ins .src a{color:#2563cc;text-decoration:none}.ins .src a:hover{text-decoration:underline}
+  .juris{font-size:11px;color:#6a5a2a;background:rgba(224,168,40,.1);border-radius:8px;padding:6px 10px;margin-bottom:10px;display:flex;align-items:center;gap:6px;font-weight:600}
+  .foot{font-size:10px;color:#8a8577;margin-top:9px;border-top:1px solid var(--ivory2);padding-top:7px;line-height:1.5}
+  /* ---------- FEED ---------- */
+  .feed .item{display:flex;gap:10px;padding:9px 15px;border-bottom:1px solid rgba(255,255,255,.055);align-items:center}
+  .feed .sev{width:4px;align-self:stretch;border-radius:3px;flex:0 0 auto}
+  .feed .dot{width:32px;height:32px;border-radius:9px;background:var(--dark2);display:flex;align-items:center;justify-content:center;font-size:15px;flex:0 0 auto}
+  .feed .nm{font-size:13px;font-weight:600}.feed .mt{font-size:10.5px;color:var(--tx3)}
+  .empty{color:var(--tx3);font-size:12px;padding:20px 16px;text-align:center;line-height:1.6}
+  /* ---------- RANKING ---------- */
+  .rank .row{display:flex;align-items:center;gap:10px;padding:8px 15px;border-bottom:1px solid rgba(255,255,255,.05);font-size:12.5px}
+  .rank .row.me{background:rgba(224,168,40,.12)}
+  .rank .row.me .city{color:var(--gold);font-weight:800}
+  .rank .pos{width:22px;color:var(--tx3);font-weight:700;text-align:center}
+  .rank .city{flex:1;color:var(--tx)}
+  .rank .bar{width:70px;height:7px;background:var(--dark2);border-radius:4px;overflow:hidden}
+  .rank .bar i{display:block;height:100%;background:linear-gradient(90deg,var(--blue),var(--violet));border-radius:4px}
+  .rank .tot{width:56px;text-align:end;color:var(--tx2);font-weight:600;font-size:11.5px}
+  .rank-note{font-size:11px;color:var(--tx3);padding:9px 15px;line-height:1.5;border-bottom:1px solid rgba(255,255,255,.06)}
+  /* ---------- RESPONSIVE: allow scroll on small ---------- */
+  @media(max-width:1100px){
+    body{overflow:auto}#app{height:auto;min-height:100vh;overflow:visible}
+    .console{grid-template-columns:1fr;padding:14px}
+    .col{min-height:0}.pane{min-height:220px}#map{min-height:300px}
+  }
+  @media print{body{background:#fff;color:#111;overflow:visible}#app{height:auto}.console{grid-template-columns:1fr}.pane{break-inside:avoid}}
 </style>
 </head>
 <body>
@@ -171,44 +183,45 @@
 
 <!-- DASHBOARD -->
 <div id="app" class="hidden">
-<div class="topbar">
-  <div class="brand">SH<span class="s">✡</span>MER <span style="color:var(--tx3);font-weight:400">Command</span>
-    <small>Municipal Intelligence · מודיעין עירוני</small></div>
-  <div class="terrbox">טריטוריה: <b id="terr-name">—</b> <span id="org-name" style="color:var(--tx3)"></span></div>
-  <div class="live"><span class="d"></span><span>LIVE · משטרת ישראל 2025</span>
-    <button class="signout" id="export-btn" style="margin-inline-end:8px">⤓ ייצא דוח</button><button class="signout" id="signout">יציאה</button></div>
-</div>
-<div class="wrap">
-  <div class="srckey">
-    <span class="sk off"><span class="dot2"></span><b>נתונים ציבוריים מאומתים</b> · משטרת ישראל 2025 + למ״ס</span>
-    <span class="sk live2"><span class="dot2"></span><b>רשת שומרים</b> · דיווחי משתמשים בזמן אמת</span>
-    <span class="sep"></span>
-    <span class="sk" style="font-size:11px;color:var(--tx3)">כל נתון מסומן במקורו · 100% מאומת</span>
+  <div class="topbar">
+    <div class="brand">SH<span class="s">✡</span>MER <small>Command · Municipal Intelligence</small></div>
+    <div class="tb-sp"></div>
+    <div class="terr-pick"><span id="terr-static" class="hidden">טריטוריה: <b id="terr-name" style="color:var(--gold)"></b></span><select id="terr-sel"></select></div>
+    <div class="live"><span class="d"></span><span id="org-name"></span></div>
+    <button class="tbtn" id="export-btn">⤓ ייצוא</button>
+    <button class="tbtn" id="signout">יציאה</button>
   </div>
-  <div class="zonelbl off"><span class="zdot"></span>נתונים ציבוריים מאומתים <span class="zsub">· סטטיסטיקה רשמית — משטרת ישראל 2025 · הערכות אוכלוסייה למ״ס</span></div>
-  <div class="cards" id="cards"></div>
-  <div class="grid">
-    <div class="panel acc-blue"><h2><span>מפת פשיעה · גבול שיפוט הרשות <span class="srcpill off">ציבורי</span></span><span class="mapbar"><button class="mini" id="spread-btn">👥 פריסת שומרים</button></span></h2><div style="position:relative"><div id="map"></div><div class="insp" id="insp"></div></div><div class="legend" id="legend"></div></div>
-    <div style="display:flex;flex-direction:column;gap:14px">
-      <div class="panel lite acc-violet"><h2><span>פילוח סוגי עבירות · לחצו לצלילה <span class="srcpill off">ציבורי</span></span><button id="donutback" style="display:none" onclick="unfocus()">← כל העבירות</button></h2><div class="pbody"><div class="donutgrid"><div id="donut"></div><div class="dlegend" id="dlegend"></div></div><div id="deepdive" style="display:none;margin-top:12px"></div></div></div>
-      <div class="panel lite acc-amber"><h2>דירוג עומס עבירות · נתוני משטרה</h2><div class="pbody" style="text-align:center"><div id="ring"></div><div id="ringsub" style="font-size:12px;color:var(--tx2);margin-top:6px"></div></div></div>
+  <div class="kpis" id="kpis"></div>
+  <div class="console">
+    <div class="col">
+      <div class="pane light" style="flex:1">
+        <div class="ph"><span class="t">פילוח עבירות</span><span style="display:flex;gap:7px;align-items:center"><span class="pill off">ציבורי</span><button class="dd-back" id="donutback" style="display:none" onclick="unfocus()">← הכל</button></span></div>
+        <div class="pb" id="donutpane"></div>
+      </div>
+    </div>
+    <div class="col">
+      <div class="pane dark" style="flex:1.2">
+        <div class="ph"><span class="t">מפת פשיעה · גבול שיפוט <span class="pill off">ציבורי</span></span><span class="maptools"><button class="mini" id="spread-btn">◉ פריסת שומרים</button></span></div>
+        <div style="position:relative;flex:1;min-height:0;display:flex;flex-direction:column"><div id="map"></div><div class="insp" id="insp"></div></div>
+        <div class="legend" id="legend"></div>
+      </div>
+      <div class="pane light" style="flex:1">
+        <div class="ph"><span class="t">ניתוח בזמן אמת + מענים מבוססי-ראיות</span><span class="pill off">מקורות מאומתים</span></div>
+        <div class="pb" id="analysispane"></div>
+      </div>
+    </div>
+    <div class="col">
+      <div class="pane dark" style="flex:1">
+        <div class="ph"><span class="t" style="color:#ff8a98">⚡ אירועים חיים · רשת שומרים</span><span class="pill live" id="feed-src">רשת שומרים</span></div>
+        <div class="pb nopad feed" id="feed"><div class="empty">מתחבר לרשת SH✡MER…</div></div>
+      </div>
+      <div class="pane dark" style="flex:1">
+        <div class="ph"><span class="t">דירוג ארצי <span class="pill off">ציבורי</span></span></div>
+        <div class="rank-note" id="rank-note"></div>
+        <div class="pb nopad rank" id="rankbody"></div>
+      </div>
     </div>
   </div>
-  <div class="sectitle t-blue">הקשר דמוגרפי · פשיעה לנפש</div>
-  <div class="cards socio" id="socio"></div>
-  <div class="sectitle t-teal">תובנות חכמות · ניתוח מבוסס נתוני משטרת ישראל 2025</div>
-  <div class="panel lite acc-teal"><div class="pbody" id="insights"></div></div>
-  <div class="sectitle t-teal">פתרונות מבוססי-ראיות · מעבר לאיסוף נתונים <span class="srcpill off" style="vertical-align:middle">מקורות מאומתים</span></div>
-  <div class="panel lite acc-teal"><div class="pbody" id="solutions"></div></div>
-  <div class="zonelbl live"><span class="zdot"></span>רשת שומרים · זמן אמת <span class="zsub">· דיווחי משתמשים חיים מתוך אזור הלקוח — SOS · נעדרים · אירועים</span></div>
-  <div class="grid">
-    <div class="panel lite acc-gold"><h2>השוואה אזורית · פשיעה ל-1,000 תושבים <span class="srcpill off">ציבורי</span></h2><div class="pbody" id="compare"></div></div>
-    <div class="panel feed acc-red"><h2><span>⚡ אירועים חיים · SOS · נעדרים · דיווחים</span><span class="srcpill live" id="feed-src">רשת שומרים</span></h2><div id="feed"><div class="empty">מתחבר לרשת SH✡MER…</div></div></div>
-  </div>
-  <div class="sectitle t-violet">דירוג ארצי · איפה הטריטוריה שלך עומדת</div>
-  <div class="panel acc-violet"><div class="rank-wrap"><table><thead><tr><th>#</th><th>עיר</th><th>סה״כ עבירות 2025</th><th>סוג מוביל</th></tr></thead><tbody id="rankbody"></tbody></table></div></div>
-  <div class="note" id="note"></div>
-</div>
 </div>
 
 <script>
@@ -258,11 +271,12 @@ async function demoBoot(){
   document.getElementById('gate').classList.add('hidden');
   document.getElementById('app').classList.remove('hidden');
   document.getElementById('terr-name').textContent=CLIENT.territory;
-  document.getElementById('org-name').textContent='· '+CLIENT.org;
+  document.getElementById('org-name').textContent=CLIENT.org;
+  document.getElementById('terr-static').classList.add('hidden');document.getElementById('terr-sel').classList.remove('hidden');
   if(!MAP) initMap(); renderLegend();
   var idx=DATA._sorted.findIndex(function(c){return c.city===CLIENT.territory;});
   render(idx>=0?idx:0);
-  document.getElementById('note').innerHTML='מצב דמו · נתוני פשיעה אמיתיים (משטרת ישראל 2025) + אירועים חיים לדוגמה · 3Shamrocks Studio.';
+  /* note removed in console layout */
 }
 function demoLive(c){
   var feed=document.getElementById('feed'); var now=Date.now();
@@ -293,12 +307,13 @@ async function boot(){
   document.getElementById('gate').classList.add('hidden');
   document.getElementById('app').classList.remove('hidden');
   document.getElementById('terr-name').textContent=CLIENT.territory;
-  document.getElementById('org-name').textContent=CLIENT.org?('· '+CLIENT.org):'';
+  document.getElementById('org-name').textContent=CLIENT.org||'';
+  document.getElementById('terr-sel').classList.add('hidden');document.getElementById('terr-static').classList.remove('hidden');
   if(!MAP) initMap();
   renderLegend();
   var idx=DATA._sorted.findIndex(function(c){return c.city===CLIENT.territory;});
   render(idx>=0?idx:0);
-  document.getElementById('note').innerHTML='מקור: '+(DATA.source||'משטרת ישראל')+' · '+(DATA.period||'2025')+' · '+fmt(DATA.records)+' רשומות · data.gov.il<br>מוצג לטריטוריה של הלקוח בלבד · גישה: 3Shamrocks Studio ולקוחות משלמים בלבד · מוצפן · לעולם לא נמכר.';
+  /* note removed in console layout */
 }
 function initMap(){ MAP=L.map('map',{zoomControl:true,attributionControl:false}).setView([31.5,34.9],7); L.tileLayer(ESRI,{maxZoom:16}).addTo(MAP); L.tileLayer(ESRIr,{maxZoom:16}).addTo(MAP); }
 function renderLegend(){ var el=document.getElementById('legend'); el.innerHTML=''; Object.keys(CAT_COL).forEach(function(k){ el.innerHTML+='<span><i style="background:'+CAT_COL[k]+'"></i>'+k+'</span>'; }); }
@@ -495,6 +510,141 @@ function loadLive(c){
     feed.innerHTML=within.slice(0,30).map(function(w){var ic=w.kind==='palert'?(w.e.kind==='abduct'?'🚨':'🔎'):(w.kind==='sos'?'🆘':'📍');var nm=w.kind==='palert'?(w.e.subjName||'התראת אדם'):(w.kind==='sos'?'קריאת SOS':(w.e.type||'דיווח'));var ph=w.e.subjPhoto?'<img src="'+w.e.subjPhoto+'" style="width:34px;height:34px;border-radius:9px;object-fit:cover">':'<div class="dot">'+ic+'</div>';var when=w.e.ts?new Date(w.e.ts).toLocaleString('he-IL'):'';return '<div class="item">'+ph+'<div style="flex:1"><div class="nm">'+ic+' '+String(nm).replace(/[<>]/g,'')+'</div><div class="mt">'+when+' · '+(+w.e.lat).toFixed(3)+','+(+w.e.lng).toFixed(3)+'</div></div></div>';}).join('');
   });
 }
+/* ===================== CONSOLE RENDER MODULE (overrides) ===================== */
+var CAT_META={
+ 'עבירות כלפי הרכוש':{s:'רכוש',c:'#2f80ed',i:'<path d="M3 10l9-7 9 7"/><path d="M5 9v11h14V9"/><rect x="10" y="14" width="4" height="6"/>'},
+ 'עבירות סדר ציבורי':{s:'סדר ציבורי',c:'#f2b705',i:'<circle cx="7" cy="8" r="2.3"/><circle cx="16" cy="8" r="2.3"/><path d="M3 19c0-3 1.8-5 4-5s4 2 4 5"/><path d="M13 19c0-3 1.8-5 4-5s4 2 4 5"/>'},
+ 'עבירות נגד גוף':{s:'אלימות',c:'#e5484d',i:'<path d="M12 2l8 3v6c0 5-3.5 8-8 11-4.5-3-8-6-8-11V5z"/><path d="M12 7v4.5"/><circle cx="12" cy="15.2" r=".95" fill="currentColor" stroke="none"/>'},
+ 'עבירות כלפי המוסר':{s:'מוסר',c:'#e5468e',i:'<path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/>'},
+ 'עבירות מרמה':{s:'מרמה',c:'#18c29c',i:'<rect x="4" y="3" width="13" height="18" rx="2"/><path d="M8 8h5M8 12h5M8 16h3"/><path d="M14 16.5l5.5 4.5" stroke-width="2.3"/>'},
+ 'עבירות כלכליות':{s:'כלכלי',c:'#9b6cff',i:'<rect x="3" y="13" width="4" height="7"/><rect x="10" y="8" width="4" height="12"/><rect x="17" y="3" width="4" height="17"/>'}
+};
+function catCol(k){return (CAT_META[k]&&CAT_META[k].c)||'#888';}
+function catShort(k){return (CAT_META[k]&&CAT_META[k].s)||k;}
+function catIcon(k,sz){var m=CAT_META[k];sz=sz||16;return '<svg viewBox="0 0 24 24" width="'+sz+'" height="'+sz+'" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">'+(m?m.i:'')+'</svg>';}
+
+var SOLSET={
+ 'עבירות כלפי הרכוש':[
+   {n:'1',t:'סיור ממוקד בנקודות חמות',d:'תיעדוף סיור יזום בזירות הרכוש הבולטות במפה. דירוג "יעיל" — ‎<b>−16% פשיעה</b> באתרים ממוקדים, עם גלישת תועלת לסביבה (לא תזוזה).',s:'OJP CrimeSolutions',u:'https://crimesolutions.ojp.gov/ratedpractices/hot-spots-policing'},
+   {n:'2',t:'תכנון סביבתי מונע פשיעה (CPTED)',d:'תאורה, שדות ראייה וחיזוק חניונים ומבואות בזירות — צמצום הזדמנויות לפריצה וגניבה.',s:'College of Policing',u:'https://www.college.police.uk/research/crime-reduction-toolkit/hot-spots-policing'},
+   {n:'3',t:'עיר ללא אלימות · הרשות לביטחון קהילתי',d:'מסגרת מוניציפלית קיימת וממומנת למיפוי זירות מקומיות ותוכניות מניעה ממוקדות ברמת הרשות.',s:'הרשות הלאומית לביטחון קהילתי',u:UVZ}
+ ],
+ 'עבירות נגד גוף':[
+   {n:'1',t:'עיר ללא אלימות · הרשות לביטחון קהילתי',d:'התוכנית הלאומית לאלימות: מיפוי זירות, מניעה ממוקדת ושיתוף קהילה — מסגרת מוניציפלית קיימת וממומנת.',s:'הרשות הלאומית לביטחון קהילתי',u:UVZ},
+   {n:'2',t:'סיור ממוקד בנקודות חמות',d:'סיור יזום בזירות האלימות — המטא-אנליזה מצאה ירידה גם בעבירות נגד גוף. דירוג "יעיל".',s:'OJP CrimeSolutions',u:'https://crimesolutions.ojp.gov/ratedpractices/hot-spots-policing'},
+   {n:'3',t:'תכנון סביבתי (CPTED)',d:'תאורה ושדות ראייה במוקדי חיכוך והתקהלות ציבורית.',s:'College of Policing',u:'https://www.college.police.uk/research/crime-reduction-toolkit/hot-spots-policing'}
+ ],
+ 'עבירות סדר ציבורי':[
+   {n:'1',t:'שיטור מכוון-בעיה (POP)',d:'אכיפת אי-סדר ממוקדת בזירות הבולטות — מפחית עבירות סדר ציבורי באזורים הממוקדים.',s:'College of Policing',u:'https://www.college.police.uk/research/crime-reduction-toolkit/hot-spots-policing'},
+   {n:'2',t:'עיר ללא אלימות',d:'מיפוי זירות התקהלות, אלכוהול וסמים ובניית מענה מוניציפלי מקומי.',s:'הרשות הלאומית לביטחון קהילתי',u:UVZ},
+   {n:'3',t:'סיור ממוקד + תחזוקת מרחב',d:'שילוב סיור ממוקד עם ניקיון ותחזוקה — הוכח יעיל כאשר מופעלים יחד (ניסוי מבוקר).',s:'J-PAL',u:'https://www.povertyactionlab.org/evaluation/improving-security-through-concentrated-policing-bogota-colombia'}
+ ]
+};
+
+function donutHero(idx){
+ var cities=DATA._sorted,c=cities[idx],tot=c.total;
+ var cats=Object.keys(c.cats).sort(function(a,b){return c.cats[b]-c.cats[a];});
+ var r=78,cx=95,cy=95,C=2*Math.PI*r,off=0;
+ var arcs=cats.map(function(k){var len=c.cats[k]/tot*C;var el='<circle cx="'+cx+'" cy="'+cy+'" r="'+r+'" fill="none" stroke="'+catCol(k)+'" stroke-width="22" stroke-dasharray="'+len.toFixed(2)+' '+(C-len).toFixed(2)+'" stroke-dashoffset="'+(-off).toFixed(2)+'" transform="rotate(-90 '+cx+' '+cy+')" style="cursor:pointer" onclick="focusCat(\''+k+'\')"><title>'+catShort(k)+'</title></circle>';off+=len;return el;}).join('');
+ var svg='<svg viewBox="0 0 190 190" width="186" height="186">'+arcs+'<text x="95" y="90" text-anchor="middle" fill="#191c22" font-size="29" font-weight="800" font-family="Rubik">'+fmt(tot)+'</text><text x="95" y="110" text-anchor="middle" fill="#8a8577" font-size="11">עבירות 2025</text></svg>';
+ var leg=cats.map(function(k){return '<div class="r" onclick="focusCat(\''+k+'\')"><span class="ico" style="background:'+catCol(k)+'">'+catIcon(k,15)+'</span><span class="n">'+catShort(k)+'</span><span class="v" style="color:'+catCol(k)+'">'+Math.round(c.cats[k]/tot*100)+'%</span><span class="chev">‹</span></div>';}).join('');
+ return '<div class="donut-hero"><span class="hint">◉ לחצו על פלח או שורה לצלילה</span><div class="donut-wrap">'+svg+'</div></div><div class="dleg">'+leg+'</div>';
+}
+function ddr(l,v,col){return '<div class="ddr"><span>'+l+'</span><b'+(col?' style="color:'+col+'"':'')+'>'+v+'</b></div>';}
+function focusCat(k){
+ var cities=DATA._sorted,c=_curCity;if(!c||!c.cats[k])return;_focus=k;
+ var tot=c.total,v=c.cats[k],cs=v/tot,ns=natShare(cities,k);
+ var r=78,C=2*Math.PI*r,len=cs*C;
+ var svg='<svg viewBox="0 0 190 190" width="186" height="186"><circle cx="95" cy="95" r="78" fill="none" stroke="#e6e0d4" stroke-width="22"/><circle cx="95" cy="95" r="78" fill="none" stroke="'+catCol(k)+'" stroke-width="22" stroke-linecap="round" stroke-dasharray="'+len.toFixed(1)+' '+(C-len).toFixed(1)+'" transform="rotate(-90 95 95)"/><text x="95" y="90" text-anchor="middle" fill="#191c22" font-size="30" font-weight="800" font-family="Rubik">'+Math.round(cs*100)+'%</text><text x="95" y="110" text-anchor="middle" fill="#8a8577" font-size="11">'+catShort(k)+'</text></svg>';
+ var arr=cities.map(function(x){return{city:x.city,v:x.cats[k]||0};}).sort(function(a,b){return b.v-a.v;});var cr=1;for(var i=0;i<arr.length;i++){if(arr[i].city===c.city){cr=i+1;break;}}
+ var diff=ns?Math.round((cs/ns-1)*100):0;var pcc=POP[c.city]?(v/POP[c.city]*1000).toFixed(2):'—';
+ var near=cities.map(function(x){return{x:x,d:Math.hypot(x.lat-c.lat,x.lng-c.lng)};}).sort(function(a,b){return a.d-b.d;}).slice(0,6).map(function(o){return o.x;});
+ var maxN=Math.max.apply(null,near.map(function(x){return x.cats[k]||0;}))||1;
+ var bars=near.map(function(x){var w=Math.round((x.cats[k]||0)/maxN*100);return '<div class="cmp '+(x.city===c.city?'me':'')+'"><span class="nm">'+x.city+'</span><span class="tr"><span class="fl" style="width:'+w+'%;background:'+catCol(k)+'"></span></span><span class="vv">'+fmt(x.cats[k]||0)+'</span></div>';}).join('');
+ document.getElementById('donutpane').innerHTML=
+  '<div class="donut-hero"><div style="font-weight:800;color:'+catCol(k)+';display:flex;align-items:center;gap:8px;margin-bottom:6px"><span style="width:28px;height:28px;border-radius:8px;background:'+catCol(k)+';color:#fff;display:inline-flex;align-items:center;justify-content:center">'+catIcon(k,16)+'</span>'+k+'</div><div class="donut-wrap" style="cursor:default">'+svg+'</div></div>'+
+  '<div style="margin-top:8px">'+ddr('היקף בטריטוריה',fmt(v)+' עבירות')+ddr('נתח מכלל העבירות',Math.round(cs*100)+'%')+ddr('דירוג ארצי בעבירה זו','#'+cr+' / '+cities.length,cr<=10?'#c23a3f':cr<=30?'#9a7318':'#1a8f63')+ddr('מול הממוצע הארצי',(diff>=0?'+':'')+diff+'%  ('+Math.round(ns*100)+'% ארצי)',diff>12?'#c23a3f':diff<-12?'#1a8f63':'')+ddr('עבירה זו ל-1,000*',pcc)+'</div>'+
+  '<div class="ddh">חלוקה גאוגרפית · ערים סמוכות</div>'+bars;
+ document.getElementById('donutback').style.display='inline-block';
+}
+function unfocus(){ if(DATA&&DATA._idx!=null){document.getElementById('donutback').style.display='none';document.getElementById('donutpane').innerHTML=donutHero(DATA._idx);} }
+
+function buildKPIs(idx){
+ var cities=DATA._sorted,c=cities[idx],tot=c.total;
+ var natTotal=cities.reduce(function(s,x){return s+x.total;},0),pct=(tot/natTotal*100).toFixed(1);
+ var pc=perCap(c);var pv=cities.map(perCap).filter(function(v){return v!=null;}).sort(function(a,b){return a-b;});var med=pv[Math.floor(pv.length/2)];
+ var viol=c.cats['עבירות נגד גוף']||0,violPct=Math.round(viol/tot*100);
+ var cov=(CLIENT&&CLIENT.demo)?214:'—';
+ var ratio=pc&&med?pc/med:null;
+ function k(l,v,m,cls){return '<div class="kpi"><div class="kl">'+l+'</div><div class="kv '+(cls||'')+'">'+v+'</div><div class="km">'+m+'</div></div>';}
+ document.getElementById('kpis').innerHTML=
+  k('סה״כ עבירות 2025',fmt(tot),c.city,'gold')+
+  k('דירוג ארצי','#'+(idx+1),'מתוך '+cities.length+' ערים',(idx<10?'bad':''))+
+  k('נתח ארצי',pct+'%',fmt(natTotal)+' בארץ')+
+  k('עבירות אלימות',violPct+'%',fmt(viol)+' נגד גוף',(violPct>12?'bad':'ok'))+
+  k('פשיעה ל-1,000',pc?pc.toFixed(1):'—',ratio?('×'+ratio.toFixed(1)+' מהחציון הארצי*'):'הערכת למ״ס*',(ratio&&ratio>1.2?'bad':ratio&&ratio<0.9?'ok':''))+
+  k('רשת שומרים',cov,'משתמשים פעילים');
+}
+
+function buildRank(idx){
+ var cities=DATA._sorted,max=cities[0].total;
+ document.getElementById('rank-note').textContent='דירוג '+cities.length+' הערים הגדולות לפי סה״כ עבירות מדווחות (משטרת ישראל 2025). הטריטוריה שלך מודגשת.';
+ document.getElementById('rankbody').innerHTML=cities.map(function(x,i){var w=Math.round(x.total/max*100);return '<div class="row '+(i===idx?'me':'')+'"><span class="pos">'+(i+1)+'</span><span class="city">'+x.city+'</span><span class="bar"><i style="width:'+w+'%"></i></span><span class="tot">'+fmt(x.total)+'</span></div>';}).join('');
+}
+
+function buildAnalysis(idx){
+ var cities=DATA._sorted,c=cities[idx],tot=c.total;natShare(cities,'x');
+ var ranked=Object.keys(c.cats).map(function(k){var cs=c.cats[k]/tot,ns=natShare(cities,k);return{k:k,cs:cs,ns:ns,gap:cs-ns};}).sort(function(a,b){return b.gap-a.gap;});
+ var pc=perCap(c);var pv=cities.map(perCap).filter(function(v){return v!=null;}).sort(function(a,b){return a-b;});var med=pv[Math.floor(pv.length/2)];
+ var tc=topCat(c.cats);var out=[];
+ var top=ranked[0];var d=top.ns?Math.round((top.cs/top.ns-1)*100):0;
+ out.push({cls:'up',i:'▲',t:catShort(top.k)+' — '+Math.round(top.cs*100)+'% מהעבירות',
+  d:'העבירה הדומיננטית, '+(d>0?'<b>+'+d+'%</b> מעל הממוצע הארצי':'קרוב לממוצע הארצי')+' ('+Math.round(top.ns*100)+'%). סיור מכוון לנקודות החמות הראה <b>−16% פשיעה</b> במטא-אנליזה של 78 ניסויים.',
+  src:'OJP CrimeSolutions — Hot Spots (דירוג: Effective)',url:'https://crimesolutions.ojp.gov/ratedpractices/hot-spots-policing'});
+ if(pc&&med){var r=pc/med;out.push({cls:'flag',i:'◉',t:'עוצמת פשיעה לנפש',
+  d:'<b>'+pc.toFixed(1)+'</b> עבירות ל-1,000 תושבים — <b>×'+r.toFixed(1)+'</b> החציון הארצי ('+med.toFixed(1)+'). '+(r>1.2?'עוצמה גבוהה — מצדיק הקצאת משאבים מוגברת.':r<0.9?'עוצמה נמוכה יחסית — שמירה על מגמה.':'עוצמה בינונית.'),
+  src:'מחושב מנתוני משטרה + הערכת למ״ס',url:''});}
+ var near=cities.map(function(x){return{x:x,d:Math.hypot(x.lat-c.lat,x.lng-c.lng)};}).sort(function(a,b){return a.d-b.d;}).slice(1,7).map(function(o){return o.x;});
+ var worse=near.filter(function(x){return (perCap(x)||0)>(pc||0);}).length;
+ out.push({cls:'info',i:'⌖',t:'מיקום יחסי',d:'מדורגת <b>#'+(idx+1)+'</b> ארצית בנפח. מבין 6 הערים הסמוכות, <b>'+worse+'</b> חמורות יותר בפשיעה לנפש.',src:'',url:''});
+ var insHTML=out.map(function(o){return '<div class="ins"><div class="ic '+o.cls+'">'+o.i+'</div><div style="flex:1"><div class="tt">'+o.t+'</div><div class="dd">'+o.d+'</div>'+(o.src?'<div class="src">'+(o.url?'<a href="'+o.url+'" target="_blank" rel="noopener">'+o.src+' ↗</a>':o.src)+'</div>':'')+'</div></div>';}).join('');
+ var set=SOLSET[tc.name]||SOLSET['עבירות כלפי הרכוש'];
+ var solHTML='<div class="juris">⚖️ תחום שיפוט: ישראל · מותאם לעבירה המובילה: '+catShort(tc.name)+'</div>'+
+  set.map(function(o){return '<div class="ins"><div class="ic flag">'+o.n+'</div><div style="flex:1"><div class="tt">'+o.t+'</div><div class="dd">'+o.d+'</div><div class="src"><a href="'+o.u+'" target="_blank" rel="noopener">'+o.s+' ↗</a></div></div></div>';}).join('');
+ document.getElementById('analysispane').innerHTML=
+  '<div class="ddh" style="margin-top:0">תובנות בזמן אמת</div>'+insHTML+
+  '<div class="ddh">מענים מבוססי-ראיות</div>'+solHTML+
+  '<div class="foot">המספרים מחושבים בזמן אמת מנתוני משטרת ישראל 2025. המענים מבוססים על מחקר מבוקר בלבד (קישור בכל כרטיס). אין זו המלצה משפטית מחייבת — יישום בתיאום הרשות והמשטרה.</div>';
+}
+
+function renderLegend(){var el=document.getElementById('legend');if(!el)return;el.innerHTML=Object.keys(CAT_META).map(function(k){return '<span><i style="background:'+catCol(k)+'"></i>'+catShort(k)+'</span>';}).join('');}
+
+function render(idx){
+ var cities=DATA._sorted,c=cities[idx];if(!c)return;_curCity=c;DATA._idx=idx;_focus=null;
+ var db=document.getElementById('donutback');if(db)db.style.display='none';
+ var ts=document.getElementById('terr-sel');
+ if(ts&&!ts.options.length){cities.forEach(function(x){var o=document.createElement('option');o.value=x.city;o.textContent=x.city;ts.appendChild(o);});}
+ if(ts)ts.value=c.city;
+ buildKPIs(idx);
+ if(cityLayer){MAP.removeLayer(cityLayer);}cityLayer=L.layerGroup().addTo(MAP);
+ if(spreadLayer){MAP.removeLayer(spreadLayer);spreadLayer=null;var sp=document.getElementById('spread-btn');if(sp)sp.classList.remove('on');}
+ var cats=Object.keys(c.cats),maxCat=Math.max.apply(null,cats.map(function(k){return c.cats[k];}));
+ drawTerritory(c);
+ cats.forEach(function(k){var ang=(cats.indexOf(k)/cats.length)*Math.PI*2,dist=0.012+(c.cats[k]/maxCat)*0.022;var la=c.lat+Math.cos(ang)*dist,ln=c.lng+Math.sin(ang)*dist/Math.cos(c.lat*Math.PI/180);
+  var mk=L.circleMarker([la,ln],{radius:6+Math.sqrt(c.cats[k])/6,color:'#141a27',weight:1.5,fillColor:catCol(k),fillOpacity:.92});
+  var ns=natShare(cities,k),cs=c.cats[k]/c.total,flag=cs>ns*1.12?' ⚠️ מעל הממוצע':(cs<ns*0.88?' ✓ מתחת לממוצע':'');
+  mk.on('mouseover',function(){insp('<b style="color:'+catCol(k)+'">'+catShort(k)+'</b><br>'+fmt(c.cats[k])+' · '+Math.round(cs*100)+'%'+flag);});
+  mk.on('mouseout',function(){insp(null);});
+  mk.on('click',function(){focusCat(k);});
+  mk.bindPopup('<b>'+catShort(k)+'</b><br>'+fmt(c.cats[k])+' · '+Math.round(cs*100)+'%<br><span style="color:'+catCol(k)+'">▸ לחצו לצלילה</span>');
+  mk.addTo(cityLayer);});
+ document.getElementById('donutpane').innerHTML=donutHero(idx);
+ buildAnalysis(idx);buildRank(idx);
+ var fs=document.getElementById('feed-src');if(fs)fs.textContent=(CLIENT&&CLIENT.demo)?'נתוני הדגמה':'רשת שומרים · חי';
+ loadLive(c);
+}
+(function(){var ts=document.getElementById('terr-sel');if(ts)ts.onchange=function(){var i=DATA._sorted.findIndex(function(x){return x.city===ts.value;});if(i>=0)render(i);};})();
+
 boot();
 </script>
 </body>
