@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>SH✡MER · Dashboard</title>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+<style>
+  :root{--gold:#faac22;--blue:#1e315f;--dark:#0c1b39;--ink:#0a1428;--card:#13213f;--card2:#16254a;--b:#243a63;--tx:#e8eefc;--tx2:#9fb2d4;--tx3:#6c82ab;}
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{background:radial-gradient(ellipse at 50% -10%,#16294d,#0a1428 60%);color:var(--tx);font-family:'Segoe UI',system-ui,-apple-system,'Alef',Arial,sans-serif;min-height:100vh;padding:max(16px,env(safe-area-inset-top)) 16px 40px}
+  .wrap{max-width:760px;margin:0 auto}
+  .brand{display:flex;align-items:center;justify-content:center;gap:10px;padding:14px 0 6px}
+  .brand h1{font-size:22px;font-weight:800;letter-spacing:.5px}
+  .brand .stars{color:var(--gold)}
+  .sub{text-align:center;color:var(--tx3);font-size:12px;margin-bottom:22px;letter-spacing:.5px;text-transform:uppercase}
+  .card{background:var(--card);border:1px solid var(--b);border-radius:16px;padding:18px;margin-bottom:14px;box-shadow:0 8px 28px rgba(0,0,0,.35)}
+  .card h2{font-size:13px;font-weight:800;color:var(--gold);letter-spacing:.06em;text-transform:uppercase;margin-bottom:12px}
+  label{display:block;font-size:12px;color:var(--tx2);margin:10px 0 5px}
+  input,select{width:100%;height:50px;background:var(--ink);border:1px solid var(--b);border-radius:12px;color:var(--tx);padding:0 14px;font-size:16px;outline:none}
+  input:focus,select:focus{border-color:var(--gold)}
+  .row{display:flex;gap:8px}
+  .row .cc{flex:0 0 118px}
+  .btn{width:100%;height:52px;border:0;border-radius:12px;background:linear-gradient(135deg,#C09020,#E0A828 60%,#F5C840);color:#23170a;font-weight:800;font-size:16px;cursor:pointer;margin-top:16px}
+  .btn:active{transform:scale(.99)}
+  .btn.ghost{background:transparent;border:1px solid var(--b);color:var(--tx2);font-weight:600;height:44px;font-size:14px}
+  .err{color:#ff6b7d;font-size:13px;margin-top:10px;min-height:16px;text-align:center}
+  .hidden{display:none!important}
+  .kv{display:flex;justify-content:space-between;padding:9px 0;border-bottom:1px solid rgba(255,255,255,.05);font-size:14px}
+  .kv:last-child{border-bottom:0}
+  .kv .k{color:var(--tx3)}
+  .kv .v{font-weight:600;direction:ltr}
+  .item{display:flex;align-items:center;gap:11px;padding:10px 0;border-bottom:1px solid rgba(255,255,255,.05)}
+  .item:last-child{border-bottom:0}
+  .dot{width:34px;height:34px;border-radius:50%;background:var(--card2);border:1px solid var(--b);display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0}
+  .item .nm{font-weight:600;font-size:14px}
+  .item .mt{font-size:11.5px;color:var(--tx3)}
+  .empty{color:var(--tx3);font-size:13px;text-align:center;padding:14px 0}
+  .pill{display:inline-block;font-size:11px;font-weight:700;padding:3px 9px;border-radius:999px}
+  .pill.on{background:rgba(46,204,113,.16);color:#58d08b}
+  .pill.off{background:rgba(255,255,255,.07);color:var(--tx3)}
+  .topbar{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
+  .topbar .who{font-size:14px;font-weight:700}
+  .topbar .who small{display:block;color:var(--tx3);font-weight:400;font-size:11px}
+  .lang{display:flex;gap:6px}
+  .lang button{background:var(--card2);border:1px solid var(--b);color:var(--tx2);border-radius:8px;padding:5px 9px;font-size:12px;cursor:pointer}
+  .lang button.on{background:var(--gold);color:#23170a;border-color:var(--gold);font-weight:700}
+  a.maplink{color:var(--gold);text-decoration:none;font-weight:600}
+  .note{text-align:center;color:var(--tx3);font-size:11.5px;margin-top:18px;line-height:1.6}
+  #recaptcha{display:flex;justify-content:center;margin-top:8px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="brand"><h1>SH<span class="stars">✡</span>MER</h1></div>
+  <div class="sub" id="sub">Dashboard · לוח בקרה</div>
+
+  <div id="login" class="card">
+    <h2 id="l-h">כניסה לחשבון</h2>
+    <div id="step-phone">
+      <label id="l-phone">מספר הנייד שלך</label>
+      <div class="row">
+        <select class="cc" id="cc"></select>
+        <input id="phone" type="tel" inputmode="tel" dir="ltr" placeholder="50 123 4567">
+      </div>
+      <button class="btn" id="send-btn">שלח קוד אימות</button>
+      <div id="recaptcha"></div>
+    </div>
+    <div id="step-code" class="hidden">
+      <label id="l-code">הזן/י את הקוד שנשלח ב-SMS</label>
+      <input id="code" type="tel" inputmode="numeric" dir="ltr" placeholder="______" maxlength="6">
+      <button class="btn" id="verify-btn">אימות וכניסה</button>
+      <button class="btn ghost" id="back-btn">חזרה</button>
+    </div>
+    <div class="err" id="err"></div>
+  </div>
+
+  <div id="dash" class="hidden">
+    <div class="topbar">
+      <div class="who" id="who">—<small id="who-ph"></small></div>
+      <div class="lang">
+        <button data-l="he" class="on">עב</button><button data-l="en">EN</button><button data-l="ar">ع</button>
+        <button class="ghost" id="signout" style="height:auto;padding:5px 9px">יציאה</button>
+      </div>
+    </div>
+    <div class="card"><h2 id="c-prof">הפרופיל שלי</h2><div id="prof"></div></div>
+    <div class="card"><h2 id="c-loc">מיקום אחרון ידוע</h2><div id="loc"></div></div>
+    <div class="card"><h2 id="c-guard">השומרים שלי</h2><div id="guards"></div></div>
+    <div class="card"><h2 id="c-act">הדיווחים וההתראות שלי</h2><div id="acts"></div></div>
+    <div class="note" id="note"></div>
+  </div>
+</div>
+
+<script>
+var T={
+ he:{sub:'לוח בקרה · Dashboard',lh:'כניסה לחשבון',lphone:'מספר הנייד שלך',send:'שלח קוד אימות',lcode:'הזן/י את הקוד שנשלח ב-SMS',verify:'אימות וכניסה',back:'חזרה',prof:'הפרופיל שלי',loc:'מיקום אחרון ידוע',guard:'השומרים שלי',act:'הדיווחים וההתראות שלי',name:'שם',phone:'טלפון',since:'חבר/ה מאז',nolocation:'אין מיקום אחרון',openmap:'פתח במפה',noguard:'עדיין אין שומרים מקושרים',noact:'אין דיווחים או התראות',signin_err:'שגיאה - נסה/י שוב',bad_code:'קוד שגוי',note:'הנתונים שלך בלבד · מוצפן · לעולם לא נמכר.',active:'פעיל',idle:'לא מחובר'},
+ en:{sub:'Dashboard',lh:'Sign in',lphone:'Your mobile number',send:'Send verification code',lcode:'Enter the SMS code',verify:'Verify & enter',back:'Back',prof:'My profile',loc:'Last known location',guard:'My SHOMERs',act:'My reports & alerts',name:'Name',phone:'Phone',since:'Member since',nolocation:'No recent location',openmap:'Open in map',noguard:'No linked guardians yet',noact:'No reports or alerts',signin_err:'Error - try again',bad_code:'Wrong code',note:'Your data only · encrypted · never sold.',active:'Active',idle:'Offline'},
+ ar:{sub:'لوحة التحكم',lh:'تسجيل الدخول',lphone:'رقم جوالك',send:'إرسال رمز التحقق',lcode:'أدخل رمز الـ SMS',verify:'تحقّق ودخول',back:'رجوع',prof:'ملفي',loc:'آخر موقع معروف',guard:'حُرّاسي',act:'بلاغاتي وتنبيهاتي',name:'الاسم',phone:'الهاتف',since:'عضو منذ',nolocation:'لا يوجد موقع حديث',openmap:'افتح في الخريطة',noguard:'لا يوجد حُرّاس مرتبطون بعد',noact:'لا بلاغات أو تنبيهات',signin_err:'خطأ - حاول مجددًا',bad_code:'رمز خاطئ',note:'بياناتك فقط · مشفّرة · لا تُباع أبدًا.',active:'نشط',idle:'غير متصل'}
+};
+var L='he';
+function tr(k){return (T[L]&&T[L][k])||T.en[k]||k;}
+function setT(id,k){var e=document.getElementById(id);if(e)e.textContent=tr(k);}
+function applyLang(){
+ document.documentElement.lang=L; document.documentElement.dir=(L==='en')?'ltr':'rtl';
+ setT('sub','sub');setT('l-h','lh');setT('l-phone','lphone');setT('send-btn','send');setT('l-code','lcode');
+ setT('verify-btn','verify');setT('back-btn','back');setT('c-prof','prof');setT('c-loc','loc');setT('c-guard','guard');setT('c-act','act');
+ document.getElementById('note').innerHTML=tr('note')+'<br>SH✡MER · 3Shamrocks Studio';
+ if(_cache)renderDash(_cache);
+}
+var DIAL={IL:'972',US:'1',GB:'44',FR:'33',DE:'49',CA:'1',AU:'61',RU:'7',IT:'39',ES:'34',NL:'31',AE:'971',SA:'966',IN:'91',BR:'55',TR:'90',UA:'380'};
+(function(){var s=document.getElementById('cc');Object.keys(DIAL).forEach(function(k){var o=document.createElement('option');o.value=DIAL[k];o.textContent=k+' +'+DIAL[k];s.appendChild(o);});s.value='972';})();
+var FB={apiKey:'AIzaSyAfevYysNLWMtXluY5lZSM_VY0eyDwZ6KQ',authDomain:'shomergency.firebaseapp.com',databaseURL:'https://shomergency-default-rtdb.firebaseio.com',projectId:'shomergency',storageBucket:'shomergency.firebasestorage.app',messagingSenderId:'745767303099',appId:'1:745767303099:web:6c9605fbba940430b7769e'};
+firebase.initializeApp(FB);
+var auth=firebase.auth();
+var confirmationResult=null, recaptcha=null, idToken=null, myUid=null, myPhone=null, _cache=null;
+function showErr(m){document.getElementById('err').textContent=m||'';}
+function canon(raw,cc){var d=String(raw||'').replace(/\D/g,'');if(d.charAt(0)==='0')d=d.slice(1);return '+'+cc+d;}
+document.getElementById('send-btn').onclick=function(){
+ showErr('');
+ var raw=document.getElementById('phone').value, cc=document.getElementById('cc').value;
+ var num=canon(raw,cc);
+ if(num.replace(/\D/g,'').length<8){showErr(tr('signin_err'));return;}
+ myPhone=num;
+ try{ if(!recaptcha){ recaptcha=new firebase.auth.RecaptchaVerifier('recaptcha',{size:'invisible'}); } }catch(e){}
+ document.getElementById('send-btn').disabled=true;
+ auth.signInWithPhoneNumber(num,recaptcha).then(function(cr){
+   confirmationResult=cr;
+   document.getElementById('step-phone').classList.add('hidden');
+   document.getElementById('step-code').classList.remove('hidden');
+ }).catch(function(e){ showErr(tr('signin_err')+' '+(e.code||'')); document.getElementById('send-btn').disabled=false; try{recaptcha.clear();recaptcha=null;}catch(_){} });
+};
+document.getElementById('back-btn').onclick=function(){document.getElementById('step-code').classList.add('hidden');document.getElementById('step-phone').classList.remove('hidden');document.getElementById('send-btn').disabled=false;showErr('');};
+document.getElementById('verify-btn').onclick=function(){
+ showErr('');
+ var code=document.getElementById('code').value.trim();
+ if(!confirmationResult||code.length<4){showErr(tr('bad_code'));return;}
+ document.getElementById('verify-btn').disabled=true;
+ confirmationResult.confirm(code).then(function(res){ afterAuth(res.user); })
+   .catch(function(e){ showErr(tr('bad_code')); document.getElementById('verify-btn').disabled=false; });
+};
+document.getElementById('signout').onclick=function(){ auth.signOut().then(function(){location.reload();}); };
+document.querySelectorAll('.lang button[data-l]').forEach(function(b){ b.onclick=function(){ L=b.getAttribute('data-l'); document.querySelectorAll('.lang button[data-l]').forEach(function(x){x.classList.toggle('on',x===b);}); applyLang(); }; });
+auth.onAuthStateChanged(function(u){ if(u && !_cache){ afterAuth(u); } });
+async function sha256Hex(str){ var buf=await crypto.subtle.digest('SHA-256', new TextEncoder().encode(str)); return Array.from(new Uint8Array(buf)).map(function(b){return b.toString(16).padStart(2,'0');}).join(''); }
+async function rget(path){ try{ var r=await fetch(FB.databaseURL+'/'+path+'.json?auth='+encodeURIComponent(idToken)); if(!r.ok) return null; return await r.json(); }catch(e){ return null; } }
+async function afterAuth(user){
+ myUid=user.uid; idToken=await user.getIdToken();
+ myPhone=myPhone||user.phoneNumber||'';
+ document.getElementById('login').classList.add('hidden');
+ document.getElementById('dash').classList.remove('hidden');
+ var data={profile:null,guards:[],acts:[],loc:null};
+ try{
+   var digits=(myPhone||'').replace(/\D/g,'');
+   var hash=digits?await sha256Hex(digits):null;
+   if(hash){ data.profile=await rget('registry/'+hash); }
+   data.loc=await rget('presence/'+myUid);
+   var pairs=await rget('pairs/'+myUid);
+   if(pairs){ Object.keys(pairs).forEach(function(k){ var p=pairs[k]||{}; data.guards.push({uid:k,name:p.name||'',ts:p.ts||0}); }); }
+   var ev=await rget('events'); if(ev){ Object.keys(ev).forEach(function(k){ var e=ev[k]; if(e&&e.by===myUid){ data.acts.push({kind:'event',t:e.type||'',ts:e.ts||0,lat:e.lat,lng:e.lng}); } }); }
+   var pa=await rget('palerts'); if(pa){ Object.keys(pa).forEach(function(k){ var a=pa[k]; if(a&&(a.by===myUid||a.subjUid===myUid)){ data.acts.push({kind:'palert',t:a.kind||'',ts:a.ts||0,lat:a.lat,lng:a.lng,name:a.subjName}); } }); }
+   data.acts.sort(function(a,b){return (b.ts||0)-(a.ts||0);});
+ }catch(e){}
+ _cache=data; renderDash(data);
+}
+function fmtDate(ts){ if(!ts)return '—'; try{ return new Date(ts).toLocaleDateString(L==='he'?'he-IL':L==='ar'?'ar':'en-GB'); }catch(e){ return '—'; } }
+function renderDash(d){
+ var nm=(d.profile&&(d.profile.name))|| (L==='he'?'שומר/ת':'Guardian');
+ document.getElementById('who').childNodes[0].nodeValue=nm;
+ document.getElementById('who-ph').textContent=myPhone||'';
+ document.getElementById('prof').innerHTML=kv(tr('name'),nm)+kv(tr('phone'),myPhone||'—')+kv(tr('since'),fmtDate(d.profile&&d.profile.ts));
+ if(d.loc&&d.loc.lat!=null){ var fresh=d.loc.ts&&(Date.now()-d.loc.ts<300000);
+   document.getElementById('loc').innerHTML='<div class="kv"><span class="k">'+tr('loc')+'</span><span class="pill '+(fresh?'on':'off')+'">'+(fresh?tr('active'):tr('idle'))+'</span></div>'+kv('',(+d.loc.lat).toFixed(4)+', '+(+d.loc.lng).toFixed(4))+'<div style="margin-top:8px"><a class="maplink" target="_blank" href="https://www.google.com/maps?q='+d.loc.lat+','+d.loc.lng+'">📍 '+tr('openmap')+'</a></div>';
+ } else { document.getElementById('loc').innerHTML='<div class="empty">'+tr('nolocation')+'</div>'; }
+ var g=document.getElementById('guards');
+ g.innerHTML = d.guards.length ? d.guards.map(function(x){ return '<div class="item"><div class="dot">🛡️</div><div><div class="nm">'+esc(x.name||x.uid.slice(0,6))+'</div><div class="mt">'+fmtDate(x.ts)+'</div></div></div>'; }).join('') : '<div class="empty">'+tr('noguard')+'</div>';
+ var a=document.getElementById('acts');
+ a.innerHTML = d.acts.length ? d.acts.slice(0,20).map(function(x){ var ic=x.kind==='palert'?(x.t==='abduct'?'🚨':'🔎'):'📍'; return '<div class="item"><div class="dot">'+ic+'</div><div><div class="nm">'+esc(actLabel(x))+'</div><div class="mt">'+fmtDate(x.ts)+(x.lat!=null?' · '+(+x.lat).toFixed(3)+','+(+x.lng).toFixed(3):'')+'</div></div></div>'; }).join('') : '<div class="empty">'+tr('noact')+'</div>';
+}
+function actLabel(x){
+ if(x.kind==='palert'){ var m={abduct:{he:'חטיפה',en:'Abduction',ar:'اختطاف'},missing:{he:'אדם נעדר',en:'Missing person',ar:'شخص مفقود'}}; var e=m[x.t]||{he:x.t,en:x.t,ar:x.t}; return (e[L]||e.en)+(x.name?' · '+x.name:''); }
+ var ev={sex:{he:'עבירת מין',en:'Assault'},viol:{he:'אלימות',en:'Violence'},theft:{he:'גניבה',en:'Theft'},sos:{he:'SOS',en:'SOS'}}; var r=ev[x.t]; return r?(r[L]||r.en):(x.t||'Event');
+}
+function kv(k,v){return '<div class="kv"><span class="k">'+esc(k)+'</span><span class="v">'+esc(v)+'</span></div>';}
+function esc(s){return String(s==null?'':s).replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];});}
+applyLang();
+</script>
+</body>
+</html>
