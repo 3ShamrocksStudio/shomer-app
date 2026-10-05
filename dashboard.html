@@ -88,6 +88,11 @@
   @keyframes lpulse{0%{box-shadow:0 0 0 0 rgba(255,26,64,.55)}70%{box-shadow:0 0 0 14px rgba(255,26,64,0)}100%{box-shadow:0 0 0 0 rgba(255,26,64,0)}}
   .insp{position:absolute;bottom:10px;inset-inline-start:10px;z-index:500;background:rgba(10,20,38,.92);border:1px solid var(--b);border-radius:10px;padding:8px 12px;font-size:12px;max-width:60%;pointer-events:none;display:none}
   .insp.on{display:block}
+  .ins{display:flex;gap:11px;padding:10px 0;border-bottom:1px solid rgba(255,255,255,.05)}
+  .ins:last-child{border-bottom:0}
+  .ins .ic{width:30px;height:30px;border-radius:8px;background:rgba(250,172,34,.14);color:var(--gold);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:15px}
+  .ins .tt{font-size:13px;font-weight:700;color:var(--tx)}
+  .ins .dd{font-size:12px;color:var(--tx2);line-height:1.5;margin-top:2px}
   @media print{body{background:#fff;color:#111}.topbar{position:static}.signout,.live .d{display:none}.panel,.stat{break-inside:avoid;border-color:#ccc}#map{height:320px}}
 </style>
 </head>
@@ -132,15 +137,17 @@
     <div class="panel"><h2><span>מפת פשיעה · גבול שיפוט הרשות</span><span class="mapbar"><button class="mini" id="spread-btn">👥 פריסת שומרים</button></span></h2><div style="position:relative"><div id="map"></div><div class="insp" id="insp"></div></div><div class="legend" id="legend"></div></div>
     <div style="display:flex;flex-direction:column;gap:14px">
       <div class="panel lite"><h2>פילוח סוגי עבירות</h2><div class="pbody"><div class="donutgrid"><div id="donut"></div><div class="dlegend" id="dlegend"></div></div></div></div>
-      <div class="panel lite"><h2>מדד בטיחות יחסי</h2><div class="pbody" style="text-align:center"><div id="ring"></div><div id="ringsub" style="font-size:12px;color:var(--tx2);margin-top:6px"></div></div></div>
+      <div class="panel lite"><h2>דירוג עומס עבירות · נתוני משטרה</h2><div class="pbody" style="text-align:center"><div id="ring"></div><div id="ringsub" style="font-size:12px;color:var(--tx2);margin-top:6px"></div></div></div>
     </div>
   </div>
   <div class="sectitle">הקשר דמוגרפי · פשיעה לנפש</div>
   <div class="cards socio" id="socio"></div>
-  <div class="sectitle">השוואה אזורית · ערים שכנות (פשיעה ל-1,000 תושבים)</div>
-  <div class="panel lite"><div class="pbody" id="compare"></div></div>
-  <div class="sectitle" style="color:#ff8a98">⚡ אירועים חיים בטריטוריה · SOS · נעדרים · דיווחים</div>
-  <div class="panel feed"><div id="feed"><div class="empty">מתחבר לרשת SH✡MER…</div></div></div>
+  <div class="sectitle">תובנות חכמות · ניתוח מבוסס נתוני משטרת ישראל 2025</div>
+  <div class="panel lite"><div class="pbody" id="insights"></div></div>
+  <div class="grid">
+    <div class="panel lite"><h2>השוואה אזורית · פשיעה ל-1,000 תושבים</h2><div class="pbody" id="compare"></div></div>
+    <div class="panel feed"><h2 style="color:#ff8a98">⚡ אירועים חיים · SOS · נעדרים · דיווחים</h2><div id="feed"><div class="empty">מתחבר לרשת SH✡MER…</div></div></div>
+  </div>
   <div class="sectitle">דירוג ארצי · איפה הטריטוריה שלך עומדת</div>
   <div class="panel"><div class="rank-wrap"><table><thead><tr><th>#</th><th>עיר</th><th>סה״כ עבירות 2025</th><th>סוג מוביל</th></tr></thead><tbody id="rankbody"></tbody></table></div></div>
   <div class="note" id="note"></div>
@@ -262,10 +269,6 @@ function render(idx){
   var rank=idx+1, tot=c.total, tc=topCat(c.cats);
   var natTotal=cities.reduce(function(s,x){return s+x.total;},0), pct=((tot/natTotal)*100).toFixed(1);
   var pc=perCap(c), pcTxt=pc?pc.toFixed(1):'—', cov=(CLIENT&&CLIENT.demo)?214:'—';
-  // safety index: percentile among cities with population (lower per-capita = safer)
-  var withPc=cities.map(perCap).filter(function(v){return v!=null;}).sort(function(a,b){return a-b;});
-  var si='—', siFrac=0;
-  if(pc){ var below=withPc.filter(function(v){return v>pc;}).length; si=Math.round(below/withPc.length*100); siFrac=si/100; }
   document.getElementById('cards').innerHTML=
     card('סה״כ עבירות 2025',fmt(tot),c.city,'gold')+
     card('פשיעה ל-1,000 תושבים',pcTxt,pc?('אוכלוסייה ~'+fmt(POP[c.city])):'אין נתוני אוכלוסייה')+
@@ -281,21 +284,25 @@ function render(idx){
     var mk=L.circleMarker([la,ln],{radius:6+Math.sqrt(c.cats[k])/6,color:'#0a1628',weight:1.5,fillColor:CAT_COL[k]||'#888',fillOpacity:.9});
     mk.on('mouseover',function(){ insp('<b style="color:'+(CAT_COL[k])+'">'+k+'</b><br>'+fmt(c.cats[k])+' עבירות · '+Math.round(c.cats[k]/tot*100)+'% · '+c.city); });
     mk.on('mouseout',function(){ insp(null); });
-    mk.bindPopup('<b>'+k+'</b><br>'+fmt(c.cats[k])+' עבירות ('+c.city+')<br>'+Math.round(c.cats[k]/tot*100)+'% מכלל העבירות בעיר');
+    var ns=natShare(cities,k), cs=c.cats[k]/tot, flag=cs>ns*1.12?' ⚠️ מעל הממוצע':(cs<ns*0.88?' ✓ מתחת לממוצע':'');
+    mk.bindPopup('<div style="min-width:170px"><b style="color:'+(CAT_COL[k])+'">'+k+'</b><br>'+fmt(c.cats[k])+' עבירות · '+Math.round(cs*100)+'% מהעיר<br><span style="color:#8aa">ארצי: '+Math.round(ns*100)+'%'+flag+'</span></div>');
     mk.addTo(cityLayer);});
   // donut + legend
   var segs=cats.slice().sort(function(a,b){return c.cats[b]-c.cats[a];}).map(function(k){return {val:c.cats[k],color:CAT_COL[k]||'#888',label:k};});
   document.getElementById('donut').innerHTML=donutSVG(segs,fmt(tot),'עבירות 2025');
   document.getElementById('dlegend').innerHTML=segs.map(function(sg){return '<div class="r"><i style="background:'+sg.color+'"></i><span class="n">'+sg.label+'</span><span class="v">'+Math.round(sg.val/tot*100)+'%</span></div>';}).join('');
-  // safety ring
-  document.getElementById('ring').innerHTML=ringSVG(siFrac, (si==='—'?'—':si), 'מדד בטיחות', si>=60?'#18c29c':si>=35?'#f2b705':'#e5484d');
-  document.getElementById('ringsub').textContent = pc? ('ככל שגבוה יותר — בטוח יותר ביחס ל-'+withPc.length+' ערים'):'דרושים נתוני אוכלוסייה';
+  // ring = national rank (100% from police data: position among all cities by total offences)
+  var rFrac=(cities.length-rank+1)/cities.length;
+  document.getElementById('ring').innerHTML=ringSVG(rFrac, '#'+rank, 'דירוג ארצי', rank<=10?'#e5484d':rank<=30?'#f2b705':'#18c29c');
+  document.getElementById('ringsub').textContent = 'מתוך '+cities.length+' ערים · סה״כ עבירות · משטרת ישראל 2025';
   // socio cards
+  var viol=c.cats['עבירות נגד גוף']||0, violPct=Math.round(viol/tot*100);
   document.getElementById('socio').innerHTML=
-    card('אוכלוסייה (הערכה)',POP[c.city]?fmt(POP[c.city]):'—','מקור: למ״ס')+
-    card('פשיעה ל-1,000',pcTxt,'תושבים לשנה')+
-    card('מדד בטיחות יחסי',(si==='—'?'—':si+'/100'),'מול ערים אחרות')+
-    card('נתח מכלל הארץ',pct+'%',fmt(natTotal)+' עבירות ארצי');
+    card('נתח מכלל הארץ',pct+'%',fmt(natTotal)+' עבירות ארצי · נתוני משטרה')+
+    card('עבירות נגד גוף (אלימות)',violPct+'%',fmt(viol)+' עבירות · נתוני משטרה')+
+    card('פשיעה ל-1,000',pcTxt,'אוכלוסייה: הערכת למ״ס*')+
+    card('אוכלוסייה (הערכה)',POP[c.city]?fmt(POP[c.city]):'—','הערכת למ״ס — לא נתון משטרה*');
+  renderInsights(idx);
   // regional comparison: nearest 6 cities by distance
   var near=cities.map(function(x){return {x:x,d:Math.hypot((x.lat-c.lat),(x.lng-c.lng))};}).sort(function(a,b){return a.d-b.d;}).slice(0,6).map(function(o){return o.x;});
   var pcs=near.map(function(x){return {city:x.city, pc:perCap(x), tot:x.total};});
@@ -330,6 +337,24 @@ async function drawTerritory(c){
     L.circle([c.lat,c.lng],{radius:4500,color:'#ffffff',weight:1.3,dashArray:'3 6',fillColor:'#ffffff',fillOpacity:.02}).addTo(cityLayer);
     MAP.setView([c.lat,c.lng],12,{animate:true});
   }
+}
+var _natCache={};
+function natShare(cities,k){ if(_natCache.k!==cities.length){ _natCache={k:cities.length,tot:0,c:{}}; cities.forEach(function(x){for(var kk in x.cats){_natCache.c[kk]=(_natCache.c[kk]||0)+x.cats[kk];_natCache.tot+=x.cats[kk];}}); } return (_natCache.c[k]||0)/_natCache.tot; }
+function renderInsights(idx){
+  var cities=DATA._sorted, c=cities[idx], tot=c.total, out=[];
+  natShare(cities,'x'); // warm cache
+  // over-represented categories vs national average
+  var ranked=Object.keys(c.cats).map(function(k){var cs=c.cats[k]/tot,ns=natShare(cities,k);return {k:k,cs:cs,ns:ns,gap:cs-ns};}).sort(function(a,b){return b.gap-a.gap;});
+  ranked.slice(0,2).forEach(function(o){ if(o.cs>o.ns*1.12){ var d=Math.round((o.cs/o.ns-1)*100);
+    out.push({i:'▲',t:o.k+' — מעל הממוצע הארצי',d:Math.round(o.cs*100)+'% מהעבירות בטריטוריה מול '+Math.round(o.ns*100)+'% ארצי (+'+d+'%). המלצה: מיקוד משאבי מניעה, סיור ותאורה ציבורית באזורים הרלוונטיים.'}); }});
+  // national load
+  out.push({i:'⌖',t:'עומס עבירות ארצי',d:'הטריטוריה מדורגת #'+(idx+1)+' מתוך '+cities.length+' בכמות העבירות המדווחות (משטרת ישראל 2025). '+(idx<10?'עומס גבוה — מצדיק חיזוק נוכחות ושיתוף רשת השומרים.':idx<30?'עומס בינוני ביחס לארץ.':'עומס נמוך יחסית — שמירה על מגמה.')});
+  // dominant category
+  var tc=topCat(c.cats);
+  out.push({i:'◆',t:'סוג עבירה מוביל',d:tc.name+' — '+fmt(tc.val)+' עבירות ('+Math.round(tc.val/tot*100)+'% מהסך). עדיפות ראשונה להקצאת משאבים ולמסע הסברה ממוקד.'});
+  var el=document.getElementById('insights');
+  el.innerHTML=out.slice(0,4).map(function(o){return '<div class="ins"><div class="ic">'+o.i+'</div><div><div class="tt">'+o.t+'</div><div class="dd">'+o.d+'</div></div></div>';}).join('')
+    +'<div style="font-size:11px;color:var(--tx2);margin-top:8px;border-top:1px solid rgba(255,255,255,.05);padding-top:8px">* תובנות אוטומטיות מחושבות מתוך נתוני משטרת ישראל 2025 (השוואה לממוצעים ארציים אמיתיים). הערכות אוכלוסייה מסומנות כ״הערכה״ ואינן נתוני משטרה.</div>';
 }
 function card(l,v,m,cls){return '<div class="stat"><div class="l">'+l+'</div><div class="v '+(cls||'')+'">'+v+'</div><div class="m">'+(m||'')+'</div></div>';}
 function haversine(la1,lo1,la2,lo2){var R=6371,r=Math.PI/180,dLa=(la2-la1)*r,dLo=(lo2-lo1)*r;var a=Math.sin(dLa/2)**2+Math.cos(la1*r)*Math.cos(la2*r)*Math.sin(dLo/2)**2;return 2*R*Math.asin(Math.min(1,Math.sqrt(a)));}
