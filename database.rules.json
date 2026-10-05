@@ -105,6 +105,60 @@
         ".read": "auth != null",
         ".write": "auth != null"
       }
+    },
+    "palerts": {
+      ".read": "auth != null",
+      "$id": {
+        ".write": "auth != null && ( !data.exists() ? newData.child('by').val() === auth.uid : ( data.child('by').val() === auth.uid || data.child('subjUid').val() === auth.uid ) )",
+        ".validate": "!newData.exists() || newData.hasChildren(['by','ts','kind'])"
+      }
+    },
+    "events": {
+      ".read": "auth != null",
+      "$id": {
+        ".write": "auth != null && ( (!data.exists() && newData.child('by').val() === auth.uid) || (data.exists() && data.child('by').val() === auth.uid) )",
+        ".validate": "!newData.exists() || newData.hasChildren(['by','ts','type'])",
+        "confirms": {
+          "$uid": {
+            ".write": "auth != null && $uid === auth.uid",
+            ".validate": "newData.hasChild('ts')"
+          }
+        },
+        "disputes": {
+          "$uid": {
+            ".write": "auth != null && $uid === auth.uid",
+            ".validate": "newData.hasChild('ts')"
+          }
+        }
+      }
+    },
+    "dashfeed": {
+      ".read": true,
+      "$id": {
+        ".write": "auth != null && (!data.exists() || data.child('by').val() === auth.uid)",
+        ".validate": "newData.hasChildren(['type','lat','lng','ts'])",
+        "type": {
+          ".validate": "newData.isString()"
+        },
+        "lat": {
+          ".validate": "newData.isNumber()"
+        },
+        "lng": {
+          ".validate": "newData.isNumber()"
+        },
+        "ts": {
+          ".validate": "newData.isNumber()"
+        },
+        "status": {
+          ".validate": "newData.isString()"
+        },
+        "by": {
+          ".validate": "newData.isString()"
+        },
+        "$other": {
+          ".validate": false
+        }
+      }
     }
   }
 }
