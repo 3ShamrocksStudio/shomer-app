@@ -397,7 +397,7 @@ input[type=range]:focus::-webkit-slider-thumb{box-shadow:0 0 0 4px rgba(224,168,
 /* Emergency Guide - emphasized like the emergency-numbers item, but GREEN (first-aid/medical) */
 .ddr-guide{background:none}
 
-.ddr-guide .dd-ic{color:#12B085}
+.ddr-guide .dd-ic{color:#faac22}
 .ddr-guide span{color:var(--tx1)}
 .dd-sep{height:1px;background:var(--b2);margin:4px 0;}
 /* DMS badge in menu */
@@ -1667,7 +1667,7 @@ body.otp-active .ob-steps{display:none!important;}
  <!-- DROPDOWN -->
  <nav id="dd" role="menu" aria-label="תפריט ניווט" hidden>
  <button class="ddr ddr-guide" onclick="openGuide();closeDD()" role="menuitem">
-  <div class="dd-ic c-guide" aria-hidden="true"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v18M3 12h18"/></svg></div>
+  <div class="dd-ic" aria-hidden="true"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6V4.8A1.8 1.8 0 0 1 10.8 3h2.4A1.8 1.8 0 0 1 15 4.8V6"/><rect x="3" y="6" width="18" height="14" rx="2.4"/><path d="M12 10.2v5.6M9.2 13h5.6"/></svg></div>
   <span id="dd-guide" data-he="מדריך חירום" data-en="Emergency Guide" data-ar="دليل الطوارئ">מדריך חירום</span>
  </button>
  <button class="ddr ddr-em" onclick="op('sh-em');closeDD()" role="menuitem">
@@ -6846,8 +6846,24 @@ function agPhoneHint(){
  hint.style.color=ok?'var(--safe,#0E8840)':'var(--tx3)';
  hint.textContent=ok?(he?'\u2713 \u05de\u05e1\u05e4\u05e8 \u05ea\u05e7\u05d9\u05df':'\u2713 Valid number'):(he?'\u05de\u05e1\u05e4\u05e8 \u05e2\u05dd \u05e7\u05d9\u05d3\u05d5\u05de\u05ea \u05de\u05d3\u05d9\u05e0\u05d4':'Number with country code');
 }
-function agPickContact(){
+async function agPickContact(){
  var he=currentLang==='he';
+ try{
+   var C=(window.Capacitor&&window.Capacitor.Plugins&&window.Capacitor.Plugins.Contacts);
+   var native=!!(window.Capacitor&&window.Capacitor.isNativePlatform&&window.Capacitor.isNativePlatform());
+   if(C && native){
+     try{ await C.requestPermissions(); }catch(e){}
+     var res=await C.pickContact({projection:{name:true,phones:true}});
+     var ct=res&&res.contact;
+     if(ct){
+       var nm=(ct.name&&(ct.name.display||ct.name.given||''))||'';
+       var tel=(ct.phones&&ct.phones[0]&&ct.phones[0].number)||'';
+       var np=document.getElementById('ag-phone'), nn=document.getElementById('ag-name');
+       if(np&&tel)np.value=(''+tel).trim(); if(nn&&nm&&!nn.value)nn.value=(''+nm).trim(); agPhoneHint();
+     }
+     return;
+   }
+ }catch(e){}
  if(navigator.contacts&&navigator.contacts.select){
    navigator.contacts.select(['name','tel'],{multiple:false}).then(function(sel){
      if(!sel||!sel.length)return; var ct=sel[0];
@@ -9889,6 +9905,24 @@ function paReadPhoto(file, cb){
     r.onerror=function(){ cb(null); }; r.readAsDataURL(file);
   }catch(e){ cb(null); }
 }
+/* ── A cancel window before any person-alert goes out (false-alarm guard) ── */
+function paCountdown(sec){
+  return new Promise(function(resolve){
+    var he=currentLang==='he', ar=currentLang==='ar';
+    var ov=document.createElement('div'); ov.className='rep-sheet'; ov.id='pa-countdown';
+    var n=sec, done=false;
+    ov.innerHTML='<div class="rep-card" style="text-align:center">'
+      +'<div class="rep-h" style="color:#FF5A6E">'+(he?'משדר התראה…':ar?'يُبثّ التنبيه…':'Broadcasting alert…')+'</div>'
+      +'<div style="font-size:44px;font-weight:800;color:#fff;margin:8px 0" id="pa-cd-n">'+n+'</div>'
+      +'<div class="rep-sub">'+(he?'רגע לבטל אם זו טעות.':ar?'لحظة للإلغاء إن كان خطأً.':'A moment to cancel if this was a mistake.')+'</div>'
+      +'<button class="cm-palert" style="background:linear-gradient(135deg,#3a3f4a,#565d6b);border-color:#6b7280" id="pa-cd-cancel">'+(he?'ביטול':ar?'إلغاء':'Cancel')+'</button>'
+      +'</div>';
+    document.body.appendChild(ov);
+    function finish(ok){ if(done)return; done=true; clearInterval(t); try{ov.remove();}catch(e){} resolve(ok); }
+    ov.querySelector('#pa-cd-cancel').onclick=function(){ finish(false); };
+    var t=setInterval(function(){ n--; var el=document.getElementById('pa-cd-n'); if(el)el.textContent=n; if(n<=0) finish(true); },1000);
+  });
+}
 /* ── Create + broadcast a person alert (guarded, rate-limited, REST write) ── */
 async function paCreate(m, kind, desc, lastSeen, photo){
   var he=currentLang==='he';
@@ -9902,6 +9936,8 @@ async function paCreate(m, kind, desc, lastSeen, photo){
     ? (he?'לשדר התראת חטיפה על '+(m.name||'')+' לרשת? זו התראה ברמת חירום הגבוהה ביותר.':'Broadcast an ABDUCTION alert for '+(m.name||'')+' to the network? This is the highest-urgency alert.')
     : (he?'לשדר התראת אדם נעדר על '+(m.name||'')+' לרשת?':'Broadcast a MISSING-PERSON alert for '+(m.name||'')+' to the network?');
   if(!confirm(warn+(he?' דיווח כוזב עלול להוביל לחסימת החשבון.':' A false report may get your account blocked.'))) return false;
+  var _go=await paCountdown(6);
+  if(!_go){ toast(he?'בוטל - לא שודר':'Cancelled - not broadcast',''); return false; }
   var id='pa_'+FB.uid.slice(0,8)+'_'+now.toString(36);
   var rec={ kind:kind, subjUid:m.partnerUid||'', subjName:(m.name||'').slice(0,60),
     desc:String(desc||'').slice(0,200), lastSeen:String(lastSeen||'').slice(0,120),
