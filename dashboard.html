@@ -6,22 +6,35 @@
 <title>SH✡MER Command · Municipal Intelligence</title>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
-  :root{--gold:#faac22;--blue:#1e315f;--dark:#0c1b39;--ink:#081222;--card:#0f1f3b;--card2:#15284b;--b:#223a63;--tx:#e8eefc;--tx2:#9fb2d4;--tx3:#6b82ab;
-    --c-prop:#2f80ed;--c-order:#f2b705;--c-body:#e5484d;--c-moral:#e5468e;--c-fraud:#18c29c;--c-econ:#9b6cff;}
+  :root{--gold:#faac22;--blue:#1e315f;--dark:#0c1b39;--ink:#081222;--card:#0f1f3b;--card2:#15284b;--b:#223a63;--tx:#e8eefc;--tx2:#9fb2d4;--tx3:#6b82ab;}
   *{box-sizing:border-box;margin:0;padding:0}
   body{background:var(--ink);color:var(--tx);font-family:'Segoe UI',system-ui,-apple-system,Arial,sans-serif;min-height:100vh}
+  .gate{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px;background:radial-gradient(ellipse at 50% -10%,#16294d,#081222 60%)}
+  .gate .box{width:100%;max-width:400px;background:var(--card);border:1px solid var(--b);border-radius:18px;padding:26px 22px;box-shadow:0 18px 50px rgba(0,0,0,.5)}
+  .gate h1{text-align:center;font-size:22px;font-weight:800;margin-bottom:4px}
+  .gate h1 .s{color:var(--gold)}
+  .gate .tag{text-align:center;font-size:11px;color:var(--tx3);letter-spacing:.14em;text-transform:uppercase;margin-bottom:22px}
+  label{display:block;font-size:12px;color:var(--tx2);margin:12px 0 5px}
+  input,select{width:100%;height:50px;background:var(--ink);border:1px solid var(--b);border-radius:12px;color:var(--tx);padding:0 14px;font-size:15px;outline:none}
+  input:focus,select:focus{border-color:var(--gold)}
+  .btn{width:100%;height:52px;border:0;border-radius:12px;background:linear-gradient(135deg,#C09020,#E0A828 60%,#F5C840);color:#23170a;font-weight:800;font-size:16px;cursor:pointer;margin-top:18px}
+  .btn:active{transform:scale(.99)}
+  .lnk{display:block;text-align:center;margin-top:14px;color:var(--tx2);font-size:13px;cursor:pointer;background:none;border:0;width:100%}
+  .lnk b{color:var(--gold)}
+  .err{color:#ff6b7d;font-size:13px;margin-top:12px;min-height:16px;text-align:center}
+  .hidden{display:none!important}
   .topbar{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 18px;background:linear-gradient(180deg,#0e1d38,#0a1628);border-bottom:1px solid var(--b);position:sticky;top:0;z-index:30;flex-wrap:wrap}
   .brand{display:flex;align-items:center;gap:10px;font-weight:800;font-size:17px;letter-spacing:.4px}
   .brand .s{color:var(--gold)}
   .brand small{display:block;font-weight:500;font-size:10px;color:var(--tx3);letter-spacing:.14em;text-transform:uppercase}
-  .terr{display:flex;align-items:center;gap:8px}
-  .terr label{font-size:11px;color:var(--tx3)}
-  select{height:40px;background:var(--card2);border:1px solid var(--b);border-radius:10px;color:var(--tx);padding:0 12px;font-size:14px;outline:none;min-width:180px}
-  select:focus{border-color:var(--gold)}
+  .terrbox{font-size:13px;color:var(--tx2)}
+  .terrbox b{color:var(--gold)}
   .live{display:flex;align-items:center;gap:6px;font-size:11px;color:var(--tx2)}
   .live .d{width:8px;height:8px;border-radius:50%;background:#2ecc71;box-shadow:0 0 8px #2ecc71;animation:pulse 1.6s infinite}
   @keyframes pulse{50%{opacity:.4}}
+  .signout{background:var(--card2);border:1px solid var(--b);color:var(--tx2);border-radius:8px;padding:6px 11px;font-size:12px;cursor:pointer}
   .wrap{max-width:1280px;margin:0 auto;padding:16px}
   .cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px;margin-bottom:14px}
   .stat{background:var(--card);border:1px solid var(--b);border-radius:14px;padding:15px 16px}
@@ -34,7 +47,6 @@
   .panel{background:var(--card);border:1px solid var(--b);border-radius:16px;overflow:hidden}
   .panel h2{font-size:12.5px;font-weight:800;color:var(--gold);letter-spacing:.06em;text-transform:uppercase;padding:14px 16px;border-bottom:1px solid var(--b)}
   #map{height:460px;width:100%}
-  .tiles-base{filter:none}
   .pbody{padding:14px 16px}
   .bar{margin-bottom:11px}
   .bar .t{display:flex;justify-content:space-between;font-size:12.5px;margin-bottom:5px}
@@ -44,156 +56,150 @@
   table{width:100%;border-collapse:collapse;font-size:13px}
   th,td{text-align:start;padding:9px 16px;border-bottom:1px solid rgba(255,255,255,.05)}
   th{font-size:11px;color:var(--tx3);text-transform:uppercase;letter-spacing:.05em}
-  tr.me{background:rgba(250,172,34,.1)}
-  tr.me td{font-weight:800;color:var(--gold)}
+  tr.me{background:rgba(250,172,34,.1)}tr.me td{font-weight:800;color:var(--gold)}
   .rank-wrap{max-height:360px;overflow-y:auto}
   .feed .item{display:flex;gap:11px;padding:11px 16px;border-bottom:1px solid rgba(255,255,255,.05);align-items:center}
   .feed .dot{width:34px;height:34px;border-radius:9px;background:var(--card2);display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0}
-  .feed .nm{font-size:13.5px;font-weight:600}
-  .feed .mt{font-size:11px;color:var(--tx3)}
+  .feed .nm{font-size:13.5px;font-weight:600}.feed .mt{font-size:11px;color:var(--tx3)}
   .empty{color:var(--tx3);font-size:12.5px;padding:18px 16px;text-align:center;line-height:1.6}
   .note{color:var(--tx3);font-size:11px;text-align:center;padding:18px 10px;line-height:1.7}
   .legend{display:flex;flex-wrap:wrap;gap:10px;padding:0 16px 14px;font-size:11px;color:var(--tx2)}
-  .legend span{display:inline-flex;align-items:center;gap:5px}
-  .legend i{width:10px;height:10px;border-radius:3px;display:inline-block}
+  .legend span{display:inline-flex;align-items:center;gap:5px}.legend i{width:10px;height:10px;border-radius:3px;display:inline-block}
   .sectitle{font-size:12px;color:var(--tx3);margin:18px 2px 10px;letter-spacing:.06em;text-transform:uppercase;font-weight:700}
 </style>
 </head>
 <body>
+
+<!-- AUTH GATE -->
+<div id="gate" class="gate">
+  <div class="box">
+    <h1>SH<span class="s">✡</span>MER <span style="color:var(--tx3);font-weight:400">Command</span></h1>
+    <div class="tag" id="gate-tag">Municipal Intelligence · גישת לקוחות</div>
+    <div id="view-login">
+      <label>אימייל ארגוני</label><input id="email" type="email" dir="ltr" placeholder="you@municipality.gov.il">
+      <label>סיסמה</label><input id="pass" type="password" dir="ltr" placeholder="••••••••">
+      <button class="btn" id="login-btn">כניסה</button>
+      <button class="lnk" id="to-signup">אין לך גישה עדיין? <b>בקשת גישת לקוח</b></button>
+    </div>
+    <div id="view-signup" class="hidden">
+      <label>שם הארגון / רשות</label><input id="su-org" type="text" placeholder="עיריית ...">
+      <label>אימייל</label><input id="su-email" type="email" dir="ltr" placeholder="you@municipality.gov.il">
+      <label>סיסמה (8+ תווים)</label><input id="su-pass" type="password" dir="ltr">
+      <label>טריטוריה</label><select id="su-terr"></select>
+      <button class="btn" id="signup-btn">צור גישת לקוח</button>
+      <button class="lnk" id="to-login">כבר יש לך גישה? <b>כניסה</b></button>
+    </div>
+    <div class="err" id="gate-err"></div>
+  </div>
+</div>
+
+<!-- DASHBOARD -->
+<div id="app" class="hidden">
 <div class="topbar">
   <div class="brand">SH<span class="s">✡</span>MER <span style="color:var(--tx3);font-weight:400">Command</span>
     <small>Municipal Intelligence · מודיעין עירוני</small></div>
-  <div class="terr">
-    <label>טריטוריה:</label>
-    <select id="city"></select>
-  </div>
-  <div class="live"><span class="d"></span><span id="live-lbl">LIVE · משטרת ישראל 2025</span></div>
+  <div class="terrbox">טריטוריה: <b id="terr-name">—</b> <span id="org-name" style="color:var(--tx3)"></span></div>
+  <div class="live"><span class="d"></span><span>LIVE · משטרת ישראל 2025</span>
+    <button class="signout" id="signout">יציאה</button></div>
 </div>
-
 <div class="wrap">
   <div class="cards" id="cards"></div>
-
   <div class="grid">
-    <div class="panel">
-      <h2>מפת פשיעה · נקודות חום בטריטוריה</h2>
-      <div id="map"></div>
-      <div class="legend" id="legend"></div>
-    </div>
-    <div class="panel">
-      <h2>פילוח סוגי עבירות</h2>
-      <div class="pbody" id="bars"></div>
-    </div>
+    <div class="panel"><h2>מפת פשיעה · נקודות חום בטריטוריה</h2><div id="map"></div><div class="legend" id="legend"></div></div>
+    <div class="panel"><h2>פילוח סוגי עבירות</h2><div class="pbody" id="bars"></div></div>
   </div>
-
   <div class="sectitle">אירועים חיים בטריטוריה · SOS · נעדרים · דיווחים</div>
-  <div class="panel feed"><div id="feed"><div class="empty" id="feed-empty">מתחבר לרשת SH✡MER…</div></div></div>
-
+  <div class="panel feed"><div id="feed"><div class="empty">מתחבר לרשת SH✡MER…</div></div></div>
   <div class="sectitle">דירוג ארצי · איפה הטריטוריה שלך עומדת</div>
-  <div class="panel"><div class="rank-wrap"><table id="ranktbl"><thead><tr><th>#</th><th>עיר</th><th>סה״כ עבירות 2025</th><th>סוג מוביל</th></tr></thead><tbody id="rankbody"></tbody></table></div></div>
-
+  <div class="panel"><div class="rank-wrap"><table><thead><tr><th>#</th><th>עיר</th><th>סה״כ עבירות 2025</th><th>סוג מוביל</th></tr></thead><tbody id="rankbody"></tbody></table></div></div>
   <div class="note" id="note"></div>
+</div>
 </div>
 
 <script>
+var SB_URL='https://otkvebgrdiayjnqrytrn.supabase.co', SB_KEY='sb_publishable_ZSMgkwuVwKwqrMgEIlG4Nw_-CmQ_Yct';
+var sb=supabase.createClient(SB_URL,SB_KEY);
 var CAT_COL={'עבירות כלפי הרכוש':'#2f80ed','עבירות סדר ציבורי':'#f2b705','עבירות נגד גוף':'#e5484d','עבירות כלפי המוסר':'#e5468e','עבירות מרמה':'#18c29c','עבירות כלכליות':'#9b6cff'};
-var DATA=null, MAP=null, cityLayer=null;
+var DATA=null, MAP=null, cityLayer=null, CLIENT=null;
 var ESRI='https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_Base/MapServer/tile/{z}/{y}/{x}';
 var ESRIr='https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_Reference/MapServer/tile/{z}/{y}/{x}';
-
 function fmt(n){return (n||0).toLocaleString('en-US');}
-function topCat(cats){var b='',v=-1;for(var k in cats){if(cats[k]>v){v=cats[k];b=k;}}return {name:b,val:v};}
+function topCat(c){var b='',v=-1;for(var k in c){if(c[k]>v){v=c[k];b=k;}}return {name:b,val:v};}
+function gerr(m){document.getElementById('gate-err').textContent=m||'';}
 
-fetch('crime-stats.json?v=2').then(function(r){return r.json();}).then(function(d){
-  DATA=d;
-  var cities=d.cities.slice().sort(function(a,b){return b.total-a.total;});
-  DATA._sorted=cities;
-  var sel=document.getElementById('city');
-  cities.forEach(function(c,i){var o=document.createElement('option');o.value=i;o.textContent=c.city;sel.appendChild(o);});
-  sel.onchange=function(){render(+sel.value);};
-  initMap();
-  render(0); // default: biggest territory
-  document.getElementById('note').innerHTML='מקור: '+ (d.source||'משטרת ישראל') +' · '+(d.period||'2025')+' · '+fmt(d.records)+' רשומות · data.gov.il<br>הנתונים מוצגים לטריטוריה הנבחרת בלבד · גישה: 3Shamrocks Studio ולקוחות משלמים בלבד · מוצפן · לעולם לא נמכר.';
+/* ---- auth UI ---- */
+document.getElementById('to-signup').onclick=function(){document.getElementById('view-login').classList.add('hidden');document.getElementById('view-signup').classList.remove('hidden');gerr('');};
+document.getElementById('to-login').onclick=function(){document.getElementById('view-signup').classList.add('hidden');document.getElementById('view-login').classList.remove('hidden');gerr('');};
+document.getElementById('login-btn').onclick=async function(){
+  gerr(''); var e=document.getElementById('email').value.trim(), p=document.getElementById('pass').value;
+  if(!e||!p){gerr('הזן אימייל וסיסמה');return;}
+  var r=await sb.auth.signInWithPassword({email:e,password:p});
+  if(r.error){gerr('כניסה נכשלה: '+r.error.message);return;}
+  boot();
+};
+document.getElementById('signup-btn').onclick=async function(){
+  gerr(''); var org=document.getElementById('su-org').value.trim(), e=document.getElementById('su-email').value.trim(), p=document.getElementById('su-pass').value, terr=document.getElementById('su-terr').value;
+  if(!org||!e||p.length<8||!terr){gerr('מלא/י את כל השדות (סיסמה 8+ תווים)');return;}
+  var r=await sb.auth.signUp({email:e,password:p,options:{data:{org:org,territory:terr,role:'client'}}});
+  if(r.error){gerr('יצירה נכשלה: '+r.error.message);return;}
+  if(r.data && r.data.session){ boot(); }
+  else { gerr('✓ נוצרה גישה. בדוק/י את האימייל לאישור, ואז היכנס/י.'); document.getElementById('to-login').click(); }
+};
+document.getElementById('signout').onclick=async function(){ await sb.auth.signOut(); location.reload(); };
+
+/* ---- boot: load data + client, route ---- */
+async function loadData(){ if(DATA)return DATA; var r=await fetch('crime-stats.json?v=3'); DATA=await r.json(); DATA._sorted=DATA.cities.slice().sort(function(a,b){return b.total-a.total;}); return DATA; }
+function fillTerr(sel){ DATA._sorted.forEach(function(c){var o=document.createElement('option');o.value=c.city;o.textContent=c.city;sel.appendChild(o);}); }
+async function boot(){
+  await loadData();
+  if(!document.getElementById('su-terr').options.length) fillTerr(document.getElementById('su-terr'));
+  var u=(await sb.auth.getUser()).data.user;
+  if(!u){ document.getElementById('gate').classList.remove('hidden'); document.getElementById('app').classList.add('hidden'); return; }
+  var md=u.user_metadata||{};
+  CLIENT={org:md.org||'',territory:md.territory||'',email:u.email};
+  if(!CLIENT.territory){ // shouldn't happen, but guard
+    CLIENT.territory=DATA._sorted[0].city;
+  }
+  document.getElementById('gate').classList.add('hidden');
+  document.getElementById('app').classList.remove('hidden');
+  document.getElementById('terr-name').textContent=CLIENT.territory;
+  document.getElementById('org-name').textContent=CLIENT.org?('· '+CLIENT.org):'';
+  if(!MAP) initMap();
   renderLegend();
-}).catch(function(e){ document.getElementById('note').textContent='שגיאה בטעינת נתונים'; });
-
-function initMap(){
-  MAP=L.map('map',{zoomControl:true,attributionControl:false}).setView([31.5,34.9],7);
-  L.tileLayer(ESRI,{maxZoom:16,className:'tiles-base'}).addTo(MAP);
-  L.tileLayer(ESRIr,{maxZoom:16}).addTo(MAP);
+  var idx=DATA._sorted.findIndex(function(c){return c.city===CLIENT.territory;});
+  render(idx>=0?idx:0);
+  document.getElementById('note').innerHTML='מקור: '+(DATA.source||'משטרת ישראל')+' · '+(DATA.period||'2025')+' · '+fmt(DATA.records)+' רשומות · data.gov.il<br>מוצג לטריטוריה של הלקוח בלבד · גישה: 3Shamrocks Studio ולקוחות משלמים בלבד · מוצפן · לעולם לא נמכר.';
 }
-function renderLegend(){
-  var el=document.getElementById('legend'); el.innerHTML='';
-  Object.keys(CAT_COL).forEach(function(k){ el.innerHTML+='<span><i style="background:'+CAT_COL[k]+'"></i>'+k+'</span>'; });
-}
+function initMap(){ MAP=L.map('map',{zoomControl:true,attributionControl:false}).setView([31.5,34.9],7); L.tileLayer(ESRI,{maxZoom:16}).addTo(MAP); L.tileLayer(ESRIr,{maxZoom:16}).addTo(MAP); }
+function renderLegend(){ var el=document.getElementById('legend'); el.innerHTML=''; Object.keys(CAT_COL).forEach(function(k){ el.innerHTML+='<span><i style="background:'+CAT_COL[k]+'"></i>'+k+'</span>'; }); }
 function render(idx){
   var cities=DATA._sorted, c=cities[idx]; if(!c)return;
   var rank=idx+1, tot=c.total, tc=topCat(c.cats);
-  var natTotal=cities.reduce(function(s,x){return s+x.total;},0);
-  var pct=((tot/natTotal)*100).toFixed(1);
-  // cards
-  document.getElementById('cards').innerHTML=
-    card('סה״כ עבירות 2025', fmt(tot), c.city, 'gold')+
-    card('דירוג ארצי', '#'+rank+' / '+cities.length, 'מתוך הערים המדווחות')+
-    card('סוג עבירה מוביל', tc.name, fmt(tc.val)+' ('+Math.round(tc.val/tot*100)+'%)')+
-    card('נתח מכלל הארץ', pct+'%', fmt(natTotal)+' ארצי');
-  // map
+  var natTotal=cities.reduce(function(s,x){return s+x.total;},0), pct=((tot/natTotal)*100).toFixed(1);
+  document.getElementById('cards').innerHTML=card('סה״כ עבירות 2025',fmt(tot),c.city,'gold')+card('דירוג ארצי','#'+rank+' / '+cities.length,'מתוך הערים המדווחות')+card('סוג עבירה מוביל',tc.name,fmt(tc.val)+' ('+Math.round(tc.val/tot*100)+'%)')+card('נתח מכלל הארץ',pct+'%',fmt(natTotal)+' ארצי');
   if(cityLayer){MAP.removeLayer(cityLayer);} cityLayer=L.layerGroup().addTo(MAP);
-  var cats=Object.keys(c.cats);
-  var maxCat=Math.max.apply(null,cats.map(function(k){return c.cats[k];}));
-  // central hotspot
+  var cats=Object.keys(c.cats), maxCat=Math.max.apply(null,cats.map(function(k){return c.cats[k];}));
   L.circle([c.lat,c.lng],{radius:Math.sqrt(tot)*35,color:CAT_COL[tc.name],fillColor:CAT_COL[tc.name],fillOpacity:.18,weight:1.5}).addTo(cityLayer);
-  // category distribution around center (visual density of the real category totals)
-  cats.forEach(function(k,i){
-    var ang=(i/cats.length)*Math.PI*2, dist=0.018+(c.cats[k]/maxCat)*0.03;
-    var la=c.lat+Math.cos(ang)*dist, ln=c.lng+Math.sin(ang)*dist/Math.cos(c.lat*Math.PI/180);
-    L.circleMarker([la,ln],{radius:6+Math.sqrt(c.cats[k])/6,color:'#0a1628',weight:1.5,fillColor:CAT_COL[k]||'#888',fillOpacity:.8})
-      .bindPopup('<b>'+k+'</b><br>'+fmt(c.cats[k])+' עבירות ('+c.city+')').addTo(cityLayer);
-  });
+  cats.forEach(function(k,i){var ang=(i/cats.length)*Math.PI*2,dist=0.018+(c.cats[k]/maxCat)*0.03;var la=c.lat+Math.cos(ang)*dist,ln=c.lng+Math.sin(ang)*dist/Math.cos(c.lat*Math.PI/180);L.circleMarker([la,ln],{radius:6+Math.sqrt(c.cats[k])/6,color:'#0a1628',weight:1.5,fillColor:CAT_COL[k]||'#888',fillOpacity:.8}).bindPopup('<b>'+k+'</b><br>'+fmt(c.cats[k])+' עבירות ('+c.city+')').addTo(cityLayer);});
   MAP.setView([c.lat,c.lng],12,{animate:true});
-  // bars
   var bars=document.getElementById('bars'); bars.innerHTML='';
-  cats.sort(function(a,b){return c.cats[b]-c.cats[a];}).forEach(function(k){
-    var p=Math.round(c.cats[k]/tot*100);
-    bars.innerHTML+='<div class="bar"><div class="t"><span class="n">'+k+'</span><span>'+fmt(c.cats[k])+' · '+p+'%</span></div><div class="track"><div class="fill" style="width:'+p+'%;background:'+(CAT_COL[k]||'#888')+'"></div></div></div>';
-  });
-  // ranking table
+  cats.sort(function(a,b){return c.cats[b]-c.cats[a];}).forEach(function(k){var p=Math.round(c.cats[k]/tot*100);bars.innerHTML+='<div class="bar"><div class="t"><span class="n">'+k+'</span><span>'+fmt(c.cats[k])+' · '+p+'%</span></div><div class="track"><div class="fill" style="width:'+p+'%;background:'+(CAT_COL[k]||'#888')+'"></div></div></div>';});
   var rb=document.getElementById('rankbody'); rb.innerHTML='';
-  cities.forEach(function(x,i){ var xt=topCat(x.cats);
-    rb.innerHTML+='<tr class="'+(i===idx?'me':'')+'"><td>'+(i+1)+'</td><td>'+x.city+'</td><td>'+fmt(x.total)+'</td><td>'+xt.name+'</td></tr>';
-  });
-  // live incidents in territory
+  cities.forEach(function(x,i){var xt=topCat(x.cats);rb.innerHTML+='<tr class="'+(i===idx?'me':'')+'"><td>'+(i+1)+'</td><td>'+x.city+'</td><td>'+fmt(x.total)+'</td><td>'+xt.name+'</td></tr>';});
   loadLive(c);
 }
 function card(l,v,m,cls){return '<div class="stat"><div class="l">'+l+'</div><div class="v '+(cls||'')+'">'+v+'</div><div class="m">'+(m||'')+'</div></div>';}
-
-/* live incidents: best-effort read of the SH✡MER network, filtered to the territory */
 function haversine(la1,lo1,la2,lo2){var R=6371,r=Math.PI/180,dLa=(la2-la1)*r,dLo=(lo2-lo1)*r;var a=Math.sin(dLa/2)**2+Math.cos(la1*r)*Math.cos(la2*r)*Math.sin(dLo/2)**2;return 2*R*Math.asin(Math.min(1,Math.sqrt(a)));}
 function loadLive(c){
-  var feed=document.getElementById('feed'); var within=[];
-  var DB='https://shomergency-default-rtdb.firebaseio.com';
-  Promise.all([
-    fetch(DB+'/sos.json').then(function(r){return r.ok?r.json():null;}).catch(function(){return null;}),
-    fetch(DB+'/palerts.json').then(function(r){return r.ok?r.json():null;}).catch(function(){return null;}),
-    fetch(DB+'/events.json').then(function(r){return r.ok?r.json():null;}).catch(function(){return null;})
-  ]).then(function(res){
-    [['sos',res[0]],['palert',res[1]],['event',res[2]]].forEach(function(pair){
-      var kind=pair[0],obj=pair[1]; if(!obj)return;
-      Object.keys(obj).forEach(function(id){ var e=obj[id]; if(!e||e.lat==null)return;
-        if(e.resolved||e.status==='resolved')return;
-        if(haversine(c.lat,c.lng,e.lat,e.lng)<=18){ within.push({kind:kind,e:e}); }
-      });
-    });
-    if(!within.length){ feed.innerHTML='<div class="empty">אין אירועים חיים בטריטוריה כעת.<br>הזרם מתעדכן אוטומטית ממשתמשי SH✡MER באזור הלקוח.</div>'; return; }
+  var feed=document.getElementById('feed'), within=[], DB='https://shomergency-default-rtdb.firebaseio.com';
+  Promise.all([fetch(DB+'/sos.json').then(function(r){return r.ok?r.json():null;}).catch(function(){return null;}),fetch(DB+'/palerts.json').then(function(r){return r.ok?r.json():null;}).catch(function(){return null;}),fetch(DB+'/events.json').then(function(r){return r.ok?r.json():null;}).catch(function(){return null;})]).then(function(res){
+    [['sos',res[0]],['palert',res[1]],['event',res[2]]].forEach(function(pr){var kind=pr[0],obj=pr[1];if(!obj)return;Object.keys(obj).forEach(function(id){var e=obj[id];if(!e||e.lat==null)return;if(e.resolved||e.status==='resolved')return;if(haversine(c.lat,c.lng,e.lat,e.lng)<=18)within.push({kind:kind,e:e});});});
+    if(!within.length){feed.innerHTML='<div class="empty">אין אירועים חיים בטריטוריה כעת.<br>הזרם מתעדכן אוטומטית ממשתמשי SH✡MER באזור הלקוח.</div>';return;}
     within.sort(function(a,b){return (b.e.ts||0)-(a.e.ts||0);});
-    feed.innerHTML=within.slice(0,30).map(function(w){
-      var ic=w.kind==='palert'?(w.e.kind==='abduct'?'🚨':'🔎'):(w.kind==='sos'?'🆘':'📍');
-      var nm=w.kind==='palert'?(w.e.subjName||'התראת אדם'):(w.kind==='sos'?'קריאת SOS':(w.e.type||'דיווח'));
-      var ph=w.e.subjPhoto?'<img src="'+w.e.subjPhoto+'" style="width:34px;height:34px;border-radius:9px;object-fit:cover">':'<div class="dot">'+ic+'</div>';
-      var when=w.e.ts?new Date(w.e.ts).toLocaleString('he-IL'):'';
-      return '<div class="item">'+ph+'<div style="flex:1"><div class="nm">'+ic+' '+String(nm).replace(/[<>]/g,'')+'</div><div class="mt">'+when+' · '+(+w.e.lat).toFixed(3)+','+(+w.e.lng).toFixed(3)+'</div></div></div>';
-    }).join('');
+    feed.innerHTML=within.slice(0,30).map(function(w){var ic=w.kind==='palert'?(w.e.kind==='abduct'?'🚨':'🔎'):(w.kind==='sos'?'🆘':'📍');var nm=w.kind==='palert'?(w.e.subjName||'התראת אדם'):(w.kind==='sos'?'קריאת SOS':(w.e.type||'דיווח'));var ph=w.e.subjPhoto?'<img src="'+w.e.subjPhoto+'" style="width:34px;height:34px;border-radius:9px;object-fit:cover">':'<div class="dot">'+ic+'</div>';var when=w.e.ts?new Date(w.e.ts).toLocaleString('he-IL'):'';return '<div class="item">'+ph+'<div style="flex:1"><div class="nm">'+ic+' '+String(nm).replace(/[<>]/g,'')+'</div><div class="mt">'+when+' · '+(+w.e.lat).toFixed(3)+','+(+w.e.lng).toFixed(3)+'</div></div></div>';}).join('');
   });
 }
+boot();
 </script>
 </body>
 </html>
