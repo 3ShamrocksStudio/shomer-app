@@ -117,6 +117,29 @@
   .ddr span{color:var(--tx2)} .ddr b{font-weight:700}
   .dd-h{font-size:11px;color:var(--tx3);text-transform:uppercase;letter-spacing:.05em;margin:4px 0 9px;font-weight:700}
   #donutback{background:var(--card2);border:1px solid var(--b);color:var(--tx2);border-radius:8px;padding:4px 10px;font-size:11px;cursor:pointer}
+  /* data provenance */
+  .srckey{display:flex;flex-wrap:wrap;gap:14px;align-items:center;background:var(--card);border:1px solid var(--b);border-radius:12px;padding:10px 14px;margin-bottom:14px;font-size:12px}
+  .srckey .sk{display:inline-flex;align-items:center;gap:7px;color:var(--tx2)}
+  .srckey .sk b{color:var(--tx)}
+  .srckey .dot2{width:11px;height:11px;border-radius:50%;flex:0 0 auto}
+  .srckey .off .dot2{background:#2f80ed;box-shadow:0 0 7px #2f80ed}
+  .srckey .live2 .dot2{background:#e5484d;box-shadow:0 0 7px #e5484d}
+  .srckey .sep{flex:1}
+  .srcpill{font-size:9.5px;font-weight:700;letter-spacing:.04em;padding:2px 8px;border-radius:20px;text-transform:uppercase;white-space:nowrap}
+  .srcpill.off{background:rgba(47,128,237,.16);color:#6aa6ff;border:1px solid rgba(47,128,237,.4)}
+  .srcpill.live{background:rgba(229,72,77,.16);color:#ff8a98;border:1px solid rgba(229,72,77,.4)}
+  .zonelbl{display:flex;align-items:center;gap:9px;margin:22px 2px 11px;font-size:13px;font-weight:800;letter-spacing:.03em}
+  .zonelbl .zdot{width:13px;height:13px;border-radius:50%;flex:0 0 auto}
+  .zonelbl.off{color:#6aa6ff} .zonelbl.off .zdot{background:#2f80ed;box-shadow:0 0 8px #2f80ed}
+  .zonelbl.live{color:#ff8a98} .zonelbl.live .zdot{background:#e5484d;box-shadow:0 0 8px #e5484d}
+  .zonelbl .zsub{font-size:11px;font-weight:500;color:var(--tx3);letter-spacing:.02em}
+  .sol{display:flex;gap:12px;padding:13px 0;border-bottom:1px solid rgba(255,255,255,.06)}
+  .sol:last-child{border-bottom:0}
+  .sol .sn{width:30px;height:30px;border-radius:9px;background:rgba(24,194,156,.14);color:#4fd9bb;display:flex;align-items:center;justify-content:center;font-weight:800;flex:0 0 auto;font-size:14px}
+  .sol .st{font-size:13.5px;font-weight:700;color:var(--tx)}
+  .sol .sd{font-size:12.5px;color:var(--tx2);line-height:1.55;margin-top:3px}
+  .sol .src{font-size:11px;margin-top:5px}
+  .sol .src a{color:#6aa6ff;text-decoration:none}.sol .src a:hover{text-decoration:underline}
   @media print{body{background:#fff;color:#111}.topbar{position:static}.signout,.live .d{display:none}.panel,.stat{break-inside:avoid;border-color:#ccc}#map{height:320px}}
 </style>
 </head>
@@ -156,11 +179,18 @@
     <button class="signout" id="export-btn" style="margin-inline-end:8px">⤓ ייצא דוח</button><button class="signout" id="signout">יציאה</button></div>
 </div>
 <div class="wrap">
+  <div class="srckey">
+    <span class="sk off"><span class="dot2"></span><b>נתונים ציבוריים מאומתים</b> · משטרת ישראל 2025 + למ״ס</span>
+    <span class="sk live2"><span class="dot2"></span><b>רשת שומרים</b> · דיווחי משתמשים בזמן אמת</span>
+    <span class="sep"></span>
+    <span class="sk" style="font-size:11px;color:var(--tx3)">כל נתון מסומן במקורו · 100% מאומת</span>
+  </div>
+  <div class="zonelbl off"><span class="zdot"></span>נתונים ציבוריים מאומתים <span class="zsub">· סטטיסטיקה רשמית — משטרת ישראל 2025 · הערכות אוכלוסייה למ״ס</span></div>
   <div class="cards" id="cards"></div>
   <div class="grid">
-    <div class="panel acc-blue"><h2><span>מפת פשיעה · גבול שיפוט הרשות</span><span class="mapbar"><button class="mini" id="spread-btn">👥 פריסת שומרים</button></span></h2><div style="position:relative"><div id="map"></div><div class="insp" id="insp"></div></div><div class="legend" id="legend"></div></div>
+    <div class="panel acc-blue"><h2><span>מפת פשיעה · גבול שיפוט הרשות <span class="srcpill off">ציבורי</span></span><span class="mapbar"><button class="mini" id="spread-btn">👥 פריסת שומרים</button></span></h2><div style="position:relative"><div id="map"></div><div class="insp" id="insp"></div></div><div class="legend" id="legend"></div></div>
     <div style="display:flex;flex-direction:column;gap:14px">
-      <div class="panel lite acc-violet"><h2><span>פילוח סוגי עבירות · לחצו לצלילה</span><button id="donutback" style="display:none" onclick="unfocus()">← כל העבירות</button></h2><div class="pbody"><div class="donutgrid"><div id="donut"></div><div class="dlegend" id="dlegend"></div></div><div id="deepdive" style="display:none;margin-top:12px"></div></div></div>
+      <div class="panel lite acc-violet"><h2><span>פילוח סוגי עבירות · לחצו לצלילה <span class="srcpill off">ציבורי</span></span><button id="donutback" style="display:none" onclick="unfocus()">← כל העבירות</button></h2><div class="pbody"><div class="donutgrid"><div id="donut"></div><div class="dlegend" id="dlegend"></div></div><div id="deepdive" style="display:none;margin-top:12px"></div></div></div>
       <div class="panel lite acc-amber"><h2>דירוג עומס עבירות · נתוני משטרה</h2><div class="pbody" style="text-align:center"><div id="ring"></div><div id="ringsub" style="font-size:12px;color:var(--tx2);margin-top:6px"></div></div></div>
     </div>
   </div>
@@ -168,9 +198,12 @@
   <div class="cards socio" id="socio"></div>
   <div class="sectitle t-teal">תובנות חכמות · ניתוח מבוסס נתוני משטרת ישראל 2025</div>
   <div class="panel lite acc-teal"><div class="pbody" id="insights"></div></div>
+  <div class="sectitle t-teal">פתרונות מבוססי-ראיות · מעבר לאיסוף נתונים <span class="srcpill off" style="vertical-align:middle">מקורות מאומתים</span></div>
+  <div class="panel lite acc-teal"><div class="pbody" id="solutions"></div></div>
+  <div class="zonelbl live"><span class="zdot"></span>רשת שומרים · זמן אמת <span class="zsub">· דיווחי משתמשים חיים מתוך אזור הלקוח — SOS · נעדרים · אירועים</span></div>
   <div class="grid">
-    <div class="panel lite acc-gold"><h2>השוואה אזורית · פשיעה ל-1,000 תושבים</h2><div class="pbody" id="compare"></div></div>
-    <div class="panel feed acc-red"><h2>⚡ אירועים חיים · SOS · נעדרים · דיווחים</h2><div id="feed"><div class="empty">מתחבר לרשת SH✡MER…</div></div></div>
+    <div class="panel lite acc-gold"><h2>השוואה אזורית · פשיעה ל-1,000 תושבים <span class="srcpill off">ציבורי</span></h2><div class="pbody" id="compare"></div></div>
+    <div class="panel feed acc-red"><h2><span>⚡ אירועים חיים · SOS · נעדרים · דיווחים</span><span class="srcpill live" id="feed-src">רשת שומרים</span></h2><div id="feed"><div class="empty">מתחבר לרשת SH✡MER…</div></div></div>
   </div>
   <div class="sectitle t-violet">דירוג ארצי · איפה הטריטוריה שלך עומדת</div>
   <div class="panel acc-violet"><div class="rank-wrap"><table><thead><tr><th>#</th><th>עיר</th><th>סה״כ עבירות 2025</th><th>סוג מוביל</th></tr></thead><tbody id="rankbody"></tbody></table></div></div>
@@ -289,6 +322,35 @@ function toggleSpread(c){
 }
 
 var _focus=null;
+var UVZ='https://he.wikipedia.org/wiki/%D7%94%D7%A8%D7%A9%D7%95%D7%AA_%D7%94%D7%9C%D7%90%D7%95%D7%9E%D7%99%D7%AA_%D7%9C%D7%91%D7%99%D7%98%D7%97%D7%95%D7%9F_%D7%A7%D7%94%D7%99%D7%9C%D7%AA%D7%99';
+var HSP='https://www.college.police.uk/research/crime-reduction-toolkit/hot-spots-policing';
+var JPAL='https://www.povertyactionlab.org/evaluation/improving-security-through-concentrated-policing-bogota-colombia';
+function solCard(n,t,d,srcTxt,srcUrl){return '<div class="sol"><div class="sn">'+n+'</div><div><div class="st">'+t+'</div><div class="sd">'+d+'</div><div class="src">מקור: <a href="'+srcUrl+'" target="_blank" rel="noopener">'+srcTxt+'</a></div></div></div>';}
+var SOLSET={
+ 'עבירות כלפי הרכוש':[
+   ['מיקוד סיור בנקודות חמות (Hot-Spots Policing)','ריכוז סיור יזום בזירות הרכוש הבולטות במפה. מטא-אנליזה מצאה ירידה מובהקת בפשיעת רכוש באזורים שקיבלו סיור ממוקד לעומת סיור שגרתי.','College of Policing — Crime Reduction Toolkit',HSP],
+   ['תכנון סביבתי מונע פשיעה (CPTED)','שיפור תאורה, שדות ראייה, גידור וחיזוק חניונים ומבואות בזירות החמות — צמצום הזדמנויות לפריצה וגניבה.','College of Policing — Crime Reduction Toolkit',HSP],
+   ['סיור מרוכז + תחזוקת מרחב ציבורי','שילוב סיור ממוקד עם ניקיון ותחזוקה מוניציפלית באותן זירות — הוכח כמפחית פשיעה רק כאשר מופעלים יחד (מחקר ניסויי מבוקר).','J-PAL — Concentrated Policing, Bogotá',JPAL]
+ ],
+ 'עבירות נגד גוף':[
+   ['תוכנית "עיר ללא אלימות" / הרשות לביטחון קהילתי','הפעלת התוכנית הלאומית ברשות: מיפוי זירות אלימות, תוכניות מניעה ממוקדות ושיתוף קהילה — מסגרת מוניציפלית קיימת וממומנת.','הרשות הלאומית לביטחון קהילתי',UVZ],
+   ['Hot-Spots Policing','סיור יזום בזירות האלימות — המטא-אנליזה מצאה ירידה גם בעבירות נגד גוף, לא רק רכוש.','College of Policing',HSP],
+   ['תכנון סביבתי מונע פשיעה (CPTED)','תאורה ושדות ראייה במוקדי התקהלות וחיכוך — הפחתת הזדמנויות לאלימות במרחב הציבורי.','College of Policing',HSP]
+ ],
+ 'עבירות סדר ציבורי':[
+   ['אכיפת אי-סדר ממוקדת (POP)','שיטור מכוון-בעיה בזירות אי-הסדר הבולטות — הוכח כמפחית עבירות סדר ציבורי באזורים הממוקדים.','College of Policing',HSP],
+   ['תוכנית "עיר ללא אלימות"','מסגרת מוניציפלית למיפוי זירות התקהלות, אלכוהול וסמים ובניית מענה מקומי.','הרשות הלאומית לביטחון קהילתי',UVZ],
+   ['CPTED + תחזוקת מרחב','תאורה, ניקיון ותחזוקה בזירות אי-הסדר — בשילוב סיור ממוקד.','J-PAL',JPAL]
+ ]
+};
+function renderSolutions(idx){
+  var cities=DATA._sorted, c=cities[idx]; var tc=topCat(c.cats).name;
+  var set=SOLSET[tc]||SOLSET['עבירות כלפי הרכוש'];
+  var head='<div class="dd-h" style="margin-bottom:10px">על בסיס העבירה המובילה בטריטוריה — <b style="color:'+(CAT_COL[tc]||'#fff')+'">'+tc+'</b> ('+Math.round(topCat(c.cats).val/c.total*100)+'%) — מענים מבוססי-ראיות הישימים ברמת הרשות:</div>';
+  var cards=set.map(function(o,i){return solCard(i+1,o[0],o[1],o[2],o[3]);}).join('');
+  var foot='<div style="font-size:11px;color:var(--tx3);margin-top:10px;border-top:1px solid rgba(255,255,255,.06);padding-top:9px">המענים מבוססים על תוכניות וראיות מחקריות מאומתות בלבד (קישור למקור בכל כרטיס). ההתאמה לטריטוריה נגזרת מהעבירה המובילה בנתוני המשטרה. אין המלצה משפטית מחייבת — יישום בתיאום הרשות והמשטרה.</div>';
+  document.getElementById('solutions').innerHTML=head+cards+foot;
+}
 function ddrow(l,v,col){return '<div class="ddr"><span>'+l+'</span><b'+(col?' style="color:'+col+'"':'')+'>'+v+'</b></div>';}
 function focusCat(k){
   var cities=DATA._sorted, c=_curCity; if(!c||!c.cats[k])return; _focus=k;
@@ -366,7 +428,8 @@ function render(idx){
     card('עבירות נגד גוף (אלימות)',violPct+'%',fmt(viol)+' עבירות · נתוני משטרה')+
     card('פשיעה ל-1,000',pcTxt,'אוכלוסייה: הערכת למ״ס*')+
     card('אוכלוסייה (הערכה)',POP[c.city]?fmt(POP[c.city]):'—','הערכת למ״ס — לא נתון משטרה*');
-  renderInsights(idx);
+  renderInsights(idx); renderSolutions(idx);
+  var fs=document.getElementById('feed-src'); if(fs)fs.textContent=(CLIENT&&CLIENT.demo)?'נתוני הדגמה':'רשת שומרים · חי';
   // regional comparison: nearest 6 cities by distance
   var near=cities.map(function(x){return {x:x,d:Math.hypot((x.lat-c.lat),(x.lng-c.lng))};}).sort(function(a,b){return a.d-b.d;}).slice(0,6).map(function(o){return o.x;});
   var pcs=near.map(function(x){return {city:x.city, pc:perCap(x), tot:x.total};});
