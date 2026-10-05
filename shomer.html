@@ -9694,7 +9694,11 @@ function openReport(){
     +'<button class="btn-ghost rep-close">'+(he?'ביטול':'Cancel')+'</button>'
     +'</div>';
   document.body.appendChild(d);
+  window._paPhoto=null;
   var chosen=null;
+  (function(){ var pb=d.querySelector('#pa-photo-btn'), pin=d.querySelector('#pa-photo'), pv=d.querySelector('#pa-photo-prev');
+    if(pb&&pin){ pb.onclick=function(){ pin.click(); };
+      pin.onchange=function(){ paReadPhoto(pin.files&&pin.files[0], function(durl){ window._paPhoto=durl||null; if(pv){ if(durl){ pv.src=durl; pv.style.display='block'; } else { pv.style.display='none'; } } }); }; } })();
   d.querySelectorAll('.rep-type').forEach(function(b){
     b.onclick=function(){
       chosen=b.getAttribute('data-t');
@@ -9848,6 +9852,7 @@ function openPersonAlert(memberId){
     +'</div>'
     +'<input id="pa-lastseen" class="rep-note" style="height:auto;min-height:0;padding:10px 12px" maxlength="120" placeholder="'+(he?'נראה/תה לאחרונה (איפה / מתי / לבוש)':ar?'آخر مرة شوهد (أين/متى/الملابس)':'Last seen (where / when / clothing)')+'">'
     +'<textarea id="pa-desc" class="rep-note" maxlength="200" placeholder="'+(he?'תיאור: גיל, מראה, פרטים מזהים (לא חובה)':ar?'الوصف: العمر، المظهر، تفاصيل (اختياري)':'Description: age, appearance, details (optional)')+'"></textarea>'
+    +'<div style="display:flex;align-items:center;gap:10px;margin:2px 2px 8px"><button type="button" id="pa-photo-btn" class="btn-ghost" style="padding:8px 12px;flex:0 0 auto">'+(he?'📷 הוסף תמונה':ar?'📷 إضافة صورة':'📷 Add photo')+'</button><img id="pa-photo-prev" alt="" style="display:none;width:44px;height:44px;border-radius:8px;object-fit:cover;border:1px solid var(--b2)"><input type="file" accept="image/*" id="pa-photo" style="display:none"></div>'
     +'<div style="font-size:11px;color:var(--tx3);margin:2px 2px 8px;line-height:1.5">'+locLine+'</div>'
     +'<button class="cm-palert" id="pa-send" disabled style="opacity:.5">'+(he?'שדר/י התראה לרשת':ar?'بث التنبيه للشبكة':'Broadcast alert to the network')+'</button>'
     +'<button class="btn-ghost rep-close">'+(he?'ביטול':ar?'إلغاء':'Cancel')+'</button>'
@@ -9865,13 +9870,27 @@ function openPersonAlert(memberId){
     if(!chosen){ toast(he?'בחר/י סוג אירוע':'Choose an event type','amb'); return; }
     var ls=(document.getElementById('pa-lastseen')||{}).value||'';
     var ds=(document.getElementById('pa-desc')||{}).value||'';
-    paCreate(m, chosen, ds, ls).then(function(ok){ if(ok) d.remove(); });
+    paCreate(m, chosen, ds, ls, window._paPhoto).then(function(ok){ if(ok) d.remove(); });
   };
   d.querySelector('.rep-close').onclick=function(){ d.remove(); };
 }
 
+/* ── Downscale a chosen photo to an RTDB-safe JPEG data URL ── */
+function paReadPhoto(file, cb){
+  try{
+    if(!file || !/^image\//.test(file.type||'')){ cb(null); return; }
+    var r=new FileReader();
+    r.onload=function(){ var img=new Image(); img.onload=function(){
+      var max=360, w=img.width, h=img.height, sc=Math.min(1, max/Math.max(w,h));
+      w=Math.max(1,Math.round(w*sc)); h=Math.max(1,Math.round(h*sc));
+      var c=document.createElement('canvas'); c.width=w; c.height=h;
+      try{ c.getContext('2d').drawImage(img,0,0,w,h); cb(c.toDataURL('image/jpeg',0.6)); }catch(e){ cb(null); }
+    }; img.onerror=function(){ cb(null); }; img.src=r.result; };
+    r.onerror=function(){ cb(null); }; r.readAsDataURL(file);
+  }catch(e){ cb(null); }
+}
 /* ── Create + broadcast a person alert (guarded, rate-limited, REST write) ── */
-async function paCreate(m, kind, desc, lastSeen){
+async function paCreate(m, kind, desc, lastSeen, photo){
   var he=currentLang==='he';
   if(!m || !m.partnerUid){ toast(he?'אפשר לדווח רק על אדם מקושר':'Only a linked person can be reported','amb'); return false; }
   if(typeof FB==='undefined' || !FB.ready || !FB.uid){ toast(he?'אין חיבור':'No connection','amb'); return false; }
@@ -9888,6 +9907,7 @@ async function paCreate(m, kind, desc, lastSeen){
     desc:String(desc||'').slice(0,200), lastSeen:String(lastSeen||'').slice(0,120),
     lat:(m.lat!=null?+(+m.lat).toFixed(4):null), lng:(m.lng!=null?+(+m.lng).toFixed(4):null), locTs:m.ts||0,
     by:FB.uid, byName:((SS.user&&SS.user.name)||'').slice(0,60), ts:now, status:'active' };
+  if(photo && typeof photo==='string' && photo.length<60000) rec.subjPhoto=photo;
   var ok=false;
   try{ var w=await fbRestWrite('PUT','palerts/'+id, rec); ok=(w!==false); }catch(e){ ok=false; }
   if(ok){
@@ -9949,6 +9969,7 @@ function openPersonAlertDetail(id){
   d.innerHTML='<div class="rep-card">'
     +'<div style="display:inline-block;background:'+col+';color:#fff;font-size:11px;font-weight:800;padding:3px 10px;border-radius:7px;margin-bottom:8px">'+(a.kind==='abduct'?'🚨 ':'🔎 ')+kindL+'</div>'
     +'<div class="rep-h">'+ESC(a.subjName||'')+'</div>'
+    +(a.subjPhoto?'<img src="'+a.subjPhoto+'" alt="" style="width:100%;max-height:230px;object-fit:cover;border-radius:12px;margin:8px 0">':'')
     +(a.lastSeen?'<div class="rep-sub"><b>'+(he?'נראה/תה לאחרונה: ':ar?'آخر ظهور: ':'Last seen: ')+'</b>'+ESC(a.lastSeen)+'</div>':'')
     +(a.desc?'<div class="rep-sub">'+ESC(a.desc)+'</div>':'')
     +'<div class="rep-sub" style="direction:ltr;text-align:start">📍 '+ESC(locTxt)+(when?'  ·  '+when:'')+'</div>'
