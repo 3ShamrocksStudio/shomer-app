@@ -66,6 +66,7 @@
   .legend{display:flex;flex-wrap:wrap;gap:10px;padding:0 16px 14px;font-size:11px;color:var(--tx2)}
   .legend span{display:inline-flex;align-items:center;gap:5px}.legend i{width:10px;height:10px;border-radius:3px;display:inline-block}
   .sectitle{font-size:12px;color:var(--tx3);margin:18px 2px 10px;letter-spacing:.06em;text-transform:uppercase;font-weight:700}
+  @media print{body{background:#fff;color:#111}.topbar{position:static}.signout,.live .d{display:none}.panel,.stat{break-inside:avoid;border-color:#ccc}#map{height:320px}}
 </style>
 </head>
 <body>
@@ -101,7 +102,7 @@
     <small>Municipal Intelligence · מודיעין עירוני</small></div>
   <div class="terrbox">טריטוריה: <b id="terr-name">—</b> <span id="org-name" style="color:var(--tx3)"></span></div>
   <div class="live"><span class="d"></span><span>LIVE · משטרת ישראל 2025</span>
-    <button class="signout" id="signout">יציאה</button></div>
+    <button class="signout" id="export-btn" style="margin-inline-end:8px">⤓ ייצא דוח</button><button class="signout" id="signout">יציאה</button></div>
 </div>
 <div class="wrap">
   <div class="cards" id="cards"></div>
@@ -148,6 +149,7 @@ document.getElementById('signup-btn').onclick=async function(){
 };
 document.getElementById('signout').onclick=async function(){ try{ if(!(CLIENT&&CLIENT.demo)) await sb.auth.signOut(); }catch(e){} location.reload(); };
 document.getElementById('demo-btn').onclick=function(){ demoBoot(); };
+(function(){var ex=document.getElementById('export-btn'); if(ex) ex.onclick=function(){ window.print(); };})();
 var DEMO_INC=[
  {kind:'sos',   nm:'קריאת SOS · אישה',        dlat:0.000,  dlng:-0.006, mins:3},
  {kind:'palert',k:'missing', nm:'אדם נעדר · דנה ל.', dlat:-0.016, dlng:0.002, mins:24},
@@ -210,17 +212,42 @@ function render(idx){
   var cities=DATA._sorted, c=cities[idx]; if(!c)return;
   var rank=idx+1, tot=c.total, tc=topCat(c.cats);
   var natTotal=cities.reduce(function(s,x){return s+x.total;},0), pct=((tot/natTotal)*100).toFixed(1);
-  document.getElementById('cards').innerHTML=card('סה״כ עבירות 2025',fmt(tot),c.city,'gold')+card('דירוג ארצי','#'+rank+' / '+cities.length,'מתוך הערים המדווחות')+card('סוג עבירה מוביל',tc.name,fmt(tc.val)+' ('+Math.round(tc.val/tot*100)+'%)')+card('נתח מכלל הארץ',pct+'%',fmt(natTotal)+' ארצי');
+  var cov=(CLIENT&&CLIENT.demo)?214:'—';
+  document.getElementById('cards').innerHTML=card('סה״כ עבירות 2025',fmt(tot),c.city,'gold')+card('דירוג ארצי','#'+rank+' / '+cities.length,'מתוך הערים המדווחות')+card('סוג עבירה מוביל',tc.name,fmt(tc.val)+' ('+Math.round(tc.val/tot*100)+'%)')+card('נתח מכלל הארץ',pct+'%',fmt(natTotal)+' ארצי')+card('רשת שומרים בטריטוריה',cov,'משתמשים פעילים · מקור תגובה');
   if(cityLayer){MAP.removeLayer(cityLayer);} cityLayer=L.layerGroup().addTo(MAP);
   var cats=Object.keys(c.cats), maxCat=Math.max.apply(null,cats.map(function(k){return c.cats[k];}));
-  L.circle([c.lat,c.lng],{radius:Math.sqrt(tot)*35,color:CAT_COL[tc.name],fillColor:CAT_COL[tc.name],fillOpacity:.18,weight:1.5}).addTo(cityLayer);
-  cats.forEach(function(k,i){var ang=(i/cats.length)*Math.PI*2,dist=0.018+(c.cats[k]/maxCat)*0.03;var la=c.lat+Math.cos(ang)*dist,ln=c.lng+Math.sin(ang)*dist/Math.cos(c.lat*Math.PI/180);L.circleMarker([la,ln],{radius:6+Math.sqrt(c.cats[k])/6,color:'#0a1628',weight:1.5,fillColor:CAT_COL[k]||'#888',fillOpacity:.8}).bindPopup('<b>'+k+'</b><br>'+fmt(c.cats[k])+' עבירות ('+c.city+')').addTo(cityLayer);});
-  MAP.setView([c.lat,c.lng],12,{animate:true});
+  drawTerritory(c);
+  cats.forEach(function(k,i){var ang=(i/cats.length)*Math.PI*2,dist=0.012+(c.cats[k]/maxCat)*0.022;var la=c.lat+Math.cos(ang)*dist,ln=c.lng+Math.sin(ang)*dist/Math.cos(c.lat*Math.PI/180);L.circleMarker([la,ln],{radius:6+Math.sqrt(c.cats[k])/6,color:'#0a1628',weight:1.5,fillColor:CAT_COL[k]||'#888',fillOpacity:.85}).bindPopup('<b>'+k+'</b><br>'+fmt(c.cats[k])+' עבירות ('+c.city+')').addTo(cityLayer);});
   var bars=document.getElementById('bars'); bars.innerHTML='';
   cats.sort(function(a,b){return c.cats[b]-c.cats[a];}).forEach(function(k){var p=Math.round(c.cats[k]/tot*100);bars.innerHTML+='<div class="bar"><div class="t"><span class="n">'+k+'</span><span>'+fmt(c.cats[k])+' · '+p+'%</span></div><div class="track"><div class="fill" style="width:'+p+'%;background:'+(CAT_COL[k]||'#888')+'"></div></div></div>';});
   var rb=document.getElementById('rankbody'); rb.innerHTML='';
   cities.forEach(function(x,i){var xt=topCat(x.cats);rb.innerHTML+='<tr class="'+(i===idx?'me':'')+'"><td>'+(i+1)+'</td><td>'+x.city+'</td><td>'+fmt(x.total)+'</td><td>'+xt.name+'</td></tr>';});
   loadLive(c);
+}
+var _boundaryCache={};
+function geoRings(geo){ var rings=[]; function ring(cs){return cs.map(function(p){return [p[1],p[0]];});}
+  if(geo.type==='Polygon'){geo.coordinates.forEach(function(r){rings.push(ring(r));});}
+  else if(geo.type==='MultiPolygon'){geo.coordinates.forEach(function(poly){poly.forEach(function(r){rings.push(ring(r));});});}
+  return rings; }
+async function drawTerritory(c){
+  var geo=_boundaryCache[c.city];
+  if(geo===undefined){
+    try{ var url='https://nominatim.openstreetmap.org/search?format=jsonv2&polygon_geojson=1&limit=1&countrycodes=il&city='+encodeURIComponent(c.city.replace(/-/g,' '));
+      var r=await fetch(url,{headers:{'Accept':'application/json'}}); var j=await r.json();
+      geo=(j&&j[0]&&j[0].geojson&&(j[0].geojson.type==='Polygon'||j[0].geojson.type==='MultiPolygon'))?j[0].geojson:null;
+    }catch(e){ geo=null; }
+    _boundaryCache[c.city]=geo;
+  }
+  if(geo){
+    var rings=geoRings(geo);
+    var world=[[85,-180],[85,180],[-85,180],[-85,-180]];
+    L.polygon([world].concat(rings),{stroke:false,fillColor:'#060f1c',fillOpacity:.62,interactive:false}).addTo(cityLayer); // dim outside the jurisdiction
+    var bnd=L.geoJSON(geo,{style:{color:'#faac22',weight:2.5,fill:true,fillColor:'#faac22',fillOpacity:.04}}).addTo(cityLayer);
+    try{ MAP.fitBounds(bnd.getBounds(),{padding:[24,24]}); }catch(e){ MAP.setView([c.lat,c.lng],12); }
+  } else {
+    L.circle([c.lat,c.lng],{radius:4500,color:'#faac22',weight:2.5,dashArray:'6 6',fillColor:'#faac22',fillOpacity:.04}).addTo(cityLayer);
+    MAP.setView([c.lat,c.lng],12,{animate:true});
+  }
 }
 function card(l,v,m,cls){return '<div class="stat"><div class="l">'+l+'</div><div class="v '+(cls||'')+'">'+v+'</div><div class="m">'+(m||'')+'</div></div>';}
 function haversine(la1,lo1,la2,lo2){var R=6371,r=Math.PI/180,dLa=(la2-la1)*r,dLo=(lo2-lo1)*r;var a=Math.sin(dLa/2)**2+Math.cos(la1*r)*Math.cos(la2*r)*Math.sin(dLo/2)**2;return 2*R*Math.asin(Math.min(1,Math.sqrt(a)));}
