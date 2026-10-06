@@ -121,6 +121,15 @@ jobs:
         working-directory: native
         run: node scripts/apply-manifest.js || echo "manifest merge optional"
 
+      - name: Strip ineligible USE_EXACT_ALARM permission (Play policy — app is not calendar/alarm-clock)
+        working-directory: native/android
+        run: |
+          M=app/src/main/AndroidManifest.xml
+          grep -q 'xmlns:tools' "$M" || sed -i 's#<manifest #<manifest xmlns:tools="http://schemas.android.com/tools" #' "$M"
+          sed -i '/android.permission.USE_EXACT_ALARM/d' "$M"
+          sed -i 's#<application#    <uses-permission android:name="android.permission.USE_EXACT_ALARM" tools:node="remove" />\n    <application#' "$M"
+          echo "--- EXACT_ALARM lines after patch ---"; grep -n "EXACT_ALARM" "$M" || true
+
       - name: Build debug APK
         working-directory: native/android
         run: |
