@@ -9,6 +9,8 @@ on:
 jobs:
   build-android:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
     steps:
       - name: Checkout repo
         uses: actions/checkout@v4
@@ -131,6 +133,18 @@ jobs:
           name: shomer-android-debug
           path: native/android/app/build/outputs/apk/debug/app-debug.apk
           if-no-files-found: warn
+
+      - name: Publish debug APK to website (SHOMER.apk)
+        run: |
+          set -e
+          cp native/android/app/build/outputs/apk/debug/app-debug.apk SHOMER.apk
+          ls -la SHOMER.apk
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add SHOMER.apk
+          git commit -m "Auto-publish SHOMER.apk to website (build ${GITHUB_RUN_NUMBER}, v1.0.${GITHUB_RUN_NUMBER})" || { echo "no APK change"; exit 0; }
+          git pull --rebase --autostash origin main || true
+          git push origin HEAD:main
 
       - name: Decode upload keystore
         working-directory: native/android
