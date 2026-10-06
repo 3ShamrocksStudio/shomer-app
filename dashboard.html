@@ -186,6 +186,22 @@
   .juris{color:#e8c877;background:rgba(224,168,40,.1)}
   .foot{color:var(--tx3);border-top:1px solid rgba(255,255,255,.07)}
 </style>
+<style id="live-css">
+.sos-div{background:none;border:0}
+.sos-beacon{position:relative;width:30px;height:30px}
+.sos-beacon .core{position:absolute;top:50%;left:50%;width:15px;height:15px;border-radius:50%;transform:translate(-50%,-50%);z-index:3;animation:sosflash .9s steps(1,end) infinite}
+.sos-beacon .halo{position:absolute;top:50%;left:50%;width:15px;height:15px;border-radius:50%;transform:translate(-50%,-50%);z-index:2;animation:soshalo 1.5s ease-out infinite}
+@keyframes sosflash{0%{background:#e5484d;box-shadow:0 0 10px 3px rgba(229,72,77,.95),0 0 0 2px #fff}50%{background:#2f6bff;box-shadow:0 0 10px 3px rgba(47,107,255,.95),0 0 0 2px #fff}}
+@keyframes soshalo{0%{box-shadow:0 0 0 0 rgba(229,72,77,.55)}70%{box-shadow:0 0 0 24px rgba(229,72,77,0)}100%{box-shadow:0 0 0 0 rgba(229,72,77,0)}}
+.feed .item{cursor:pointer;transition:background .12s}
+.feed .item:hover{background:rgba(255,255,255,.04)}
+.feed .item.sos{background:rgba(229,72,77,.07)}
+.feed .item.flash{animation:feedflash 1.1s ease-out 2}
+@keyframes feedflash{0%{background:rgba(229,72,77,.32)}100%{background:rgba(229,72,77,.07)}}
+.feed .live-go{color:var(--tx3);font-size:14px;align-self:center;flex:0 0 auto;opacity:.6}
+.live-alert{position:absolute;top:8px;left:8px;right:8px;z-index:30;background:linear-gradient(90deg,#e5484d,#2f6bff);color:#fff;font-weight:800;font-size:12px;padding:8px 12px;border-radius:9px;display:flex;align-items:center;gap:8px;box-shadow:0 6px 20px rgba(0,0,0,.4);animation:laIn .3s ease}
+@keyframes laIn{from{opacity:0;transform:translateY(-8px)}to{opacity:1;transform:none}}
+</style>
 </head>
 <body>
 
@@ -261,6 +277,7 @@ var SB_URL='https://otkvebgrdiayjnqrytrn.supabase.co', SB_KEY='sb_publishable_ZS
 var sb=supabase.createClient(SB_URL,SB_KEY);
 var CAT_COL={'עבירות כלפי הרכוש':'#2f80ed','עבירות סדר ציבורי':'#f2b705','עבירות נגד גוף':'#e5484d','עבירות כלפי המוסר':'#e5468e','עבירות מרמה':'#18c29c','עבירות כלכליות':'#9b6cff'};
 var DATA=null, MAP=null, cityLayer=null, CLIENT=null, _curCity=null;
+var liveLayer=null,_seenSos={},_liveTimer=null,_curCityObj=null,_liveInitDone=false;
 var ESRI='https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_Base/MapServer/tile/{z}/{y}/{x}';
 var ESRIr='https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_Reference/MapServer/tile/{z}/{y}/{x}';
 function fmt(n){return (n||0).toLocaleString('en-US');}
@@ -311,16 +328,9 @@ async function demoBoot(){
   /* note removed in console layout */
 }
 function demoLive(c){
-  var feed=document.getElementById('feed'); var now=Date.now();
-  var rows=DEMO_INC.map(function(w){ return {kind:w.kind,k:w.k,nm:w.nm,t:w.t,lat:c.lat+w.dlat,lng:c.lng+w.dlng,ts:now-w.mins*60000}; });
-  // map markers (pulsing live pins over the hotspots)
-  rows.forEach(function(w){ var col=w.kind==='sos'?'#ff1a40':(w.kind==='palert'?(w.k==='abduct'?'#D10029':'#6D4AFF'):'#f2b705');
-    L.circleMarker([w.lat,w.lng],{radius:8,color:'#fff',weight:2,fillColor:col,fillOpacity:.95}).bindPopup('<b>'+w.nm+'</b>').addTo(cityLayer);
-  });
-  feed.innerHTML=rows.map(function(w){ var ic=w.kind==='palert'?(w.k==='abduct'?'🚨':'🔎'):(w.kind==='sos'?'🆘':'📍');
-    var nm=w.nm||w.t; var mins=Math.round((now-w.ts)/60000); var ago=mins<60?('לפני '+mins+' דק׳'):('לפני '+Math.round(mins/60)+' שע׳');
-    return '<div class="item"><div class="dot">'+ic+'</div><div style="flex:1"><div class="nm">'+ic+' '+nm+'</div><div class="mt">'+ago+' · '+w.lat.toFixed(3)+','+w.lng.toFixed(3)+'</div></div></div>';
-  }).join('');
+  var now=Date.now();
+  var list=DEMO_INC.map(function(w,i){ return {id:'demo'+i, type:(w.kind==='sos'?'sos':(w.kind==='palert'?w.k:'event')), k:w.k, nm:w.nm, t:w.t, lat:c.lat+w.dlat, lng:c.lng+w.dlng, ts:now-w.mins*60000}; });
+  renderLive(c,list,{demo:true});
 }
 
 /* ---- boot: load data + client, route ---- */
@@ -347,7 +357,7 @@ async function boot(){
   render(idx>=0?idx:0);
   /* note removed in console layout */
 }
-function initMap(){ MAP=L.map('map',{zoomControl:true,attributionControl:false}).setView([31.5,34.9],7); L.tileLayer(ESRI,{maxZoom:16}).addTo(MAP); L.tileLayer(ESRIr,{maxZoom:16}).addTo(MAP); }
+function initMap(){ MAP=L.map('map',{zoomControl:true,attributionControl:false}).setView([31.5,34.9],7); L.tileLayer(ESRI,{maxZoom:16}).addTo(MAP); L.tileLayer(ESRIr,{maxZoom:16}).addTo(MAP); liveLayer=L.layerGroup().addTo(MAP); }
 function renderLegend(){ var el=document.getElementById('legend'); el.innerHTML=''; Object.keys(CAT_COL).forEach(function(k){ el.innerHTML+='<span><i style="background:'+CAT_COL[k]+'"></i>'+k+'</span>'; }); }
 /* approx CBS 2023 populations (public figures) for per-capita context */
 var POP={'תל אביב יפו':474000,'ירושלים':981000,'חיפה':285000,'ראשון לציון':254000,'פתח תקווה':248000,'אשדוד':225000,'נתניה':221000,'באר שבע':209000,'בני ברק':208000,'חולון':196000,'רמת גן':171000,'בית שמש':146000,'רחובות':149000,'אשקלון':144000,'בת ים':128000,'כפר סבא':100000,'חדרה':100000,'הרצליה':97000,'מודיעין':93000,'לוד':80000,'רמלה':77000,'רעננה':75000,'רהט':75000,'הוד השרון':65000,'גבעתיים':60000,'קרית גת':60000,'קרית אתא':58000,'נהריה':58000,'עפולה':56000,'אילת':52000,'עכו':49000,'טבריה':48000};
@@ -532,20 +542,50 @@ function renderInsights(idx){
 }
 function card(l,v,m,cls){return '<div class="stat"><div class="l">'+l+'</div><div class="v '+(cls||'')+'">'+v+'</div><div class="m">'+(m||'')+'</div></div>';}
 function haversine(la1,lo1,la2,lo2){var R=6371,r=Math.PI/180,dLa=(la2-la1)*r,dLo=(lo2-lo1)*r;var a=Math.sin(dLa/2)**2+Math.cos(la1*r)*Math.cos(la2*r)*Math.sin(dLo/2)**2;return 2*R*Math.asin(Math.min(1,Math.sqrt(a)));}
+function ESC(s){return String(s==null?'':s).replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];});}
+function _liveBeep(){ try{ var AC=window.AudioContext||window.webkitAudioContext; if(!AC)return; var a=new AC(); var o=a.createOscillator(),g=a.createGain(); o.connect(g); g.connect(a.destination); o.type='sine'; g.gain.value=0.0001; o.start(); o.frequency.setValueAtTime(880,a.currentTime); g.gain.exponentialRampToValueAtTime(0.22,a.currentTime+0.02); g.gain.exponentialRampToValueAtTime(0.0001,a.currentTime+0.18); o.frequency.setValueAtTime(1175,a.currentTime+0.2); g.gain.exponentialRampToValueAtTime(0.22,a.currentTime+0.22); g.gain.exponentialRampToValueAtTime(0.0001,a.currentTime+0.42); o.stop(a.currentTime+0.45); }catch(e){} }
+function _sosIcon(){ return L.divIcon({className:'sos-div',html:'<div class="sos-beacon"><span class="halo"></span><span class="core"></span></div>',iconSize:[30,30],iconAnchor:[15,15]}); }
+function _liveMeta(e){
+ if(e.type==='sos') return {i:'\ud83c\udd98',t:(e.nm||'\u05e7\u05e8\u05d9\u05d0\u05ea SOS'),c:'#e5484d',sos:true};
+ if(e.type==='abduct'||e.k==='abduct') return {i:'\ud83d\udea8',t:(e.nm||'\u05d7\u05e9\u05d3 \u05dc\u05d7\u05d8\u05d9\u05e4\u05d4'),c:'#D10029'};
+ if(e.type==='missing'||e.k==='missing') return {i:'\ud83d\udd0e',t:(e.nm||'\u05d0\u05d3\u05dd \u05e0\u05e2\u05d3\u05e8'),c:'#9b6cff'};
+ var cc=CAT_META[e.t||e.type]; return {i:'\ud83d\udccd',t:(e.nm||catShort(e.t||e.type)||'\u05d3\u05d9\u05d5\u05d5\u05d7'),c:(cc?cc.c:'#f2b705')};
+}
+function flyToLive(lat,lng,id){ try{ if(!MAP)return; MAP.flyTo([lat,lng],15,{duration:.8}); var mk=liveLayer&&liveLayer._byId&&liveLayer._byId[id]; if(mk){ setTimeout(function(){ try{mk.openPopup();}catch(e){} },850); } var it=document.querySelector('.feed .item[data-id="'+id+'"]'); if(it){ it.classList.remove('flash'); void it.offsetWidth; it.classList.add('flash'); } }catch(e){} }
+function liveAlertBanner(txt){ try{ var host=document.getElementById('map'); if(!host)return; var b=document.createElement('div'); b.className='live-alert'; b.innerHTML='\ud83d\udea8 '+ESC(txt||'SOS \u05d7\u05d3\u05e9 \u05d1\u05d8\u05e8\u05d9\u05d8\u05d5\u05e8\u05d9\u05d4'); host.appendChild(b); setTimeout(function(){ try{ b.style.transition='opacity .5s'; b.style.opacity='0'; setTimeout(function(){b.remove();},500);}catch(e){} },6000); }catch(e){} }
+function renderLive(c,list,opts){
+ opts=opts||{}; var feed=document.getElementById('feed'), now=Date.now();
+ if(!liveLayer&&MAP){ liveLayer=L.layerGroup().addTo(MAP); }
+ if(liveLayer){ liveLayer.clearLayers(); liveLayer._byId={}; }
+ if(!list.length){ feed.innerHTML='<div class="empty">\u05d0\u05d9\u05df \u05d0\u05d9\u05e8\u05d5\u05e2\u05d9\u05dd \u05d7\u05d9\u05d9\u05dd \u05d1\u05d8\u05e8\u05d9\u05d8\u05d5\u05e8\u05d9\u05d4 \u05db\u05e2\u05ea.<br>\u05d4\u05d6\u05e8\u05dd \u05de\u05ea\u05e2\u05d3\u05db\u05df \u05d0\u05d5\u05d8\u05d5\u05de\u05d8\u05d9\u05ea \u05de\u05de\u05e9\u05ea\u05de\u05e9\u05d9 SH\u2721MER \u05d1\u05d0\u05d6\u05d5\u05e8 \u2014 \u05dc\u05dc\u05d0 \u05e4\u05e8\u05d8\u05d9\u05dd \u05de\u05d6\u05d4\u05d9\u05dd.</div>'; return; }
+ list.sort(function(a,b){return (b.ts||0)-(a.ts||0);});
+ var newSos=null;
+ var html=list.slice(0,40).map(function(e){
+  var m=_liveMeta(e); var id=e.id||(e.type+'_'+(+e.lat).toFixed(3)+'_'+(+e.lng).toFixed(3)+'_'+(e.ts||0));
+  if(liveLayer){
+   var mk; if(m.sos){ mk=L.marker([e.lat,e.lng],{icon:_sosIcon(),zIndexOffset:1000}); } else { mk=L.circleMarker([e.lat,e.lng],{radius:8,color:'#fff',weight:2,fillColor:m.c,fillOpacity:.95}); }
+   var mn=Math.round((now-(e.ts||now))/60000); var ag=mn<1?'\u05e2\u05db\u05e9\u05d9\u05d5':mn<60?('\u05dc\u05e4\u05e0\u05d9 '+mn+' \u05d3\u05e7\u05f3'):('\u05dc\u05e4\u05e0\u05d9 '+Math.round(mn/60)+' \u05e9\u05e2\u05f3');
+   mk.bindPopup('<div style="font-family:Rubik,sans-serif;min-width:150px"><div style="font-weight:800;color:'+m.c+'">'+m.i+' '+ESC(m.t)+'</div><div style="font-size:11px;color:#555;margin-top:3px">'+ag+'</div><div style="font-size:11px;color:#555">'+(+e.lat).toFixed(3)+', '+(+e.lng).toFixed(3)+' \u00b7 \u05d0\u05d6\u05d5\u05e8</div><div style="font-size:10px;color:#999;margin-top:4px">'+(opts.demo?'\u05e0\u05ea\u05d5\u05e0\u05d9 \u05d4\u05d3\u05d2\u05de\u05d4':'\u05e8\u05e9\u05ea \u05e9\u05d5\u05de\u05e8\u05d9\u05dd \u00b7 \u05de\u05d5\u05e6\u05e4\u05df')+'</div></div>');
+   mk.addTo(liveLayer); liveLayer._byId[id]=mk;
+  }
+  if(m.sos&&!opts.demo&&!_seenSos[id]){ _seenSos[id]=1; if(!opts.initial) newSos={lat:e.lat,lng:e.lng,id:id}; }
+  var mins=Math.round((now-(e.ts||now))/60000); var ago=mins<1?'\u05e2\u05db\u05e9\u05d9\u05d5':mins<60?('\u05dc\u05e4\u05e0\u05d9 '+mins+' \u05d3\u05e7\u05f3'):('\u05dc\u05e4\u05e0\u05d9 '+Math.round(mins/60)+' \u05e9\u05e2\u05f3');
+  return '<div class="item'+(m.sos?' sos':'')+'" data-id="'+id+'" onclick="flyToLive('+(+e.lat)+','+(+e.lng)+',\''+id+'\')"><span class="sev" style="background:'+m.c+'"></span><div class="dot">'+m.i+'</div><div style="flex:1"><div class="nm">'+m.i+' '+ESC(m.t)+'</div><div class="mt">'+ago+' \u00b7 '+(+e.lat).toFixed(2)+','+(+e.lng).toFixed(2)+' \u00b7 \u05d0\u05d6\u05d5\u05e8</div></div><span class="live-go">\u2922</span></div>';
+ }).join('');
+ feed.innerHTML=html;
+ if(newSos){ _liveBeep(); liveAlertBanner(); flyToLive(newSos.lat,newSos.lng,newSos.id); }
+}
 function loadLive(c){
-  if(CLIENT&&CLIENT.demo){ return demoLive(c); }
-  var feed=document.getElementById('feed'), DB='https://shomergency-default-rtdb.firebaseio.com';
-  // Reads the SANITIZED public feed only (no names/photos/PII). Coarse coords.
+  _curCityObj=c;
+  if(CLIENT&&CLIENT.demo){ demoLive(c); return; }
+  var DB='https://shomergency-default-rtdb.firebaseio.com';
+  var initial=!_liveInitDone;
   fetch(DB+'/dashfeed.json').then(function(r){return r.ok?r.json():null;}).catch(function(){return null;}).then(function(obj){
-    var now=Date.now(), DAY=24*60*60*1000, within=[];
-    if(obj){ Object.keys(obj).forEach(function(id){ var e=obj[id]; if(!e||e.lat==null||e.lng==null)return; if(e.status==='resolved')return; if((now-(e.ts||0))>DAY)return; if(haversine(c.lat,c.lng,e.lat,e.lng)<=18) within.push(e); }); }
-    if(!within.length){ feed.innerHTML='<div class="empty">אין אירועים חיים בטריטוריה כעת.<br>הזרם מתעדכן אוטומטית ומוצפן ממשתמשי SH✡MER באזור — ללא פרטים מזהים.</div>'; return; }
-    within.sort(function(a,b){return (b.ts||0)-(a.ts||0);});
-    var META={sos:{i:'🆘',t:'קריאת SOS',c:'#e5484d'},abduct:{i:'🚨',t:'חטיפה',c:'#e5484d'},missing:{i:'🔎',t:'אדם נעדר',c:'#9b6cff'}};
-    feed.innerHTML=within.slice(0,40).map(function(e){ var m=META[e.type]||{i:'📍',t:String(e.type||'דיווח'),c:'#f2b705'}; var mins=Math.round((now-(e.ts||now))/60000); var ago=mins<1?'עכשיו':mins<60?('לפני '+mins+' דק׳'):('לפני '+Math.round(mins/60)+' שע׳');
-      return '<div class="item"><span class="sev" style="background:'+m.c+'"></span><div class="dot">'+m.i+'</div><div style="flex:1"><div class="nm">'+m.i+' '+m.t+'</div><div class="mt">'+ago+' · '+(+e.lat).toFixed(2)+','+(+e.lng).toFixed(2)+' · אזור</div></div></div>';
-    }).join('');
+    var now=Date.now(), DAY=864e5, list=[];
+    if(obj){ Object.keys(obj).forEach(function(id){ var e=obj[id]; if(!e||e.lat==null||e.lng==null)return; if(e.status==='resolved')return; if((now-(e.ts||0))>DAY)return; if(haversine(c.lat,c.lng,e.lat,e.lng)<=18){ e.id=id; list.push(e); } }); }
+    renderLive(c,list,{demo:false,initial:initial}); _liveInitDone=true;
   });
+  if(!_liveTimer){ _liveTimer=setInterval(function(){ if(_curCityObj && !(CLIENT&&CLIENT.demo)){ loadLive(_curCityObj); } }, 15000); }
 }
 
 /* ===================== CONSOLE RENDER MODULE (overrides) ===================== */
