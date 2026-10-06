@@ -59,6 +59,13 @@
   .kpi .kv{font-size:25px;font-weight:800;line-height:1}
   .kpi .km{font-size:11px;color:var(--tx2);margin-top:3px}
   .kpi .kv.gold{color:var(--gold)}.kpi .kv.bad{color:var(--bad)}.kpi .kv.ok{color:var(--ok)}
+  .kpi .kv.gap{color:#4fc3e8}.kpi .kv.net-v{color:#ff8a98}
+  .kpi .kprov{font-size:8px;font-weight:700;padding:1px 5px;border-radius:7px;margin-inline-start:6px;letter-spacing:.02em;vertical-align:1px}
+  .kprov.pub{background:rgba(255,255,255,.06);color:var(--tx3)}
+  .kprov.net{background:rgba(255,138,152,.15);color:#ff8a98}
+  .kprov.nat{background:rgba(79,195,232,.15);color:#4fc3e8}
+  .kpi.kpi-hl{background:linear-gradient(180deg,rgba(79,195,232,.09),rgba(79,195,232,.015));border-inline-start:2px solid #4fc3e8}
+  .kpi.kpi-hl .kl{color:#9fdcee}
   .kchip{font-size:10px;font-weight:700;padding:1px 7px;border-radius:10px;margin-inline-start:6px}
   .kchip.up{background:rgba(229,72,77,.16);color:#ff8a98}.kchip.dn{background:rgba(43,182,115,.16);color:#6ee7a8}
   /* ---------- CONSOLE GRID ---------- */
@@ -603,19 +610,21 @@ function unfocus(){ if(DATA&&DATA._idx!=null){document.getElementById('donutback
 
 function buildKPIs(idx){
  var cities=DATA._sorted,c=cities[idx],tot=c.total;
- var natTotal=cities.reduce(function(s,x){return s+x.total;},0),pct=(tot/natTotal*100).toFixed(1);
  var pc=perCap(c);var pv=cities.map(perCap).filter(function(v){return v!=null;}).sort(function(a,b){return a-b;});var med=pv[Math.floor(pv.length/2)];
  var viol=c.cats['עבירות נגד גוף']||0,violPct=Math.round(viol/tot*100);
  var cov=(CLIENT&&CLIENT.demo)?214:'—';
  var ratio=pc&&med?pc/med:null;
- function k(l,v,m,cls){return '<div class="kpi"><div class="kl">'+l+'</div><div class="kv '+(cls||'')+'">'+v+'</div><div class="km">'+m+'</div></div>';}
+ function k(l,v,m,cls,prov,hl){return '<div class="kpi'+(hl?' kpi-hl':'')+'">'+
+   '<div class="kl">'+l+(prov?'<span class="kprov '+prov.c+'">'+prov.t+'</span>':'')+'</div>'+
+   '<div class="kv '+(cls||'')+'">'+v+'</div><div class="km">'+m+'</div></div>';}
+ var PUB={c:'pub',t:'ציבורי'},NET={c:'net',t:'רשת'},NAT={c:'nat',t:'ארצי'};
  document.getElementById('kpis').innerHTML=
-  k('סה״כ עבירות 2025',fmt(tot),c.city,'gold')+
-  k('דירוג ארצי','#'+(idx+1),'מתוך '+cities.length+' ערים',(idx<10?'bad':''))+
-  k('נתח ארצי',pct+'%',fmt(natTotal)+' בארץ')+
-  k('עבירות אלימות',violPct+'%',fmt(viol)+' נגד גוף',(violPct>12?'bad':'ok'))+
-  k('פשיעה ל-1,000',pc?pc.toFixed(1):'—',ratio?('×'+ratio.toFixed(1)+' מהחציון הארצי*'):'הערכת למ״ס*',(ratio&&ratio>1.2?'bad':ratio&&ratio<0.9?'ok':''))+
-  k('רשת שומרים',cov,'משתמשים פעילים');
+  k('סה״כ עבירות 2025',fmt(tot),c.city+' · משטרת ישראל','gold',PUB)+
+  k('פשיעה ל-1,000',pc?pc.toFixed(1):'—',ratio?('×'+ratio.toFixed(1)+' מהחציון הארצי*'):'הערכת למ״ס*',(ratio&&ratio>1.2?'bad':ratio&&ratio<0.9?'ok':''),PUB)+
+  k('עבירות אלימות',violPct+'%',fmt(viol)+' נגד גוף',(violPct>12?'bad':'ok'),PUB)+
+  k('פער הדיווח','~74%','רק 26% מהעבירות מדווח למשטרה · IDI','gap',NAT,true)+
+  k('רשת שומרים',cov,'דיווחים חיים · משלים את הפער','net-v',NET)+
+  k('דירוג ארצי','#'+(idx+1),'מתוך '+cities.length+' · לפי היקף');
 }
 
 function buildRank(idx){
