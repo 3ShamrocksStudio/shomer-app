@@ -1308,6 +1308,13 @@ body.otp-active .ob-steps{display:none!important;}
 .ob-returning:hover{color:var(--g4,#F5C840)}
 </style>
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"><meta http-equiv="Pragma" content="no-cache"><meta http-equiv="Expires" content="0">
+<style id="pf2-css">
+.prof2-row{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:9px 2px;flex-wrap:wrap}
+.prof2-lbl{font-size:13px;color:#9aa6bd;font-weight:600}
+.prof2-seg{display:flex;gap:6px;flex-wrap:wrap}
+.prof2-b{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.13);color:#9aa6bd;border-radius:999px;padding:6px 12px;font-size:12px;cursor:pointer;font-family:inherit}
+.prof2-b.sel{background:#e0a828;color:#23170a;border-color:#e0a828;font-weight:700}
+</style>
 </head>
 <body class="lb-on">
 <a href="#main-content" class="skip-link">עבור לתוכן</a>
@@ -2048,7 +2055,7 @@ body.otp-active .ob-steps{display:none!important;}
  <div class="sh-pill" aria-hidden="true"></div>
  <div class="sh-head"><span class="sh-ttl" id="set-ttl">הגדרות</span><button class="sh-x" onclick="cl('sh-set')" aria-label="סגור"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg></button></div>
  <div class="sh-body">
- <div class="set-cat"><div class="set-cat-ic"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M18 8a6 6 0 1 0-12 0c0 7-3 9-3 9h18s-3-2-3-9" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><path d="M13.7 21a2 2 0 0 1-3.4 0" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></div><div class="set-cat-t" data-he="התראות" data-en="Alerts &amp; Notifications">התראות</div></div>
+ <div class="set-cat"><div class="set-cat-ic"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="4" fill="none" stroke="currentColor" stroke-width="2"/><path d="M4 20a8 8 0 0 1 16 0" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></div><div class="set-cat-t" data-he="פרופיל (אופציונלי)" data-en="Profile (optional)">פרופיל (אופציונלי)</div></div><div class="set-grp" id="profile-grp"><div class="sec-cap mb12" data-he="עוזר לשפר נתוני בטיחות מצרפיים ואנונימיים. לא חובה." data-en="Helps improve anonymous, aggregate safety data. Optional.">עוזר לשפר נתוני בטיחות מצרפיים ואנונימיים. לא חובה.</div><div class="prof2-row"><span class="prof2-lbl" data-he="מגדר" data-en="Gender">מגדר</span><span class="prof2-seg" id="pf-gender"></span></div><div class="prof2-row"><span class="prof2-lbl" data-he="גיל" data-en="Age">גיל</span><span class="prof2-seg" id="pf-age"></span></div><div class="prof2-row"><span class="prof2-lbl" data-he="באזור" data-en="In this area">באזור</span><span class="prof2-seg" id="pf-res"></span></div></div><div class="set-cat"><div class="set-cat-ic"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M18 8a6 6 0 1 0-12 0c0 7-3 9-3 9h18s-3-2-3-9" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><path d="M13.7 21a2 2 0 0 1-3.4 0" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></div><div class="set-cat-t" data-he="התראות" data-en="Alerts &amp; Notifications">התראות</div></div>
  <div class="sec-cap mb12" id="set-radius-lbl">רדיוס התראה</div>
  <div class="sl-card mb20">
  <div class="rad-big"><span id="rad-v">5</span><span class="rad-u" id="rad-u"> ק"מ</span></div>
@@ -2063,7 +2070,7 @@ body.otp-active .ob-steps{display:none!important;}
  <div class="set-row"><div class="sr-l"><div class="sr-ic"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 12.5l5 5L20 6" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div><div class="sr-nm" id="n-closed-nm">אירועים שנסגרו</div><div class="sr-sb" id="n-closed-sb">עדכון כשאירוע לידך טופל ונסגר</div></div></div><div class="tog" data-skey="n_closed" onclick="this.classList.toggle('on');saveToggle(this)" role="switch"></div></div>
  <div class="set-row"><div class="sr-l"><div class="sr-ic"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M11 5L6 9H3v6h3l5 4z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><path d="M15.5 8.5a5 5 0 0 1 0 7M18.5 6a8 8 0 0 1 0 12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></div><div><div class="sr-nm" id="n-snd-nm">צלילי אירועים חיים</div><div class="sr-sb" id="n-snd-sb">צליל עדין כששומר/ת מצטרף/ת, באירוע חדש או בעדכון</div></div></div><div class="tog on" data-skey="snd_cues" onclick="this.classList.toggle('on');saveToggle(this);if(this.classList.contains('on'))playCue('join')" role="switch"></div></div>
  </div>
- <div class="set-cat"><div class="set-cat-ic"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3l7 3v5c0 5-3.4 8.5-7 10-3.6-1.5-7-5-7-10V6Z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></svg></div><div class="set-cat-t" data-he="בטיחות" data-en="Safety features">בטיחות</div></div>
+ <div class="set-grp"><div class="set-row" onclick="testNotifications()" role="button" tabindex="0"><div class="sr-l"><div class="sr-ic"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M18 8a6 6 0 1 0-12 0c0 7-3 9-3 9h18s-3-2-3-9" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></svg></div><div><div class="sr-nm" data-he="בדיקת התראות" data-en="Test notifications">בדיקת התראות</div><div class="sr-sb" data-he="שולח התראת עדכון + התראת רקע (נעל/י מסך). לא בזמן חירום." data-en="Sends an update + background alert (lock screen). Not during emergency.">שולח התראת עדכון + התראת רקע.</div></div></div><span style="color:var(--tx3);font-size:18px">›</span></div></div><div class="set-cat"><div class="set-cat-ic"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3l7 3v5c0 5-3.4 8.5-7 10-3.6-1.5-7-5-7-10V6Z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></svg></div><div class="set-cat-t" data-he="בטיחות" data-en="Safety features">בטיחות</div></div>
  <div class="set-grp"><div class="set-row" onclick="opFrom('sh-dms','sh-set');cl('sh-set')" role="button" tabindex="0"><div class="sr-l"><div class="sr-ic"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8.5" fill="none" stroke="currentColor" stroke-width="2"/><path d="M12 7.5V12l3 2" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="sr-nm" data-he="שומר אוטומטי" data-en="שומר אוטומטי" data-ar="مفتاح الأمان الميت">שומר אוטומטי</div></div><span style="color:var(--tx3);font-size:18px">›</span></div><div class="set-row" onclick="opFrom('sh-alarm','sh-set');cl('sh-set')" role="button" tabindex="0"><div class="sr-l"><div class="sr-ic"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 18v-5a5 5 0 0 1 10 0v5" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><rect x="5" y="18" width="14" height="3" rx="1.5" fill="none" stroke="currentColor" stroke-width="2"/><path d="M12 3v2M4.5 7l1.5 1.3M19.5 7L18 8.3" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></div><div class="sr-nm" data-he="הגדרות אזעקה" data-en="Alarm settings">הגדרות אזעקה</div></div><span style="color:var(--tx3);font-size:18px">›</span></div></div>
  <div class="set-grp"><div class="set-row"><div class="sr-l"><div class="sr-ic"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 4 L17 18.5 L12 15.2 L7 18.5 Z" fill="currentColor"/></svg></div><div><div class="sr-nm" id="resp-tog-lbl" data-he="ניווט מגיב/ה (הצטרפות)" data-en="Responder navigation (opt-in)">ניווט מגיב/ה (הצטרפות)</div><div class="sr-sb" id="resp-tog-sub" data-he="הצג מסלול חי ומרחק כשמגיבים ל-SOS. מיועד למגיבים מאומתים ולשומרים - לא תחליף לחיוג 100/101/102." data-en="Show a live route + distance when responding to an SOS. For verified responders/guardians - not a replacement for 100/101/102.">הצג מסלול חי ומרחק כשמגיבים ל-SOS.</div></div></div><div class="tog" id="resp-tog" onclick="toggleRespond(this)" role="switch"></div></div></div>
  <div class="set-grp"><div class="set-row" onclick="openSetPin()" role="button" tabindex="0"><div class="sr-l"><div class="sr-ic"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="11" width="14" height="9" rx="2" fill="none" stroke="currentColor" stroke-width="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3" fill="none" stroke="currentColor" stroke-width="2"/></svg></div><div><div class="sr-nm" data-he="קוד לביטול SOS (PIN)" data-en="SOS cancel code (PIN)">קוד לביטול SOS (PIN)</div><div class="sr-sb" data-he="נדרש לביטול SOS פעיל - לעולם לא טביעת אצבע." data-en="Required to cancel an active SOS - never a fingerprint.">נדרש לביטול SOS פעיל - לעולם לא טביעת אצבע.</div></div></div><span id="pin-set-state" style="font-size:12px;font-weight:700;color:var(--amb);white-space:nowrap">לא הוגדר</span></div></div>
@@ -3051,8 +3058,9 @@ let dmsWarningTimer=null;
 const SKEY='shomer_state_v1';
 let SS={
  onboarded:false,
+ _lastVerSeen:'',
  lang:'he',
- user:{name:'',phone:'',profession:''},
+ user:{name:'',phone:'',profession:'',gender:'',ageBand:'',residency:''},
  alarm:{type:'shomer',vol:0.6},
  shake:{enabled:true,sensitivity:28},
  dms:{interval:5,active:false,deadline:0},
@@ -4062,6 +4070,7 @@ function obFinish(goSettings){
 function obFinishToSettings(){ obFinish(true); }
 /* ── Post-entry setup nudge - prominent but NEVER blocking; Enter is always fast ── */
 function showSetupPrompt(){
+ if(_emergencyBusy())return;
  var he=currentLang==='he', ar=currentLang==='ar';
  var ov=document.getElementById('setup-prompt');
  if(!ov){ ov=document.createElement('div'); ov.id='setup-prompt'; ov.className='setup-ov'; document.body.appendChild(ov); }
@@ -4119,6 +4128,7 @@ function _nudgeGeoNow(){
 }
 function nudgeMaybeShow(){
  try{
+  if(_emergencyBusy()) return;
   if(document.getElementById('nudge-bar')) return;
   var n=nudgeState();
   if(n.lastTs && (Date.now()-n.lastTs) < 18*3600000) return;   /* at most ~once / 18h */
@@ -4132,6 +4142,48 @@ function nudgeMaybeShow(){
   setTimeout(function(){ try{ if(bar&&bar.parentNode){ bar.style.transition='opacity .4s'; bar.style.opacity='0'; setTimeout(function(){bar.remove();},400);} }catch(e){} }, 14000);
  }catch(e){}
 }
+
+/* ═══ v211: software-update notice, notification test, profile data (Phase A) ═══ */
+function _emergencyBusy(){ try{ return (typeof sosActive!=='undefined'&&sosActive) || (typeof sosPhase!=='undefined'&&sosPhase&&sosPhase!=='idle') || !!(SS&&SS.dms&&SS.dms.active); }catch(e){ return false; } }
+function fireUpdateNotice(){
+ try{
+  var he=currentLang==='he',ar=currentLang==='ar';
+  var title=he?'SH\u2721MER \u05e2\u05d5\u05d3\u05db\u05df':ar?'\u062a\u0645 \u062a\u062d\u062f\u064a\u062b SH\u2721MER':'SH\u2721MER updated';
+  var body=(he?'\u05d4\u05d0\u05e4\u05dc\u05d9\u05e7\u05e6\u05d9\u05d4 \u05e2\u05d5\u05d3\u05db\u05e0\u05d4 \u05dc\u05d2\u05e8\u05e1\u05d4 ':ar?'\u062a\u0645 \u0627\u0644\u062a\u062d\u062f\u064a\u062b \u0625\u0644\u0649 ':'Updated to ')+APP_VER;
+  try{ if(_ln){ _ln.schedule({notifications:[{id:(_lnId=(_lnId%2000000)+1),title:title,body:body,channelId:'shomer-updates',autoCancel:true,extra:{tag:'update'}}]}); } }catch(e){}
+  if(!_emergencyBusy()){ try{ toast(title+' \u00b7 '+body,'grn'); }catch(e){} }
+ }catch(e){}
+}
+function checkSoftwareUpdate(){
+ try{
+  if(!SS) return;
+  var seen=SS._lastVerSeen||'';
+  if(seen && seen!==APP_VER){ fireUpdateNotice(); }
+  else if(!seen && SS.onboarded){ fireUpdateNotice(); }
+  SS._lastVerSeen=APP_VER; try{saveStore();}catch(e){}
+ }catch(e){}
+}
+function testNotifications(){
+ var he=currentLang==='he',ar=currentLang==='ar';
+ if(_emergencyBusy()){ try{ toast(he?'\u05dc\u05d0 \u05d6\u05de\u05d9\u05df \u05d1\u05de\u05d4\u05dc\u05da \u05d7\u05d9\u05e8\u05d5\u05dd':'Not available during an emergency','amb'); }catch(e){} return; }
+ fireUpdateNotice();
+ try{ if(_ln){ _ln.schedule({notifications:[{id:(_lnId=(_lnId%2000000)+1),title:(he?'\u05d1\u05d3\u05d9\u05e7\u05ea \u05d4\u05ea\u05e8\u05d0\u05d4 \u05d1\u05e8\u05e7\u05e2':ar?'\u0627\u062e\u062a\u0628\u0627\u0631 \u0625\u0634\u0639\u0627\u0631 \u0628\u0627\u0644\u062e\u0644\u0641\u064a\u0629':'Background alert test'),body:(he?'SH\u2721MER \u05e4\u05d5\u05e2\u05dc \u05d2\u05dd \u05db\u05e9\u05d4\u05d0\u05e4\u05dc\u05d9\u05e7\u05e6\u05d9\u05d4 \u05e1\u05d2\u05d5\u05e8\u05d4 \u05d0\u05d5 \u05d4\u05de\u05e1\u05da \u05e0\u05e2\u05d5\u05dc.':ar?'\u064a\u0639\u0645\u0644 SH\u2721MER \u062d\u062a\u0649 \u0639\u0646\u062f \u0625\u063a\u0644\u0627\u0642 \u0627\u0644\u062a\u0637\u0628\u064a\u0642.':'SH\u2721MER works even when the app is closed or the screen is locked.'),channelId:'shomer-updates',autoCancel:true,schedule:{at:new Date(Date.now()+12000)},extra:{tag:'bgtest'}}]}); } }catch(e){}
+ try{ var n=nudgeState(); n.lastTs=0; nudgeMaybeShow(); }catch(e){}
+ try{ toast(he?'\u05e0\u05e9\u05dc\u05d7\u05d4 \u05d1\u05d3\u05d9\u05e7\u05d4 \u00b7 \u05e0\u05e2\u05dc/\u05d9 \u05de\u05e1\u05da \u05dc\u05e8\u05d0\u05d5\u05ea \u05d4\u05ea\u05e8\u05d0\u05ea \u05e8\u05e7\u05e2 (12 \u05e9\u05e0\u05f3)':ar?'\u062a\u0645 \u0627\u0644\u0625\u0631\u0633\u0627\u0644':'Test sent \u00b7 lock the screen to see the background alert (12s)','grn'); }catch(e){}
+}
+var PF_OPTS={
+ gender:[['f','\u05d0\u05d9\u05e9\u05d4','Female'],['m','\u05d2\u05d1\u05e8','Male'],['o','\u05d0\u05d7\u05e8','Other'],['x','\u2014','Prefer not']],
+ age:[['u18','<18','<18'],['18_29','18-29','18-29'],['30_49','30-49','30-49'],['50_64','50-64','50-64'],['65p','65+','65+']],
+ res:[['res','\u05ea\u05d5\u05e9\u05d1/\u05ea','Resident'],['vis','\u05de\u05d1\u05e7\u05e8/\u05ea','Visitor']]
+};
+function _pfKey(f){ return f==='gender'?'gender':f==='age'?'ageBand':'residency'; }
+function setProfileField2(f,val){ try{ if(!SS.user)SS.user={}; var k=_pfKey(f); SS.user[k]=(SS.user[k]===val?'':val); saveStore(); renderProfile2(); }catch(e){} }
+function renderProfile2(){ try{ var he=currentLang==='he';
+  [['gender','pf-gender'],['age','pf-age'],['res','pf-res']].forEach(function(p){
+   var box=document.getElementById(p[1]); if(!box)return; var k=_pfKey(p[0]); var cur=(SS.user&&SS.user[k])||'';
+   box.innerHTML=PF_OPTS[p[0]].map(function(o){ return '<button type="button" class="prof2-b'+(cur===o[0]?' sel':'')+'" onclick="setProfileField2(\''+p[0]+'\',\''+o[0]+'\')">'+(he?o[1]:o[2])+'</button>'; }).join('');
+  });
+ }catch(e){} }
 
 function enterApp(returning){
  const profNm=document.getElementById('profNm');
@@ -4162,6 +4214,8 @@ function enterApp(returning){
  try{ guardianInit(); }catch(e){}
  try{ fbListenPersonAlerts(); }catch(e){}
  try{ setTimeout(nudgeMaybeShow, 4500); }catch(e){}
+ try{ renderProfile2(); }catch(e){}
+ try{ setTimeout(checkSoftwareUpdate, 6500); }catch(e){}
  // Re-request durable storage now that the user is engaged (browsers grant it more
  // readily after interaction - helps the installed-PWA path keep the session).
  try{ if(navigator.storage&&navigator.storage.persist){ navigator.storage.persist().then(function(ok){ window.__shomerPersist=ok?'granted':'denied'; },function(){}); } }catch(e){}
@@ -4249,6 +4303,8 @@ async function initNativeAlerts(){
    try{ await _ln.createChannel({id:'shomer-sos',name:'SH\u2721MER SOS',
      description:'Emergency alerts from nearby SH\u2721MER users',
      importance:5,visibility:1,sound:'default',vibration:true,lights:true,lightColor:'#FF1A40'}); }catch(e){}
+   try{ await _ln.createChannel({id:'shomer-alerts',name:'SH\u2721MER Alerts',description:'General safety alerts nearby',importance:4,visibility:1,sound:'default',vibration:true}); }catch(e){}
+   try{ await _ln.createChannel({id:'shomer-updates',name:'SH\u2721MER Updates',description:'App updates & setup reminders',importance:3,visibility:1,vibration:false}); }catch(e){}
    try{ _ln.addListener('localNotificationActionPerformed',function(){ try{ window.focus(); }catch(e){} }); }catch(e){}
   }
  }catch(e){}
@@ -8718,7 +8774,7 @@ try{ hydrateIcons(document); }catch(e){}
 /* Loaded-build version - shown in the diagnostic panel so a phone can prove
    whether it's on the latest build or a STALE cached one. Keep in lock-step
    with sw.js SW_VERSION on every deploy. */
-var APP_VER='v210';
+var APP_VER='v211';
 var FB={ready:false,uid:null,db:null,_presTimer:null,connected:false,listening:false,pushState:'default',near:0,swVer:'?',
   authState:'connecting',sdkLoaded:false,persist:'',permErr:null,err:null,wsProbe:'',csp:''};
 /* Always log connection diagnostics to the console so the real failure can be SEEN in Chrome. */
