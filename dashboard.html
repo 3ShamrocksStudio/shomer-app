@@ -188,9 +188,9 @@
 </style>
 <style id="live-css">
 .sos-div{background:none;border:0}
-.sos-beacon{position:relative;width:30px;height:30px}
-.sos-beacon .core{position:absolute;top:50%;left:50%;width:15px;height:15px;border-radius:50%;transform:translate(-50%,-50%);z-index:3;animation:sosflash .9s steps(1,end) infinite}
-.sos-beacon .halo{position:absolute;top:50%;left:50%;width:15px;height:15px;border-radius:50%;transform:translate(-50%,-50%);z-index:2;animation:soshalo 1.5s ease-out infinite}
+.sos-beacon{position:relative;width:44px;height:44px;cursor:pointer}
+.sos-beacon .core{position:absolute;top:50%;left:50%;width:20px;height:20px;border-radius:50%;transform:translate(-50%,-50%);z-index:3;animation:sosflash .9s steps(1,end) infinite}
+.sos-beacon .halo{position:absolute;top:50%;left:50%;width:20px;height:20px;border-radius:50%;transform:translate(-50%,-50%);z-index:2;animation:soshalo 1.5s ease-out infinite}
 @keyframes sosflash{0%{background:#e5484d;box-shadow:0 0 10px 3px rgba(229,72,77,.95),0 0 0 2px #fff}50%{background:#2f6bff;box-shadow:0 0 10px 3px rgba(47,107,255,.95),0 0 0 2px #fff}}
 @keyframes soshalo{0%{box-shadow:0 0 0 0 rgba(229,72,77,.55)}70%{box-shadow:0 0 0 24px rgba(229,72,77,0)}100%{box-shadow:0 0 0 0 rgba(229,72,77,0)}}
 .feed .item{cursor:pointer;transition:background .12s}
@@ -596,7 +596,7 @@ function card(l,v,m,cls){return '<div class="stat"><div class="l">'+l+'</div><di
 function haversine(la1,lo1,la2,lo2){var R=6371,r=Math.PI/180,dLa=(la2-la1)*r,dLo=(lo2-lo1)*r;var a=Math.sin(dLa/2)**2+Math.cos(la1*r)*Math.cos(la2*r)*Math.sin(dLo/2)**2;return 2*R*Math.asin(Math.min(1,Math.sqrt(a)));}
 function ESC(s){return String(s==null?'':s).replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];});}
 function _liveBeep(){ try{ var AC=window.AudioContext||window.webkitAudioContext; if(!AC)return; var a=new AC(); var o=a.createOscillator(),g=a.createGain(); o.connect(g); g.connect(a.destination); o.type='sine'; g.gain.value=0.0001; o.start(); o.frequency.setValueAtTime(880,a.currentTime); g.gain.exponentialRampToValueAtTime(0.22,a.currentTime+0.02); g.gain.exponentialRampToValueAtTime(0.0001,a.currentTime+0.18); o.frequency.setValueAtTime(1175,a.currentTime+0.2); g.gain.exponentialRampToValueAtTime(0.22,a.currentTime+0.22); g.gain.exponentialRampToValueAtTime(0.0001,a.currentTime+0.42); o.stop(a.currentTime+0.45); }catch(e){} }
-function _sosIcon(){ return L.divIcon({className:'sos-div',html:'<div class="sos-beacon"><span class="halo"></span><span class="core"></span></div>',iconSize:[30,30],iconAnchor:[15,15]}); }
+function _sosIcon(){ return L.divIcon({className:'sos-div',html:'<div class="sos-beacon"><span class="halo"></span><span class="core"></span></div>',iconSize:[44,44],iconAnchor:[22,22]}); }
 function _liveMeta(e){
  if(e.type==='sos') return {i:'\ud83c\udd98',t:(e.nm||'\u05e7\u05e8\u05d9\u05d0\u05ea SOS'),c:'#e5484d',sos:true};
  if(e.type==='abduct'||e.k==='abduct') return {i:'\ud83d\udea8',t:(e.nm||'\u05d7\u05e9\u05d3 \u05dc\u05d7\u05d8\u05d9\u05e4\u05d4'),c:'#D10029'};
@@ -669,9 +669,8 @@ function renderLive(c,list,opts){
   var m=_liveMeta(e); var id=e.id||(e.type+'_'+(+e.lat).toFixed(3)+'_'+(+e.lng).toFixed(3)+'_'+(e.ts||0));
   _liveEvents[id]={e:e,m:m,demo:!!opts.demo};
   if(liveLayer){
-   var mk; if(m.sos){ mk=L.marker([e.lat,e.lng],{icon:_sosIcon(),zIndexOffset:1000}); } else { mk=L.circleMarker([e.lat,e.lng],{radius:8,color:'#fff',weight:2,fillColor:m.c,fillOpacity:.95}); }
+   var mk; if(m.sos){ mk=L.marker([e.lat,e.lng],{icon:_sosIcon(),zIndexOffset:1000}); } else { mk=L.circleMarker([e.lat,e.lng],{radius:11,color:'#fff',weight:2.5,fillColor:m.c,fillOpacity:.97}); }
    var mn=Math.round((now-(e.ts||now))/60000); var ag=mn<1?'\u05e2\u05db\u05e9\u05d9\u05d5':mn<60?('\u05dc\u05e4\u05e0\u05d9 '+mn+' \u05d3\u05e7\u05f3'):('\u05dc\u05e4\u05e0\u05d9 '+Math.round(mn/60)+' \u05e9\u05e2\u05f3');
-   mk.bindPopup('<div style="font-family:Rubik,sans-serif;min-width:150px"><div style="font-weight:800;color:'+m.c+'">'+m.i+' '+ESC(m.t)+'</div><div style="font-size:11px;color:#555;margin-top:3px">'+ag+'</div><div style="font-size:11px;color:#555">'+(+e.lat).toFixed(3)+', '+(+e.lng).toFixed(3)+' \u00b7 \u05d0\u05d6\u05d5\u05e8</div><div style="font-size:10px;color:#999;margin-top:4px">'+(opts.demo?'\u05e0\u05ea\u05d5\u05e0\u05d9 \u05d4\u05d3\u05d2\u05de\u05d4':'\u05e8\u05e9\u05ea \u05e9\u05d5\u05de\u05e8\u05d9\u05dd \u00b7 \u05de\u05d5\u05e6\u05e4\u05df')+'</div></div>');
    mk.on('click',(function(eid){return function(){openResponse(eid);};})(id)); if(mk.setZIndexOffset){} try{if(mk._path)mk._path.style.cursor='pointer';}catch(_e){} mk.addTo(liveLayer); liveLayer._byId[id]=mk;
   }
   if(m.sos&&!opts.demo&&!_seenSos[id]){ _seenSos[id]=1; if(!opts.initial) newSos={lat:e.lat,lng:e.lng,id:id}; }
