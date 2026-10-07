@@ -188,7 +188,7 @@ body:not(.lb-on){--hdr-top:max(env(safe-area-inset-top, 0px), 28px);}
 .ob-st.on{background:var(--g3);}
 .ob-panel{width:100%;max-width:390px;padding:0 20px;display:none!important;}
 .nudge-bar{position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);z-index:100000;display:flex;flex-direction:column;align-items:center;gap:13px;padding:26px 22px 20px;border-radius:20px;background:linear-gradient(160deg,#16294a,#0e1d35);border:1px solid rgba(250,172,34,.5);box-shadow:0 24px 80px rgba(0,0,0,.65);animation:nudgeIn .3s ease;width:min(90vw,330px);text-align:center}
-.nudge-bar .nudge-ic{font-size:42px;line-height:1}
+.nudge-bar .nudge-ic{font-size:33px;line-height:1;width:66px;height:66px;display:flex;align-items:center;justify-content:center;border-radius:19px;background:linear-gradient(135deg,#C09020,#E0A828 55%,#F5C840);box-shadow:0 8px 22px rgba(224,168,40,.42)}
 .nudge-bar .nudge-tx{font-size:15.5px;font-weight:600;color:#eef3fb;line-height:1.5}
 .nudge-bar .nudge-cta{width:100%;background:linear-gradient(135deg,#C09020,#E0A828 60%,#F5C840);color:#23170a;font-weight:800;font-size:15px;border:0;border-radius:12px;padding:12px;cursor:pointer;font-family:inherit}
 .nudge-bar .nudge-x{position:absolute;top:9px;inset-inline-end:12px;background:none;border:0;color:#8a93a6;font-size:17px;cursor:pointer}
@@ -2106,7 +2106,7 @@ body.otp-active .ob-steps{display:none!important;}
  <div class="set-grp">
  <div class="set-row"><div class="sr-l"><div class="sr-ic"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="11" width="14" height="9" rx="2" fill="none" stroke="currentColor" stroke-width="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3" fill="none" stroke="currentColor" stroke-width="2"/></svg></div><div><div class="sr-nm" id="hold-arm-lbl">מניעת לחיצה בטעות</div><div class="sr-sb" id="hold-arm-sub">לחיצה ארוכה של 2 שניות תפעיל SOS - כדי שלא יישלח מהכיס</div></div></div><div class="tog" id="hold-arm-tog" onclick="toggleHoldArm(this)" role="switch"></div></div>
  </div>
- <div class="set-cat"><div class="set-cat-ic"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="11" width="14" height="9" rx="2" fill="none" stroke="currentColor" stroke-width="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3" fill="none" stroke="currentColor" stroke-width="2"/></svg></div><div class="set-cat-t" data-he="מיקום ופרטיות" data-en="Location &amp; Privacy">מיקום ופרטיות</div></div>
+ <div class="set-cat"><div class="set-cat-ic"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 6l6-3 6 3 6-3v15l-6 3-6-3-6 3Z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><path d="M9 3v15M15 6v15" fill="none" stroke="currentColor" stroke-width="2"/></svg></div><div class="set-cat-t" data-he="שכבות מפה" data-en="Map layers">שכבות מפה</div></div><div class="set-grp"><div class="sec-cap mb12" data-he="המפה נפתחת עם כל השכבות דלוקות. אפשר לכבות או להדליק כל שכבה כאן." data-en="The map opens with every layer on. Toggle any layer on or off here." data-ar="تفتح الخريطة وكل الطبقات مفعّلة. يمكنك تشغيل أو إيقاف أي طبقة هنا.">המפה נפתחת עם כל השכבות דלוקות. אפשר לכבות או להדליק כל שכבה כאן.</div><div class="set-row"><div class="sr-l"><div class="sr-ic"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="13" width="4" height="7" rx="1" fill="none" stroke="currentColor" stroke-width="2"/><rect x="10" y="8" width="4" height="12" rx="1" fill="none" stroke="currentColor" stroke-width="2"/><rect x="17" y="3" width="4" height="17" rx="1" fill="none" stroke="currentColor" stroke-width="2"/></svg></div><div><div class="sr-nm" data-he="סטטיסטיקת פשיעה" data-en="Crime statistics" data-ar="إحصاءات الجريمة">סטטיסטיקת פשיעה</div><div class="sr-sb" data-he="סמני ערים · נתוני משטרת ישראל" data-en="City markers · Israel Police data" data-ar="علامات المدن · بيانات الشرطة">סמני ערים · נתוני משטרת ישראל</div></div></div><div class="tog on" data-skey="map_stats" onclick="mapLayerToggle(this,'stats')" role="switch"></div></div><div class="set-row"><div class="sr-l"><div class="sr-ic"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 22s7-6.4 7-12a7 7 0 1 0-14 0c0 5.6 7 12 7 12Z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><circle cx="12" cy="10" r="2.6" fill="currentColor"/></svg></div><div><div class="sr-nm" data-he="הדיווחים שלי" data-en="My reports" data-ar="بلاغاتي">הדיווחים שלי</div><div class="sr-sb" data-he="סיכות הדיווחים שהגשת" data-en="Pins of reports you filed" data-ar="دبابيس بلاغاتك">סיכות הדיווחים שהגשת</div></div></div><div class="tog on" data-skey="map_reports" onclick="mapLayerToggle(this,'reports')" role="switch"></div></div><div class="set-row"><div class="sr-l"><div class="sr-ic"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><circle cx="9" cy="8" r="3.2" fill="none" stroke="currentColor" stroke-width="2"/><path d="M3.5 19a5.5 5.5 0 0 1 11 0" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><circle cx="17" cy="9" r="2.4" fill="none" stroke="currentColor" stroke-width="2"/><path d="M15.5 14.4A4.6 4.6 0 0 1 20.5 19" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></div><div><div class="sr-nm" data-he="המעגל שלי" data-en="My circle" data-ar="دائرتي">המעגל שלי</div><div class="sr-sb" data-he="מיקום השומרים המקושרים אליך" data-en="Your linked guardians’ location" data-ar="مواقع حُرّاسك المرتبطين">מיקום השומרים המקושרים אליך</div></div></div><div class="tog on" data-skey="map_circle" onclick="mapLayerToggle(this,'circle')" role="switch"></div></div></div><div class="set-cat"><div class="set-cat-ic"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="11" width="14" height="9" rx="2" fill="none" stroke="currentColor" stroke-width="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3" fill="none" stroke="currentColor" stroke-width="2"/></svg></div><div class="set-cat-t" data-he="מיקום ופרטיות" data-en="Location &amp; Privacy">מיקום ופרטיות</div></div>
  <div class="sec-cap mb12" id="set-priv-lbl">פרטיות</div>
  <div class="set-grp">
  <div class="set-row"><div class="sr-l"><div class="sr-ic"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 22s7-6.4 7-12a7 7 0 1 0-14 0c0 5.6 7 12 7 12Z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><circle cx="12" cy="10" r="2.6" fill="currentColor"/></svg></div><div><div class="sr-nm" id="p-bgloc-nm">שיתוף מיקום ברקע</div><div class="sr-sb" id="p-bgloc-sb">נדרש ל-SOS ו-DMS - בלעדיו אי אפשר לשלוח את מיקומך בחירום</div></div></div><div class="tog on" data-skey="p_bgloc" onclick="this.classList.toggle('on');saveToggle(this)" role="switch"></div></div>
@@ -2120,7 +2120,7 @@ body.otp-active .ob-steps{display:none!important;}
  </div>
  </div>
  <div class="set-cat"><div class="set-cat-ic"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 4h3.5l1.5 4-2 1.5a11 11 0 0 0 5 5l1.5-2 4 1.5V19a2 2 0 0 1-2.2 2A16 16 0 0 1 4 6.2 2 2 0 0 1 5 4Z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></svg></div><div class="set-cat-t" id="set-contacts-lbl" data-he="אנשי קשר חירום" data-en="Emergency contacts">אנשי קשר חירום</div></div>
- <div class="set-grp" id="contacts-grp"><!-- rendered live from your paired SHOMERs (renderSetContacts) --></div>
+ <div class="set-grp"><div class="set-row" onclick="findShomerContacts()" role="button" tabindex="0"><div class="sr-l"><div class="sr-ic"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7" fill="none" stroke="currentColor" stroke-width="2"/><path d="M20 20l-3.2-3.2" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></div><div><div class="sr-nm" data-he="מצא אנשי קשר ב-SHOMER" data-en="Find contacts on SHOMER" data-ar="ابحث عن جهات في SHOMER">מצא אנשי קשר ב-SHOMER</div><div class="sr-sb" data-he="בודק מי מאנשי הקשר שלך כבר משתמש/ת ב-SHOMER — המספרים נבדקים מוצפנים ולא נחשפים." data-en="Checks which of your contacts already use SHOMER — numbers are hashed, never exposed." data-ar="يتحقق من جهاتك التي تستخدم SHOMER — تُشفَّر الأرقام ولا تُكشف.">בודק מי מאנשי הקשר שלך כבר משתמש/ת ב-SHOMER — מוצפן, לא נחשף.</div></div></div><span style="color:var(--tx3);font-size:18px">›</span></div></div><div class="set-grp" id="contacts-grp"><!-- rendered live from your paired SHOMERs (renderSetContacts) --></div>
  <button class="add-c mb20" onclick="cl('sh-set');openCircles()" data-he="+ חבר/י שומר/ת" data-en="+ Connect a SHOMER">+ חבר/י שומר/ת</button>
  <div class="set-cat"><div class="set-cat-ic"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="2"/><path d="M3 12h18" stroke="currentColor" stroke-width="2"/><path d="M12 3a15 15 0 0 1 0 18M12 3a15 15 0 0 0 0 18" fill="none" stroke="currentColor" stroke-width="2"/></svg></div><div class="set-cat-t" id="set-lang-lbl" data-he="שפה" data-en="Language">שפה</div></div>
  <div class="set-grp" style="padding:10px 14px;">
@@ -3338,8 +3338,8 @@ function addReportPin(rep){
  const m=window.L.marker(ll,{icon:catIcon(rep.type||'new'),keyboard:true,
  alt:(currentLang==='he'?'הדיווח שלי':'My report')+' - '+(rep.loc||'')});
  m.on('click',()=>{if(rep._detIdx!=null)openDetail(rep._detIdx);});
- m.addTo(MAP);
  mapLayers.reports[rep.id]=m;
+ if(_layerOn('reports'))m.addTo(MAP);
 }
 function renderReportsList(){
  const l=document.getElementById('my-reports-list');if(!l)return;
@@ -6485,7 +6485,7 @@ function toast(txt,cls,act){
  const d=document.createElement('div');
  d.className='toast '+(cls||'');
  // No innerHTML for user content - toast text is from our own code only here
- const dot=document.createElement('div');dot.className='toast-dot';dot.style.cssText=`background:${col};box-shadow:0 0 8px ${col}88;width:10px;height:10px;border-radius:50%;flex-shrink:0;`;dot.setAttribute('aria-hidden','true');
+ const dot=document.createElement('div');dot.className='toast-dot';dot.setAttribute('aria-hidden','true');dot.style.cssText=`width:22px;height:22px;flex-shrink:0;color:${col};filter:drop-shadow(0 0 5px ${col}66)`;dot.innerHTML='<svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M12 3l7 3v5c0 5-3.4 8.5-7 10-3.6-1.5-7-5-7-10V6Z"/><path d="M9 12l2 2 3.6-4" stroke-linecap="round"/></svg>';
  const span=document.createElement('span');span.className='t-tx';span.textContent=txt;
  const xBtn=document.createElement('button');xBtn.className='t-x';xBtn.textContent='✕';xBtn.setAttribute('aria-label','סגור');xBtn.onclick=function(e){if(e)e.stopPropagation();d.remove();};
  d.appendChild(dot);d.appendChild(span);
@@ -6962,6 +6962,94 @@ function agPhoneHint(){
  hint.style.color=ok?'var(--safe,#0E8840)':'var(--tx3)';
  hint.textContent=ok?(he?'\u2713 \u05de\u05e1\u05e4\u05e8 \u05ea\u05e7\u05d9\u05df':'\u2713 Valid number'):(he?'\u05de\u05e1\u05e4\u05e8 \u05e2\u05dd \u05e7\u05d9\u05d3\u05d5\u05de\u05ea \u05de\u05d3\u05d9\u05e0\u05d4':'Number with country code');
 }
+async function _scReadContacts(){
+  try{
+    var C=(window.Capacitor&&window.Capacitor.Plugins&&window.Capacitor.Plugins.Contacts);
+    var native=!!(window.Capacitor&&window.Capacitor.isNativePlatform&&window.Capacitor.isNativePlatform());
+    if(C&&native){
+      try{ await C.requestPermissions(); }catch(e){}
+      var res=await C.getContacts({projection:{name:true,phones:true}});
+      var list=(res&&res.contacts)||[];
+      return list.map(function(ct){ return {name:(ct.name&&(ct.name.display||ct.name.given||''))||'', phones:((ct.phones||[]).map(function(ph){return (ph&&ph.number)||'';}).filter(Boolean))}; });
+    }
+  }catch(e){ if(typeof fbLog==='function')fbLog('sc read:',(e&&e.message)||e); }
+  return null;
+}
+function _scModal(){
+  var he=currentLang==='he',ar=currentLang==='ar';
+  var ov=document.getElementById('sc-modal'); if(ov)ov.remove();
+  ov=document.createElement('div'); ov.id='sc-modal';
+  ov.setAttribute('style','position:fixed;inset:0;z-index:100002;display:flex;align-items:center;justify-content:center;padding:20px;background:rgba(6,11,22,.74);font-family:Rubik,system-ui,sans-serif');
+  ov.innerHTML='<div style="width:100%;max-width:360px;max-height:82vh;display:flex;flex-direction:column;background:linear-gradient(180deg,#141a27,#0f1218);border:1px solid #2a3450;border-radius:20px;overflow:hidden;box-shadow:0 24px 70px rgba(0,0,0,.6)">'
+   +'<div style="display:flex;align-items:center;gap:11px;padding:16px 18px;border-bottom:1px solid #232c40">'
+   +'<div style="width:40px;height:40px;border-radius:12px;background:linear-gradient(135deg,#C09020,#E0A828 55%,#F5C840);display:flex;align-items:center;justify-content:center;flex:0 0 auto"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="#23170a" stroke-width="2" stroke-linejoin="round"><path d="M12 3l7 3v5c0 5-3.4 8.5-7 10-3.6-1.5-7-5-7-10V6Z"/></svg></div>'
+   +'<div style="flex:1"><div style="font-size:16px;font-weight:800;color:#f2f5fb">'+(he?'אנשי קשר ב-SH✡MER':ar?'جهات في SH✡MER':'Contacts on SH✡MER')+'</div><div style="font-size:11px;color:#8a93a6">'+(he?'מוצפן · המספרים לא נחשפים':ar?'مشفّر · لا تُكشف الأرقام':'Hashed · numbers never exposed')+'</div></div>'
+   +'<button onclick="var m=document.getElementById(\'sc-modal\');if(m)m.remove()" style="background:none;border:0;color:#8a93a6;font-size:20px;cursor:pointer">✕</button></div>'
+   +'<div id="sc-list" style="flex:1;overflow:auto;padding:12px 14px"></div></div>';
+  document.body.appendChild(ov); return document.getElementById('sc-list');
+}
+function _scStatus(box,txt){ if(box)box.innerHTML='<div style="text-align:center;color:#9aa6bd;font-size:13px;padding:26px 8px;line-height:1.6">'+txt+'</div>'; }
+async function findShomerContacts(){
+  var he=currentLang==='he',ar=currentLang==='ar';
+  var native=!!(window.Capacitor&&window.Capacitor.isNativePlatform&&window.Capacitor.isNativePlatform());
+  if(!native){ try{ toast(he?'זמין באפליקציה המותקנת':ar?'متاح في التطبيق':'Available in the installed app','amb'); }catch(e){} return; }
+  var box=_scModal(); _scStatus(box,(he?'קורא אנשי קשר…':ar?'جارٍ القراءة…':'Reading contacts…'));
+  var contacts=await _scReadContacts();
+  if(!contacts){ _scStatus(box,(he?'לא ניתן לקרוא אנשי קשר. בדוק/י הרשאות.':ar?'تعذّر قراءة جهات الاتصال.':'Could not read contacts. Check permissions.')); return; }
+  _scStatus(box,(he?'בודק מול רשת SH✡MER…':ar?'جارٍ الفحص…':'Checking against SH✡MER…'));
+  // Build unique {hash -> {name,raw,canon}} (cap for safety)
+  var seen={}, items=[], cc=(typeof myDial==='function'?myDial():'');
+  for(var i=0;i<contacts.length && items.length<500;i++){
+    var ct=contacts[i];
+    for(var j=0;j<ct.phones.length;j++){
+      var raw=(''+ct.phones[j]).trim(); if(!raw)continue;
+      var canon; try{ canon=phoneCanon(raw,cc); }catch(e){ canon=null; }
+      if(!canon||!phoneIsValid(canon))continue;
+      if(seen[canon])continue; seen[canon]=1;
+      items.push({name:ct.name||'',raw:raw,canon:canon});
+    }
+  }
+  var inCircle={}; (SS.circleMembers||[]).forEach(function(m){ if(m.phoneCanon)inCircle[m.phoneCanon]=1; });
+  var matches=[];
+  // hash + registry lookup, limited concurrency
+  var idx=0;
+  async function worker(){
+    while(idx<items.length){
+      var it=items[idx++];
+      try{
+        var h=await sha256Hex(it.canon);
+        if(!h||h===FB._myPhoneHash)continue;
+        if(inCircle[it.canon])continue;
+        var rec=null; try{ rec=(await fbRestGet('registry/'+h)).val(); }catch(e){ rec=null; }
+        if(rec&&rec.uid){ matches.push(it); }
+      }catch(e){}
+    }
+  }
+  var pool=[]; for(var w=0;w<6;w++)pool.push(worker());
+  await Promise.all(pool);
+  if(!matches.length){ _scStatus(box,(he?'לא נמצאו אנשי קשר שכבר ב-SH✡MER.<br><span style="color:#6d7893;font-size:12px">אפשר להזמין אותם דרך “הזמן שומר”.</span>':ar?'لا جهات على SH✡MER بعد.':'None of your contacts are on SH✡MER yet.<br><span style="color:#6d7893;font-size:12px">Invite them via “Invite a guardian”.</span>')); return; }
+  box.innerHTML='<div style="font-size:12px;color:#9aa6bd;margin:2px 2px 12px">'+(he?(matches.length+' מאנשי הקשר שלך כבר ב-SH✡MER. להוסיף למעגל?'):ar?(matches.length+' من جهاتك على SH✡MER'):(matches.length+' of your contacts are on SH✡MER. Add to your circle?'))+'</div>';
+  matches.forEach(function(it,k){
+    var row=document.createElement('div'); row.setAttribute('style','display:flex;align-items:center;gap:11px;padding:11px 4px;border-bottom:1px solid #1e2636');
+    var nm=(it.name||(he?'איש קשר':'Contact')).replace(/[<>&]/g,'');
+    row.innerHTML='<div style="width:36px;height:36px;border-radius:50%;background:#1b2740;color:#8ab4ff;display:flex;align-items:center;justify-content:center;font-weight:800;flex:0 0 auto">'+(nm.slice(0,1)||'?')+'</div>'
+      +'<div style="flex:1;min-width:0"><div style="font-size:14px;color:#f2f5fb;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+nm+'</div><div style="font-size:11px;color:#6ee7a8">● '+(he?'משתמש/ת ב-SH✡MER':ar?'على SH✡MER':'on SH✡MER')+'</div></div>'
+      +'<button id="sc-add-'+k+'" style="flex:0 0 auto;background:linear-gradient(135deg,#C09020,#E0A828 60%,#F5C840);color:#23170a;font-weight:800;font-size:12px;border:0;border-radius:9px;padding:8px 13px;cursor:pointer;font-family:inherit">'+(he?'הוסף':ar?'أضف':'Add')+'</button>';
+    box.appendChild(row);
+    var b=row.querySelector('#sc-add-'+k);
+    b.onclick=async function(){ b.disabled=true; b.style.opacity='.6'; b.textContent=(he?'…':'…');
+      try{ await addMatchedContact(it.name,it.raw); b.textContent=(he?'נוסף ✓':ar?'تم ✓':'Added ✓'); b.style.background='#1c3b2a'; b.style.color='#6ee7a8'; }
+      catch(e){ b.disabled=false; b.style.opacity=''; b.textContent=(he?'הוסף':'Add'); }
+    };
+  });
+}
+async function addMatchedContact(name,raw){
+  var np=document.getElementById('ag-phone'), nn=document.getElementById('ag-name');
+  if(nn)nn.value=(name||'').trim().substring(0,24);
+  if(np)np.value=(''+raw).trim();
+  try{ agPhoneHint(); }catch(e){}
+  await addGuardian();
+}
 async function agPickContact(){
  var he=currentLang==='he';
  try{
@@ -7387,7 +7475,7 @@ function renderCircleMarkers(){
  // add/update wanted
  Object.values(want).forEach(m=>{
  if(mapLayers.circle[m.id]){mapLayers.circle[m.id].setLatLng([m.lat,m.lng]);mapLayers.circle[m.id].setIcon(circleIcon(m));}
- else{const mk=window.L.marker([m.lat,m.lng],{icon:circleIcon(m),zIndexOffset:m.sos?950:700,alt:m.name});mk.bindPopup(()=>memberPopupHtml(m.id),{maxWidth:230,closeButton:true});mk.addTo(MAP);mapLayers.circle[m.id]=mk;}
+ else{const mk=window.L.marker([m.lat,m.lng],{icon:circleIcon(m),zIndexOffset:m.sos?950:700,alt:m.name});mk.bindPopup(()=>memberPopupHtml(m.id),{maxWidth:230,closeButton:true});mapLayers.circle[m.id]=mk;if(_layerOn('circle'))mk.addTo(MAP);}
  });
 }
 function showCircleOnMap(cid){
@@ -8780,7 +8868,7 @@ try{ hydrateIcons(document); }catch(e){}
 /* Loaded-build version - shown in the diagnostic panel so a phone can prove
    whether it's on the latest build or a STALE cached one. Keep in lock-step
    with sw.js SW_VERSION on every deploy. */
-var APP_VER='v216';
+var APP_VER='v217';
 var FB={ready:false,uid:null,db:null,_presTimer:null,connected:false,listening:false,pushState:'default',near:0,swVer:'?',
   authState:'connecting',sdkLoaded:false,persist:'',permErr:null,err:null,wsProbe:'',csp:''};
 /* Always log connection diagnostics to the console so the real failure can be SEEN in Chrome. */
@@ -10782,6 +10870,10 @@ function statsMarkUnavailable(){
     btn.setAttribute('aria-disabled','true');
   }
 }
+function _layerOn(key){ try{ return !(SS&&SS.settings&&SS.settings.toggles&&SS.settings.toggles['map_'+key]===false); }catch(e){ return true; } }
+function _applyStats(on){ try{ if(typeof STATS==='undefined')return; if(on&&!STATS.on){ statsToggle(); } else if(!on&&STATS.on){ statsToggle(); } }catch(e){} }
+function applyMapLayer(key){ try{ var on=_layerOn(key); if(key==='stats'){ _applyStats(on); return; } var grp=key==='reports'?mapLayers.reports:mapLayers.circle; Object.keys(grp||{}).forEach(function(id){ var m=grp[id]; if(!m||!MAP)return; if(on){ if(!MAP.hasLayer(m))MAP.addLayer(m); } else { if(MAP.hasLayer(m))MAP.removeLayer(m); } }); }catch(e){} }
+function mapLayerToggle(el,key){ try{ el.classList.toggle('on'); SS.settings=SS.settings||{}; SS.settings.toggles=SS.settings.toggles||{}; SS.settings.toggles['map_'+key]=el.classList.contains('on'); saveStore(); applyMapLayer(key); var he=currentLang==='he'; var nm={stats:he?'סטטיסטיקת פשיעה':'Crime statistics',reports:he?'הדיווחים שלי':'My reports',circle:he?'המעגל שלי':'My circle'}[key]; try{ toast((el.classList.contains('on')?(he?'שכבה דלוקה · ':'Layer on · '):(he?'שכבה כבויה · ':'Layer off · '))+nm,'grn'); }catch(e){} }catch(e){} }
 async function statsToggle(){
   if(!STATS.data){ statsMarkUnavailable(); return; }
   STATS.on=!STATS.on;
