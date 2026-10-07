@@ -166,7 +166,7 @@ img{display:block;}
 .lbtn:hover:not(.on){color:var(--tx1);}
 /* When lang bar visible, offset everything */
 body.lb-on{--hdr-top:calc(env(safe-area-inset-top, 0px) + 32px);}
-body:not(.lb-on){--hdr-top:max(env(safe-area-inset-top, 0px), 28px);}
+body:not(.lb-on){--hdr-top:max(env(safe-area-inset-top, 0px), 46px);}
 
 /* ══════════ ONBOARDING ══════════ */
 #ob{position:fixed;inset:0;z-index:9999;background:#070F1E;overflow-y:auto;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:26px 0;}
@@ -365,7 +365,7 @@ input[type=range]:focus::-webkit-slider-thumb{box-shadow:0 0 0 4px rgba(224,168,
 .selfie-count{font-size:34px;font-weight:900;color:#FF7080;line-height:1;margin-bottom:2px;}
 .selfie-cancel{width:100%;padding:14px;background:linear-gradient(135deg,#16a06a,#0e8f5c);border:none;border-radius:12px;color:#fff;font-size:15px;font-weight:800;cursor:pointer;}
 .selfie-note{font-size:10.5px;color:var(--tx3);margin-top:10px;line-height:1.5;}
-.hdr-bell{position:relative;width:42px;height:42px;border-radius:50%;background:var(--n3);border:1px solid var(--b2);display:flex;align-items:center;justify-content:center;font-size:18px;transition:all .15s;flex-shrink:0;}
+.hdr-bell{position:fixed;top:calc(var(--hdr-top,0px) + var(--hdr) + 8px);inset-inline-start:12px;left:auto;right:auto;width:44px;height:44px;border-radius:50%;background:rgba(8,18,36,.92);backdrop-filter:blur(12px);border:1px solid var(--b3);box-shadow:var(--e3);display:flex;align-items:center;justify-content:center;font-size:18px;transition:all .15s;flex-shrink:0;z-index:605;}
 .hdr-bell:hover{background:var(--n4);}
 .bell-dot{position:absolute;top:6px;right:6px;width:8px;height:8px;border-radius:50%;background:var(--r3);border:2px solid rgba(8,18,36,.97);display:none;}
 .bell-dot.on{display:block;animation:blink 1.2s ease-in-out infinite;}
@@ -1555,7 +1555,7 @@ body.otp-active .ob-steps{display:none!important;}
  <div class="leg"><div class="ldc" style="background:#16A06A" aria-hidden="true"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="4" width="16" height="16" rx="4" fill="none" stroke="currentColor" stroke-width="2"/><path d="M12 8v8M8 12h8" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg></div><span id="l6">רפואי</span></div>
  <div class="leg"><div class="ldc" style="background:#19A8FF;border-color:#fff" aria-hidden="true"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 4 L17 18.5 L12 15.2 L7 18.5 Z" fill="#fff"/></svg></div><span id="l8">המיקום שלי</span></div>
  <div class="legend-foot" id="legend-foot">צבעים = קטגוריה. סמני ערים = סקירה סטטיסטית מצרפית, לא אירוע ספציפי.</div></div></div>
-     <div class="leg-sec" id="leg-past-sec"><button class="leg-sec-tog" id="leg-past-tog" onclick="togglePastEvents();this.classList.toggle('on');this.setAttribute('aria-expanded',this.classList.contains('on'))" aria-expanded="false"><span data-he="אירועי עבר" data-en="Past events" data-ar="أحداث سابقة">אירועי עבר</span><span style="margin-inline-start:auto;font-size:10.5px;color:var(--tx3)" data-he="הצג/הסתר" data-en="Show/Hide">הצג/הסתר</span></button></div>
+     <div class="leg-sec" id="leg-past-sec"><div class="leg-past-row"><span data-he="אירועי עבר" data-en="Past events" data-ar="أحداث سابقة">אירועי עבר</span><div class="tog" id="leg-past-tog" role="switch" aria-checked="false" onclick="togglePastEvents();this.classList.toggle('on');this.setAttribute('aria-checked',this.classList.contains('on'))"></div></div></div>
      <div class="leg-sec" id="leg-ess">
    <button class="leg-sec-tog" id="ess-tog" onclick="essToggleMenu()" aria-expanded="false">
      <span>שירותי חירום</span>
@@ -8881,7 +8881,7 @@ try{ hydrateIcons(document); }catch(e){}
 /* Loaded-build version - shown in the diagnostic panel so a phone can prove
    whether it's on the latest build or a STALE cached one. Keep in lock-step
    with sw.js SW_VERSION on every deploy. */
-var APP_VER='v219';
+var APP_VER='v220';
 var FB={ready:false,uid:null,db:null,_presTimer:null,connected:false,listening:false,pushState:'default',near:0,swVer:'?',
   authState:'connecting',sdkLoaded:false,persist:'',permErr:null,err:null,wsProbe:'',csp:''};
 /* Always log connection diagnostics to the console so the real failure can be SEEN in Chrome. */
@@ -12913,6 +12913,7 @@ html[dir="rtl"] .sh-back svg{transform:scaleX(-1)}
 .leg span{overflow:hidden;text-overflow:ellipsis}
 
 /* row 2 - emergency services: one horizontal row of round icon buttons */
+.leg-past-row{display:flex;align-items:center;gap:10px;width:100%;padding:4px 2px;font-size:12.5px;font-weight:700;color:var(--tx1)}.leg-past-row .tog{margin-inline-start:auto}
 .leg-sec-tog{display:flex;align-items:center;justify-content:center;gap:5px;width:100%;background:none;border:0;
   color:var(--g3);font-family:inherit;font-weight:900;font-size:9px;letter-spacing:.03em;cursor:pointer;padding:0;margin-bottom:7px}
 .leg-caret{font-size:8px;color:var(--tx3)}
