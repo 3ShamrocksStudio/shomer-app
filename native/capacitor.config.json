@@ -9,7 +9,9 @@
   },
   "server": {
     "androidScheme": "https",
-    "cleartext": true
+    "cleartext": true,
+    "url": "https://www.shomer-app.co.il",
+    "errorPath": "index.html"
   },
   "plugins": {
     "SplashScreen": {
