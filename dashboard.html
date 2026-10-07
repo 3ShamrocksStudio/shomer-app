@@ -625,7 +625,9 @@ function _respGroups(e){
 }
 function _respReach(){ var r=_respRadius; return {resp:Math.max(1,Math.round(r*9)), med:Math.max(0,Math.round(r*2)), patrol:(r>=1?1:0)}; }
 function respToggle(k,el){ _respSel=_respSel||{}; _respSel[k]=!_respSel[k]; if(el)el.classList.toggle('on'); }
-function respSetRadius(v){ _respRadius=parseFloat(v)||1.5; var rr=document.getElementById('resp-reach'); var rv=document.getElementById('resp-rv'); var x=_respReach(); if(rv)rv.textContent=_respRadius.toFixed(1)+' ק"מ'; if(rr)rr.innerHTML='בטווח זה: <b style="color:#eef1f7">'+x.resp+' מגיבים · '+x.med+' רפואיים · שיטור '+x.patrol+'</b> · <span style="color:#6d7893">הערכה</span>'; try{ if(_respCircle){ _respCircle.setRadius(_respRadius*1000); } }catch(e){} }
+function respFitRadius(){ try{ if(_respCircle&&MAP){ MAP.fitBounds(_respCircle.getBounds(),{padding:[40,40]}); } }catch(e){} }
+function _radChip(){ try{ var mc=document.getElementById('map'); if(!mc)return; var ch=document.getElementById('rad-chip'); if(!ch){ ch=document.createElement('div'); ch.id='rad-chip'; ch.style.cssText='position:absolute;top:10px;inset-inline-start:10px;z-index:600;background:rgba(20,26,39,.92);border:1px solid #2a3450;color:#4fc3e8;font:700 12px Rubik,system-ui,sans-serif;padding:6px 11px;border-radius:9px;box-shadow:0 4px 14px rgba(0,0,0,.4);pointer-events:none'; mc.appendChild(ch); } ch.textContent='\u05e8\u05d3\u05d9\u05d5\u05e1 \u05d4\u05ea\u05e8\u05d0\u05d4 \u00b7 '+_respRadius.toFixed(1)+' \u05e7"\u05de'; }catch(e){} }
+function respSetRadius(v){ _respRadius=parseFloat(v)||1.5; var rr=document.getElementById('resp-reach'); var rv=document.getElementById('resp-rv'); var x=_respReach(); if(rv)rv.textContent=_respRadius.toFixed(1)+' ק"מ'; if(rr)rr.innerHTML='בטווח זה: <b style="color:#eef1f7">'+x.resp+' מגיבים · '+x.med+' רפואיים · שיטור '+x.patrol+'</b> · <span style="color:#6d7893">הערכה</span>'; try{ if(_respCircle){ _respCircle.setRadius(_respRadius*1000); } }catch(e){} try{ _radChip(); }catch(e){} }
 function respLog(id,txt){ var o=_liveEvents[id]; if(!o)return; o._log=o._log||[]; var t=new Date(); o._log.push(('0'+t.getHours()).slice(-2)+':'+('0'+t.getMinutes()).slice(-2)+' — '+txt); var el=document.getElementById('resp-log'); if(el)el.innerHTML=o._log.map(function(l){return '<div>• '+l+'</div>';}).join(''); }
 function respDispatch(id){
  var sel=Object.keys(_respSel||{}).filter(function(k){return _respSel[k];});
@@ -645,12 +647,12 @@ function bigSosAlert(id){
   setTimeout(function(){ if(document.getElementById('sos-pop'))ov.remove(); },12000);
  }catch(e){}
 }
-function closeResponse(){ var p=document.getElementById('resp'); if(p){ p.classList.remove('on'); setTimeout(function(){try{p.remove();}catch(e){}},300); } try{ if(_respCircle){MAP.removeLayer(_respCircle);_respCircle=null;} }catch(e){} }
+function closeResponse(){ var p=document.getElementById('resp'); if(p){ p.classList.remove('on'); setTimeout(function(){try{p.remove();}catch(e){}},300); } try{ if(_respCircle){MAP.removeLayer(_respCircle);_respCircle=null;} }catch(e){} try{ var _rc=document.getElementById('rad-chip'); if(_rc)_rc.remove(); }catch(e){} }
 function openResponse(id){
  try{
   var o=_liveEvents[id]; if(!o){ return; } var e=o.e, m=o.m; _respSel={}; _respRadius=1.5;
   try{ flyToLive(e.lat,e.lng,id); }catch(_){}
-  try{ if(_respCircle){MAP.removeLayer(_respCircle);} _respLatLng=[e.lat,e.lng]; _respCircle=L.circle(_respLatLng,{radius:_respRadius*1000,color:'#4fc3e8',weight:2,fillColor:'#4fc3e8',fillOpacity:.08,dashArray:'7 6'}).addTo(MAP); }catch(_e){}
+  try{ if(_respCircle){MAP.removeLayer(_respCircle);} _respLatLng=[e.lat,e.lng]; _respCircle=L.circle(_respLatLng,{radius:_respRadius*1000,color:'#4fc3e8',weight:2,fillColor:'#4fc3e8',fillOpacity:.08,dashArray:'7 6'}).addTo(MAP); _radChip(); }catch(_e){}
   var old=document.getElementById('resp'); if(old)old.remove();
   var now=Date.now(); var mn=Math.round((now-(e.ts||now))/60000); var ago=mn<1?'עכשיו':mn<60?('לפני '+mn+' דק׳'):('לפני '+Math.round(mn/60)+' שע׳');
   var groups=_respGroups(e);
@@ -660,7 +662,7 @@ function openResponse(id){
    +'<div class="resp-h"><span class="ic">'+m.i+'</span><div class="tt"><b>'+ESC(m.t)+'</b><span>'+ago+' · '+(+e.lat).toFixed(2)+','+(+e.lng).toFixed(2)+' · '+(o.demo?'נתוני הדגמה':'רשת שומרים')+'</span></div><button class="resp-x" onclick="closeResponse()">✕</button></div>'
    +'<div class="resp-b">'
    +'  <div><div class="resp-cap">פעולות תגובה · לפי סוג האירוע</div><div class="rg">'+gHtml+'</div></div>'
-   +'  <div><div class="resp-cap">רדיוס התראה · <span id="resp-rv">1.5 ק"מ</span></div><input class="resp-slider" type="range" min="0.2" max="5" step="0.1" value="1.5" oninput="respSetRadius(this.value)"><div class="resp-reach" id="resp-reach"></div></div>'
+   +'  <div><div class="resp-cap">רדיוס התראה · <span id="resp-rv">1.5 ק"מ</span></div><input class="resp-slider" type="range" min="0.2" max="5" step="0.1" value="1.5" oninput="respSetRadius(this.value)" onchange="respFitRadius()"><div class="resp-reach" id="resp-reach"></div></div>'
    +'  <div class="resp-two"><div class="resp-esc" onclick="respLog(\''+id+'\',\'בקשת תגבור — אזור נוסף\')">⬆️ בקש תגבור</div><div class="resp-bc" onclick="respLog(\''+id+'\',\'הודעה נשלחה לקבוצה\')">📢 הודעה לקבוצה</div></div>'
    +'  <button class="resp-send" onclick="respDispatch(\''+id+'\')">⚡ שגר התראה לקבוצות · דורש אישור</button>'
    +'  <div class="resp-nat"><b style="color:#eef1f7">שירותים ארציים:</b> 🚑 מד"א 101 · 🚔 100 · 🚒 102 — <span style="color:#f0c75a">פרטי האירוע מוכנים להעברה ע״י המוקדן. אין שיגור אוטומטי.</span></div>'
