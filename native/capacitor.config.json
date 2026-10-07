@@ -10,7 +10,7 @@
   "server": {
     "androidScheme": "https",
     "cleartext": true,
-    "url": "https://www.shomer-app.co.il",
+    "url": "https://www.shomer-app.co.il/shomer.html",
     "errorPath": "index.html"
   },
   "plugins": {
