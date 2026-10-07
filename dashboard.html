@@ -253,6 +253,17 @@
 .tier-pill.f{background:rgba(255,255,255,.06);color:#9aa6bd}
 .acct-note{font-size:11px;color:#6d7893;margin-top:12px;line-height:1.5}
 </style>
+<style id="brand2-css">
+.brand{display:flex;align-items:center;gap:9px}
+.brand .logo-mark{width:30px;height:30px;flex:0 0 auto;display:block}
+.brand .wm{font-weight:800;font-size:16px;letter-spacing:.3px;line-height:1.05;color:#eef1f7;white-space:nowrap}
+.brand .wm .s{color:#F5C840}
+.feed .item.sos{background:linear-gradient(90deg,rgba(229,72,77,.20),rgba(229,72,77,.04));border-inline-start:3px solid #e5484d;animation:feedpulse 1.8s ease-in-out infinite}
+@keyframes feedpulse{0%,100%{box-shadow:inset 3px 0 0 #e5484d}50%{box-shadow:inset 3px 0 0 #ff6b78,0 0 14px rgba(229,72,77,.22)}}
+.feed .item.sos .dot{background:#e5484d;color:#fff}
+.live-badge{display:inline-flex;align-items:center;gap:4px;font-size:9px;font-weight:800;letter-spacing:.06em;color:#fff;background:#e5484d;border-radius:20px;padding:2px 7px;margin-inline-start:6px;animation:lbpulse 1.1s ease-in-out infinite;vertical-align:middle}
+@keyframes lbpulse{50%{opacity:.5}}
+</style>
 </head>
 <body>
 
@@ -283,7 +294,7 @@
 <!-- DASHBOARD -->
 <div id="app" class="hidden">
   <div class="topbar">
-    <div class="brand" dir="ltr">SH<span class="s">✡</span>MER <small>Command · Municipal Intelligence</small></div>
+    <div class="brand" dir="ltr"><svg class="logo-mark" viewBox="0 0 48 48" aria-label="SH✡MER"><defs><linearGradient id="shg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#C09020"/><stop offset=".6" stop-color="#E0A828"/><stop offset="1" stop-color="#F5C840"/></linearGradient></defs><rect x="3" y="3" width="42" height="42" rx="12" fill="url(#shg)"/><path d="M24 13 L31.8 26.5 L16.2 26.5 Z" fill="none" stroke="#23170a" stroke-width="2.4" stroke-linejoin="round"/><path d="M24 31 L16.2 17.5 L31.8 17.5 Z" fill="none" stroke="#23170a" stroke-width="2.4" stroke-linejoin="round"/></svg><span style="display:flex;flex-direction:column;gap:2px"><span class="wm">SH<span class="s">✡</span>MER</span><small>Command · Municipal Intelligence</small></span></div>
     <div class="tb-sp"></div>
     <div class="terr-pick"><span id="terr-static" class="hidden">טריטוריה: <b id="terr-name" style="color:var(--gold)"></b></span><select id="terr-sel"></select></div>
     <div class="live"><span class="d"></span><span id="org-name"></span></div>
@@ -329,7 +340,7 @@ var sb=supabase.createClient(SB_URL,SB_KEY);
 var CAT_COL={'עבירות כלפי הרכוש':'#2f80ed','עבירות סדר ציבורי':'#f2b705','עבירות נגד גוף':'#e5484d','עבירות כלפי המוסר':'#e5468e','עבירות מרמה':'#18c29c','עבירות כלכליות':'#9b6cff'};
 var DATA=null, MAP=null, cityLayer=null, CLIENT=null, _curCity=null;
 var liveLayer=null,_seenSos={},_liveTimer=null,_curCityObj=null,_liveInitDone=false;
-var _liveEvents={},_respRadius=1.5,_respSelKey=null;
+var _liveEvents={},_respRadius=1.5,_respSelKey=null,_respCircle=null,_respLatLng=null;
 var ESRI='https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_Base/MapServer/tile/{z}/{y}/{x}';
 var ESRIr='https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_Reference/MapServer/tile/{z}/{y}/{x}';
 function fmt(n){return (n||0).toLocaleString('en-US');}
@@ -409,7 +420,7 @@ async function boot(){
   render(idx>=0?idx:0);
   /* note removed in console layout */
 }
-function initMap(){ MAP=L.map('map',{zoomControl:true,attributionControl:false}).setView([31.5,34.9],7); L.tileLayer(ESRI,{maxZoom:16}).addTo(MAP); L.tileLayer(ESRIr,{maxZoom:16}).addTo(MAP); liveLayer=L.layerGroup().addTo(MAP); }
+function initMap(){ MAP=L.map('map',{zoomControl:true,attributionControl:false}).setView([31.5,34.9],7); L.tileLayer(ESRI,{maxZoom:19,maxNativeZoom:16}).addTo(MAP); L.tileLayer(ESRIr,{maxZoom:19,maxNativeZoom:16}).addTo(MAP); liveLayer=L.layerGroup().addTo(MAP); }
 function renderLegend(){ var el=document.getElementById('legend'); el.innerHTML=''; Object.keys(CAT_COL).forEach(function(k){ el.innerHTML+='<span><i style="background:'+CAT_COL[k]+'"></i>'+k+'</span>'; }); }
 /* approx CBS 2023 populations (public figures) for per-capita context */
 var POP={'תל אביב יפו':474000,'ירושלים':981000,'חיפה':285000,'ראשון לציון':254000,'פתח תקווה':248000,'אשדוד':225000,'נתניה':221000,'באר שבע':209000,'בני ברק':208000,'חולון':196000,'רמת גן':171000,'בית שמש':146000,'רחובות':149000,'אשקלון':144000,'בת ים':128000,'כפר סבא':100000,'חדרה':100000,'הרצליה':97000,'מודיעין':93000,'לוד':80000,'רמלה':77000,'רעננה':75000,'רהט':75000,'הוד השרון':65000,'גבעתיים':60000,'קרית גת':60000,'קרית אתא':58000,'נהריה':58000,'עפולה':56000,'אילת':52000,'עכו':49000,'טבריה':48000};
@@ -603,7 +614,7 @@ function _liveMeta(e){
  if(e.type==='missing'||e.k==='missing') return {i:'\ud83d\udd0e',t:(e.nm||'\u05d0\u05d3\u05dd \u05e0\u05e2\u05d3\u05e8'),c:'#9b6cff'};
  var cc=CAT_META[e.t||e.type]; return {i:'\ud83d\udccd',t:(e.nm||catShort(e.t||e.type)||'\u05d3\u05d9\u05d5\u05d5\u05d7'),c:(cc?cc.c:'#f2b705')};
 }
-function flyToLive(lat,lng,id){ try{ if(!MAP)return; MAP.flyTo([lat,lng],17,{duration:.7}); var mk=liveLayer&&liveLayer._byId&&liveLayer._byId[id]; if(mk){ setTimeout(function(){ try{mk.openPopup();}catch(e){} },850); } var it=document.querySelector('.feed .item[data-id="'+id+'"]'); if(it){ it.classList.remove('flash'); void it.offsetWidth; it.classList.add('flash'); } }catch(e){} }
+function flyToLive(lat,lng,id){ try{ if(!MAP)return; MAP.flyTo([lat,lng],18,{duration:.7}); var mk=liveLayer&&liveLayer._byId&&liveLayer._byId[id]; if(mk){ setTimeout(function(){ try{mk.openPopup();}catch(e){} },850); } var it=document.querySelector('.feed .item[data-id="'+id+'"]'); if(it){ it.classList.remove('flash'); void it.offsetWidth; it.classList.add('flash'); } }catch(e){} }
 function liveAlertBanner(txt){ try{ var host=document.getElementById('map'); if(!host)return; var b=document.createElement('div'); b.className='live-alert'; b.innerHTML='\ud83d\udea8 '+ESC(txt||'SOS \u05d7\u05d3\u05e9 \u05d1\u05d8\u05e8\u05d9\u05d8\u05d5\u05e8\u05d9\u05d4'); host.appendChild(b); setTimeout(function(){ try{ b.style.transition='opacity .5s'; b.style.opacity='0'; setTimeout(function(){b.remove();},500);}catch(e){} },6000); }catch(e){} }
 function _respGroups(e){
  var t=(e.type||e.k||'');
@@ -614,7 +625,7 @@ function _respGroups(e){
 }
 function _respReach(){ var r=_respRadius; return {resp:Math.max(1,Math.round(r*9)), med:Math.max(0,Math.round(r*2)), patrol:(r>=1?1:0)}; }
 function respToggle(k,el){ _respSel=_respSel||{}; _respSel[k]=!_respSel[k]; if(el)el.classList.toggle('on'); }
-function respSetRadius(v){ _respRadius=parseFloat(v)||1.5; var rr=document.getElementById('resp-reach'); var rv=document.getElementById('resp-rv'); var x=_respReach(); if(rv)rv.textContent=_respRadius.toFixed(1)+' ק"מ'; if(rr)rr.innerHTML='בטווח זה: <b style="color:#eef1f7">'+x.resp+' מגיבים · '+x.med+' רפואיים · שיטור '+x.patrol+'</b> · <span style="color:#6d7893">הערכה</span>'; }
+function respSetRadius(v){ _respRadius=parseFloat(v)||1.5; var rr=document.getElementById('resp-reach'); var rv=document.getElementById('resp-rv'); var x=_respReach(); if(rv)rv.textContent=_respRadius.toFixed(1)+' ק"מ'; if(rr)rr.innerHTML='בטווח זה: <b style="color:#eef1f7">'+x.resp+' מגיבים · '+x.med+' רפואיים · שיטור '+x.patrol+'</b> · <span style="color:#6d7893">הערכה</span>'; try{ if(_respCircle){ _respCircle.setRadius(_respRadius*1000); } }catch(e){} }
 function respLog(id,txt){ var o=_liveEvents[id]; if(!o)return; o._log=o._log||[]; var t=new Date(); o._log.push(('0'+t.getHours()).slice(-2)+':'+('0'+t.getMinutes()).slice(-2)+' — '+txt); var el=document.getElementById('resp-log'); if(el)el.innerHTML=o._log.map(function(l){return '<div>• '+l+'</div>';}).join(''); }
 function respDispatch(id){
  var sel=Object.keys(_respSel||{}).filter(function(k){return _respSel[k];});
@@ -634,11 +645,12 @@ function bigSosAlert(id){
   setTimeout(function(){ if(document.getElementById('sos-pop'))ov.remove(); },12000);
  }catch(e){}
 }
-function closeResponse(){ var p=document.getElementById('resp'); if(p){ p.classList.remove('on'); setTimeout(function(){try{p.remove();}catch(e){}},300); } }
+function closeResponse(){ var p=document.getElementById('resp'); if(p){ p.classList.remove('on'); setTimeout(function(){try{p.remove();}catch(e){}},300); } try{ if(_respCircle){MAP.removeLayer(_respCircle);_respCircle=null;} }catch(e){} }
 function openResponse(id){
  try{
   var o=_liveEvents[id]; if(!o){ return; } var e=o.e, m=o.m; _respSel={}; _respRadius=1.5;
   try{ flyToLive(e.lat,e.lng,id); }catch(_){}
+  try{ if(_respCircle){MAP.removeLayer(_respCircle);} _respLatLng=[e.lat,e.lng]; _respCircle=L.circle(_respLatLng,{radius:_respRadius*1000,color:'#4fc3e8',weight:2,fillColor:'#4fc3e8',fillOpacity:.08,dashArray:'7 6'}).addTo(MAP); }catch(_e){}
   var old=document.getElementById('resp'); if(old)old.remove();
   var now=Date.now(); var mn=Math.round((now-(e.ts||now))/60000); var ago=mn<1?'עכשיו':mn<60?('לפני '+mn+' דק׳'):('לפני '+Math.round(mn/60)+' שע׳');
   var groups=_respGroups(e);
@@ -675,7 +687,7 @@ function renderLive(c,list,opts){
   }
   if(m.sos&&!opts.demo&&!_seenSos[id]){ _seenSos[id]=1; if(!opts.initial) newSos={lat:e.lat,lng:e.lng,id:id}; }
   var mins=Math.round((now-(e.ts||now))/60000); var ago=mins<1?'\u05e2\u05db\u05e9\u05d9\u05d5':mins<60?('\u05dc\u05e4\u05e0\u05d9 '+mins+' \u05d3\u05e7\u05f3'):('\u05dc\u05e4\u05e0\u05d9 '+Math.round(mins/60)+' \u05e9\u05e2\u05f3');
-  return '<div class="item'+(m.sos?' sos':'')+'" data-id="'+id+'" onclick="openResponse(\''+id+'\')"><span class="sev" style="background:'+m.c+'"></span><div class="dot">'+m.i+'</div><div style="flex:1"><div class="nm">'+m.i+' '+ESC(m.t)+'</div><div class="mt">'+ago+' \u00b7 '+(+e.lat).toFixed(2)+','+(+e.lng).toFixed(2)+' \u00b7 \u05d0\u05d6\u05d5\u05e8</div></div><span class="live-go">\u2922</span></div>';
+  return '<div class="item'+(m.sos?' sos':'')+'" data-id="'+id+'" onclick="openResponse(\''+id+'\')"><span class="sev" style="background:'+m.c+'"></span><div class="dot">'+m.i+'</div><div style="flex:1"><div class="nm">'+m.i+' '+ESC(m.t)+(m.sos?'<span class="live-badge">\u25cf LIVE</span>':'')+'</div><div class="mt">'+ago+' \u00b7 '+(+e.lat).toFixed(2)+','+(+e.lng).toFixed(2)+' \u00b7 \u05d0\u05d6\u05d5\u05e8</div></div><span class="live-go">\u2922</span></div>';
  }).join('');
  feed.innerHTML=html;
  if(newSos){ _liveBeep(); flyToLive(newSos.lat,newSos.lng,newSos.id); bigSosAlert(newSos.id); }
