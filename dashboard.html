@@ -202,13 +202,45 @@
 .live-alert{position:absolute;top:8px;left:8px;right:8px;z-index:30;background:linear-gradient(90deg,#e5484d,#2f6bff);color:#fff;font-weight:800;font-size:12px;padding:8px 12px;border-radius:9px;display:flex;align-items:center;gap:8px;box-shadow:0 6px 20px rgba(0,0,0,.4);animation:laIn .3s ease}
 @keyframes laIn{from{opacity:0;transform:translateY(-8px)}to{opacity:1;transform:none}}
 </style>
+<style id="resp-css">
+.sos-pop{position:fixed;inset:0;z-index:99990;display:flex;align-items:center;justify-content:center;background:rgba(6,11,22,.55);font-family:Rubik,system-ui,sans-serif;animation:rpf .2s ease}
+@keyframes rpf{from{opacity:0}to{opacity:1}}
+.sos-pop-card{width:100%;max-width:340px;background:linear-gradient(180deg,#1a2131,#12151d);border:1px solid #3a2730;border-radius:20px;padding:22px;text-align:center;box-shadow:0 24px 70px rgba(0,0,0,.6)}
+.sos-pop-ring{width:58px;height:58px;margin:0 auto 12px;border-radius:50%;background:#e5484d;animation:sosflash .9s steps(1,end) infinite;display:flex;align-items:center;justify-content:center;font-size:28px}
+.sos-pop-card h3{color:#fff;font-size:20px;font-weight:800;margin:0 0 4px}
+.sos-pop-card p{color:#9aa6bd;font-size:13px;margin:0 0 16px}
+.sos-pop-go{width:100%;height:48px;border:0;border-radius:12px;background:linear-gradient(135deg,#e5484d,#2f6bff);color:#fff;font-weight:800;font-size:15px;cursor:pointer;font-family:inherit}
+.sos-pop-x{margin-top:9px;background:none;border:0;color:#8a93a6;font-size:13px;cursor:pointer;font-family:inherit}
+.resp{position:fixed;top:0;inset-inline-start:0;height:100vh;width:380px;max-width:92vw;z-index:99991;background:linear-gradient(180deg,#141a27,#0f1218);border-inline-end:1px solid #2a3450;box-shadow:0 0 50px rgba(0,0,0,.55);display:flex;flex-direction:column;transform:translateX(-102%);transition:transform .28s ease;font-family:Rubik,system-ui,sans-serif}
+[dir=rtl] .resp{inset-inline-start:auto;inset-inline-end:0;border-inline-end:0;border-inline-start:1px solid #2a3450;transform:translateX(102%)}
+.resp.on{transform:none!important}
+.resp-h{padding:14px 16px;border-bottom:1px solid #232c40;display:flex;align-items:center;gap:10px;background:linear-gradient(90deg,rgba(229,72,77,.16),rgba(47,107,255,.08))}
+.resp-h .ic{font-size:22px}
+.resp-h .tt{flex:1}.resp-h .tt b{display:block;font-size:15px;color:#f2f5fb}.resp-h .tt span{font-size:11px;color:#9aa6bd}
+.resp-x{background:none;border:0;color:#9aa6bd;font-size:20px;cursor:pointer}
+.resp-b{flex:1;overflow:auto;padding:14px 16px;display:flex;flex-direction:column;gap:16px}
+.resp-cap{font-size:10.5px;letter-spacing:.05em;text-transform:uppercase;color:#6d7893;margin-bottom:7px}
+.rg{display:flex;flex-wrap:wrap;gap:7px}
+.rg b{background:#1b2235;border:1px solid #2f3b57;color:#cdd6e6;border-radius:9px;padding:7px 11px;font-size:12px;font-weight:600;cursor:pointer;transition:.12s}
+.rg b.on{background:rgba(224,168,40,.18);border-color:#E0A828;color:#F5C840}
+.resp-slider{width:100%;accent-color:#4fc3e8}
+.resp-reach{font-size:11.5px;color:#9aa6bd;margin-top:5px}
+.resp-two{display:flex;gap:8px}
+.resp-two div{flex:1;border-radius:10px;padding:9px;text-align:center;font-size:12px;font-weight:700;cursor:pointer}
+.resp-esc{background:#241a10;border:1px solid #BA7517;color:#f0c75a}
+.resp-bc{background:#101a2e;border:1px solid #378ADD;color:#8ab4ff}
+.resp-send{background:linear-gradient(135deg,#b8841c,#e0a828 60%,#f3cf6a);color:#23180a;border:0;border-radius:11px;padding:12px;text-align:center;font-size:14px;font-weight:800;cursor:pointer;width:100%;font-family:inherit}
+.resp-nat{background:rgba(255,255,255,.03);border:1px dashed #3a4a63;border-radius:10px;padding:10px 12px;font-size:11px;color:#9aa6bd;line-height:1.6}
+.resp-log{font-size:11.5px;color:#9aa6bd;line-height:1.9}
+.resp-log b{color:#6ee7a8}
+</style>
 </head>
 <body>
 
 <!-- AUTH GATE -->
 <div id="gate" class="gate">
   <div class="box">
-    <h1>SH<span class="s">✡</span>MER <span style="color:var(--tx3);font-weight:400">Command</span></h1>
+    <h1 dir="ltr">SH<span class="s">✡</span>MER <span style="color:var(--tx3);font-weight:400">Command</span></h1>
     <div class="tag" id="gate-tag">Municipal Intelligence · גישת לקוחות</div>
     <div id="view-login">
       <label>אימייל ארגוני</label><input id="email" type="email" dir="ltr" placeholder="you@municipality.gov.il">
@@ -232,7 +264,7 @@
 <!-- DASHBOARD -->
 <div id="app" class="hidden">
   <div class="topbar">
-    <div class="brand">SH<span class="s">✡</span>MER <small>Command · Municipal Intelligence</small></div>
+    <div class="brand" dir="ltr">SH<span class="s">✡</span>MER <small>Command · Municipal Intelligence</small></div>
     <div class="tb-sp"></div>
     <div class="terr-pick"><span id="terr-static" class="hidden">טריטוריה: <b id="terr-name" style="color:var(--gold)"></b></span><select id="terr-sel"></select></div>
     <div class="live"><span class="d"></span><span id="org-name"></span></div>
@@ -278,6 +310,7 @@ var sb=supabase.createClient(SB_URL,SB_KEY);
 var CAT_COL={'עבירות כלפי הרכוש':'#2f80ed','עבירות סדר ציבורי':'#f2b705','עבירות נגד גוף':'#e5484d','עבירות כלפי המוסר':'#e5468e','עבירות מרמה':'#18c29c','עבירות כלכליות':'#9b6cff'};
 var DATA=null, MAP=null, cityLayer=null, CLIENT=null, _curCity=null;
 var liveLayer=null,_seenSos={},_liveTimer=null,_curCityObj=null,_liveInitDone=false;
+var _liveEvents={},_respRadius=1.5,_respSelKey=null;
 var ESRI='https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_Base/MapServer/tile/{z}/{y}/{x}';
 var ESRIr='https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_Reference/MapServer/tile/{z}/{y}/{x}';
 function fmt(n){return (n||0).toLocaleString('en-US');}
@@ -551,8 +584,61 @@ function _liveMeta(e){
  if(e.type==='missing'||e.k==='missing') return {i:'\ud83d\udd0e',t:(e.nm||'\u05d0\u05d3\u05dd \u05e0\u05e2\u05d3\u05e8'),c:'#9b6cff'};
  var cc=CAT_META[e.t||e.type]; return {i:'\ud83d\udccd',t:(e.nm||catShort(e.t||e.type)||'\u05d3\u05d9\u05d5\u05d5\u05d7'),c:(cc?cc.c:'#f2b705')};
 }
-function flyToLive(lat,lng,id){ try{ if(!MAP)return; MAP.flyTo([lat,lng],15,{duration:.8}); var mk=liveLayer&&liveLayer._byId&&liveLayer._byId[id]; if(mk){ setTimeout(function(){ try{mk.openPopup();}catch(e){} },850); } var it=document.querySelector('.feed .item[data-id="'+id+'"]'); if(it){ it.classList.remove('flash'); void it.offsetWidth; it.classList.add('flash'); } }catch(e){} }
+function flyToLive(lat,lng,id){ try{ if(!MAP)return; MAP.flyTo([lat,lng],16,{duration:.7}); var mk=liveLayer&&liveLayer._byId&&liveLayer._byId[id]; if(mk){ setTimeout(function(){ try{mk.openPopup();}catch(e){} },850); } var it=document.querySelector('.feed .item[data-id="'+id+'"]'); if(it){ it.classList.remove('flash'); void it.offsetWidth; it.classList.add('flash'); } }catch(e){} }
 function liveAlertBanner(txt){ try{ var host=document.getElementById('map'); if(!host)return; var b=document.createElement('div'); b.className='live-alert'; b.innerHTML='\ud83d\udea8 '+ESC(txt||'SOS \u05d7\u05d3\u05e9 \u05d1\u05d8\u05e8\u05d9\u05d8\u05d5\u05e8\u05d9\u05d4'); host.appendChild(b); setTimeout(function(){ try{ b.style.transition='opacity .5s'; b.style.opacity='0'; setTimeout(function(){b.remove();},500);}catch(e){} },6000); }catch(e){} }
+function _respGroups(e){
+ var t=(e.type||e.k||'');
+ var g=[{k:'patrol',i:'🚓',t:'שיטור עירוני'},{k:'security',i:'🛡️',t:'קב"ט / ביטחון'},{k:'medics',i:'⛑️',t:'מגיבים רפואיים ברשת'},{k:'volunteers',i:'👥',t:'מתנדבי רשת באזור'}];
+ if(t==='sos'||t==='abduct'||t==='missing'){ g.push({k:'fire',i:'🚒',t:'כבאות והצלה'}); }
+ if(t==='abduct'||t==='missing'){ g.push({k:'command',i:'📢',t:'פיקוד/תיאום רשויות'}); }
+ return g;
+}
+function _respReach(){ var r=_respRadius; return {resp:Math.max(1,Math.round(r*9)), med:Math.max(0,Math.round(r*2)), patrol:(r>=1?1:0)}; }
+function respToggle(k,el){ _respSel=_respSel||{}; _respSel[k]=!_respSel[k]; if(el)el.classList.toggle('on'); }
+function respSetRadius(v){ _respRadius=parseFloat(v)||1.5; var rr=document.getElementById('resp-reach'); var rv=document.getElementById('resp-rv'); var x=_respReach(); if(rv)rv.textContent=_respRadius.toFixed(1)+' ק"מ'; if(rr)rr.innerHTML='בטווח זה: <b style="color:#eef1f7">'+x.resp+' מגיבים · '+x.med+' רפואיים · שיטור '+x.patrol+'</b> · <span style="color:#6d7893">הערכה</span>'; }
+function respLog(id,txt){ var o=_liveEvents[id]; if(!o)return; o._log=o._log||[]; var t=new Date(); o._log.push(('0'+t.getHours()).slice(-2)+':'+('0'+t.getMinutes()).slice(-2)+' — '+txt); var el=document.getElementById('resp-log'); if(el)el.innerHTML=o._log.map(function(l){return '<div>• '+l+'</div>';}).join(''); }
+function respDispatch(id){
+ var sel=Object.keys(_respSel||{}).filter(function(k){return _respSel[k];});
+ if(!sel.length){ try{alert('בחר/י לפחות קבוצה אחת לשיגור');}catch(e){} return; }
+ var groups=_respGroups((_liveEvents[id]||{}).e||{});
+ var names=sel.map(function(k){var gg=groups.filter(function(x){return x.k===k;})[0];return gg?gg.t:k;}).join(' · ');
+ if(!confirm('לשגר התראה ל: '+names+' · רדיוס '+_respRadius.toFixed(1)+' ק"מ?\n(הדגמה — שיגור אמיתי יחובר עם מערכת ההתראות)')) return;
+ respLog(id,'מוקדן שיגר: '+names+' ('+_respRadius.toFixed(1)+' ק"מ)');
+ var x=_respReach(); respLog(id,'נשלח ל-'+x.resp+' מגיבים · ממתין לאישור');
+}
+function bigSosAlert(id){
+ try{ if(document.getElementById('sos-pop'))return; var o=_liveEvents[id]; var area=''; var ov=document.createElement('div'); ov.id='sos-pop'; ov.className='sos-pop';
+  ov.innerHTML='<div class="sos-pop-card"><div class="sos-pop-ring">🆘</div><h3>SOS חדש בטריטוריה</h3><p>קריאת מצוקה חיה · לחצו לפתיחת מרכז תגובה</p><button class="sos-pop-go" id="sos-pop-go">פתח מרכז תגובה ←</button><button class="sos-pop-x" id="sos-pop-x">סגור</button></div>';
+  document.body.appendChild(ov);
+  document.getElementById('sos-pop-go').onclick=function(){ ov.remove(); openResponse(id); };
+  document.getElementById('sos-pop-x').onclick=function(){ ov.remove(); };
+  setTimeout(function(){ if(document.getElementById('sos-pop'))ov.remove(); },12000);
+ }catch(e){}
+}
+function closeResponse(){ var p=document.getElementById('resp'); if(p){ p.classList.remove('on'); setTimeout(function(){try{p.remove();}catch(e){}},300); } }
+function openResponse(id){
+ try{
+  var o=_liveEvents[id]; if(!o){ return; } var e=o.e, m=o.m; _respSel={}; _respRadius=1.5;
+  try{ flyToLive(e.lat,e.lng,id); }catch(_){}
+  var old=document.getElementById('resp'); if(old)old.remove();
+  var now=Date.now(); var mn=Math.round((now-(e.ts||now))/60000); var ago=mn<1?'עכשיו':mn<60?('לפני '+mn+' דק׳'):('לפני '+Math.round(mn/60)+' שע׳');
+  var groups=_respGroups(e);
+  var gHtml=groups.map(function(g){return '<b onclick="respToggle(\''+g.k+'\',this)">'+g.i+' '+g.t+'</b>';}).join('');
+  var p=document.createElement('div'); p.id='resp'; p.className='resp';
+  p.innerHTML=''
+   +'<div class="resp-h"><span class="ic">'+m.i+'</span><div class="tt"><b>'+ESC(m.t)+'</b><span>'+ago+' · '+(+e.lat).toFixed(2)+','+(+e.lng).toFixed(2)+' · '+(o.demo?'נתוני הדגמה':'רשת שומרים')+'</span></div><button class="resp-x" onclick="closeResponse()">✕</button></div>'
+   +'<div class="resp-b">'
+   +'  <div><div class="resp-cap">פעולות תגובה · לפי סוג האירוע</div><div class="rg">'+gHtml+'</div></div>'
+   +'  <div><div class="resp-cap">רדיוס התראה · <span id="resp-rv">1.5 ק"מ</span></div><input class="resp-slider" type="range" min="0.2" max="5" step="0.1" value="1.5" oninput="respSetRadius(this.value)"><div class="resp-reach" id="resp-reach"></div></div>'
+   +'  <div class="resp-two"><div class="resp-esc" onclick="respLog(\''+id+'\',\'בקשת תגבור — אזור נוסף\')">⬆️ בקש תגבור</div><div class="resp-bc" onclick="respLog(\''+id+'\',\'הודעה נשלחה לקבוצה\')">📢 הודעה לקבוצה</div></div>'
+   +'  <button class="resp-send" onclick="respDispatch(\''+id+'\')">⚡ שגר התראה לקבוצות · דורש אישור</button>'
+   +'  <div class="resp-nat"><b style="color:#eef1f7">שירותים ארציים:</b> 🚑 מד"א 101 · 🚔 100 · 🚒 102 — <span style="color:#f0c75a">פרטי האירוע מוכנים להעברה ע״י המוקדן. אין שיגור אוטומטי.</span></div>'
+   +'  <div><div class="resp-cap">יומן תגובה (מתועד)</div><div class="resp-log" id="resp-log"><div>• '+(('0'+new Date(e.ts||now).getHours()).slice(-2))+':'+(('0'+new Date(e.ts||now).getMinutes()).slice(-2))+' — אותר ע״י רשת שומרים</div></div></div>'
+   +'</div>';
+  document.body.appendChild(p);
+  setTimeout(function(){ p.classList.add('on'); respSetRadius(1.5); },20);
+ }catch(err){ try{console.error(err);}catch(e){} }
+}
 function renderLive(c,list,opts){
  opts=opts||{}; var feed=document.getElementById('feed'), now=Date.now();
  if(!liveLayer&&MAP){ liveLayer=L.layerGroup().addTo(MAP); }
@@ -562,6 +648,7 @@ function renderLive(c,list,opts){
  var newSos=null;
  var html=list.slice(0,40).map(function(e){
   var m=_liveMeta(e); var id=e.id||(e.type+'_'+(+e.lat).toFixed(3)+'_'+(+e.lng).toFixed(3)+'_'+(e.ts||0));
+  _liveEvents[id]={e:e,m:m,demo:!!opts.demo};
   if(liveLayer){
    var mk; if(m.sos){ mk=L.marker([e.lat,e.lng],{icon:_sosIcon(),zIndexOffset:1000}); } else { mk=L.circleMarker([e.lat,e.lng],{radius:8,color:'#fff',weight:2,fillColor:m.c,fillOpacity:.95}); }
    var mn=Math.round((now-(e.ts||now))/60000); var ag=mn<1?'\u05e2\u05db\u05e9\u05d9\u05d5':mn<60?('\u05dc\u05e4\u05e0\u05d9 '+mn+' \u05d3\u05e7\u05f3'):('\u05dc\u05e4\u05e0\u05d9 '+Math.round(mn/60)+' \u05e9\u05e2\u05f3');
@@ -570,10 +657,10 @@ function renderLive(c,list,opts){
   }
   if(m.sos&&!opts.demo&&!_seenSos[id]){ _seenSos[id]=1; if(!opts.initial) newSos={lat:e.lat,lng:e.lng,id:id}; }
   var mins=Math.round((now-(e.ts||now))/60000); var ago=mins<1?'\u05e2\u05db\u05e9\u05d9\u05d5':mins<60?('\u05dc\u05e4\u05e0\u05d9 '+mins+' \u05d3\u05e7\u05f3'):('\u05dc\u05e4\u05e0\u05d9 '+Math.round(mins/60)+' \u05e9\u05e2\u05f3');
-  return '<div class="item'+(m.sos?' sos':'')+'" data-id="'+id+'" onclick="flyToLive('+(+e.lat)+','+(+e.lng)+',\''+id+'\')"><span class="sev" style="background:'+m.c+'"></span><div class="dot">'+m.i+'</div><div style="flex:1"><div class="nm">'+m.i+' '+ESC(m.t)+'</div><div class="mt">'+ago+' \u00b7 '+(+e.lat).toFixed(2)+','+(+e.lng).toFixed(2)+' \u00b7 \u05d0\u05d6\u05d5\u05e8</div></div><span class="live-go">\u2922</span></div>';
+  return '<div class="item'+(m.sos?' sos':'')+'" data-id="'+id+'" onclick="openResponse(\''+id+'\')"><span class="sev" style="background:'+m.c+'"></span><div class="dot">'+m.i+'</div><div style="flex:1"><div class="nm">'+m.i+' '+ESC(m.t)+'</div><div class="mt">'+ago+' \u00b7 '+(+e.lat).toFixed(2)+','+(+e.lng).toFixed(2)+' \u00b7 \u05d0\u05d6\u05d5\u05e8</div></div><span class="live-go">\u2922</span></div>';
  }).join('');
  feed.innerHTML=html;
- if(newSos){ _liveBeep(); liveAlertBanner(); flyToLive(newSos.lat,newSos.lng,newSos.id); }
+ if(newSos){ _liveBeep(); flyToLive(newSos.lat,newSos.lng,newSos.id); bigSosAlert(newSos.id); }
 }
 function loadLive(c){
   _curCityObj=c;
