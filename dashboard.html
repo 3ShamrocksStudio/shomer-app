@@ -233,6 +233,25 @@
 .resp-nat{background:rgba(255,255,255,.03);border:1px dashed #3a4a63;border-radius:10px;padding:10px 12px;font-size:11px;color:#9aa6bd;line-height:1.6}
 .resp-log{font-size:11.5px;color:#9aa6bd;line-height:1.9}
 .resp-log b{color:#6ee7a8}
+.resp-live{color:#ff5a5f;font-weight:800;animation:respBlink 1s steps(2,end) infinite}
+@keyframes respBlink{50%{opacity:.25}}
+.rsec{border:1px solid #232c40;border-radius:13px;padding:12px 13px;background:rgba(255,255,255,.015)}
+.rsec-h{display:flex;align-items:center;gap:8px;font-size:13px;font-weight:800;color:#eef1f7;margin-bottom:9px}
+.rsec-n{display:inline-flex;align-items:center;justify-content:center;width:20px;height:20px;border-radius:50%;background:linear-gradient(135deg,#C09020,#E0A828 60%,#F5C840);color:#23170a;font-size:11px;font-weight:900;flex:0 0 auto}
+.rsec-v{margin-inline-start:auto;font-size:11px;font-weight:700;color:#4fc3e8;letter-spacing:0}
+.rsec-hint{font-size:11px;color:#8a93a6;margin:0 0 9px;line-height:1.5}
+.rloc{background:rgba(79,195,232,.06);border:1px solid #27425a;border-radius:11px;padding:11px 12px}
+.rloc-a{font-size:14px;color:#f2f5fb;line-height:1.45;min-height:20px;display:flex;flex-direction:column;gap:2px}
+.rloc-a b{font-size:15px;font-weight:800}
+.rloc-sub{font-size:11.5px;color:#9aa6bd;font-weight:500}
+.rloc-c{font-size:12px;color:#9aa6bd;margin-top:7px}
+.rloc-acc{font-size:10.5px;color:#6d7893;margin-top:3px}
+.rloc-btns{display:flex;gap:8px;margin-top:11px}
+.rlb{flex:1;border:1px solid #2a3450;background:#101826;color:#cdd6e8;border-radius:9px;padding:9px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit}
+.rlb-p{background:linear-gradient(135deg,#1d6fd6,#3f8ae0);border-color:#3f8ae0;color:#fff}
+.rlb:active{transform:translateY(1px)}
+.rloc-sp{width:13px;height:13px;border:2px solid #4fc3e8;border-top-color:transparent;border-radius:50%;display:inline-block;margin-inline-end:7px;vertical-align:-2px;animation:rspin .7s linear infinite}
+@keyframes rspin{to{transform:rotate(360deg)}}
 </style>
 <style id="acct-css">
 .plan-badge{font-size:10px;font-weight:800;letter-spacing:.04em;background:rgba(224,168,40,.16);color:#F5C840;border:1px solid rgba(224,168,40,.4);border-radius:20px;padding:3px 9px;white-space:nowrap}
@@ -662,26 +681,68 @@ function closeResponse(){ var p=document.getElementById('resp'); if(p){ p.classL
 function openResponse(id){
  try{
   var o=_liveEvents[id]; if(!o){ return; } var e=o.e, m=o.m; _respSel={}; _respRadius=1.5;
-  try{ flyToLive(e.lat,e.lng,id); }catch(_){}
-  try{ if(_respCircle){MAP.removeLayer(_respCircle);} _respLatLng=[e.lat,e.lng]; _respCircle=L.circle(_respLatLng,{radius:_respRadius*1000,color:'#4fc3e8',weight:2,fillColor:'#4fc3e8',fillOpacity:.08,dashArray:'7 6'}).addTo(MAP); _radChip(); }catch(_e){}
+  var lat=+e.lat, lng=+e.lng;
+  try{ flyToLive(lat,lng,id); }catch(_){}
+  try{ if(_respCircle){MAP.removeLayer(_respCircle);} _respLatLng=[lat,lng]; _respCircle=L.circle(_respLatLng,{radius:_respRadius*1000,color:'#4fc3e8',weight:2,fillColor:'#4fc3e8',fillOpacity:.08,dashArray:'7 6'}).addTo(MAP); _radChip(); }catch(_e){}
   var old=document.getElementById('resp'); if(old)old.remove();
   var now=Date.now(); var mn=Math.round((now-(e.ts||now))/60000); var ago=mn<1?'עכשיו':mn<60?('לפני '+mn+' דק׳'):('לפני '+Math.round(mn/60)+' שע׳');
+  var hh=('0'+new Date(e.ts||now).getHours()).slice(-2)+':'+('0'+new Date(e.ts||now).getMinutes()).slice(-2);
   var groups=_respGroups(e);
   var gHtml=groups.map(function(g){return '<b onclick="respToggle(\''+g.k+'\',this)">'+g.i+' '+g.t+'</b>';}).join('');
+  var coord=lat.toFixed(4)+', '+lng.toFixed(4);
+  var accTxt=o.demo?'מיקום מקורב · נתוני הדגמה':'מיקום מרשת שומרים · קואורדינטות מעובדות';
   var p=document.createElement('div'); p.id='resp'; p.className='resp';
   p.innerHTML=''
-   +'<div class="resp-h"><span class="ic">'+m.i+'</span><div class="tt"><b>'+ESC(m.t)+'</b><span>'+ago+' · '+(+e.lat).toFixed(2)+','+(+e.lng).toFixed(2)+' · '+(o.demo?'נתוני הדגמה':'רשת שומרים')+'</span></div><button class="resp-x" onclick="closeResponse()">✕</button></div>'
+   +'<div class="resp-h"><span class="ic">'+m.i+'</span><div class="tt"><b>'+ESC(m.t)+'</b><span><span class="resp-live">● חי</span> · '+ago+' · '+(o.demo?'נתוני הדגמה':'רשת שומרים')+'</span></div><button class="resp-x" onclick="closeResponse()">✕</button></div>'
    +'<div class="resp-b">'
-   +'  <div><div class="resp-cap">פעולות תגובה · לפי סוג האירוע</div><div class="rg">'+gHtml+'</div></div>'
-   +'  <div><div class="resp-cap">רדיוס התראה · <span id="resp-rv">1.5 ק"מ</span></div><input class="resp-slider" type="range" min="0.2" max="5" step="0.1" value="1.5" oninput="respSetRadius(this.value)" onchange="respFitRadius()"><div class="resp-reach" id="resp-reach"></div></div>'
-   +'  <div class="resp-two"><div class="resp-esc" onclick="respLog(\''+id+'\',\'בקשת תגבור — אזור נוסף\')">⬆️ בקש תגבור</div><div class="resp-bc" onclick="respLog(\''+id+'\',\'הודעה נשלחה לקבוצה\')">📢 הודעה לקבוצה</div></div>'
-   +'  <button class="resp-send" onclick="respDispatch(\''+id+'\')">⚡ שגר התראה לקבוצות · דורש אישור</button>'
-   +'  <div class="resp-nat"><b style="color:#eef1f7">שירותים ארציים:</b> 🚑 מד"א 101 · 🚔 100 · 🚒 102 — <span style="color:#f0c75a">פרטי האירוע מוכנים להעברה ע״י המוקדן. אין שיגור אוטומטי.</span></div>'
-   +'  <div><div class="resp-cap">יומן תגובה (מתועד)</div><div class="resp-log" id="resp-log"><div>• '+(('0'+new Date(e.ts||now).getHours()).slice(-2))+':'+(('0'+new Date(e.ts||now).getMinutes()).slice(-2))+' — אותר ע״י רשת שומרים</div></div></div>'
+   // 1 — LOCATION
+   +'  <div class="rsec"><div class="rsec-h"><span class="rsec-n">1</span>מיקום האירוע</div>'
+   +'    <div class="rloc">'
+   +'      <div class="rloc-a" id="resp-addr"><span class="rloc-sp"></span>מאתר כתובת מדויקת…</div>'
+   +'      <div class="rloc-c">🧭 <span dir="ltr">'+coord+'</span></div>'
+   +'      <div class="rloc-acc">'+accTxt+'</div>'
+   +'      <div class="rloc-btns"><button class="rlb rlb-p" onclick="flyToLive('+lat+','+lng+',\''+id+'\')">🗺️ זום לרחוב</button><button class="rlb" onclick="respCopyLoc('+lat+','+lng+')">📋 העתק מיקום</button></div>'
+   +'    </div></div>'
+   // 2 — ALERT RADIUS
+   +'  <div class="rsec"><div class="rsec-h"><span class="rsec-n">2</span>טווח התראה <span class="rsec-v" id="resp-rv">1.5 ק"מ</span></div>'
+   +'    <input class="resp-slider" type="range" min="0.2" max="5" step="0.1" value="1.5" oninput="respSetRadius(this.value)" onchange="respFitRadius()"><div class="resp-reach" id="resp-reach"></div>'
+   +'    <div class="rsec-hint">הרדיוס מסומן על המפה בעיגול מקווקו.</div></div>'
+   // 3 — DISPATCH
+   +'  <div class="rsec"><div class="rsec-h"><span class="rsec-n">3</span>שיגור לכוחות</div>'
+   +'    <div class="rsec-hint">בחר/י למי לשגר, ואז שלח/י לאישור:</div>'
+   +'    <div class="rg">'+gHtml+'</div>'
+   +'    <div class="resp-two"><div class="resp-esc" onclick="respLog(\''+id+'\',\'בקשת תגבור — אזור נוסף\')">⬆️ בקש תגבור</div><div class="resp-bc" onclick="respLog(\''+id+'\',\'הודעה נשלחה לקבוצה\')">📢 הודעה לקבוצה</div></div>'
+   +'    <button class="resp-send" onclick="respDispatch(\''+id+'\')">⚡ שגר התראה לקבוצות הנבחרות · דורש אישור</button></div>'
+   // 4 — NATIONAL
+   +'  <div class="rsec"><div class="rsec-h"><span class="rsec-n">4</span>שירותים ארציים</div>'
+   +'    <div class="resp-nat">🚑 מד"א 101 · 🚔 משטרה 100 · 🚒 כבאות 102<br><span style="color:#f0c75a">פרטי האירוע מוכנים להעברה ידנית ע״י המוקדן. אין שיגור אוטומטי לשירותי החירום.</span></div></div>'
+   // 5 — LOG
+   +'  <div class="rsec"><div class="rsec-h"><span class="rsec-n">5</span>יומן תגובה <span class="rsec-v">מתועד</span></div>'
+   +'    <div class="resp-log" id="resp-log"><div>• '+hh+' — אותר ע״י רשת שומרים</div></div></div>'
    +'</div>';
   document.body.appendChild(p);
-  setTimeout(function(){ p.classList.add('on'); respSetRadius(1.5); },20);
+  setTimeout(function(){ p.classList.add('on'); respSetRadius(1.5); try{respGeocode(lat,lng,o.demo);}catch(e){} },20);
  }catch(err){ try{console.error(err);}catch(e){} }
+}
+function respCopyLoc(lat,lng){ try{ var t=lat.toFixed(5)+', '+lng.toFixed(5); if(navigator.clipboard){navigator.clipboard.writeText(t);} var a=document.getElementById('resp-addr'); }catch(e){} }
+function respGeocode(lat,lng,demo){
+ var box=document.getElementById('resp-addr'); if(!box) return;
+ try{
+  fetch('https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat='+lat+'&lon='+lng+'&zoom=17&addressdetails=1&accept-language=he',{headers:{'Accept':'application/json'}})
+   .then(function(r){ return r.ok?r.json():null; })
+   .then(function(d){
+     if(!d||!d.address){ box.textContent='כתובת לא זמינה · ראה קואורדינטות'; return; }
+     var a=d.address;
+     var road=a.road||a.pedestrian||a.footway||a.path||'';
+     var num=a.house_number?(' '+a.house_number):'';
+     var nb=a.neighbourhood||a.suburb||a.quarter||a.city_district||'';
+     var city=a.city||a.town||a.village||a.municipality||a.county||'';
+     var line1=(road?road+num:(nb||city||'אזור'));
+     var rest=[]; if(nb&&nb!==line1)rest.push(nb); if(city&&city!==line1&&city!==nb)rest.push(city);
+     box.innerHTML='<b>📍 '+ESC(line1)+'</b>'+(rest.length?'<span class="rloc-sub">'+ESC(rest.join(' · '))+'</span>':'')+(demo?'<span class="rloc-sub" style="color:#6d7893">כתובת מקורבת (נתוני הדגמה)</span>':'');
+   })
+   .catch(function(){ box.textContent='כתובת לא זמינה · ראה קואורדינטות'; });
+ }catch(e){ box.textContent='כתובת לא זמינה · ראה קואורדינטות'; }
 }
 function renderLive(c,list,opts){
  opts=opts||{}; var feed=document.getElementById('feed'), now=Date.now();
