@@ -311,7 +311,7 @@ input[type=range]:focus::-webkit-slider-thumb{box-shadow:0 0 0 4px rgba(224,168,
 .prof-opt.sel .pic{box-shadow:0 0 0 3px rgba(245,200,64,.55),0 6px 16px rgba(0,0,0,.45)}
 .prof-opt.sel .pic{box-shadow:0 0 0 2px currentColor inset}
 /* profile stat circles */
-.pstats{display:flex;gap:18px;justify-content:center;margin:6px 0 22px}
+.pstats{display:flex;gap:18px;justify-content:center;margin:4px 0 14px}
 .pcirc{width:104px;height:104px;border-radius:50%;display:flex;flex-direction:column;align-items:center;justify-content:center;color:#fff;box-shadow:0 10px 26px rgba(0,0,0,.4)}
 .pcirc.resp{background:radial-gradient(circle at 36% 28%,#4DA3FF 0%,#1670E0 42%,#0B4491 100%);border:3px solid rgba(255,255,255,.18);box-shadow:0 0 0 4px rgba(22,112,224,.28),0 10px 30px rgba(0,0,0,.5)}
 .pcirc.rep{background:radial-gradient(circle at 36% 28%,#FF3B50 0%,#E0182C 42%,#9A0F1E 100%);border:3px solid rgba(255,255,255,.2);box-shadow:0 0 0 4px rgba(204,20,38,.34),0 10px 30px rgba(0,0,0,.5)}
@@ -598,7 +598,7 @@ body.sheet-open .ff-fab{opacity:0;pointer-events:none;}
 .sh-x:hover{background:var(--n5);}
 .sh-body{overflow-y:auto;-webkit-overflow-scrolling:touch;flex:1;padding:14px 16px 36px;}
 /* section label */
-.sec-cap{font-size:10px;font-weight:700;letter-spacing:.9px;text-transform:uppercase;color:var(--g2);margin-bottom:9px;display:flex;align-items:center;gap:7px;}
+.sec-cap{font-size:11px;font-weight:700;letter-spacing:.3px;color:var(--g2);margin-bottom:9px;display:flex;align-items:center;gap:7px;}
 /* Settings category band - groups sub-sections into clear, scannable categories */
 .set-cat{display:flex;align-items:center;gap:10px;margin:26px 0 14px;padding-bottom:10px;border-bottom:1px solid var(--b2);}.set-cat{cursor:pointer;-webkit-user-select:none;user-select:none;}.set-cat-caret{margin-inline-start:auto;flex:0 0 auto;color:var(--g3);font-size:13px;transition:transform .2s ease;}.set-cat.collapsed .set-cat-caret{transform:rotate(-90deg);}.set-cat:active{opacity:.85;}.set-collapsible-hidden{display:none!important;}
 .set-cat:first-child{margin-top:2px;}
@@ -748,8 +748,8 @@ body.sheet-open .ff-fab{opacity:0;pointer-events:none;}
 
 /* ══════════ PROFILE ══════════ */
 .prof-top{display:flex;flex-direction:column;align-items:center;padding:6px 0 20px;}
-.p-logo{width:122px;height:122px;object-fit:contain;filter:drop-shadow(0 14px 30px rgba(0,0,0,.6)) drop-shadow(0 0 22px rgba(245,200,64,.20));}
-.p-nm{font-size:22px;font-weight:900;letter-spacing:-.4px;background:linear-gradient(135deg,#C09020 0%,#E0A828 60%,#F5C840 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin:12px 0 5px;}
+.p-logo{width:66px;height:66px;object-fit:contain;filter:drop-shadow(0 8px 18px rgba(0,0,0,.55)) drop-shadow(0 0 16px rgba(245,200,64,.18));}
+.p-nm{font-size:18px;font-weight:900;letter-spacing:-.3px;background:linear-gradient(135deg,#C09020 0%,#E0A828 60%,#F5C840 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin:7px 0 4px;}
 .p-badges{display:flex;align-items:center;gap:7px;flex-wrap:wrap;justify-content:center;}
 .p-rk{font-size:11px;font-weight:600;color:var(--tx2);background:var(--n3);border:1px solid var(--b3);padding:3px 12px;border-radius:20px;}
 /* Responder profession badge shown on the profile */
@@ -758,7 +758,7 @@ body.sheet-open .ff-fab{opacity:0;pointer-events:none;}
 .p-prof-badge .ic{font-size:13px;line-height:1;}
 /* Profession picker chips */
 .prof-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;}
-.prof-opt{background:var(--n3);border:1.5px solid var(--b1);border-radius:var(--r12);padding:12px 6px;display:flex;flex-direction:column;align-items:center;gap:6px;font-size:11px;font-weight:600;color:var(--tx2);cursor:pointer;transition:all .15s;text-align:center;}
+.prof-opt{background:var(--n3);border:1.5px solid var(--b1);border-radius:var(--r12);padding:8px 5px;display:flex;flex-direction:column;align-items:center;gap:4px;font-size:10.5px;font-weight:600;color:var(--tx2);cursor:pointer;transition:all .15s;text-align:center;}
 .prof-opt .pic{font-size:24px;line-height:1;}
 .prof-opt:hover{border-color:var(--b2);color:var(--tx1);}
 .prof-opt.sel{border-color:rgba(40,98,255,.6);background:rgba(24,82,192,.16);color:#9FD0FF;box-shadow:0 0 0 1px rgba(40,98,255,.4);}
@@ -784,7 +784,7 @@ body.sheet-open .ff-fab{opacity:0;pointer-events:none;}
 
 /* ══════════ TOASTS ══════════ */
 #toasts{position:fixed;top:calc(var(--hdr-top,0px) + var(--hdr) + 10px);left:12px;right:12px;z-index:9000;pointer-events:none;display:flex;flex-direction:column;gap:8px;}
-.toast{border-radius:var(--r12);padding:13px 14px;display:flex;align-items:center;gap:11px;box-shadow:var(--e3);pointer-events:auto;animation:tin .22s ease;position:relative;overflow:hidden;}
+.toast{border-radius:var(--r12);padding:15px 16px;display:flex;align-items:center;gap:12px;box-shadow:var(--e3);pointer-events:auto;animation:tin .22s ease;position:relative;overflow:hidden;}
 .toast{background:#162238;border:1px solid rgba(136,152,184,.22);}
 .toast::before{content:'';position:absolute;top:0;right:0;bottom:0;width:5px;}
 .toast.red{background:#1E0810;border-color:rgba(204,20,38,.38);}
@@ -795,7 +795,7 @@ body.sheet-open .ff-fab{opacity:0;pointer-events:none;}
 .toast.amb::before{background:var(--amb);}
 .toast::before{background:var(--g3);}
 .toast-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0;}
-.t-tx{flex:1;font-size:13px;font-weight:600;color:#fff;line-height:1.45;}
+.t-tx{flex:1;font-size:15px;font-weight:600;color:#fff;line-height:1.5;}
 .t-x{color:rgba(255,255,255,.4);font-size:16px;cursor:pointer;flex-shrink:0;padding:0 2px;}
 @keyframes tin{from{opacity:0;transform:translateY(-10px)}to{opacity:1;transform:translateY(0)}}
 
@@ -1232,7 +1232,7 @@ body.otp-active .ob-steps{display:none!important;}
 
 /* Settings visual improvements */
 .set-section{margin-bottom:8px;}
-.set-section-label{font-size:10px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--tx3);padding:14px 2px 6px;display:block;}
+.set-section-label{font-size:11.5px;font-weight:800;letter-spacing:.02em;color:var(--tx3);padding:14px 2px 6px;display:block;}
 .set-grp{border-radius:14px;overflow:hidden;border:1px solid var(--b1);background:var(--n3,rgba(255,255,255,.04));margin-bottom:6px;}
 .set-row{display:flex;align-items:center;gap:12px;padding:13px 14px;min-height:52px;border-bottom:1px solid var(--b1);}
 .set-row:last-child{border-bottom:none;}
@@ -1287,7 +1287,7 @@ body.otp-active .ob-steps{display:none!important;}
 .ob-logo img{max-height:160px;width:auto;}
 
 /* Profile: identity card + differentiated stat tiles */
-.prof-top{background:linear-gradient(160deg,rgba(224,168,40,.10),rgba(16,30,52,.65));border:1px solid rgba(224,168,40,.35);border-radius:16px;padding:18px 14px 16px;margin-bottom:14px;}
+.prof-top{background:linear-gradient(160deg,rgba(224,168,40,.10),rgba(16,30,52,.65));border:1px solid rgba(224,168,40,.30);border-radius:14px;padding:10px 14px 10px;margin-bottom:10px;}
 .prof-top .p-nm{font-family:inherit;letter-spacing:.3px;}
 .stats .st{border-top:3px solid transparent;border-radius:12px;}
 .stats .st:nth-child(1){border-top-color:rgba(224,168,40,.7);}
@@ -1555,6 +1555,7 @@ body.otp-active .ob-steps{display:none!important;}
  <div class="leg"><div class="ldc" style="background:#16A06A" aria-hidden="true"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="4" width="16" height="16" rx="4" fill="none" stroke="currentColor" stroke-width="2"/><path d="M12 8v8M8 12h8" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg></div><span id="l6">רפואי</span></div>
  <div class="leg"><div class="ldc" style="background:#19A8FF;border-color:#fff" aria-hidden="true"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 4 L17 18.5 L12 15.2 L7 18.5 Z" fill="#fff"/></svg></div><span id="l8">המיקום שלי</span></div>
  <div class="legend-foot" id="legend-foot">צבעים = קטגוריה. סמני ערים = סקירה סטטיסטית מצרפית, לא אירוע ספציפי.</div></div></div>
+     <div class="leg-sec" id="leg-past-sec"><button class="leg-sec-tog" id="leg-past-tog" onclick="togglePastEvents();this.classList.toggle('on');this.setAttribute('aria-expanded',this.classList.contains('on'))" aria-expanded="false"><span data-he="אירועי עבר" data-en="Past events" data-ar="أحداث سابقة">אירועי עבר</span><span style="margin-inline-start:auto;font-size:10.5px;color:var(--tx3)" data-he="הצג/הסתר" data-en="Show/Hide">הצג/הסתר</span></button></div>
      <div class="leg-sec" id="leg-ess">
    <button class="leg-sec-tog" id="ess-tog" onclick="essToggleMenu()" aria-expanded="false">
      <span>שירותי חירום</span>
@@ -2106,7 +2107,7 @@ body.otp-active .ob-steps{display:none!important;}
  <div class="set-grp">
  <div class="set-row"><div class="sr-l"><div class="sr-ic"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="11" width="14" height="9" rx="2" fill="none" stroke="currentColor" stroke-width="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3" fill="none" stroke="currentColor" stroke-width="2"/></svg></div><div><div class="sr-nm" id="hold-arm-lbl">מניעת לחיצה בטעות</div><div class="sr-sb" id="hold-arm-sub">לחיצה ארוכה של 2 שניות תפעיל SOS - כדי שלא יישלח מהכיס</div></div></div><div class="tog" id="hold-arm-tog" onclick="toggleHoldArm(this)" role="switch"></div></div>
  </div>
- <div class="set-cat"><div class="set-cat-ic"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 6l6-3 6 3 6-3v15l-6 3-6-3-6 3Z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><path d="M9 3v15M15 6v15" fill="none" stroke="currentColor" stroke-width="2"/></svg></div><div class="set-cat-t" data-he="שכבות מפה" data-en="Map layers">שכבות מפה</div></div><div class="set-grp"><div class="sec-cap mb12" data-he="המפה נפתחת עם כל השכבות דלוקות. אפשר לכבות או להדליק כל שכבה כאן." data-en="The map opens with every layer on. Toggle any layer on or off here." data-ar="تفتح الخريطة وكل الطبقات مفعّلة. يمكنك تشغيل أو إيقاف أي طبقة هنا.">המפה נפתחת עם כל השכבות דלוקות. אפשר לכבות או להדליק כל שכבה כאן.</div><div class="set-row"><div class="sr-l"><div class="sr-ic"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="13" width="4" height="7" rx="1" fill="none" stroke="currentColor" stroke-width="2"/><rect x="10" y="8" width="4" height="12" rx="1" fill="none" stroke="currentColor" stroke-width="2"/><rect x="17" y="3" width="4" height="17" rx="1" fill="none" stroke="currentColor" stroke-width="2"/></svg></div><div><div class="sr-nm" data-he="סטטיסטיקת פשיעה" data-en="Crime statistics" data-ar="إحصاءات الجريمة">סטטיסטיקת פשיעה</div><div class="sr-sb" data-he="סמני ערים · נתוני משטרת ישראל" data-en="City markers · Israel Police data" data-ar="علامات المدن · بيانات الشرطة">סמני ערים · נתוני משטרת ישראל</div></div></div><div class="tog on" data-skey="map_stats" onclick="mapLayerToggle(this,'stats')" role="switch"></div></div><div class="set-row"><div class="sr-l"><div class="sr-ic"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 22s7-6.4 7-12a7 7 0 1 0-14 0c0 5.6 7 12 7 12Z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><circle cx="12" cy="10" r="2.6" fill="currentColor"/></svg></div><div><div class="sr-nm" data-he="הדיווחים שלי" data-en="My reports" data-ar="بلاغاتي">הדיווחים שלי</div><div class="sr-sb" data-he="סיכות הדיווחים שהגשת" data-en="Pins of reports you filed" data-ar="دبابيس بلاغاتك">סיכות הדיווחים שהגשת</div></div></div><div class="tog on" data-skey="map_reports" onclick="mapLayerToggle(this,'reports')" role="switch"></div></div><div class="set-row"><div class="sr-l"><div class="sr-ic"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><circle cx="9" cy="8" r="3.2" fill="none" stroke="currentColor" stroke-width="2"/><path d="M3.5 19a5.5 5.5 0 0 1 11 0" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><circle cx="17" cy="9" r="2.4" fill="none" stroke="currentColor" stroke-width="2"/><path d="M15.5 14.4A4.6 4.6 0 0 1 20.5 19" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></div><div><div class="sr-nm" data-he="המעגל שלי" data-en="My circle" data-ar="دائرتي">המעגל שלי</div><div class="sr-sb" data-he="מיקום השומרים המקושרים אליך" data-en="Your linked guardians’ location" data-ar="مواقع حُرّاسك المرتبطين">מיקום השומרים המקושרים אליך</div></div></div><div class="tog on" data-skey="map_circle" onclick="mapLayerToggle(this,'circle')" role="switch"></div></div></div><div class="set-cat"><div class="set-cat-ic"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="11" width="14" height="9" rx="2" fill="none" stroke="currentColor" stroke-width="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3" fill="none" stroke="currentColor" stroke-width="2"/></svg></div><div class="set-cat-t" data-he="מיקום ופרטיות" data-en="Location &amp; Privacy">מיקום ופרטיות</div></div>
+ <div class="set-cat"><div class="set-cat-ic"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 6l6-3 6 3 6-3v15l-6 3-6-3-6 3Z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><path d="M9 3v15M15 6v15" fill="none" stroke="currentColor" stroke-width="2"/></svg></div><div class="set-cat-t" data-he="שכבות מפה" data-en="Map layers">שכבות מפה</div></div><div class="sec-cap mb12" data-he="המפה נפתחת עם כל השכבות דלוקות. אפשר לכבות או להדליק כל שכבה כאן." data-en="The map opens with every layer on. Toggle any layer on or off here." data-ar="تفتح الخريطة وكل الطبقات مفعّلة. يمكنك تشغيل أو إيقاف أي طبقة هنا.">המפה נפתחת עם כל השכבות דלוקות. אפשר לכבות או להדליק כל שכבה כאן.</div><div class="set-grp"><div class="set-row"><div class="sr-l"><div class="sr-ic"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="13" width="4" height="7" rx="1" fill="none" stroke="currentColor" stroke-width="2"/><rect x="10" y="8" width="4" height="12" rx="1" fill="none" stroke="currentColor" stroke-width="2"/><rect x="17" y="3" width="4" height="17" rx="1" fill="none" stroke="currentColor" stroke-width="2"/></svg></div><div><div class="sr-nm" data-he="סטטיסטיקת פשיעה" data-en="Crime statistics" data-ar="إحصاءات الجريمة">סטטיסטיקת פשיעה</div><div class="sr-sb" data-he="סמני ערים · נתוני משטרת ישראל" data-en="City markers · Israel Police data" data-ar="علامات المدن · بيانات الشرطة">סמני ערים · נתוני משטרת ישראל</div></div></div><div class="tog on" data-skey="map_stats" onclick="mapLayerToggle(this,'stats')" role="switch"></div></div><div class="set-row"><div class="sr-l"><div class="sr-ic"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 22s7-6.4 7-12a7 7 0 1 0-14 0c0 5.6 7 12 7 12Z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><circle cx="12" cy="10" r="2.6" fill="currentColor"/></svg></div><div><div class="sr-nm" data-he="הדיווחים שלי" data-en="My reports" data-ar="بلاغاتي">הדיווחים שלי</div><div class="sr-sb" data-he="סיכות הדיווחים שהגשת" data-en="Pins of reports you filed" data-ar="دبابيس بلاغاتك">סיכות הדיווחים שהגשת</div></div></div><div class="tog on" data-skey="map_reports" onclick="mapLayerToggle(this,'reports')" role="switch"></div></div><div class="set-row"><div class="sr-l"><div class="sr-ic"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><circle cx="9" cy="8" r="3.2" fill="none" stroke="currentColor" stroke-width="2"/><path d="M3.5 19a5.5 5.5 0 0 1 11 0" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><circle cx="17" cy="9" r="2.4" fill="none" stroke="currentColor" stroke-width="2"/><path d="M15.5 14.4A4.6 4.6 0 0 1 20.5 19" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></div><div><div class="sr-nm" data-he="המעגל שלי" data-en="My circle" data-ar="دائرتي">המעגל שלי</div><div class="sr-sb" data-he="מיקום השומרים המקושרים אליך" data-en="Your linked guardians’ location" data-ar="مواقع حُرّاسك المرتبطين">מיקום השומרים המקושרים אליך</div></div></div><div class="tog on" data-skey="map_circle" onclick="mapLayerToggle(this,'circle')" role="switch"></div></div><div class="set-row"><div class="sr-l"><div class="sr-ic"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8.5" fill="none" stroke="currentColor" stroke-width="2"/><path d="M12 7.5V12l3 2" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div><div class="sr-nm" data-he="אירועי עבר" data-en="Past events" data-ar="أحداث سابقة">אירועי עבר</div><div class="sr-sb" data-he="הצג אירועי עבר על המפה — למודעות בלבד" data-en="Show past events on the map — awareness only" data-ar="عرض الأحداث السابقة على الخريطة">הצג אירועי עבר על המפה — למודעות בלבד</div></div></div><div class="tog" id="set-past-tog" onclick="togglePastEvents();this.classList.toggle('on')" role="switch"></div></div></div><div class="set-cat"><div class="set-cat-ic"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="11" width="14" height="9" rx="2" fill="none" stroke="currentColor" stroke-width="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3" fill="none" stroke="currentColor" stroke-width="2"/></svg></div><div class="set-cat-t" data-he="מיקום ופרטיות" data-en="Location &amp; Privacy">מיקום ופרטיות</div></div>
  <div class="sec-cap mb12" id="set-priv-lbl">פרטיות</div>
  <div class="set-grp">
  <div class="set-row"><div class="sr-l"><div class="sr-ic"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 22s7-6.4 7-12a7 7 0 1 0-14 0c0 5.6 7 12 7 12Z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><circle cx="12" cy="10" r="2.6" fill="currentColor"/></svg></div><div><div class="sr-nm" id="p-bgloc-nm">שיתוף מיקום ברקע</div><div class="sr-sb" id="p-bgloc-sb">נדרש ל-SOS ו-DMS - בלעדיו אי אפשר לשלוח את מיקומך בחירום</div></div></div><div class="tog on" data-skey="p_bgloc" onclick="this.classList.toggle('on');saveToggle(this)" role="switch"></div></div>
@@ -2200,6 +2201,14 @@ body.otp-active .ob-steps{display:none!important;}
  <div class="prof-opt sel" data-prof="" onclick="selectProfession('')" role="button" tabindex="0"><span class="pic" aria-hidden="true"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8.5" fill="none" stroke="currentColor" stroke-width="2"/><path d="M6.3 6.3l11.4 11.4" fill="none" stroke="currentColor" stroke-width="2"/></svg></span><span class="pl" data-pl="none">ללא</span></div>
  </div>
 <!-- defib incentive: responders likely have/know a defib - invite them to add it -->
+
+   <!-- MY SH✡MER inside profile -->
+
+
+ <div class="sec-cap mb12" data-he="נתוני פרופיל (אופציונלי)" data-en="Profile data (optional)">נתוני פרופיל (אופציונלי)</div><div class="sec-cap mb12" data-he="עוזר לשפר נתוני בטיחות מצרפיים ואנונימיים. לא חובה." data-en="Helps improve anonymous, aggregate safety data. Optional.">עוזר לשפר נתוני בטיחות מצרפיים ואנונימיים. לא חובה.</div><div class="set-grp" id="profile-grp"><div class="prof2-row"><span class="prof2-lbl" data-he="מגדר" data-en="Gender">מגדר</span><span class="prof2-seg" id="pf-gender"></span></div><div class="prof2-row"><span class="prof2-lbl" data-he="גיל" data-en="Age">גיל</span><span class="prof2-seg" id="pf-age"></span></div><div class="prof2-row"><span class="prof2-lbl" data-he="באזור" data-en="In this area">באזור</span><span class="prof2-seg" id="pf-res"></span></div></div><div class="sec-cap mb12" id="myrep-cap">הדיווחים שלי</div>
+ <div id="my-reports-list" class="mb20" role="list"></div>
+ <div class="sec-cap mb12" id="soshist-cap">היסטוריית SOS</div>
+ <div id="sos-hist-list" role="list"></div>
    <div class="defib-prompt" id="defib-prompt">
      <div class="defib-l">
        <span class="defib-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2L4.5 13H11l-1 9 8.5-11H12l1-9Z"/></svg></span>
@@ -2208,13 +2217,6 @@ body.otp-active .ob-steps{display:none!important;}
      <button class="btn-secondary defib-add" onclick="cl('sh-prof'); setTimeout(function(){ try{ aedPlaceMode(); }catch(e){} }, 300);">הוסף דפיברילטור למפה</button>
    </div>
 
-   <!-- MY SH✡MER inside profile -->
-
-
- <div class="sec-cap mb12" data-he="נתוני פרופיל (אופציונלי)" data-en="Profile data (optional)">נתוני פרופיל (אופציונלי)</div><div class="set-grp" id="profile-grp"><div class="sec-cap mb12" data-he="עוזר לשפר נתוני בטיחות מצרפיים ואנונימיים. לא חובה." data-en="Helps improve anonymous, aggregate safety data. Optional.">עוזר לשפר נתוני בטיחות מצרפיים ואנונימיים. לא חובה.</div><div class="prof2-row"><span class="prof2-lbl" data-he="מגדר" data-en="Gender">מגדר</span><span class="prof2-seg" id="pf-gender"></span></div><div class="prof2-row"><span class="prof2-lbl" data-he="גיל" data-en="Age">גיל</span><span class="prof2-seg" id="pf-age"></span></div><div class="prof2-row"><span class="prof2-lbl" data-he="באזור" data-en="In this area">באזור</span><span class="prof2-seg" id="pf-res"></span></div></div><div class="sec-cap mb12" id="myrep-cap">הדיווחים שלי</div>
- <div id="my-reports-list" class="mb20" role="list"></div>
- <div class="sec-cap mb12" id="soshist-cap">היסטוריית SOS</div>
- <div id="sos-hist-list" role="list"></div>
  </div>
  </div>
 
@@ -3737,6 +3739,12 @@ function applyTranslations(){
  try{ if(typeof guideApplyLang==='function'){ guideApplyLang(); guideFilter(); } }catch(e){}
  try{ legalApplyI18n(); }catch(e){}
  renderReportsList();renderSosHistory();
+ // A language pick must flip the WHOLE app — re-render every dynamic view so none keeps the old language.
+ try{ if(typeof renderProfile==='function') renderProfile(); }catch(e){}
+ try{ if(typeof renderProfile2==='function') renderProfile2(); }catch(e){}
+ try{ if(typeof renderSetContacts==='function') renderSetContacts(); }catch(e){}
+ try{ if(typeof renderCircles==='function') renderCircles(); }catch(e){}
+ try{ if(typeof renderProfession==='function') renderProfession(); }catch(e){}
 }
 
 /* ═══════════════════════════════════
@@ -4106,7 +4114,9 @@ var NUDGE_TIPS=[
  {k:'bleed', he:'איך עוצרים דימום חמור?',          en:'How to stop severe bleeding?',       ar:'كيف توقف نزيفاً شديداً؟'},
  {k:'stroke',he:'לזהות שבץ בזמן (FAST)',           en:'Spot a stroke in time (FAST)',       ar:'تعرّف على السكتة (FAST)'},
  {k:'heart', he:'סימני התקף לב — מה עושים?',       en:'Heart-attack signs — what to do?',   ar:'علامات النوبة القلبية؟'},
- {k:'drown', he:'חילוץ טביעה — הצעדים',            en:'Drowning rescue — the steps',        ar:'إنقاذ من الغرق؟'}
+ {k:'drown', he:'חילוץ טביעה — הצעדים',            en:'Drowning rescue — the steps',        ar:'إنقاذ من الغرق؟'},
+ {k:'burn',  he:'טיפול נכון בכוויה',             en:'Treating a burn correctly',         ar:'علاج الحروق بشكل صحيح؟'},
+ {k:'seizure',he:'מה עושים בהתקף פרכוס?',        en:'What to do during a seizure?',       ar:'ماذا تفعل أثناء التشنج؟'}
 ];
 function nudgeState(){ if(!SS.nudge) SS.nudge={lastTs:0,tipIdx:0,dismissed:{}}; return SS.nudge; }
 function _nudgeDismissed(kind,days){ var n=nudgeState(); var t=n.dismissed[kind]||0; return (Date.now()-t) < (days*86400000); }
@@ -4121,6 +4131,13 @@ function nudgePick(){
    return {kind:'code', ic:'🔒', tx:(he?'הגדר/י קוד אבטחה — לביטול SOS והגנת גנב.':ar?'اضبط رمز الأمان — لإلغاء الاستغاثة وحماية السرقة.':'Set a security code — to cancel SOS + arm theft protection.'), cta:(he?'הגדר/י':ar?'اضبط':'Set'), act:function(){ try{openSetPin();}catch(e){} }};
  if(!hasGeo && !_nudgeDismissed('geo',1))
    return {kind:'geo', ic:'📍', tx:(he?'שתף/י מיקום כדי שעזרה תגיע אליך מהר.':ar?'شارك موقعك ليصلك العون بسرعة.':'Share your location so help reaches you fast.'), cta:(he?'שתף/י':ar?'شارك':'Share'), act:function(){ try{ nudgeAskGeo(); }catch(e){} }};
+ var _cm=(SS.circleMembers||[]).filter(function(m){return m && !m.pending;});
+ if(hasCircle && _cm.length<3 && !_nudgeDismissed('more',4))
+   return {kind:'more', ic:'👥', tx:(he?'הוסף/י עוד שומרים — רשת גדולה יותר = עזרה מהירה יותר.':ar?'أضف المزيد من الحُرّاس.':'Add more SHOMERs — a bigger circle means faster help.'), cta:(he?'הוסף/י':ar?'أضف':'Add'), act:function(){ try{openCircles();}catch(e){} }};
+ if(hasCircle && !_nudgeDismissed('invite',5))
+   return {kind:'invite', ic:'📨', tx:(he?'הזמן/י חבר/ה ל-SHOMER — ככל שיותר אנשים ברשת, כולם בטוחים יותר.':ar?'ادعُ صديقاً إلى SHOMER.':'Invite a friend to SHOMER — more people means everyone is safer.'), cta:(he?'הזמן/י':ar?'ادعُ':'Invite'), act:function(){ try{shareInvite();}catch(e){} }};
+ if(hasGeo && !_nudgeDismissed('updates',3))
+   return {kind:'updates', ic:'📡', tx:(he?'בדוק/י מה קורה באזורך — ודיווח שלך עוזר לכל השכונה.':ar?'تحقق مما يجري في منطقتك.':'Check what\'s happening near you — your reports help the whole area.'), cta:(he?'צפה/י':ar?'اعرض':'View'), act:function(){ try{ var u=document.getElementById('nav-upd'); if(u)u.click(); }catch(e){} }};
  var n=nudgeState(); var tip=NUDGE_TIPS[(n.tipIdx||0)%NUDGE_TIPS.length];
  return {kind:'tip', ic:'💡', tx:(he?tip.he:ar?tip.ar:tip.en), cta:(he?'קרא/י':ar?'اقرأ':'Read'), act:function(){ try{ openGuideTopic(tip.k); }catch(e){} }, tip:true};
 }
@@ -6526,9 +6543,9 @@ function seedCirclesIfEmpty(){
   if(!SS.circles||!SS.circles.length){
     const he=currentLang==='he',ar=currentLang==='ar';
     SS.circles=[
-      {id:'fam',name:he?'משפחה':ar?'عائلة':'Family',type:'family'},
-      {id:'frnd',name:he?'חברים':ar?'أصدقاء':'Friends',type:'friends'},
-      {id:'nbr',name:he?'שכנים':ar?'الجيران':'Neighbors',type:'neighbors'},
+      {id:'fam',name:he?'משפחה':ar?'عائلة':'Family',type:'family',named:true},
+      {id:'frnd',name:he?'חברים':ar?'أصدقاء':'Friends',type:'friends',named:true},
+      {id:'nbr',name:he?'שכנים':ar?'الجيران':'Neighbors',type:'neighbors',named:true},
     ];
   }
   if(!SS.circleMembers)SS.circleMembers=[];
@@ -6716,21 +6733,17 @@ function renderCircles(){
 
     list.forEach(function(cc,i){
       var ms=membersOf(cc.id);
-      var isNew = !cc.named;                    /* never renamed → still a blank slot */
       var isOn  = ms.length>0;                  /* has guardians → always ON */
       var b=document.createElement('button');
-      b.className='bub'+(isNew?' bub-new':(isOn?' bub-on':' bub-off'));
+      b.className='bub '+(isOn?'bub-on':'bub-off');
       if(isOn){
         b.style.background=COLORS[i%COLORS.length];
         b.style.color=INK[i%INK.length];
       } else {
         b.style.background=''; b.style.color='';
       }
-      b.innerHTML = isNew
-        ? '<b>+</b><span>'+(he?'חדש':'new')+'</span>'
-        : '<b>'+ms.length+'</b><span>'+ESC(cc.name)+'</span>';
+      b.innerHTML = '<b>'+ms.length+'</b><span>'+ESC(cc.name||(he?'מעגל':'Circle'))+'</span>';
       b.onclick=function(){
-        if(isNew){ renameCircle(cc.id); renderCircles(); return; }   /* name it first */
         activeCircleId=cc.id;
         COT_OPEN=(COT_OPEN===cc.id)?null:cc.id;
         renderCircles();
@@ -6738,11 +6751,11 @@ function renderCircles(){
       wrap.appendChild(b);
     });
 
-    /* room for more? show the add bubbles */
-    for(var k=list.length; k<CIRCLE_MAX; k++){
+    /* exactly ONE clear create bubble, visually distinct from existing circles */
+    if(list.length < CIRCLE_MAX){
       var a=document.createElement('button');
       a.className='bub bub-new';
-      a.innerHTML='<b>+</b><span>'+(he?'חדש':'new')+'</span>';
+      a.innerHTML='<b>+</b><span>'+(he?'צור מעגל':'Create')+'</span>';
       a.onclick=function(){ var id=addCircle(); if(id) renameCircle(id); renderCircles(); };
       wrap.appendChild(a);
     }
@@ -7389,12 +7402,12 @@ function renameCircle(id){
 function addCircle(){
   var _he=currentLang==='he';
   if(circlesList().length>=6){
-    toast(_he?'6 מעגלים זה המקסימום - שנה/י שם או מזג/י מעגל קיים':'6 circles is the max - rename or merge one','amb');
+    toast(_he?'6 מעגלים זה המקסימום. שנה/י שם למעגל קיים או הסר/י שומרים שאינך צריך/ה.':'6 circles is the max. Rename an existing circle, or remove guardians you no longer need.','amb');
     return;
   }
  const he=currentLang==='he';
  const n=circlesList().length;
- const c={id:genId('c'),name:(he?'מעגל ':'Circle ')+(n+1),type:n%2?'friends':'family'};
+ const c={id:genId('c'),name:(he?'מעגל ':'Circle ')+(n+1),type:n%2?'friends':'family',named:true};
  SS.circles.push(c); activeCircleId=c.id; saveStore(); renderCircles();
  toast(he?'✓ מעגל חדש נוצר':'✓ New circle created','grn');
 }
@@ -8868,7 +8881,7 @@ try{ hydrateIcons(document); }catch(e){}
 /* Loaded-build version - shown in the diagnostic panel so a phone can prove
    whether it's on the latest build or a STALE cached one. Keep in lock-step
    with sw.js SW_VERSION on every deploy. */
-var APP_VER='v218';
+var APP_VER='v219';
 var FB={ready:false,uid:null,db:null,_presTimer:null,connected:false,listening:false,pushState:'default',near:0,swVer:'?',
   authState:'connecting',sdkLoaded:false,persist:'',permErr:null,err:null,wsProbe:'',csp:''};
 /* Always log connection diagnostics to the console so the real failure can be SEEN in Chrome. */
@@ -12990,6 +13003,7 @@ html[dir="rtl"] .sh-back svg{transform:scaleX(-1)}
 .past-fab{position:absolute;bottom:calc(var(--nav) + 126px);left:12px;z-index:401;width:48px;height:48px;border-radius:50%;border:1px solid rgba(140,155,189,.18);background:rgba(8,18,36,.92);backdrop-filter:blur(12px);color:var(--tx2,#8898B8);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;box-shadow:0 4px 12px rgba(0,0,0,.4);cursor:pointer;transition:background .2s,color .2s,box-shadow .2s}
 .past-fab .ic{width:20px;height:20px}
 .past-fab-lbl{font:800 8px/1 Heebo,sans-serif;letter-spacing:.3px}
+.past-fab{display:none!important}
 .past-fab[aria-pressed="false"]{background:rgba(8,18,36,.85);color:#5a6a8a;border-color:rgba(140,155,189,.15);opacity:.82}
 .past-fab[aria-pressed="true"]{background:#5B8CA8;color:#fff;border-color:#7FB4CC;box-shadow:0 0 0 3px rgba(91,140,168,.55),0 0 18px rgba(91,140,168,.7),0 4px 14px rgba(0,0,0,.4);transform:scale(1.06)}
 </style>

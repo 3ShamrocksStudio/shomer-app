@@ -53,10 +53,12 @@
   .tbtn:hover{border-color:var(--gold);color:var(--tx)}
   /* ---------- KPI STRIP (de-boxed) ---------- */
   .kpis{flex:0 0 auto;display:flex;align-items:stretch;gap:0;padding:0 18px;height:70px;background:rgba(255,255,255,.015);border-bottom:1px solid var(--db)}
-  .kpi{flex:1;display:flex;flex-direction:column;justify-content:center;padding:0 20px;border-inline-start:1px solid rgba(255,255,255,.06)}
+  .kpi{flex:1;display:flex;flex-direction:column;justify-content:center;padding:0 20px;border-inline-start:1px solid rgba(255,255,255,.06);transition:background .15s}
+  .kpi:hover{background:rgba(255,255,255,.025)}
+  .kpi[onclick]:hover .kv{transform:translateY(-1px)}
   .kpi:first-child{border-inline-start:0}
   .kpi .kl{font-size:10.5px;color:var(--tx3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:3px;display:flex;align-items:center;gap:5px}
-  .kpi .kv{font-size:25px;font-weight:800;line-height:1}
+  .kpi .kv{font-size:29px;font-weight:800;line-height:1;transition:transform .15s}
   .kpi .km{font-size:11px;color:var(--tx2);margin-top:3px}
   .kpi .kv.gold{color:var(--gold)}.kpi .kv.bad{color:var(--bad)}.kpi .kv.ok{color:var(--ok)}
   .kpi .kv.gap{color:#4fc3e8}.kpi .kv.net-v{color:#ff8a98}
@@ -905,6 +907,17 @@ function buildKPIs(idx){
   k('פער הדיווח','~74%','רק 26% מהעבירות מדווח למשטרה · IDI','gap',NAT,true)+
   k('רשת שומרים',cov,(cov==='—'?'דיווחים חיים · משלים את הפער':'דיווחים חיים · ▸ לחצו לרשת המגיבים'),'net-v',NET,false,'openRoster()')+
   k('דירוג ארצי','#'+(idx+1),'מתוך '+cities.length+' · משטרת ישראל 2025');
+ if(!window._kpiAnimated){ window._kpiAnimated=true; try{ animateKPIs(); }catch(e){} }
+}
+function animateKPIs(){
+  document.querySelectorAll('#kpis .kv').forEach(function(el){
+    var raw=el.textContent; var m=raw.match(/^([^0-9]*)([0-9,]+(?:\.[0-9]+)?)(.*)$/); if(!m)return;
+    var pre=m[1],numStr=m[2],suf=m[3]; var target=parseFloat(numStr.replace(/,/g,'')); if(isNaN(target))return;
+    var dec=(numStr.indexOf('.')>=0)?1:0, hasComma=(numStr.indexOf(',')>=0), t0=null, dur=950;
+    function fmt(v){ var sNum=dec?(+v).toFixed(1):Math.round(v).toString(); if(hasComma){ sNum=Number(dec?(+v).toFixed(1):Math.round(v)).toLocaleString('en-US',{minimumFractionDigits:dec,maximumFractionDigits:dec}); } return pre+sNum+suf; }
+    function step(ts){ if(!t0)t0=ts; var pr=Math.min(1,(ts-t0)/dur); var e=1-Math.pow(1-pr,3); el.textContent=fmt(target*e); if(pr<1)requestAnimationFrame(step); else el.textContent=raw; }
+    requestAnimationFrame(step);
+  });
 }
 
 function buildRank(idx){
