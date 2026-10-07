@@ -603,7 +603,7 @@ function _liveMeta(e){
  if(e.type==='missing'||e.k==='missing') return {i:'\ud83d\udd0e',t:(e.nm||'\u05d0\u05d3\u05dd \u05e0\u05e2\u05d3\u05e8'),c:'#9b6cff'};
  var cc=CAT_META[e.t||e.type]; return {i:'\ud83d\udccd',t:(e.nm||catShort(e.t||e.type)||'\u05d3\u05d9\u05d5\u05d5\u05d7'),c:(cc?cc.c:'#f2b705')};
 }
-function flyToLive(lat,lng,id){ try{ if(!MAP)return; MAP.flyTo([lat,lng],16,{duration:.7}); var mk=liveLayer&&liveLayer._byId&&liveLayer._byId[id]; if(mk){ setTimeout(function(){ try{mk.openPopup();}catch(e){} },850); } var it=document.querySelector('.feed .item[data-id="'+id+'"]'); if(it){ it.classList.remove('flash'); void it.offsetWidth; it.classList.add('flash'); } }catch(e){} }
+function flyToLive(lat,lng,id){ try{ if(!MAP)return; MAP.flyTo([lat,lng],17,{duration:.7}); var mk=liveLayer&&liveLayer._byId&&liveLayer._byId[id]; if(mk){ setTimeout(function(){ try{mk.openPopup();}catch(e){} },850); } var it=document.querySelector('.feed .item[data-id="'+id+'"]'); if(it){ it.classList.remove('flash'); void it.offsetWidth; it.classList.add('flash'); } }catch(e){} }
 function liveAlertBanner(txt){ try{ var host=document.getElementById('map'); if(!host)return; var b=document.createElement('div'); b.className='live-alert'; b.innerHTML='\ud83d\udea8 '+ESC(txt||'SOS \u05d7\u05d3\u05e9 \u05d1\u05d8\u05e8\u05d9\u05d8\u05d5\u05e8\u05d9\u05d4'); host.appendChild(b); setTimeout(function(){ try{ b.style.transition='opacity .5s'; b.style.opacity='0'; setTimeout(function(){b.remove();},500);}catch(e){} },6000); }catch(e){} }
 function _respGroups(e){
  var t=(e.type||e.k||'');
@@ -672,7 +672,7 @@ function renderLive(c,list,opts){
    var mk; if(m.sos){ mk=L.marker([e.lat,e.lng],{icon:_sosIcon(),zIndexOffset:1000}); } else { mk=L.circleMarker([e.lat,e.lng],{radius:8,color:'#fff',weight:2,fillColor:m.c,fillOpacity:.95}); }
    var mn=Math.round((now-(e.ts||now))/60000); var ag=mn<1?'\u05e2\u05db\u05e9\u05d9\u05d5':mn<60?('\u05dc\u05e4\u05e0\u05d9 '+mn+' \u05d3\u05e7\u05f3'):('\u05dc\u05e4\u05e0\u05d9 '+Math.round(mn/60)+' \u05e9\u05e2\u05f3');
    mk.bindPopup('<div style="font-family:Rubik,sans-serif;min-width:150px"><div style="font-weight:800;color:'+m.c+'">'+m.i+' '+ESC(m.t)+'</div><div style="font-size:11px;color:#555;margin-top:3px">'+ag+'</div><div style="font-size:11px;color:#555">'+(+e.lat).toFixed(3)+', '+(+e.lng).toFixed(3)+' \u00b7 \u05d0\u05d6\u05d5\u05e8</div><div style="font-size:10px;color:#999;margin-top:4px">'+(opts.demo?'\u05e0\u05ea\u05d5\u05e0\u05d9 \u05d4\u05d3\u05d2\u05de\u05d4':'\u05e8\u05e9\u05ea \u05e9\u05d5\u05de\u05e8\u05d9\u05dd \u00b7 \u05de\u05d5\u05e6\u05e4\u05df')+'</div></div>');
-   mk.addTo(liveLayer); liveLayer._byId[id]=mk;
+   mk.on('click',(function(eid){return function(){openResponse(eid);};})(id)); if(mk.setZIndexOffset){} try{if(mk._path)mk._path.style.cursor='pointer';}catch(_e){} mk.addTo(liveLayer); liveLayer._byId[id]=mk;
   }
   if(m.sos&&!opts.demo&&!_seenSos[id]){ _seenSos[id]=1; if(!opts.initial) newSos={lat:e.lat,lng:e.lng,id:id}; }
   var mins=Math.round((now-(e.ts||now))/60000); var ago=mins<1?'\u05e2\u05db\u05e9\u05d9\u05d5':mins<60?('\u05dc\u05e4\u05e0\u05d9 '+mins+' \u05d3\u05e7\u05f3'):('\u05dc\u05e4\u05e0\u05d9 '+Math.round(mins/60)+' \u05e9\u05e2\u05f3');
