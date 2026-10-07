@@ -4162,12 +4162,12 @@ function checkSoftwareUpdate(){
  try{
   if(!SS) return;
   var seen=SS._lastVerSeen||'';
-  if(seen && seen!==APP_VER){ fireUpdateNotice(); }
-  else if(!seen && SS.onboarded){ fireUpdateNotice(); }
+  var changed=(seen && seen!==APP_VER)||(!seen && SS.onboarded);
+  if(changed){ try{ fireUpdateNotice(); }catch(e){} try{ if(typeof updShowBanner==='function') updShowBanner(APP_VER,true); }catch(e){} }
   SS._lastVerSeen=APP_VER; try{saveStore();}catch(e){}
  }catch(e){}
 }
-function testNotifications(){
+function testNotifications(){ try{ if(typeof updShowBanner==='function') updShowBanner((typeof APP_VER!=='undefined'?APP_VER:''),false); }catch(e){}
  var he=currentLang==='he',ar=currentLang==='ar';
  if(_emergencyBusy()){ try{ toast(he?'\u05dc\u05d0 \u05d6\u05de\u05d9\u05df \u05d1\u05de\u05d4\u05dc\u05da \u05d7\u05d9\u05e8\u05d5\u05dd':'Not available during an emergency','amb'); }catch(e){} return; }
  fireUpdateNotice();
@@ -8780,7 +8780,7 @@ try{ hydrateIcons(document); }catch(e){}
 /* Loaded-build version - shown in the diagnostic panel so a phone can prove
    whether it's on the latest build or a STALE cached one. Keep in lock-step
    with sw.js SW_VERSION on every deploy. */
-var APP_VER='v214';
+var APP_VER='v215';
 var FB={ready:false,uid:null,db:null,_presTimer:null,connected:false,listening:false,pushState:'default',near:0,swVer:'?',
   authState:'connecting',sdkLoaded:false,persist:'',permErr:null,err:null,wsProbe:'',csp:''};
 /* Always log connection diagnostics to the console so the real failure can be SEEN in Chrome. */
@@ -11418,29 +11418,28 @@ function updSetBadge(txt,stale){
  var b=document.getElementById('ver-badge'); if(b){ b.textContent=txt; b.style.color=stale?'#F5C840':'#6b7a9c'; }
  var s=document.getElementById('set-ver'); if(s){ s.textContent=txt; s.style.color=stale?'#F5C840':''; }   // Settings → About build row
 }
-function updShowBanner(pubV){
+function updShowBanner(pubV,done){
   if(document.getElementById('upd-modal')) return;
   var he=currentLang==='he', ar=currentLang==='ar';
-  var title=he?'עדכון זמין':ar?'تحديث متاح':'Update available';
-  var sub=he?'גרסה חדשה של SH✡MER מוכנה — שיפורים, מהירות ותיקוני אבטחה.':ar?'نسخة جديدة من SH✡MER جاهزة — تحسينات وأمان.':'A new version of SH✡MER is ready — improvements, speed & security.';
-  var nowL=he?'עדכן עכשיו':ar?'حدّث الآن':'Update now';
-  var laterL=he?'אחר כך':ar?'لاحقًا':'Later';
+  var title=done?(he?'SH\u2721MER \u05e2\u05d5\u05d3\u05db\u05df':ar?'\u062a\u0645 \u062a\u062d\u062f\u064a\u062b SH\u2721MER':'SH\u2721MER updated'):(he?'\u05e2\u05d3\u05db\u05d5\u05df \u05d6\u05de\u05d9\u05df':ar?'\u062a\u062d\u062f\u064a\u062b \u0645\u062a\u0627\u062d':'Update available');
+  var sub=done?(he?'\u05d4\u05d0\u05e4\u05dc\u05d9\u05e7\u05e6\u05d9\u05d4 \u05e2\u05d5\u05d3\u05db\u05e0\u05d4 \u05dc\u05d2\u05e8\u05e1\u05d4 \u05d4\u05d0\u05d7\u05e8\u05d5\u05e0\u05d4 \u2014 \u05ea\u05d5\u05d3\u05d4!':ar?'\u062a\u0645 \u0627\u0644\u062a\u062d\u062f\u064a\u062b':'Updated to the latest version \u2014 thank you!'):(he?'\u05d2\u05e8\u05e1\u05d4 \u05d7\u05d3\u05e9\u05d4 \u05e9\u05dc SH\u2721MER \u05de\u05d5\u05db\u05e0\u05d4 \u2014 \u05e9\u05d9\u05e4\u05d5\u05e8\u05d9\u05dd, \u05de\u05d4\u05d9\u05e8\u05d5\u05ea \u05d5\u05ea\u05d9\u05e7\u05d5\u05e0\u05d9 \u05d0\u05d1\u05d8\u05d7\u05d4.':ar?'\u0646\u0633\u062e\u0629 \u062c\u062f\u064a\u062f\u0629 \u062c\u0627\u0647\u0632\u0629':'A new version of SH\u2721MER is ready \u2014 improvements, speed & security.');
+  var nowL=done?(he?'\u05de\u05e2\u05d5\u05dc\u05d4':ar?'\u0645\u062a\u0627\u0628\u0639\u0629':'Continue'):(he?'\u05e2\u05d3\u05db\u05df \u05e2\u05db\u05e9\u05d9\u05d5':ar?'\u062d\u062f\u0651\u062b \u0627\u0644\u0622\u0646':'Update now');
   var ov=document.createElement('div'); ov.id='upd-modal';
   ov.setAttribute('style','position:fixed;inset:0;z-index:99998;display:flex;align-items:center;justify-content:center;padding:22px;background:rgba(6,11,22,.74);font-family:Rubik,system-ui,-apple-system,Segoe UI,Roboto,sans-serif');
   ov.innerHTML='<div style="width:100%;max-width:340px;background:linear-gradient(180deg,#141a27,#0f1218);border:1px solid #2a3450;border-radius:22px;padding:26px 22px 18px;text-align:center;box-shadow:0 24px 70px rgba(0,0,0,.6)">'
     +'<div style="width:66px;height:66px;margin:0 auto 14px;border-radius:19px;background:linear-gradient(135deg,#C09020,#E0A828 55%,#F5C840);display:flex;align-items:center;justify-content:center;box-shadow:0 8px 24px rgba(224,168,40,.4)">'
     +'<svg viewBox="0 0 24 24" width="36" height="36" fill="none" stroke="#23170a" stroke-width="2" stroke-linejoin="round"><path d="M12 3l7 3v5c0 5-3.4 8.5-7 10-3.6-1.5-7-5-7-10V6Z"/><path d="M12 7.6l1.25 2.55 2.8.4-2.02 1.97.48 2.79L12 14.0l-2.49 1.31.48-2.79L7.95 10.55l2.8-.4Z" fill="#23170a" stroke="none"/></svg>'
     +'</div>'
-    +'<div style="font-size:12px;font-weight:800;letter-spacing:.14em;color:#E0A828;text-transform:uppercase;margin-bottom:6px">SH<span style="color:#F5C840">✡</span>MER</div>'
+    +'<div style="font-size:12px;font-weight:800;letter-spacing:.14em;color:#E0A828;text-transform:uppercase;margin-bottom:6px">SH<span style="color:#F5C840">\u2721</span>MER</div>'
     +'<div style="font-size:21px;font-weight:800;color:#f2f5fb;margin-bottom:8px">'+title+'</div>'
     +'<div style="font-size:13.5px;color:#9aa6bd;line-height:1.55;margin-bottom:20px">'+sub+'</div>'
     +'<button id="upd-refresh" style="width:100%;height:50px;border:none;border-radius:13px;background:linear-gradient(135deg,#b8841c,#e0a828 60%,#f3cf6a);color:#23180a;font-weight:800;font-size:16px;cursor:pointer;font-family:inherit">'+nowL+'</button>'
-    +'<button id="upd-x" style="width:100%;margin-top:10px;background:none;border:none;color:#8a93a6;font-size:13px;cursor:pointer;font-family:inherit">'+laterL+'</button>'
-    +'<div style="font-size:10px;color:#5f6b82;margin-top:10px">'+(he?'גרסה ':ar?'إصدار ':'version ')+pubV+'</div>'
+    +(done?'':'<button id="upd-x" style="width:100%;margin-top:10px;background:none;border:none;color:#8a93a6;font-size:13px;cursor:pointer;font-family:inherit">'+(he?'\u05d0\u05d7\u05e8 \u05db\u05da':ar?'\u0644\u0627\u062d\u0642\u064b\u0627':'Later')+'</button>')
+    +'<div style="font-size:10px;color:#5f6b82;margin-top:10px">'+(he?'\u05d2\u05e8\u05e1\u05d4 ':ar?'\u0625\u0635\u062f\u0627\u0631 ':'version ')+pubV+'</div>'
     +'</div>';
   document.body.appendChild(ov);
-  document.getElementById('upd-refresh').onclick=function(){ try{forceFreshReload();}catch(e){ try{location.reload();}catch(_){} } };
-  document.getElementById('upd-x').onclick=function(){ ov.remove(); };
+  document.getElementById('upd-refresh').onclick=function(){ if(done){ ov.remove(); return; } try{forceFreshReload();}catch(e){ try{location.reload();}catch(_){} } };
+  var x=document.getElementById('upd-x'); if(x)x.onclick=function(){ ov.remove(); };
 }
 function updCheck(manual){
   try{

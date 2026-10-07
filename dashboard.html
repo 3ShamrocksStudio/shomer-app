@@ -274,6 +274,7 @@
 .live-banner .lb-m{font-size:11px;color:#f2c7cb;margin-top:2px}
 .live-banner .lb-go{margin-top:7px;background:linear-gradient(135deg,#e5484d,#2f6bff);color:#fff;font-weight:800;font-size:11px;border:0;border-radius:8px;padding:6px 13px;cursor:pointer;font-family:inherit}
 </style>
+<style id="board-css">.feed-sec{padding:7px 15px;font-size:10px;letter-spacing:.06em;text-transform:uppercase;color:#6d7893;background:rgba(255,255,255,.02);border-bottom:1px solid rgba(255,255,255,.05);font-weight:700}</style>
 </head>
 <body>
 
@@ -332,7 +333,7 @@
     </div>
     <div class="col">
       <div class="pane dark pa-red" style="flex:1">
-        <div class="ph"><span class="t" style="color:#ff8a98">⚡ אירועים חיים · רשת שומרים</span><span class="pill live" id="feed-src">רשת שומרים</span></div>
+        <div class="ph"><span class="t" style="color:#ff8a98">⚡ לוח אירועים · זמן אמת · רשת שומרים</span><span class="pill live" id="feed-src">רשת שומרים</span></div>
         <div id="live-banner" class="live-banner idle">ממתין לאירוע חי…</div><div class="pb nopad feed" id="feed"><div class="empty">מתחבר לרשת SH✡MER…</div></div>
       </div>
       <div class="pane dark pa-violet" style="flex:1">
@@ -689,9 +690,12 @@ function renderLive(c,list,opts){
  if(!list.length){ try{var lbx=document.getElementById('live-banner'); if(lbx){lbx.className='live-banner idle';lbx.textContent='\u05d0\u05d9\u05df \u05d0\u05d9\u05e8\u05d5\u05e2 \u05d7\u05d9 \u05d1\u05d8\u05e8\u05d9\u05d8\u05d5\u05e8\u05d9\u05d4 \u05db\u05e2\u05ea';}}catch(e){} feed.innerHTML='<div class="empty">\u05d0\u05d9\u05df \u05d0\u05d9\u05e8\u05d5\u05e2\u05d9\u05dd \u05d7\u05d9\u05d9\u05dd \u05d1\u05d8\u05e8\u05d9\u05d8\u05d5\u05e8\u05d9\u05d4 \u05db\u05e2\u05ea.<br>\u05d4\u05d6\u05e8\u05dd \u05de\u05ea\u05e2\u05d3\u05db\u05df \u05d0\u05d5\u05d8\u05d5\u05de\u05d8\u05d9\u05ea \u05de\u05de\u05e9\u05ea\u05de\u05e9\u05d9 SH\u2721MER \u05d1\u05d0\u05d6\u05d5\u05e8 \u2014 \u05dc\u05dc\u05d0 \u05e4\u05e8\u05d8\u05d9\u05dd \u05de\u05d6\u05d4\u05d9\u05dd.</div>'; return; }
  list.sort(function(a,b){return (b.ts||0)-(a.ts||0);});
  var newSos=null;
+ var _topSos=list.filter(function(e){return _liveMeta(e).sos;}).sort(function(a,b){return (b.ts||0)-(a.ts||0);})[0];
+ var _topSosId=_topSos?(_topSos.id||(_topSos.type+'_'+(+_topSos.lat).toFixed(3)+'_'+(+_topSos.lng).toFixed(3)+'_'+(_topSos.ts||0))):null;
  var html=list.slice(0,40).map(function(e){
   var m=_liveMeta(e); var id=e.id||(e.type+'_'+(+e.lat).toFixed(3)+'_'+(+e.lng).toFixed(3)+'_'+(e.ts||0));
   _liveEvents[id]={e:e,m:m,demo:!!opts.demo};
+  if(id===_topSosId){ return ''; }
   if(liveLayer){
    var mk; if(m.sos){ mk=L.marker([e.lat,e.lng],{icon:_sosIcon(),zIndexOffset:1000}); } else { mk=L.circleMarker([e.lat,e.lng],{radius:11,color:'#fff',weight:2.5,fillColor:m.c,fillOpacity:.97}); }
    var mn=Math.round((now-(e.ts||now))/60000); var ag=mn<1?'\u05e2\u05db\u05e9\u05d9\u05d5':mn<60?('\u05dc\u05e4\u05e0\u05d9 '+mn+' \u05d3\u05e7\u05f3'):('\u05dc\u05e4\u05e0\u05d9 '+Math.round(mn/60)+' \u05e9\u05e2\u05f3');
@@ -701,7 +705,7 @@ function renderLive(c,list,opts){
   var mins=Math.round((now-(e.ts||now))/60000); var ago=mins<1?'\u05e2\u05db\u05e9\u05d9\u05d5':mins<60?('\u05dc\u05e4\u05e0\u05d9 '+mins+' \u05d3\u05e7\u05f3'):('\u05dc\u05e4\u05e0\u05d9 '+Math.round(mins/60)+' \u05e9\u05e2\u05f3');
   return '<div class="item'+(m.sos?' sos':'')+'" data-id="'+id+'" onclick="openResponse(\''+id+'\')"><span class="sev" style="background:'+m.c+'"></span><div class="dot">'+m.i+'</div><div style="flex:1"><div class="nm">'+m.i+' '+ESC(m.t)+(m.sos?'<span class="live-badge">\u25cf LIVE</span>':'')+'</div><div class="mt">'+ago+' \u00b7 '+(+e.lat).toFixed(2)+','+(+e.lng).toFixed(2)+' \u00b7 \u05d0\u05d6\u05d5\u05e8</div></div><span class="live-go">\u2922</span></div>';
  }).join('');
- feed.innerHTML=html;
+ feed.innerHTML='<div class="feed-sec">\u05d0\u05d9\u05e8\u05d5\u05e2\u05d9\u05dd \u05d0\u05d7\u05e8\u05d5\u05e0\u05d9\u05dd \u00b7 24 \u05e9\u05e2\u05d5\u05ea</div>'+(html.replace(/^(\s*)$/,'')||'<div class="empty" style="padding:16px">\u05d0\u05d9\u05df \u05d0\u05d9\u05e8\u05d5\u05e2\u05d9\u05dd \u05e0\u05d5\u05e1\u05e4\u05d9\u05dd</div>');
  try{ var lb=document.getElementById('live-banner'); if(lb){ var ss=list.filter(function(e){return _liveMeta(e).sos;}).sort(function(a,b){return (b.ts||0)-(a.ts||0);}); if(ss.length){ var e0=ss[0],m0=_liveMeta(e0); var id0=e0.id||(e0.type+'_'+(+e0.lat).toFixed(3)+'_'+(+e0.lng).toFixed(3)+'_'+(e0.ts||0)); var mn0=Math.round((now-(e0.ts||now))/60000); var ag0=mn0<1?'\u05e2\u05db\u05e9\u05d9\u05d5':mn0<60?('\u05dc\u05e4\u05e0\u05d9 '+mn0+' \u05d3\u05e7\u05f3'):('\u05dc\u05e4\u05e0\u05d9 '+Math.round(mn0/60)+' \u05e9\u05e2\u05f3'); lb.className='live-banner active'; lb.innerHTML='<div class="lb-t">'+m0.i+' '+ESC(m0.t)+' \u00b7 LIVE</div><div class="lb-m">'+(+e0.lat).toFixed(3)+','+(+e0.lng).toFixed(3)+' \u00b7 \u05d0\u05d6\u05d5\u05e8 \u00b7 '+ag0+' \u00b7 '+(opts.demo?'\u05e0\u05ea\u05d5\u05e0\u05d9 \u05d4\u05d3\u05d2\u05de\u05d4':'\u05e8\u05e9\u05ea \u05e9\u05d5\u05de\u05e8\u05d9\u05dd')+'</div><button class="lb-go" onclick="openResponse(\''+id0+'\')">\u05e4\u05ea\u05d7 \u05de\u05e8\u05db\u05d6 \u05ea\u05d2\u05d5\u05d1\u05d4 \u2190</button>'; } else { lb.className='live-banner idle'; lb.textContent='\u05d0\u05d9\u05df \u05d0\u05d9\u05e8\u05d5\u05e2 \u05d7\u05d9 \u05d1\u05d8\u05e8\u05d9\u05d8\u05d5\u05e8\u05d9\u05d4 \u05db\u05e2\u05ea \u00b7 \u05d4\u05d6\u05e8\u05dd \u05de\u05ea\u05e2\u05d3\u05db\u05df \u05d0\u05d5\u05d8\u05d5\u05de\u05d8\u05d9\u05ea'; } } }catch(e){}
  if(newSos){ _liveBeep(); flyToLive(newSos.lat,newSos.lng,newSos.id); bigSosAlert(newSos.id); }
 }
