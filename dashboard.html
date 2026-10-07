@@ -234,6 +234,25 @@
 .resp-log{font-size:11.5px;color:#9aa6bd;line-height:1.9}
 .resp-log b{color:#6ee7a8}
 </style>
+<style id="acct-css">
+.plan-badge{font-size:10px;font-weight:800;letter-spacing:.04em;background:rgba(224,168,40,.16);color:#F5C840;border:1px solid rgba(224,168,40,.4);border-radius:20px;padding:3px 9px;white-space:nowrap}
+.acct-ov{position:fixed;inset:0;z-index:99993;display:flex;align-items:center;justify-content:center;padding:22px;background:rgba(6,11,22,.7);font-family:Rubik,system-ui,sans-serif}
+.acct-card{width:100%;max-width:440px;background:linear-gradient(180deg,#141a27,#0f1218);border:1px solid #2a3450;border-radius:18px;padding:20px 20px 16px;box-shadow:0 24px 70px rgba(0,0,0,.6);color:#eef1f7}
+.acct-card h3{font-size:17px;font-weight:800;margin:0}
+.acct-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:4px}
+.acct-x{background:none;border:0;color:#9aa6bd;font-size:19px;cursor:pointer}
+.acct-sub{font-size:12px;color:#9aa6bd;margin-bottom:16px}
+.tier-tbl{width:100%;border-collapse:collapse;font-size:12.5px}
+.tier-tbl th,.tier-tbl td{padding:8px 6px;border-bottom:1px solid #212a3f;text-align:center}
+.tier-tbl th:first-child,.tier-tbl td:first-child{text-align:start;color:#9aa6bd}
+.tier-tbl thead th{font-size:11px;color:#cdd6e6}
+.tier-tbl .pro{color:#6ee7a8;font-weight:700}
+.tier-tbl .free{color:#6d7893}
+.tier-pill{display:inline-block;font-size:10px;font-weight:800;border-radius:20px;padding:2px 8px}
+.tier-pill.p{background:rgba(224,168,40,.16);color:#F5C840}
+.tier-pill.f{background:rgba(255,255,255,.06);color:#9aa6bd}
+.acct-note{font-size:11px;color:#6d7893;margin-top:12px;line-height:1.5}
+</style>
 </head>
 <body>
 
@@ -268,7 +287,7 @@
     <div class="tb-sp"></div>
     <div class="terr-pick"><span id="terr-static" class="hidden">טריטוריה: <b id="terr-name" style="color:var(--gold)"></b></span><select id="terr-sel"></select></div>
     <div class="live"><span class="d"></span><span id="org-name"></span></div>
-    <button class="tbtn" id="export-btn">⤓ ייצוא</button>
+    <span class="plan-badge" id="plan-badge" title="רמת מנוי">Pro · דמו</span><button class="tbtn" id="acct-btn">⚙ חשבון</button><button class="tbtn" id="export-btn">⤓ ייצוא</button>
     <button class="tbtn" id="signout">יציאה</button>
   </div>
   <div class="kpis" id="kpis"></div>
@@ -286,7 +305,7 @@
         <div class="legend" id="legend"></div>
       </div>
       <div class="pane light pa-teal" style="flex:1">
-        <div class="ph"><span class="t">ניתוח בזמן אמת + מענים מבוססי-ראיות</span><span class="pill off">מקורות מאומתים</span></div>
+        <div class="ph"><span class="t">מענים מוכחים · מה שעבד באירועים דומים</span><span class="pill off">מקורות מאומתים</span></div>
         <div class="pb" id="analysispane"></div>
       </div>
     </div>
@@ -751,13 +770,13 @@ function buildKPIs(idx){
   k('עבירות אלימות',violPct+'%',fmt(viol)+' נגד גוף',(violPct>12?'bad':'ok'),PUB)+
   k('פער הדיווח','~74%','רק 26% מהעבירות מדווח למשטרה · IDI','gap',NAT,true)+
   k('רשת שומרים',cov,'דיווחים חיים · משלים את הפער','net-v',NET)+
-  k('דירוג ארצי','#'+(idx+1),'מתוך '+cities.length+' · לפי היקף');
+  k('דירוג ארצי','#'+(idx+1),'מתוך '+cities.length+' · משטרת ישראל 2025');
 }
 
 function buildRank(idx){
  var cities=DATA._sorted,max=cities[0].total;
- document.getElementById('rank-note').textContent='דירוג '+cities.length+' הערים הגדולות לפי סה״כ עבירות מדווחות (משטרת ישראל 2025). הטריטוריה שלך מודגשת.';
- document.getElementById('rankbody').innerHTML=cities.map(function(x,i){var w=Math.round(x.total/max*100);return '<div class="row '+(i===idx?'me':'')+'"><span class="pos">'+(i+1)+'</span><span class="city">'+x.city+'</span><span class="bar"><i style="width:'+w+'%"></i></span><span class="tot">'+fmt(x.total)+'</span></div>';}).join('');
+ document.getElementById('rank-note').innerHTML='דירוג '+cities.length+' הערים הגדולות · סה״כ עבירות מדווחות · <b>משטרת ישראל 2025</b>.<br>לחצו על עיר כדי לצפות בנתונים שלה (השוואת טריטוריות).';
+ document.getElementById('rankbody').innerHTML=cities.map(function(x,i){var w=Math.round(x.total/max*100);return '<div class="row '+(i===idx?'me':'')+'" onclick="render('+i+')" style="cursor:pointer" title="צפייה בטריטוריה זו"><span class="pos">'+(i+1)+'</span><span class="city">'+x.city+'</span><span class="bar"><i style="width:'+w+'%"></i></span><span class="tot">'+fmt(x.total)+'</span></div>';}).join('');
 }
 
 var CRIME_LEVER={
@@ -802,8 +821,33 @@ function buildAnalysis(idx,fk){
 
 function renderLegend(){var el=document.getElementById('legend');if(!el)return;el.innerHTML=Object.keys(CAT_META).map(function(k){return '<span><i style="background:'+catCol(k)+'"></i>'+catShort(k)+'</span>';}).join('');}
 
+var PLAN='pro'; /* demo runs Pro — all open. Tier model shown for the GTM. */
+function closeAccount(){ var o=document.getElementById('acct-ov'); if(o)o.remove(); }
+function openAccount(){
+ if(document.getElementById('acct-ov'))return;
+ var rows=[
+  ['טריטוריות','הטריטוריה שלך','כל 60 הערים · השוואה'],
+  ['מרכז תגובה (שיגור)','—','✓'],
+  ['רדיוס התראה','עד 2 ק"מ','ללא הגבלה'],
+  ['תובנות ומענים מוכחים','בסיסי','מלא · חוצה-טריטוריות'],
+  ['ייצוא דוחות','—','✓ PDF'],
+  ['שמירת נתונים','30 יום','12 חודשים']
+ ];
+ var body=rows.map(function(r){return '<tr><td>'+r[0]+'</td><td class="free">'+r[1]+'</td><td class="pro">'+r[2]+'</td></tr>';}).join('');
+ var ov=document.createElement('div'); ov.id='acct-ov'; ov.className='acct-ov';
+ ov.innerHTML='<div class="acct-card">'
+  +'<div class="acct-head"><h3>חשבון ותוכנית</h3><button class="acct-x" onclick="closeAccount()">✕</button></div>'
+  +'<div class="acct-sub">'+((CLIENT&&CLIENT.org)||'עיריית הדגמה')+' · תוכנית נוכחית: <b style="color:#F5C840">Pro (דמו — הכל פתוח)</b></div>'
+  +'<table class="tier-tbl"><thead><tr><th>יכולת</th><th><span class="tier-pill f">Pilot</span></th><th><span class="tier-pill p">Pro</span></th></tr></thead><tbody>'+body+'</tbody></table>'
+  +'<div class="acct-note">Pilot = התנסות חינם (90 יום, אזור אחד). Pro = שליטה מלאה לכל הרשות. בדמו הכל פתוח כ-Pro.<br>כל הנתונים הציבוריים ממשטרת ישראל 2025; נתוני הרשת מוצגים מצטבר וללא זיהוי אישי.</div>'
+  +'</div>';
+ document.body.appendChild(ov);
+ ov.addEventListener('click',function(ev){ if(ev.target===ov)closeAccount(); });
+}
+try{ document.addEventListener('DOMContentLoaded',function(){ var ab=document.getElementById('acct-btn'); if(ab)ab.onclick=openAccount; }); var _ab=document.getElementById('acct-btn'); if(_ab)_ab.onclick=openAccount; }catch(e){}
 function render(idx){
  var cities=DATA._sorted,c=cities[idx];if(!c)return;_curCity=c;DATA._idx=idx;_focus=null;
+ try{var _ab2=document.getElementById('acct-btn');if(_ab2&&!_ab2._b){_ab2._b=1;_ab2.onclick=openAccount;}}catch(e){}
  var db=document.getElementById('donutback');if(db)db.style.display='none';
  var ts=document.getElementById('terr-sel');
  if(ts&&!ts.options.length){cities.forEach(function(x){var o=document.createElement('option');o.value=x.city;o.textContent=x.city;ts.appendChild(o);});}
