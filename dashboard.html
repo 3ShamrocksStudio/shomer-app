@@ -882,7 +882,7 @@ function focusCat(k){
  document.getElementById('donutpane').innerHTML=
   '<div class="donut-hero"><div style="font-weight:800;color:'+catCol(k)+';display:flex;align-items:center;gap:8px;margin-bottom:6px"><span style="width:28px;height:28px;border-radius:8px;background:'+catCol(k)+';color:#fff;display:inline-flex;align-items:center;justify-content:center">'+catIcon(k,16)+'</span>'+k+'</div><div class="donut-wrap" style="cursor:default">'+svg+'</div></div>'+
   '<div style="margin-top:8px">'+ddr('היקף בטריטוריה',fmt(v)+' עבירות')+ddr('נתח מכלל העבירות',Math.round(cs*100)+'%')+ddr('דירוג ארצי בעבירה זו','#'+cr+' / '+cities.length,cr<=10?'#ff8a98':cr<=30?'#f0c75a':'#6ee7a8')+ddr('מול הממוצע הארצי',(diff>=0?'+':'')+diff+'%  ('+Math.round(ns*100)+'% ארצי)',diff>12?'#ff8a98':diff<-12?'#6ee7a8':'')+ddr('עבירה זו ל-1,000*',pcc)+'</div>'+
-  '<div class="ddh">חלוקה גאוגרפית · ערים סמוכות</div>'+bars+'<div class="ddh">תת-עבירות</div><div style="font-size:11px;color:var(--tx3);line-height:1.55">פילוח תת-עבירות (לדוגמה רצח · תקיפה · שוד) ייטען מנתוני סוג-עבירה גרנולריים (StatisticCrimeType) של משטרת ישראל — בתהליך הטמעה. לא יוצגו מספרים לא-מאומתים.</div>';
+  '<div class="ddh">חלוקה גאוגרפית · ערים סמוכות</div>'+bars+'';
  buildAnalysis(DATA._idx,k);
  document.getElementById('donutback').style.display='inline-block';
 }
@@ -950,7 +950,7 @@ function buildAnalysis(idx,fk){
  document.getElementById('analysispane').innerHTML=
   '<div class="ddh" style="margin-top:0">'+head+'</div>'+insHTML+
   '<div class="ddh">מענים מבוססי-ראיות</div>'+solHTML+
-  '<div class="foot">מחושב בזמן אמת מנתוני משטרת ישראל 2025. '+(fk?'הניתוח ממוקד לעבירה ולטריטוריה שנבחרו. ':'לחצו על פלח/זירה לניתוח ממוקד. ')+'מגמה רב-שנתית ותת-עבירות יתווספו עם נתוני עבר גרנולריים — בתהליך. אין זו המלצה משפטית מחייבת.</div>';
+  '<div class="foot">מחושב בזמן אמת מנתוני משטרת ישראל 2025. '+(fk?'הניתוח ממוקד לעבירה ולטריטוריה שנבחרו. ':'לחצו על פלח/זירה לניתוח ממוקד. ')+'אין זו המלצה משפטית מחייבת.</div>';
 }
 
 function renderLegend(){var el=document.getElementById('legend');if(!el)return;el.innerHTML=Object.keys(CAT_META).map(function(k){return '<span><i style="background:'+catCol(k)+'"></i>'+catShort(k)+'</span>';}).join('');}

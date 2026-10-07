@@ -2059,7 +2059,7 @@ body.otp-active .ob-steps{display:none!important;}
  <div class="sh-pill" aria-hidden="true"></div>
  <div class="sh-head"><span class="sh-ttl" id="set-ttl">הגדרות</span><button class="sh-x" onclick="cl('sh-set')" aria-label="סגור"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg></button></div>
  <div class="sh-body">
- <div class="set-cat"><div class="set-cat-ic"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="4" fill="none" stroke="currentColor" stroke-width="2"/><path d="M4 20a8 8 0 0 1 16 0" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></div><div class="set-cat-t" data-he="פרופיל (אופציונלי)" data-en="Profile (optional)">פרופיל (אופציונלי)</div></div><div class="set-grp" id="profile-grp"><div class="sec-cap mb12" data-he="עוזר לשפר נתוני בטיחות מצרפיים ואנונימיים. לא חובה." data-en="Helps improve anonymous, aggregate safety data. Optional.">עוזר לשפר נתוני בטיחות מצרפיים ואנונימיים. לא חובה.</div><div class="prof2-row"><span class="prof2-lbl" data-he="מגדר" data-en="Gender">מגדר</span><span class="prof2-seg" id="pf-gender"></span></div><div class="prof2-row"><span class="prof2-lbl" data-he="גיל" data-en="Age">גיל</span><span class="prof2-seg" id="pf-age"></span></div><div class="prof2-row"><span class="prof2-lbl" data-he="באזור" data-en="In this area">באזור</span><span class="prof2-seg" id="pf-res"></span></div></div><div class="set-cat"><div class="set-cat-ic"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M18 8a6 6 0 1 0-12 0c0 7-3 9-3 9h18s-3-2-3-9" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><path d="M13.7 21a2 2 0 0 1-3.4 0" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></div><div class="set-cat-t" data-he="התראות" data-en="Alerts &amp; Notifications">התראות</div></div>
+ <div class="set-cat"><div class="set-cat-ic"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M18 8a6 6 0 1 0-12 0c0 7-3 9-3 9h18s-3-2-3-9" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><path d="M13.7 21a2 2 0 0 1-3.4 0" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></div><div class="set-cat-t" data-he="התראות" data-en="Alerts &amp; Notifications">התראות</div></div>
  <div class="sec-cap mb12" id="set-radius-lbl">רדיוס התראה</div>
  <div class="sl-card mb20">
  <div class="rad-big"><span id="rad-v">5</span><span class="rad-u" id="rad-u"> ק"מ</span></div>
@@ -2205,13 +2205,13 @@ body.otp-active .ob-steps{display:none!important;}
        <span class="defib-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2L4.5 13H11l-1 9 8.5-11H12l1-9Z"/></svg></span>
        <div><div class="defib-t">יש לך גישה לדפיברילטור?</div><div class="defib-s">הוסף/י אותו למפה - כל שנייה קובעת בעצירת לב. יופיע לכל השומרים באזור.</div></div>
      </div>
-     <button class="btn-secondary defib-add" onclick="cl('sh-profile'); setTimeout(function(){ try{ aedPlaceMode(); }catch(e){} }, 300);">הוסף דפיברילטור למפה</button>
+     <button class="btn-secondary defib-add" onclick="cl('sh-prof'); setTimeout(function(){ try{ aedPlaceMode(); }catch(e){} }, 300);">הוסף דפיברילטור למפה</button>
    </div>
 
    <!-- MY SH✡MER inside profile -->
 
 
- <div class="sec-cap mb12" id="myrep-cap">הדיווחים שלי</div>
+ <div class="sec-cap mb12" data-he="נתוני פרופיל (אופציונלי)" data-en="Profile data (optional)">נתוני פרופיל (אופציונלי)</div><div class="set-grp" id="profile-grp"><div class="sec-cap mb12" data-he="עוזר לשפר נתוני בטיחות מצרפיים ואנונימיים. לא חובה." data-en="Helps improve anonymous, aggregate safety data. Optional.">עוזר לשפר נתוני בטיחות מצרפיים ואנונימיים. לא חובה.</div><div class="prof2-row"><span class="prof2-lbl" data-he="מגדר" data-en="Gender">מגדר</span><span class="prof2-seg" id="pf-gender"></span></div><div class="prof2-row"><span class="prof2-lbl" data-he="גיל" data-en="Age">גיל</span><span class="prof2-seg" id="pf-age"></span></div><div class="prof2-row"><span class="prof2-lbl" data-he="באזור" data-en="In this area">באזור</span><span class="prof2-seg" id="pf-res"></span></div></div><div class="sec-cap mb12" id="myrep-cap">הדיווחים שלי</div>
  <div id="my-reports-list" class="mb20" role="list"></div>
  <div class="sec-cap mb12" id="soshist-cap">היסטוריית SOS</div>
  <div id="sos-hist-list" role="list"></div>
@@ -6073,7 +6073,7 @@ function founderPaint(){
 function op(id){closeAll();const el=document.getElementById(id);if(el)el.classList.add('open');syncSheetState();
  if(id==='sh-set'){try{renderSetContacts();}catch(e){}}
  if(id==='sh-circles'){ try{syncPairsToCircles();}catch(e){} try{renderCircles();}catch(e){} try{gdRenderList();}catch(e){} }   // was never re-rendered → circles list + toggles appeared empty
- if(id==='sh-prof'){ try{syncPairsToCircles();}catch(e){} try{renderProfile();}catch(e){} try{renderCircles();}catch(e){} }
+ if(id==='sh-prof'){ try{syncPairsToCircles();}catch(e){} try{renderProfile();}catch(e){} try{renderProfile2();}catch(e){} try{renderCircles();}catch(e){} }
 }
 /* Settings → "Emergency contacts" renders the user's REAL paired SHOMERs (name + link status),
    or a clear empty state. No phone numbers are shown (pairing is privacy-first: name + uid only). */
@@ -8868,7 +8868,7 @@ try{ hydrateIcons(document); }catch(e){}
 /* Loaded-build version - shown in the diagnostic panel so a phone can prove
    whether it's on the latest build or a STALE cached one. Keep in lock-step
    with sw.js SW_VERSION on every deploy. */
-var APP_VER='v217';
+var APP_VER='v218';
 var FB={ready:false,uid:null,db:null,_presTimer:null,connected:false,listening:false,pushState:'default',near:0,swVer:'?',
   authState:'connecting',sdkLoaded:false,persist:'',permErr:null,err:null,wsProbe:'',csp:''};
 /* Always log connection diagnostics to the console so the real failure can be SEEN in Chrome. */
@@ -10013,7 +10013,7 @@ function paintHdrFounder(){ var s=document.getElementById('hdr-founder-slot'); i
 function founderHeaderHTML(){
   if(!isFounder()) return '';
   var he=currentLang==='he';
-  return '<button class="hdr-founder" title="'+(he?'מייסד SH✡MER':'Founder')+'" aria-label="'+(he?'מייסד':'Founder')+'" onclick="op(\'sh-profile\')">'+founderCrestSVG(40)+'</button>';
+  return '<button class="hdr-founder" title="'+(he?'מייסד SH✡MER':'Founder')+'" aria-label="'+(he?'מייסד':'Founder')+'" onclick="op(\'sh-prof\')">'+founderCrestSVG(40)+'</button>';
 }
 /* ══ COMMUNITY EVENTS - safe by design ══
    A community report is the most abusable surface in the app: one bad actor could spark panic
