@@ -69,13 +69,42 @@ public class ShakeService extends Service implements SensorEventListener {
   }
 
   private void fireSos() {
-    // Do NOT sound the alarm here. Launch the app so the web layer runs the
+    // Do NOT sound the alarm here. Bring up the app so the web layer runs the
     // CANCELLABLE countdown (a few seconds to abort a false alarm before anything is
     // broadcast or the loud alarm sounds). An accidental shake must never fire an
     // un-cancellable alarm.
+    //
+    // Android 10+ BLOCKS a background service from calling startActivity() directly, so
+    // a screen-off shake used to do nothing until the user manually opened the app. The
+    // fix is a FULL-SCREEN-INTENT notification — the same mechanism alarm clocks and
+    // incoming calls use to surface UI over a locked/off screen from the background.
     Intent open = new Intent(this, MainActivity.class);
-    open.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_SINGLE_TOP);
+    open.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_SINGLE_TOP | Intent.FLAG_ACTIVITY_CLEAR_TOP);
     open.putExtra("shomer_sos", "shake");
+    PendingIntent pi = PendingIntent.getActivity(this, 1, open,
+        PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
+
+    NotificationManager nm = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+    if (Build.VERSION.SDK_INT >= 26) {
+      NotificationChannel fch = new NotificationChannel("shomer_shake_fire", "SHOMER SOS trigger", NotificationManager.IMPORTANCE_HIGH);
+      fch.setDescription("Opens the SOS screen when you shake with the screen off");
+      try { fch.setBypassDnd(true); } catch (Exception e) {}
+      nm.createNotificationChannel(fch);
+    }
+    Notification fire = new NotificationCompat.Builder(this, "shomer_shake_fire")
+        .setContentTitle("SHOMER — SOS")
+        .setContentText("Shake detected — opening SOS…")
+        .setSmallIcon(R.mipmap.ic_launcher)
+        .setPriority(NotificationCompat.PRIORITY_MAX)
+        .setCategory(NotificationCompat.CATEGORY_ALARM)
+        .setFullScreenIntent(pi, true)
+        .setContentIntent(pi)
+        .setAutoCancel(true)
+        .setOngoing(false)
+        .build();
+    try { nm.notify(7, fire); } catch (Exception e) {}
+
+    // Fallback for the cases where a direct launch IS permitted (app recently foregrounded).
     try { startActivity(open); } catch (Exception e) {}
   }
 
