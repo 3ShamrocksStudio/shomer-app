@@ -78,7 +78,7 @@ jobs:
             for (const [d, px] of Object.entries(SIZES)) {
               const dir = path.join(RES, 'mipmap-' + d);
               fs.mkdirSync(dir, { recursive: true });
-              await sharp('assets/icon-fg-src.png').resize(px, px, { fit:'contain',
+              await sharp('assets/icon-fg-src.png').trim().resize(px, px, { fit:'contain',
                 background:{r:0,g:0,b:0,alpha:0} }).png().toFile(path.join(dir,'ic_launcher_foreground.png'));
               await sharp('assets/icon-bg-src.png').resize(px, px).png()
                 .toFile(path.join(dir,'ic_launcher_background.png'));
