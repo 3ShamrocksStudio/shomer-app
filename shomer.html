@@ -4121,26 +4121,28 @@ var NUDGE_TIPS=[
 ];
 function nudgeState(){ if(!SS.nudge) SS.nudge={lastTs:0,tipIdx:0,dismissed:{}}; return SS.nudge; }
 function _nudgeDismissed(kind,days){ var n=nudgeState(); var t=n.dismissed[kind]||0; return (Date.now()-t) < (days*86400000); }
+function _nic(paths){ return '<svg viewBox="0 0 24 24" width="30" height="30" fill="none" stroke="#23170a" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">'+paths+'</svg>'; }
+var _NIC={shield:'<path d="M12 3l7 3v5c0 5-3.4 8.5-7 10-3.6-1.5-7-5-7-10V6Z"/>',lock:'<rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/>',pin:'<path d="M12 22s7-6.4 7-12a7 7 0 1 0-14 0c0 5.6 7 12 7 12Z"/><circle cx="12" cy="10" r="2.4"/>',bulb:'<path d="M9 18h6M10 21h4"/><path d="M12 3a6 6 0 0 1 4 10.5c-.6.6-1 1.3-1 2.2H9c0-.9-.4-1.6-1-2.2A6 6 0 0 1 12 3Z"/>',people:'<circle cx="9" cy="8" r="3.1"/><path d="M3.5 19a5.5 5.5 0 0 1 11 0"/><circle cx="17" cy="9" r="2.3"/><path d="M15.6 14.4A4.6 4.6 0 0 1 20.5 19"/>',mail:'<rect x="3" y="6" width="18" height="12" rx="2"/><path d="M3.5 7l8.5 6 8.5-6"/>',radio:'<circle cx="12" cy="12" r="2.2"/><path d="M12 14v6"/><path d="M7.8 7.8a6 6 0 0 0 0 8.4M16.2 7.8a6 6 0 0 1 0 8.4M5 5a10 10 0 0 0 0 14M19 5a10 10 0 0 1 0 14"/>'};
 function nudgePick(){
  var he=currentLang==='he', ar=currentLang==='ar';
  var hasCircle=(SS.circleMembers||[]).some(function(m){return m && !m.pending;});
  var hasCode=!!(SS.security&&/^\d{4,6}$/.test((SS.security.pin)||''));
  var hasGeo=(typeof userLat!=='undefined'&&userLat!=null);
  if(!hasCircle && !_nudgeDismissed('circle',2))
-   return {kind:'circle', ic:'🛡️', tx:(he?'הגדרת את מעגל השומרים שלך? זה מי שיקבל את ה-SOS.':ar?'هل أضفت دائرة حُرّاسك؟ هم من يتلقّى استغاثتك.':'Set up your SHOMER circle? They receive your SOS.'), cta:(he?'הוסף/י':ar?'أضف':'Add'), act:function(){ try{openCircles();}catch(e){} }};
+   return {kind:'circle', ic:_nic(_NIC.shield), tx:(he?'הגדרת את מעגל השומרים שלך? זה מי שיקבל את ה-SOS.':ar?'هل أضفت دائرة حُرّاسك؟ هم من يتلقّى استغاثتك.':'Set up your SHOMER circle? They receive your SOS.'), cta:(he?'הוסף/י':ar?'أضف':'Add'), act:function(){ try{openCircles();}catch(e){} }};
  if(!hasCode && !_nudgeDismissed('code',2))
-   return {kind:'code', ic:'🔒', tx:(he?'הגדר/י קוד אבטחה — לביטול SOS והגנת גנב.':ar?'اضبط رمز الأمان — لإلغاء الاستغاثة وحماية السرقة.':'Set a security code — to cancel SOS + arm theft protection.'), cta:(he?'הגדר/י':ar?'اضبط':'Set'), act:function(){ try{openSetPin();}catch(e){} }};
+   return {kind:'code', ic:_nic(_NIC.lock), tx:(he?'הגדר/י קוד אבטחה — לביטול SOS והגנת גנב.':ar?'اضبط رمز الأمان — لإلغاء الاستغاثة وحماية السرقة.':'Set a security code — to cancel SOS + arm theft protection.'), cta:(he?'הגדר/י':ar?'اضبط':'Set'), act:function(){ try{openSetPin();}catch(e){} }};
  if(!hasGeo && !_nudgeDismissed('geo',1))
-   return {kind:'geo', ic:'📍', tx:(he?'שתף/י מיקום כדי שעזרה תגיע אליך מהר.':ar?'شارك موقعك ليصلك العون بسرعة.':'Share your location so help reaches you fast.'), cta:(he?'שתף/י':ar?'شارك':'Share'), act:function(){ try{ nudgeAskGeo(); }catch(e){} }};
+   return {kind:'geo', ic:_nic(_NIC.pin), tx:(he?'שתף/י מיקום כדי שעזרה תגיע אליך מהר.':ar?'شارك موقعك ليصلك العون بسرعة.':'Share your location so help reaches you fast.'), cta:(he?'שתף/י':ar?'شارك':'Share'), act:function(){ try{ nudgeAskGeo(); }catch(e){} }};
  var _cm=(SS.circleMembers||[]).filter(function(m){return m && !m.pending;});
  if(hasCircle && _cm.length<3 && !_nudgeDismissed('more',4))
-   return {kind:'more', ic:'👥', tx:(he?'הוסף/י עוד שומרים — רשת גדולה יותר = עזרה מהירה יותר.':ar?'أضف المزيد من الحُرّاس.':'Add more SHOMERs — a bigger circle means faster help.'), cta:(he?'הוסף/י':ar?'أضف':'Add'), act:function(){ try{openCircles();}catch(e){} }};
+   return {kind:'more', ic:_nic(_NIC.people), tx:(he?'הוסף/י עוד שומרים — רשת גדולה יותר = עזרה מהירה יותר.':ar?'أضف المزيد من الحُرّاس.':'Add more SHOMERs — a bigger circle means faster help.'), cta:(he?'הוסף/י':ar?'أضف':'Add'), act:function(){ try{openCircles();}catch(e){} }};
  if(hasCircle && !_nudgeDismissed('invite',5))
-   return {kind:'invite', ic:'📨', tx:(he?'הזמן/י חבר/ה ל-SHOMER — ככל שיותר אנשים ברשת, כולם בטוחים יותר.':ar?'ادعُ صديقاً إلى SHOMER.':'Invite a friend to SHOMER — more people means everyone is safer.'), cta:(he?'הזמן/י':ar?'ادعُ':'Invite'), act:function(){ try{shareInvite();}catch(e){} }};
+   return {kind:'invite', ic:_nic(_NIC.mail), tx:(he?'הזמן/י חבר/ה ל-SHOMER — ככל שיותר אנשים ברשת, כולם בטוחים יותר.':ar?'ادعُ صديقاً إلى SHOMER.':'Invite a friend to SHOMER — more people means everyone is safer.'), cta:(he?'הזמן/י':ar?'ادعُ':'Invite'), act:function(){ try{shareInvite();}catch(e){} }};
  if(hasGeo && !_nudgeDismissed('updates',3))
-   return {kind:'updates', ic:'📡', tx:(he?'בדוק/י מה קורה באזורך — ודיווח שלך עוזר לכל השכונה.':ar?'تحقق مما يجري في منطقتك.':'Check what\'s happening near you — your reports help the whole area.'), cta:(he?'צפה/י':ar?'اعرض':'View'), act:function(){ try{ var u=document.getElementById('nav-upd'); if(u)u.click(); }catch(e){} }};
+   return {kind:'updates', ic:_nic(_NIC.radio), tx:(he?'בדוק/י מה קורה באזורך — ודיווח שלך עוזר לכל השכונה.':ar?'تحقق مما يجري في منطقتك.':'Check what\'s happening near you — your reports help the whole area.'), cta:(he?'צפה/י':ar?'اعرض':'View'), act:function(){ try{ var u=document.getElementById('nav-upd'); if(u)u.click(); }catch(e){} }};
  var n=nudgeState(); var tip=NUDGE_TIPS[(n.tipIdx||0)%NUDGE_TIPS.length];
- return {kind:'tip', ic:'💡', tx:(he?tip.he:ar?tip.ar:tip.en), cta:(he?'קרא/י':ar?'اقرأ':'Read'), act:function(){ try{ openGuideTopic(tip.k); }catch(e){} }, tip:true};
+ return {kind:'tip', ic:_nic(_NIC.bulb), tx:(he?tip.he:ar?tip.ar:tip.en), cta:(he?'קרא/י':ar?'اقرأ':'Read'), act:function(){ try{ openGuideTopic(tip.k); }catch(e){} }, tip:true};
 }
 function nudgeAskGeo(){
  try{ if(typeof ensureNativeGeo==='function'){ ensureNativeGeo().then(function(){ _nudgeGeoNow(); }); } else { _nudgeGeoNow(); } }catch(e){ _nudgeGeoNow(); }
@@ -8882,7 +8884,7 @@ try{ hydrateIcons(document); }catch(e){}
 /* Loaded-build version - shown in the diagnostic panel so a phone can prove
    whether it's on the latest build or a STALE cached one. Keep in lock-step
    with sw.js SW_VERSION on every deploy. */
-var APP_VER='v221';
+var APP_VER='v222';
 var FB={ready:false,uid:null,db:null,_presTimer:null,connected:false,listening:false,pushState:'default',near:0,swVer:'?',
   authState:'connecting',sdkLoaded:false,persist:'',permErr:null,err:null,wsProbe:'',csp:''};
 /* Always log connection diagnostics to the console so the real failure can be SEEN in Chrome. */
