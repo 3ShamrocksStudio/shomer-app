@@ -3599,24 +3599,19 @@ function setLang(code){
    any tap on an element carrying data-setlang — before anything in the bubbling
    path can swallow it — and switches language reliably. Covers click AND touch. */
 (function(){
-  var _lastLangCode='', _lastLangTime=0;
+  // ONE event path only: a single capture-phase 'click'. On every platform a deliberate tap
+  // produces exactly one click, and capture phase fires it BEFORE anything in the bubbling
+  // path can swallow it (that was the original Hebrew problem). No touchend, no debounce —
+  // so there is exactly one language switch per tap and nothing can get out of sync.
   function _langFromTap(e){
     try{
       var el=e.target && e.target.closest ? e.target.closest('[data-setlang]') : null;
       if(!el) return;
       var code=el.getAttribute('data-setlang');
-      if(!code) return;
-      var now=Date.now();
-      // A single physical tap fires touchend AND click. Suppress ONLY the duplicate of the
-      // SAME button within a short window — a genuine tap on a DIFFERENT language always
-      // switches immediately (so tapping HE then AR right away both work).
-      if(code===_lastLangCode && (now-_lastLangTime) < 500) return;
-      _lastLangCode=code; _lastLangTime=now;
-      try{ setLang(code); }catch(_){}
+      if(code){ try{ setLang(code); }catch(_){} }
     }catch(_e){}
   }
-  document.addEventListener('touchend', _langFromTap, true); // touch devices (fires first)
-  document.addEventListener('click', _langFromTap, true);   // capture phase (mouse / fallback)
+  document.addEventListener('click', _langFromTap, true);   // capture phase — the only handler
   /* Same bulletproofing for the "pick from contacts" button — some webviews weren't
      delivering its tap either. A capture-phase delegated handler guarantees it fires. */
   var _contactsBusy=false;
@@ -3628,8 +3623,7 @@ function setLang(code){
       try{ agPickContact(); }catch(_){}
     }catch(_e){}
   }
-  document.addEventListener('click', _contactsFromTap, true);
-  document.addEventListener('touchend', _contactsFromTap, true);
+  document.addEventListener('click', _contactsFromTap, true); // capture phase — single path
 })();
 function applyTranslations(){
  // Onboarding
@@ -8966,7 +8960,7 @@ try{ hydrateIcons(document); }catch(e){}
 /* Loaded-build version - shown in the diagnostic panel so a phone can prove
    whether it's on the latest build or a STALE cached one. Keep in lock-step
    with sw.js SW_VERSION on every deploy. */
-var APP_VER='v239';
+var APP_VER='v240';
 var FB={ready:false,uid:null,db:null,_presTimer:null,connected:false,listening:false,pushState:'default',near:0,swVer:'?',
   authState:'connecting',sdkLoaded:false,persist:'',permErr:null,err:null,wsProbe:'',csp:''};
 /* Always log connection diagnostics to the console so the real failure can be SEEN in Chrome. */
