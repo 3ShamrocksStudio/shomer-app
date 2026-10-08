@@ -116,6 +116,13 @@ jobs:
             cp -v "$RAW"/* android/app/src/main/res/raw/ || true
             ls -la android/app/src/main/res/raw
           fi
+          # Copy SHOMER's own notification small icon (white Magen David) — additive, named
+          # ic_stat_shomer so it never collides with capacitor-assets launcher/splash output.
+          DRW=shomer-android/android/app/src/main/res/drawable
+          if [ -f "$DRW/ic_stat_shomer.xml" ]; then
+            mkdir -p android/app/src/main/res/drawable
+            cp -v "$DRW/ic_stat_shomer.xml" android/app/src/main/res/drawable/ || true
+          fi
 
       - name: Merge Android manifest additions (permissions)
         working-directory: native
