@@ -424,7 +424,7 @@
     </div>
     <div class="col">
       <div class="pane dark pa-blue" style="flex:1.2">
-        <div class="ph"><span class="t">מפת פשיעה · גבול שיפוט <span class="pill off">ציבורי</span></span><span class="maptools"><button class="mini" id="spread-btn">◉ פריסת שומרים</button></span></div>
+        <div class="ph"><span class="t">מפת פשיעה · גבול שיפוט <span class="pill off">ציבורי</span></span><span class="maptools"><button class="mini" id="spread-btn" title="הצג/הסתר שומרים בטריטוריה">◉ שומרים</button><button class="mini on" id="tgl-events" onclick="toggleMapLayer('events')" title="הצג/הסתר אירועים חיים">⚡ אירועים</button><button class="mini on" id="tgl-bound" onclick="toggleMapLayer('bound')" title="הצג/הסתר גבול שיפוט">⬠ גבול</button></span></div>
         <div style="position:relative;flex:1;min-height:0;display:flex;flex-direction:column"><div id="map"></div><div class="insp" id="insp"></div></div>
         <div class="legend" id="legend"></div>
       </div>
@@ -547,6 +547,16 @@ function donutSVG(segs,center,sub){var tot=segs.reduce(function(s,x){return s+x.
 function ringSVG(frac,label,sub,col){var sz=150,r=sz/2-12,cx=sz/2,cy=sz/2,C=2*Math.PI*r,len=Math.max(0,Math.min(1,frac))*C;
  return '<svg viewBox="0 0 '+sz+' '+sz+'" width="150" height="150"><circle cx="'+cx+'" cy="'+cy+'" r="'+r+'" fill="none" stroke="#15284b" stroke-width="14"/><circle cx="'+cx+'" cy="'+cy+'" r="'+r+'" fill="none" stroke="'+col+'" stroke-width="14" stroke-linecap="round" stroke-dasharray="'+len.toFixed(1)+' '+(C-len).toFixed(1)+'" transform="rotate(-90 '+cx+' '+cy+')"/><text x="'+cx+'" y="'+(cy-1)+'" text-anchor="middle" fill="#e8eefc" font-size="26" font-weight="800">'+label+'</text><text x="'+cx+'" y="'+(cy+18)+'" text-anchor="middle" fill="#6b82ab" font-size="10">'+sub+'</text></svg>';}
 function insp(html){var e=document.getElementById('insp'); if(!e)return; if(html){e.innerHTML=html;e.classList.add('on');} else e.classList.remove('on');}
+function toggleMapLayer(which){
+ try{
+  if(!MAP)return;
+  var lyr = which==='events' ? liveLayer : which==='bound' ? cityLayer : null;
+  var btn = document.getElementById(which==='events'?'tgl-events':'tgl-bound');
+  if(!lyr)return;
+  if(MAP.hasLayer(lyr)){ MAP.removeLayer(lyr); if(btn)btn.classList.remove('on'); }
+  else { MAP.addLayer(lyr); if(btn)btn.classList.add('on'); }
+ }catch(e){}
+}
 var spreadLayer=null;
 function toggleSpread(c){
  var btn=document.getElementById('spread-btn');

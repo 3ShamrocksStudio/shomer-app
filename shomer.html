@@ -181,7 +181,9 @@ body:not(.lb-on){--hdr-top:max(env(safe-area-inset-top, 0px), 46px);}
 /* direction:ltr keeps He/En buttons in a FIXED order regardless of the active
  language - selecting one no longer swaps their positions. */
 .ob-lang-pick{display:flex;direction:ltr;gap:7px;justify-content:center;padding:0 20px;margin-bottom:14px;}
-.olb{padding:5px 14px;border:1px solid var(--b2);border-radius:20px;font-size:12px;font-weight:600;color:var(--tx2);background:rgba(16,30,52,.7);backdrop-filter:blur(8px);cursor:pointer;transition:all .15s;}
+.olb{padding:10px 16px;min-height:42px;border:1px solid var(--b2);border-radius:20px;font-size:13px;font-weight:600;color:var(--tx2);background:rgba(16,30,52,.7);backdrop-filter:blur(8px);cursor:pointer;transition:all .15s;touch-action:manipulation;position:relative;z-index:2;-webkit-tap-highlight-color:rgba(245,200,64,.25);}
+#set-lang-btns{gap:8px!important;}
+#set-lang-btns .olb{flex:1 1 0;min-width:0;text-align:center;}
 .olb.on{background:var(--gd);border-color:var(--b3);color:var(--g3);box-shadow:0 0 0 1px var(--b3);}
 .ob-steps{display:flex;gap:7px;margin-bottom:16px;}
 .ob-st{width:32px;height:3px;border-radius:2px;background:var(--n5);transition:background .3s;}
@@ -1405,9 +1407,9 @@ body.otp-active .ob-steps{display:none!important;}
 
 <!-- LANGUAGE BAR -->
 <div id="lang-bar" role="navigation" aria-label="בחירת שפה">
- <button class="lbtn on" onclick="setLang('he')" lang="he">🇮🇱 עב</button>
- <button class="lbtn" onclick="setLang('ar')" lang="ar">🇦🇪 عر</button>
- <button class="lbtn" onclick="setLang('en')" lang="en">🇬🇧 EN</button>
+ <button class="lbtn on" data-setlang="he" onclick="setLang('he')" lang="he">🇮🇱 עב</button>
+ <button class="lbtn" data-setlang="ar" onclick="setLang('ar')" lang="ar">🇦🇪 عر</button>
+ <button class="lbtn" data-setlang="en" onclick="setLang('en')" lang="en">🇬🇧 EN</button>
 </div>
 
 <input type="file" id="file-in" accept="image/*" multiple style="display:none" onchange="handleFiles(this.files)">
@@ -1425,9 +1427,9 @@ body.otp-active .ob-steps{display:none!important;}
  <div class="ob-sub" id="ob-tagline">Citizens for Citizens</div>
  <!-- Language pick in onboarding -->
  <div class="ob-lang-pick" role="group" aria-label="שפה">
- <button class="olb" onclick="setLang('en')" lang="en">🇬🇧 EN</button>
- <button class="olb" onclick="setLang('ar')" lang="ar">🇦🇪 عر</button>
- <button class="olb on" onclick="setLang('he')" lang="he">🇮🇱 עב</button>
+ <button class="olb" data-setlang="en" onclick="setLang('en')" lang="en">🇬🇧 EN</button>
+ <button class="olb" data-setlang="ar" onclick="setLang('ar')" lang="ar">🇦🇪 عر</button>
+ <button class="olb on" data-setlang="he" onclick="setLang('he')" lang="he">🇮🇱 עב</button>
  </div>
  </div>
 
@@ -1595,9 +1597,8 @@ body.otp-active .ob-steps{display:none!important;}
  <div class="hdr-left">
  <button class="hdr-menu" id="menu-btn" onclick="toggleDD()" aria-label="תפריט" aria-expanded="false" aria-haspopup="true"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></button>
  <span id="hdr-founder-slot" style="display:none"></span>
-   <button class="hdr-guide" onclick="openGuide()" aria-label="מדריך חירום" title="מדריך חירום">
- <svg class="ic" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6V4.8A1.8 1.8 0 0 1 10.8 3h2.4A1.8 1.8 0 0 1 15 4.8V6"/><rect x="3" y="6" width="18" height="14" rx="2.4"/><path d="M12 10.2v5.6M9.2 13h5.6" stroke-width="2.3"/></svg>
- </button>
+ <!-- Emergency Guide lives in the dropdown menu (ddr-guide) — removed from the header so
+      the bar is balanced: [menu] … [logo centered] … [bell]. -->
  <!-- REAL "SHOMERs nearby" - live count from RTDB presence (shown only when connected). -->
  <button class="hdr-near" id="hdr-near" style="display:none" onclick="explainNearby()" aria-live="polite">
  <div class="ldot" aria-hidden="true"></div>
@@ -2127,9 +2128,9 @@ body.otp-active .ob-steps{display:none!important;}
  <div class="set-cat"><div class="set-cat-ic"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="2"/><path d="M3 12h18" stroke="currentColor" stroke-width="2"/><path d="M12 3a15 15 0 0 1 0 18M12 3a15 15 0 0 0 0 18" fill="none" stroke="currentColor" stroke-width="2"/></svg></div><div class="set-cat-t" id="set-lang-lbl" data-he="שפה" data-en="Language">שפה</div></div>
  <div class="set-grp" style="padding:10px 0;border:0;background:none;">
  <div style="display:flex;direction:ltr;gap:6px;flex-wrap:wrap;" id="set-lang-btns">
- <button class="olb" onclick="setLang('en')" lang="en">🇬🇧 EN</button>
- <button class="olb" onclick="setLang('ar')" lang="ar">🇦🇪 عر</button>
- <button class="olb on" onclick="setLang('he')" lang="he">🇮🇱 עב</button>
+ <button class="olb" data-setlang="en" onclick="setLang('en')" lang="en">🇬🇧 EN</button>
+ <button class="olb" data-setlang="ar" onclick="setLang('ar')" lang="ar">🇦🇪 عر</button>
+ <button class="olb on" data-setlang="he" onclick="setLang('he')" lang="he">🇮🇱 עב</button>
  </div>
  </div>
  <div class="set-cat"><div class="set-cat-ic"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="3" fill="none" stroke="currentColor" stroke-width="2"/><path d="M12 2.5l1.3 2.3 2.6-.4.5 2.6 2.3 1.3-1 2.4 1 2.4-2.3 1.3-.5 2.6-2.6-.4L12 21.5l-1.3-2.3-2.6.4-.5-2.6L5.3 15.7l1-2.4-1-2.4 2.3-1.3.5-2.6 2.6.4Z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></svg></div><div class="set-cat-t" data-he="חשבון ומידע" data-en="Account &amp; About">חשבון ומידע</div></div>
@@ -3589,6 +3590,24 @@ function setLang(code){
  applyTranslations();
  refreshAutoName(); // keep the auto-filled username in step with the language
 }
+/* ── Bulletproof language switching ──────────────────────────────────────────
+   Some devices/webviews were not delivering the tap to the Hebrew button (inline
+   onclick never fired). A capture-phase delegated listener on the document catches
+   any tap on an element carrying data-setlang — before anything in the bubbling
+   path can swallow it — and switches language reliably. Covers click AND touch. */
+(function(){
+  function _langFromTap(e){
+    try{
+      var el=e.target && e.target.closest ? e.target.closest('[data-setlang]') : null;
+      if(!el) return;
+      var code=el.getAttribute('data-setlang');
+      if(code && (!currentLang || code!==currentLang)){ try{ setLang(code); }catch(_){} }
+      else if(code){ try{ setLang(code); }catch(_){} } // re-apply even if same, so taps always "do something"
+    }catch(_e){}
+  }
+  document.addEventListener('click', _langFromTap, true);   // capture phase
+  document.addEventListener('touchend', _langFromTap, true); // touch devices
+})();
 function applyTranslations(){
  // Onboarding
  setText('ob-h0',T('ob_h0')); setText('ob-d0',T('ob_d0'));
@@ -3766,6 +3785,17 @@ let nameAuto=true; // true until the user edits the name field themselves
 // Auto-generated handle: "Shomer" + a zero-padded number (e.g. Shomer00001). Editable.
 function pickRandomName(){if(pickRandomName._n==null)pickRandomName._n=Math.floor(Math.random()*9999)+1;return 'SH✡MER'+String(pickRandomName._n).padStart(4,'0');}
 function localizedGuardian(){return ({he:'שומר',en:'SHOMER',ar:'حارس',ru:'Страж',am:'ጠባቂ',fr:'Gardien'})[currentLang]||'SHOMER';}
+/* Every user IS a SHOMER, so the profile shows a UNIQUE handle (SH✡MER####), never the
+   generic word "שומר/SHOMER". Prefer a stored username; else derive a stable 4-digit
+   handle from the phone or the auth uid so it's consistent across sessions. */
+function uniqueHandle(){
+  try{
+    if(SS.user&&SS.user.username&&!/^(שומר|SHOMER|حارس)$/i.test(SS.user.username)) return SS.user.username;
+    var seed=(SS&&SS.phone)|| (typeof FB!=='undefined'&&FB&&FB.uid)|| (SS&&SS.security&&SS.security.firebaseUid)||'';
+    if(seed){ var h=0; seed=''+seed; for(var i=0;i<seed.length;i++){ h=((h<<5)-h+seed.charCodeAt(i))|0; } var num=(Math.abs(h)%9999)+1; var handle='SH✡MER'+String(num).padStart(4,'0'); try{ if(SS.user){ SS.user.username=handle; saveStore(); } }catch(_){} return handle; }
+  }catch(e){}
+  return localizedGuardian();
+}
 function randomizeName(){const inp=document.getElementById('ob-name');if(!inp)return;nameAuto=true;pickRandomName._n=null;inp.value=pickRandomName();}
 /* If the field still holds an auto-generated name (user hasn't typed), refresh it
  to the current language so name + UI localize together. */
@@ -4149,7 +4179,7 @@ function nudgeAskGeo(){
  try{ if(typeof ensureNativeGeo==='function'){ ensureNativeGeo().then(function(){ _nudgeGeoNow(); }); } else { _nudgeGeoNow(); } }catch(e){ _nudgeGeoNow(); }
 }
 function _nudgeGeoNow(){
- try{ navigator.geolocation.getCurrentPosition(function(p){ userLat=p.coords.latitude; userLng=p.coords.longitude; try{ccSyncFromGeo&&ccSyncFromGeo();}catch(e){} try{moveUserDot(userLat,userLng);}catch(e){} try{startGeoWatch();}catch(e){} try{ if(MAP) MAP.setView([userLat,userLng], Math.max(MAP.getZoom?MAP.getZoom():14,15)); }catch(e){} }, function(){}, {enableHighAccuracy:true,timeout:15000,maximumAge:0}); }catch(e){}
+ try{ navigator.geolocation.getCurrentPosition(function(p){ userLat=p.coords.latitude; userLng=p.coords.longitude; try{ccSyncFromGeo&&ccSyncFromGeo();}catch(e){} try{moveUserDot(userLat,userLng);}catch(e){} try{startGeoWatch();}catch(e){} try{ if(MAP) MAP.setView([userLat,userLng], Math.max(MAP.getZoom?MAP.getZoom():16,16)); }catch(e){} }, function(){}, {enableHighAccuracy:true,timeout:15000,maximumAge:0}); }catch(e){}
 }
 function nudgeMaybeShow(){
  try{
@@ -4213,7 +4243,7 @@ function renderProfile2(){ try{ var he=currentLang==='he';
 function scheduleRetentionNudges(){ try{ if(!_isNative()||!_ln) return; var he=currentLang==='he'; var hasCode=!!(SS.security&&/^\\d{4,6}$/.test((SS.security.pin)||'')); var hasCircle=(SS.circleMembers||[]).some(function(m){return m&&!m.pending;}); var ns=[]; if(!hasCode||!hasCircle){ ns.push({id:91001,title:'SH\u2721MER',body:he?'\u05d4\u05e9\u05dc\u05d9\u05de\u05d5 \u05d0\u05ea \u05d4\u05d4\u05d2\u05d3\u05e8\u05ea MY SHOMER \u2014 \u05de\u05e2\u05d2\u05dc \u05d0\u05de\u05d5\u05df \u05d5\u05e7\u05d5\u05d3 \u05d0\u05d1\u05d8\u05d7\u05d4':'Finish setting up MY SHOMER \u2014 trusted circle + security code',channelId:'shomer-updates',autoCancel:true,schedule:{at:new Date(Date.now()+2*3600*1000)}}); } ns.push({id:91002,title:'SH\u2721MER',body:he?'\u05d3\u05e7\u05d4 \u05dc\u05d1\u05d3\u05d5\u05e7 \u05d0\u05ea \u05d4\u05d0\u05d6\u05d5\u05e8 \u05e9\u05dc\u05da \u2014 \u05d4\u05ea\u05e8\u05d0\u05d5\u05ea \u05d1\u05d8\u05d9\u05d7\u05d5\u05ea \u05d1\u05d6\u05de\u05df \u05d0\u05de\u05ea':'A minute to check your area \u2014 live safety updates near you',channelId:'shomer-updates',autoCancel:true,schedule:{at:new Date(Date.now()+24*3600*1000)}}); try{ if(_ln&&ns.length)_ln.schedule({notifications:ns}); }catch(e){} }catch(e){} }
 function enterApp(returning){
  const profNm=document.getElementById('profNm');
- if(profNm)profNm.textContent=(SS.user&&SS.user.username)||user.name||localizedGuardian();
+ if(profNm)profNm.textContent=uniqueHandle();
  try{ renderProfession(); }catch(e){}
  // Best-effort setup - never let a failure here trap the user.
  try{ startShakeDetection(); }catch(e){}       // Android/desktop: live immediately
@@ -5322,7 +5352,7 @@ function addSOSPin(){
  removeSOSPin();
  const ll=(userLat!=null&&userLng!=null)?[userLat,userLng]:(MAP.getCenter()?[MAP.getCenter().lat,MAP.getCenter().lng]:[32.0707,34.7805]);
  mapLayers.sosMarker=window.L.marker(ll,{icon:sosPinIcon(curSosType),zIndexOffset:1000,alt:'SOS'}).addTo(MAP);
- try{MAP.setView(ll,Math.max(MAP.getZoom(),14),{animate:true});}catch(e){}
+ try{MAP.setView(ll,Math.max(MAP.getZoom(),16),{animate:true});}catch(e){}
 }
 function removeSOSPin(){if(mapLayers.sosMarker){MAP.removeLayer(mapLayers.sosMarker);mapLayers.sosMarker=null;}}
 
@@ -5561,7 +5591,7 @@ function initMap(){
  if(typeof window.L==='undefined'||!window.L.map){ setTimeout(initMap,90); return; } // Leaflet loads deferred
  const el=document.getElementById('map'); if(!el)return;
  MAP=window.L.map('map',{preferCanvas:true,zoomControl:false,attributionControl:true,
- center:[32.0853,34.7818],zoom:14,minZoom:3,maxZoom:19,
+ center:[32.0853,34.7818],zoom:16,minZoom:3,maxZoom:19,
  zoomSnap:.5,worldCopyJump:true});
  window.L.tileLayer(TILE_BASE,{maxZoom:16,className:'tiles-base',
  attribution:'Esri · HERE · Garmin · OpenStreetMap contributors'}).addTo(MAP);
@@ -8888,7 +8918,7 @@ try{ hydrateIcons(document); }catch(e){}
 /* Loaded-build version - shown in the diagnostic panel so a phone can prove
    whether it's on the latest build or a STALE cached one. Keep in lock-step
    with sw.js SW_VERSION on every deploy. */
-var APP_VER='v232';
+var APP_VER='v233';
 var FB={ready:false,uid:null,db:null,_presTimer:null,connected:false,listening:false,pushState:'default',near:0,swVer:'?',
   authState:'connecting',sdkLoaded:false,persist:'',permErr:null,err:null,wsProbe:'',csp:''};
 /* Always log connection diagnostics to the console so the real failure can be SEEN in Chrome. */
