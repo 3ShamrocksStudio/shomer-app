@@ -436,6 +436,7 @@ var sb=supabase.createClient(SB_URL,SB_KEY);
 var CAT_COL={'עבירות כלפי הרכוש':'#2f80ed','עבירות סדר ציבורי':'#f2b705','עבירות נגד גוף':'#e5484d','עבירות כלפי המוסר':'#e5468e','עבירות מרמה':'#18c29c','עבירות כלכליות':'#9b6cff'};
 var DATA=null, MAP=null, cityLayer=null, CLIENT=null, _curCity=null;
 var liveLayer=null,_seenSos={},_liveTimer=null,_curCityObj=null,_liveInitDone=false;
+var _sosFocusLock=false; /* when a live SOS is being shown, keep the map on the 0.3km event view (don't let the async territory draw re-fit to the whole city) */
 var _liveEvents={},_respRadius=1.5,_respSelKey=null,_respCircle=null,_respLatLng=null;
 var ESRI='https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_Base/MapServer/tile/{z}/{y}/{x}';
 var ESRIr='https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_Reference/MapServer/tile/{z}/{y}/{x}';
@@ -677,11 +678,11 @@ async function drawTerritory(c){
     L.polygon([world].concat(rings),{stroke:false,fillColor:'#060f1c',fillOpacity:.62,interactive:false}).addTo(cityLayer); // dim outside the jurisdiction
     var bnd=L.geoJSON(geo,{style:{color:'#ffffff',weight:1.3,dashArray:'3 6',fill:true,fillColor:'#ffffff',fillOpacity:.02}}).addTo(cityLayer);
     try{ MAP.invalidateSize(false); }catch(_s){}
-    try{ MAP.fitBounds(bnd.getBounds(),{padding:[24,24]}); }catch(e){ MAP.setView([c.lat,c.lng],12); }
+    if(!_sosFocusLock){ try{ MAP.fitBounds(bnd.getBounds(),{padding:[24,24]}); }catch(e){ MAP.setView([c.lat,c.lng],12); } }
   } else {
     L.circle([c.lat,c.lng],{radius:4500,color:'#ffffff',weight:1.3,dashArray:'3 6',fillColor:'#ffffff',fillOpacity:.02}).addTo(cityLayer);
     try{ MAP.invalidateSize(false); }catch(_s){}
-    MAP.setView([c.lat,c.lng],12,{animate:true});
+    if(!_sosFocusLock){ MAP.setView([c.lat,c.lng],12,{animate:true}); }
   }
 }
 var _natCache={};
@@ -963,9 +964,10 @@ function renderLive(c,list,opts){
          +'<div class="ls-go"><button onclick="event.stopPropagation();openResponse(\''+id0+'\')">\u05e4\u05ea\u05d7 \u05de\u05e8\u05db\u05d6 \u05ea\u05d2\u05d5\u05d1\u05d4 \u2190</button></div>';
        try{ stripGeocode(+e0.lat,+e0.lng); }catch(e){}
        strip.onclick=function(){ try{ openResponse(id0); }catch(e){} };
+       _sosFocusLock=true;
        if(id0!==_alarmId){ _alarmId=id0; _alarmSilenced=false; strip.style.animation=''; strip.style.background=''; strip.style.boxShadow=''; strip.classList.remove('attended'); startAlarm(); try{ flyToLive(+e0.lat,+e0.lng,id0); }catch(_f){} }
        else if(!_alarmSilenced){ startAlarm(); }
-     } else { strip.style.display='none'; strip.innerHTML=''; stopAlarm(); _alarmId=null; }
+     } else { strip.style.display='none'; strip.innerHTML=''; stopAlarm(); _alarmId=null; _sosFocusLock=false; }
    }
  }catch(e){}
  if(newSos){ _liveBeep(); flyToLive(newSos.lat,newSos.lng,newSos.id); bigSosAlert(newSos.id); }
