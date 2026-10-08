@@ -116,8 +116,10 @@
   .cmp .vv{width:52px;text-align:end;font-weight:700;color:var(--ink)}
   /* ---------- MAP ---------- */
   #map{flex:1;min-height:0;width:100%}
-  /* identical navy recolor to the app map (same ArcGIS tiles + same filter) */
-  .tiles-base{filter:brightness(.85) sepia(.75) hue-rotate(192deg) saturate(2) brightness(.4) contrast(.9);}
+  /* identical navy recolor to the app map: same ArcGIS tiles + same filter. The base tiles
+     live in the default tile pane (filtered navy); the labels layer sits in shadowPane
+     (above, unfiltered) so street names stay crisp — exactly how the app map is built. */
+  .leaflet-tile-pane{filter:brightness(.85) sepia(.75) hue-rotate(192deg) saturate(2) brightness(.4) contrast(.9);}
   .maptools{display:flex;gap:7px}
   .mini{background:var(--dark2);border:1px solid var(--db);color:var(--tx2);border-radius:8px;padding:5px 10px;font-size:11px;cursor:pointer;font-family:inherit}
   .mini.on{background:var(--gold);color:#231806;border-color:var(--gold);font-weight:700}
@@ -543,7 +545,7 @@ async function boot(){
   render(idx>=0?idx:0);
   /* note removed in console layout */
 }
-function initMap(){ MAP=L.map('map',{zoomControl:true,attributionControl:false}).setView([31.5,34.9],7); L.tileLayer(ESRI,{maxZoom:19,maxNativeZoom:16,className:'tiles-base'}).addTo(MAP); L.tileLayer(ESRIr,{maxZoom:19,maxNativeZoom:16,className:'tiles-ref'}).addTo(MAP); liveLayer=L.layerGroup().addTo(MAP); }
+function initMap(){ MAP=L.map('map',{zoomControl:true,attributionControl:false}).setView([31.5,34.9],7); L.tileLayer(ESRI,{maxZoom:19,maxNativeZoom:16}).addTo(MAP); L.tileLayer(ESRIr,{maxZoom:19,maxNativeZoom:16,pane:'shadowPane'}).addTo(MAP); liveLayer=L.layerGroup().addTo(MAP); }
 function renderLegend(){ var el=document.getElementById('legend'); el.innerHTML=''; Object.keys(CAT_COL).forEach(function(k){ el.innerHTML+='<span><i style="background:'+CAT_COL[k]+'"></i>'+k+'</span>'; }); }
 /* approx CBS 2023 populations (public figures) for per-capita context */
 var POP={'תל אביב יפו':474000,'ירושלים':981000,'חיפה':285000,'ראשון לציון':254000,'פתח תקווה':248000,'אשדוד':225000,'נתניה':221000,'באר שבע':209000,'בני ברק':208000,'חולון':196000,'רמת גן':171000,'בית שמש':146000,'רחובות':149000,'אשקלון':144000,'בת ים':128000,'כפר סבא':100000,'חדרה':100000,'הרצליה':97000,'מודיעין':93000,'לוד':80000,'רמלה':77000,'רעננה':75000,'רהט':75000,'הוד השרון':65000,'גבעתיים':60000,'קרית גת':60000,'קרית אתא':58000,'נהריה':58000,'עפולה':56000,'אילת':52000,'עכו':49000,'טבריה':48000};
