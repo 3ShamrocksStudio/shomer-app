@@ -362,7 +362,7 @@
     <div class="tb-sp"></div>
     <div class="terr-pick"><span id="terr-static" class="hidden">טריטוריה: <b id="terr-name" style="color:var(--gold)"></b></span><select id="terr-sel"></select></div>
     <div class="live"><span class="d"></span><span id="org-name"></span></div>
-    <span class="plan-badge" id="plan-badge" title="רמת מנוי">Pro · דמו</span><button class="tbtn" id="acct-btn">⚙ חשבון</button><button class="tbtn" id="export-btn">⤓ ייצוא</button>
+    <span class="plan-badge" id="plan-badge" title="רמת מנוי">Pro · דמו</span><button class="tbtn" id="trends-btn" onclick="openTrends()">📈 מגמות</button><button class="tbtn" id="acct-btn">⚙ חשבון</button><button class="tbtn" id="export-btn">⤓ ייצוא</button>
     <button class="tbtn" id="signout">יציאה</button>
   </div>
   <div class="kpis" id="kpis"></div>
@@ -1026,6 +1026,28 @@ function buildAnalysis(idx,fk){
 function renderLegend(){var el=document.getElementById('legend');if(!el)return;el.innerHTML=Object.keys(CAT_META).map(function(k){return '<span><i style="background:'+catCol(k)+'"></i>'+catShort(k)+'</span>';}).join('');}
 
 var PLAN='pro'; /* demo runs Pro — all open. Tier model shown for the GTM. */
+function closeTrends(){ var o=document.getElementById("trend-ov"); if(o)o.remove(); }
+function openTrends(){
+ if(document.getElementById("trend-ov"))return;
+ var months=['יולי','אוג׳','ספט׳','אוק׳','נוב׳','דצ׳'];
+ var series=[{k:'רכוש',c:'#2f80ed',v:[42,38,47,51,44,58]},{k:'אלימות',c:'#e5484d',v:[11,14,9,13,16,12]},{k:'סדר ציבורי',c:'#f2b705',v:[22,19,25,21,28,24]}];
+ var W=620,H=300,pad=34,gw=(W-pad*2)/months.length,maxV=0;
+ series.forEach(function(sr){sr.v.forEach(function(x){if(x>maxV)maxV=x;});});
+ var bw=Math.min(16,(gw-14)/series.length), bars='';
+ months.forEach(function(m,mi){
+   var x0=pad+mi*gw+(gw-bw*series.length-(series.length-1)*3)/2;
+   series.forEach(function(sr,si){ var hgt=(sr.v[mi]/maxV)*(H-pad*2-18); var x=x0+si*(bw+3), y=H-pad-hgt;
+     bars+='<rect x="'+x.toFixed(1)+'" y="'+(H-pad)+'" width="'+bw+'" height="0" rx="3" fill="'+sr.c+'"><animate attributeName="height" from="0" to="'+hgt.toFixed(1)+'" dur="0.7s" begin="'+(mi*0.06+si*0.03)+'s" fill="freeze"/><animate attributeName="y" from="'+(H-pad)+'" to="'+y.toFixed(1)+'" dur="0.7s" begin="'+(mi*0.06+si*0.03)+'s" fill="freeze"/></rect>';
+   });
+   bars+='<text x="'+(pad+mi*gw+gw/2)+'" y="'+(H-pad+16)+'" text-anchor="middle" fill="#8a93a6" font-size="11" font-family="Rubik">'+m+'</text>';
+ });
+ var grid='';for(var g=1;g<=3;g++){var gy=H-pad-(g/3)*(H-pad*2-18);grid+='<line x1="'+pad+'" y1="'+gy+'" x2="'+(W-pad)+'" y2="'+gy+'" stroke="rgba(255,255,255,.07)"/><text x="'+(pad-6)+'" y="'+(gy+4)+'" text-anchor="end" fill="#5f6b82" font-size="10">'+Math.round(maxV*g/3)+'</text>';}
+ var legend=series.map(function(sr){return '<span style="display:inline-flex;align-items:center;gap:6px;font-size:12px;color:#cdd6e8;margin-inline-end:14px"><i style="width:11px;height:11px;border-radius:3px;background:'+sr.c+'"></i>'+sr.k+'</span>';}).join('');
+ var ov=document.createElement('div'); ov.id='trend-ov'; ov.className='acct-ov';
+ ov.innerHTML='<div class="acct-card" style="max-width:720px"><div class="acct-head"><h3>מגמות · השוואה חודשית</h3><button class="acct-x" onclick="closeTrends()">✕</button></div><div class="acct-sub">השוואת דיווחים לפי קטגוריה וחודש · 6 חודשים</div><div style="margin:6px 2px 10px">'+legend+'</div><svg viewBox="0 0 '+W+' '+H+'" style="width:100%;height:auto">'+grid+bars+'</svg><div class="acct-note"><b style="color:#f0c75a">דוגמה</b> — הגרף יוזן מנתוני דיווחי התושבים האמיתיים, כאשר יצטברו מספיק אירועים. לא יוצגו מספרים לא-מאומתים.</div></div>';
+ document.body.appendChild(ov);
+ ov.addEventListener('click',function(ev){ if(ev.target===ov)closeTrends(); });
+}
 function closeRoster(){ var o=document.getElementById("rost-ov"); if(o)o.remove(); }
 function openRoster(){
  if(document.getElementById("rost-ov"))return;

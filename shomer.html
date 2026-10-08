@@ -301,13 +301,14 @@ input[type=range]:focus::-webkit-slider-thumb{box-shadow:0 0 0 4px rgba(224,168,
 /* colourful professional roles */
 .prof-opt .pic{transition:background .18s,color .18s,border-color .18s;width:34px;height:34px}
 .prof-opt .pic .ic{width:19px;height:19px}
-.prof-opt .pic{border:0!important;color:#fff!important;box-shadow:0 6px 16px rgba(0,0,0,.4)}
-.prof-opt[data-prof="police"] .pic{background:linear-gradient(150deg,#4DA3FF,#1670E0 55%,#0B4491)}
-.prof-opt[data-prof="doctor"] .pic{background:linear-gradient(150deg,#3DDC97,#12A594 55%,#0A6E62)}
-.prof-opt[data-prof="fire"]   .pic{background:linear-gradient(150deg,#FFB03A,#E8811C 55%,#A9500A)}
-.prof-opt[data-prof="para"]   .pic{background:linear-gradient(150deg,#FF3B50,#E0182C 55%,#9A0F1E)}
-.prof-opt[data-prof="security"] .pic{background:linear-gradient(135deg,#C09020,#E0A828 60%,#F5C840);color:#23170a!important}
-.prof-opt[data-prof=""] .pic{background:linear-gradient(150deg,#8898B8,#5A6B87 60%,#3A465C)}
+.prof-opt .pic{border:1.6px solid currentColor;border-radius:11px;background:rgba(255,255,255,.035);box-shadow:none}
+.prof-opt .pic .ic{fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.prof-opt[data-prof="police"] .pic{color:#2962FF}
+.prof-opt[data-prof="doctor"] .pic{color:#16A06A}
+.prof-opt[data-prof="fire"] .pic{color:#FF7A1A}
+.prof-opt[data-prof="para"] .pic{color:#FF3B50}
+.prof-opt[data-prof="security"] .pic{color:#E0A828}
+.prof-opt[data-prof=""] .pic{color:#8898B8}
 .prof-opt.sel{border-color:var(--g3)!important;background:rgba(224,168,40,.10)}
 .prof-opt.sel .pic{box-shadow:0 0 0 3px rgba(245,200,64,.55),0 6px 16px rgba(0,0,0,.45)}
 .prof-opt.sel .pic{box-shadow:0 0 0 2px currentColor inset}
@@ -2194,12 +2195,12 @@ body.otp-active .ob-steps{display:none!important;}
  <div class="sec-cap mb12" id="prof-prof-cap">תפקיד מקצועי (מתנדב/ת מגיב/ה)</div>
  <p class="sr-sb" id="prof-prof-hint" style="margin:-4px 2px 12px;line-height:1.6">בחר/י תפקיד אם את/ה מגיב/ה מקצועי/ת - סמל יוצג בפרופיל ועל הסמן שלך במפה.</p>
  <div class="prof-grid mb20" id="prof-grid" role="group" aria-label="תפקיד מקצועי">
- <div class="prof-opt" data-prof="police" onclick="selectProfession('police')" role="button" tabindex="0"><span class="pic" aria-hidden="true"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.8l7 2.6v5.1c0 4.5-2.9 8-7 9.7-4.1-1.7-7-5.2-7-9.7V5.4Z" fill="currentColor" stroke="none"/><path d="M12 7.9l1.15 2.33 2.57.37-1.86 1.82.44 2.55L12 13.77l-2.3 1.2.44-2.55-1.86-1.82 2.57-.37Z" fill="#fff" stroke="none"/></svg></span><span class="pl" data-pl="police">משטרה</span></div>
- <div class="prof-opt" data-prof="doctor" onclick="selectProfession('doctor')" role="button" tabindex="0"><span class="pic" aria-hidden="true"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.5v19" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M12 5.6c2.6 0 2.6 2.6 0 2.6s-2.6 2.6 0 2.6 2.6 2.6 0 2.6-2.6 2.6 0 2.6 2.6 2.6 0 2.6" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/><path d="M9.6 3.6h4.8" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></span><span class="pl" data-pl="doctor">רופא/ה (MD)</span></div>
- <div class="prof-opt" data-prof="fire" onclick="selectProfession('fire')" role="button" tabindex="0"><span class="pic" aria-hidden="true"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.5c.4 3-1.3 4.2-2.7 5.6C7.6 9.7 6 11.3 6 14a6 6 0 0 0 12 0c0-2.4-1-3.9-2.2-5.3-.5 .9-1.2 1.4-2 1.4 1-2.6-.2-5.6-1.8-7.6Z" fill="currentColor" stroke="none"/><path d="M12 20a3 3 0 0 1-3-3c0-1.4 1-2.2 1.7-3 .3 .8 .9 1.2 1.6 1.2-.4-1.3 .2-2.7 .9-3.5 .6 .9 1.8 1.9 1.8 4.3a3 3 0 0 1-3 3Z" fill="#fff" opacity=".55" stroke="none"/></svg></span><span class="pl" data-pl="fire">כבאי/ת</span></div>
- <div class="prof-opt" data-prof="para" onclick="selectProfession('para')" role="button" tabindex="0"><span class="pic" aria-hidden="true"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.2l2.4 4.15 4.79.02-2.4 4.13 2.4 4.13-4.79.02L12 18.8l-2.4-4.15-4.79-.02 2.4-4.13-2.4-4.13 4.79-.02Z" fill="currentColor" stroke="none"/><path d="M12 7.2v9.6M8.6 9.2l6.8 5.6M15.4 9.2l-6.8 5.6" stroke="rgba(0,0,0,.35)" stroke-width="1" stroke-linecap="round"/></svg></span><span class="pl" data-pl="para">פרמדיק/ית</span></div>
- <div class="prof-opt" data-prof="security" onclick="selectProfession('security')" role="button" tabindex="0"><span class="pic" aria-hidden="true"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.6l7.4 2.8v5.4c0 4.8-3.1 8.5-7.4 10.4-4.3-1.9-7.4-5.6-7.4-10.4V5.4Z" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linejoin="round"/><path d="M8.8 12.2l2.2 2.2 4.2-4.4" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span class="pl" data-pl="security">אבטחה</span></div>
- <div class="prof-opt sel" data-prof="" onclick="selectProfession('')" role="button" tabindex="0"><span class="pic" aria-hidden="true"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8.5" fill="none" stroke="currentColor" stroke-width="2"/><path d="M6.3 6.3l11.4 11.4" fill="none" stroke="currentColor" stroke-width="2"/></svg></span><span class="pl" data-pl="none">ללא</span></div>
+ <div class="prof-opt" data-prof="police" onclick="selectProfession('police')" role="button" tabindex="0"><span class="pic" aria-hidden="true"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3l7 2.6v5c0 4.5-2.9 7.9-7 9.6-4.1-1.7-7-5.1-7-9.6V5.6Z"/><path d="M12 8.3l1 2 2.2.3-1.6 1.5.4 2.2-2-1-2 1 .4-2.2L8.8 10.6l2.2-.3Z"/></svg></span><span class="pl" data-pl="police">משטרה</span></div>
+ <div class="prof-opt" data-prof="doctor" onclick="selectProfession('doctor')" role="button" tabindex="0"><span class="pic" aria-hidden="true"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="4" width="16" height="16" rx="4"/><path d="M12 8.5v7M8.5 12h7"/></svg></span><span class="pl" data-pl="doctor">רופא/ה (MD)</span></div>
+ <div class="prof-opt" data-prof="fire" onclick="selectProfession('fire')" role="button" tabindex="0"><span class="pic" aria-hidden="true"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3c.5 3-1.3 4.3-2.7 5.7C7.7 10 6 11.5 6 14a6 6 0 0 0 12 0c0-2.4-1-3.9-2.3-5.3-.5.9-1.2 1.4-2 1.4 1-2.7-.1-5.6-1.7-7.1Z"/></svg></span><span class="pl" data-pl="fire">כבאי/ת</span></div>
+ <div class="prof-opt" data-prof="para" onclick="selectProfession('para')" role="button" tabindex="0"><span class="pic" aria-hidden="true"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v18M4.2 7.5l15.6 9M19.8 7.5l-15.6 9"/></svg></span><span class="pl" data-pl="para">פרמדיק/ית</span></div>
+ <div class="prof-opt" data-prof="security" onclick="selectProfession('security')" role="button" tabindex="0"><span class="pic" aria-hidden="true"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3l7 2.6v5c0 4.5-2.9 7.9-7 9.6-4.1-1.7-7-5.1-7-9.6V5.6Z"/><path d="M8.8 12.2l2.2 2.2 4.2-4.4"/></svg></span><span class="pl" data-pl="security">אבטחה</span></div>
+ <div class="prof-opt" data-prof="" onclick="selectProfession('')" role="button" tabindex="0"><span class="pic" aria-hidden="true"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M6.3 6.3l11.4 11.4"/></svg></span><span class="pl" data-pl="none">ללא</span></div>
  </div>
 <!-- defib incentive: responders likely have/know a defib - invite them to add it -->
 
@@ -8888,7 +8889,7 @@ try{ hydrateIcons(document); }catch(e){}
 /* Loaded-build version - shown in the diagnostic panel so a phone can prove
    whether it's on the latest build or a STALE cached one. Keep in lock-step
    with sw.js SW_VERSION on every deploy. */
-var APP_VER='v224';
+var APP_VER='v225';
 var FB={ready:false,uid:null,db:null,_presTimer:null,connected:false,listening:false,pushState:'default',near:0,swVer:'?',
   authState:'connecting',sdkLoaded:false,persist:'',permErr:null,err:null,wsProbe:'',csp:''};
 /* Always log connection diagnostics to the console so the real failure can be SEEN in Chrome. */
