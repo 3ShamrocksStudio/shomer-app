@@ -311,7 +311,7 @@
 .live-banner .lb-m{font-size:11px;color:#f2c7cb;margin-top:2px}
 .live-banner .lb-go{margin-top:7px;background:linear-gradient(135deg,#FF2D2D,#2f6bff);color:#fff;font-weight:800;font-size:11px;border:0;border-radius:8px;padding:6px 13px;cursor:pointer;font-family:inherit}
 #live-banner{display:none}
-.live-strip{margin:0 14px 10px;border-radius:14px;cursor:pointer;display:flex;align-items:center;gap:16px;padding:12px 16px;animation:lspulse 1.1s steps(1,end) infinite;position:relative;overflow:hidden}
+.live-strip{margin:16px auto 16px;max-width:1080px;width:calc(100% - 28px);border-radius:16px;cursor:pointer;display:flex;align-items:center;justify-content:space-between;gap:20px;padding:12px 18px;animation:lspulse 1.1s steps(1,end) infinite;position:relative;overflow:hidden}
 @keyframes lspulse{0%,100%{background:linear-gradient(90deg,rgba(255,26,64,.96),rgba(214,20,40,.93));box-shadow:0 10px 30px rgba(204,20,38,.5),0 0 0 1px rgba(255,130,140,.7) inset}50%{background:linear-gradient(90deg,rgba(43,98,255,.93),rgba(20,70,210,.92));box-shadow:0 10px 36px rgba(30,90,220,.55),0 0 0 1px rgba(140,175,255,.8) inset}}
 .live-strip .ls-go{flex:0 0 auto}
 .live-strip .ls-go button{background:rgba(10,16,30,.5);color:#fff;font-weight:800;font-size:13px;border:1px solid rgba(255,255,255,.4);border-radius:11px;padding:11px 16px;cursor:pointer;font-family:inherit;white-space:nowrap;transition:background .15s}
@@ -320,7 +320,23 @@
 .live-strip .ls-t{font-size:21px;font-weight:900;letter-spacing:.3px;line-height:1.1;text-shadow:0 1px 6px rgba(0,0,0,.4)}
 .live-strip .ls-addr{font-size:14px;font-weight:700;color:#fff;margin-top:5px}
 .live-strip .ls-resp{font-size:12.5px;color:#ffe0e4;margin-top:4px}
+.live-strip .ls-resp{display:flex;flex-wrap:wrap;gap:7px 10px;justify-content:center;align-items:center}
 .live-strip .ls-resp b{color:#fff}
+.ls-chip{display:inline-flex;align-items:center;gap:5px;background:rgba(10,16,30,.4);border:1px solid rgba(255,255,255,.22);border-radius:999px;padding:3px 10px;font-size:12px;color:#fff;white-space:nowrap}
+.ls-chip i{width:8px;height:8px;border-radius:50%;flex:0 0 auto;box-shadow:0 0 6px currentColor}
+.ls-chip b{font-weight:900;font-size:12.5px}
+.ls-demo{font-size:11px;color:#ffd0d4;font-weight:700;align-self:center}
+/* comparison-chart controls */
+.tr-ctrl{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:8px 12px;margin:2px 2px 8px}
+.tr-ranges{display:inline-flex;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);border-radius:9px;padding:2px}
+.tr-rg{background:none;border:none;color:#9aa6bd;font-family:inherit;font-size:11.5px;font-weight:700;padding:4px 10px;border-radius:7px;cursor:pointer;transition:all .15s}
+.tr-rg.on{background:rgba(224,168,40,.18);color:#f0c75a}
+.tr-checks{display:flex;flex-wrap:wrap;gap:6px}
+.tr-ck{display:inline-flex;align-items:center;gap:6px;background:rgba(255,255,255,.035);border:1px solid rgba(255,255,255,.12);border-radius:999px;padding:4px 11px 4px 9px;font-family:inherit;font-size:11.5px;font-weight:600;color:#8a93a6;cursor:pointer;transition:all .15s}
+.tr-ck i{width:10px;height:10px;border-radius:3px;background:transparent;border:1.6px solid var(--cc);transition:background .15s}
+.tr-ck.on{color:#e8edf5;border-color:color-mix(in srgb,var(--cc) 55%,transparent);background:color-mix(in srgb,var(--cc) 12%,transparent)}
+.tr-ck.on i{background:var(--cc)}
+.tr-ck:hover{color:#cdd6e8}
 .live-strip .ls-beacon{flex:0 0 auto;display:flex;align-items:center}
 .live-strip .ls-live{display:inline-flex;align-items:center;gap:5px;background:rgba(10,16,30,.55);color:#fff;font-weight:900;font-size:12px;letter-spacing:.08em;padding:7px 12px;border-radius:999px;border:1px solid rgba(255,255,255,.5);white-space:nowrap}
 .live-strip.attended .ls-live{opacity:.6}
@@ -899,14 +915,15 @@ function renderLive(c,list,opts){
        var demo=!!opts.demo;
        var g=demo?42:'\u2014', pol=demo?3:'\u2014', fire=demo?1:'\u2014', med=demo?8:'\u2014';
        strip.style.display='flex';
+       var _chip=function(col,n,lbl){return '<span class="ls-chip"><i style="background:'+col+'"></i><b>'+n+'</b> '+lbl+'</span>';};
        strip.innerHTML=''
-         +'<div class="ls-go"><button onclick="openResponse(\''+id0+'\')">\u05e4\u05ea\u05d7 \u05de\u05e8\u05db\u05d6 \u05ea\u05d2\u05d5\u05d1\u05d4 \u2190</button></div>'
+         +'<div class="ls-beacon"><span class="ls-live">\u25cf LIVE</span><button id="ls-silence" class="ls-silence" onclick="event.stopPropagation();silenceAlarm()">\ud83d\udd07 \u05d4\u05e9\u05ea\u05e7 \u05d0\u05d6\u05e2\u05e7\u05d4</button></div>'
          +'<div class="ls-main">'
-         +'<div class="ls-t">'+m0.i+' '+ESC(m0.t)+' \u00b7 LIVE!</div>'
-         +'<div class="ls-addr">\u05e8\u05d7\u05d5\u05d1: <span id="ls-addr-txt">\u05de\u05d0\u05ea\u05e8 \u05db\u05ea\u05d5\u05d1\u05ea\u2026</span></div>'
-         +'<div class="ls-resp">\u05e9\u05d5\u05de\u05e8\u05d9\u05dd \u05d6\u05de\u05d9\u05e0\u05d9\u05dd: <b>'+g+'</b> \u00b7 \u05de\u05ea\u05e0\u05d3\u05d1\u05d9\u05dd \u05d6\u05de\u05d9\u05e0\u05d9\u05dd \u2014 \u05e9\u05d5\u05d8\u05e8\u05d9\u05dd: <b>'+pol+'</b> \u00b7 \u05db\u05d1\u05d0\u05d9\u05dd: <b>'+fire+'</b> \u00b7 \u05e4\u05e8\u05de\u05d3\u05d9\u05e7/\u05e8\u05d5\u05e4\u05d0: <b>'+med+'</b>'+(demo?' \u00b7 <span style="color:#ffd0d4">\u05e0\u05ea\u05d5\u05e0\u05d9 \u05d4\u05d3\u05d2\u05de\u05d4</span>':'')+'</div>'
+         +'<div class="ls-t">'+m0.i+' '+ESC(m0.t)+'</div>'
+         +'<div class="ls-addr"><span id="ls-addr-txt">\u05de\u05d0\u05ea\u05e8 \u05db\u05ea\u05d5\u05d1\u05ea\u2026</span></div>'
+         +'<div class="ls-resp">'+_chip('#E0A828',g,'\u05e9\u05d5\u05de\u05e8\u05d9\u05dd')+_chip('#2962FF',pol,'\u05e9\u05d5\u05d8\u05e8\u05d9\u05dd')+_chip('#16A06A',med,'\u05e8\u05e4\u05d5\u05d0\u05d4')+_chip('#FF7A1A',fire,'\u05db\u05d1\u05d0\u05d5\u05ea')+(demo?'<span class="ls-demo">\u05e0\u05ea\u05d5\u05e0\u05d9 \u05d4\u05d3\u05d2\u05de\u05d4</span>':'')+'</div>'
          +'</div>'
-         +'<div class="ls-beacon"><span class="ls-live">● LIVE</span><button id="ls-silence" class="ls-silence" onclick="event.stopPropagation();silenceAlarm()">🔇 השתק אזעקה</button></div>';
+         +'<div class="ls-go"><button onclick="event.stopPropagation();openResponse(\''+id0+'\')">\u05e4\u05ea\u05d7 \u05de\u05e8\u05db\u05d6 \u05ea\u05d2\u05d5\u05d1\u05d4 \u2190</button></div>';
        try{ stripGeocode(+e0.lat,+e0.lng); }catch(e){}
        strip.onclick=function(){ try{ openResponse(id0); }catch(e){} };
        if(id0!==_alarmId){ _alarmId=id0; _alarmSilenced=false; strip.style.animation=''; strip.style.background=''; strip.style.boxShadow=''; strip.classList.remove('attended'); startAlarm(); }
@@ -1005,7 +1022,11 @@ function buildKPIs(idx){
   k('עבירות אלימות',violPct+'%',fmt(viol)+' נגד גוף',(violPct>12?'bad':'ok'),PUB)+
   k('פער הדיווח','~74%','רק 26% מהעבירות מדווח למשטרה · IDI','gap',NAT,true)+
   k('רשת שומרים',cov,(cov==='—'?'דיווחים חיים · משלים את הפער':'דיווחים חיים · ▸ לחצו לרשת המגיבים'),'net-v',NET,false,'openRoster()')+
-  k('דירוג ארצי','#'+(idx+1),'מתוך '+cities.length+' · משטרת ישראל 2025');
+  (function(){var cleaner=cities.length-1-idx,third=cities.length/3,
+     sevCls=idx<third?'bad':idx<third*2?'gold':'ok',
+     mark=idx<third?'▲ ':'',
+     sub=idx===0?'הגבוהה בארץ בעבירות מדווחות — הכי חמור':idx<third?('מהחמורות בארץ · חמורה מ-'+cleaner+' ערים'):('חמורה מ-'+cleaner+' מתוך '+(cities.length-1)+' ערים');
+     return k('דירוג חומרה · ארצי',mark+'#'+(idx+1),sub,sevCls,PUB);})();
  if(!window._kpiAnimated){ window._kpiAnimated=true; try{ animateKPIs(); }catch(e){} }
 }
 function animateKPIs(){
@@ -1033,24 +1054,56 @@ var CRIME_LEVER={
 };
 function renderTrendInline(elId){
  var el=document.getElementById(elId); if(!el)return;
- var months=['יולי','אוג׳','ספ׳','אוק׳','נוב׳','דצ׳'];
- var series=[{k:'רכוש',c:'#2f80ed',v:[42,38,47,51,44,58]},{k:'אלימות',c:'#e5484d',v:[11,14,9,13,16,12]},{k:'סדר ציבורי',c:'#f2b705',v:[22,19,25,21,28,24]}];
- var W=560,H=250,pad=30,gw=(W-pad*2)/months.length,maxV=0;
- series.forEach(function(sr){sr.v.forEach(function(x){if(x>maxV)maxV=x;});});
- var bw=Math.min(15,(gw-12)/series.length), bars='';
- months.forEach(function(m,mi){
-   var x0=pad+mi*gw+(gw-bw*series.length-(series.length-1)*3)/2;
-   series.forEach(function(sr,si){ var hgt=(sr.v[mi]/maxV)*(H-pad*2-16); var x=x0+si*(bw+3), y=H-pad-hgt;
-     bars+='<rect x="'+x.toFixed(1)+'" y="'+(H-pad)+'" width="'+bw+'" height="0" rx="3" fill="'+sr.c+'"><animate attributeName="height" from="0" to="'+hgt.toFixed(1)+'" dur="0.7s" begin="'+(mi*0.06+si*0.03)+'s" fill="freeze"/><animate attributeName="y" from="'+(H-pad)+'" to="'+y.toFixed(1)+'" dur="0.7s" begin="'+(mi*0.06+si*0.03)+'s" fill="freeze"/></rect>';
-   });
-   bars+='<text x="'+(pad+mi*gw+gw/2)+'" y="'+(H-pad+15)+'" text-anchor="middle" fill="#8a93a6" font-size="11" font-family="Rubik">'+m+'</text>';
+ var MON=['נוב׳','דצ׳','ינו׳','פבר׳','מרץ','אפר׳','מאי','יונ׳','יול׳','אוג׳','ספט׳','אוק׳'];
+ var SER=[
+  {k:'רכוש',c:'#2f80ed',v:[46,41,39,44,52,49,55,58,51,47,54,61]},
+  {k:'אלימות',c:'#e5484d',v:[13,16,12,11,15,18,14,13,17,16,12,15]},
+  {k:'סדר ציבורי',c:'#f2b705',v:[24,21,19,23,26,22,28,25,27,24,29,31]},
+  {k:'מוסר',c:'#e5468e',v:[7,6,8,5,9,7,8,10,6,7,9,8]},
+  {k:'מרמה',c:'#18c29c',v:[9,11,10,8,12,13,11,14,12,15,13,16]},
+  {k:'כלכלי',c:'#9b6cff',v:[5,6,5,7,6,8,7,6,9,8,7,9]}
+ ];
+ if(!window._trRange)window._trRange=6;
+ if(!window._trOn){window._trOn={'רכוש':1,'אלימות':1,'סדר ציבורי':1,'מוסר':0,'מרמה':0,'כלכלי':0};}
+ var R=window._trRange, on=window._trOn;
+ var mon=MON.slice(MON.length-R), act=SER.filter(function(s){return on[s.k];});
+ var W=640,H=236,padL=30,padR=14,padT=14,padB=26, iw=W-padL-padR, ih=H-padT-padB;
+ var maxV=1; act.forEach(function(s){s.v.slice(s.v.length-R).forEach(function(x){if(x>maxV)maxV=x;});});
+ maxV=Math.ceil(maxV/5)*5;
+ var n=mon.length, step=n>1?iw/(n-1):iw;
+ function X(i){return padL+i*step;}
+ function Y(v){return padT+ih-(v/maxV)*ih;}
+ function smooth(pts){ if(pts.length<2)return ''; var d='M'+pts[0][0].toFixed(1)+','+pts[0][1].toFixed(1);
+   for(var i=0;i<pts.length-1;i++){ var p0=pts[i-1]||pts[i],p1=pts[i],p2=pts[i+1],p3=pts[i+2]||pts[i+1];
+     var c1x=p1[0]+(p2[0]-p0[0])/6, c1y=p1[1]+(p2[1]-p0[1])/6, c2x=p2[0]-(p3[0]-p1[0])/6, c2y=p2[1]-(p3[1]-p1[1])/6;
+     d+='C'+c1x.toFixed(1)+','+c1y.toFixed(1)+' '+c2x.toFixed(1)+','+c2y.toFixed(1)+' '+p2[0].toFixed(1)+','+p2[1].toFixed(1); }
+   return d; }
+ // gridlines + y labels
+ var grid='';for(var g=0;g<=4;g++){var gy=padT+ih-(g/4)*ih;grid+='<line x1="'+padL+'" y1="'+gy.toFixed(1)+'" x2="'+(W-padR)+'" y2="'+gy.toFixed(1)+'" stroke="rgba(255,255,255,.06)"/><text x="'+(padL-6)+'" y="'+(gy+3).toFixed(1)+'" text-anchor="end" fill="#5f6b82" font-size="9.5" font-family="Rubik">'+Math.round(maxV*g/4)+'</text>';}
+ var xlab='';mon.forEach(function(m,i){xlab+='<text x="'+X(i).toFixed(1)+'" y="'+(H-8)+'" text-anchor="middle" fill="#8a93a6" font-size="10" font-family="Rubik">'+m+'</text>';});
+ // series paths (area + line + dots)
+ var defs='',paths='';
+ act.forEach(function(s,si){
+   var vals=s.v.slice(s.v.length-R); var pts=vals.map(function(v,i){return [X(i),Y(v)];});
+   var line=smooth(pts);
+   var area=line+' L'+X(n-1).toFixed(1)+','+(padT+ih)+' L'+padL.toFixed(1)+','+(padT+ih)+' Z';
+   var gid='trg'+si;
+   defs+='<linearGradient id="'+gid+'" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="'+s.c+'" stop-opacity="0.28"/><stop offset="1" stop-color="'+s.c+'" stop-opacity="0"/></linearGradient>';
+   paths+='<path d="'+area+'" fill="url(#'+gid+')" opacity="0"><animate attributeName="opacity" from="0" to="1" dur="0.5s" begin="'+(0.25+si*0.08)+'s" fill="freeze"/></path>';
+   paths+='<path d="'+line+'" fill="none" stroke="'+s.c+'" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" pathLength="100" stroke-dasharray="100" stroke-dashoffset="100"><animate attributeName="stroke-dashoffset" from="100" to="0" dur="0.85s" begin="'+(si*0.08)+'s" fill="freeze" calcMode="spline" keySplines="0.22 1 0.36 1" keyTimes="0;1" values="100;0"/></path>';
+   pts.forEach(function(p,i){ paths+='<circle cx="'+p[0].toFixed(1)+'" cy="'+p[1].toFixed(1)+'" r="2.6" fill="#0f1218" stroke="'+s.c+'" stroke-width="2" opacity="0"><animate attributeName="opacity" from="0" to="1" dur="0.3s" begin="'+(0.5+si*0.08+i*0.02)+'s" fill="freeze"/></circle>'; });
  });
- var grid='';for(var g=1;g<=3;g++){var gy=H-pad-(g/3)*(H-pad*2-16);grid+='<line x1="'+pad+'" y1="'+gy+'" x2="'+(W-pad)+'" y2="'+gy+'" stroke="rgba(255,255,255,.07)"/><text x="'+(pad-6)+'" y="'+(gy+4)+'" text-anchor="end" fill="#5f6b82" font-size="10">'+Math.round(maxV*g/3)+'</text>';}
- var legend=series.map(function(sr){return '<span style="display:inline-flex;align-items:center;gap:6px;font-size:12px;color:#cdd6e8;margin-inline-end:14px"><i style="width:11px;height:11px;border-radius:3px;background:'+sr.c+'"></i>'+sr.k+'</span>';}).join('');
- el.innerHTML='<div style="margin:2px 2px 8px">'+legend+'</div>'
-  +'<svg viewBox="0 0 '+W+' '+H+'" style="width:100%;height:auto">'+grid+bars+'</svg>'
-  +'<div class="foot"><b style="color:#f0c75a">דוגמה</b> — הגרף יוזן מדיווחי התושבים האמיתיים כשיצטברו מספיק אירועים. לחצו על פלח בדונאט לניתוח מעמיק ומענים מוכחים.</div>';
+ // controls
+ var ranges=[3,6,12].map(function(r){return '<button class="tr-rg'+(r===R?' on':'')+'" onclick="_trSetRange('+r+')">'+r+' ח׳</button>';}).join('');
+ var checks=SER.map(function(s){var active=!!on[s.k];return '<button class="tr-ck'+(active?' on':'')+'" onclick="_trToggle(\''+s.k+'\')" style="--cc:'+s.c+'"><i></i>'+s.k+'</button>';}).join('');
+ el.innerHTML=''
+  +'<div class="tr-ctrl"><div class="tr-ranges">'+ranges+'</div><div class="tr-checks">'+checks+'</div></div>'
+  +(act.length?'<svg viewBox="0 0 '+W+' '+H+'" style="width:100%;height:auto;display:block"><defs>'+defs+'</defs>'+grid+paths+xlab+'</svg>'
+     :'<div style="text-align:center;color:#6d7893;padding:34px 10px;font-size:13px">בחרו סוג עבירה אחד או יותר להצגה</div>')
+  +'<div class="foot"><b style="color:#f0c75a">דוגמה</b> — השוואת סוגי עבירה לאורך זמן. הגרף יוזן מדיווחי התושבים האמיתיים כשיצטברו מספיק אירועים. סמנו/בטלו סוגי עבירה ובחרו טווח חודשים.</div>';
 }
+function _trSetRange(r){window._trRange=r;try{renderTrendInline('analysispane');}catch(e){}}
+function _trToggle(k){if(!window._trOn)window._trOn={};window._trOn[k]=window._trOn[k]?0:1;try{renderTrendInline('analysispane');}catch(e){}}
 function buildAnalysis(idx,fk){
  var _tt=document.getElementById('analysis-ttl'),_tp=document.getElementById('analysis-pill');
  if(!fk){ if(_tt)_tt.innerHTML='📊 מגמות · השוואה חודשית · 6 חודשים'; if(_tp){_tp.textContent='דוגמה';} renderTrendInline('analysispane'); return; }
@@ -1064,7 +1117,7 @@ function buildAnalysis(idx,fk){
    var near=cities.map(function(x){return{x:x,d:Math.hypot(x.lat-c.lat,x.lng-c.lng)};}).sort(function(a,b){return a.d-b.d;}).slice(1,7).map(function(o){return o.x;});
    var worse=near.filter(function(x){return (x.cats[fk]||0)>v;}).length;
    var lev=CRIME_LEVER[fk]||CRIME_LEVER._def;
-   out.push({cls:'up',i:'▲',t:catShort(fk)+' · '+c.city,d:'<b>'+fmt(v)+'</b> עבירות ('+Math.round(cs*100)+'% מהעיר) · דירוג ארצי <b>#'+cr+'</b> בעבירה זו · '+(diff>=0?'+':'')+diff+'% מול הממוצע הארצי.'});
+   out.push({cls:'up',i:'▲',t:catShort(fk)+' · '+c.city,d:'<b>'+fmt(v)+'</b> עבירות ('+Math.round(cs*100)+'% מהעיר) · דירוג חומרה <b style="color:'+(cr<=10?'#e5484d':cr<=30?'#f2b705':'#16a06a')+'">#'+cr+'</b> בעבירה זו'+(cr<=10?' (מהחמורות בארץ)':'')+' · '+(diff>=0?'+':'')+diff+'% מול הממוצע הארצי.'});
    out.push({cls:'flag',i:'⌖',t:'הקשר גאוגרפי',d:'מבין 6 הערים הסמוכות, <b>'+worse+'</b> חמורות יותר בעבירה זו.'+(cr<=10?' מהגבוהות בארץ — עדיפות גבוהה.':'')});
    out.push({cls:'info',i:'◆',t:'מנוף מומלץ לעבירה זו',d:lev.d,src:lev.s,url:lev.u});
    head='ניתוח ממוקד · '+catShort(fk)+' · '+c.city;

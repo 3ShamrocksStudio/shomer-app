@@ -371,10 +371,10 @@ input[type=range]:focus::-webkit-slider-thumb{box-shadow:0 0 0 4px rgba(224,168,
 .bell-dot{position:absolute;top:6px;right:6px;width:8px;height:8px;border-radius:50%;background:var(--r3);border:2px solid rgba(8,18,36,.97);display:none;}
 .bell-dot.on{display:block;animation:blink 1.2s ease-in-out infinite;}
 @keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
-.hdr-center{flex:0 0 auto;display:flex;align-items:center;justify-content:center;gap:9px;}
+.hdr-center{position:absolute;left:50%;top:50%;transform:translate(-50%,calc(-50% + var(--hdr-top,0px)/2));display:flex;align-items:center;justify-content:center;gap:9px;pointer-events:none;z-index:1;}
 /* Badge floats free - transparent PNG, no plate, just a soft halo. */
-.hdr-logo-svg{height:30px;width:auto;max-width:60vw;object-fit:contain;flex-shrink:0;filter:drop-shadow(0 2px 6px rgba(0,0,0,.6));}
-@media(max-width:360px){.hdr-logo-svg{height:26px;}}
+.hdr-logo-svg{height:37px;width:auto;max-width:56vw;object-fit:contain;flex-shrink:0;pointer-events:auto;filter:drop-shadow(0 2px 7px rgba(0,0,0,.6));}
+@media(max-width:360px){.hdr-logo-svg{height:32px;}}
 /* Wordmark echoes the badge: brushed-platinum letters, gold Star of David. */
 .hdr-name{font-size:22px;font-weight:900;letter-spacing:1px;background:linear-gradient(160deg,#FFFFFF 0%,#C8D2E2 30%,#8392AB 58%,#E6ECF6 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;display:inline-flex;align-items:center;text-shadow:0 1px 1px rgba(0,0,0,.3);}
 .hdr-name .star{-webkit-text-fill-color:#F5C840;color:#F5C840;font-size:.98em;line-height:1;margin:0 .02em;text-shadow:0 0 12px var(--gb);}
@@ -2213,9 +2213,9 @@ body.otp-active .ob-steps{display:none!important;}
    <div class="defib-prompt" id="defib-prompt">
      <div class="defib-l">
        <span class="defib-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2L4.5 13H11l-1 9 8.5-11H12l1-9Z"/></svg></span>
-       <div><div class="defib-t">יש לך גישה לדפיברילטור?</div><div class="defib-s">הוסף/י אותו למפה - כל שנייה קובעת בעצירת לב. יופיע לכל השומרים באזור.</div></div>
+       <div><div class="defib-t" data-he="יש לך גישה לדפיברילטור?" data-en="Have access to a defibrillator?" data-ar="هل لديك وصول إلى جهاز إزالة الرجفان؟">יש לך גישה לדפיברילטור?</div><div class="defib-s" data-he="הוסף/י אותו למפה - כל שנייה קובעת בעצירת לב. יופיע לכל השומרים באזור." data-en="Add it to the map — every second counts in cardiac arrest. It'll show to all SHOMERs nearby." data-ar="أضفه إلى الخريطة — كل ثانية مهمة في السكتة القلبية. سيظهر لكل الحُرّاس في المنطقة.">הוסף/י אותו למפה - כל שנייה קובעת בעצירת לב. יופיע לכל השומרים באזור.</div></div>
      </div>
-     <button class="btn-secondary defib-add" onclick="cl('sh-prof'); setTimeout(function(){ try{ aedPlaceMode(); }catch(e){} }, 300);">הוסף דפיברילטור למפה</button>
+     <button class="btn-secondary defib-add" data-he="הוסף דפיברילטור למפה" data-en="Add defibrillator to map" data-ar="أضف جهاز إزالة الرجفان إلى الخريطة" onclick="cl('sh-prof'); setTimeout(function(){ try{ aedPlaceMode(); }catch(e){} }, 300);">הוסף דפיברילטור למפה</button>
    </div>
 
  </div>
@@ -8888,7 +8888,7 @@ try{ hydrateIcons(document); }catch(e){}
 /* Loaded-build version - shown in the diagnostic panel so a phone can prove
    whether it's on the latest build or a STALE cached one. Keep in lock-step
    with sw.js SW_VERSION on every deploy. */
-var APP_VER='v226';
+var APP_VER='v227';
 var FB={ready:false,uid:null,db:null,_presTimer:null,connected:false,listening:false,pushState:'default',near:0,swVer:'?',
   authState:'connecting',sdkLoaded:false,persist:'',permErr:null,err:null,wsProbe:'',csp:''};
 /* Always log connection diagnostics to the console so the real failure can be SEEN in Chrome. */
@@ -12916,8 +12916,9 @@ html[dir="rtl"] .sh-back svg{transform:scaleX(-1)}
 
 .defib-prompt{background:linear-gradient(160deg,rgba(61,187,102,.1),rgba(16,30,52,.6));border:1px solid rgba(61,187,102,.3);border-radius:14px;padding:14px;margin-bottom:20px}
 .defib-l{display:flex;gap:11px;align-items:flex-start;margin-bottom:12px}
-.defib-ic{width:34px;height:34px;border-radius:10px;background:rgba(61,187,102,.15);border:1px solid rgba(61,187,102,.4);display:flex;align-items:center;justify-content:center;color:#3DBB66;flex:0 0 auto}
-.defib-ic svg{width:18px;height:18px}
+/* circular legend-style disc (matches map-legend .ldc + profile role discs) */
+.defib-ic{width:38px;height:38px;border-radius:50%;background:#16A06A;border:1.6px solid rgba(255,255,255,.88);box-shadow:0 2px 9px rgba(0,0,0,.42),0 0 11px -2px #16A06A;display:flex;align-items:center;justify-content:center;color:#fff;flex:0 0 auto}
+.defib-ic svg{width:20px;height:20px;stroke:#fff;fill:none}
 .defib-t{font-size:14px;font-weight:900;color:var(--tx0);margin-bottom:3px}
 .defib-s{font-size:11.5px;color:var(--tx2);line-height:1.55}
 .defib-add{background:rgba(61,187,102,.14)!important;border-color:rgba(61,187,102,.45)!important;color:#3DBB66!important}
