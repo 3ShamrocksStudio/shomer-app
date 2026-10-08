@@ -718,9 +718,10 @@ function _liveMeta(e){
 }
 function flyToLive(lat,lng,id){ try{ if(!MAP)return;
   try{ MAP.invalidateSize(false); }catch(_s){}
-  /* open on a ~0.3 km radius view (600 m box) centred exactly on the event */
-  var b=L.latLng(+lat,+lng).toBounds(600);
-  try{ MAP.fitBounds(b,{maxZoom:18,padding:[16,16],animate:true,duration:.6}); }catch(_e){ try{MAP.setView([+lat,+lng],17,{animate:true});}catch(_e2){} }
+  /* open on a close ~0.3 km-radius view centred exactly on the event (fixed zoom is
+     reliable here — the map panel is wide and short, so fitBounds of a square box
+     under-zooms). zoom 16 ≈ 0.3 km radius vertically. */
+  try{ MAP.setView([+lat,+lng],16,{animate:true}); }catch(_e){ try{MAP.setView([+lat,+lng],16);}catch(_e2){} }
   var mk=liveLayer&&liveLayer._byId&&liveLayer._byId[id]; if(mk){ setTimeout(function(){ try{mk.openPopup();}catch(e){} },850); }
   var it=document.querySelector('.feed .item[data-id="'+id+'"]'); if(it){ it.classList.remove('flash'); void it.offsetWidth; it.classList.add('flash'); }
  }catch(e){} }
