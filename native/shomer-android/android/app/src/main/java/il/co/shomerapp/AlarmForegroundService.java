@@ -105,7 +105,7 @@ public class AlarmForegroundService extends Service {
     return new NotificationCompat.Builder(this, CH)
         .setContentTitle("🚨 SHOMER — SOS")
         .setContentText("Alarm active — tap STOP to silence, or open the app")
-        .setSmallIcon(R.mipmap.ic_launcher)
+        .setSmallIcon(R.drawable.ic_stat_shomer)
         .setOngoing(true)
         .setContentIntent(pi)
         .setFullScreenIntent(pi, true)
