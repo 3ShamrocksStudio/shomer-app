@@ -116,6 +116,8 @@
   .cmp .vv{width:52px;text-align:end;font-weight:700;color:var(--ink)}
   /* ---------- MAP ---------- */
   #map{flex:1;min-height:0;width:100%}
+  /* identical navy recolor to the app map (same ArcGIS tiles + same filter) */
+  .tiles-base{filter:brightness(.85) sepia(.75) hue-rotate(192deg) saturate(2) brightness(.4) contrast(.9);}
   .maptools{display:flex;gap:7px}
   .mini{background:var(--dark2);border:1px solid var(--db);color:var(--tx2);border-radius:8px;padding:5px 10px;font-size:11px;cursor:pointer;font-family:inherit}
   .mini.on{background:var(--gold);color:#231806;border-color:var(--gold);font-weight:700}
@@ -366,6 +368,11 @@
 .tr-ck.on{color:#e8edf5;border-color:color-mix(in srgb,var(--cc) 55%,transparent);background:color-mix(in srgb,var(--cc) 12%,transparent)}
 .tr-ck.on i{background:var(--cc)}
 .tr-ck:hover{color:#cdd6e8}
+.shr-chips{display:flex;flex-wrap:wrap;gap:8px}
+.shr-ck{display:inline-flex;align-items:center;gap:7px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.14);border-radius:999px;padding:8px 14px;font-family:inherit;font-size:13px;font-weight:600;color:#9aa6bd;cursor:pointer;transition:all .15s}
+.shr-ck i{width:11px;height:11px;border-radius:50%;border:1.8px solid var(--cc);transition:background .15s}
+.shr-ck.on{color:#e8edf5;border-color:color-mix(in srgb,var(--cc) 60%,transparent);background:color-mix(in srgb,var(--cc) 14%,transparent)}
+.shr-ck.on i{background:var(--cc)}
 .live-strip .ls-beacon{flex:0 0 auto;display:flex;align-items:center}
 .live-strip .ls-live{display:inline-flex;align-items:center;gap:5px;background:rgba(10,16,30,.55);color:#fff;font-weight:900;font-size:12px;letter-spacing:.08em;padding:7px 12px;border-radius:999px;border:1px solid rgba(255,255,255,.5);white-space:nowrap}
 .live-strip.attended .ls-live{opacity:.6}
@@ -536,7 +543,7 @@ async function boot(){
   render(idx>=0?idx:0);
   /* note removed in console layout */
 }
-function initMap(){ MAP=L.map('map',{zoomControl:true,attributionControl:false}).setView([31.5,34.9],7); L.tileLayer(ESRI,{maxZoom:19,maxNativeZoom:16}).addTo(MAP); L.tileLayer(ESRIr,{maxZoom:19,maxNativeZoom:16}).addTo(MAP); liveLayer=L.layerGroup().addTo(MAP); }
+function initMap(){ MAP=L.map('map',{zoomControl:true,attributionControl:false}).setView([31.5,34.9],7); L.tileLayer(ESRI,{maxZoom:19,maxNativeZoom:16,className:'tiles-base'}).addTo(MAP); L.tileLayer(ESRIr,{maxZoom:19,maxNativeZoom:16,className:'tiles-ref'}).addTo(MAP); liveLayer=L.layerGroup().addTo(MAP); }
 function renderLegend(){ var el=document.getElementById('legend'); el.innerHTML=''; Object.keys(CAT_COL).forEach(function(k){ el.innerHTML+='<span><i style="background:'+CAT_COL[k]+'"></i>'+k+'</span>'; }); }
 /* approx CBS 2023 populations (public figures) for per-capita context */
 var POP={'תל אביב יפו':474000,'ירושלים':981000,'חיפה':285000,'ראשון לציון':254000,'פתח תקווה':248000,'אשדוד':225000,'נתניה':221000,'באר שבע':209000,'בני ברק':208000,'חולון':196000,'רמת גן':171000,'בית שמש':146000,'רחובות':149000,'אשקלון':144000,'בת ים':128000,'כפר סבא':100000,'חדרה':100000,'הרצליה':97000,'מודיעין':93000,'לוד':80000,'רמלה':77000,'רעננה':75000,'רהט':75000,'הוד השרון':65000,'גבעתיים':60000,'קרית גת':60000,'קרית אתא':58000,'נהריה':58000,'עפולה':56000,'אילת':52000,'עכו':49000,'טבריה':48000};
@@ -915,16 +922,55 @@ function _respMenim(e,m){
   if(!men)men={d:'סיור יזום ממוקד + אכיפה מהירה בזירה — הגישה בעלת בסיס-הראיות החזק ביותר.',s:'OJP CrimeSolutions',u:'https://crimesolutions.ojp.gov'};
   return '<div class="rloc" style="border-color:rgba(79,195,232,.25)"><div class="rloc-a" style="color:#cfe8ff">'+men.d+'</div><div class="rloc-acc"><a href="'+men.u+'" target="_blank" rel="noopener" style="color:#7fd0f0">מקור: '+men.s+' ↗</a></div></div>';
 }
+var _shareSel={};
+function closeShare(){ var o=document.getElementById('share-ov'); if(o)o.remove(); }
+function _shareToggle(k,el){ _shareSel[k]=!_shareSel[k]; if(el)el.classList.toggle('on'); _shareUpdateCount(); }
+function _shareUpdateCount(){
+  var demo=true; var counts={shomrim:42,police:3,med:8,fire:1};
+  var rad=window._shareRad||1.5; var factor=Math.min(1,rad/1.5);
+  var total=0; Object.keys(_shareSel).forEach(function(k){ if(_shareSel[k]){ total+= (k==='all'?(counts.shomrim+counts.police+counts.med+counts.fire):(counts[k]||0)); } });
+  if(_shareSel.all){ total=counts.shomrim+counts.police+counts.med+counts.fire; }
+  total=Math.round(total*factor);
+  var el=document.getElementById('share-count'); if(el) el.textContent=total;
+}
+function _shareRad(v){ window._shareRad=+v; var el=document.getElementById('share-radv'); if(el)el.textContent=(+v).toFixed(1)+' ק"מ'; _shareUpdateCount(); }
+function respSendAlert(id){
+  var sel=Object.keys(_shareSel).filter(function(k){return _shareSel[k];});
+  if(!sel.length){ try{ var w=document.getElementById('share-warn'); if(w)w.style.display='block'; }catch(e){} return; }
+  var rad=window._shareRad||1.5;
+  var names={shomrim:'שומרים',police:'שוטרים',med:'צוותי רפואה',fire:'כבאות',all:'כל המגיבים'};
+  var who=sel.map(function(k){return names[k]||k;}).join(', ');
+  var cnt=(document.getElementById('share-count')||{}).textContent||'';
+  try{ respLog(id,'📣 התראת מיקום אירוע נשלחה · נמענים: '+who+' · רדיוס '+rad.toFixed(1)+' ק"מ · ~'+cnt+' מקבלים'); }catch(e){}
+  var card=document.getElementById('share-card');
+  if(card){ card.innerHTML='<div style="text-align:center;padding:26px 18px"><div style="font-size:40px">📣</div><div style="font-size:17px;font-weight:800;color:#8fe0b0;margin-top:8px">ההתראה נשלחה</div><div style="font-size:13px;color:#9aa6bd;margin-top:6px">מיקום האירוע הופץ ל-<b style="color:#fff">'+cnt+'</b> מגיבים ('+who+') ברדיוס '+rad.toFixed(1)+' ק"מ.</div><div style="font-size:11px;color:#6d7893;margin-top:10px">נתוני הדגמה · במערכת החיה ההתראה נשלחת כ-Push למכשירי השומרים הנבחרים</div><button class="resp-send" style="margin-top:14px" onclick="closeShare()">סגור</button></div>'; }
+  setTimeout(closeShare, 3200);
+}
 function respShareLoc(lat,lng,id){
   try{
+    if(document.getElementById('share-ov'))return;
+    _shareSel={shomrim:true}; window._shareRad=(typeof _respRadius==='number'?_respRadius:1.5);
     var addrEl=document.getElementById('resp-addr'); var addr=addrEl?(addrEl.textContent||'').trim():'';
     var mapUrl='https://www.google.com/maps?q='+lat.toFixed(5)+','+lng.toFixed(5);
-    var txt='מיקום אירוע SH✡MER'+(addr&&addr.indexOf('מאתר')<0?' · '+addr:'')+'\n'+mapUrl;
-    if(navigator.share){ navigator.share({title:'מיקום אירוע',text:txt,url:mapUrl}).then(function(){ try{respLog(id,'📤 מיקום האירוע שותף');}catch(e){} }).catch(function(){}); return; }
-    if(navigator.clipboard){ navigator.clipboard.writeText(txt); }
-    try{respLog(id,'📤 קישור למיקום האירוע הועתק — מוכן לשיתוף עם כוח מגיב');}catch(e){}
-    var btn=event&&event.target; if(btn){ var o=btn.textContent; btn.textContent='✓ הועתק'; setTimeout(function(){btn.textContent=o;},1600); }
-  }catch(e){}
+    var chip=function(k,col,lbl){ return '<button class="shr-ck'+(_shareSel[k]?' on':'')+'" style="--cc:'+col+'" onclick="_shareToggle(\''+k+'\',this)"><i></i>'+lbl+'</button>'; };
+    var ov=document.createElement('div'); ov.id='share-ov'; ov.className='acct-ov';
+    ov.innerHTML='<div class="acct-card" id="share-card" style="max-width:440px">'
+      +'<div class="acct-head"><h3>📤 שיתוף מיקום אירוע · התראה לשומרים</h3><button class="acct-x" onclick="closeShare()">✕</button></div>'
+      +'<div class="acct-sub">בחר/י מי יקבל התראה עם מיקום האירוע. ההתראה נשלחת רק לנמענים שתבחר/י.</div>'
+      +'<div style="margin:12px 0 6px;font-size:12px;color:#9aa6bd;font-weight:700">נמענים</div>'
+      +'<div class="shr-chips">'+chip('shomrim','#E0A828','שומרים')+chip('police','#2962FF','שוטרים')+chip('med','#16A06A','רפואה')+chip('fire','#FF7A1A','כבאות')+chip('all','#ff6b78','כולם')+'</div>'
+      +'<div id="share-warn" style="display:none;color:#ff6b70;font-size:11.5px;margin-top:6px">בחר/י לפחות נמען אחד</div>'
+      +'<div style="margin:14px 0 4px;font-size:12px;color:#9aa6bd;font-weight:700">רדיוס התראה <span id="share-radv" style="color:#f0c75a">'+window._shareRad.toFixed(1)+' ק"מ</span></div>'
+      +'<input class="resp-slider" type="range" min="0.2" max="5" step="0.1" value="'+window._shareRad+'" oninput="_shareRad(this.value)">'
+      +'<div style="text-align:center;margin:12px 0;font-size:13px;color:#cdd6e8">מקבלים משוערים: <b id="share-count" style="color:#fff;font-size:17px">42</b></div>'
+      +'<button class="resp-send" onclick="respSendAlert(\''+id+'\')">📣 שלח התראת מיקום לנמענים</button>'
+      +'<div class="resp-two" style="margin-top:9px"><div class="resp-bc" onclick="(function(){try{navigator.clipboard&&navigator.clipboard.writeText(\''+mapUrl+'\');respLog(\''+id+'\',\'🔗 קישור מיקום הועתק\');}catch(e){}})()">🔗 העתק קישור מפה</div>'+(navigator.share?'<div class="resp-esc" onclick="navigator.share({title:\'מיקום אירוע\',url:\''+mapUrl+'\'}).catch(function(){})">↗ שתף</div>':'')+'</div>'
+      +'<div class="acct-note">נתוני הדגמה · ההתראה במערכת החיה נשלחת כהתראת Push למכשירי השומרים הנבחרים בלבד, בהתאם לבחירתך.</div>'
+      +'</div>';
+    document.body.appendChild(ov);
+    ov.onclick=function(e){ if(e.target===ov)closeShare(); };
+    _shareUpdateCount();
+  }catch(e){ try{console.error(e);}catch(_){} }
 }
 function respReinforce(id){
   try{

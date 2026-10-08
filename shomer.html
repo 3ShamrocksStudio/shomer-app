@@ -3607,6 +3607,19 @@ function setLang(code){
   }
   document.addEventListener('click', _langFromTap, true);   // capture phase
   document.addEventListener('touchend', _langFromTap, true); // touch devices
+  /* Same bulletproofing for the "pick from contacts" button — some webviews weren't
+     delivering its tap either. A capture-phase delegated handler guarantees it fires. */
+  var _contactsBusy=false;
+  function _contactsFromTap(e){
+    try{
+      var el=e.target && e.target.closest ? e.target.closest('.agf-contacts') : null;
+      if(!el) return;
+      if(_contactsBusy) return; _contactsBusy=true; setTimeout(function(){_contactsBusy=false;},800);
+      try{ agPickContact(); }catch(_){}
+    }catch(_e){}
+  }
+  document.addEventListener('click', _contactsFromTap, true);
+  document.addEventListener('touchend', _contactsFromTap, true);
 })();
 function applyTranslations(){
  // Onboarding
@@ -7126,34 +7139,41 @@ async function addMatchedContact(name,raw){
   await addGuardian();
 }
 async function agPickContact(){
- var he=currentLang==='he';
+ var he=currentLang==='he', ar=currentLang==='ar';
+ function _fill(nm,tel){ var np=document.getElementById('ag-phone'), nn=document.getElementById('ag-name'); if(np&&tel)np.value=(''+tel).replace(/[^\d+]/g,'').trim(); if(nn&&nm&&!nn.value)nn.value=(''+nm).trim(); try{agPhoneHint();}catch(e){} }
+ function _manual(msg){ try{ toast(msg,'amb'); }catch(e){} var np=document.getElementById('ag-phone'); if(np){ try{np.focus();}catch(e){} } }
+ // immediate feedback so the user knows the tap registered
+ try{ toast(he?'\u05e4\u05d5\u05ea\u05d7 \u05d0\u05ea \u05d0\u05e0\u05e9\u05d9 \u05d4\u05e7\u05e9\u05e8\u2026':ar?'\u062c\u0627\u0631\u064d \u0641\u062a\u062d \u062c\u0647\u0627\u062a \u0627\u0644\u0627\u062a\u0635\u0627\u0644\u2026':'Opening contacts\u2026',''); }catch(e){}
+ // 1) Native Capacitor Contacts plugin (installed app)
  try{
    var C=(window.Capacitor&&window.Capacitor.Plugins&&window.Capacitor.Plugins.Contacts);
    var native=!!(window.Capacitor&&window.Capacitor.isNativePlatform&&window.Capacitor.isNativePlatform());
-   if(C && native){
+   if(native && C && typeof C.pickContact==='function'){
      try{ await C.requestPermissions(); }catch(e){}
      var res=await C.pickContact({projection:{name:true,phones:true}});
      var ct=res&&res.contact;
-     if(ct){
-       var nm=(ct.name&&(ct.name.display||ct.name.given||''))||'';
-       var tel=(ct.phones&&ct.phones[0]&&ct.phones[0].number)||'';
-       var np=document.getElementById('ag-phone'), nn=document.getElementById('ag-name');
-       if(np&&tel)np.value=(''+tel).trim(); if(nn&&nm&&!nn.value)nn.value=(''+nm).trim(); agPhoneHint();
-     }
+     if(ct){ _fill((ct.name&&(ct.name.display||ct.name.given||''))||'', (ct.phones&&ct.phones[0]&&ct.phones[0].number)||''); }
      return;
    }
- }catch(e){}
- if(navigator.contacts&&navigator.contacts.select){
-   navigator.contacts.select(['name','tel'],{multiple:false}).then(function(sel){
-     if(!sel||!sel.length)return; var ct=sel[0];
-     var tel=(ct.tel&&ct.tel[0])||''; var nm=(ct.name&&ct.name[0])||'';
-     var np=document.getElementById('ag-phone'), nn=document.getElementById('ag-name');
-     if(np&&tel)np.value=(''+tel).trim(); if(nn&&nm&&!nn.value)nn.value=(''+nm).trim(); agPhoneHint();
-   }).catch(function(){});
- } else {
-   toast(he?'\u05d1\u05d7\u05d9\u05e8\u05d4 \u05de\u05d0\u05e0\u05e9\u05d9 \u05e7\u05e9\u05e8 \u05dc\u05d0 \u05e0\u05ea\u05de\u05db\u05ea \u05db\u05d0\u05df - \u05d4\u05d6\u05df/\u05d9 \u05d9\u05d3\u05e0\u05d9\u05ea':'Contact picker unsupported here - type the number','amb');
-   var np=document.getElementById('ag-phone'); if(np)np.focus();
+   if(native && (!C || typeof C.pickContact!=='function')){
+     // native app but the Contacts plugin isn't available in this build
+     _manual(he?'\u05d1\u05d5\u05d7\u05e8 \u05d0\u05e0\u05e9\u05d9 \u05e7\u05e9\u05e8 \u05d0\u05d9\u05e0\u05d5 \u05d6\u05de\u05d9\u05df \u05d1\u05d2\u05e8\u05e1\u05d4 \u05d6\u05d5 \u2014 \u05d4\u05e7\u05dc\u05d3/\u05d9 \u05de\u05e1\u05e4\u05e8 \u05d9\u05d3\u05e0\u05d9\u05ea':ar?'\u0645\u0646\u062a\u0642\u064a \u062c\u0647\u0627\u062a \u0627\u0644\u0627\u062a\u0635\u0627\u0644 \u063a\u064a\u0631 \u0645\u062a\u0627\u062d \u2014 \u0623\u062f\u062e\u0644 \u0627\u0644\u0631\u0642\u0645 \u064a\u062f\u0648\u064a\u0627\u064b':'Contact picker isn\'t available in this build \u2014 type the number');
+     return;
+   }
+ }catch(e){ /* user cancelled or permission denied \u2014 fall through to manual */
+   _manual(he?'\u05dc\u05d0 \u05e0\u05d1\u05d7\u05e8 \u05d0\u05d9\u05e9 \u05e7\u05e9\u05e8 \u2014 \u05d4\u05e7\u05dc\u05d3/\u05d9 \u05de\u05e1\u05e4\u05e8 \u05d9\u05d3\u05e0\u05d9\u05ea':ar?'\u0644\u0645 \u064a\u062a\u0645 \u0627\u062e\u062a\u064a\u0627\u0631 \u062c\u0647\u0629 \u0627\u062a\u0635\u0627\u0644':'No contact selected \u2014 type the number');
+   return;
  }
+ // 2) Web Contact Picker API (some Android Chrome builds)
+ try{
+   if(navigator.contacts && typeof navigator.contacts.select==='function'){
+     var sel=await navigator.contacts.select(['name','tel'],{multiple:false});
+     if(sel&&sel.length){ var c2=sel[0]; _fill((c2.name&&c2.name[0])||'', (c2.tel&&c2.tel[0])||''); }
+     return;
+   }
+ }catch(e){ _manual(he?'\u05d4\u05e7\u05dc\u05d3/\u05d9 \u05de\u05e1\u05e4\u05e8 \u05d9\u05d3\u05e0\u05d9\u05ea':'Type the number manually'); return; }
+ // 3) No picker available anywhere \u2014 guide to manual entry
+ _manual(he?'\u05d1\u05d7\u05d9\u05e8\u05d4 \u05de\u05d0\u05e0\u05e9\u05d9 \u05e7\u05e9\u05e8 \u05d0\u05d9\u05e0\u05d4 \u05e0\u05ea\u05de\u05db\u05ea \u05db\u05d0\u05df \u2014 \u05d4\u05e7\u05dc\u05d3/\u05d9 \u05de\u05e1\u05e4\u05e8':ar?'\u0627\u0643\u062a\u0628 \u0627\u0644\u0631\u0642\u0645':'Contact picker unsupported here \u2014 type the number');
 }
 /* ══ WILDFIRE: one tap to invite anyone, anywhere ══
    Creates a real pairing invite and hands it to the OS share sheet (WhatsApp, SMS,
@@ -8943,7 +8963,7 @@ try{ hydrateIcons(document); }catch(e){}
 /* Loaded-build version - shown in the diagnostic panel so a phone can prove
    whether it's on the latest build or a STALE cached one. Keep in lock-step
    with sw.js SW_VERSION on every deploy. */
-var APP_VER='v234';
+var APP_VER='v235';
 var FB={ready:false,uid:null,db:null,_presTimer:null,connected:false,listening:false,pushState:'default',near:0,swVer:'?',
   authState:'connecting',sdkLoaded:false,persist:'',permErr:null,err:null,wsProbe:'',csp:''};
 /* Always log connection diagnostics to the console so the real failure can be SEEN in Chrome. */
