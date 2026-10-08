@@ -311,7 +311,19 @@
 .live-banner .lb-m{font-size:11px;color:#f2c7cb;margin-top:2px}
 .live-banner .lb-go{margin-top:7px;background:linear-gradient(135deg,#FF2D2D,#2f6bff);color:#fff;font-weight:800;font-size:11px;border:0;border-radius:8px;padding:6px 13px;cursor:pointer;font-family:inherit}
 #live-banner{display:none}
-.live-strip{margin:16px auto 16px;max-width:1080px;width:calc(100% - 28px);border-radius:16px;cursor:pointer;display:flex;align-items:center;justify-content:space-between;gap:20px;padding:12px 18px;animation:lspulse 1.1s steps(1,end) infinite;position:relative;overflow:hidden}
+/* ops row spans the exact console width; strip + user panel fill it, no dead space */
+.ops-row{display:flex;gap:14px;padding:14px 18px 0;align-items:stretch}
+.live-strip{flex:2 1 0;min-width:0;border-radius:16px;cursor:pointer;display:flex;align-items:center;justify-content:space-between;gap:18px;padding:12px 18px;animation:lspulse 1.1s steps(1,end) infinite;position:relative;overflow:hidden}
+.user-panel{flex:1 1 0;min-width:220px;background:linear-gradient(160deg,rgba(26,34,52,.9),rgba(14,20,34,.92));border:1px solid var(--db);border-radius:16px;padding:13px 17px;display:flex;flex-direction:column;justify-content:center;gap:4px}
+.user-panel .up-top{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:3px}
+.user-panel .up-logo{font-size:13px;font-weight:900;letter-spacing:.06em;color:#f2f5fb}
+.user-panel .up-logo b{color:#F5C840}
+.user-panel .up-plan{font-size:10px;font-weight:800;letter-spacing:.03em;background:rgba(224,168,40,.16);color:#F5C840;border:1px solid rgba(224,168,40,.4);border-radius:20px;padding:2px 9px;white-space:nowrap}
+.user-panel .up-org{font-size:15px;font-weight:800;color:#e8edf5;line-height:1.1}
+.user-panel .up-terr{font-size:12px;color:#9aa6bd;margin-top:1px}
+.user-panel .up-status{display:flex;align-items:center;gap:6px;font-size:11.5px;color:#7fd0a0;margin-top:6px;font-weight:600}
+.user-panel .up-status .up-dot{width:7px;height:7px;border-radius:50%;background:#2ecc71;box-shadow:0 0 7px #2ecc71;animation:pulse 1.6s infinite}
+.user-panel .up-time{font-size:10.5px;color:#5f6b82}
 @keyframes lspulse{0%,100%{background:linear-gradient(90deg,rgba(255,26,64,.96),rgba(214,20,40,.93));box-shadow:0 10px 30px rgba(204,20,38,.5),0 0 0 1px rgba(255,130,140,.7) inset}50%{background:linear-gradient(90deg,rgba(43,98,255,.93),rgba(20,70,210,.92));box-shadow:0 10px 36px rgba(30,90,220,.55),0 0 0 1px rgba(140,175,255,.8) inset}}
 .live-strip .ls-go{flex:0 0 auto}
 .live-strip .ls-go button{background:rgba(10,16,30,.5);color:#fff;font-weight:800;font-size:13px;border:1px solid rgba(255,255,255,.4);border-radius:11px;padding:11px 16px;cursor:pointer;font-family:inherit;white-space:nowrap;transition:background .15s}
@@ -385,7 +397,7 @@
     <button class="tbtn" id="signout">יציאה</button>
   </div>
   <div class="kpis" id="kpis"></div>
-  <div id="live-strip" class="live-strip" style="display:none"></div>
+  <div class="ops-row"><div id="live-strip" class="live-strip" style="display:none"></div><div class="user-panel" id="user-panel"></div></div>
   <div class="console">
     <div class="col">
       <div class="pane light pa-gold" style="flex:1">
@@ -701,7 +713,13 @@ function _liveMeta(e){
  if(e.type==='missing'||e.k==='missing') return {i:_liveSvg(_LIVE_IC.missing),t:(e.nm||'אדם נעדר'),c:'#6D4AFF'};
  var cc=CAT_META[e.t||e.type]; var ic=cc?_liveSvg(cc.i):_liveSvg(_LIVE_IC.missing); return {i:ic,t:(e.nm||catShort(e.t||e.type)||'דיווח'),c:(cc?cc.c:'#f2b705')};
 }
-function flyToLive(lat,lng,id){ try{ if(!MAP)return; MAP.flyTo([lat,lng],18,{duration:.7}); var mk=liveLayer&&liveLayer._byId&&liveLayer._byId[id]; if(mk){ setTimeout(function(){ try{mk.openPopup();}catch(e){} },850); } var it=document.querySelector('.feed .item[data-id="'+id+'"]'); if(it){ it.classList.remove('flash'); void it.offsetWidth; it.classList.add('flash'); } }catch(e){} }
+function flyToLive(lat,lng,id){ try{ if(!MAP)return;
+  /* open on a ~0.3 km radius view (600 m box) centred exactly on the event */
+  var b=L.latLng(+lat,+lng).toBounds(600);
+  try{ MAP.flyToBounds(b,{duration:.7,maxZoom:17,padding:[18,18]}); }catch(_e){ MAP.flyTo([+lat,+lng],17,{duration:.7}); }
+  var mk=liveLayer&&liveLayer._byId&&liveLayer._byId[id]; if(mk){ setTimeout(function(){ try{mk.openPopup();}catch(e){} },850); }
+  var it=document.querySelector('.feed .item[data-id="'+id+'"]'); if(it){ it.classList.remove('flash'); void it.offsetWidth; it.classList.add('flash'); }
+ }catch(e){} }
 function liveAlertBanner(txt){ try{ var host=document.getElementById('map'); if(!host)return; var b=document.createElement('div'); b.className='live-alert'; b.innerHTML='\ud83d\udea8 '+ESC(txt||'SOS \u05d7\u05d3\u05e9 \u05d1\u05d8\u05e8\u05d9\u05d8\u05d5\u05e8\u05d9\u05d4'); host.appendChild(b); setTimeout(function(){ try{ b.style.transition='opacity .5s'; b.style.opacity='0'; setTimeout(function(){b.remove();},500);}catch(e){} },6000); }catch(e){} }
 function _respGroups(e){
  var t=(e.type||e.k||'');
@@ -746,7 +764,22 @@ function stripGeocode(lat,lng){
 }
 function _playAlertTone(){
  try{ var AC=window.AudioContext||window.webkitAudioContext; if(!AC)return; var ctx=_playAlertTone._c||(_playAlertTone._c=new AC()); if(ctx.state==='suspended')ctx.resume();
-  [[880,0],[660,0.18],[880,0.36]].forEach(function(pr){ var o=ctx.createOscillator(),g=ctx.createGain(); o.type='sine'; o.frequency.value=pr[0]; var t=ctx.currentTime+pr[1]; g.gain.setValueAtTime(0,t); g.gain.linearRampToValueAtTime(0.09,t+0.02); g.gain.exponentialRampToValueAtTime(0.0001,t+0.15); o.connect(g); g.connect(ctx.destination); o.start(t); o.stop(t+0.16); });
+  var t0=ctx.currentTime;
+  // Emergency two-tone warble (hi-lo-hi-lo), square wave softened by a low-pass —
+  // urgent and attention-grabbing like a dispatch alarm, not a soft call beep.
+  var seq=[[1046,0],[784,0.17],[1046,0.34],[784,0.51]];
+  seq.forEach(function(p){
+    var o=ctx.createOscillator(),g=ctx.createGain(),f=ctx.createBiquadFilter();
+    o.type='square'; o.frequency.value=p[0];
+    f.type='lowpass'; f.frequency.value=2600; f.Q.value=0.6;
+    var t=t0+p[1];
+    g.gain.setValueAtTime(0.0001,t);
+    g.gain.linearRampToValueAtTime(0.13,t+0.012);
+    g.gain.setValueAtTime(0.13,t+0.12);
+    g.gain.exponentialRampToValueAtTime(0.0008,t+0.16);
+    o.connect(f); f.connect(g); g.connect(ctx.destination);
+    o.start(t); o.stop(t+0.17);
+  });
  }catch(e){}
 }
 var _alarmTimer=null, _alarmId=null, _alarmSilenced=false;
@@ -894,12 +927,13 @@ function renderLive(c,list,opts){
  var html=list.slice(0,40).map(function(e){
   var m=_liveMeta(e); var id=e.id||(e.type+'_'+(+e.lat).toFixed(3)+'_'+(+e.lng).toFixed(3)+'_'+(e.ts||0));
   _liveEvents[id]={e:e,m:m,demo:!!opts.demo};
-  if(id===_topSosId){ return ''; }
   if(liveLayer){
-   var mk; if(m.sos){ mk=L.marker([e.lat,e.lng],{icon:_sosIcon(),zIndexOffset:1000}); } else { mk=L.circleMarker([e.lat,e.lng],{radius:11,color:'#fff',weight:2.5,fillColor:m.c,fillOpacity:.97}); }
-   var mn=Math.round((now-(e.ts||now))/60000); var ag=mn<1?'\u05e2\u05db\u05e9\u05d9\u05d5':mn<60?('\u05dc\u05e4\u05e0\u05d9 '+mn+' \u05d3\u05e7\u05f3'):('\u05dc\u05e4\u05e0\u05d9 '+Math.round(mn/60)+' \u05e9\u05e2\u05f3');
+   /* the active event (top SOS) always gets the pulsing beacon so there is a 100% accurate
+      blinking dot exactly on its location \u2014 even though it is omitted from the feed list. */
+   var mk; if(m.sos||id===_topSosId){ mk=L.marker([e.lat,e.lng],{icon:_sosIcon(),zIndexOffset:1200}); } else { mk=L.circleMarker([e.lat,e.lng],{radius:11,color:'#fff',weight:2.5,fillColor:m.c,fillOpacity:.97}); }
    mk.on('click',(function(eid){return function(){openResponse(eid);};})(id)); if(mk.setZIndexOffset){} try{if(mk._path)mk._path.style.cursor='pointer';}catch(_e){} mk.addTo(liveLayer); liveLayer._byId[id]=mk;
   }
+  if(id===_topSosId){ return ''; }
   if(m.sos&&!opts.demo&&!_seenSos[id]){ _seenSos[id]=1; if(!opts.initial) newSos={lat:e.lat,lng:e.lng,id:id}; }
   var mins=Math.round((now-(e.ts||now))/60000); var ago=mins<1?'\u05e2\u05db\u05e9\u05d9\u05d5':mins<60?('\u05dc\u05e4\u05e0\u05d9 '+mins+' \u05d3\u05e7\u05f3'):('\u05dc\u05e4\u05e0\u05d9 '+Math.round(mins/60)+' \u05e9\u05e2\u05f3');
   return '<div class="item'+(m.sos?' sos':'')+'" data-id="'+id+'" onclick="openResponse(\''+id+'\')"><span class="sev" style="background:'+m.c+'"></span><div class="dot" style="color:'+m.c+'">'+m.i+'</div><div style="flex:1"><div class="nm">'+ESC(m.t)+(m.sos?'<span class="live-badge">\u25cf LIVE</span>':'')+'</div><div class="mt">'+ago+' \u00b7 '+(+e.lat).toFixed(2)+','+(+e.lng).toFixed(2)+' \u00b7 \u05d0\u05d6\u05d5\u05e8</div></div><span class="live-go">\u2922</span></div>';
@@ -921,12 +955,12 @@ function renderLive(c,list,opts){
          +'<div class="ls-main">'
          +'<div class="ls-t">'+m0.i+' '+ESC(m0.t)+'</div>'
          +'<div class="ls-addr"><span id="ls-addr-txt">\u05de\u05d0\u05ea\u05e8 \u05db\u05ea\u05d5\u05d1\u05ea\u2026</span></div>'
-         +'<div class="ls-resp">'+_chip('#E0A828',g,'\u05e9\u05d5\u05de\u05e8\u05d9\u05dd')+_chip('#2962FF',pol,'\u05e9\u05d5\u05d8\u05e8\u05d9\u05dd')+_chip('#16A06A',med,'\u05e8\u05e4\u05d5\u05d0\u05d4')+_chip('#FF7A1A',fire,'\u05db\u05d1\u05d0\u05d5\u05ea')+(demo?'<span class="ls-demo">\u05e0\u05ea\u05d5\u05e0\u05d9 \u05d4\u05d3\u05d2\u05de\u05d4</span>':'')+'</div>'
+         +'<div class="ls-resp">'+_chip('#E0A828',g,'\u05e9\u05d5\u05de\u05e8\u05d9\u05dd \u05d6\u05de\u05d9\u05e0\u05d9\u05dd')+_chip('#4fc3e8',(demo?(pol+med+fire):'\u2014'),'\u05de\u05ea\u05e0\u05d3\u05d1\u05d9 \u05d7\u05d9\u05e8\u05d5\u05dd')+(demo?'<span class="ls-demo">\u05e0\u05ea\u05d5\u05e0\u05d9 \u05d4\u05d3\u05d2\u05de\u05d4</span>':'')+'</div>'
          +'</div>'
          +'<div class="ls-go"><button onclick="event.stopPropagation();openResponse(\''+id0+'\')">\u05e4\u05ea\u05d7 \u05de\u05e8\u05db\u05d6 \u05ea\u05d2\u05d5\u05d1\u05d4 \u2190</button></div>';
        try{ stripGeocode(+e0.lat,+e0.lng); }catch(e){}
        strip.onclick=function(){ try{ openResponse(id0); }catch(e){} };
-       if(id0!==_alarmId){ _alarmId=id0; _alarmSilenced=false; strip.style.animation=''; strip.style.background=''; strip.style.boxShadow=''; strip.classList.remove('attended'); startAlarm(); }
+       if(id0!==_alarmId){ _alarmId=id0; _alarmSilenced=false; strip.style.animation=''; strip.style.background=''; strip.style.boxShadow=''; strip.classList.remove('attended'); startAlarm(); try{ flyToLive(+e0.lat,+e0.lng,id0); }catch(_f){} }
        else if(!_alarmSilenced){ startAlarm(); }
      } else { strip.style.display='none'; strip.innerHTML=''; stopAlarm(); _alarmId=null; }
    }
@@ -1006,6 +1040,17 @@ function focusCat(k){
 }
 function unfocus(){ if(DATA&&DATA._idx!=null){document.getElementById('donutback').style.display='none';document.getElementById('donutpane').innerHTML=donutHero(DATA._idx);buildAnalysis(DATA._idx,null);} }
 
+function renderUserPanel(){
+ var el=document.getElementById('user-panel'); if(!el)return;
+ var org=(CLIENT&&CLIENT.org)||'—', terr=(CLIENT&&CLIENT.territory)||'—', demo=!!(CLIENT&&CLIENT.demo);
+ var now=new Date(), hh=('0'+now.getHours()).slice(-2)+':'+('0'+now.getMinutes()).slice(-2);
+ el.innerHTML=''
+  +'<div class="up-top"><span class="up-logo">SH<b>✡</b>MER <span style="color:#9aa6bd;font-weight:700">Command</span></span><span class="up-plan">'+(demo?'Pro · דמו':'Pro')+'</span></div>'
+  +'<div class="up-org">'+ESC(org)+'</div>'
+  +'<div class="up-terr">📍 טריטוריה: '+ESC(terr)+'</div>'
+  +'<div class="up-status"><span class="up-dot"></span>מערכת מקוונת · מתעדכן בזמן אמת</div>'
+  +'<div class="up-time">עודכן '+hh+'</div>';
+}
 function buildKPIs(idx){
  var cities=DATA._sorted,c=cities[idx],tot=c.total;
  var pc=perCap(c);var pv=cities.map(perCap).filter(function(v){return v!=null;}).sort(function(a,b){return a-b;});var med=pv[Math.floor(pv.length/2)];
@@ -1028,6 +1073,7 @@ function buildKPIs(idx){
      sub=idx===0?'הגבוהה בארץ בעבירות מדווחות — הכי חמור':idx<third?('מהחמורות בארץ · חמורה מ-'+cleaner+' ערים'):('חמורה מ-'+cleaner+' מתוך '+(cities.length-1)+' ערים');
      return k('דירוג חומרה · ארצי',mark+'#'+(idx+1),sub,sevCls,PUB);})();
  if(!window._kpiAnimated){ window._kpiAnimated=true; try{ animateKPIs(); }catch(e){} }
+ try{ renderUserPanel(); }catch(e){}
 }
 function animateKPIs(){
   document.querySelectorAll('#kpis .kv').forEach(function(el){
@@ -1067,7 +1113,7 @@ function renderTrendInline(elId){
  if(!window._trOn){window._trOn={'רכוש':1,'אלימות':1,'סדר ציבורי':1,'מוסר':0,'מרמה':0,'כלכלי':0};}
  var R=window._trRange, on=window._trOn;
  var mon=MON.slice(MON.length-R), act=SER.filter(function(s){return on[s.k];});
- var W=640,H=236,padL=30,padR=14,padT=14,padB=26, iw=W-padL-padR, ih=H-padT-padB;
+ var W=640,H=164,padL=30,padR=14,padT=10,padB=22, iw=W-padL-padR, ih=H-padT-padB;
  var maxV=1; act.forEach(function(s){s.v.slice(s.v.length-R).forEach(function(x){if(x>maxV)maxV=x;});});
  maxV=Math.ceil(maxV/5)*5;
  var n=mon.length, step=n>1?iw/(n-1):iw;
@@ -1100,7 +1146,7 @@ function renderTrendInline(elId){
   +'<div class="tr-ctrl"><div class="tr-ranges">'+ranges+'</div><div class="tr-checks">'+checks+'</div></div>'
   +(act.length?'<svg viewBox="0 0 '+W+' '+H+'" style="width:100%;height:auto;display:block"><defs>'+defs+'</defs>'+grid+paths+xlab+'</svg>'
      :'<div style="text-align:center;color:#6d7893;padding:34px 10px;font-size:13px">בחרו סוג עבירה אחד או יותר להצגה</div>')
-  +'<div class="foot"><b style="color:#f0c75a">דוגמה</b> — השוואת סוגי עבירה לאורך זמן. הגרף יוזן מדיווחי התושבים האמיתיים כשיצטברו מספיק אירועים. סמנו/בטלו סוגי עבירה ובחרו טווח חודשים.</div>';
+  +'<div class="foot" style="padding-top:4px"><b style="color:#f0c75a">דוגמה</b> — יוזן מדיווחי התושבים האמיתיים. סמנו סוגי עבירה · בחרו טווח.</div>';
 }
 function _trSetRange(r){window._trRange=r;try{renderTrendInline('analysispane');}catch(e){}}
 function _trToggle(k){if(!window._trOn)window._trOn={};window._trOn[k]=window._trOn[k]?0:1;try{renderTrendInline('analysispane');}catch(e){}}
