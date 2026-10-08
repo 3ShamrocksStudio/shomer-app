@@ -3599,18 +3599,20 @@ function setLang(code){
    any tap on an element carrying data-setlang — before anything in the bubbling
    path can swallow it — and switches language reliably. Covers click AND touch. */
 (function(){
-  var _lastLangTap=0;
+  var _lastLangCode='', _lastLangTime=0;
   function _langFromTap(e){
     try{
       var el=e.target && e.target.closest ? e.target.closest('[data-setlang]') : null;
       if(!el) return;
-      // Debounce: a real tap fires touchend AND click. Without this guard the first event
-      // switches language + re-renders, then the second event can land on a NEIGHBOURING
-      // button and switch again (this is what broke the middle "Arabic" button). One switch
-      // per physical tap.
-      var now=Date.now(); if(now-_lastLangTap < 350) return; _lastLangTap=now;
       var code=el.getAttribute('data-setlang');
-      if(code){ try{ setLang(code); }catch(_){} }
+      if(!code) return;
+      var now=Date.now();
+      // A single physical tap fires touchend AND click. Suppress ONLY the duplicate of the
+      // SAME button within a short window — a genuine tap on a DIFFERENT language always
+      // switches immediately (so tapping HE then AR right away both work).
+      if(code===_lastLangCode && (now-_lastLangTime) < 500) return;
+      _lastLangCode=code; _lastLangTime=now;
+      try{ setLang(code); }catch(_){}
     }catch(_e){}
   }
   document.addEventListener('touchend', _langFromTap, true); // touch devices (fires first)
@@ -7152,19 +7154,19 @@ async function agPickContact(){
  function _manual(msg){ try{ toast(msg,'amb'); }catch(e){} var np=document.getElementById('ag-phone'); if(np){ try{np.focus();}catch(e){} } }
  // immediate feedback so the user knows the tap registered
  try{ toast(he?'\u05e4\u05d5\u05ea\u05d7 \u05d0\u05ea \u05d0\u05e0\u05e9\u05d9 \u05d4\u05e7\u05e9\u05e8\u2026':ar?'\u062c\u0627\u0631\u064d \u0641\u062a\u062d \u062c\u0647\u0627\u062a \u0627\u0644\u0627\u062a\u0635\u0627\u0644\u2026':'Opening contacts\u2026',''); }catch(e){}
- // 1) Native Capacitor Contacts plugin (installed app). If it throws (plugin not linked,
- //    permission issue), we do NOT dead-end \u2014 we fall straight through to the web picker.
+ // 1) Native Capacitor Contacts plugin. Use it whenever the plugin object is present \u2014
+ //    do NOT gate on isNativePlatform() (that check is flaky in some WebView configs and
+ //    was causing the whole native path to be skipped even though the plugin exists).
  try{
    var C=(window.Capacitor&&window.Capacitor.Plugins&&window.Capacitor.Plugins.Contacts);
-   var native=!!(window.Capacitor&&window.Capacitor.isNativePlatform&&window.Capacitor.isNativePlatform());
-   if(native && C && typeof C.pickContact==='function'){
+   if(C && typeof C.pickContact==='function'){
      try{ await C.requestPermissions(); }catch(e){}
      var res=await C.pickContact({projection:{name:true,phones:true}});
      var ct=res&&res.contact;
      if(ct){ _fill((ct.name&&(ct.name.display||ct.name.given||''))||'', (ct.phones&&ct.phones[0]&&ct.phones[0].number)||''); }
      return; // native picker handled it (picked or user-cancelled) \u2014 don't nag
    }
- }catch(e){ /* native plugin unavailable/failed \u2014 silently try the web picker next */ }
+ }catch(e){ /* native plugin threw \u2014 silently try the web picker next */ }
  // 2) Web Contact Picker API (works in Chromium Android WebView on a secure origin)
  try{
    if(navigator.contacts && typeof navigator.contacts.select==='function'){
@@ -8964,7 +8966,7 @@ try{ hydrateIcons(document); }catch(e){}
 /* Loaded-build version - shown in the diagnostic panel so a phone can prove
    whether it's on the latest build or a STALE cached one. Keep in lock-step
    with sw.js SW_VERSION on every deploy. */
-var APP_VER='v238';
+var APP_VER='v239';
 var FB={ready:false,uid:null,db:null,_presTimer:null,connected:false,listening:false,pushState:'default',near:0,swVer:'?',
   authState:'connecting',sdkLoaded:false,persist:'',permErr:null,err:null,wsProbe:'',csp:''};
 /* Always log connection diagnostics to the console so the real failure can be SEEN in Chrome. */
