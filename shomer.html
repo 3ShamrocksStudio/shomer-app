@@ -299,10 +299,9 @@ input[type=range]:focus::-webkit-slider-thumb{box-shadow:0 0 0 4px rgba(224,168,
 .gt{display:flex;align-items:center;gap:6px;font-size:11px;color:var(--tx2);font-weight:600}
 .gt .tog{width:34px;height:19px;flex:0 0 auto}
 /* colourful professional roles */
-.prof-opt .pic{transition:background .18s,color .18s,border-color .18s;width:34px;height:34px}
-.prof-opt .pic .ic{width:19px;height:19px}
-.prof-opt .pic{border:1.6px solid currentColor;border-radius:11px;background:rgba(255,255,255,.035);box-shadow:none}
-.prof-opt .pic .ic{fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+/* role discs mirror the map-legend marker look (.ldc): filled colour circle, white glyph, white hairline + soft colour glow */
+.prof-opt .pic{transition:box-shadow .18s,transform .18s;width:40px;height:40px;border-radius:50%;display:flex;align-items:center;justify-content:center;border:1.6px solid rgba(255,255,255,.88);background:currentColor;box-shadow:0 2px 9px rgba(0,0,0,.42),0 0 11px -2px currentColor}
+.prof-opt .pic .ic{width:21px;height:21px;fill:none;stroke:#fff;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}
 .prof-opt[data-prof="police"] .pic{color:#2962FF}
 .prof-opt[data-prof="doctor"] .pic{color:#16A06A}
 .prof-opt[data-prof="fire"] .pic{color:#FF7A1A}
@@ -1701,7 +1700,7 @@ body.otp-active .ob-steps{display:none!important;}
  <div class="dd-sep"></div>
  <button class="ddr ddr-circ" onclick="op('sh-circles');closeDD()" role="menuitem">
   <div class="dd-ic c-circ" aria-hidden="true"><svg class="ic" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H7a4 4 0 0 0-4 4v2" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><circle cx="10" cy="7" r="3.4" fill="none" stroke="currentColor" stroke-width="2"/><path d="M21 21v-2a4 4 0 0 0-3-3.87M17.5 3.4a4 4 0 0 1 0 7.2" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></div>
-  <span id="dd-circ" data-he="השומרים שלי" data-en="My SHOMER" data-ar="حُرّاسي">השומרים שלי</span>
+  <span id="dd-circ" data-he="השומרים שלי" data-en="My SHOMERs" data-ar="حُرّاسي">השומרים שלי</span>
  </button>
  <button class="ddr" onclick="op('sh-prof');closeDD()" role="menuitem">
   <div class="dd-ic c-prof" aria-hidden="true"><svg class="ic" viewBox="0 0 24 24"><circle cx="12" cy="8" r="3.7" fill="none" stroke="currentColor" stroke-width="2"/><path d="M5.5 20a6.5 6.5 0 0 1 13 0" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></div>
@@ -8889,7 +8888,7 @@ try{ hydrateIcons(document); }catch(e){}
 /* Loaded-build version - shown in the diagnostic panel so a phone can prove
    whether it's on the latest build or a STALE cached one. Keep in lock-step
    with sw.js SW_VERSION on every deploy. */
-var APP_VER='v225';
+var APP_VER='v226';
 var FB={ready:false,uid:null,db:null,_presTimer:null,connected:false,listening:false,pushState:'default',near:0,swVer:'?',
   authState:'connecting',sdkLoaded:false,persist:'',permErr:null,err:null,wsProbe:'',csp:''};
 /* Always log connection diagnostics to the console so the real failure can be SEEN in Chrome. */
@@ -11558,6 +11557,7 @@ function updShowBanner(pubV,done){
   var x=document.getElementById('upd-x'); if(x)x.onclick=function(){ ov.remove(); };
 }
 function updCheck(manual){
+  var _firstRun=!!window._updBoot; window._updBoot=false;
   try{
     if(!navigator.onLine){ if(manual){ try{ toast(currentLang==='he'?'אין חיבור לרשת':'No internet connection','amb'); }catch(e){} } return; }
     try{ if('serviceWorker' in navigator) navigator.serviceWorker.getRegistration().then(function(r){ if(r)r.update(); }).catch(function(){}); }catch(e){}
@@ -11568,9 +11568,21 @@ function updCheck(manual){
         if(!d||!d.v||typeof APP_VER==='undefined') return;
         var pub=updNum(d.v), cur=updNum(APP_VER), stale=pub>cur;
         updSetBadge('v0.9 · beta', stale);
-        if(stale){ try{fbLog('UPDATE available: '+APP_VER+' → '+d.v);}catch(e){} updShowBanner(d.v);
+        if(stale){ try{fbLog('UPDATE available: '+APP_VER+' → '+d.v);}catch(e){}
           try{ if(_ln && window._updNotified!==d.v){ window._updNotified=d.v; var _he=currentLang==='he',_ar=currentLang==='ar';
             _ln.schedule({notifications:[{id:(_lnId=(_lnId%2000000)+1),title:(_he?'עדכון זמין · SH✡MER':_ar?'تحديث متاح · SH✡MER':'Update available · SH✡MER'),body:(_he?'גרסה חדשה מוכנה — פתח/י את SH✡MER כדי לעדכן.':_ar?'نسخة جديدة جاهزة — افتح SH✡MER للتحديث.':'A new version is ready — open SH✡MER to update.'),channelId:'shomer-updates',autoCancel:true,extra:{tag:'update-available'}}]}); } }catch(e){}
+          /* AUTO-APPLY on cold boot: if this is the first check of the session, the URL has no
+             ?u= marker yet, and we haven't already auto-updated — silently pull the fresh build
+             so the user lands on the latest version WITHOUT manually tapping. Loop-safe: the
+             forced reload adds ?u=<ts>, and once fresh content loads APP_VER===published so
+             stale becomes false. If it's still stale after that, we fall back to the banner. */
+          if(_firstRun && !window._updAutoApplied && !/[?&]u=\d+/.test(location.search)){
+            window._updAutoApplied=true;
+            try{ setTimeout(function(){ try{forceFreshReload();}catch(e){ try{updShowBanner(d.v);}catch(_){} } }, 900); }
+            catch(e){ try{updShowBanner(d.v);}catch(_){} }
+          } else {
+            updShowBanner(d.v);
+          }
         }
         else if(manual){ try{ toast((currentLang==='he'?'✓ מעודכן - ':'✓ Up to date - ')+APP_VER,'grn'); }catch(e){} }
       }).catch(function(){ if(manual){ try{ toast(currentLang==='he'?'בדיקת עדכון נכשלה':'Update check failed','amb'); }catch(e){} } });
@@ -11588,7 +11600,7 @@ function updMountBadge(){
 }
 try{
   if(document.readyState!=='loading'){ updMountBadge(); } else document.addEventListener('DOMContentLoaded',updMountBadge);
-  setTimeout(updCheck,800);
+  setTimeout(function(){ window._updBoot=true; updCheck(); },800);
   setInterval(updCheck, UPD_POLL_MS);
   document.addEventListener('visibilitychange',function(){ if(document.visibilityState==='visible') updCheck(); });
 }catch(e){}

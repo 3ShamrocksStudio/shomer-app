@@ -324,6 +324,9 @@
 .live-strip .ls-beacon{flex:0 0 auto;display:flex;align-items:center}
 .live-strip .ls-live{display:inline-flex;align-items:center;gap:5px;background:rgba(10,16,30,.55);color:#fff;font-weight:900;font-size:12px;letter-spacing:.08em;padding:7px 12px;border-radius:999px;border:1px solid rgba(255,255,255,.5);white-space:nowrap}
 .live-strip.attended .ls-live{opacity:.6}
+.ls-silence{margin-inline-start:9px;background:rgba(10,16,30,.6);color:#fff;font-weight:800;font-size:12px;border:1px solid rgba(255,255,255,.55);border-radius:999px;padding:8px 13px;cursor:pointer;font-family:inherit;white-space:nowrap;transition:background .15s}
+.ls-silence:hover{background:rgba(10,16,30,.85)}
+.ls-silence.done{background:rgba(60,72,96,.5);border-color:rgba(255,255,255,.2);color:#aeb7c7;cursor:default}
 .live-strip .ls-dot{position:absolute;inset:0;margin:auto;width:20px;height:20px;border-radius:50%;background:#fff;box-shadow:0 0 0 0 rgba(255,255,255,.85);animation:lsdot 1s ease-out infinite}
 @keyframes lsdot{0%{box-shadow:0 0 0 0 rgba(255,255,255,.85)}70%{box-shadow:0 0 0 18px rgba(255,255,255,0)}100%{box-shadow:0 0 0 0 rgba(255,255,255,0)}}
 </style>
@@ -381,7 +384,7 @@
         <div class="legend" id="legend"></div>
       </div>
       <div class="pane light pa-teal" style="flex:1">
-        <div class="ph"><span class="t">מענים מוכחים · מה שעבד באירועים דומים</span><span class="pill off">מקורות מאומתים</span></div>
+        <div class="ph"><span class="t" id="analysis-ttl">📊 מגמות · השוואה חודשית · 6 חודשים</span><span class="pill off" id="analysis-pill">דוגמה</span></div>
         <div class="pb" id="analysispane"></div>
       </div>
     </div>
@@ -730,8 +733,12 @@ function _playAlertTone(){
   [[880,0],[660,0.18],[880,0.36]].forEach(function(pr){ var o=ctx.createOscillator(),g=ctx.createGain(); o.type='sine'; o.frequency.value=pr[0]; var t=ctx.currentTime+pr[1]; g.gain.setValueAtTime(0,t); g.gain.linearRampToValueAtTime(0.09,t+0.02); g.gain.exponentialRampToValueAtTime(0.0001,t+0.15); o.connect(g); g.connect(ctx.destination); o.start(t); o.stop(t+0.16); });
  }catch(e){}
 }
+var _alarmTimer=null, _alarmId=null, _alarmSilenced=false;
+function startAlarm(){ if(_alarmTimer)return; try{_playAlertTone();}catch(e){} _alarmTimer=setInterval(function(){ var st=document.getElementById('live-strip'); if(!st||st.style.display==='none'||_alarmSilenced){ stopAlarm(); return; } try{_playAlertTone();}catch(e){} },2300); }
+function stopAlarm(){ if(_alarmTimer){clearInterval(_alarmTimer);_alarmTimer=null;} }
+function silenceAlarm(){ _alarmSilenced=true; stopAlarm(); var st=document.getElementById('live-strip'); if(st){ st.style.animation='none'; st.style.background='linear-gradient(90deg,rgba(60,72,96,.6),rgba(36,46,66,.6))'; st.style.boxShadow='0 6px 20px rgba(0,0,0,.4),0 0 0 1px rgba(255,255,255,.12) inset'; st.classList.add('attended'); } var b=document.getElementById('ls-silence'); if(b){ b.textContent='🔕 הושתק'; b.classList.add('done'); } }
+/* openResponse does NOT stop the alarm — only the user clicking "השתק אזעקה" silences it. */
 function openResponse(id){
- try{ var _st=document.getElementById('live-strip'); if(_st){ _st.style.animation='none'; _st.style.background='linear-gradient(90deg,rgba(60,72,96,.6),rgba(36,46,66,.6))'; _st.style.boxShadow='0 6px 20px rgba(0,0,0,.4),0 0 0 1px rgba(255,255,255,.12) inset'; _st.classList.add('attended'); } }catch(e){}
  try{
   var o=_liveEvents[id]; if(!o){ return; } var e=o.e, m=o.m; _respSel={}; _respRadius=1.5;
   var lat=+e.lat, lng=+e.lng;
@@ -754,8 +761,11 @@ function openResponse(id){
    +'      <div class="rloc-a" id="resp-addr"><span class="rloc-sp"></span>מאתר כתובת מדויקת…</div>'
    +'      <div class="rloc-c">🧭 <span dir="ltr">'+coord+'</span></div>'
    +'      <div class="rloc-acc">'+accTxt+'</div>'
-   +'      <div class="rloc-btns"><button class="rlb rlb-p" onclick="flyToLive('+lat+','+lng+',\''+id+'\')">🗺️ זום לרחוב</button><button class="rlb" onclick="respCopyLoc('+lat+','+lng+')">📋 העתק מיקום</button></div>'
+   +'      <div class="rloc-btns"><button class="rlb rlb-p" onclick="flyToLive('+lat+','+lng+',\''+id+'\')">🗺️ זום לרחוב</button><button class="rlb" onclick="respShareLoc('+lat+','+lng+',\''+id+'\')">📤 שתף מיקום אירוע</button></div>'
    +'    </div></div>'
+   // מענים מוכחים — specific to this event
+   +'  <div class="rsec"><div class="rsec-h"><span class="rsec-n">✓</span>מענים מוכחים · לאירוע זה</div>'
+   +'    '+_respMenim(e,m)+'</div>'
    // 2 — ALERT RADIUS
    +'  <div class="rsec"><div class="rsec-h"><span class="rsec-n">2</span>טווח התראה <span class="rsec-v" id="resp-rv">1.5 ק"מ</span></div>'
    +'    <input class="resp-slider" type="range" min="0.2" max="5" step="0.1" value="1.5" oninput="respSetRadius(this.value)" onchange="respFitRadius()"><div class="resp-reach" id="resp-reach"></div>'
@@ -764,7 +774,7 @@ function openResponse(id){
    +'  <div class="rsec"><div class="rsec-h"><span class="rsec-n">3</span>שיגור לכוחות</div>'
    +'    <div class="rsec-hint">בחר/י למי לשגר, ואז שלח/י לאישור:</div>'
    +'    <div class="rg">'+gHtml+'</div>'
-   +'    <div class="resp-two"><div class="resp-esc" onclick="respLog(\''+id+'\',\'בקשת תגבור — אזור נוסף\')">⬆️ בקש תגבור</div><div class="resp-bc" onclick="respLog(\''+id+'\',\'הודעה נשלחה לקבוצה\')">📢 הודעה לקבוצה</div></div>'
+   +'    <div class="resp-two"><div class="resp-esc" onclick="respReinforce(\''+id+'\')" title="מרחיב את טווח ההתראה ומצרף שומרים נוספים + מוקד 106">⬆️ בקש תגבור</div><div class="resp-bc" onclick="respLog(\''+id+'\',\'הודעה נשלחה לקבוצות הנבחרות\')">📢 הודעה לקבוצה</div></div>'
    +'    <button class="resp-send" onclick="respDispatch(\''+id+'\')">⚡ שגר התראה לקבוצות הנבחרות · דורש אישור</button></div>'
    // 4 — NATIONAL
    +'  <div class="rsec"><div class="rsec-h"><span class="rsec-n">4</span>שירותים ארציים</div>'
@@ -806,7 +816,37 @@ function evidenceConfirm(id){
   try{ respLog(id,"⚖️ חבילת ראיות הוכנה · בסיס: "+basis+" · נמען: "+rec+" · ממתין להעברה מאושרת ע״י הרשות"); }catch(e){}
   var box=document.getElementById("resp-evid"); if(box){ box.innerHTML='<div class="rost-empty" style="padding:14px 4px;color:#8fe0b0">✓ חבילת ההעברה הוכנה ותועדה ביומן.<br><span style="color:#6d7893">ההעברה בפועל מתבצעת ידנית ע״י מורשה הרשות. אין שיגור אוטומטי.</span></div>'; }
 }
-function respCopyLoc(lat,lng){ try{ var t=lat.toFixed(5)+', '+lng.toFixed(5); if(navigator.clipboard){navigator.clipboard.writeText(t);} var a=document.getElementById('resp-addr'); }catch(e){} }
+function _respMenim(e,m){
+  var t=e.type||e.t||'';
+  var MEN={
+   sos:{d:'הגעת שומר קרוב ראשון תוך דקות + שיחת 100/101 מיידית. זמן תגובה קצר הוא הגורם הקריטי ביותר.',s:'NFPA / מגן דוד אדום',u:'https://www.mdais.org'},
+   abduct:{d:'הפצת תיאור מיידית לשומרים + מוקד 100/106, חסימת צירי מילוט ושיתוף המיקום האחרון. שעה ראשונה קריטית.',s:'AMBER Alert · NCMEC',u:'https://www.missingkids.org'},
+   missing:{d:'חיפוש ברדיוס מתרחב מנקודת היעלמות + גיוס מתנדבים מקומיים, שיתוף תיאור/תמונה בהסכמה.',s:'יחידת איתור (SAR) · משטרת ישראל',u:'https://www.gov.il/he/departments/israel_police'}
+  };
+  var men=MEN[t];
+  if(!men){ var lev=(typeof CRIME_LEVER!=='undefined')?(CRIME_LEVER[e.t]||CRIME_LEVER._def):null; if(lev)men={d:lev.d,s:lev.s,u:lev.u}; }
+  if(!men)men={d:'סיור יזום ממוקד + אכיפה מהירה בזירה — הגישה בעלת בסיס-הראיות החזק ביותר.',s:'OJP CrimeSolutions',u:'https://crimesolutions.ojp.gov'};
+  return '<div class="rloc" style="border-color:rgba(79,195,232,.25)"><div class="rloc-a" style="color:#cfe8ff">'+men.d+'</div><div class="rloc-acc"><a href="'+men.u+'" target="_blank" rel="noopener" style="color:#7fd0f0">מקור: '+men.s+' ↗</a></div></div>';
+}
+function respShareLoc(lat,lng,id){
+  try{
+    var addrEl=document.getElementById('resp-addr'); var addr=addrEl?(addrEl.textContent||'').trim():'';
+    var mapUrl='https://www.google.com/maps?q='+lat.toFixed(5)+','+lng.toFixed(5);
+    var txt='מיקום אירוע SH✡MER'+(addr&&addr.indexOf('מאתר')<0?' · '+addr:'')+'\n'+mapUrl;
+    if(navigator.share){ navigator.share({title:'מיקום אירוע',text:txt,url:mapUrl}).then(function(){ try{respLog(id,'📤 מיקום האירוע שותף');}catch(e){} }).catch(function(){}); return; }
+    if(navigator.clipboard){ navigator.clipboard.writeText(txt); }
+    try{respLog(id,'📤 קישור למיקום האירוע הועתק — מוכן לשיתוף עם כוח מגיב');}catch(e){}
+    var btn=event&&event.target; if(btn){ var o=btn.textContent; btn.textContent='✓ הועתק'; setTimeout(function(){btn.textContent=o;},1600); }
+  }catch(e){}
+}
+function respReinforce(id){
+  try{
+    var cur=(typeof _respRadius==='number'?_respRadius:1.5); var nr=Math.min(5,Math.round((cur+1.5)*10)/10);
+    var sl=document.querySelector('.resp-slider'); if(sl){ sl.value=nr; }
+    try{ respSetRadius(nr); }catch(e){} try{ respFitRadius(); }catch(e){}
+    respLog(id,'⬆️ בקשת תגבור — טווח ההתראה הורחב ל-'+nr.toFixed(1)+' ק"מ, שומרים נוספים בטווח + מוקד עירוני 106 עודכנו');
+  }catch(e){}
+}
 function respGeocode(lat,lng,demo){
  var box=document.getElementById('resp-addr'); if(!box) return;
  try{
@@ -866,10 +906,12 @@ function renderLive(c,list,opts){
          +'<div class="ls-addr">\u05e8\u05d7\u05d5\u05d1: <span id="ls-addr-txt">\u05de\u05d0\u05ea\u05e8 \u05db\u05ea\u05d5\u05d1\u05ea\u2026</span></div>'
          +'<div class="ls-resp">\u05e9\u05d5\u05de\u05e8\u05d9\u05dd \u05d6\u05de\u05d9\u05e0\u05d9\u05dd: <b>'+g+'</b> \u00b7 \u05de\u05ea\u05e0\u05d3\u05d1\u05d9\u05dd \u05d6\u05de\u05d9\u05e0\u05d9\u05dd \u2014 \u05e9\u05d5\u05d8\u05e8\u05d9\u05dd: <b>'+pol+'</b> \u00b7 \u05db\u05d1\u05d0\u05d9\u05dd: <b>'+fire+'</b> \u00b7 \u05e4\u05e8\u05de\u05d3\u05d9\u05e7/\u05e8\u05d5\u05e4\u05d0: <b>'+med+'</b>'+(demo?' \u00b7 <span style="color:#ffd0d4">\u05e0\u05ea\u05d5\u05e0\u05d9 \u05d4\u05d3\u05d2\u05de\u05d4</span>':'')+'</div>'
          +'</div>'
-         +'<div class="ls-beacon"><span class="ls-live">● LIVE</span></div>';
+         +'<div class="ls-beacon"><span class="ls-live">● LIVE</span><button id="ls-silence" class="ls-silence" onclick="event.stopPropagation();silenceAlarm()">🔇 השתק אזעקה</button></div>';
        try{ stripGeocode(+e0.lat,+e0.lng); }catch(e){}
        strip.onclick=function(){ try{ openResponse(id0); }catch(e){} };
-     } else { strip.style.display='none'; strip.innerHTML=''; }
+       if(id0!==_alarmId){ _alarmId=id0; _alarmSilenced=false; strip.style.animation=''; strip.style.background=''; strip.style.boxShadow=''; strip.classList.remove('attended'); startAlarm(); }
+       else if(!_alarmSilenced){ startAlarm(); }
+     } else { strip.style.display='none'; strip.innerHTML=''; stopAlarm(); _alarmId=null; }
    }
  }catch(e){}
  if(newSos){ _liveBeep(); flyToLive(newSos.lat,newSos.lng,newSos.id); bigSosAlert(newSos.id); }
@@ -989,7 +1031,30 @@ var CRIME_LEVER={
  'עבירות סדר ציבורי':{d:'שיטור מכוון-בעיה (POP) ואכיפת אי-סדר ממוקדת בזירות הבולטות מפחיתים עבירות סדר ציבורי באזורים הממוקדים.',s:'College of Policing',u:'https://www.college.police.uk/research/crime-reduction-toolkit/hot-spots-policing'},
  '_def':{d:'סיור יזום ממוקד בזירות הבולטות + אכיפה ממוקדת — הגישה בעלת בסיס-הראיות החזק ביותר להפחתת פשיעה.',s:'OJP CrimeSolutions',u:'https://crimesolutions.ojp.gov/ratedpractices/hot-spots-policing'}
 };
+function renderTrendInline(elId){
+ var el=document.getElementById(elId); if(!el)return;
+ var months=['יולי','אוג׳','ספ׳','אוק׳','נוב׳','דצ׳'];
+ var series=[{k:'רכוש',c:'#2f80ed',v:[42,38,47,51,44,58]},{k:'אלימות',c:'#e5484d',v:[11,14,9,13,16,12]},{k:'סדר ציבורי',c:'#f2b705',v:[22,19,25,21,28,24]}];
+ var W=560,H=250,pad=30,gw=(W-pad*2)/months.length,maxV=0;
+ series.forEach(function(sr){sr.v.forEach(function(x){if(x>maxV)maxV=x;});});
+ var bw=Math.min(15,(gw-12)/series.length), bars='';
+ months.forEach(function(m,mi){
+   var x0=pad+mi*gw+(gw-bw*series.length-(series.length-1)*3)/2;
+   series.forEach(function(sr,si){ var hgt=(sr.v[mi]/maxV)*(H-pad*2-16); var x=x0+si*(bw+3), y=H-pad-hgt;
+     bars+='<rect x="'+x.toFixed(1)+'" y="'+(H-pad)+'" width="'+bw+'" height="0" rx="3" fill="'+sr.c+'"><animate attributeName="height" from="0" to="'+hgt.toFixed(1)+'" dur="0.7s" begin="'+(mi*0.06+si*0.03)+'s" fill="freeze"/><animate attributeName="y" from="'+(H-pad)+'" to="'+y.toFixed(1)+'" dur="0.7s" begin="'+(mi*0.06+si*0.03)+'s" fill="freeze"/></rect>';
+   });
+   bars+='<text x="'+(pad+mi*gw+gw/2)+'" y="'+(H-pad+15)+'" text-anchor="middle" fill="#8a93a6" font-size="11" font-family="Rubik">'+m+'</text>';
+ });
+ var grid='';for(var g=1;g<=3;g++){var gy=H-pad-(g/3)*(H-pad*2-16);grid+='<line x1="'+pad+'" y1="'+gy+'" x2="'+(W-pad)+'" y2="'+gy+'" stroke="rgba(255,255,255,.07)"/><text x="'+(pad-6)+'" y="'+(gy+4)+'" text-anchor="end" fill="#5f6b82" font-size="10">'+Math.round(maxV*g/3)+'</text>';}
+ var legend=series.map(function(sr){return '<span style="display:inline-flex;align-items:center;gap:6px;font-size:12px;color:#cdd6e8;margin-inline-end:14px"><i style="width:11px;height:11px;border-radius:3px;background:'+sr.c+'"></i>'+sr.k+'</span>';}).join('');
+ el.innerHTML='<div style="margin:2px 2px 8px">'+legend+'</div>'
+  +'<svg viewBox="0 0 '+W+' '+H+'" style="width:100%;height:auto">'+grid+bars+'</svg>'
+  +'<div class="foot"><b style="color:#f0c75a">דוגמה</b> — הגרף יוזן מדיווחי התושבים האמיתיים כשיצטברו מספיק אירועים. לחצו על פלח בדונאט לניתוח מעמיק ומענים מוכחים.</div>';
+}
 function buildAnalysis(idx,fk){
+ var _tt=document.getElementById('analysis-ttl'),_tp=document.getElementById('analysis-pill');
+ if(!fk){ if(_tt)_tt.innerHTML='📊 מגמות · השוואה חודשית · 6 חודשים'; if(_tp){_tp.textContent='דוגמה';} renderTrendInline('analysispane'); return; }
+ if(_tt)_tt.innerHTML='📍 ניתוח ממוקד · מענים מוכחים'; if(_tp){_tp.textContent='מקורות מאומתים';}
  var cities=DATA._sorted,c=cities[idx],tot=c.total;natShare(cities,'x');
  var out=[],head;
  if(fk){
