@@ -6641,9 +6641,11 @@ function renderArrivals(){
     var rows='';
     for(var p=0;p<ARR_P;p++){
       var pl=(sel.places&&sel.places[p])||{};
+      var _st=pl.resolved?'<span class="arr-geo ok" data-g="'+i+'" data-p="'+p+'" title="'+(he?'כתובת מאומתת':'Verified address')+'">✓</span>':(pl.addr?'<span class="arr-geo bad" data-g="'+i+'" data-p="'+p+'" title="'+(he?'כתובת לא אומתה':'Address not verified')+'">!</span>':'<span class="arr-geo" data-g="'+i+'" data-p="'+p+'"></span>');
       rows+='<div class="arr-row'+(p>0&&!(pl.addr)?' arr-hidden':'')+'">'
          +  '<span class="arr-n">'+(he?('מיקום '+(p+1)):('Place '+(p+1)))+'</span>'
-         +  '<input class="arr-in" data-g="'+i+'" data-p="'+p+'" data-f="addr" placeholder="'+(he?'תן כתובת':'Address')+'" value="'+ESC(pl.addr||'')+'">'
+         +  '<input class="arr-in" inputmode="text" autocomplete="street-address" data-g="'+i+'" data-p="'+p+'" data-f="addr" placeholder="'+(he?'הקלד/י כתובת אמיתית…':'Type a real address…')+'" value="'+ESC(pl.addr||'')+'">'
+         +  _st
          +  '</div>';
     }
     html+='<div class="arr-slot">'
@@ -6662,11 +6664,34 @@ function renderArrivals(){
   });
   host.querySelectorAll('.arr-in').forEach(function(inp){
     inp.onchange=function(){
+      var he2=currentLang==='he';
       var g=inp.getAttribute('data-g'), p=+inp.getAttribute('data-p'), A2=arrState();
       A2['g'+g]=A2['g'+g]||{places:[]};
       A2['g'+g].places=A2['g'+g].places||[];
       A2['g'+g].places[p]=A2['g'+g].places[p]||{};
-      A2['g'+g].places[p].addr=inp.value; saveStore();
+      var val=(inp.value||'').trim();
+      var st=host.querySelector('.arr-geo[data-g="'+g+'"][data-p="'+p+'"]');
+      // Reset: an address must be geocoded to real coordinates before it counts. Free text
+      // alone is never stored as a usable alert location.
+      A2['g'+g].places[p]={addr:val, lat:null, lng:null, resolved:false}; saveStore();
+      if(!val){ if(st){st.className='arr-geo';st.textContent='';} return; }
+      if(st){ st.className='arr-geo wait'; st.textContent='…'; }
+      fetch('https://nominatim.openstreetmap.org/search?format=jsonv2&addressdetails=1&limit=1&countrycodes=il&q='+encodeURIComponent(val),{headers:{'Accept':'application/json'}})
+        .then(function(r){return r.ok?r.json():null;})
+        .then(function(j){
+          if(j&&j[0]&&j[0].lat){
+            var pl2=A2['g'+g].places[p];
+            pl2.lat=+j[0].lat; pl2.lng=+j[0].lon; pl2.resolved=true;
+            var a=j[0].address||{}; var road=a.road||a.pedestrian||a.neighbourhood||''; var num=a.house_number?(' '+a.house_number):''; var city=a.city||a.town||a.village||a.municipality||'';
+            pl2.addr=(road?road+num:(j[0].display_name.split(',')[0]))+(city?(' · '+city):'');
+            inp.value=pl2.addr; saveStore();
+            if(st){ st.className='arr-geo ok'; st.textContent='✓'; st.title=he2?'כתובת מאומתת · '+pl2.lat.toFixed(4)+','+pl2.lng.toFixed(4):'Verified'; }
+          } else {
+            if(st){ st.className='arr-geo bad'; st.textContent='!'; st.title=he2?'לא נמצאה כתובת אמיתית — נסה/י שוב':'No real address found — try again'; }
+            try{ toast(he2?'לא נמצאה כתובת אמיתית. התראות מיקום פועלות רק על כתובות מאומתות.':'No real address found. Location alerts only work with verified addresses.','amb'); }catch(e){}
+          }
+        })
+        .catch(function(){ if(st){ st.className='arr-geo bad'; st.textContent='!'; } });
     };
   });
   host.querySelectorAll('.arr-add').forEach(function(btn){
@@ -8918,7 +8943,7 @@ try{ hydrateIcons(document); }catch(e){}
 /* Loaded-build version - shown in the diagnostic panel so a phone can prove
    whether it's on the latest build or a STALE cached one. Keep in lock-step
    with sw.js SW_VERSION on every deploy. */
-var APP_VER='v233';
+var APP_VER='v234';
 var FB={ready:false,uid:null,db:null,_presTimer:null,connected:false,listening:false,pushState:'default',near:0,swVer:'?',
   authState:'connecting',sdkLoaded:false,persist:'',permErr:null,err:null,wsProbe:'',csp:''};
 /* Always log connection diagnostics to the console so the real failure can be SEEN in Chrome. */
@@ -12776,6 +12801,10 @@ html[dir="rtl"] .sh-back svg{transform:scaleX(-1)}
 .arr-row{display:flex;align-items:center;gap:6px}
 .arr-n{flex:0 0 auto;font-size:9.5px;color:var(--tx3);font-weight:800;white-space:nowrap}
 .arr-in{flex:1;min-width:0;padding:9px;border-radius:9px;border:1px solid var(--b2);background:var(--n3);color:var(--tx0);font-family:inherit;font-size:12px}
+.arr-geo{flex:0 0 auto;width:22px;height:22px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:900}
+.arr-geo.ok{background:rgba(22,160,106,.18);color:#2ecc71;border:1px solid rgba(46,204,113,.5)}
+.arr-geo.bad{background:rgba(229,72,77,.16);color:#ff6b70;border:1px solid rgba(229,72,77,.5)}
+.arr-geo.wait{color:var(--tx3)}
 .arr-in::placeholder{color:var(--tx3)}
 .arr-cap{font-size:11px;color:var(--tx3);text-align:center;margin-top:8px;line-height:1.5}.arr-row.arr-hidden{display:none}.arr-add{margin-top:8px;width:100%;padding:9px;border-radius:9px;border:1px dashed var(--b2);background:transparent;color:#C9A84C;font-family:inherit;font-weight:800;font-size:12.5px;cursor:pointer}
 
