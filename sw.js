@@ -8,8 +8,8 @@
 // (a) uses network-first for navigations so a stale shell can never trap the
 // user, and (b) deletes every cache it does not own on activate.
 
-const CACHE_NAME = 'shomer-ctapad-cache-v222';
-const SW_VERSION = 'v222';
+const CACHE_NAME = 'shomer-ctapad-cache-v223';
+const SW_VERSION = 'v223';
 const urlsToCache = [
   './',
   'index.html',
@@ -100,7 +100,7 @@ self.addEventListener('fetch', event => {
   if (req.mode === 'navigate') {
     SW_STATS.handled++;
     event.respondWith(
-      fetch(req)
+      fetch(new Request(req, { cache: 'reload' }))   // bypass the HTTP/WebView cache so a new build is always fetched fresh
         .then(res => {
           const copy = res.clone();
           caches.open(CACHE_NAME).then(c => c.put(req, copy)).catch(() => {});

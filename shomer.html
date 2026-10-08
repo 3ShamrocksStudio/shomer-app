@@ -8884,7 +8884,7 @@ try{ hydrateIcons(document); }catch(e){}
 /* Loaded-build version - shown in the diagnostic panel so a phone can prove
    whether it's on the latest build or a STALE cached one. Keep in lock-step
    with sw.js SW_VERSION on every deploy. */
-var APP_VER='v222';
+var APP_VER='v223';
 var FB={ready:false,uid:null,db:null,_presTimer:null,connected:false,listening:false,pushState:'default',near:0,swVer:'?',
   authState:'connecting',sdkLoaded:false,persist:'',permErr:null,err:null,wsProbe:'',csp:''};
 /* Always log connection diagnostics to the console so the real failure can be SEEN in Chrome. */
@@ -11563,7 +11563,10 @@ function updCheck(manual){
         if(!d||!d.v||typeof APP_VER==='undefined') return;
         var pub=updNum(d.v), cur=updNum(APP_VER), stale=pub>cur;
         updSetBadge('v0.9 · beta', stale);
-        if(stale){ try{fbLog('UPDATE available: '+APP_VER+' → '+d.v);}catch(e){} updShowBanner(d.v); }
+        if(stale){ try{fbLog('UPDATE available: '+APP_VER+' → '+d.v);}catch(e){} updShowBanner(d.v);
+          try{ if(_ln && window._updNotified!==d.v){ window._updNotified=d.v; var _he=currentLang==='he',_ar=currentLang==='ar';
+            _ln.schedule({notifications:[{id:(_lnId=(_lnId%2000000)+1),title:(_he?'עדכון זמין · SH✡MER':_ar?'تحديث متاح · SH✡MER':'Update available · SH✡MER'),body:(_he?'גרסה חדשה מוכנה — פתח/י את SH✡MER כדי לעדכן.':_ar?'نسخة جديدة جاهزة — افتح SH✡MER للتحديث.':'A new version is ready — open SH✡MER to update.'),channelId:'shomer-updates',autoCancel:true,extra:{tag:'update-available'}}]}); } }catch(e){}
+        }
         else if(manual){ try{ toast((currentLang==='he'?'✓ מעודכן - ':'✓ Up to date - ')+APP_VER,'grn'); }catch(e){} }
       }).catch(function(){ if(manual){ try{ toast(currentLang==='he'?'בדיקת עדכון נכשלה':'Update check failed','amb'); }catch(e){} } });
   }catch(e){}
