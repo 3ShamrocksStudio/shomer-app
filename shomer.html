@@ -294,12 +294,13 @@ input[type=range]:focus::-webkit-slider-thumb{box-shadow:0 0 0 4px rgba(224,168,
 .cot-ed{background:none;border:0;color:#5B6B85;cursor:pointer;padding:4px;display:flex}
 .cot-ed svg{width:16px;height:16px}
 .cot-new{display:flex;align-items:center;gap:7px;padding:11px 4px;color:#1D6FD6;font-weight:800;font-size:13.5px;cursor:pointer;background:none;border:0;width:100%}
-/* inline per-guardian toggles */
+/* inline per-SHOMER toggles */
 .gt-row{display:flex;gap:14px;margin-top:7px;flex-wrap:wrap}
 .gt{display:flex;align-items:center;gap:6px;font-size:11px;color:var(--tx2);font-weight:600}
 .gt .tog{width:34px;height:19px;flex:0 0 auto}
 /* colourful professional roles */
-.prof-opt .pic{transition:background .18s,color .18s,border-color .18s}
+.prof-opt .pic{transition:background .18s,color .18s,border-color .18s;width:34px;height:34px}
+.prof-opt .pic .ic{width:19px;height:19px}
 .prof-opt .pic{border:0!important;color:#fff!important;box-shadow:0 6px 16px rgba(0,0,0,.4)}
 .prof-opt[data-prof="police"] .pic{background:linear-gradient(150deg,#4DA3FF,#1670E0 55%,#0B4491)}
 .prof-opt[data-prof="doctor"] .pic{background:linear-gradient(150deg,#3DDC97,#12A594 55%,#0A6E62)}
@@ -365,7 +366,7 @@ input[type=range]:focus::-webkit-slider-thumb{box-shadow:0 0 0 4px rgba(224,168,
 .selfie-count{font-size:34px;font-weight:900;color:#FF7080;line-height:1;margin-bottom:2px;}
 .selfie-cancel{width:100%;padding:14px;background:linear-gradient(135deg,#16a06a,#0e8f5c);border:none;border-radius:12px;color:#fff;font-size:15px;font-weight:800;cursor:pointer;}
 .selfie-note{font-size:10.5px;color:var(--tx3);margin-top:10px;line-height:1.5;}
-.hdr-bell{position:fixed;top:calc(var(--hdr-top,0px) + var(--hdr) + 8px);inset-inline-start:12px;left:auto;right:auto;width:44px;height:44px;border-radius:50%;background:rgba(8,18,36,.92);backdrop-filter:blur(12px);border:1px solid var(--b3);box-shadow:var(--e3);display:flex;align-items:center;justify-content:center;font-size:18px;transition:all .15s;flex-shrink:0;z-index:605;}
+.hdr-bell{position:relative;width:42px;height:42px;border-radius:50%;background:var(--n3);border:1px solid var(--b2);display:flex;align-items:center;justify-content:center;font-size:18px;transition:all .15s;flex-shrink:0;}
 .hdr-bell:hover{background:var(--n4);}
 .bell-dot{position:absolute;top:6px;right:6px;width:8px;height:8px;border-radius:50%;background:var(--r3);border:2px solid rgba(8,18,36,.97);display:none;}
 .bell-dot.on{display:block;animation:blink 1.2s ease-in-out infinite;}
@@ -445,7 +446,7 @@ input[type=range]:focus::-webkit-slider-thumb{box-shadow:0 0 0 4px rgba(224,168,
 .resp-mk .resp-dot{position:relative;width:26px;height:26px;border-radius:50%;background:rgba(14,136,64,.95);display:flex;align-items:center;justify-content:center;box-shadow:0 3px 10px rgba(14,136,64,.5);}
 .resp-mk .resp-ring{position:absolute;inset:-5px;border-radius:50%;border:2px solid rgba(14,136,64,.6);animation:sosIncDot 1.4s ease-out infinite;}
 /* Live connection-status pill (top-center) - shows connected · N nearby · listening ✓ */
-.fb-status{position:static;display:flex;align-items:center;gap:5px;padding:4px 9px;border-radius:999px;background:rgba(8,18,36,.85);border:1px solid var(--b2);font-size:10px;font-weight:600;color:var(--tx1);max-width:118px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;cursor:pointer;transition:opacity .3s;}
+.fb-status{position:fixed;top:calc(var(--hdr-top,0px) + var(--hdr) + 8px);inset-inline-start:12px;z-index:402;display:flex;align-items:center;gap:5px;padding:5px 10px;border-radius:999px;background:rgba(8,18,36,.92);backdrop-filter:blur(12px);border:1px solid var(--b3);box-shadow:var(--e3);font-size:10px;font-weight:600;color:var(--tx1);max-width:150px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;cursor:pointer;transition:opacity .3s;}
 .fb-dot{width:8px;height:8px;border-radius:50%;background:var(--amb);flex-shrink:0;}
 .fb-status.connected{color:var(--tx0);}
 .fb-status.connected .fb-dot{background:var(--grn);animation:fbpulse 2s ease-out infinite;}
@@ -591,10 +592,10 @@ body.sheet-open .ff-fab{opacity:0;pointer-events:none;}
 .sheet{position:absolute;left:0;right:0;bottom:0;z-index:620;background:var(--n2);border-radius:22px 22px 0 0;border-top:1px solid var(--b3);box-shadow:0 -10px 60px rgba(0,0,0,.8);transform:translateY(100%);transition:transform .35s cubic-bezier(.25,1,.35,1);max-height:calc(100vh - var(--hdr-top,0px) - var(--hdr) - 14px);display:flex;flex-direction:column;overflow:hidden;}
 .sheet.open{transform:translateY(0);}
 .sheet::before{content:'';position:absolute;top:0;left:25%;right:25%;height:1px;background:linear-gradient(90deg,transparent,var(--gd),transparent);}
-.sh-pill{width:42px;height:3px;border-radius:2px;background:var(--n5);margin:10px auto 0;flex-shrink:0;}
+.sh-pill{display:none}
 .sh-head{display:flex;align-items:center;justify-content:space-between;padding:12px 16px 11px;flex-shrink:0;border-bottom:1px solid var(--b1);}
 .sh-ttl{font-size:17px;font-weight:900;letter-spacing:-.3px;background:linear-gradient(135deg,#C09020 0%,#E0A828 60%,#F5C840 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
-.sh-x{width:30px;height:30px;border-radius:50%;background:var(--n4);border:1px solid var(--b1);display:flex;align-items:center;justify-content:center;font-size:16px;color:var(--tx2);transition:background .12s;}
+.sh-x{width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,#C09020,#E0A828 60%,#F5C840);border:0;display:flex;align-items:center;justify-content:center;font-size:17px;color:#23170a;font-weight:800;transition:transform .12s,filter .12s;box-shadow:0 4px 12px rgba(224,168,40,.35);}.sh-x:active{transform:scale(.92)}
 .sh-x:hover{background:var(--n5);}
 .sh-body{overflow-y:auto;-webkit-overflow-scrolling:touch;flex:1;padding:14px 16px 36px;}
 /* section label */
@@ -916,7 +917,7 @@ body.sheet-open .ff-fab{opacity:0;pointer-events:none;}
 
 .ldc{width:18px;height:18px;border-radius:50%;flex-shrink:0;border:1.5px solid rgba(255,255,255,.85);box-shadow:0 1px 3px rgba(0,0,0,.4);display:flex;align-items:center;justify-content:center;font-size:9px;line-height:1;}
 
-.map-controls{position:absolute;top:calc(var(--hdr-top,0px) + var(--hdr) + 10px);right:10px;z-index:400;display:flex;flex-direction:column;gap:6px;}
+.map-controls{position:absolute;top:calc(var(--hdr-top,0px) + var(--hdr) + 10px);inset-inline-end:10px;right:auto;z-index:400;display:flex;flex-direction:column;gap:6px;}
 .mc{width:42px;height:42px;border-radius:50%;background:rgba(8,18,36,.92);backdrop-filter:blur(12px);border:1px solid var(--b2);box-shadow:var(--e2);display:flex;align-items:center;justify-content:center;font-size:20px;font-weight:700;color:var(--p3);transition:all .15s;}
 .mc:hover{background:rgba(16,30,52,.96);transform:translateY(-1px);}
 .mc:active{transform:scale(.92);}
@@ -1030,7 +1031,7 @@ body.sheet-open .ff-fab{opacity:0;pointer-events:none;}
 .honesty-note{display:flex;align-items:flex-start;gap:9px;background:rgba(24,82,192,.10);border:1px solid rgba(40,98,255,.3);border-radius:var(--r12);padding:11px 13px;margin-bottom:14px;font-size:11px;color:var(--tx1);line-height:1.55;}
 .honesty-note .hn-ic{font-size:16px;flex-shrink:0;}
 .honesty-note strong{color:#9FD0FF;}
-/* ── Guardian pairing ── */
+/* ── SHOMER pairing ── */
 .gd-hero{background:linear-gradient(160deg,rgba(224,168,40,.14),rgba(24,82,192,.10));border:1px solid var(--b3);border-radius:var(--r16);padding:14px;margin-bottom:14px;}
 .gd-hero-t{font-size:15px;font-weight:900;color:var(--tx0);display:flex;align-items:center;gap:8px;}
 .gd-hero-s{font-size:11.5px;color:var(--tx2);line-height:1.6;margin:6px 0 12px;}
@@ -1047,7 +1048,7 @@ body.sheet-open .ff-fab{opacity:0;pointer-events:none;}
 .rb-col.next .rb-h{color:#C9A84C;}
 .rb-li{font-size:10.5px;color:var(--tx1);line-height:1.5;padding:3px 0;display:flex;gap:5px;}
 .rb-li::before{content:'';flex-shrink:0;}
-/* Guardian list rows */
+/* SHOMER list rows */
 .gd-row{display:flex;align-items:center;gap:11px;background:var(--n3);border:1px solid var(--b1);border-radius:var(--r12);padding:11px 12px;margin-bottom:8px;}
 .gd-row.live{border-color:rgba(14,136,64,.55);}
 .gd-av{width:42px;height:42px;flex-shrink:0;border-radius:50%;background:radial-gradient(circle at 36% 30%,#15294A,#0A1628);border:2.5px solid var(--g3);display:flex;align-items:center;justify-content:center;font-size:18px;position:relative;}
@@ -1199,7 +1200,7 @@ body.otp-active .ob-steps{display:none!important;}
 .name-hint{font-size:10px;color:var(--tx3);margin:-4px 0 12px;line-height:1.5;display:flex;align-items:center;gap:5px;}
 
 /* SH✡MER FIXES */
-.sh-x{width:32px!important;height:32px!important;border-radius:8px!important;background:rgba(255,255,255,.09)!important;border:1px solid rgba(255,255,255,.15)!important;display:flex!important;align-items:center!important;justify-content:center!important;cursor:pointer!important;transition:.15s!important;flex-shrink:0!important;}
+.sh-x{width:34px!important;height:34px!important;border-radius:50%!important;background:linear-gradient(135deg,#C09020,#E0A828 60%,#F5C840)!important;border:0!important;color:#23170a!important;display:flex!important;align-items:center!important;justify-content:center!important;cursor:pointer!important;transition:.15s!important;flex-shrink:0!important;box-shadow:0 4px 12px rgba(224,168,40,.35)!important;}
 .sh-x:hover{background:rgba(255,255,255,.18)!important;border-color:rgba(255,255,255,.3)!important;}
 .setup-skip{width:100%!important;padding:13px!important;background:transparent!important;border:1.5px solid rgba(255,255,255,.2)!important;border-radius:12px!important;color:var(--tx2)!important;font-size:14px!important;font-weight:600!important;cursor:pointer!important;font-family:inherit!important;margin-top:8px!important;display:flex!important;align-items:center!important;justify-content:center!important;gap:8px!important;transition:.15s!important;}
 .setup-skip:hover{background:rgba(255,255,255,.07)!important;border-color:rgba(255,255,255,.35)!important;}
@@ -1287,7 +1288,7 @@ body.otp-active .ob-steps{display:none!important;}
 .ob-logo img{max-height:160px;width:auto;}
 
 /* Profile: identity card + differentiated stat tiles */
-.prof-top{background:linear-gradient(160deg,rgba(224,168,40,.10),rgba(16,30,52,.65));border:1px solid rgba(224,168,40,.30);border-radius:14px;padding:10px 14px 10px;margin-bottom:10px;}
+.prof-top{background:none;border:0;border-radius:0;padding:4px 0 8px;margin-bottom:8px;}
 .prof-top .p-nm{font-family:inherit;letter-spacing:.3px;}
 .stats .st{border-top:3px solid transparent;border-radius:12px;}
 .stats .st:nth-child(1){border-top-color:rgba(224,168,40,.7);}
@@ -1593,11 +1594,11 @@ body.otp-active .ob-steps{display:none!important;}
  <header class="hdr" role="banner" id="main-content">
  <div class="hdr-left">
  <button class="hdr-menu" id="menu-btn" onclick="toggleDD()" aria-label="תפריט" aria-expanded="false" aria-haspopup="true"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></button>
- <span id="hdr-founder-slot"></span>
+ <span id="hdr-founder-slot" style="display:none"></span>
    <button class="hdr-guide" onclick="openGuide()" aria-label="מדריך חירום" title="מדריך חירום">
  <svg class="ic" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6V4.8A1.8 1.8 0 0 1 10.8 3h2.4A1.8 1.8 0 0 1 15 4.8V6"/><rect x="3" y="6" width="18" height="14" rx="2.4"/><path d="M12 10.2v5.6M9.2 13h5.6" stroke-width="2.3"/></svg>
  </button>
- <!-- REAL "guardians nearby" - live count from RTDB presence (shown only when connected). -->
+ <!-- REAL "SHOMERs nearby" - live count from RTDB presence (shown only when connected). -->
  <button class="hdr-near" id="hdr-near" style="display:none" onclick="explainNearby()" aria-live="polite">
  <div class="ldot" aria-hidden="true"></div>
  <span id="gnear-n">0</span>
@@ -1809,8 +1810,8 @@ body.otp-active .ob-steps{display:none!important;}
  <div class="resp-consent" id="resp-consent" role="alertdialog" aria-modal="true" aria-labelledby="rc-t" aria-hidden="true">
  <div class="rc-card">
  <div class="rc-ic"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3l7 3v5c0 5-3.4 8.5-7 10-3.6-1.5-7-5-7-10V6Z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></svg></div>
- <div class="rc-t" id="rc-t" data-he="להגיב כשומר/ת?" data-en="Respond as a guardian?">להגיב כשומר/ת?</div>
- <div class="rc-b" data-he="ניווט מגיבים מיועד בעיקר למגיבים מאומתים (כבאות/משטרה/מד״א) ולשומרים מוגדרים. הוא יציג מסלול חי ומרחק אל מי שזקוק/ה לעזרה." data-en="Responder navigation is intended primarily for verified responders (fire/police/medic) and designated guardians. It shows a live route and distance to the person in need.">ניווט מגיבים מיועד בעיקר למגיבים מאומתים (כבאות/משטרה/מד״א) ולשומרים מוגדרים. הוא יציג מסלול חי ומרחק אל מי שזקוק/ה לעזרה.</div>
+ <div class="rc-t" id="rc-t" data-he="להגיב כשומר/ת?" data-en="Respond as a SHOMER?">להגיב כשומר/ת?</div>
+ <div class="rc-b" data-he="ניווט מגיבים מיועד בעיקר למגיבים מאומתים (כבאות/משטרה/מד״א) ולשומרים מוגדרים. הוא יציג מסלול חי ומרחק אל מי שזקוק/ה לעזרה." data-en="Responder navigation is intended primarily for verified responders (fire/police/medic) and designated SHOMERs. It shows a live route and distance to the person in need.">ניווט מגיבים מיועד בעיקר למגיבים מאומתים (כבאות/משטרה/מד״א) ולשומרים מוגדרים. הוא יציג מסלול חי ומרחק אל מי שזקוק/ה לעזרה.</div>
  <div class="rc-warn" data-he="⚠ אל תסכן/י את עצמך. שומר מחזק עזרה הדדית ואינו תחליף לשירותי חירום. בכל מצב חירום חייגו 100 / 101 / 102. אם אינך מגיב/ה מיומן/ת - התרעה וחיוג הם התרומה הטובה ביותר." data-en="⚠ Do not put yourself in danger. SHOMER augments mutual aid and is not a replacement for emergency services. In any emergency call 100 / 101 / 102. If you are not a trained responder, alerting and calling is the best help.">⚠ אל תסכן/י את עצמך. שומר מחזק עזרה הדדית ואינו תחליף לשירותי חירום. בכל מצב חירום חייגו 100 / 101 / 102. אם אינך מגיב/ה מיומן/ת - התרעה וחיוג הם התרומה הטובה ביותר.</div>
  <div class="rc-actions">
  <button class="cta-gold" onclick="respondConsentAccept()" data-he="הבנתי - הפעל/י ניווט" data-en="I understand - start navigation">הבנתי - הפעל/י ניווט</button>
@@ -1824,10 +1825,10 @@ body.otp-active .ob-steps{display:none!important;}
  <div class="sh-pill" aria-hidden="true"></div>
  <div class="sh-head"><span class="sh-ttl" id="ci-ttl" data-he="צ׳ק-אין הדדי" data-en="Mutual check-in">צ׳ק-אין הדדי</span><button class="sh-x" onclick="cl('sh-checkin')" aria-label="close"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg></button></div>
  <div class="sh-body">
- <p class="set-help" data-he="מתג-מת חברתי דו-כיווני: האפליקציה תשאל אותך מדי פעם „הכל טוב??”. אם לא תאשר/י בזמן - השומר/ת המקושר/ת מקבל/ת אזעקה ויכול/ה לשלוח SOS בשמך." data-en="A two-way social שומר אוטומטי: the app periodically asks 'Are you OK?'. If you don't confirm in time, your paired guardian is alerted and can send an SOS on your behalf.">מתג-מת חברתי דו-כיווני.</p><p id="obv-cap-note" style="font-size:11px;color:var(--tx3);text-align:center;margin:4px 0 0" data-he="אשר/י שאינך רובוט, ואז תשלח לך SMS" data-en="Verify you're human, then SMS is sent">אשר/י שאינך רובוט, ואז תשלח לך SMS</p>
- <div class="sec-cap mb12" data-he="שומרים מקושרים (עד 5)" data-en="Paired guardians (up to 5)">שומרים מקושרים (עד 5)</div>
- <div id="ci-guardians-list" role="group" aria-label="Paired guardians"></div>
- <p class="set-help" id="ci-guardians-note" style="margin:6px 0 0" data-he="בחר/י עד 5 שומרים מהרשימה השמורה שלך." data-en="Choose up to 5 guardians from your saved list.">בחר/י עד 5 שומרים מהרשימה השמורה שלך.</p>
+ <p class="set-help" data-he="מתג-מת חברתי דו-כיווני: האפליקציה תשאל אותך מדי פעם „הכל טוב??”. אם לא תאשר/י בזמן - השומר/ת המקושר/ת מקבל/ת אזעקה ויכול/ה לשלוח SOS בשמך." data-en="A two-way social שומר אוטומטי: the app periodically asks 'Are you OK?'. If you don't confirm in time, your paired SHOMER is alerted and can send an SOS on your behalf.">מתג-מת חברתי דו-כיווני.</p><p id="obv-cap-note" style="font-size:11px;color:var(--tx3);text-align:center;margin:4px 0 0" data-he="אשר/י שאינך רובוט, ואז תשלח לך SMS" data-en="Verify you're human, then SMS is sent">אשר/י שאינך רובוט, ואז תשלח לך SMS</p>
+ <div class="sec-cap mb12" data-he="שומרים מקושרים (עד 5)" data-en="Paired SHOMERs (up to 5)">שומרים מקושרים (עד 5)</div>
+ <div id="ci-SHOMERs-list" role="group" aria-label="Paired SHOMERs"></div>
+ <p class="set-help" id="ci-SHOMERs-note" style="margin:6px 0 0" data-he="בחר/י עד 5 שומרים מהרשימה השמורה שלך." data-en="Choose up to 5 SHOMERs from your saved list.">בחר/י עד 5 שומרים מהרשימה השמורה שלך.</p>
  <div class="sec-cap mb12" style="margin-top:6px" data-he="תדירות" data-en="Frequency">תדירות</div>
  <div class="dms-intervals" id="ci-freq" role="group">
  <div class="dms-iv" data-min="15" onclick="ciPick('freq',15,this)" tabindex="0"><div class="dms-iv-n">15</div><div class="dms-iv-l" data-he="דק׳" data-en="min">דק׳</div></div>
@@ -1858,13 +1859,13 @@ body.otp-active .ob-steps{display:none!important;}
  </div>
  </div>
 
- <!-- MUTUAL CHECK-IN - guardian alerted (miss) -->
+ <!-- MUTUAL CHECK-IN - SHOMER alerted (miss) -->
  <div class="sos-cd" id="checkin-miss" role="alertdialog" aria-modal="true" aria-hidden="true">
  <div class="sos-cd-card">
  <div class="rc-ic" style="margin:0 auto 13px;background:var(--rb);border-color:var(--b4);color:#FF6173"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3.5l9 16H3Z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><path d="M12 10v4" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><circle cx="12" cy="17" r="1.2" fill="currentColor"/></svg></div>
  <div class="sos-cd-ttl" data-he="לא התקבל אישור" data-en="No check-in response">לא התקבל אישור</div>
  <div class="sos-cd-sub" id="ci-miss-sub"></div>
- <button class="cta-red" style="margin-top:6px" onclick="guardianActivateForUser()" data-he="כשומר/ת: שלח/י SOS עבורם" data-en="As guardian: send SOS for them">כשומר/ת: שלח/י SOS עבורם</button>
+ <button class="cta-red" style="margin-top:6px" onclick="guardianActivateForUser()" data-he="כשומר/ת: שלח/י SOS עבורם" data-en="As SHOMER: send SOS for them">כשומר/ת: שלח/י SOS עבורם</button>
  <button class="ob-back" style="margin-top:9px" onclick="cl2('checkin-miss')" data-he="סגור" data-en="Dismiss">סגור</button>
  </div>
  </div>
@@ -1872,7 +1873,7 @@ body.otp-active .ob-steps{display:none!important;}
  <!-- DMS STRIP -->
  <div class="dms-strip" id="dms-strip" role="alert" aria-live="assertive">
  <div class="dms-bar">
- <div class="dms-t" id="dms-strip-t" data-he=" שומר אוטומטי פעיל" data-en=" Auto-guardian active"> שומר אוטומטי פעיל</div>
+ <div class="dms-t" id="dms-strip-t" data-he=" שומר אוטומטי פעיל" data-en=" Auto-SHOMER active"> שומר אוטומטי פעיל</div>
  <div class="dms-s" id="dms-strip-s">בדיקה הבאה בעוד 5:00</div>
  </div>
  <button class="dms-ok" onclick="dmsConfirm()" id="dms-ok-btn" data-he="✓ הכל טוב?" data-en="✓ I'm OK">✓ הכל טוב?</button>
@@ -2077,13 +2078,13 @@ body.otp-active .ob-steps{display:none!important;}
  </div>
  <div class="set-grp"><div class="set-row" onclick="testNotifications()" role="button" tabindex="0"><div class="sr-l"><div class="sr-ic"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M18 8a6 6 0 1 0-12 0c0 7-3 9-3 9h18s-3-2-3-9" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></svg></div><div><div class="sr-nm" data-he="בדיקת התראות" data-en="Test notifications">בדיקת התראות</div><div class="sr-sb" data-he="שולח התראת עדכון + התראת רקע (נעל/י מסך). לא בזמן חירום." data-en="Sends an update + background alert (lock screen). Not during emergency.">שולח התראת עדכון + התראת רקע.</div></div></div><span style="color:var(--tx3);font-size:18px">›</span></div></div><div class="set-cat"><div class="set-cat-ic"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3l7 3v5c0 5-3.4 8.5-7 10-3.6-1.5-7-5-7-10V6Z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></svg></div><div class="set-cat-t" data-he="בטיחות" data-en="Safety features">בטיחות</div></div>
  <div class="set-grp"><div class="set-row" onclick="opFrom('sh-dms','sh-set');cl('sh-set')" role="button" tabindex="0"><div class="sr-l"><div class="sr-ic"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8.5" fill="none" stroke="currentColor" stroke-width="2"/><path d="M12 7.5V12l3 2" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="sr-nm" data-he="שומר אוטומטי" data-en="שומר אוטומטי" data-ar="مفتاح الأمان الميت">שומר אוטומטי</div></div><span style="color:var(--tx3);font-size:18px">›</span></div><div class="set-row" onclick="opFrom('sh-alarm','sh-set');cl('sh-set')" role="button" tabindex="0"><div class="sr-l"><div class="sr-ic"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 18v-5a5 5 0 0 1 10 0v5" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><rect x="5" y="18" width="14" height="3" rx="1.5" fill="none" stroke="currentColor" stroke-width="2"/><path d="M12 3v2M4.5 7l1.5 1.3M19.5 7L18 8.3" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></div><div class="sr-nm" data-he="הגדרות אזעקה" data-en="Alarm settings">הגדרות אזעקה</div></div><span style="color:var(--tx3);font-size:18px">›</span></div></div>
- <div class="set-grp"><div class="set-row"><div class="sr-l"><div class="sr-ic"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 4 L17 18.5 L12 15.2 L7 18.5 Z" fill="currentColor"/></svg></div><div><div class="sr-nm" id="resp-tog-lbl" data-he="ניווט מגיב/ה (הצטרפות)" data-en="Responder navigation (opt-in)">ניווט מגיב/ה (הצטרפות)</div><div class="sr-sb" id="resp-tog-sub" data-he="הצג מסלול חי ומרחק כשמגיבים ל-SOS. מיועד למגיבים מאומתים ולשומרים - לא תחליף לחיוג 100/101/102." data-en="Show a live route + distance when responding to an SOS. For verified responders/guardians - not a replacement for 100/101/102.">הצג מסלול חי ומרחק כשמגיבים ל-SOS.</div></div></div><div class="tog" id="resp-tog" onclick="toggleRespond(this)" role="switch"></div></div></div>
+ <div class="set-grp"><div class="set-row"><div class="sr-l"><div class="sr-ic"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 4 L17 18.5 L12 15.2 L7 18.5 Z" fill="currentColor"/></svg></div><div><div class="sr-nm" id="resp-tog-lbl" data-he="ניווט מגיב/ה (הצטרפות)" data-en="Responder navigation (opt-in)">ניווט מגיב/ה (הצטרפות)</div><div class="sr-sb" id="resp-tog-sub" data-he="הצג מסלול חי ומרחק כשמגיבים ל-SOS. מיועד למגיבים מאומתים ולשומרים - לא תחליף לחיוג 100/101/102." data-en="Show a live route + distance when responding to an SOS. For verified responders/SHOMERs - not a replacement for 100/101/102.">הצג מסלול חי ומרחק כשמגיבים ל-SOS.</div></div></div><div class="tog" id="resp-tog" onclick="toggleRespond(this)" role="switch"></div></div></div>
  <div class="set-grp"><div class="set-row" onclick="openSetPin()" role="button" tabindex="0"><div class="sr-l"><div class="sr-ic"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="11" width="14" height="9" rx="2" fill="none" stroke="currentColor" stroke-width="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3" fill="none" stroke="currentColor" stroke-width="2"/></svg></div><div><div class="sr-nm" data-he="קוד לביטול SOS (PIN)" data-en="SOS cancel code (PIN)">קוד לביטול SOS (PIN)</div><div class="sr-sb" data-he="נדרש לביטול SOS פעיל - לעולם לא טביעת אצבע." data-en="Required to cancel an active SOS - never a fingerprint.">נדרש לביטול SOS פעיל - לעולם לא טביעת אצבע.</div></div></div><span id="pin-set-state" style="font-size:12px;font-weight:700;color:var(--amb);white-space:nowrap">לא הוגדר</span></div></div>
  <div class="set-grp">
  <div class="set-row"><div class="sr-l"><div class="sr-ic"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="7" width="18" height="13" rx="2.5" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="12" cy="13.5" r="3.2" fill="none" stroke="currentColor" stroke-width="2"/><path d="M9 7l1.5-2h3L15 7" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></svg></div><div><div class="sr-nm" id="selfie-tog-lbl" data-he="הגנת גנב - סלפי" data-en="Theft protection - selfie" data-ar="حماية السرقة - سيلفي">הגנת גנב - סלפי</div><div class="sr-sb" id="selfie-tog-sub" data-he="אחרי 3 קודים שגויים: צילום סלפי של מי שמחזיק את הטלפון + שליחת מיקום חי לשומרים שלך. דורש הרשאת מצלמה. פועל רק כשהאפליקציה פתוחה." data-en="After 3 wrong codes: snap a selfie of whoever holds the phone + send live location to your SHOMERs. Needs camera permission. Works only while the app is open.">אחרי 3 קודים שגויים: סלפי + מיקום חי לשומרים שלך.</div></div></div><div class="tog" id="selfie-tog" onclick="toggleSelfie(this)" role="switch" aria-label="הגנה מפני גניבת מכשיר - צילום סלפי אוטומטי"></div></div>
  <div class="set-row" onclick="openTheftEvidence()" role="button" tabindex="0"><div class="sr-l"><div class="sr-ic"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="5" width="16" height="14" rx="2" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="12" cy="12" r="3" fill="none" stroke="currentColor" stroke-width="2"/></svg></div><div><div class="sr-nm" data-he="ראיות גניבה" data-en="Theft evidence" data-ar="أدلة السرقة">ראיות גניבה</div><div class="sr-sb" data-he="סלפי ומיקום שנלכדו - ראיה מתועדת למשטרה." data-en="Captured selfies + locations - documented proof for police.">סלפי ומיקום שנלכדו - ראיה למשטרה.</div></div></div><span id="theft-ev-state" style="font-size:12px;font-weight:700;color:var(--g3);white-space:nowrap"></span></div>
  </div>
- <div class="set-grp"><div class="set-row" onclick="opFrom('sh-checkin','dd');try{reflectCheckin()}catch(e){}" role="button" tabindex="0"><div class="sr-l"><div class="sr-ic"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3l7 3v5c0 5-3.4 8.5-7 10-3.6-1.5-7-5-7-10V6Z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><path d="M9 12l2 2 4-4" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div><div class="sr-nm" data-he="צ׳ק-אין הדדי (עם שומר/ת)" data-en="Mutual check-in (with a guardian)">צ׳ק-אין הדדי</div><div class="sr-sb" data-he="„הכל טוב??” תקופתי - אם לא תאשר/י, השומר/ת מקבל/ה אזעקה." data-en="Periodic 'Are you OK?' - if you don't confirm, your guardian is alerted.">„הכל טוב??” תקופתי.</div></div></div><span id="ci-set-state" style="font-size:12px;font-weight:700;color:var(--tx3);white-space:nowrap">כבוי</span></div></div>
+ <div class="set-grp"><div class="set-row" onclick="opFrom('sh-checkin','dd');try{reflectCheckin()}catch(e){}" role="button" tabindex="0"><div class="sr-l"><div class="sr-ic"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3l7 3v5c0 5-3.4 8.5-7 10-3.6-1.5-7-5-7-10V6Z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><path d="M9 12l2 2 4-4" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div><div class="sr-nm" data-he="צ׳ק-אין הדדי (עם שומר/ת)" data-en="Mutual check-in (with a SHOMER)">צ׳ק-אין הדדי</div><div class="sr-sb" data-he="„הכל טוב??” תקופתי - אם לא תאשר/י, השומר/ת מקבל/ה אזעקה." data-en="Periodic 'Are you OK?' - if you don't confirm, your SHOMER is alerted.">„הכל טוב??” תקופתי.</div></div></div><span id="ci-set-state" style="font-size:12px;font-weight:700;color:var(--tx3);white-space:nowrap">כבוי</span></div></div>
  <div class="sec-cap mb12" id="shake-set-lbl">Shake-to-SOS</div>
  <div class="set-grp">
  <div class="set-row"><div class="sr-l"><div class="sr-ic"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M13 2L4 14h6l-1 8 9-12h-6Z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></svg></div><div><div class="sr-nm" id="shake-tog-lbl">הפעל Shake-to-SOS</div><div class="sr-sb" id="shake-tog-sub">5 ניעורים חזקים → SOS</div></div></div><div class="tog on" id="shake-tog" onclick="toggleShake(this)" role="switch"></div></div>
@@ -2107,7 +2108,7 @@ body.otp-active .ob-steps{display:none!important;}
  <div class="set-grp">
  <div class="set-row"><div class="sr-l"><div class="sr-ic"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="11" width="14" height="9" rx="2" fill="none" stroke="currentColor" stroke-width="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3" fill="none" stroke="currentColor" stroke-width="2"/></svg></div><div><div class="sr-nm" id="hold-arm-lbl">מניעת לחיצה בטעות</div><div class="sr-sb" id="hold-arm-sub">לחיצה ארוכה של 2 שניות תפעיל SOS - כדי שלא יישלח מהכיס</div></div></div><div class="tog" id="hold-arm-tog" onclick="toggleHoldArm(this)" role="switch"></div></div>
  </div>
- <div class="set-cat"><div class="set-cat-ic"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 6l6-3 6 3 6-3v15l-6 3-6-3-6 3Z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><path d="M9 3v15M15 6v15" fill="none" stroke="currentColor" stroke-width="2"/></svg></div><div class="set-cat-t" data-he="שכבות מפה" data-en="Map layers">שכבות מפה</div></div><div class="sec-cap mb12" data-he="המפה נפתחת עם כל השכבות דלוקות. אפשר לכבות או להדליק כל שכבה כאן." data-en="The map opens with every layer on. Toggle any layer on or off here." data-ar="تفتح الخريطة وكل الطبقات مفعّلة. يمكنك تشغيل أو إيقاف أي طبقة هنا.">המפה נפתחת עם כל השכבות דלוקות. אפשר לכבות או להדליק כל שכבה כאן.</div><div class="set-grp"><div class="set-row"><div class="sr-l"><div class="sr-ic"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="13" width="4" height="7" rx="1" fill="none" stroke="currentColor" stroke-width="2"/><rect x="10" y="8" width="4" height="12" rx="1" fill="none" stroke="currentColor" stroke-width="2"/><rect x="17" y="3" width="4" height="17" rx="1" fill="none" stroke="currentColor" stroke-width="2"/></svg></div><div><div class="sr-nm" data-he="סטטיסטיקת פשיעה" data-en="Crime statistics" data-ar="إحصاءات الجريمة">סטטיסטיקת פשיעה</div><div class="sr-sb" data-he="סמני ערים · נתוני משטרת ישראל" data-en="City markers · Israel Police data" data-ar="علامات المدن · بيانات الشرطة">סמני ערים · נתוני משטרת ישראל</div></div></div><div class="tog on" data-skey="map_stats" onclick="mapLayerToggle(this,'stats')" role="switch"></div></div><div class="set-row"><div class="sr-l"><div class="sr-ic"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 22s7-6.4 7-12a7 7 0 1 0-14 0c0 5.6 7 12 7 12Z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><circle cx="12" cy="10" r="2.6" fill="currentColor"/></svg></div><div><div class="sr-nm" data-he="הדיווחים שלי" data-en="My reports" data-ar="بلاغاتي">הדיווחים שלי</div><div class="sr-sb" data-he="סיכות הדיווחים שהגשת" data-en="Pins of reports you filed" data-ar="دبابيس بلاغاتك">סיכות הדיווחים שהגשת</div></div></div><div class="tog on" data-skey="map_reports" onclick="mapLayerToggle(this,'reports')" role="switch"></div></div><div class="set-row"><div class="sr-l"><div class="sr-ic"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><circle cx="9" cy="8" r="3.2" fill="none" stroke="currentColor" stroke-width="2"/><path d="M3.5 19a5.5 5.5 0 0 1 11 0" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><circle cx="17" cy="9" r="2.4" fill="none" stroke="currentColor" stroke-width="2"/><path d="M15.5 14.4A4.6 4.6 0 0 1 20.5 19" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></div><div><div class="sr-nm" data-he="המעגל שלי" data-en="My circle" data-ar="دائرتي">המעגל שלי</div><div class="sr-sb" data-he="מיקום השומרים המקושרים אליך" data-en="Your linked guardians’ location" data-ar="مواقع حُرّاسك المرتبطين">מיקום השומרים המקושרים אליך</div></div></div><div class="tog on" data-skey="map_circle" onclick="mapLayerToggle(this,'circle')" role="switch"></div></div><div class="set-row"><div class="sr-l"><div class="sr-ic"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8.5" fill="none" stroke="currentColor" stroke-width="2"/><path d="M12 7.5V12l3 2" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div><div class="sr-nm" data-he="אירועי עבר" data-en="Past events" data-ar="أحداث سابقة">אירועי עבר</div><div class="sr-sb" data-he="הצג אירועי עבר על המפה — למודעות בלבד" data-en="Show past events on the map — awareness only" data-ar="عرض الأحداث السابقة على الخريطة">הצג אירועי עבר על המפה — למודעות בלבד</div></div></div><div class="tog" id="set-past-tog" onclick="togglePastEvents();this.classList.toggle('on')" role="switch"></div></div></div><div class="set-cat"><div class="set-cat-ic"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="11" width="14" height="9" rx="2" fill="none" stroke="currentColor" stroke-width="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3" fill="none" stroke="currentColor" stroke-width="2"/></svg></div><div class="set-cat-t" data-he="מיקום ופרטיות" data-en="Location &amp; Privacy">מיקום ופרטיות</div></div>
+ <div class="set-cat"><div class="set-cat-ic"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 6l6-3 6 3 6-3v15l-6 3-6-3-6 3Z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><path d="M9 3v15M15 6v15" fill="none" stroke="currentColor" stroke-width="2"/></svg></div><div class="set-cat-t" data-he="שכבות מפה" data-en="Map layers">שכבות מפה</div></div><div class="sec-cap mb12" data-he="המפה נפתחת עם כל השכבות דלוקות. אפשר לכבות או להדליק כל שכבה כאן." data-en="The map opens with every layer on. Toggle any layer on or off here." data-ar="تفتح الخريطة وكل الطبقات مفعّلة. يمكنك تشغيل أو إيقاف أي طبقة هنا.">המפה נפתחת עם כל השכבות דלוקות. אפשר לכבות או להדליק כל שכבה כאן.</div><div class="set-grp"><div class="set-row"><div class="sr-l"><div class="sr-ic"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="13" width="4" height="7" rx="1" fill="none" stroke="currentColor" stroke-width="2"/><rect x="10" y="8" width="4" height="12" rx="1" fill="none" stroke="currentColor" stroke-width="2"/><rect x="17" y="3" width="4" height="17" rx="1" fill="none" stroke="currentColor" stroke-width="2"/></svg></div><div><div class="sr-nm" data-he="סטטיסטיקת פשיעה" data-en="Crime statistics" data-ar="إحصاءات الجريمة">סטטיסטיקת פשיעה</div><div class="sr-sb" data-he="סמני ערים · נתוני משטרת ישראל" data-en="City markers · Israel Police data" data-ar="علامات المدن · بيانات الشرطة">סמני ערים · נתוני משטרת ישראל</div></div></div><div class="tog on" data-skey="map_stats" onclick="mapLayerToggle(this,'stats')" role="switch"></div></div><div class="set-row"><div class="sr-l"><div class="sr-ic"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 22s7-6.4 7-12a7 7 0 1 0-14 0c0 5.6 7 12 7 12Z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><circle cx="12" cy="10" r="2.6" fill="currentColor"/></svg></div><div><div class="sr-nm" data-he="הדיווחים שלי" data-en="My reports" data-ar="بلاغاتي">הדיווחים שלי</div><div class="sr-sb" data-he="סיכות הדיווחים שהגשת" data-en="Pins of reports you filed" data-ar="دبابيس بلاغاتك">סיכות הדיווחים שהגשת</div></div></div><div class="tog on" data-skey="map_reports" onclick="mapLayerToggle(this,'reports')" role="switch"></div></div><div class="set-row"><div class="sr-l"><div class="sr-ic"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><circle cx="9" cy="8" r="3.2" fill="none" stroke="currentColor" stroke-width="2"/><path d="M3.5 19a5.5 5.5 0 0 1 11 0" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><circle cx="17" cy="9" r="2.4" fill="none" stroke="currentColor" stroke-width="2"/><path d="M15.5 14.4A4.6 4.6 0 0 1 20.5 19" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></div><div><div class="sr-nm" data-he="המעגל שלי" data-en="My circle" data-ar="دائرتي">המעגל שלי</div><div class="sr-sb" data-he="מיקום השומרים המקושרים אליך" data-en="Your linked SHOMERs’ location" data-ar="مواقع حُرّاسك المرتبطين">מיקום השומרים המקושרים אליך</div></div></div><div class="tog on" data-skey="map_circle" onclick="mapLayerToggle(this,'circle')" role="switch"></div></div><div class="set-row"><div class="sr-l"><div class="sr-ic"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8.5" fill="none" stroke="currentColor" stroke-width="2"/><path d="M12 7.5V12l3 2" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div><div class="sr-nm" data-he="אירועי עבר" data-en="Past events" data-ar="أحداث سابقة">אירועי עבר</div><div class="sr-sb" data-he="הצג אירועי עבר על המפה — למודעות בלבד" data-en="Show past events on the map — awareness only" data-ar="عرض الأحداث السابقة على الخريطة">הצג אירועי עבר על המפה — למודעות בלבד</div></div></div><div class="tog" id="set-past-tog" onclick="togglePastEvents();this.classList.toggle('on')" role="switch"></div></div></div><div class="set-cat"><div class="set-cat-ic"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="11" width="14" height="9" rx="2" fill="none" stroke="currentColor" stroke-width="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3" fill="none" stroke="currentColor" stroke-width="2"/></svg></div><div class="set-cat-t" data-he="מיקום ופרטיות" data-en="Location &amp; Privacy">מיקום ופרטיות</div></div>
  <div class="sec-cap mb12" id="set-priv-lbl">פרטיות</div>
  <div class="set-grp">
  <div class="set-row"><div class="sr-l"><div class="sr-ic"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 22s7-6.4 7-12a7 7 0 1 0-14 0c0 5.6 7 12 7 12Z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><circle cx="12" cy="10" r="2.6" fill="currentColor"/></svg></div><div><div class="sr-nm" id="p-bgloc-nm">שיתוף מיקום ברקע</div><div class="sr-sb" id="p-bgloc-sb">נדרש ל-SOS ו-DMS - בלעדיו אי אפשר לשלוח את מיקומך בחירום</div></div></div><div class="tog on" data-skey="p_bgloc" onclick="this.classList.toggle('on');saveToggle(this)" role="switch"></div></div>
@@ -2177,10 +2178,10 @@ body.otp-active .ob-steps{display:none!important;}
  <div class="sh-head"><span class="sh-ttl" id="prof-ttl">הפרופיל שלי</span><button class="sh-x" onclick="cl('sh-prof')" aria-label="סגור"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg></button></div>
  <div class="sh-body">
  <div class="prof-top">
- <img class="p-logo" src="SHOMER_logo_big.png" alt="לוגו שומר" width="122" height="122">
+ 
  <div class="p-nm" id="profNm">שומר</div>
  <div class="p-badges">
- <!-- "guardian level" removed (vanity gamification trivialises a safety app). Only a real
+ <!-- "SHOMER level" removed (vanity gamification trivialises a safety app). Only a real
       trust/anti-abuse reputation mechanic would justify a status indicator here. -->
  <span id="founder-slot"></span><span class="p-prof-badge" id="prof-prof-badge"><span class="ic" id="prof-prof-ic"></span><span id="prof-prof-nm"></span></span>
  </div>
@@ -2205,7 +2206,7 @@ body.otp-active .ob-steps{display:none!important;}
    <!-- MY SH✡MER inside profile -->
 
 
- <div class="sec-cap mb12" data-he="נתוני פרופיל (אופציונלי)" data-en="Profile data (optional)">נתוני פרופיל (אופציונלי)</div><div class="sec-cap mb12" data-he="עוזר לשפר נתוני בטיחות מצרפיים ואנונימיים. לא חובה." data-en="Helps improve anonymous, aggregate safety data. Optional.">עוזר לשפר נתוני בטיחות מצרפיים ואנונימיים. לא חובה.</div><div class="set-grp" id="profile-grp"><div class="prof2-row"><span class="prof2-lbl" data-he="מגדר" data-en="Gender">מגדר</span><span class="prof2-seg" id="pf-gender"></span></div><div class="prof2-row"><span class="prof2-lbl" data-he="גיל" data-en="Age">גיל</span><span class="prof2-seg" id="pf-age"></span></div><div class="prof2-row"><span class="prof2-lbl" data-he="באזור" data-en="In this area">באזור</span><span class="prof2-seg" id="pf-res"></span></div></div><div class="sec-cap mb12" id="myrep-cap">הדיווחים שלי</div>
+ <div class="sec-cap mb12" data-he="נתוני פרופיל (אופציונלי)" data-en="Profile data (optional)">נתוני פרופיל (אופציונלי)</div><div class="sec-cap mb12" data-he="עוזר לשפר נתוני בטיחות מצרפיים ואנונימיים. לא חובה." data-en="Helps improve anonymous, aggregate safety data. Optional.">עוזר לשפר נתוני בטיחות מצרפיים ואנונימיים. לא חובה.</div><div class="set-grp" id="profile-grp"><div class="prof2-row"><span class="prof2-lbl" data-he="מגדר" data-en="Gender">מגדר</span><span class="prof2-seg" id="pf-gender"></span></div><div class="prof2-row"><span class="prof2-lbl" data-he="גיל" data-en="Age">גיל</span><span class="prof2-seg" id="pf-age"></span></div></div><div class="sec-cap mb12" id="myrep-cap">הדיווחים שלי</div>
  <div id="my-reports-list" class="mb20" role="list"></div>
  <div class="sec-cap mb12" id="soshist-cap">היסטוריית SOS</div>
  <div id="sos-hist-list" role="list"></div>
@@ -2624,14 +2625,14 @@ const LANGS={
  dir:'ltr',font:"'Inter',sans-serif",
  ob_h0:'Create your Shomer account',ob_d0:'Live safety map · SOS + instant alarm · mutual aid',
  ob_phone:'Phone number *',ob_why:'* Your phone is used for verification and sending help. Never for marketing.',
- ob_h1:'Location access',ob_d1:'Required to send SOS instantly to guardians nearby.',
+ ob_h1:'Location access',ob_d1:'Required to send SOS instantly to SHOMERs nearby.',
  ob_h2:'Emergency settings',ob_d2:'Tap an alarm to hear it. It fires when you trigger SOS.',
  geo_need:'Location access needed',geo_wait:'Locating...',geo_ok:'Location confirmed!',geo_err:'Could not locate you',
  geo_allow:'Share location',geo_next:'Enter the map →',geo_retry:' Retry',geo_skip:'Skip – continue without sharing',
  al1:'SHOMER SOS alarm',al1d:'Our signature emergency sound - escalating, dissonant, unmistakable',al2:'',al2d:'',al3:'',al3d:'',
  vol:'Volume',test:'Test alarm',finish:'✓ Enter Shomer',back:'← Back',
  shake:'<strong>Shake-to-SOS:</strong> 5 hard shakes trigger automatic SOS.',
- dms_ob:"<strong>Auto-guardian:</strong> We ask 'All good?' every X min. No answer - we alert your guardians.",
+ dms_ob:"<strong>Auto-SHOMER:</strong> We ask 'All good?' every X min. No answer - we alert your SHOMERs.",
  nav_map:'Map',nav_sos:'Emergency',nav_upd:'Updates',
  dd_rep:'Report incident',dd_dms:"שומר אוטומטי",dd_alarm:'Alarm settings',dd_prof:'Profile',dd_set:'Settings',dd_em:'Emergency numbers',
  ss_t:'SOS active - alarm firing',ss_wait:'Waiting for response...',
@@ -2642,13 +2643,13 @@ const LANGS={
  saved:'✓ Settings saved',sent:' Report sent!',dms_on:'DMS active',dms_off:'DMS off',
  rep_desc:'What did you see? Describe: the incident, people involved, exact location, identifying details...',
  share_loc:'Share current location',loc_ok:' Location captured ✓',
- send:' Send report to all guardians',
+ send:' Send report to all SHOMERs',
  open_det:'Open full details →',respond:' I\'m on my way',call100:' Call 100',close:'Close',responded:' Response recorded',
  dms_how:"<strong style='color:#FF7080'>How it works:</strong> Activate before walking alone. Every X minutes - 'All OK?' - no reply in 60 seconds = auto SOS.",
  dms_start:' Activate',dms_stop:' Stop',dms_next:'Next check in',dms_min:'min',
  dms_on_badge:'Active',dms_off_badge:'Off',
  em_intro:"Tap to call directly. If you can't speak - keep the line open.",
- profile_rank:'Guardian level 2',
+ profile_rank:'SHOMER level 2',
  anon:'Anonymous report',anon_sub:'Your name will not be shown',
  cam_empty:'No photos',cam_taken:' Photo taken ✓',cam_added:' Photo added ✓',cam_denied:' Access denied - allow in browser settings',cam_nf:' Camera not found',
  welcome:'Welcome',
@@ -2797,7 +2798,7 @@ const LANGS={
 const AR={
  // ── Trilingual audit fills (check-in · geofence · verify · map labels) ──
  'Resend code':'إعادة إرسال الرمز','Not now':'ليس الآن','Legend':'مفتاح الخريطة',
- 'Paired guardian':'حارس مقترن','Frequency':'التكرار','Response window':'مهلة الاستجابة',
+ 'Paired SHOMER':'حارس مقترن','Frequency':'التكرار','Response window':'مهلة الاستجابة',
  'Start check-in':'بدء تسجيل الوصول','Arrival reminder':'تذكير الوصول','Place label':'اسم المكان',
  'Geofence radius':'نطاق السياج الجغرافي','Active reminders':'التذكيرات النشطة',
  'Works best while the app is open.':'يعمل بأفضل صورة أثناء فتح التطبيق.',
@@ -2824,7 +2825,7 @@ const AR={
  'Skip - continue without location':'تخطّي - المتابعة بدون مشاركة الموقع','Skip – continue without sharing':'تخطّي - المتابعة بدون مشاركة الموقع',
  'Citizens for Citizens':'مواطنون من أجل مواطنين',
  // ── Map / header / status ──
- 'Map':'الخريطة','SHOMERs':'حُرّاس','SHOMER':'حارس','guardian':'حارس','Live event':'حدث مباشر',
+ 'Map':'الخريطة','SHOMERs':'حُرّاس','SHOMER':'حارس','SHOMER':'حارس','Live event':'حدث مباشر',
  'active SHOMERs near you (live)':'حُرّاس نشطون بقربك (مباشر)','An active SHOMER nearby (approximate, anonymous)':'حارس نشط في الجوار (موقع تقريبي، مجهول الهوية)',
  // ── Status / connection panel ──
  'Connecting…':'جارٍ الاتصال…','Offline - not connected':'غير متصل','Connecting to the live service…':'جارٍ الاتصال بالخدمة المباشرة…',
@@ -2880,9 +2881,9 @@ const AR={
  '<strong>iPhone:</strong> press the side button 3× → Emergency SOS.<br><strong>Android:</strong> press the power button 5× → Emergency SOS.<br><strong>SHOMER Shake:</strong> 5 hard shakes triggers an automatic SOS.<br>Set 100 as your phone\'s primary emergency contact.':'<strong>آيفون:</strong> اضغط الزر الجانبي 3 مرات ← استغاثة طارئة.<br><strong>أندرويد:</strong> اضغط زر التشغيل 5 مرات ← استغاثة طارئة.<br><strong>هزّة شومير:</strong> 5 هزّات قوية تُفعّل استغاثة تلقائية.<br>اجعل 100 جهة الطوارئ الأساسية في هاتفك.'/*SAFETY*/,
  // ── Settings long-tail (deep labels) ──
  'Dead Man\'s Switch':'مفتاح الأمان الميت',
- 'Show a live route + distance when responding to an SOS. For verified responders/guardians - not a replacement for 100/101/102.':'أظهر مساراً مباشراً + المسافة عند الاستجابة لنداء استغاثة. للمستجيبين/الحُرّاس المُوثَّقين - وليس بديلاً عن 100/101/102.'/*SAFETY*/,
+ 'Show a live route + distance when responding to an SOS. For verified responders/SHOMERs - not a replacement for 100/101/102.':'أظهر مساراً مباشراً + المسافة عند الاستجابة لنداء استغاثة. للمستجيبين/الحُرّاس المُوثَّقين - وليس بديلاً عن 100/101/102.'/*SAFETY*/,
  'Required to cancel an active SOS - never a fingerprint.':'مطلوب لإلغاء نداء استغاثة نشط - وليس بصمة إصبع أبداً.'/*SAFETY*/,
- 'Mutual check-in (with a guardian)':'تفقّد متبادل (مع حارس)','Periodic \'Are you OK?\' - if you don\'t confirm, your guardian is alerted.':'تفقّد دوري „هل أنت بخير؟" - إن لم تؤكّد، يُنبَّه حارسك.'/*SAFETY*/,
+ 'Mutual check-in (with a SHOMER)':'تفقّد متبادل (مع حارس)','Periodic \'Are you OK?\' - if you don\'t confirm, your SHOMER is alerted.':'تفقّد دوري „هل أنت بخير؟" - إن لم تؤكّد، يُنبَّه حارسك.'/*SAFETY*/,
  'Enable Shake-to-SOS':'تفعيل الهزّ للاستغاثة','5 hard shakes → SOS':'5 هزّات قوية ← استغاثة','Shake sensitivity':'حساسية الهزّ','Medium':'متوسطة','Simulate shake (test)':'محاكاة هزّة (اختبار)',
  'Press & hold 2s - prevents pocket-dials':'اضغط مع الاستمرار ثانيتين - يمنع الاتصال العَرَضي من الجيب',
  'Background location':'موقع الخلفية','Needed for SOS & DMS - without it your location can\'t be sent in an emergency':'ضروري لنداء الاستغاثة ومفتاح الأمان - بدونه لا يمكن إرسال موقعك في حالة الطوارئ'/*SAFETY*/,
@@ -2894,7 +2895,7 @@ const AR={
  'City markers are an':'علامات المدن هي',' aggregate statistical overview':' نظرة إحصائية إجمالية','aggregate statistical overview':'نظرة إحصائية إجمالية',
  'About SHOMER':'حول شومير','Data & sources':'البيانات والمصادر',
  // ── Profile extras ──
- 'Points':'نقاط','Guardian level':'مستوى الحارس',
+ 'Points':'نقاط','SHOMER level':'مستوى الحارس',
  // ── My SHOMERs / circles sheet ──
  'No one sees your location':'لا أحد يرى موقعك','Find a friend':'ابحث عن صديق','✓ New circle created':'✓ تم إنشاء دائرة جديدة',
  'Add someone you trust to your "My SHOMERs". They\'ll see your live location and you\'ll see theirs - by invite and mutual accept. You can stop anytime.':'أضِف شخصاً تثق به إلى قائمة „حُرّاسي". سيرى موقعك المباشر وسترى موقعه - عبر دعوة وقبول متبادل. يمكنك الإيقاف في أي وقت.',
@@ -3075,9 +3076,9 @@ let SS={
     not have their alert force-cancelled with their own finger). + phone-verification flag. */
  security:{pin:'',phoneVerified:false},
  geoReminders:[], // {id,memberId,memberName,label,lat,lng,radius,done} - My SHOMER arrival reminders
- /* Mutual "Are you OK?" check-in - two-way social שומר אוטומטי with a paired guardian.
-    Cross-DEVICE alarm to the guardian needs the realtime backend (Firebase) - flagged. */
- checkin:{enabled:false,guardians:[],freqMin:30,windowSec:120,due:0,awaiting:false},
+ /* Mutual "Are you OK?" check-in - two-way social שומר אוטומטי with a paired SHOMER.
+    Cross-DEVICE alarm to the SHOMER needs the realtime backend (Firebase) - flagged. */
+ checkin:{enabled:false,SHOMERs:[],freqMin:30,windowSec:120,due:0,awaiting:false},
  /* ── SOS anti-abuse / safety config (front-end sim - server must enforce for real) ── */
  sos:{
  countdown:10, // cancel-window seconds before broadcast. Default 10; user may lower (5/7) for high-risk.
@@ -3095,21 +3096,21 @@ let SS={
  circles:[], // {id,name,type:'family'|'friends'}
  circleMembers:[], // {id,cid,name,rel,emoji,color,lat,lng,baseLat,baseLng,moving,shareTo,seeThem,sos,seed}
  circleGhost:false, // pause MY outgoing location sharing (ghost mode)
- /* ── Guardian pairing (1:1 trusted link via invite/accept) ──
+ /* ── SHOMER pairing (1:1 trusted link via invite/accept) ──
  REAL now: stable display name + code, shareable invite link, accept flow,
  who-sees-whom toggles, and a live-location transport (BroadcastChannel +
  storage relay) that carries the REAL device position between windows/tabs of
  this app on the SAME browser, keyed by each pair's token.
  BACKEND PHASE: true always-on, cross-DEVICE live exchange + verified accounts.
  See TEST.md. */
- guardian:{
- myName:'', // display name a guardian sees for me (defaults to my handle)
+ SHOMER:{
+ myName:'', // display name a SHOMER sees for me (defaults to my handle)
  myCode:'', // my stable id used to de-dupe my own live messages
  pairs:[] // {id,token,name,rel,shareToThem,seeThem,addedTs,initiator,pending,lat,lng,ts,live,simLat,simLng}
  },
  /* ── Compliance / consent ──
  Explicit, opt-in consent the user must grant BEFORE any location SHARING
- (guardian pairing) begins. Recorded with a timestamp + the policy version
+ (SHOMER pairing) begins. Recorded with a timestamp + the policy version
  acknowledged. Revocable anytime (ghost / disconnect / reset). */
  consent:{ share:false, tos:false, ts:0, ver:'' }
 };
@@ -3127,7 +3128,7 @@ function deepMerge(base,o){
 function loadStore(){try{const r=localStorage.getItem(SKEY);if(r)SS=deepMerge(SS,JSON.parse(r));}catch(e){}}
 /* ══ MIGRATION (v105): purge stale/simulated positions ══
    Members added before v103 still carry fake Tel Aviv coordinates in localStorage, so the
-   map kept pinning them there. A guardian's position may ONLY come from live presence. */
+   map kept pinning them there. A SHOMER's position may ONLY come from live presence. */
 function purgeStalePositions(){
   try{
     var n=0;
@@ -3135,7 +3136,7 @@ function purgeStalePositions(){
       if(m.lat!=null||m.lng!=null){ m.lat=null; m.lng=null; m.live=false; m.moving=false; n++; }
       delete m.baseLat; delete m.baseLng; delete m.simLat; delete m.simLng;
     });
-    (((SS.guardian||{}).pairs)||[]).forEach(function(p){   /* SS.guardian - NOT SS.gd (this is why Tel Aviv survived) */
+    (((SS.SHOMER||{}).pairs)||[]).forEach(function(p){   /* SS.SHOMER - NOT SS.gd (this is why Tel Aviv survived) */
       if(!p.demo){ p.lat=null; p.lng=null; p.live=false; p.ts=0; delete p.simLat; delete p.simLng; }
     });
     try{ if(window.mapLayers&&mapLayers.circle){ Object.keys(mapLayers.circle).forEach(function(id){ try{MAP.removeLayer(mapLayers.circle[id]);}catch(e){} delete mapLayers.circle[id]; }); } }catch(e){}
@@ -3173,10 +3174,10 @@ function makeThumb(src){return new Promise(res=>{
 
 /* Apply stored settings to globals + UI on load (before app shows). */
 function applyStoredSettings(){
- /* Mutual check-in: migrate legacy single free-text guardian -> array of saved-SHOMER ids. */
- try{ if(SS.checkin){ if(!Array.isArray(SS.checkin.guardians)) SS.checkin.guardians=[];
-   if(SS.checkin.guardian){ var _gm=(SS.circleMembers||[]).filter(function(m){return (m.name||'').trim().toLowerCase()===String(SS.checkin.guardian).trim().toLowerCase();})[0];
-     if(_gm && SS.checkin.guardians.indexOf(_gm.id)<0) SS.checkin.guardians.push(_gm.id); delete SS.checkin.guardian; }
+ /* Mutual check-in: migrate legacy single free-text SHOMER -> array of saved-SHOMER ids. */
+ try{ if(SS.checkin){ if(!Array.isArray(SS.checkin.SHOMERs)) SS.checkin.SHOMERs=[];
+   if(SS.checkin.SHOMER){ var _gm=(SS.circleMembers||[]).filter(function(m){return (m.name||'').trim().toLowerCase()===String(SS.checkin.SHOMER).trim().toLowerCase();})[0];
+     if(_gm && SS.checkin.SHOMERs.indexOf(_gm.id)<0) SS.checkin.SHOMERs.push(_gm.id); delete SS.checkin.SHOMER; }
  } }catch(e){}
  // ONE signature alarm now - migrate any legacy saved type (siren/horn/pulse) to it.
  alarmType='shomer'; if(SS.alarm.type!=='shomer'){ SS.alarm.type='shomer'; }
@@ -3280,7 +3281,7 @@ function resetApp(){
    user-claimed handles, so deletion discards the identity entirely and a fresh open
    generates a brand-new one. It must NEVER touch the SOS flow.
    Wipes: presence · live position · own SOS events · push token · check-in/geo ·
-   profile + settings (local) · and removes this SHOMER from every paired guardian's
+   profile + settings (local) · and removes this SHOMER from every paired SHOMER's
    circle (no dangling dead links). Then clears ALL local SHOMER storage INCLUDING the
    device id (shomerCID) and signs out - so reopening is a clean, new identity. */
 function deleteAccount(){
@@ -3303,7 +3304,7 @@ function deleteAccount(){
      try{ db.ref('tombstones/'+uid).set({deleted:true,ts:Date.now()}); }catch(e){}
      // my own live SOS events
      try{ db.ref('sos').once('value').then(function(snap){ var all=snap.val()||{}; Object.keys(all).forEach(function(id){ if(all[id]&&all[id].uid===uid){ try{db.ref('sos/'+id).remove();}catch(e){} } }); }).catch(function(){}); }catch(e){}
-     // UNPAIR - drop my node AND my entry inside each partner's node, so no guardian
+     // UNPAIR - drop my node AND my entry inside each partner's node, so no SHOMER
      // is left with a dead link to a deleted SHOMER.
      try{ var partners=FB._pairedUids?Object.keys(FB._pairedUids):[];
        partners.forEach(function(pu){ try{ db.ref('pairs/'+pu+'/'+uid).remove(); }catch(e){} });
@@ -3704,7 +3705,7 @@ function applyTranslations(){
  setText('n-snd-nm',he?'צלילי אירועים חיים':'Live event sounds'); setText('n-snd-sb',he?'צליל עדין כששומר/ת מצטרף/ת, באירוע חדש או בעדכון':'A soft chime when a SHOMER joins, on a new event or an update');
  setText('shake-set-help',he?'מאפשר להפעיל SOS בלי להסתכל על המסך - מנערים את הטלפון בחוזקה. שימושי כשהטלפון בכיס או כשאי אפשר להביט במסך.':'Lets you trigger SOS without looking at the screen - just shake the phone hard. Useful when it\'s in your pocket or you can\'t look.');
  setText('sos-safety-help',he?'מגן עליך מפני אזעקות שווא ושיגור בטעות. כך לא תשלח/י עזרה בלי כוונה - ולא תפגע/י באמון המערכת.':'Protects you from false alarms and accidental triggers, so you never send help by mistake - or hurt the system\'s trust.');
- setText('set-priv-help',he?'את/ה שולט/ת במה שמשותף. המיקום נשמר במכשירך ומשותף רק כשאת/ה מפעיל/ה SOS, DMS או שיתוף עם שומר/ת.':'You control what\'s shared. Your location stays on your device and is shared only when you trigger SOS, DMS, or guardian sharing.');
+ setText('set-priv-help',he?'את/ה שולט/ת במה שמשותף. המיקום נשמר במכשירך ומשותף רק כשאת/ה מפעיל/ה SOS, DMS או שיתוף עם שומר/ת.':'You control what\'s shared. Your location stays on your device and is shared only when you trigger SOS, DMS, or SHOMER sharing.');
  setText('p-bgloc-nm',he?'שיתוף מיקום ברקע':'Background location'); setText('p-bgloc-sb',he?'נדרש ל-SOS ו-DMS - בלעדיו אי אפשר לשלוח את מיקומך בחירום':'Needed for SOS & DMS - without it your location can\'t be sent in an emergency');
  setText('p-showname-nm',he?'הצג שם בעדכונים':'Show name on reports'); setText('p-showname-sb',he?'כבוי = הדיווחים שלך מופיעים בעילום שם':'Off = your reports appear anonymously');
  setText('set-contacts-lbl',he?'אנשי קשר חירום':'Emergency contacts');
@@ -3763,7 +3764,7 @@ const NAMES={
 let nameAuto=true; // true until the user edits the name field themselves
 // Auto-generated handle: "Shomer" + a zero-padded number (e.g. Shomer00001). Editable.
 function pickRandomName(){if(pickRandomName._n==null)pickRandomName._n=Math.floor(Math.random()*9999)+1;return 'SH✡MER'+String(pickRandomName._n).padStart(4,'0');}
-function localizedGuardian(){return ({he:'שומר',en:'Guardian',ar:'حارس',ru:'Страж',am:'ጠባቂ',fr:'Gardien'})[currentLang]||'Guardian';}
+function localizedGuardian(){return ({he:'שומר',en:'SHOMER',ar:'حارس',ru:'Страж',am:'ጠባቂ',fr:'Gardien'})[currentLang]||'SHOMER';}
 function randomizeName(){const inp=document.getElementById('ob-name');if(!inp)return;nameAuto=true;pickRandomName._n=null;inp.value=pickRandomName();}
 /* If the field still holds an auto-generated name (user hasn't typed), refresh it
  to the current language so name + UI localize together. */
@@ -3802,7 +3803,7 @@ function obPaintSignIn(){
   try{
     setText('si-h',  obTx('כניסה לחשבון קיים','Sign in to your account','تسجيل الدخول إلى حسابك'));
     setText('si-d',  obTx('הזן/י את מספר הטלפון שאיתו נרשמת. נשלח קוד אימות ב-SMS ונשחזר את החשבון שלך.','Enter the number you registered with. We will text you a code and restore your account.','أدخل الرقم الذي سجّلت به. سنرسل رمز تحقق ونستعيد حسابك.'));
-    setText('si-why',obTx('נשחזר את השם, מעגלי האמון והשומרים השמורים שלך.','We will restore your name, circles of trust and saved guardians.','سنستعيد اسمك ودوائر الثقة والحراس المحفوظين.'));
+    setText('si-why',obTx('נשחזר את השם, מעגלי האמון והשומרים השמורים שלך.','We will restore your name, circles of trust and saved SHOMERs.','سنستعيد اسمك ودوائر الثقة والحراس المحفوظين.'));
     setText('si-cta-t',obTx('התחבר/י','Sign in','تسجيل الدخول'));
     var b=document.getElementById('si-back');
     if(b) b.textContent=obTx('משתמש חדש? יצירת חשבון','New here? Create an account','مستخدم جديد؟ إنشاء حساب');
@@ -4036,7 +4037,7 @@ function firstRunTour(){
     t.className='tour-card';
     t.innerHTML=
       '<div class="tour-h">'+(he?'שני דברים, ואת/ה מוכן/ה':'Two things and you are ready')+'</div>'
-     +'<div class="tour-r"><b>1</b><span>'+(he?'הכפתור האדום שולח את המיקום שלך לשומרים שלך ומפעיל אזעקה.':'The red button sends your location to your guardians and sounds an alarm.')+'</span></div>'
+     +'<div class="tour-r"><b>1</b><span>'+(he?'הכפתור האדום שולח את המיקום שלך לשומרים שלך ומפעיל אזעקה.':'The red button sends your location to your SHOMERs and sounds an alarm.')+'</span></div>'
      +'<div class="tour-r"><b>2</b><span>'+(he?'קוד ביטול בן 6 ספרות - כדי שרק את/ה תוכל/י לכבות SOS פעיל.':'A 6-digit cancel code - so only you can stop an active SOS.')+'</span></div>'
      +'<button class="cta-gold tour-go">'+(he?'קבע/י קוד ביטול':'Set my cancel code')+'</button>'
      +'<button class="ob-skip tour-later">'+(he?'אחר כך':'Later')+'</button>';
@@ -4246,7 +4247,7 @@ function enterApp(returning){
  setTimeout(function(){ try{ maybePromptInstall(); }catch(e){} }, 2500);
  setTimeout(function(){ try{ maybePromptBackgroundAlerts(); }catch(e){} }, 5000); // notification opt-in (Android/installed)
  try{ resumeDMS(); }catch(e){}
- // Handle an incoming guardian invite link (?g=…) once the map is ready.
+ // Handle an incoming SHOMER invite link (?g=…) once the map is ready.
  setTimeout(()=>{ try{ gdCheckInviteParam(); }catch(e){} },900);
  if(!returning){
  setTimeout(()=>{
@@ -4824,7 +4825,7 @@ function renderCountdown(){
  const he=currentLang==='he';
  setText('sos-cd-ttl',he?' שולח SOS…':' Sending SOS…');
  setText('sos-cd-sub',he?'האזעקה פועלת. שידור לשומרים בקרבתך בעוד…'
- :'Alarm is sounding. Broadcasting to nearby guardians in…');
+ :'Alarm is sounding. Broadcasting to nearby SHOMERs in…');
  setText('sos-cd-cancel',he?'אני בטוח/ה - בטל':"I'm safe - Cancel");
  setText('sos-cd-hint',he?'ביטול עכשיו = אזעקת שווא. שום דבר לא ישודר ולא יופיע במפה.'
  :'Cancel now = false alarm. Nothing is broadcast and nothing appears on the map.');
@@ -4911,8 +4912,8 @@ function activateSOS(){
  sosTimer=setInterval(()=>{
  r++;
  const ss=document.getElementById('ss-s');
- if(ss) ss.textContent=`${r} ${he?'שומר'+(r>1?'ים':'')+' בדרך':'guardian'+(r>1?'s':'')+' responding'}`;
- if(r>=3){toast(he?'3 שומרים בדרך - הישאר במקומך!':'3 guardians responding - stay put!','grn',function(){try{openUpdates();}catch(e){}});clearInterval(sosTimer);}
+ if(ss) ss.textContent=`${r} ${he?'שומר'+(r>1?'ים':'')+' בדרך':'SHOMER'+(r>1?'s':'')+' responding'}`;
+ if(r>=3){toast(he?'3 שומרים בדרך - הישאר במקומך!':'3 SHOMERs responding - stay put!','grn',function(){try{openUpdates();}catch(e){}});clearInterval(sosTimer);}
  },5000);
  setTimeout(()=>{if(sosPhase==='active')openUpdates();},800);
 }
@@ -5028,7 +5029,7 @@ function selfieTheftBroadcast(photo){
   // 2) Broadcast the phone's LIVE LOCATION as a theft event → nearby SHOMERs + My SHOMER
   //    see it on the live map (existing REST+SSE 'sos' path; works under current rules).
   try{ fbBroadcastTheft(id,lat,lng); }catch(e){}
-  // 3) Attach the selfie cross-device so guardians can see the face (needs the /theft rule).
+  // 3) Attach the selfie cross-device so SHOMERs can see the face (needs the /theft rule).
   try{ fbAttachTheftPhoto(id,lat,lng,photo); }catch(e){}
   // 4) Ping My SHOMER directly.
   try{ fbAlertPairedTheft(); }catch(e){}
@@ -5095,8 +5096,8 @@ function stopMaxAttention(){
    continue). Fully stopping requires the cancel code (never biometric). */
 function minimizeStrobe(){ var ov=document.getElementById('sos-strobe'); if(ov){ov.classList.remove('on');ov.setAttribute('aria-hidden','true');} }
 
-/* ── MUTUAL "ARE YOU OK?" CHECK-IN - two-way social שומר אוטומטי with a paired guardian.
-   On-device demo works now; the cross-DEVICE alarm to the guardian needs the realtime backend
+/* ── MUTUAL "ARE YOU OK?" CHECK-IN - two-way social שומר אוטומטי with a paired SHOMER.
+   On-device demo works now; the cross-DEVICE alarm to the SHOMER needs the realtime backend
    (Firebase). Stopping/answering is consent-paired and configurable. ── */
 let _ciTimer=null, _ciCountdown=null;
 function cl2(id){ var ov=document.getElementById(id); if(ov){ov.classList.remove('on');ov.setAttribute('aria-hidden','true');} }
@@ -5104,29 +5105,29 @@ function ciPick(kind,val,el){ el.parentNode.querySelectorAll('.dms-iv').forEach(
 var CHECKIN_MAX=5;
 /* Saved SHOMERs the user can pick as check-in partners (source: SS.circleMembers, non-pending). */
 function checkinSavedShomers(){ return (SS.circleMembers||[]).filter(function(m){return m && !m.pending;}); }
-function checkinGuardianNames(){ var ids=(SS.checkin&&SS.checkin.guardians)||[]; var names=checkinSavedShomers().filter(function(m){return ids.indexOf(m.id)>=0;}).map(function(m){return m.name||'';}).filter(Boolean); return names; }
-/* All reachable (paired) uids for the selected check-in guardians. */
-function checkinGuardianUids(){ var ids=(SS.checkin&&SS.checkin.guardians)||[]; var out=[];
+function checkinGuardianNames(){ var ids=(SS.checkin&&SS.checkin.SHOMERs)||[]; var names=checkinSavedShomers().filter(function(m){return ids.indexOf(m.id)>=0;}).map(function(m){return m.name||'';}).filter(Boolean); return names; }
+/* All reachable (paired) uids for the selected check-in SHOMERs. */
+function checkinGuardianUids(){ var ids=(SS.checkin&&SS.checkin.SHOMERs)||[]; var out=[];
  checkinSavedShomers().forEach(function(m){ if(ids.indexOf(m.id)>=0 && m.partnerUid && out.indexOf(m.partnerUid)<0) out.push(m.partnerUid); });
  return out; }
-function ciToggleGuardian(id){ var c=SS.checkin; if(!Array.isArray(c.guardians))c.guardians=[]; var i=c.guardians.indexOf(id);
- if(i>=0){ c.guardians.splice(i,1); }
- else { if(c.guardians.length>=CHECKIN_MAX){ var he=currentLang==='he'; try{ toast(he?('אפשר לבחור עד '+CHECKIN_MAX+' שומרים'):('You can choose up to '+CHECKIN_MAX+' guardians'),'amb'); }catch(e){} return; } c.guardians.push(id); }
+function ciToggleGuardian(id){ var c=SS.checkin; if(!Array.isArray(c.SHOMERs))c.SHOMERs=[]; var i=c.SHOMERs.indexOf(id);
+ if(i>=0){ c.SHOMERs.splice(i,1); }
+ else { if(c.SHOMERs.length>=CHECKIN_MAX){ var he=currentLang==='he'; try{ toast(he?('אפשר לבחור עד '+CHECKIN_MAX+' שומרים'):('You can choose up to '+CHECKIN_MAX+' SHOMERs'),'amb'); }catch(e){} return; } c.SHOMERs.push(id); }
  saveStore(); renderCiGuardians(); }
-function renderCiGuardians(){ var host=document.getElementById('ci-guardians-list'); if(!host)return; var he=currentLang==='he';
- var list=checkinSavedShomers(), sel=(SS.checkin&&SS.checkin.guardians)||[];
- if(!list.length){ host.innerHTML='<div class="set-help" style="padding:4px 2px">'+(he?'אין שומרים שמורים עדיין - הוסף/י שומרים במסך „השומרים שלי”.':'No saved guardians yet - add some in "My SHOMER".')+'</div>'; return; }
+function renderCiGuardians(){ var host=document.getElementById('ci-SHOMERs-list'); if(!host)return; var he=currentLang==='he';
+ var list=checkinSavedShomers(), sel=(SS.checkin&&SS.checkin.SHOMERs)||[];
+ if(!list.length){ host.innerHTML='<div class="set-help" style="padding:4px 2px">'+(he?'אין שומרים שמורים עדיין - הוסף/י שומרים במסך „השומרים שלי”.':'No saved SHOMERs yet - add some in "My SHOMER".')+'</div>'; return; }
  host.innerHTML=list.map(function(m){ var on=sel.indexOf(m.id)>=0;
    return '<button type="button" class="ci-gd-row'+(on?' sel':'')+'" onclick="ciToggleGuardian(\''+m.id+'\')" aria-pressed="'+on+'" style="display:flex;align-items:center;gap:10px;width:100%;text-align:start;padding:11px 12px;margin-bottom:7px;border-radius:var(--r12);border:1px solid '+(on?'var(--g3)':'var(--b2)')+';background:'+(on?'rgba(224,168,40,.12)':'var(--n4)')+';color:var(--tx1);cursor:pointer">'
     +'<span style="width:18px;height:18px;flex:0 0 auto;border-radius:5px;border:2px solid '+(on?'var(--g3)':'var(--b3)')+';background:'+(on?'var(--g3)':'transparent')+';display:flex;align-items:center;justify-content:center;color:#23170a;font-weight:900;font-size:12px">'+(on?'✓':'')+'</span>'
-    +'<span style="flex:1;font-weight:700;font-size:13.5px">'+ESC(m.name||(he?'שומר/ת':'Guardian'))+'</span>'
+    +'<span style="flex:1;font-weight:700;font-size:13.5px">'+ESC(m.name||(he?'שומר/ת':'SHOMER'))+'</span>'
     +(m.partnerUid?'':'<span style="font-size:10.5px;color:var(--tx3)">'+(he?'לא מקושר':'not linked')+'</span>')
     +'</button>'; }).join('');
 }
 function reflectCheckin(){ var c=SS.checkin,he=currentLang==='he'; setText('ci-toggle-btn', c.enabled?(he?'עצור צ׳ק-אין':'Stop check-in'):(he?'הפעל צ׳ק-אין':'Start check-in')); try{ renderCiGuardians(); }catch(e){} var st=document.getElementById('ci-set-state'); if(st){st.textContent=c.enabled?(he?'פעיל ✓':'On ✓'):(he?'כבוי':'Off'); st.style.color=c.enabled?'var(--grn)':'var(--tx3)';} }
 function checkinToggle(){ var c=SS.checkin,he=currentLang==='he';
  if(c.enabled){ c.enabled=false; saveStore(); checkinStop(); reflectCheckin(); toast(he?'צ׳ק-אין הופסק':'Check-in stopped',''); return; }
- if(!Array.isArray(c.guardians)||!c.guardians.length){ toast(he?'בחר/י לפחות שומר/ת אחד/ת מהרשימה':'Choose at least one guardian from your list','amb'); return; }
+ if(!Array.isArray(c.SHOMERs)||!c.SHOMERs.length){ toast(he?'בחר/י לפחות שומר/ת אחד/ת מהרשימה':'Choose at least one SHOMER from your list','amb'); return; }
  c.enabled=true; saveStore(); reflectCheckin(); checkinSchedule();
  toast(he?'✓ צ׳ק-אין הדדי פעיל - נשאל כל '+c.freqMin+' דק׳':'✓ Mutual check-in on - every '+c.freqMin+' min','grn'); cl('sh-checkin');
 }
@@ -5135,21 +5136,21 @@ function checkinStop(){ if(_ciTimer){clearTimeout(_ciTimer);_ciTimer=null;} if(_
 function checkinPrompt(){ if(!SS.checkin.enabled)return; var he=currentLang==='he';
  SS.checkin.awaiting=true; saveStore();
  var ov=document.getElementById('checkin-prompt'); if(ov){ov.classList.add('on');ov.setAttribute('aria-hidden','false');}
- try{pushNotify(he?'שומר - הכל טוב??':'SHOMER - Are you OK?',he?'אשר/י אחרת תישלח התראה לשומר/ת':'Confirm, or your guardian is alerted','checkin');}catch(e){}
+ try{pushNotify(he?'שומר - הכל טוב??':'SHOMER - Are you OK?',he?'אשר/י אחרת תישלח התראה לשומר/ת':'Confirm, or your SHOMER is alerted','checkin');}catch(e){}
  var left=SS.checkin.windowSec||120;
- var _gn=checkinGuardianNames(); var _gstr=_gn.length?_gn.join(', '):(he?'השומרים שלך':'your guardians');
+ var _gn=checkinGuardianNames(); var _gstr=_gn.length?_gn.join(', '):(he?'השומרים שלך':'your SHOMERs');
  var upd=function(){ setText('ci-prompt-sub',(he?'אשר/י תוך ':'Confirm within ')+Math.max(0,left)+(he?' שנ׳ - אחרת '+_gstr+' יקבלו אזעקה':'s - or '+_gstr+' is alerted')); };
  upd(); if(_ciCountdown)clearInterval(_ciCountdown);
  _ciCountdown=setInterval(function(){ left--; upd(); if(left<=0){ clearInterval(_ciCountdown); checkinMiss(); } },1000);
 }
 function checkinOk(){ var he=currentLang==='he'; SS.checkin.awaiting=false; saveStore(); if(_ciCountdown){clearInterval(_ciCountdown);_ciCountdown=null;} cl2('checkin-prompt'); toast(he?'✓ נרשם - הכל טוב?':'✓ Logged - you are OK','grn'); checkinSchedule(); }
-/* Resolve the check-in guardian to a PAIRED partner's uid (so we can actually reach their
-   phone). The guardian field is a free-text name; match it to a linked pair by name, else
-   fall back to the first linked pair. Returns null if the user has no linked guardian. */
-/* Back-compat single-uid resolver: first reachable selected guardian (or null). */
+/* Resolve the check-in SHOMER to a PAIRED partner's uid (so we can actually reach their
+   phone). The SHOMER field is a free-text name; match it to a linked pair by name, else
+   fall back to the first linked pair. Returns null if the user has no linked SHOMER. */
+/* Back-compat single-uid resolver: first reachable selected SHOMER (or null). */
 function checkinGuardianUid(){ var u=checkinGuardianUids(); return u.length?u[0]:null; }
 function checkinMiss(){ var he=currentLang==='he'; SS.checkin.awaiting=false; saveStore(); cl2('checkin-prompt');
- /* Real cross-device alert to EVERY selected guardian's phone (even when closed) via /alarms -> alarmFanout. */
+ /* Real cross-device alert to EVERY selected SHOMER's phone (even when closed) via /alarms -> alarmFanout. */
  var uids=checkinGuardianUids(), sent=0;
  if(uids.length && typeof FB!=='undefined' && FB.ready){
   var _nm=(SS.user&&SS.user.name)||'שומר';
@@ -5161,15 +5162,15 @@ function checkinMiss(){ var he=currentLang==='he'; SS.checkin.awaiting=false; sa
    sent++;
   }catch(e){} });
  }
- var _gn=checkinGuardianNames(), _gstr=_gn.length?_gn.join(', '):(he?'השומרים שלך':'your guardians');
- /* HONEST UI: only claim guardians were alerted if we actually dispatched. */
+ var _gn=checkinGuardianNames(), _gstr=_gn.length?_gn.join(', '):(he?'השומרים שלך':'your SHOMERs');
+ /* HONEST UI: only claim SHOMERs were alerted if we actually dispatched. */
  setText('ci-miss-sub', sent
    ? (he?'לא אישרת „הכל טוב?”. '+_gstr+' קיבלו התראה.':'You didn\'t confirm. '+_gstr+' were alerted.')
-   : (he?'לא אישרת „הכל טוב?”. חבר/י שומר/ת מקושר/ת כדי שיקבלו התראה אוטומטית.':'You didn\'t confirm. Link a guardian so they\'re alerted automatically.'));
+   : (he?'לא אישרת „הכל טוב?”. חבר/י שומר/ת מקושר/ת כדי שיקבלו התראה אוטומטית.':'You didn\'t confirm. Link a SHOMER so they\'re alerted automatically.'));
  var ov=document.getElementById('checkin-miss'); if(ov){ov.classList.add('on');ov.setAttribute('aria-hidden','false');}
  try{pushNotify(he?'שומר - צ׳ק-אין הוחמץ':'SHOMER - missed check-in',he?'אפשר לשלוח SOS עבורם':'You can send an SOS on their behalf','checkin-miss');}catch(e){}
 }
-/* Guardian-side: send an SOS on the user's behalf after a missed check-in. */
+/* SHOMER-side: send an SOS on the user's behalf after a missed check-in. */
 function guardianActivateForUser(){ cl2('checkin-miss'); try{ beginSOS('checkin'); activateSOS(); }catch(e){} }
 function _torch(on){ try{ if(_torchTrack)_torchTrack.applyConstraints({advanced:[{torch:!!on}]}); }catch(e){} }
 async function startMorse(){
@@ -5326,7 +5327,7 @@ function removeSOSPin(){if(mapLayers.sosMarker){MAP.removeLayer(mapLayers.sosMar
  MAP - real Leaflet + OpenStreetMap
 ═══════════════════════════════════ */
 let MAP=null;
-const mapLayers={stats:[],reports:{},sosMarker:null,meMarker:null,circle:{},guardian:{},radar:null};
+const mapLayers={stats:[],reports:{},sosMarker:null,meMarker:null,circle:{},SHOMER:{},radar:null};
 /* BRANDED basemap - CARTO dark base recoloured to the SHOMER navy world via a
  class-scoped CSS filter, with crisp labels layered on top (untinted). */
 const TILE_BASE='https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_Base/MapServer/tile/{z}/{y}/{x}';
@@ -5421,11 +5422,11 @@ function communityNudge(){
         cta_he:'הוסף/י AED', cta_en:'Add AED',
         act:function(){ try{ if(typeof aedPlaceMode==='function') aedPlaceMode(); }catch(e){} } },
       { he:'רוצה להזהיר שומרים אחרים מסביבך? דווח/י על אירוע במפה',
-        en:'Want to warn other guardians near you? Report an event on the map',
+        en:'Want to warn other SHOMERs near you? Report an event on the map',
         cta_he:'דווח/י', cta_en:'Report',
         act:function(){ try{ if(typeof openReport==='function') openReport(); }catch(e){} } },
       { he:'ככל שיותר שומרים סביבך - כך בטוח יותר. הזמן/י שכן או חבר/ה',
-        en:'The more guardians around you, the safer everyone is. Invite a neighbor or friend',
+        en:'The more SHOMERs around you, the safer everyone is. Invite a neighbor or friend',
         cta_he:'הזמן/י', cta_en:'Invite',
         act:function(){ try{ if(typeof openGuardians==='function') openGuardians(); }catch(e){} } }
     ];
@@ -5488,7 +5489,7 @@ function communityNudge(){
         en:'Saw something others should know? Create an event and warn the community',
         act:function(){ try{ if(typeof openReport==='function') openReport(); }catch(e){} } },
       { he:'הזמן/י שכן או חבר להיות שומר - ככל שיותר עיניים, כולנו בטוחים יותר',
-        en:'Invite a neighbour or friend to be a guardian - more eyes keep us all safer',
+        en:'Invite a neighbour or friend to be a SHOMER - more eyes keep us all safer',
         act:function(){ try{ if(typeof openGuardians==='function') openGuardians(); }catch(e){} } }
     ];
     var n = nudges[opens % nudges.length];
@@ -5514,7 +5515,7 @@ function checkInbox(){
         var first=box[invites[0]];
         var msg = he
           ? (invites.length===1 ? ((first.fromName||'מישהו')+' הזמין/ה אותך להיות שומר/ת') : ('יש לך '+invites.length+' הזמנות ממתינות'))
-          : (invites.length===1 ? ((first.fromName||'Someone')+' invited you to be their guardian') : ('You have '+invites.length+' pending invites'));
+          : (invites.length===1 ? ((first.fromName||'Someone')+' invited you to be their SHOMER') : ('You have '+invites.length+' pending invites'));
         showInboxBanner(msg, invites, box);
       }
     }).catch(function(e){});
@@ -5529,7 +5530,7 @@ function showInboxBanner(msg, inviteKeys, box){
     b.style.cssText='position:fixed;left:50%;top:calc(var(--hdr,64px) + 12px);transform:translateX(-50%);z-index:9500;max-width:92vw;background:linear-gradient(135deg,#C09020,#E0A828,#F5C840);color:#1a1206;padding:13px 16px;border-radius:14px;box-shadow:0 8px 28px rgba(0,0,0,.4);display:flex;align-items:center;gap:12px;font:700 13.5px Heebo,sans-serif;cursor:pointer';
     b.innerHTML='<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" style="flex-shrink:0"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/></svg><span style="flex:1">'+msg+'</span><span style="background:rgba(0,0,0,.15);border-radius:8px;padding:5px 10px;font-weight:800">'+(he?'הצג':'View')+'</span>';
     b.onclick=function(){
-      /* mark seen + open the guardians/circle screen so they can accept */
+      /* mark seen + open the SHOMERs/circle screen so they can accept */
       try{ inviteKeys.forEach(function(k){ fbRestWrite('PUT','invites/inbox_'+FB._myPhoneHash+'/'+k+'/seen', true); }); }catch(e){}
       b.remove();
       try{ if(typeof openGuardians==='function') openGuardians(); else if(typeof showCircle==='function') showCircle(); }catch(e){}
@@ -5621,7 +5622,7 @@ function _startGeoWatchNow(){
  /* On every app open, center the map on the user's own location the first time we get a fix. */
  if(!_centeredOnOpen && MAP){ try{ MAP.setView([userLat,userLng], Math.max(MAP.getZoom(),15), {animate:true}); }catch(e){} _centeredOnOpen=true; }
  if(sosActive) addSOSPin(); // keep the live SOS pin on the user
- try{ gdBroadcast(); }catch(e){} // share my real position with paired guardians
+ try{ gdBroadcast(); }catch(e){} // share my real position with paired SHOMERs
  },
  ()=>{},
  {enableHighAccuracy:true,timeout:20000,maximumAge:5000}
@@ -6567,7 +6568,7 @@ function switchCircle(cid){activeCircleId=cid;renderCircles();}
 
 /* Build the Circles sheet body (tabs + member list). User data via ESC(). */
 function paintMapCount(){
-  /* Removed from the map: guardians are already visible as pins there, and a counter on top of
+  /* Removed from the map: SHOMERs are already visible as pins there, and a counter on top of
      the map is noise in the one screen that must stay instantly scannable. The number now lives
      in השומרים שלי, where you actually act on it. */
   var he=currentLang==='he';
@@ -6584,7 +6585,7 @@ function paintMapCount(){
   el.textContent = total ? (he?(live+' מתוך '+total+' משתפים מיקום'):(live+' of '+total+' sharing location')) : '';
 }
 /* ══ התראות מיקום השומרים שלי ══
-   5 guardians x 4 places = 20 = the iOS ceiling on monitored regions. Past 20 iOS silently
+   5 SHOMERs x 4 places = 20 = the iOS ceiling on monitored regions. Past 20 iOS silently
    stops firing, so the limit is enforced here rather than discovered in an emergency. */
 var ARR_G=5, ARR_P=4;
 function arrState(){ if(!SS.arrivals) SS.arrivals={}; return SS.arrivals; }
@@ -6597,7 +6598,7 @@ function renderArrivals(){
   var html='';
   for(var i=0;i<ARR_G;i++){
     var sel=A['g'+i]||{};
-    var opts='<option value="">'+(he?'בחר שומר':'Choose guardian')+'</option>'
+    var opts='<option value="">'+(he?'בחר שומר':'Choose SHOMER')+'</option>'
       + members.map(function(m){
           return '<option value="'+m.id+'"'+(sel.mid===m.id?' selected':'')+'>'+ESC(m.name||'')+'</option>';
         }).join('');
@@ -6610,7 +6611,7 @@ function renderArrivals(){
          +  '</div>';
     }
     html+='<div class="arr-slot">'
-       +  '<div class="arr-hd"><span class="arr-lbl">'+(he?('שומר '+(i+1)):('Guardian '+(i+1)))+'</span>'
+       +  '<div class="arr-hd"><span class="arr-lbl">'+(he?('שומר '+(i+1)):('SHOMER '+(i+1)))+'</span>'
        +  '<select class="arr-sel" data-g="'+i+'">'+opts+'</select></div>'
        +  '<div class="arr-rows">'+rows+'</div>'+'<button class="arr-add" type="button" data-g="'+i+'">+ הוסף מיקום</button>'
        +  '</div>';
@@ -6641,7 +6642,7 @@ function renderArrivals(){
   var cap=document.getElementById('arr-cap');
   if(cap) cap.textContent = he
     ? ('עד '+ARR_G+' שומרים · '+ARR_P+' מיקומים לכל אחד - מגבלת מערכת ההפעלה היא 20.')
-    : (ARR_G+' guardians x '+ARR_P+' places - the OS limit is 20.');
+    : (ARR_G+' SHOMERs x '+ARR_P+' places - the OS limit is 20.');
 }
 /* ══ SYSTEM UPDATES + STRANGER PROTECTION ══
    Two separate things, deliberately kept apart:
@@ -6684,9 +6685,9 @@ function strangerWarning(nm, phoneCanon){
     +'</div>';
 }
 /* ══ CIRCLE RULE ══
-   A guardian must never silently appear inside a circle. You open (or create) a circle first,
-   then add people to it. If someone adds a guardian with no circle in existence, we finish the
-   guardian first, then ask - once - whether they want to create their first circle. */
+   A SHOMER must never silently appear inside a circle. You open (or create) a circle first,
+   then add people to it. If someone adds a SHOMER with no circle in existence, we finish the
+   SHOMER first, then ask - once - whether they want to create their first circle. */
 function circlesNamed(){ return circlesList().filter(function(x){ return x.named && x.name; }); }
 function needsFirstCircle(){ return circlesNamed().length===0; }
 function askFirstCircle(){
@@ -6713,7 +6714,7 @@ function renderCircles(){
   try{ paintMapCount(); }catch(e){}
   var he=currentLang==='he';
   var cot=document.getElementById('cot-list');
-  var CIRCLE_MAX=6;                 /* 20 guardians / 6 circles - fewer is a freeze in a panic */
+  var CIRCLE_MAX=6;                 /* 20 SHOMERs / 6 circles - fewer is a freeze in a panic */
   /* one brand colour per circle - gold leads (primary brand), then the family palette */
   var COLORS=[
     'linear-gradient(135deg,#C09020,#E0A828 60%,#F5C840)',   /* משפחה - the gold */
@@ -6733,7 +6734,7 @@ function renderCircles(){
 
     list.forEach(function(cc,i){
       var ms=membersOf(cc.id);
-      var isOn  = ms.length>0;                  /* has guardians → always ON */
+      var isOn  = ms.length>0;                  /* has SHOMERs → always ON */
       var b=document.createElement('button');
       b.className='bub '+(isOn?'bub-on':'bub-off');
       if(isOn){
@@ -6778,7 +6779,7 @@ function renderCircles(){
         if(!ms2.length){
           var e=document.createElement('div');
           e.className='cot-empty';
-          e.textContent=he?'אין שומרים במעגל הזה':'No guardians in this circle';
+          e.textContent=he?'אין שומרים במעגל הזה':'No SHOMERs in this circle';
           sub.appendChild(e);
         }
         ms2.forEach(function(mm){
@@ -6798,7 +6799,7 @@ function renderCircles(){
     }
   }
 
-  /* השומרים שלי - one compact row per guardian */
+  /* השומרים שלי - one compact row per SHOMER */
   var host=document.getElementById('circ-members');
   if(host){
     host.innerHTML='';
@@ -6806,7 +6807,7 @@ function renderCircles(){
     if(!ms3.length){
       var e2=document.createElement('div');
       e2.style.cssText='text-align:center;color:var(--tx3);font-size:12.5px;padding:18px';
-      e2.textContent=he?'עדיין אין שומרים - הוסף/י אנשים שאת/ה סומכ/ת עליהם.':'No guardians yet - add people you trust.';
+      e2.textContent=he?'עדיין אין שומרים - הוסף/י אנשים שאת/ה סומכ/ת עליהם.':'No SHOMERs yet - add people you trust.';
       host.appendChild(e2);
     } else {
       ms3.forEach(function(mm){
@@ -6899,7 +6900,7 @@ function buildMemberRow(m,he){
  </div>
  <div class="cm-actions">
   <button class="btn-secondary" data-a="rename">${he?'שנה/י שם':'Rename'}</button>
-  <button class="btn-danger" data-a="remove">${he?'הסר/י שומר':'Remove guardian'}</button>
+  <button class="btn-danger" data-a="remove">${he?'הסר/י שומר':'Remove SHOMER'}</button>
  </div>
  ${(m.partnerUid&&!m.pending)?`<button class="cm-palert" data-a="palert">${he?'🚨 דווח/י: חטיפה / אדם נעדר':currentLang==='ar'?'🚨 إبلاغ: اختطاف / شخص مفقود':'🚨 Report: Abduction / Missing'}</button>`:''}`;
  priv.querySelectorAll('.tog').forEach(t=>{
@@ -6963,7 +6964,7 @@ function agPhoneHint(){
  var raw=(document.getElementById('ag-phone')||{}).value||'';
  var hint=document.getElementById('ag-hint'); if(!hint)return;
  if(!raw.trim()){
-    /* guardians are reached by SMS - make it obvious a MOBILE number is required */
+    /* SHOMERs are reached by SMS - make it obvious a MOBILE number is required */
     hint.style.color='var(--tx3)';
     hint.textContent = he ? 'מספר נייד בלבד - השומר/ת מקבל/ת הזמנה ב-SMS'
                           : 'Mobile numbers only - your SHOMER is invited by SMS';
@@ -7040,7 +7041,7 @@ async function findShomerContacts(){
   }
   var pool=[]; for(var w=0;w<6;w++)pool.push(worker());
   await Promise.all(pool);
-  if(!matches.length){ _scStatus(box,(he?'לא נמצאו אנשי קשר שכבר ב-SH✡MER.<br><span style="color:#6d7893;font-size:12px">אפשר להזמין אותם דרך “הזמן שומר”.</span>':ar?'لا جهات على SH✡MER بعد.':'None of your contacts are on SH✡MER yet.<br><span style="color:#6d7893;font-size:12px">Invite them via “Invite a guardian”.</span>')); return; }
+  if(!matches.length){ _scStatus(box,(he?'לא נמצאו אנשי קשר שכבר ב-SH✡MER.<br><span style="color:#6d7893;font-size:12px">אפשר להזמין אותם דרך “הזמן שומר”.</span>':ar?'لا جهات على SH✡MER بعد.':'None of your contacts are on SH✡MER yet.<br><span style="color:#6d7893;font-size:12px">Invite them via “Invite a SHOMER”.</span>')); return; }
   box.innerHTML='<div style="font-size:12px;color:#9aa6bd;margin:2px 2px 12px">'+(he?(matches.length+' מאנשי הקשר שלך כבר ב-SH✡MER. להוסיף למעגל?'):ar?(matches.length+' من جهاتك على SH✡MER'):(matches.length+' of your contacts are on SH✡MER. Add to your circle?'))+'</div>';
   matches.forEach(function(it,k){
     var row=document.createElement('div'); row.setAttribute('style','display:flex;align-items:center;gap:11px;padding:11px 4px;border-bottom:1px solid #1e2636');
@@ -7113,7 +7114,7 @@ async function shareInvite(){
   var link='https://www.shomer-app.co.il/shomer.html?g='+encodeURIComponent(tok);
   var txt=he
     ? ('הצטרף/י למעגל השומרים שלי ב-SH\u2721MER - אפליקציית בטיחות קהילתית חינמית. אם יקרה לי משהו, תדע/י איפה אני.\n'+link)
-    : ('Join my SH\u2721MER guardian circle - a free community safety app. If something happens to me, you will know where I am.\n'+link);
+    : ('Join my SH\u2721MER SHOMER circle - a free community safety app. If something happens to me, you will know where I am.\n'+link);
   try{
     if(navigator.share){ await navigator.share({title:'SH\u2721MER', text:txt}); return; }
   }catch(e){ return; }
@@ -7165,7 +7166,7 @@ function inviteTextFor(name, token){
   var link=inviteLinkFor(token);
   return he
     ? ('היי '+(name||'')+', הוספתי אותך למעגל השומרים שלי ב-SH\u2721MER - אפליקציית בטיחות חינמית. אשר/י כדי שנוכל לראות זה את זה במקרה חירום:\n'+link)
-    : ('Hi '+(name||'')+", I added you to my SH\u2721MER guardian circle - a free safety app. Approve so we can see each other in an emergency:\n"+link);
+    : ('Hi '+(name||'')+", I added you to my SH\u2721MER SHOMER circle - a free safety app. Approve so we can see each other in an emergency:\n"+link);
 }
 function showInvitePanel(name, phone, token, code){
   var he=currentLang==='he';
@@ -7206,7 +7207,7 @@ function openManage(){
   var old=document.getElementById('mng-panel'); if(old) old.remove();
   var p=document.createElement('div');
   p.id='mng-panel'; p.className='mng-panel';
-  p.innerHTML='<div class="mng-hd"><span>'+(he?'ניהול מעגלים ושומרים':'Manage circles & guardians')+'</span>'
+  p.innerHTML='<div class="mng-hd"><span>'+(he?'ניהול מעגלים ושומרים':'Manage circles & SHOMERs')+'</span>'
     +'<button class="mng-x" onclick="document.getElementById(\'mng-panel\').remove()">✕</button></div>'
     +'<div class="mng-body" id="mng-body"></div>';
   document.body.appendChild(p);
@@ -7227,7 +7228,7 @@ function renderManage(){
     var list=document.createElement('div'); list.className='mng-list';
     if(!ms.length){
       var e=document.createElement('div'); e.className='mng-empty';
-      e.textContent=he?'אין שומרים במעגל זה':'No guardians in this circle';
+      e.textContent=he?'אין שומרים במעגל זה':'No SHOMERs in this circle';
       list.appendChild(e);
     }
     ms.forEach(function(m){
@@ -7279,7 +7280,7 @@ async function addGuardian(){
  var canon=phoneCanon(raw,_cc);
  var validPhone=raw && phoneIsValid(canon);
  if(!validPhone){ toast(he?'\u05d7\u05d5\u05d1\u05d4 \u05de\u05e1\u05e4\u05e8 \u05e0\u05d9\u05d9\u05d3 \u05d0\u05de\u05d9\u05ea\u05d9 \u2014 \u05d4\u05e7\u05dc\u05d3/\u05d9 \u05d0\u05d5 \u05d1\u05d7\u05e8/\u05d9 \u05de\u05d0\u05e0\u05e9\u05d9 \u05e7\u05e9\u05e8':currentLang==='ar'?'\u0645\u0637\u0644\u0648\u0628 \u0631\u0642\u0645 \u062c\u0648\u0627\u0644 \u062d\u0642\u064a\u0642\u064a \u2014 \u0627\u0643\u062a\u0628\u0647 \u0623\u0648 \u0627\u062e\u062a\u0631 \u0645\u0646 \u062c\u0647\u0627\u062a \u0627\u0644\u0627\u062a\u0635\u0627\u0644':'A real mobile number is required \u2014 type it or pick from contacts','amb'); if(typeof shakeField==='function')shakeField('ag-phone'); return; }
- if(!name){ name=(he?'\u05e9\u05d5\u05de\u05e8':'Guardian'); }
+ if(!name){ name=(he?'\u05e9\u05d5\u05de\u05e8':'SHOMER'); }
  if(go){go.disabled=true;go.style.opacity='.6';}
  if(validPhone){
    var dup=(SS.circleMembers||[]).find(function(m){return m.phoneCanon===canon;});
@@ -7306,11 +7307,11 @@ async function addGuardian(){
          }catch(e){ if(typeof fbLog==='function')fbLog('invite create:',(e&&e.message)||e); }
        }
      }
-   }catch(e){ if(typeof fbLog==='function')fbLog('guardian lookup:',(e&&e.message)||e); }
+   }catch(e){ if(typeof fbLog==='function')fbLog('SHOMER lookup:',(e&&e.message)||e); }
  }
  var _selC=(document.getElementById('ag-circle')||{}).value||activeCircleId;
  var m={id:genId('m'),cid:_selC,name:name,rel:'',phoneCanon:validPhone?canon:null,registered:registered,partnerUid:theirUid,pending:(validPhone&&!registered),emoji:'',color:palette[(SS.circleMembers.length)%palette.length],lat:null,lng:null,moving:false,shareTo:true,seeThem:true,sos:false};
- /* NO simulated coordinates. A guardian is only ever drawn where they REALLY are
+ /* NO simulated coordinates. A SHOMER is only ever drawn where they REALLY are
     (resolved from their live presence). Until then they have no position at all -
     showing a person at a fake location in a safety app is worse than showing nothing. */
  SS.circleMembers.push(m);
@@ -7359,9 +7360,9 @@ function addMember(){
 }
 function removeMember(id){
   /* TWO-STORES DISEASE: this used to delete the member from SS.circleMembers only, while the
-     underlying PAIR lived on in SS.guardian.pairs - so syncPairsToCircles() promptly rebuilt
+     underlying PAIR lived on in SS.SHOMER.pairs - so syncPairsToCircles() promptly rebuilt
      the member and they reappeared. Worse: the pair is what grants location access, so a
-     "removed" guardian could STILL SEE THE USER. Removing someone must cut the pair itself. */
+     "removed" SHOMER could STILL SEE THE USER. Removing someone must cut the pair itself. */
   const m=memberById(id); if(!m) return;
   const he=currentLang==='he';
   const puid=m.partnerUid||null;
@@ -7386,7 +7387,7 @@ function removeMember(id){
   if(mapLayers.circle[id]){ MAP&&MAP.removeLayer(mapLayers.circle[id]); delete mapLayers.circle[id]; }
   if(alertMemberId===id) clearCircleAlert();
   saveStore(); renderCircles();
-  try{ sosRotateSalt(); }catch(e){}   /* removed guardian can no longer compute the SOS channel */
+  try{ sosRotateSalt(); }catch(e){}   /* removed SHOMER can no longer compute the SOS channel */
   toast(he?('הוסר/ה '+(m.name||'')+' - כבר לא רואה את המיקום שלך'):((m.name||'Removed')+' - they can no longer see your location'),'');
 }
 function renameCircle(id){
@@ -7402,7 +7403,7 @@ function renameCircle(id){
 function addCircle(){
   var _he=currentLang==='he';
   if(circlesList().length>=6){
-    toast(_he?'6 מעגלים זה המקסימום. שנה/י שם למעגל קיים או הסר/י שומרים שאינך צריך/ה.':'6 circles is the max. Rename an existing circle, or remove guardians you no longer need.','amb');
+    toast(_he?'6 מעגלים זה המקסימום. שנה/י שם למעגל קיים או הסר/י שומרים שאינך צריך/ה.':'6 circles is the max. Rename an existing circle, or remove SHOMERs you no longer need.','amb');
     return;
   }
  const he=currentLang==='he';
@@ -7433,7 +7434,7 @@ function clearCircleMarkers(){
  Object.keys(mapLayers.circle).forEach(id=>{if(MAP)MAP.removeLayer(mapLayers.circle[id]);});
  mapLayers.circle={};
 }
-/* ══ MAP INTERACTIONS - tapping a guardian actually does something now ══ */
+/* ══ MAP INTERACTIONS - tapping a SHOMER actually does something now ══ */
 function pingMember(id){
   var m=memberById(id); if(!m)return;
   var he=currentLang==='he';
@@ -7599,7 +7600,7 @@ function locateAlertMember(){ if(alertMemberId)flyToMember(alertMemberId); }
 
 /* ═══════════════════════════════════
    RESPONDER NAVIGATION - opt-in glowing route + live distance to an active SOS
-   Safety: OPT-IN, disclaimer shown, verified responders (fire/police/medic) + guardians
+   Safety: OPT-IN, disclaimer shown, verified responders (fire/police/medic) + SHOMERs
    prioritised; general users are steered to ALERT + call 100/101/102. Augments, never
    replaces emergency services. Cross-device responder positions need the backend (FIREBASE-SETUP).
 ═══════════════════════════════════ */
@@ -7615,7 +7616,7 @@ function fmtDistance(m){
   if(imp){const ft=m*3.28084; return ft<1000?Math.round(ft)+' ft':(m/1609.344).toFixed((m/1609.344)<5?2:1)+' mi';}
   return m<1000?Math.round(m)+' m':(m/1000).toFixed((m/1000)<5?2:1)+' km';
 }
-/* Entry point - opt-in gated. by responders/guardians for active response. */
+/* Entry point - opt-in gated. by responders/SHOMERs for active response. */
 function respondToSOS(lat,lng,label){
   if(!(SS.settings&&SS.settings.respond)){ openRespondConsent(lat,lng,label); return; }
   respTarget={lat:lat,lng:lng,label:label||''};
@@ -7727,12 +7728,12 @@ function radarPing(ll){
  carry your REAL position between WINDOWS/TABS of this app on the SAME
  browser. Each tab has its own sender id (sessionStorage), so two windows
  genuinely act as two people exchanging live coordinates.
- • Per-guardian who-sees-whom toggles, ghost/pause, one-tap disconnect.
+ • Per-SHOMER who-sees-whom toggles, ghost/pause, one-tap disconnect.
  BACKEND/NATIVE phase (flagged in-app + TEST.md):
  • Live exchange across DIFFERENT devices, always-on background tracking,
  verified accounts, and end-to-end encryption need a server + native app.
  When no live peer is broadcasting on a pair (the usual cross-device case) the
- guardian's marker is clearly badged "simulated" so the map UX is complete.
+ SHOMER's marker is clearly badged "simulated" so the map UX is complete.
 ═══════════════════════════════════════════════════ */
 const GD_CH='shomer-live-v1'; // BroadcastChannel name
 const GD_RELAY='shomer_live_relay'; // localStorage relay key (cross-tab fallback)
@@ -7740,7 +7741,7 @@ const GD_FRESH=10000; // ms a live position stays "live"
 const GD_PALETTE=['#C9A84C','#2962FF','#00C853','#E91E8C','#9C27B0','#FF6A00'];
 let gdBC=null, gdTabCode='', gdLiveTimer=null, gdSimTimer=null;
 
-function gdState(){ if(!SS.guardian)SS.guardian={myName:'',myCode:'',pairs:[]}; if(!SS.guardian.pairs)SS.guardian.pairs=[]; return SS.guardian; }
+function gdState(){ if(!SS.SHOMER)SS.SHOMER={myName:'',myCode:'',pairs:[]}; if(!SS.SHOMER.pairs)SS.SHOMER.pairs=[]; return SS.SHOMER; }
 function gdPairByToken(t){ return gdState().pairs.find(p=>p.token===t); }
 function gdPairById(id){ return gdState().pairs.find(p=>p.id===id); }
 function gdBaseUrl(){ return location.origin+location.pathname.replace(/index\.html$/,'shomer.html'); }
@@ -7753,7 +7754,7 @@ function gdBaseUrl(){ return location.origin+location.pathname.replace(/index\.h
 var DIAL={IL:'972',US:'1',CA:'1',GB:'44',FR:'33',AU:'61',NZ:'64',IE:'353',DE:'49',ES:'34',IT:'39',PT:'351',NL:'31',BE:'32',CH:'41',AT:'43',SE:'46',NO:'47',DK:'45',FI:'358',IS:'354',LU:'352',MT:'356',PL:'48',CZ:'420',SK:'421',SI:'386',HR:'385',RS:'381',BG:'359',GR:'30',RO:'40',HU:'36',UA:'380',BY:'375',MD:'373',LV:'371',LT:'370',EE:'372',RU:'7',GE:'995',AM:'374',AZ:'994',UZ:'998',TR:'90',CY:'357',BR:'55',MX:'52',AR:'54',CL:'56',CO:'57',PE:'51',UY:'598',PY:'595',BO:'591',EC:'593',VE:'58',PA:'507',CR:'506',GT:'502',ZA:'27',MA:'212',TN:'216',DZ:'213',EG:'20',ET:'251',NG:'234',KE:'254',AE:'971',SA:'966',QA:'974',JO:'962',IN:'91',JP:'81',CN:'86',KR:'82',TH:'66',VN:'84',PH:'63',ID:'62',MY:'60',SG:'65',HK:'852',TW:'886'}
 
 /* Country names + a real MOBILE example per country, so people can see at a glance that
-   SH✡MER expects a mobile number (guardians are reached by SMS - a landline can't work). */
+   SH✡MER expects a mobile number (SHOMERs are reached by SMS - a landline can't work). */
 var CNAME={
  IL:['ישראל','Israel'],US:['ארצות הברית','United States'],CA:['קנדה','Canada'],GB:['בריטניה','United Kingdom'],
  FR:['צרפת','France'],AU:['אוסטרליה','Australia'],NZ:['ניו זילנד','New Zealand'],IE:['אירלנד','Ireland'],
@@ -7815,7 +7816,7 @@ var EMERG={
 };
 var EMERG_DEFAULT={p:'112',a:'112',f:'112'};   /* EU + GSM universal */
 
-/* Localise the guardian form's default country by the user's ACTUAL GPS position (highest
+/* Localise the SHOMER form's default country by the user's ACTUAL GPS position (highest
    priority over device locale/timezone). Offline bounding-box lookup - no network, no privacy leak.
    Only sets a DEFAULT; the user can still pick any country. Touches nothing else. */
 var GEO_BOX=[
@@ -8004,21 +8005,21 @@ function guardianIcon(p,live){
 function gdUpdateMarker(p){
  if(!MAP||!window.L) return;
  const show=p.seeThem&&!p.pending&&gdPos(p);
- if(!show){ if(mapLayers.guardian[p.id]){ MAP.removeLayer(mapLayers.guardian[p.id]); delete mapLayers.guardian[p.id]; } return; }
+ if(!show){ if(mapLayers.SHOMER[p.id]){ MAP.removeLayer(mapLayers.SHOMER[p.id]); delete mapLayers.SHOMER[p.id]; } return; }
  const ll=gdPos(p), live=gdIsLive(p);
- if(mapLayers.guardian[p.id]){ mapLayers.guardian[p.id].setLatLng(ll); mapLayers.guardian[p.id].setIcon(guardianIcon(p,live)); }
- else mapLayers.guardian[p.id]=window.L.marker(ll,{icon:guardianIcon(p,live),zIndexOffset:live?760:680,alt:p.name||'Guardian'}).addTo(MAP);
+ if(mapLayers.SHOMER[p.id]){ mapLayers.SHOMER[p.id].setLatLng(ll); mapLayers.SHOMER[p.id].setIcon(guardianIcon(p,live)); }
+ else mapLayers.SHOMER[p.id]=window.L.marker(ll,{icon:guardianIcon(p,live),zIndexOffset:live?760:680,alt:p.name||'SHOMER'}).addTo(MAP);
 }
 function gdRenderMarkers(){ if(!MAP)return; gdState().pairs.forEach(gdUpdateMarker);
  // drop markers for removed pairs
- Object.keys(mapLayers.guardian).forEach(id=>{ if(!gdPairById(id)){ MAP.removeLayer(mapLayers.guardian[id]); delete mapLayers.guardian[id]; } }); }
+ Object.keys(mapLayers.SHOMER).forEach(id=>{ if(!gdPairById(id)){ MAP.removeLayer(mapLayers.SHOMER[id]); delete mapLayers.SHOMER[id]; } }); }
 function gdFlyTo(id){
  const p=gdPairById(id); const ll=p&&gdPos(p); if(!ll){ toast(currentLang==='he'?'אין מיקום זמין עדיין':'No location yet','amb'); return; }
  gdUpdateMarker(p); cl('sh-circles');
  if(MAP){ try{MAP.invalidateSize(false);}catch(e){}
  setTimeout(()=>{ try{MAP.setView(ll,16,{animate:true,duration:1.0});}catch(e){try{MAP.setView(ll,16);}catch(_){}}
  setTimeout(()=>radarPing(ll),650); },60); }
- toast((currentLang==='he'?' מאתר/ת את ':' Locating ')+(p.name||(currentLang==='he'?'שומר/ת':'guardian'))+'…','');
+ toast((currentLang==='he'?' מאתר/ת את ':' Locating ')+(p.name||(currentLang==='he'?'שומר/ת':'SHOMER'))+'…','');
 }
 
 /* ── Invite / accept / connect flows ── */
@@ -8044,7 +8045,7 @@ function gdCopyLink(){
 }
 function gdShareLink(){
  const inp=document.getElementById('gd-invite-link'); const link=inp?inp.value:'';
- const txt=currentLang==='he'?'הצטרף/י אליי ב-SHOMER כשומר/ת - נראה זה את מיקומו של זה:':'Join me on SHOMER as my guardian - we\'ll see each other\'s live location:';
+ const txt=currentLang==='he'?'הצטרף/י אליי ב-SHOMER כשומר/ת - נראה זה את מיקומו של זה:':'Join me on SHOMER as my SHOMER - we\'ll see each other\'s live location:';
  if(navigator.share){ navigator.share({title:'SHOMER',text:txt,url:link}).catch(()=>{}); }
  else gdCopyLink();
 }
@@ -8148,8 +8149,8 @@ function gdConnect(tok,nm,fromLink){
  saveStore();
  gdSend({type:'hello'}); gdBroadcast(); gdRenderMarkers(); gdRenderList();
  if(document.getElementById('sh-circles')&&document.getElementById('sh-circles').classList.contains('open')){} else openCircles();
- toast(currentLang==='he'?'✓ חוברת ל'+(p.name||'שומר/ת'):'✓ Connected to '+(p.name||'guardian'),'grn');
- try{ pushNotify(' SHOMER',(currentLang==='he'?'חוברת לשומר/ת':'Guardian connected'),'gd-pair'); }catch(e){}
+ toast(currentLang==='he'?'✓ חוברת ל'+(p.name||'שומר/ת'):'✓ Connected to '+(p.name||'SHOMER'),'grn');
+ try{ pushNotify(' SHOMER',(currentLang==='he'?'חוברת לשומר/ת':'SHOMER connected'),'gd-pair'); }catch(e){}
 }
 /* ══ ADD MY SHOMER BY PHONE ══
    Only a real, registered SHOMER user can be added (verified via the hashed-phone
@@ -8239,7 +8240,7 @@ function gdInviteShareLink(){
 function gdDisconnect(id){
  const g=gdState(); const p=gdPairById(id); if(!p)return;
  g.pairs=g.pairs.filter(x=>x.id!==id);
- if(mapLayers.guardian[id]){ MAP&&MAP.removeLayer(mapLayers.guardian[id]); delete mapLayers.guardian[id]; }
+ if(mapLayers.SHOMER[id]){ MAP&&MAP.removeLayer(mapLayers.SHOMER[id]); delete mapLayers.SHOMER[id]; }
  saveStore(); gdRenderList();
  toast(currentLang==='he'?'החיבור נותק':'Disconnected','');
 }
@@ -8248,7 +8249,7 @@ function gdToggleField(id,field,el){ const p=gdPairById(id); if(!p)return; p[fie
 function gdRename(id,val){ const p=gdPairById(id); if(!p)return; p.name=val; saveStore(); }
 function gdSetRel(id,val){ const p=gdPairById(id); if(!p)return; p.rel=val; saveStore(); }
 
-/* ── Guardian list UI (XSS-safe via ESC / textContent) ── */
+/* ── SHOMER list UI (XSS-safe via ESC / textContent) ── */
 function gdStatusOf(p){
  const he=currentLang==='he', ar=currentLang==='ar';
  if(p.pending) return {cls:'pending',txt:he?' ממתין לאישור':ar?' بانتظار القبول':' Waiting to accept'};
@@ -8262,7 +8263,7 @@ function gdRenderList(){
   var el=document.getElementById('gd-list');
   if(el) el.innerHTML='';
 }
-/* Static-label translations for the guardian UI (he/en; other locales fall back). */
+/* Static-label translations for the SHOMER UI (he/en; other locales fall back). */
 function gdApplyI18n(){
  const he=currentLang==='he';
  setText('dd-guard',he?'השומרים שלי':'My SHOMERs');
@@ -8276,10 +8277,10 @@ function gdApplyI18n(){
  setText('gd-copy-lbl',he?'העתק':'Copy');
  setText('gd-share-lbl',he?'שתף/י קישור':'Share link');
  setText('gd-invite-note',he?'המיקום משותף רק לאחר אישור, ורק עם מי שבחרת. אפשר להפסיק את השיתוף בכל רגע.':'Location is shared only after they accept, and only with people you choose. You can stop sharing anytime.');
- setText('gd-enter-ttl',he?' הזן/י קוד שומר/ת':' Enter a guardian code');
+ setText('gd-enter-ttl',he?' הזן/י קוד שומר/ת':' Enter a SHOMER code');
  setText('gd-enter-help',he?'הדבק/י קישור הזמנה או קוד שקיבלת.':'Paste an invite link or code you received.');
  setText('gd-enter-submit-lbl',he?'חבר/י':'Connect');
- setText('gd-accept-ttl',he?' הזמנה לשמירה':' Guardian invite');
+ setText('gd-accept-ttl',he?' הזמנה לשמירה':' SHOMER invite');
  setText('gd-accept-sub',he?'באישור: תראו זה את מיקומו החי של זה. ניתן לעצור בכל רגע מתוך "מעגלים".':'On accept: you\'ll see each other\'s live location. You can stop anytime from "Circles".');
  setText('gd-accept-yes-lbl',he?'אשר/י וחבר/י':'Accept & connect');
  setText('gd-accept-no',he?'דחה/י':'Decline');
@@ -8515,7 +8516,7 @@ function privacyHTML(){ const he=currentLang==='he';
  <h4>Limitations</h4>
  <p>End-to-end encryption and background / locked-screen alerts are limited in the web version.</p>
  <h4>Children</h4>
- <p>The app is not directed to minors under 16 without parent/guardian consent.</p>
+ <p>The app is not directed to minors under 16 without parent/SHOMER consent.</p>
  <h4>Contact</h4>
  <p>For privacy questions, contact us through 3Shamrocks Studio.</p>
  <p class="legal-meta">${legalUpdated()}</p>`);
@@ -8632,7 +8633,7 @@ function legalApplyI18n(){
  setText('set-tos-row',he?'תנאי שימוש':'Terms of Service');
  setText('set-priv-row',he?'מדיניות פרטיות':'Privacy Policy');
  setText('consent-ttl',he?' הסכמה לשיתוף מיקום':' Location-sharing consent');
- setText('consent-intro',he?'כדי לחבר שומר/ת, עליך להסכים לשתף את מיקומך החי. ההסכמה היא בבחירתך וניתן לבטל אותה בכל רגע.':'To connect a guardian, you opt in to share your live location. Consent is your choice and can be revoked anytime.');
+ setText('consent-intro',he?'כדי לחבר שומר/ת, עליך להסכים לשתף את מיקומך החי. ההסכמה היא בבחירתך וניתן לבטל אותה בכל רגע.':'To connect a SHOMER, you opt in to share your live location. Consent is your choice and can be revoked anytime.');
  setText('consent-agree-lbl',he?'אני מסכים/ה לשתף מיקום':'I agree to share my location');
  setText('consent-cancel-btn',he?'ביטול':'Cancel');
  const cpz=document.getElementById('consent-policy'); if(cpz)cpz.innerHTML=he
@@ -8874,14 +8875,14 @@ try{ hydrateIcons(document); }catch(e){}
 
 /* ═══════════════════════════════════════════════════════════════════════
    FIREBASE REALTIME BACKEND (Spark plan: RTDB + Auth + FCM)
-   Real now (app open): anonymous auth, PRESENCE -> live "guardians nearby" count,
+   Real now (app open): anonymous auth, PRESENCE -> live "SHOMERs nearby" count,
    cross-DEVICE SOS events + type fan-out. Needs the deployed auth-scoped rules
    (database.rules.json). Fully-closed push + SMS verification need Blaze (flagged).
 ═══════════════════════════════════════════════════════════════════════ */
 /* Loaded-build version - shown in the diagnostic panel so a phone can prove
    whether it's on the latest build or a STALE cached one. Keep in lock-step
    with sw.js SW_VERSION on every deploy. */
-var APP_VER='v220';
+var APP_VER='v221';
 var FB={ready:false,uid:null,db:null,_presTimer:null,connected:false,listening:false,pushState:'default',near:0,swVer:'?',
   authState:'connecting',sdkLoaded:false,persist:'',permErr:null,err:null,wsProbe:'',csp:''};
 /* Always log connection diagnostics to the console so the real failure can be SEEN in Chrome. */
@@ -9419,7 +9420,7 @@ function fbStartPresence(){
   // GRACEFUL DEGRADATION: the raw stream can fire thousands of events/sec under the global
   // fan-out. Never re-scan on every event - stash the latest snapshot and process it on a
   // debounced schedule so the SOS path + UI stay responsive even when presence is hammered.
-  /* PRIVACY: never read the whole presence tree - subscribe ONLY to approved guardians.
+  /* PRIVACY: never read the whole presence tree - subscribe ONLY to approved SHOMERs.
      This closes the leak (a stranger could read everyone) at the app layer and works cleanly
      under the strict rule once it is published. */
   fbWatchGuardianPresence();
@@ -9444,14 +9445,14 @@ function fbWatchGuardianPresence(){
       setTimeout(function(){ FB._presPending=false; try{ fbProcessPeer(); }catch(e){} }, PRES_DEBOUNCE_MS);
     }, function(e){ FB.permErr=(e&&e.code)||'denied'; renderFbStatus(); });
   });
-  /* stop watching anyone no longer a guardian */
+  /* stop watching anyone no longer a SHOMER */
   Object.keys(FB._presRefs).forEach(function(puid){
     if(!want[puid]){ try{ FB._presRefs[puid].off(); }catch(e){} delete FB._presRefs[puid];
       if(FB._peer) delete FB._peer[puid]; }
   });
 }
 function fbProcessPeer(){
-  /* hand the collected guardian positions to the existing renderer as a synthetic snapshot */
+  /* hand the collected SHOMER positions to the existing renderer as a synthetic snapshot */
   var all=FB._peer||{};
   try{ fbApplyPeerPresence(all); }catch(e){}
   try{ fbRenderPeerMarkers(all); }catch(e){}
@@ -9698,7 +9699,7 @@ function fbClearResponderMarkers(){ try{ Object.keys(fbResponderMarkers).forEach
 /* Register this device's FCM token + location so the Cloud Function can target it for push. */
 function fbRegisterToken(token){ if(!FB.ready||!token)return; var lat=userLat!=null?userLat:32.07, lng=userLng!=null?userLng:34.78; try{ FB.db.ref('tokens/'+FB.uid).set({token:token,lat:lat,lng:lng,ts:Date.now()}); }catch(e){} }
 /* Queue a targeted alarm - alarmFanout Cloud Function pushes it to the recipient even when their
-   app is CLOSED (used by geofence arrival; check-in cross-device needs guardian-uid pairing). */
+   app is CLOSED (used by geofence arrival; check-in cross-device needs SHOMER-uid pairing). */
 function fbQueueAlarm(toUid,title,body,tag){ if(!FB.ready||!toUid)return; try{ FB.db.ref('alarms').push({fromUid:FB.uid,toUid:toUid,title:title,body:body,tag:tag||'shomer',ts:Date.now()}); }catch(e){} }
 
 /* ══ REAL backend pairing (item 3): a mutual account link in RTDB so SOS + location
@@ -9798,7 +9799,7 @@ function syncPairsToCircles(){
    A PWA cannot track in the background - the geolocation API only runs on a visible page
    and service workers have no geolocation access at all. So instead of pretending, we give
    the moment that actually matters: the walk home. The user starts a session, we hold a
-   screen wake-lock, publish high-accuracy presence continuously, and tell their guardians.
+   screen wake-lock, publish high-accuracy presence continuously, and tell their SHOMERs.
    When they arrive safely they end it - or it auto-expires. This is the real use case. */
 
 
@@ -9837,9 +9838,9 @@ function essToggleMenu(){
   if(k) k.textContent = open ? '▴' : '▾';
 }
 /* ══ RESPONDER STATUS SIGNALS ══
-   Once a guardian is on-scene they hold information everyone else needs - is a medic needed,
+   Once a SHOMER is on-scene they hold information everyone else needs - is a medic needed,
    have the authorities arrived, is it over. These broadcast on the same bus, key rs_<uid>,
-   payload "code|name" (e.g. "medic|Yossi"). Any paired guardian watching the incident sees it. */
+   payload "code|name" (e.g. "medic|Yossi"). Any paired SHOMER watching the incident sees it. */
 var SIGNALS={
   medic:   {he:'צריך פרמדיק',       en:'Medic needed',        ic:'✚', c:'#E5484D'},
   defib:   {he:'צריך דפיברילטור',    en:'Defibrillator now',   ic:'⚡', c:'#E5484D'},
@@ -9874,7 +9875,7 @@ function openSignalSheet(){
       +'<span class="sig-ic" style="color:'+s.c+'">'+s.ic+'</span>'
       +'<span>'+(he?s.he:s.en)+'</span></button>';
   }).join('');
-  d.innerHTML='<div class="sig-h">'+(he?'עדכן/י את השומרים':'Update the guardians')+'</div>'
+  d.innerHTML='<div class="sig-h">'+(he?'עדכן/י את השומרים':'Update the SHOMERs')+'</div>'
     +'<div class="sig-grid">'+btns+'</div>'
     +'<button class="sig-close">'+(he?'סגור':'Close')+'</button>';
   document.body.appendChild(d);
@@ -9884,7 +9885,7 @@ function openSignalSheet(){
   d.querySelector('.sig-close').onclick=function(){ d.remove(); };
 }
 
-/* watch paired guardians' signals; surface as a small ticker */
+/* watch paired SHOMERs' signals; surface as a small ticker */
 function watchSignals(){
   if(!FB.ready||!FB.uid) return;
   var g=gdState();
@@ -9926,7 +9927,7 @@ function openReport(){
   }).join('');
   d.innerHTML='<div class="rep-card">'
     +'<div class="rep-h">'+(he?'דיווח על אירוע':'Report an event')+'</div>'
-    +'<div class="rep-sub">'+(he?'הדיווח נשלח קודם לשומרים שלך. יתפרסם לאזור רק אחרי שכנים שיאשרו.':'Goes to your guardians first. Area-wide only after neighbours confirm.')+'</div>'
+    +'<div class="rep-sub">'+(he?'הדיווח נשלח קודם לשומרים שלך. יתפרסם לאזור רק אחרי שכנים שיאשרו.':'Goes to your SHOMERs first. Area-wide only after neighbours confirm.')+'</div>'
     +'<div class="rep-grid">'+btns+'</div>'
     +'<textarea class="rep-note" id="rep-note" maxlength="140" placeholder="'+(he?'פרטים (לא חובה)':'Details (optional)')+'"></textarea>'
     +'<button class="btn-ghost rep-close">'+(he?'ביטול':'Cancel')+'</button>'
@@ -10033,7 +10034,7 @@ function founderHeaderHTML(){
    or dispatch. So a report is NOT a broadcast. It is a claim that must EARN its reach.
 
    Trust ladder (reach grows only with corroboration + reputation):
-     • A new report is PRIVATE to the reporter's own guardians. Nobody else sees it.
+     • A new report is PRIVATE to the reporter's own SHOMERs. Nobody else sees it.
      • It goes NEIGHBOURHOOD-WIDE only after N independent nearby users CONFIRM it.
      • High-severity types (weapon / active threat) require MORE confirmations, never fewer.
      • Every event can be DISPUTED; disputes throttle reach and flag the reporter.
@@ -10073,7 +10074,7 @@ function paPinIcon(kind){ var t=(kind==='abduct')?'abduct':'missing';
 function openPersonAlert(memberId){
   var he=currentLang==='he', ar=currentLang==='ar';
   var m=paMember(memberId);
-  if(!m){ toast(he?'לא נמצא שומר מקושר':'Linked guardian not found','amb'); return; }
+  if(!m){ toast(he?'לא נמצא שומר מקושר':'Linked SHOMER not found','amb'); return; }
   if(!m.partnerUid || m.pending){ toast(he?'אפשר לדווח רק על אדם מקושר':'You can only report a linked person','amb'); return; }
   var old=document.getElementById('pa-sheet'); if(old) old.remove();
   var locKnown=(m.lat!=null && m.lng!=null);
@@ -10215,7 +10216,7 @@ function paIncomingAlert(a){
   if(MAP && a.lat!=null){ try{ MAP.setView([a.lat,a.lng],14,{animate:true}); }catch(e){} }
 }
 
-/* ── Detail card: who can stand it down = subject, reporter, or a linked guardian ── */
+/* ── Detail card: who can stand it down = subject, reporter, or a linked SHOMER ── */
 function paCanResolve(a){ try{ return a && (FB.uid===a.subjUid || FB.uid===a.by || (typeof isGuardianOf==='function' && isGuardianOf(a.subjUid))); }catch(e){ return false; } }
 function openPersonAlertDetail(id){
   var he=currentLang==='he', ar=currentLang==='ar';
@@ -10371,7 +10372,7 @@ async function evtCreate(type, note){
   if(ok){
     try{ dashFeedPush(id,ev.type,ev.lat,ev.lng); }catch(e){}
     var r=repState(); r.made=(r.made||0)+1; r._posts=(r._posts||[]); r._posts.push(Date.now()); saveStore();
-    toast(he?'הדיווח נשלח לשומרים שלך. יתפרסם לאזור רק לאחר אישור של שכנים.':'Sent to your guardians. Goes area-wide only after neighbours confirm.','grn');
+    toast(he?'הדיווח נשלח לשומרים שלך. יתפרסם לאזור רק לאחר אישור של שכנים.':'Sent to your SHOMERs. Goes area-wide only after neighbours confirm.','grn');
     try{ evtRenderMine(); }catch(e){}
   } else {
     toast(he?'הדיווח לא נשלח':'Report not sent','amb');
@@ -10438,7 +10439,7 @@ async function evtDispute(id, ev){
 function evtVisibleToMe(ev, id){
   if(!ev) return false;
   if(ev.by===FB.uid) return true;                       /* my own report - always */
-  if(isGuardianOf(ev.by)) return true;                  /* the reporter's guardian - always */
+  if(isGuardianOf(ev.by)) return true;                  /* the reporter's SHOMER - always */
   var confirms=ev.confirms?Object.keys(ev.confirms).length:0;
   var disputes=ev.disputes?Object.keys(ev.disputes).length:0;
   if(disputes>=confirms && disputes>0) return false;    /* contested → suppressed */
@@ -10456,9 +10457,9 @@ function haversineM(la1,lo1,la2,lo2){
 }
 /* ══ ROTATING SOS CHANNEL ══
    The SOS broadcast key is sos_<uid>_<salt>. The salt is a per-victim secret held only by the
-   victim and their CURRENT guardians (delivered in the approved invite). If a guardian is
-   removed, the victim rotates the salt and re-issues it to the remaining guardians, so the
-   removed guardian can no longer compute the channel - closing the ex-guardian residual read. */
+   victim and their CURRENT SHOMERs (delivered in the approved invite). If a SHOMER is
+   removed, the victim rotates the salt and re-issues it to the remaining SHOMERs, so the
+   removed SHOMER can no longer compute the channel - closing the ex-SHOMER residual read. */
 function sosSalt(){
   if(!SS.sosSalt){ SS.sosSalt=sosNewSalt(); saveStore(); }
   return SS.sosSalt;
@@ -10471,7 +10472,7 @@ function sosNewSalt(){
 }
 /* my own SOS channel key */
 function sosChan(uid, salt){ return 'sos_'+String(uid||'').slice(0,20)+'_'+(salt||''); }
-/* a guardian stores each partner's salt (learned at approval) so they can watch the right key */
+/* a SHOMER stores each partner's salt (learned at approval) so they can watch the right key */
 function guardianSalt(puid){
   try{ return (SS.partnerSalts||{})[puid]||''; }catch(e){ return ''; }
 }
@@ -10479,18 +10480,18 @@ function setGuardianSalt(puid, salt){
   if(!SS.partnerSalts) SS.partnerSalts={};
   SS.partnerSalts[puid]=salt; saveStore();
 }
-/* rotate my salt and re-issue to every remaining guardian's inbox */
+/* rotate my salt and re-issue to every remaining SHOMER's inbox */
 async function sosRotateSalt(){
   var oldSalt=SS.sosSalt;
   var ns=sosNewSalt(); SS.sosSalt=ns; saveStore();
-  /* actively wipe any SOS sitting on the OLD channel so a removed guardian can never read
+  /* actively wipe any SOS sitting on the OLD channel so a removed SHOMER can never read
      a lingering broadcast - belt and suspenders on top of them not knowing the new salt */
   if(oldSalt){ try{ await fbRestWrite('PUT','invites/'+sosChan(FB.uid, oldSalt),
     {fromUid:FB.uid, ts:Date.now(), name:packSOS(false,'',null,null,FB.uid)}); }catch(e){} }
   var g=gdState();
   var me=(SS.user&&SS.user.name)||'';
   await Promise.all((g.pairs||[]).filter(function(p){return !p.pending && p.partnerUid;}).map(function(p){
-    /* deliver the new salt to the guardian on a key only they poll: salt_<theirUid> */
+    /* deliver the new salt to the SHOMER on a key only they poll: salt_<theirUid> */
     return fbRestWrite('PUT','invites/salt_'+FB.uid.slice(0,16)+'_'+p.partnerUid.slice(0,16),
       {fromUid:FB.uid, ts:Date.now(), name:'S|'+me.slice(0,16)+'|'+ns}).catch(function(){});
   }));
@@ -10532,7 +10533,7 @@ function unpackSOS(s){
 }
 /* ══ SOS BUS - the actual emergency broadcast ══
    THE BUG THIS FIXES: pressing SOS sounded an alarm and drew a local pin, but never told a
-   single guardian. The "broadcast" was part of the simulation. The core promise of the app
+   single SHOMER. The "broadcast" was part of the simulation. The core promise of the app
    did not work.
 
    WHY IT IS BUILT THIS WAY: the deployed security rules permit exactly two cross-user paths -
@@ -10541,7 +10542,7 @@ function unpackSOS(s){
    So the emergency bus rides on deterministic tokens both sides can compute from a uid:
         sos_<victimUid>                      → the SOS itself
         resp_<victimUid>_<responderUid>      → "I am coming"
-   A guardian already knows their partners' uids, so they can watch precisely the right keys.
+   A SHOMER already knows their partners' uids, so they can watch precisely the right keys.
    When the proper rules ship (sos/ node), writeBus() prefers it automatically - no rewrite.  */
 var SOSBUS={ active:null, watchers:{}, responders:{}, mine:{} };
 
@@ -10606,7 +10607,7 @@ async function sosBroadcast(sosId, type){
   SOSBUS.active=payload.sosId;
   if(ok){
     var n=(SS.circleMembers||[]).filter(function(m){return !m.pending;}).length;
-    toast(he?('\u2713 נשלחה התרעה ל'+n+' שומרים'):('\u2713 Alert sent to '+n+' guardians'),'grn');
+    toast(he?('\u2713 נשלחה התרעה ל'+n+' שומרים'):('\u2713 Alert sent to '+n+' SHOMERs'),'grn');
     sosWatchMyResponders();
   } else { /* Queue it, keep retrying, and tell the user to call 100 NOW. */ try{ sosQueuePush(sosChan(FB.uid, sosSalt()), payload); }catch(e){} toast(he?'\u26A0 ההתרעה טרם נשלחה - ננסה שוב אוטומטית. התקשר/י 100 עכשיו':'\u26A0 Alert not sent yet - retrying automatically. Call 100 now','sos'); }
   return ok;
@@ -10648,7 +10649,7 @@ function onPartnerSOS(puid, v){
   if(SOSBUS.mine[puid]) return;      /* already showing */
   SOSBUS.mine[puid]=1;
   var he=currentLang==='he';
-  var nm=v.name||(memberByPair(puid)||{}).name||(he?'שומר':'a guardian');
+  var nm=v.name||(memberByPair(puid)||{}).name||(he?'שומר':'a SHOMER');
   try{ if(navigator.vibrate) navigator.vibrate([200,90,200,90,400]); }catch(e){}
   try{ playAlarm(2500); }catch(e){}
   showIncomingSOS(puid, nm, v);
@@ -10661,7 +10662,7 @@ function memberByPair(puid){
   return (SS.circleMembers||[]).filter(function(m){return m.partnerUid===puid;})[0]||null;
 }
 
-/* The alert a guardian actually sees. This is the whole product. */
+/* The alert a SHOMER actually sees. This is the whole product. */
 function showIncomingSOS(puid, nm, v){
   var he=currentLang==='he';
   var old=document.getElementById('in-sos-'+puid); if(old) old.remove();
@@ -10772,16 +10773,16 @@ function sosPaintMyHelp(){
   var names=ks.map(function(k){ return String(SOSBUS.responders[k].name||'').trim(); }).filter(Boolean);
   b.innerHTML='<div class="help-t">'+(he?'עזרה בדרך':'Help is coming')+'</div>'
    +(names.length?'<div class="help-n">'+ESC(names.slice(0,3).join(' · '))+(ks.length>3?(' +'+(ks.length-3)):'')+'</div>':'')
-   +'<div class="help-s">'+(ks.length===1?(he?'שומר אחד בדרך אליך':'1 guardian on the way')
-                                         :(he?(ks.length+' שומרים בדרך אליך'):(ks.length+' guardians on the way')))+'</div>';
+   +'<div class="help-s">'+(ks.length===1?(he?'שומר אחד בדרך אליך':'1 SHOMER on the way')
+                                         :(he?(ks.length+' שומרים בדרך אליך'):(ks.length+' SHOMERs on the way')))+'</div>';
 }
 /* ══ REMOTE ALARM STAND-DOWN ══════════════════════════════════════════════════════
    A trusted, paired "My SHOMER" can ask a blaring alarm to stand down - the recovery valve
    for a locked-out legitimate owner who can't enter their secret cancel code. Anti-abuse:
      1. GUARDIAN side confirms before sending (no accidental taps).
-     2. Only a MUTUALLY-PAIRED guardian's request is honoured (client verifies fromUid is a
+     2. Only a MUTUALLY-PAIRED SHOMER's request is honoured (client verifies fromUid is a
         linked partner - a random authed user's message is ignored).
-     3. VICTIM side must actively CONFIRM on-device - a guardian can never silence it silently.
+     3. VICTIM side must actively CONFIRM on-device - a SHOMER can never silence it silently.
    The secret code stays the PRIMARY anti-thief stop; this never bypasses that on its own.
    Rides the existing invites-bus (sd_<victimUid>) over REST+SSE - NO rules change, NO RTDB WS. */
 async function sosStandDownAlarm(victimUid, victimName){
@@ -10790,7 +10791,7 @@ async function sosStandDownAlarm(victimUid, victimName){
   var msg=he?('להשתיק את האזעקה של '+(victimName||'')+'? עשה/י זאת רק אם וידאת שהם בטוחים.')
          :ar?('إيقاف إنذار '+(victimName||'')+'؟ افعل ذلك فقط إذا تأكدت أنهم بأمان.')
          :('Stand down '+(victimName||'their')+" alarm? Only do this if you've confirmed they are safe.");
-  if(!window.confirm(msg)) return;                       // guardian-side confirm (anti-abuse #1)
+  if(!window.confirm(msg)) return;                       // SHOMER-side confirm (anti-abuse #1)
   var myName=cut((SS.user&&SS.user.name)||'SHOMER',20);
   // Proven invites-bus shape {fromUid, ts, name} - the sd_ key IS the stand-down channel
   // (the deployed rules reject unknown fields, so no 'type' here).
@@ -10809,7 +10810,7 @@ function sosWatchStandDown(){
       if(!sosActive) return;                              // only while an alarm is live
       if(v.ts===_sdSeen) return;                          // already handled this request
       if(Date.now()-v.ts > 5*60*1000) return;            // ignore stale
-      // anti-abuse #2 - only honour a MUTUALLY-PAIRED guardian (this also ignores the
+      // anti-abuse #2 - only honour a MUTUALLY-PAIRED SHOMER (this also ignores the
       // owner's own ack writes, since the owner is not their own paired partner).
       var trusted=(gdState().pairs||[]).some(function(p){ return p&&p.linked&&p.partnerUid===v.fromUid; });
       if(!trusted) return;
@@ -11320,7 +11321,7 @@ function fbListenPairs(){
 /* Cross-user unpair via TOMBSTONE - when a SHOMER deletes their account they write
    tombstones/<theirUid>={deleted:true}. On load we check each paired partner's
    tombstone and, if deleted, prune that link locally AND drop our own side of the
-   pair - so a guardian is never left with a dead link to a deleted SHOMER. Works
+   pair - so a SHOMER is never left with a dead link to a deleted SHOMER. Works
    under the current rules (a read any authed user can do) - no backend deploy. */
 function fbPrunePairsByTombstone(){
   if(!FB.ready||!FB.db)return;
@@ -12181,7 +12182,7 @@ async function completeRegistration(){ try{document.body.classList.remove("otp-a
         1) ADOPT THE NEW UID. A reinstall gets a fresh anonymous uid, but the
            registry still pointed at the dead one - so anyone inviting this
            person by phone resolved to a uid that no longer exists and the
-           invite silently vanished. Their whole guardian network was orphaned.
+           invite silently vanished. Their whole SHOMER network was orphaned.
         2) SKIP ONBOARDING. They already signed up; make them verify the phone
            and go straight in, restoring the name we already hold. */
      var _prevName=(existing.name||"").trim();
@@ -12320,7 +12321,7 @@ async function getOrCreateDeviceId(){
 (function autoFillName(){
  var el = document.getElementById('ob-name');
  if(el && !el.value){
-  var names = ['SH✡MER User','Guardian','Shomer'];
+  var names = ['SH✡MER User','SHOMER','Shomer'];
   // Use a descriptive placeholder that looks filled
   var rnd = 'SH✡MER' + String(Math.floor(1000 + Math.random()*9000));
   el.value = rnd;
@@ -12334,6 +12335,7 @@ async function getOrCreateDeviceId(){
 /* Settings compact */
 #sh-set .sh-body{padding-top:8px;}
 #sh-set .set-grp + .sec-cap{margin-top:16px;}
+#sh-prof #profile-grp{background:none!important;border:0!important;padding:0!important}
 
 /* ══ v105 LATE OVERRIDES (must win - earlier muted .pic rules were overriding these) ══ */
 .prof-opt[data-prof] .pic{border:0!important;box-shadow:0 6px 16px rgba(0,0,0,.42)!important;padding:9px!important;border-radius:14px!important}
@@ -12466,7 +12468,7 @@ async function getOrCreateDeviceId(){
 .aed-place-bar{position:fixed;left:12px;right:12px;top:74px;z-index:100000;display:none;align-items:center;justify-content:space-between;gap:10px;background:rgba(14,143,110,.96);color:#fff;border-radius:12px;padding:11px 14px;font-size:12.5px;font-weight:800;box-shadow:0 8px 26px rgba(0,0,0,.5)}
 .aed-place-bar button{background:rgba(0,0,0,.25);border:0;color:#fff;border-radius:8px;padding:6px 12px;font-family:inherit;font-weight:800;cursor:pointer;font-size:12px}
 body.aed-placing #map{cursor:crosshair}
-/* header no longer squeezes the connection pill - the guardian count moves onto the map */
+/* header no longer squeezes the connection pill - the SHOMER count moves onto the map */
 #hdr-count,.hdr-gd-count{display:none!important}
 
 .map-count b{color:var(--g3)}
@@ -12485,7 +12487,7 @@ body.aed-placing #map{cursor:crosshair}
 .ob-agree-row label{font-size:12.5px;color:var(--tx2);line-height:1.6}
 .ob-agree-row a{color:var(--g3)}
 
-/* guardian count - TOP-LEFT, directly above the map legend. Never near the SOS button. */
+/* SHOMER count - TOP-LEFT, directly above the map legend. Never near the SOS button. */
 
 .map-count b{color:var(--g3)}
 .map-count .mc-dot{width:7px;height:7px;border-radius:50%;background:#3DDC97;flex:0 0 auto}
@@ -12521,7 +12523,7 @@ body.aed-placing #map{cursor:crosshair}
 .leg-stats-btn{width:100%;margin-top:5px;padding:5px;border-radius:8px;border:1px solid var(--b2);background:rgba(255,255,255,.04);color:var(--tx2);font-family:inherit;font-size:10px;font-weight:800;cursor:pointer}
 #leg-stats-sec.dim{opacity:.5}
 
-/* responding guardians - pulsing, impossible to miss */
+/* responding SHOMERs - pulsing, impossible to miss */
 .resp-ic{background:none;border:0}
 .resp-pulse{position:relative;width:34px;height:34px;display:flex;align-items:center;justify-content:center}
 .resp-ring{position:absolute;inset:0;border-radius:50%;background:rgba(61,220,151,.35);animation:respPulse 1.25s ease-out infinite}
@@ -12540,7 +12542,7 @@ body.aed-placing #map{cursor:crosshair}
 .help-s{font-size:11.5px;color:rgba(255,255,255,.85);margin-top:2px}
 @keyframes helpIn{from{transform:translateY(-14px);opacity:0}to{transform:translateY(0);opacity:1}}
 
-/* incoming SOS - a guardian must not be able to miss this */
+/* incoming SOS - a SHOMER must not be able to miss this */
 .in-sos{position:fixed;left:12px;right:12px;top:calc(var(--hdr-top,0px) + var(--hdr) + 10px);z-index:100003;background:linear-gradient(135deg,#CC1426,#8E0C19);border:1.5px solid rgba(255,120,130,.7);border-radius:18px;padding:16px;box-shadow:0 16px 48px rgba(204,20,38,.5);max-width:520px;margin-inline:auto;animation:sosIn .3s ease-out, sosFlash 1.1s ease-in-out infinite}
 .in-sos.acked{animation:sosIn .3s ease-out;background:linear-gradient(135deg,#0E8F6E,#0B7355);border-color:rgba(61,220,151,.6)}
 .in-sos-h{font-size:11px;font-weight:900;letter-spacing:.12em;color:#FFD9DD}
@@ -12684,7 +12686,7 @@ html[dir="rtl"] .sh-back svg{transform:scaleX(-1)}
 
 .eye{width:16px;height:16px;display:block}
 
-/* add-guardian form - wireframe layout */
+/* add-SHOMER form - wireframe layout */
 .agf{background:var(--n2);border:1px solid var(--b2);border-radius:16px;padding:14px}
 .agf-row3{display:grid;grid-template-columns:1fr 88px 96px;gap:7px;margin-bottom:10px}
 .agf-in{width:100%;padding:12px;border-radius:11px;border:1px solid var(--b2);background:var(--n3);color:var(--tx0);font-family:inherit;font-size:14px;min-width:0}
@@ -12735,7 +12737,7 @@ html[dir="rtl"] .sh-back svg{transform:scaleX(-1)}
 
 
 
-/* guardian count banner - centred in every language */
+/* SHOMER count banner - centred in every language */
 
 
 /* ══ MAP INDEX ══
@@ -12777,7 +12779,7 @@ html[dir="rtl"] .sh-back svg{transform:scaleX(-1)}
 .ibtn svg{width:17px;height:17px}
 .ibtn.on{background:rgba(224,168,40,.14);border-color:rgba(224,168,40,.5);color:var(--g3)}
 .ibtn.danger{color:#E5484D;border-color:rgba(229,72,77,.35)}
-/* the add-guardian button inherits the system */
+/* the add-SHOMER button inherits the system */
 .agf-add{width:100%;padding:14px;border-radius:999px;border:0;
   background:linear-gradient(135deg,#C09020 0%,#E0A828 60%,#F5C840 100%);color:#23170a;
   font-family:inherit;font-weight:900;font-size:15px;cursor:pointer}
@@ -12994,7 +12996,7 @@ html[dir="rtl"] .sh-back svg{transform:scaleX(-1)}
 .mk-me-founder{display:flex;align-items:center;justify-content:center;width:46px;height:46px;filter:drop-shadow(0 0 8px rgba(224,168,40,.5)) drop-shadow(0 2px 5px rgba(0,0,0,.6));animation:fcFloat 3.5s ease-in-out infinite}
 .mk-me-founder .fc-emb{width:40px!important;height:40px!important}
 
-/* merged guardian phone row - number + single country/dial select */
+/* merged SHOMER phone row - number + single country/dial select */
 .agf-row2{display:grid;grid-template-columns:1fr 150px;gap:8px;margin-bottom:12px}
 .agf-row2 .agf-in{width:100%;padding:13px 12px;border-radius:12px;border:1px solid var(--b2);background:var(--n3);color:var(--tx0);font-family:inherit;font-size:15px;text-align:start}
 .agf-row2 .agf-sel{width:100%;padding:13px 10px;border-radius:12px;border:1px solid var(--b2);background:var(--n3);color:var(--tx0);font-family:inherit;font-size:13px}
