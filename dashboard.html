@@ -676,9 +676,11 @@ async function drawTerritory(c){
     var world=[[85,-180],[85,180],[-85,180],[-85,-180]];
     L.polygon([world].concat(rings),{stroke:false,fillColor:'#060f1c',fillOpacity:.62,interactive:false}).addTo(cityLayer); // dim outside the jurisdiction
     var bnd=L.geoJSON(geo,{style:{color:'#ffffff',weight:1.3,dashArray:'3 6',fill:true,fillColor:'#ffffff',fillOpacity:.02}}).addTo(cityLayer);
+    try{ MAP.invalidateSize(false); }catch(_s){}
     try{ MAP.fitBounds(bnd.getBounds(),{padding:[24,24]}); }catch(e){ MAP.setView([c.lat,c.lng],12); }
   } else {
     L.circle([c.lat,c.lng],{radius:4500,color:'#ffffff',weight:1.3,dashArray:'3 6',fillColor:'#ffffff',fillOpacity:.02}).addTo(cityLayer);
+    try{ MAP.invalidateSize(false); }catch(_s){}
     MAP.setView([c.lat,c.lng],12,{animate:true});
   }
 }
@@ -714,9 +716,10 @@ function _liveMeta(e){
  var cc=CAT_META[e.t||e.type]; var ic=cc?_liveSvg(cc.i):_liveSvg(_LIVE_IC.missing); return {i:ic,t:(e.nm||catShort(e.t||e.type)||'דיווח'),c:(cc?cc.c:'#f2b705')};
 }
 function flyToLive(lat,lng,id){ try{ if(!MAP)return;
+  try{ MAP.invalidateSize(false); }catch(_s){}
   /* open on a ~0.3 km radius view (600 m box) centred exactly on the event */
   var b=L.latLng(+lat,+lng).toBounds(600);
-  try{ MAP.flyToBounds(b,{duration:.7,maxZoom:17,padding:[18,18]}); }catch(_e){ MAP.flyTo([+lat,+lng],17,{duration:.7}); }
+  try{ MAP.fitBounds(b,{maxZoom:18,padding:[16,16],animate:true,duration:.6}); }catch(_e){ try{MAP.setView([+lat,+lng],17,{animate:true});}catch(_e2){} }
   var mk=liveLayer&&liveLayer._byId&&liveLayer._byId[id]; if(mk){ setTimeout(function(){ try{mk.openPopup();}catch(e){} },850); }
   var it=document.querySelector('.feed .item[data-id="'+id+'"]'); if(it){ it.classList.remove('flash'); void it.offsetWidth; it.classList.add('flash'); }
  }catch(e){} }
@@ -1113,7 +1116,7 @@ function renderTrendInline(elId){
  if(!window._trOn){window._trOn={'רכוש':1,'אלימות':1,'סדר ציבורי':1,'מוסר':0,'מרמה':0,'כלכלי':0};}
  var R=window._trRange, on=window._trOn;
  var mon=MON.slice(MON.length-R), act=SER.filter(function(s){return on[s.k];});
- var W=640,H=164,padL=30,padR=14,padT=10,padB=22, iw=W-padL-padR, ih=H-padT-padB;
+ var W=640,H=92,padL=28,padR=12,padT=8,padB=17, iw=W-padL-padR, ih=H-padT-padB;
  var maxV=1; act.forEach(function(s){s.v.slice(s.v.length-R).forEach(function(x){if(x>maxV)maxV=x;});});
  maxV=Math.ceil(maxV/5)*5;
  var n=mon.length, step=n>1?iw/(n-1):iw;
