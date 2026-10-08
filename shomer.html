@@ -446,7 +446,7 @@ input[type=range]:focus::-webkit-slider-thumb{box-shadow:0 0 0 4px rgba(224,168,
 .resp-mk .resp-dot{position:relative;width:26px;height:26px;border-radius:50%;background:rgba(14,136,64,.95);display:flex;align-items:center;justify-content:center;box-shadow:0 3px 10px rgba(14,136,64,.5);}
 .resp-mk .resp-ring{position:absolute;inset:-5px;border-radius:50%;border:2px solid rgba(14,136,64,.6);animation:sosIncDot 1.4s ease-out infinite;}
 /* Live connection-status pill (top-center) - shows connected · N nearby · listening ✓ */
-.fb-status{position:fixed;top:calc(var(--hdr-top,0px) + var(--hdr) + 8px);inset-inline-start:12px;z-index:402;display:flex;align-items:center;gap:5px;padding:5px 10px;border-radius:999px;background:rgba(8,18,36,.92);backdrop-filter:blur(12px);border:1px solid var(--b3);box-shadow:var(--e3);font-size:10px;font-weight:600;color:var(--tx1);max-width:150px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;cursor:pointer;transition:opacity .3s;}
+.fb-status{position:fixed;top:calc(var(--hdr-top,0px) + var(--hdr) + 8px);left:50%;transform:translateX(-50%);z-index:402;display:flex;align-items:center;gap:5px;padding:5px 10px;border-radius:999px;background:rgba(8,18,36,.92);backdrop-filter:blur(12px);border:1px solid var(--b3);box-shadow:var(--e3);font-size:10px;font-weight:600;color:var(--tx1);max-width:150px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;cursor:pointer;transition:opacity .3s;}
 .fb-dot{width:8px;height:8px;border-radius:50%;background:var(--amb);flex-shrink:0;}
 .fb-status.connected{color:var(--tx0);}
 .fb-status.connected .fb-dot{background:var(--grn);animation:fbpulse 2s ease-out infinite;}
@@ -2125,7 +2125,7 @@ body.otp-active .ob-steps{display:none!important;}
  <div class="set-grp"><div class="set-row" onclick="findShomerContacts()" role="button" tabindex="0"><div class="sr-l"><div class="sr-ic"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7" fill="none" stroke="currentColor" stroke-width="2"/><path d="M20 20l-3.2-3.2" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></div><div><div class="sr-nm" data-he="מצא אנשי קשר ב-SHOMER" data-en="Find contacts on SHOMER" data-ar="ابحث عن جهات في SHOMER">מצא אנשי קשר ב-SHOMER</div><div class="sr-sb" data-he="בודק מי מאנשי הקשר שלך כבר משתמש/ת ב-SHOMER — המספרים נבדקים מוצפנים ולא נחשפים." data-en="Checks which of your contacts already use SHOMER — numbers are hashed, never exposed." data-ar="يتحقق من جهاتك التي تستخدم SHOMER — تُشفَّر الأرقام ولا تُكشف.">בודק מי מאנשי הקשר שלך כבר משתמש/ת ב-SHOMER — מוצפן, לא נחשף.</div></div></div><span style="color:var(--tx3);font-size:18px">›</span></div></div><div class="set-grp" id="contacts-grp"><!-- rendered live from your paired SHOMERs (renderSetContacts) --></div>
  <button class="add-c mb20" onclick="cl('sh-set');openCircles()" data-he="+ חבר/י שומר/ת" data-en="+ Connect a SHOMER">+ חבר/י שומר/ת</button>
  <div class="set-cat"><div class="set-cat-ic"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="2"/><path d="M3 12h18" stroke="currentColor" stroke-width="2"/><path d="M12 3a15 15 0 0 1 0 18M12 3a15 15 0 0 0 0 18" fill="none" stroke="currentColor" stroke-width="2"/></svg></div><div class="set-cat-t" id="set-lang-lbl" data-he="שפה" data-en="Language">שפה</div></div>
- <div class="set-grp" style="padding:10px 14px;">
+ <div class="set-grp" style="padding:10px 0;border:0;background:none;">
  <div style="display:flex;direction:ltr;gap:6px;flex-wrap:wrap;" id="set-lang-btns">
  <button class="olb" onclick="setLang('en')" lang="en">🇬🇧 EN</button>
  <button class="olb" onclick="setLang('ar')" lang="ar">🇦🇪 عر</button>
@@ -2363,9 +2363,9 @@ body.otp-active .ob-steps{display:none!important;}
 
     <div class="agf">
      <!-- number · dial code · country -->
-     <div class="agf-row2">
-       <input class="agf-in" id="ag-phone" type="tel" inputmode="tel" dir="ltr" autocomplete="tel" placeholder="הקלד מספר" aria-label="מספר נייד" oninput="agPhoneHint()" onkeydown="if(event.key==='Enter')addGuardian()">
-       <select class="agf-sel" id="ag-country" aria-label="מדינה וקידומת" onchange="agCountryPick()"></select>
+     <div class="agf-row2" dir="ltr">
+       <select class="agf-sel" id="ag-country" aria-label="Country code" onchange="agCountryPick()"></select>
+       <input class="agf-in" id="ag-phone" type="tel" inputmode="tel" dir="ltr" autocomplete="tel" placeholder="50 123 4567" aria-label="Mobile number" oninput="agPhoneHint()" onkeydown="if(event.key==='Enter')addGuardian()">
        <input type="hidden" id="ag-cc">
       </div>
 
@@ -3740,6 +3740,7 @@ function applyTranslations(){
  try{ if(typeof guideApplyLang==='function'){ guideApplyLang(); guideFilter(); } }catch(e){}
  try{ legalApplyI18n(); }catch(e){}
  renderReportsList();renderSosHistory();
+ try{ var _he=currentLang==='he',_ar=currentLang==='ar'; document.querySelectorAll('#arr-ttl').forEach(function(e){ e.textContent=_he?'התראות מיקום השומרים שלי':_ar?'تنبيهات موقع حُرّاسي':'My SHOMERs location alerts'; }); }catch(e){}
  // A language pick must flip the WHOLE app — re-render every dynamic view so none keeps the old language.
  try{ if(typeof renderProfile==='function') renderProfile(); }catch(e){}
  try{ if(typeof renderProfile2==='function') renderProfile2(); }catch(e){}
@@ -6546,13 +6547,16 @@ function seedCirclesIfEmpty(){
   if(!SS.circles||!SS.circles.length){
     const he=currentLang==='he',ar=currentLang==='ar';
     SS.circles=[
-      {id:'fam',name:he?'משפחה':ar?'عائلة':'Family',type:'family',named:true},
-      {id:'frnd',name:he?'חברים':ar?'أصدقاء':'Friends',type:'friends',named:true},
-      {id:'nbr',name:he?'שכנים':ar?'الجيران':'Neighbors',type:'neighbors',named:true},
+      {id:'fam',seedKey:'family',type:'family',named:true},
+      {id:'frnd',seedKey:'friends',type:'friends',named:true},
+      {id:'nbr',seedKey:'neighbors',type:'neighbors',named:true},
     ];
   }
+  // migrate older stored seeds (hard-coded Hebrew names) so default circles localize too
+  try{ (SS.circles||[]).forEach(function(c){ if(!c.seedKey && !c._renamed){ if(c.id==='fam'||/^(משפחה|Family|عائلة)$/.test(c.name||''))c.seedKey='family'; else if(c.id==='frnd'||/^(חברים|Friends|أصدقاء)$/.test(c.name||''))c.seedKey='friends'; else if(c.id==='nbr'||/^(שכנים|Neighbors|الجيران)$/.test(c.name||''))c.seedKey='neighbors'; } }); }catch(e){}
   if(!SS.circleMembers)SS.circleMembers=[];
 }
+function _circName(cc){ if(cc && cc.seedKey && !cc._renamed){ var he=currentLang==='he',ar=currentLang==='ar'; var M={family:he?'משפחה':ar?'عائلة':'Family',friends:he?'חברים':ar?'أصدقاء':'Friends',neighbors:he?'שכנים':ar?'الجيران':'Neighbors'}; return M[cc.seedKey]||cc.name; } return cc?cc.name:''; }
 function circlesList(){return SS.circles||[];}
 function membersOf(cid){return (SS.circleMembers||[]).filter(m=>m.cid===cid);}
 function memberById(id){return (SS.circleMembers||[]).find(m=>m.id===id);}
@@ -6745,7 +6749,7 @@ function renderCircles(){
       } else {
         b.style.background=''; b.style.color='';
       }
-      b.innerHTML = '<b>'+ms.length+'</b><span>'+ESC(cc.name||(he?'מעגל':'Circle'))+'</span>';
+      b.innerHTML = '<b>'+ms.length+'</b><span>'+ESC(_circName(cc)||(he?'מעגל':'Circle'))+'</span>';
       b.onclick=function(){
         activeCircleId=cc.id;
         COT_OPEN=(COT_OPEN===cc.id)?null:cc.id;
@@ -7399,7 +7403,7 @@ function renameCircle(id){
  if(nm===null)return;
  nm=(''+nm).trim().substring(0,20);
  if(!nm){ toast(he?'שם ריק':'Empty name','amb'); return; }
- cc.name=nm; cc.named=true; saveStore(); renderCircles();
+ cc.name=nm; cc.named=true; cc._renamed=true; saveStore(); renderCircles();
  toast(he?('✓ שם המעגל עודכן'):'✓ Circle renamed','grn');
 }
 function addCircle(){
@@ -8884,7 +8888,7 @@ try{ hydrateIcons(document); }catch(e){}
 /* Loaded-build version - shown in the diagnostic panel so a phone can prove
    whether it's on the latest build or a STALE cached one. Keep in lock-step
    with sw.js SW_VERSION on every deploy. */
-var APP_VER='v223';
+var APP_VER='v224';
 var FB={ready:false,uid:null,db:null,_presTimer:null,connected:false,listening:false,pushState:'default',near:0,swVer:'?',
   authState:'connecting',sdkLoaded:false,persist:'',permErr:null,err:null,wsProbe:'',csp:''};
 /* Always log connection diagnostics to the console so the real failure can be SEEN in Chrome. */
@@ -12846,7 +12850,7 @@ html[dir="rtl"] .sh-back svg{transform:scaleX(-1)}
 /* ══ MAP INDEX - compact, no scroll, brand-separated ══
    CLOSED: a small centred pill. OPEN: a low panel that fits WITHOUT scrolling; the extra
    info sits on its own darker brand surface so it's visually distinct from the header. */
-.map-legend{position:absolute;top:calc(var(--hdr-top,0px) + var(--hdr) + 8px);
+.map-legend{position:absolute;top:calc(var(--hdr-top,0px) + var(--hdr) + 46px);
   left:50%;transform:translateX(-50%);z-index:600;
   background:rgba(10,22,40,.95);border:1px solid rgba(201,168,76,.3);border-radius:11px;
   backdrop-filter:blur(10px);box-shadow:0 8px 22px rgba(0,0,0,.5);overflow:hidden;
@@ -13002,10 +13006,10 @@ html[dir="rtl"] .sh-back svg{transform:scaleX(-1)}
 .mk-me-founder .fc-emb{width:40px!important;height:40px!important}
 
 /* merged SHOMER phone row - number + single country/dial select */
-.agf-row2{display:grid;grid-template-columns:1fr 150px;gap:8px;margin-bottom:12px}
+.agf-row2{display:grid;grid-template-columns:132px 1fr;gap:8px;margin-bottom:12px}
 .agf-row2 .agf-in{width:100%;padding:13px 12px;border-radius:12px;border:1px solid var(--b2);background:var(--n3);color:var(--tx0);font-family:inherit;font-size:15px;text-align:start}
 .agf-row2 .agf-sel{width:100%;padding:13px 10px;border-radius:12px;border:1px solid var(--b2);background:var(--n3);color:var(--tx0);font-family:inherit;font-size:13px}
-@media(max-width:360px){ .agf-row2{grid-template-columns:1fr 128px} }
+@media(max-width:360px){ .agf-row2{grid-template-columns:112px 1fr} }
 
 .past-div{background:transparent!important;border:0!important}
 .past-fab{position:absolute;bottom:calc(var(--nav) + 126px);left:12px;z-index:401;width:48px;height:48px;border-radius:50%;border:1px solid rgba(140,155,189,.18);background:rgba(8,18,36,.92);backdrop-filter:blur(12px);color:var(--tx2,#8898B8);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;box-shadow:0 4px 12px rgba(0,0,0,.4);cursor:pointer;transition:background .2s,color .2s,box-shadow .2s}

@@ -321,7 +321,9 @@
 .live-strip .ls-addr{font-size:14px;font-weight:700;color:#fff;margin-top:5px}
 .live-strip .ls-resp{font-size:12.5px;color:#ffe0e4;margin-top:4px}
 .live-strip .ls-resp b{color:#fff}
-.live-strip .ls-beacon{flex:0 0 auto;width:46px;height:46px;position:relative}
+.live-strip .ls-beacon{flex:0 0 auto;display:flex;align-items:center}
+.live-strip .ls-live{display:inline-flex;align-items:center;gap:5px;background:rgba(10,16,30,.55);color:#fff;font-weight:900;font-size:12px;letter-spacing:.08em;padding:7px 12px;border-radius:999px;border:1px solid rgba(255,255,255,.5);white-space:nowrap}
+.live-strip.attended .ls-live{opacity:.6}
 .live-strip .ls-dot{position:absolute;inset:0;margin:auto;width:20px;height:20px;border-radius:50%;background:#fff;box-shadow:0 0 0 0 rgba(255,255,255,.85);animation:lsdot 1s ease-out infinite}
 @keyframes lsdot{0%{box-shadow:0 0 0 0 rgba(255,255,255,.85)}70%{box-shadow:0 0 0 18px rgba(255,255,255,0)}100%{box-shadow:0 0 0 0 rgba(255,255,255,0)}}
 </style>
@@ -729,6 +731,7 @@ function _playAlertTone(){
  }catch(e){}
 }
 function openResponse(id){
+ try{ var _st=document.getElementById('live-strip'); if(_st){ _st.style.animation='none'; _st.style.background='linear-gradient(90deg,rgba(60,72,96,.6),rgba(36,46,66,.6))'; _st.style.boxShadow='0 6px 20px rgba(0,0,0,.4),0 0 0 1px rgba(255,255,255,.12) inset'; _st.classList.add('attended'); } }catch(e){}
  try{
   var o=_liveEvents[id]; if(!o){ return; } var e=o.e, m=o.m; _respSel={}; _respRadius=1.5;
   var lat=+e.lat, lng=+e.lng;
@@ -863,7 +866,7 @@ function renderLive(c,list,opts){
          +'<div class="ls-addr">\u05e8\u05d7\u05d5\u05d1: <span id="ls-addr-txt">\u05de\u05d0\u05ea\u05e8 \u05db\u05ea\u05d5\u05d1\u05ea\u2026</span></div>'
          +'<div class="ls-resp">\u05e9\u05d5\u05de\u05e8\u05d9\u05dd \u05d6\u05de\u05d9\u05e0\u05d9\u05dd: <b>'+g+'</b> \u00b7 \u05de\u05ea\u05e0\u05d3\u05d1\u05d9\u05dd \u05d6\u05de\u05d9\u05e0\u05d9\u05dd \u2014 \u05e9\u05d5\u05d8\u05e8\u05d9\u05dd: <b>'+pol+'</b> \u00b7 \u05db\u05d1\u05d0\u05d9\u05dd: <b>'+fire+'</b> \u00b7 \u05e4\u05e8\u05de\u05d3\u05d9\u05e7/\u05e8\u05d5\u05e4\u05d0: <b>'+med+'</b>'+(demo?' \u00b7 <span style="color:#ffd0d4">\u05e0\u05ea\u05d5\u05e0\u05d9 \u05d4\u05d3\u05d2\u05de\u05d4</span>':'')+'</div>'
          +'</div>'
-         +'<div class="ls-beacon"><span class="ls-dot"></span></div>';
+         +'<div class="ls-beacon"><span class="ls-live">● LIVE</span></div>';
        try{ stripGeocode(+e0.lat,+e0.lng); }catch(e){}
        strip.onclick=function(){ try{ openResponse(id0); }catch(e){} };
      } else { strip.style.display='none'; strip.innerHTML=''; }
