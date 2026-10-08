@@ -18,6 +18,10 @@
       "launchShowDuration": 800,
       "backgroundColor": "#0A1628",
       "showSpinner": false
+    },
+    "LocalNotifications": {
+      "smallIcon": "ic_stat_shomer",
+      "iconColor": "#E0A828"
     }
   }
 }
