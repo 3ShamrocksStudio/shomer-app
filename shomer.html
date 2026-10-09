@@ -8960,7 +8960,7 @@ try{ hydrateIcons(document); }catch(e){}
 /* Loaded-build version - shown in the diagnostic panel so a phone can prove
    whether it's on the latest build or a STALE cached one. Keep in lock-step
    with sw.js SW_VERSION on every deploy. */
-var APP_VER='v240';
+var APP_VER='v241';
 var FB={ready:false,uid:null,db:null,_presTimer:null,connected:false,listening:false,pushState:'default',near:0,swVer:'?',
   authState:'connecting',sdkLoaded:false,persist:'',permErr:null,err:null,wsProbe:'',csp:''};
 /* Always log connection diagnostics to the console so the real failure can be SEEN in Chrome. */
@@ -11634,7 +11634,7 @@ function updCheck(manual){
     if(!navigator.onLine){ if(manual){ try{ toast(currentLang==='he'?'אין חיבור לרשת':'No internet connection','amb'); }catch(e){} } return; }
     try{ if('serviceWorker' in navigator) navigator.serviceWorker.getRegistration().then(function(r){ if(r)r.update(); }).catch(function(){}); }catch(e){}
     if(!manual && /[?&]u=\d+/.test(location.search) && !window._updRecheck){ window._updRecheck=1; }
-    fetch('https://shomer-app.co.il/version.json?cb='+(new Date().getTime()),{cache:'no-store'})
+    fetch('https://www.shomer-app.co.il/version.json?cb='+(new Date().getTime()),{cache:'no-store'})
       .then(function(r){ return r.ok?r.json():null; })
       .then(function(d){
         if(!d||!d.v||typeof APP_VER==='undefined') return;
