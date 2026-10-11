@@ -8971,7 +8971,7 @@ try{ hydrateIcons(document); }catch(e){}
 /* Loaded-build version - shown in the diagnostic panel so a phone can prove
    whether it's on the latest build or a STALE cached one. Keep in lock-step
    with sw.js SW_VERSION on every deploy. */
-var APP_VER='v242';
+var APP_VER='v243';
 var FB={ready:false,uid:null,db:null,_presTimer:null,connected:false,listening:false,pushState:'default',near:0,swVer:'?',
   authState:'connecting',sdkLoaded:false,persist:'',permErr:null,err:null,wsProbe:'',csp:''};
 /* Always log connection diagnostics to the console so the real failure can be SEEN in Chrome. */
@@ -9583,7 +9583,7 @@ function fbPublishPresence(){
      anonymous uid, no name/phone. Written to the public /dashfeed path (same place as events),
      so the dashboard can count online users network-wide and per-territory WITHOUT ever reading
      the locked /presence tree. One row per user, overwritten each beat. */
-  try{ if(userLat!=null&&userLng!=null){ fbRestWrite('PUT','dashfeed/hb_'+FB.uid,{type:'presence',lat:lat,lng:lng,ts:Date.now(),status:'online',by:FB.uid}); } }catch(e){}
+  try{ if(userLat!=null&&userLng!=null){ var _hb={type:'presence',lat:lat,lng:lng,ts:Date.now(),status:'online',by:FB.uid}; try{ if(isFounder())_hb.founder=true; }catch(_f){} fbRestWrite('PUT','dashfeed/hb_'+FB.uid,_hb); } }catch(e){}
 }
 function updateGuardiansNearby(n){
   var el=document.getElementById('gnear-n'); if(el)el.textContent=n;

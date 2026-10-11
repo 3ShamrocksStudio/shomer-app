@@ -127,6 +127,10 @@
      live in the default tile pane (filtered navy); the labels layer sits in shadowPane
      (above, unfiltered) so street names stay crisp — exactly how the app map is built. */
   .leaflet-tile-pane{filter:brightness(.85) sepia(.75) hue-rotate(192deg) saturate(2) brightness(.4) contrast(.9);}
+  .founder-div{background:none;border:0}
+  .founder-beacon{position:relative;width:34px;height:34px;filter:drop-shadow(0 0 6px rgba(224,168,40,.8))}
+  .founder-beacon::before{content:'';position:absolute;inset:0;border-radius:50%;box-shadow:0 0 0 0 rgba(224,168,40,.6);animation:fbpulse 1.8s ease-out infinite}
+  @keyframes fbpulse{0%{box-shadow:0 0 0 0 rgba(224,168,40,.55)}70%{box-shadow:0 0 0 16px rgba(224,168,40,0)}100%{box-shadow:0 0 0 0 rgba(224,168,40,0)}}
   .maptools{display:flex;gap:7px}
   .mini{background:var(--dark2);border:1px solid var(--db);color:var(--tx2);border-radius:8px;padding:5px 10px;font-size:11px;cursor:pointer;font-family:inherit}
   .mini.on{background:var(--gold);color:#231806;border-color:var(--gold);font-weight:700}
@@ -1088,7 +1092,8 @@ function loadLive(c){
   var initial=!_liveInitDone;
   fetch(DB+'/dashfeed.json').then(function(r){return r.ok?r.json():null;}).catch(function(){return null;}).then(function(obj){
     var now=Date.now(), DAY=864e5, ONLINE=18e4; /* 3 min = "online" */
-    var evList=[], presTerr=[], active24={}, onlineUsers={}, onlineTerrUsers={}, active24Terr={}, reps={};
+    var evList=[], presTerr=[], presAll=[], active24={}, onlineUsers={}, onlineTerrUsers={}, active24Terr={}, reps={};
+    var RECENT_PRES=36e5; /* show a presence pin if the user pinged within the last hour */
     if(obj){ Object.keys(obj).forEach(function(id){
       var e=obj[id]; if(!e||e.lat==null||e.lng==null)return;
       var recent=(now-(e.ts||0))<=DAY;
@@ -1096,8 +1101,11 @@ function loadLive(c){
       if(recent&&e.by){ active24[e.by]=1; if(inTerr) active24Terr[e.by]=1; }
       if(e.type==='presence'){
         var fresh=(now-(e.ts||0))<=ONLINE;
-        if(fresh&&e.by){ onlineUsers[e.by]=1; if(inTerr){ onlineTerrUsers[e.by]=1; e.id=id; presTerr.push(e); } }
-        return; /* presence heartbeat is NOT an event */
+        if(fresh&&e.by){ onlineUsers[e.by]=1; if(inTerr) onlineTerrUsers[e.by]=1; }
+        /* every SHOMER user seen in the last hour gets a map pin — network-wide for the admin
+           (live) view, territory-only for a paying customer. Founder keeps a distinct crest. */
+        if((now-(e.ts||0))<=RECENT_PRES){ e.id=id; e._online=fresh; presAll.push(e); if(inTerr) presTerr.push(e); }
+        return;
       }
       if(e.status==='resolved')return; if(!recent)return;
       if(inTerr){ e.id=id; evList.push(e); if(e.by)reps[e.by]=1; }
@@ -1110,7 +1118,7 @@ function loadLive(c){
       activeEvents:evList.length, reportersTerr:Object.keys(reps).length };
     window._liveNet=evList.length; window._liveReporters=window._liveStats.reportersTerr;
     try{ updateLiveBanner(); }catch(e){}
-    try{ renderPresenceLayer(presTerr); }catch(e){}
+    try{ renderPresenceLayer((CLIENT&&CLIENT.live)?presAll:presTerr, !!(CLIENT&&CLIENT.live)); }catch(e){}
     renderLive(c,evList,{demo:false,initial:initial}); _liveInitDone=true;
   });
   if(!_liveTimer){ _liveTimer=setInterval(function(){ if(_curCityObj && !(CLIENT&&CLIENT.demo)){ loadLive(_curCityObj); } }, 12000); }
@@ -1302,10 +1310,20 @@ var KICO={
  warn:'<svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3 2 20h20L12 3Z"/><path d="M12 9v5M12 17h0"/></svg>'
 };
 var presLayer=null;
-function renderPresenceLayer(list){
+function _founderStar(){ return L.divIcon({className:'founder-div',html:'<div class="founder-beacon"><svg viewBox="0 0 48 48" width="34" height="34"><defs><radialGradient id="fga" cx="50%" cy="50%" r="50%"><stop offset="0" stop-color="#F7D66A" stop-opacity=".6"/><stop offset="70%" stop-color="#E0A828" stop-opacity="0"/></radialGradient><linearGradient id="fgs" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#FDEBA6"/><stop offset=".5" stop-color="#E7B434"/><stop offset="1" stop-color="#B8801C"/></linearGradient></defs><circle cx="24" cy="24" r="23" fill="url(#fga)"/><path d="M24 7 32 21 16 21Z M24 41 16 27 32 27Z" fill="none" stroke="url(#fgs)" stroke-width="3" stroke-linejoin="round"/></svg></div>',iconSize:[34,34],iconAnchor:[17,17]}); }
+function renderPresenceLayer(list, fit){
   try{ if(!MAP)return; if(presLayer){MAP.removeLayer(presLayer);presLayer=null;} if(!list||!list.length)return;
-    presLayer=L.layerGroup().addTo(MAP);
-    list.forEach(function(p){ L.circleMarker([p.lat,p.lng],{radius:5,color:'#0f7a4a',weight:1.6,fillColor:'#2ecc71',fillOpacity:.85}).addTo(presLayer); });
+    presLayer=L.layerGroup().addTo(MAP); var pts=[];
+    list.forEach(function(p){ pts.push([p.lat,p.lng]);
+      if(p.founder){
+        L.marker([p.lat,p.lng],{icon:_founderStar(),zIndexOffset:900,title:'SH✡MER · מייסד/מנהל'}).addTo(presLayer);
+      } else {
+        L.circleMarker([p.lat,p.lng],{radius:p._online?5.5:4,color:'#0f7a4a',weight:1.6,fillColor:p._online?'#2ecc71':'#7fcf9e',fillOpacity:p._online?.9:.55}).addTo(presLayer);
+      }
+    });
+    /* admin/live view: frame all SHOMER users across the network so the founder (and anyone
+       outside the selected territory) is always visible, not just the Tel-Aviv cluster. */
+    if(fit && pts.length){ try{ if(pts.length===1){ MAP.setView(pts[0],13,{animate:true}); } else { MAP.fitBounds(L.latLngBounds(pts).pad(0.25),{maxZoom:13,animate:true}); } _sosFocusLock=true; }catch(e){} }
   }catch(e){}
 }
 function updateLiveBanner(){ try{ buildKPIs(DATA._idx!=null?DATA._idx:0); }catch(e){} }
