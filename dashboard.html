@@ -58,6 +58,8 @@
   .kpi[onclick]:hover .kv{transform:translateY(-1px)}
   .kpi:first-child{border-inline-start:0}
   .kpi .kl{font-size:10.5px;color:var(--tx3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:3px;display:flex;align-items:center;gap:5px}
+  .kpi .ki{display:inline-flex;align-items:center;justify-content:center;width:17px;height:17px;color:var(--gold);opacity:.85;flex:0 0 auto}
+  .kpi .kv.net-v+.km,.kpi .ki{vertical-align:middle}
   .kpi .kv{font-size:36px;font-weight:900;line-height:1;transition:transform .15s}
   .kpi .km{font-size:11px;color:var(--tx2);margin-top:3px}
   .kpi .kv.gold{color:var(--gold)}.kpi .kv.bad{color:var(--bad)}.kpi .kv.ok{color:var(--ok)}
@@ -1080,12 +1082,29 @@ function loadLive(c){
   var DB='https://shomergency-default-rtdb.firebaseio.com';
   var initial=!_liveInitDone;
   fetch(DB+'/dashfeed.json').then(function(r){return r.ok?r.json():null;}).catch(function(){return null;}).then(function(obj){
-    var now=Date.now(), DAY=864e5, list=[], reps={};
-    if(obj){ Object.keys(obj).forEach(function(id){ var e=obj[id]; if(!e||e.lat==null||e.lng==null)return; if(e.status==='resolved')return; if((now-(e.ts||0))>DAY)return; if(haversine(c.lat,c.lng,e.lat,e.lng)<=18){ e.id=id; list.push(e); if(e.by)reps[e.by]=1; } }); }
-    // real network metrics from the sanitized feed — never fabricated
-    window._liveNet=list.length; window._liveReporters=Object.keys(reps).length;
-    try{ document.querySelectorAll('#kpis .kpi').forEach(function(kp){ var kl=kp.querySelector('.kl'); if(kl&&/רשת שומרים/.test(kl.textContent)){ var kv=kp.querySelector('.kv'),km=kp.querySelector('.km'); if(kv)kv.textContent=window._liveNet; if(km)km.textContent=(window._liveNet>0?('דיווחים חיים · 24 שעות · '+window._liveReporters+' מדווחים'):'🟢 מחובר · ממתין לדיווחים מהרשת'); } }); }catch(e){}
-    renderLive(c,list,{demo:false,initial:initial}); _liveInitDone=true;
+    var now=Date.now(), DAY=864e5, ONLINE=18e4; /* 3 min = "online" */
+    var evList=[], presTerr=[], allUsers={}, onlineUsers={}, onlineTerrUsers={}, terrUsers={}, reps={};
+    if(obj){ Object.keys(obj).forEach(function(id){
+      var e=obj[id]; if(!e||e.lat==null||e.lng==null)return;
+      if(e.by) allUsers[e.by]=1;
+      var inTerr=haversine(c.lat,c.lng,e.lat,e.lng)<=18;
+      if(inTerr&&e.by) terrUsers[e.by]=1;
+      if(e.type==='presence'){
+        var fresh=(now-(e.ts||0))<=ONLINE;
+        if(fresh&&e.by){ onlineUsers[e.by]=1; if(inTerr){ onlineTerrUsers[e.by]=1; e.id=id; presTerr.push(e); } }
+        return; /* presence heartbeat is NOT an event */
+      }
+      if(e.status==='resolved')return; if((now-(e.ts||0))>DAY)return;
+      if(inTerr){ e.id=id; evList.push(e); if(e.by)reps[e.by]=1; }
+    }); }
+    // 100% real metrics derived from the sanitized feed — never fabricated
+    window._liveStats={ totalUsers:Object.keys(allUsers).length, onlineNow:Object.keys(onlineUsers).length,
+      territoryUsers:Object.keys(terrUsers).length, onlineTerr:Object.keys(onlineTerrUsers).length,
+      activeEvents:evList.length, reportersTerr:Object.keys(reps).length };
+    window._liveNet=evList.length; window._liveReporters=window._liveStats.reportersTerr;
+    try{ updateLiveBanner(); }catch(e){}
+    try{ renderPresenceLayer(presTerr); }catch(e){}
+    renderLive(c,evList,{demo:false,initial:initial}); _liveInitDone=true;
   });
   if(!_liveTimer){ _liveTimer=setInterval(function(){ if(_curCityObj && !(CLIENT&&CLIENT.demo)){ loadLive(_curCityObj); } }, 12000); }
 }
@@ -1266,28 +1285,62 @@ function exportReport(){
   w.document.open(); w.document.write(html); w.document.close();
  }catch(e){ try{console.error(e);window.print();}catch(_){} }
 }
+var KICO={
+ users:'<svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8" r="3.1"/><path d="M3.6 20c0-3 2.4-5 5.4-5s5.4 2 5.4 5"/><path d="M16 5.3a3.1 3.1 0 0 1 0 5.9M18.4 20c0-2.3-1-4-2.5-4.6"/></svg>',
+ online:'<svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12h3l2.5-6 4 13 2.5-7H21"/></svg>',
+ pin:'<svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s7-6 7-11a7 7 0 0 0-14 0c0 5 7 11 7 11Z"/><circle cx="12" cy="10" r="2.6"/></svg>',
+ bolt:'<svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2 4 14h7l-1 8 9-12h-7l1-8Z"/></svg>',
+ shield:'<svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l7 2.6v5c0 4.5-2.9 7.9-7 9.6-4.1-1.7-7-5.1-7-9.6V5.6Z"/></svg>',
+ gap:'<svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="13" width="4" height="7"/><rect x="10" y="8" width="4" height="12"/><rect x="17" y="3" width="4" height="17"/></svg>',
+ warn:'<svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3 2 20h20L12 3Z"/><path d="M12 9v5M12 17h0"/></svg>'
+};
+var presLayer=null;
+function renderPresenceLayer(list){
+  try{ if(!MAP)return; if(presLayer){MAP.removeLayer(presLayer);presLayer=null;} if(!list||!list.length)return;
+    presLayer=L.layerGroup().addTo(MAP);
+    list.forEach(function(p){ L.circleMarker([p.lat,p.lng],{radius:5,color:'#0f7a4a',weight:1.6,fillColor:'#2ecc71',fillOpacity:.85}).addTo(presLayer); });
+  }catch(e){}
+}
+function updateLiveBanner(){ try{ buildKPIs(DATA._idx!=null?DATA._idx:0); }catch(e){} }
 function buildKPIs(idx){
  var cities=DATA._sorted,c=cities[idx],tot=c.total;
  var pc=perCap(c);var pv=cities.map(perCap).filter(function(v){return v!=null;}).sort(function(a,b){return a-b;});var med=pv[Math.floor(pv.length/2)];
  var viol=c.cats['עבירות נגד גוף']||0,violPct=Math.round(viol/tot*100);
- var cov=(CLIENT&&CLIENT.demo)?214:((CLIENT&&CLIENT.live&&window._liveNet!=null)?window._liveNet:'—');
- var covSub=(CLIENT&&CLIENT.live)?((window._liveNet!=null&&window._liveNet>0)?('דיווחים חיים · 24 שעות · '+(window._liveReporters||0)+' מדווחים'):'🟢 מחובר · ממתין לדיווחים מהרשת'):(cov==='—'?'דיווחים חיים · משלים את הפער':'דיווחים חיים · ▸ לחצו לרשת המגיבים');
  var ratio=pc&&med?pc/med:null;
- function k(l,v,m,cls,prov,hl,click){return '<div class="kpi'+(hl?' kpi-hl':'')+'"'+(click?' onclick="'+click+'" style="cursor:pointer" title="לחצו לפירוט רשת המגיבים"':'')+'>'+
-   '<div class="kl">'+l+(prov?'<span class="kprov '+prov.c+'">'+prov.t+'</span>':'')+'</div>'+
+ var S=window._liveStats||{};
+ var live=!!(CLIENT&&CLIENT.live), paying=!!(CLIENT&&!CLIENT.demo&&!CLIENT.live);
+ function k(ic,l,v,m,cls,prov,click){return '<div class="kpi"'+(click?' onclick="'+click+'" style="cursor:pointer"':'')+'>'+
+   '<div class="kl"><span class="ki">'+(ic||'')+'</span>'+l+(prov?'<span class="kprov '+prov.c+'">'+prov.t+'</span>':'')+'</div>'+
    '<div class="kv '+(cls||'')+'">'+v+'</div><div class="km">'+m+'</div></div>';}
- var PUB={c:'pub',t:'ציבורי'},NET={c:'net',t:'רשת'},NAT={c:'nat',t:'ארצי'};
- document.getElementById('kpis').innerHTML=
-  k('סה״כ עבירות 2025',fmt(tot),c.city+' · משטרת ישראל','gold',PUB)+
-  k('פשיעה ל-1,000',pc?pc.toFixed(1):'—',ratio?('×'+ratio.toFixed(1)+' מהחציון הארצי*'):'הערכת למ״ס*',(ratio&&ratio>1.2?'bad':ratio&&ratio<0.9?'ok':''),PUB)+
-  k('עבירות אלימות',violPct+'%',fmt(viol)+' נגד גוף',(violPct>12?'bad':'ok'),PUB)+
-  k('פער הדיווח','~74%','רק 26% מהעבירות מדווח למשטרה · IDI','gap',NAT,true)+
-  k('רשת שומרים',cov,covSub,'net-v',NET,false,'openRoster()')+
-  (function(){var cleaner=cities.length-1-idx,third=cities.length/3,
-     sevCls=idx<third?'bad':idx<third*2?'gold':'ok',
-     mark=idx<third?'▲ ':'',
-     sub=idx===0?'הגבוהה בארץ בעבירות מדווחות — הכי חמור':idx<third?('מהחמורות בארץ · חמורה מ-'+cleaner+' ערים'):('חמורה מ-'+cleaner+' מתוך '+(cities.length-1)+' ערים');
-     return k('דירוג חומרה · ארצי',mark+'#'+(idx+1),sub,sevCls,PUB);})();
+ var PUB={c:'pub',t:'ציבורי'},NET={c:'net',t:'רשת · חי'},NAT={c:'nat',t:'ארצי'};
+ var sevCls=idx<cities.length/3?'bad':idx<cities.length*2/3?'gold':'ok', mark=idx<cities.length/3?'▲ ':'',
+     cleaner=cities.length-1-idx, sevSub=idx===0?'הכי חמור בארץ':idx<cities.length/3?('חמורה מ-'+cleaner+' ערים'):('חמורה מ-'+cleaner+' מ-'+(cities.length-1));
+ var rankCard=k(KICO.warn,'דירוג חומרה',mark+'#'+(idx+1),sevSub,sevCls,NAT);
+ var crimeCard=k(KICO.shield,'סה״כ עבירות 2025',fmt(tot),c.city+' · משטרת ישראל','gold',PUB);
+ var html='';
+ if(live){
+   html+= k(KICO.users,'סה״כ משתמשים', S.totalUsers!=null?fmt(S.totalUsers):'—','ברשת SH✡MER','', NET)
+        + k(KICO.online,'מחוברים כעת', S.onlineNow!=null?String(S.onlineNow):'—','בזמן אמת','ok', NET)
+        + k(KICO.pin,'בטריטוריה', (S.onlineTerr!=null?S.onlineTerr:'—')+' / '+(S.territoryUsers!=null?S.territoryUsers:'—'),'מחוברים / סה״כ','gap', NET)
+        + k(KICO.bolt,'אירועים חיים', S.activeEvents!=null?String(S.activeEvents):'—',(S.activeEvents>0?'24 שעות':'🟢 ממתין לדיווחים'),'net-v', NET)
+        + crimeCard + rankCard;
+ } else if(paying){
+   html+= k(KICO.pin,'משתמשים בטריטוריה', S.territoryUsers!=null?fmt(S.territoryUsers):'—','רשומים באזור','', NET)
+        + k(KICO.online,'פעילים כעת', S.onlineTerr!=null?String(S.onlineTerr):'—','בזמן אמת','ok', NET)
+        + crimeCard
+        + k(KICO.gap,'פשיעה ל-1,000',pc?pc.toFixed(1):'—',ratio?('×'+ratio.toFixed(1)+' מהחציון'):'למ״ס*',(ratio&&ratio>1.2?'bad':ratio&&ratio<0.9?'ok':''),PUB)
+        + k(KICO.warn,'עבירות אלימות',violPct+'%',fmt(viol)+' נגד גוף',(violPct>12?'bad':'ok'),PUB)
+        + rankCard;
+ } else {
+   var cov=(CLIENT&&CLIENT.demo)?214:'—';
+   html+= crimeCard
+        + k(KICO.gap,'פשיעה ל-1,000',pc?pc.toFixed(1):'—',ratio?('×'+ratio.toFixed(1)+' מהחציון׳'):'למ״ס*',(ratio&&ratio>1.2?'bad':ratio&&ratio<0.9?'ok':''),PUB)
+        + k(KICO.warn,'עבירות אלימות',violPct+'%',fmt(viol)+' נגד גוף',(violPct>12?'bad':'ok'),PUB)
+        + k(KICO.online,'פער הדיווח','~74%','רק 26% מדווח · IDI','gap',NAT)
+        + k(KICO.users,'רשת שומרים',cov,(cov==='—'?'דיווחים חיים':'דיווחים חיים · ▸'),'net-v',NET,'openRoster()')
+        + rankCard;
+ }
+ document.getElementById('kpis').innerHTML=html;
  if(!window._kpiAnimated){ window._kpiAnimated=true; try{ animateKPIs(); }catch(e){} }
  try{ renderUserPanel(); }catch(e){}
 }

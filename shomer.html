@@ -8971,7 +8971,7 @@ try{ hydrateIcons(document); }catch(e){}
 /* Loaded-build version - shown in the diagnostic panel so a phone can prove
    whether it's on the latest build or a STALE cached one. Keep in lock-step
    with sw.js SW_VERSION on every deploy. */
-var APP_VER='v241';
+var APP_VER='v242';
 var FB={ready:false,uid:null,db:null,_presTimer:null,connected:false,listening:false,pushState:'default',near:0,swVer:'?',
   authState:'connecting',sdkLoaded:false,persist:'',permErr:null,err:null,wsProbe:'',csp:''};
 /* Always log connection diagnostics to the console so the real failure can be SEEN in Chrome. */
@@ -9579,6 +9579,11 @@ function fbPublishPresence(){
   // coarse (~1km) location for privacy; precise location only for SOS / opt-in responder positions
   var lat=userLat!=null?Math.round(userLat*100)/100:32.07, lng=userLng!=null?Math.round(userLng*100)/100:34.78;
   FB.db.ref('presence/'+FB.uid).set({lat:lat,lng:lng,ts:Date.now()}).then(function(){ if(FB.permErr){FB.permErr=null;renderFbStatus();} }).catch(function(e){ FB.permErr=(e&&e.code)||'write-denied'; fbLog('presence WRITE denied:', FB.permErr, e); renderFbStatus(); });
+  /* Sanitized, PII-free presence heartbeat for the municipal dashboard — coarse ~1km coords,
+     anonymous uid, no name/phone. Written to the public /dashfeed path (same place as events),
+     so the dashboard can count online users network-wide and per-territory WITHOUT ever reading
+     the locked /presence tree. One row per user, overwritten each beat. */
+  try{ if(userLat!=null&&userLng!=null){ fbRestWrite('PUT','dashfeed/hb_'+FB.uid,{type:'presence',lat:lat,lng:lng,ts:Date.now(),status:'online',by:FB.uid}); } }catch(e){}
 }
 function updateGuardiansNearby(n){
   var el=document.getElementById('gnear-n'); if(el)el.textContent=n;
