@@ -51,17 +51,22 @@
   @keyframes pulse{50%{opacity:.4}}
   .tbtn{background:var(--dark2);border:1px solid var(--db);color:var(--tx2);border-radius:9px;padding:7px 12px;font-size:12px;cursor:pointer;font-family:inherit;white-space:nowrap}
   .tbtn:hover{border-color:var(--gold);color:var(--tx)}
-  /* ---------- KPI STRIP (de-boxed) ---------- */
-  .kpis{flex:0 0 auto;display:flex;align-items:stretch;gap:0;padding:0 18px;height:70px;background:rgba(255,255,255,.015);border-bottom:1px solid var(--db)}
-  .kpi{flex:1;display:flex;flex-direction:column;justify-content:center;padding:0 20px;border-inline-start:1px solid rgba(255,255,255,.06);transition:background .15s}
-  .kpi:hover{background:rgba(255,255,255,.025)}
-  .kpi[onclick]:hover .kv{transform:translateY(-1px)}
-  .kpi:first-child{border-inline-start:0}
-  .kpi .kl{font-size:10.5px;color:var(--tx3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:3px;display:flex;align-items:center;gap:5px}
-  .kpi .ki{display:inline-flex;align-items:center;justify-content:center;width:17px;height:17px;color:var(--gold);opacity:.85;flex:0 0 auto}
-  .kpi .kv.net-v+.km,.kpi .ki{vertical-align:middle}
-  .kpi .kv{font-size:36px;font-weight:900;line-height:1;transition:transform .15s}
-  .kpi .km{font-size:11px;color:var(--tx2);margin-top:3px}
+  /* ---------- KPI STRIP (visual cards, roomy) ---------- */
+  .kpis{flex:0 0 auto;display:flex;align-items:stretch;gap:10px;padding:11px 16px;min-height:92px;background:rgba(255,255,255,.015);border-bottom:1px solid var(--db)}
+  .kpi{flex:1;display:flex;align-items:center;gap:12px;padding:10px 14px;border-radius:14px;background:rgba(255,255,255,.025);border:1px solid rgba(255,255,255,.055);transition:background .15s,transform .15s}
+  .kpi:hover{background:rgba(255,255,255,.045)}
+  .kpi[onclick]{cursor:pointer}.kpi[onclick]:hover{transform:translateY(-1px)}
+  .kpi .kbadge{flex:0 0 auto;width:38px;height:38px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:rgba(224,168,40,.14);color:var(--gold)}
+  .kpi .kbadge svg{width:19px;height:19px}
+  .kpi .kbody{min-width:0;display:flex;flex-direction:column;justify-content:center}
+  .kpi .kl{font-size:10px;color:var(--tx3);text-transform:uppercase;letter-spacing:.05em;margin-bottom:2px;display:flex;align-items:center;gap:5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .kpi .kv{font-size:30px;font-weight:900;line-height:1.02;transition:transform .15s}
+  .kpi .km{font-size:10.5px;color:var(--tx2);margin-top:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  /* badge tint follows the stat's meaning colour */
+  .kpi.b-ok .kbadge{background:rgba(46,204,113,.15);color:#2ecc71}
+  .kpi.b-bad .kbadge{background:rgba(229,72,77,.15);color:#ff6b70}
+  .kpi.b-gap .kbadge{background:rgba(79,195,232,.15);color:#4fc3e8}
+  .kpi.b-net-v .kbadge{background:rgba(255,138,152,.15);color:#ff8a98}
   .kpi .kv.gold{color:var(--gold)}.kpi .kv.bad{color:var(--bad)}.kpi .kv.ok{color:var(--ok)}
   .kpi .kv.gap{color:#4fc3e8}.kpi .kv.net-v{color:#ff8a98}
   .kpi .kprov{font-size:8px;font-weight:700;padding:1px 5px;border-radius:7px;margin-inline-start:6px;letter-spacing:.02em;vertical-align:1px}
@@ -1083,23 +1088,25 @@ function loadLive(c){
   var initial=!_liveInitDone;
   fetch(DB+'/dashfeed.json').then(function(r){return r.ok?r.json():null;}).catch(function(){return null;}).then(function(obj){
     var now=Date.now(), DAY=864e5, ONLINE=18e4; /* 3 min = "online" */
-    var evList=[], presTerr=[], allUsers={}, onlineUsers={}, onlineTerrUsers={}, terrUsers={}, reps={};
+    var evList=[], presTerr=[], active24={}, onlineUsers={}, onlineTerrUsers={}, active24Terr={}, reps={};
     if(obj){ Object.keys(obj).forEach(function(id){
       var e=obj[id]; if(!e||e.lat==null||e.lng==null)return;
-      if(e.by) allUsers[e.by]=1;
+      var recent=(now-(e.ts||0))<=DAY;
       var inTerr=haversine(c.lat,c.lng,e.lat,e.lng)<=18;
-      if(inTerr&&e.by) terrUsers[e.by]=1;
+      if(recent&&e.by){ active24[e.by]=1; if(inTerr) active24Terr[e.by]=1; }
       if(e.type==='presence'){
         var fresh=(now-(e.ts||0))<=ONLINE;
         if(fresh&&e.by){ onlineUsers[e.by]=1; if(inTerr){ onlineTerrUsers[e.by]=1; e.id=id; presTerr.push(e); } }
         return; /* presence heartbeat is NOT an event */
       }
-      if(e.status==='resolved')return; if((now-(e.ts||0))>DAY)return;
+      if(e.status==='resolved')return; if(!recent)return;
       if(inTerr){ e.id=id; evList.push(e); if(e.by)reps[e.by]=1; }
     }); }
-    // 100% real metrics derived from the sanitized feed — never fabricated
-    window._liveStats={ totalUsers:Object.keys(allUsers).length, onlineNow:Object.keys(onlineUsers).length,
-      territoryUsers:Object.keys(terrUsers).length, onlineTerr:Object.keys(onlineTerrUsers).length,
+    // 100% real, truthful metrics derived from the sanitized live feed — never fabricated.
+    // NOTE: these count users seen on the LIVE network (v242+). Full historical registry
+    // total requires the server-side counter (pending the Firebase deploy token).
+    window._liveStats={ onlineNow:Object.keys(onlineUsers).length, activeToday:Object.keys(active24).length,
+      territoryActive:Object.keys(active24Terr).length, onlineTerr:Object.keys(onlineTerrUsers).length,
       activeEvents:evList.length, reportersTerr:Object.keys(reps).length };
     window._liveNet=evList.length; window._liveReporters=window._liveStats.reportersTerr;
     try{ updateLiveBanner(); }catch(e){}
@@ -1265,7 +1272,7 @@ function exportReport(){
    +'.noprint{position:fixed;top:12px;left:12px;background:#23170a;color:#F5C840;border:none;border-radius:9px;padding:10px 18px;font:700 14px Rubik,sans-serif;cursor:pointer}'
    +'</style></head><body><div class="wrap">'
    +'<button class="noprint" onclick="window.print()">⬇ שמירה / הדפסה כ-PDF</button>'
-   +'<div class="hd"><div class="l"><div class="emblem"><svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="#23170a" stroke-width="1.8"><path d="M12 3l7 2.6v5c0 4.5-2.9 7.9-7 9.6-4.1-1.7-7-5.1-7-9.6V5.6Z"/><path d="M12 4 14.6 12 12 10.3 9.4 12Z" fill="#23170a" stroke="none"/></svg></div>'
+   +'<div class="hd"><div class="l"><img src="https://www.shomer-app.co.il/SHOMER_logo_big.png" alt="SH✡MER" style="width:52px;height:52px;object-fit:contain;flex:0 0 auto">'
    +'<div><div class="brand">SH<span class="star">✡</span>MER <span style="color:#6a7488;font-weight:700;font-size:15px">Command</span></div><div class="sub">Municipal Intelligence</div></div></div>'
    +'<div class="meta">'+ESC(org)+'<br>'+dstr+(demo?'<span class="badge">דוח לדוגמה</span>':'')+'</div></div>'
    +'<div class="title">דוח תמונת מצב פשיעה</div>'
@@ -1309,9 +1316,10 @@ function buildKPIs(idx){
  var ratio=pc&&med?pc/med:null;
  var S=window._liveStats||{};
  var live=!!(CLIENT&&CLIENT.live), paying=!!(CLIENT&&!CLIENT.demo&&!CLIENT.live);
- function k(ic,l,v,m,cls,prov,click){return '<div class="kpi"'+(click?' onclick="'+click+'" style="cursor:pointer"':'')+'>'+
-   '<div class="kl"><span class="ki">'+(ic||'')+'</span>'+l+(prov?'<span class="kprov '+prov.c+'">'+prov.t+'</span>':'')+'</div>'+
-   '<div class="kv '+(cls||'')+'">'+v+'</div><div class="km">'+m+'</div></div>';}
+ function k(ic,l,v,m,cls,prov,click){return '<div class="kpi'+(cls?' b-'+cls:'')+'"'+(click?' onclick="'+click+'" style="cursor:pointer"':'')+'>'+
+   '<div class="kbadge">'+(ic||'')+'</div>'+
+   '<div class="kbody"><div class="kl">'+l+(prov?'<span class="kprov '+prov.c+'">'+prov.t+'</span>':'')+'</div>'+
+   '<div class="kv '+(cls||'')+'">'+v+'</div><div class="km">'+m+'</div></div></div>';}
  var PUB={c:'pub',t:'ציבורי'},NET={c:'net',t:'רשת · חי'},NAT={c:'nat',t:'ארצי'};
  var sevCls=idx<cities.length/3?'bad':idx<cities.length*2/3?'gold':'ok', mark=idx<cities.length/3?'▲ ':'',
      cleaner=cities.length-1-idx, sevSub=idx===0?'הכי חמור בארץ':idx<cities.length/3?('חמורה מ-'+cleaner+' ערים'):('חמורה מ-'+cleaner+' מ-'+(cities.length-1));
@@ -1319,14 +1327,14 @@ function buildKPIs(idx){
  var crimeCard=k(KICO.shield,'סה״כ עבירות 2025',fmt(tot),c.city+' · משטרת ישראל','gold',PUB);
  var html='';
  if(live){
-   html+= k(KICO.users,'סה״כ משתמשים', S.totalUsers!=null?fmt(S.totalUsers):'—','ברשת SH✡MER','', NET)
-        + k(KICO.online,'מחוברים כעת', S.onlineNow!=null?String(S.onlineNow):'—','בזמן אמת','ok', NET)
-        + k(KICO.pin,'בטריטוריה', (S.onlineTerr!=null?S.onlineTerr:'—')+' / '+(S.territoryUsers!=null?S.territoryUsers:'—'),'מחוברים / סה״כ','gap', NET)
+   html+= k(KICO.online,'מחוברים כעת', S.onlineNow!=null?String(S.onlineNow):'—','פעילים בזמן אמת','ok', NET)
+        + k(KICO.users,'פעילים היום', S.activeToday!=null?String(S.activeToday):'—','24 שעות אחרונות','', NET)
+        + k(KICO.pin,'בטריטוריה', (S.onlineTerr!=null?S.onlineTerr:'—')+' / '+(S.territoryActive!=null?S.territoryActive:'—'),'מחוברים / פעילים','gap', NET)
         + k(KICO.bolt,'אירועים חיים', S.activeEvents!=null?String(S.activeEvents):'—',(S.activeEvents>0?'24 שעות':'🟢 ממתין לדיווחים'),'net-v', NET)
         + crimeCard + rankCard;
  } else if(paying){
-   html+= k(KICO.pin,'משתמשים בטריטוריה', S.territoryUsers!=null?fmt(S.territoryUsers):'—','רשומים באזור','', NET)
-        + k(KICO.online,'פעילים כעת', S.onlineTerr!=null?String(S.onlineTerr):'—','בזמן אמת','ok', NET)
+   html+= k(KICO.pin,'פעילים בטריטוריה', S.territoryActive!=null?String(S.territoryActive):'—','24 שעות','', NET)
+        + k(KICO.online,'מחוברים כעת', S.onlineTerr!=null?String(S.onlineTerr):'—','בזמן אמת','ok', NET)
         + crimeCard
         + k(KICO.gap,'פשיעה ל-1,000',pc?pc.toFixed(1):'—',ratio?('×'+ratio.toFixed(1)+' מהחציון'):'למ״ס*',(ratio&&ratio>1.2?'bad':ratio&&ratio<0.9?'ok':''),PUB)
         + k(KICO.warn,'עבירות אלימות',violPct+'%',fmt(viol)+' נגד גוף',(violPct>12?'bad':'ok'),PUB)
