@@ -397,7 +397,8 @@
       <label>אימייל ארגוני</label><input id="email" type="email" dir="ltr" placeholder="you@municipality.gov.il">
       <label>סיסמה</label><input id="pass" type="password" dir="ltr" placeholder="••••••••">
       <button class="btn" id="login-btn">כניסה</button>
-      <button class="btn" id="demo-btn" style="background:transparent;border:1px solid var(--gold);color:var(--gold);margin-top:10px">👁  כניסה לדמו · See a live demo</button>
+      <button class="btn" id="live-btn" style="background:linear-gradient(135deg,#0f7a4a,#16a06a 60%,#2ecc71);color:#042016;margin-top:10px;font-weight:800">🟢  תצוגה חיה · נתוני רשת אמת (PoC)</button>
+      <button class="btn" id="demo-btn" style="background:transparent;border:1px solid var(--gold);color:var(--gold);margin-top:8px">👁  כניסה לדמו · See a live demo</button>
       <button class="lnk" id="to-signup">אין לך גישה עדיין? <b>בקשת גישת לקוח</b></button>
     </div>
     <div id="view-signup" class="hidden">
@@ -490,6 +491,7 @@ document.getElementById('signup-btn').onclick=async function(){
 };
 document.getElementById('signout').onclick=async function(){ try{ if(!(CLIENT&&CLIENT.demo)) await sb.auth.signOut(); }catch(e){} location.reload(); };
 document.getElementById('demo-btn').onclick=function(){ demoBoot(); };
+(function(){ var lb=document.getElementById('live-btn'); if(lb) lb.onclick=function(){ liveBoot(); }; })();
 (function(){var ex=document.getElementById('export-btn'); if(ex) ex.onclick=function(){ try{exportReport();}catch(e){window.print();} };
  var ac=document.getElementById('acct-btn'); if(ac) ac.onclick=function(){ try{openSettings();}catch(e){} };})();
 (function(){var sp=document.getElementById('spread-btn'); if(sp) sp.onclick=function(){ if(_curCity) toggleSpread(_curCity); };})();
@@ -519,6 +521,24 @@ function demoLive(c){
   var now=Date.now();
   var list=DEMO_INC.map(function(w,i){ return {id:'demo'+i, type:(w.kind==='sos'?'sos':(w.kind==='palert'?w.k:'event')), k:w.k, nm:w.nm, t:w.t, lat:c.lat+w.dlat, lng:c.lng+w.dlng, ts:now-w.mins*60000}; });
   renderLive(c,list,{demo:true});
+}
+/* ── LIVE mode: real SH✡MER network data from the sanitized public /dashfeed path ──
+   100% real, read-only, PII-free (coarse coords, no names). Boots straight into the live
+   network view; loadLive() (non-demo branch) streams real events for the chosen territory.
+   When no events exist yet it shows an honest "awaiting data" state — never fabricated. */
+async function liveBoot(){
+  await loadData();
+  CLIENT={org:'רשת SH✡MER · תצוגה חיה', territory:DATA._sorted[0].city, email:'live', demo:false, live:true};
+  document.getElementById('gate').classList.add('hidden');
+  document.getElementById('app').classList.remove('hidden');
+  document.getElementById('terr-name').textContent=CLIENT.territory;
+  document.getElementById('org-name').textContent=CLIENT.org;
+  document.getElementById('terr-static').classList.add('hidden'); document.getElementById('terr-sel').classList.remove('hidden');
+  if(!MAP) initMap(); renderLegend();
+  var sel=document.getElementById('terr-sel'); if(sel && !sel.options.length){ fillTerr(sel); }
+  if(sel){ sel.value=CLIENT.territory; sel.onchange=function(){ var i=DATA._sorted.findIndex(function(c){return c.city===sel.value;}); if(i>=0){ CLIENT.territory=sel.value; render(i); } }; }
+  var idx=DATA._sorted.findIndex(function(c){return c.city===CLIENT.territory;});
+  render(idx>=0?idx:0);
 }
 
 /* ---- boot: load data + client, route ---- */
@@ -1060,11 +1080,14 @@ function loadLive(c){
   var DB='https://shomergency-default-rtdb.firebaseio.com';
   var initial=!_liveInitDone;
   fetch(DB+'/dashfeed.json').then(function(r){return r.ok?r.json():null;}).catch(function(){return null;}).then(function(obj){
-    var now=Date.now(), DAY=864e5, list=[];
-    if(obj){ Object.keys(obj).forEach(function(id){ var e=obj[id]; if(!e||e.lat==null||e.lng==null)return; if(e.status==='resolved')return; if((now-(e.ts||0))>DAY)return; if(haversine(c.lat,c.lng,e.lat,e.lng)<=18){ e.id=id; list.push(e); } }); }
+    var now=Date.now(), DAY=864e5, list=[], reps={};
+    if(obj){ Object.keys(obj).forEach(function(id){ var e=obj[id]; if(!e||e.lat==null||e.lng==null)return; if(e.status==='resolved')return; if((now-(e.ts||0))>DAY)return; if(haversine(c.lat,c.lng,e.lat,e.lng)<=18){ e.id=id; list.push(e); if(e.by)reps[e.by]=1; } }); }
+    // real network metrics from the sanitized feed — never fabricated
+    window._liveNet=list.length; window._liveReporters=Object.keys(reps).length;
+    try{ document.querySelectorAll('#kpis .kpi').forEach(function(kp){ var kl=kp.querySelector('.kl'); if(kl&&/רשת שומרים/.test(kl.textContent)){ var kv=kp.querySelector('.kv'),km=kp.querySelector('.km'); if(kv)kv.textContent=window._liveNet; if(km)km.textContent=(window._liveNet>0?('דיווחים חיים · 24 שעות · '+window._liveReporters+' מדווחים'):'🟢 מחובר · ממתין לדיווחים מהרשת'); } }); }catch(e){}
     renderLive(c,list,{demo:false,initial:initial}); _liveInitDone=true;
   });
-  if(!_liveTimer){ _liveTimer=setInterval(function(){ if(_curCityObj && !(CLIENT&&CLIENT.demo)){ loadLive(_curCityObj); } }, 15000); }
+  if(!_liveTimer){ _liveTimer=setInterval(function(){ if(_curCityObj && !(CLIENT&&CLIENT.demo)){ loadLive(_curCityObj); } }, 12000); }
 }
 
 /* ===================== CONSOLE RENDER MODULE (overrides) ===================== */
@@ -1247,7 +1270,8 @@ function buildKPIs(idx){
  var cities=DATA._sorted,c=cities[idx],tot=c.total;
  var pc=perCap(c);var pv=cities.map(perCap).filter(function(v){return v!=null;}).sort(function(a,b){return a-b;});var med=pv[Math.floor(pv.length/2)];
  var viol=c.cats['עבירות נגד גוף']||0,violPct=Math.round(viol/tot*100);
- var cov=(CLIENT&&CLIENT.demo)?214:'—';
+ var cov=(CLIENT&&CLIENT.demo)?214:((CLIENT&&CLIENT.live&&window._liveNet!=null)?window._liveNet:'—');
+ var covSub=(CLIENT&&CLIENT.live)?((window._liveNet!=null&&window._liveNet>0)?('דיווחים חיים · 24 שעות · '+(window._liveReporters||0)+' מדווחים'):'🟢 מחובר · ממתין לדיווחים מהרשת'):(cov==='—'?'דיווחים חיים · משלים את הפער':'דיווחים חיים · ▸ לחצו לרשת המגיבים');
  var ratio=pc&&med?pc/med:null;
  function k(l,v,m,cls,prov,hl,click){return '<div class="kpi'+(hl?' kpi-hl':'')+'"'+(click?' onclick="'+click+'" style="cursor:pointer" title="לחצו לפירוט רשת המגיבים"':'')+'>'+
    '<div class="kl">'+l+(prov?'<span class="kprov '+prov.c+'">'+prov.t+'</span>':'')+'</div>'+
@@ -1258,7 +1282,7 @@ function buildKPIs(idx){
   k('פשיעה ל-1,000',pc?pc.toFixed(1):'—',ratio?('×'+ratio.toFixed(1)+' מהחציון הארצי*'):'הערכת למ״ס*',(ratio&&ratio>1.2?'bad':ratio&&ratio<0.9?'ok':''),PUB)+
   k('עבירות אלימות',violPct+'%',fmt(viol)+' נגד גוף',(violPct>12?'bad':'ok'),PUB)+
   k('פער הדיווח','~74%','רק 26% מהעבירות מדווח למשטרה · IDI','gap',NAT,true)+
-  k('רשת שומרים',cov,(cov==='—'?'דיווחים חיים · משלים את הפער':'דיווחים חיים · ▸ לחצו לרשת המגיבים'),'net-v',NET,false,'openRoster()')+
+  k('רשת שומרים',cov,covSub,'net-v',NET,false,'openRoster()')+
   (function(){var cleaner=cities.length-1-idx,third=cities.length/3,
      sevCls=idx<third?'bad':idx<third*2?'gold':'ok',
      mark=idx<third?'▲ ':'',
