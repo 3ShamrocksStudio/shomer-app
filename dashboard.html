@@ -67,6 +67,12 @@
   .kpi.b-bad .kbadge{background:rgba(229,72,77,.15);color:#ff6b70}
   .kpi.b-gap .kbadge{background:rgba(79,195,232,.15);color:#4fc3e8}
   .kpi.b-net-v .kbadge{background:rgba(255,138,152,.15);color:#ff8a98}
+  /* card-level tinting — each stat gets its own visual identity, not just the icon */
+  .kpi.b-ok{background:rgba(21,183,158,.07);border-color:rgba(21,183,158,.22);border-top:2px solid var(--teal)}
+  .kpi.b-bad{background:rgba(229,72,77,.08);border-color:rgba(229,72,77,.20);border-top:2px solid var(--bad)}
+  .kpi.b-gold{background:rgba(224,168,40,.08);border-color:rgba(224,168,40,.20);border-top:2px solid var(--gold)}
+  .kpi.b-gap{background:rgba(79,195,232,.07);border-color:rgba(79,195,232,.20);border-top:2px solid #4fc3e8}
+  .kpi.b-net-v{background:rgba(155,108,255,.07);border-color:rgba(155,108,255,.20);border-top:2px solid var(--violet)}
   .kpi .kv.gold{color:var(--gold)}.kpi .kv.bad{color:var(--bad)}.kpi .kv.ok{color:var(--ok)}
   .kpi .kv.gap{color:#4fc3e8}.kpi .kv.net-v{color:#ff8a98}
   .kpi .kprov{font-size:8px;font-weight:700;padding:1px 5px;border-radius:7px;margin-inline-start:6px;letter-spacing:.02em;vertical-align:1px}
@@ -1116,11 +1122,18 @@ function loadLive(c){
     var evList=[], presTerr=[], presAll=[], active24={}, onlineUsers={}, onlineTerrUsers={}, active24Terr={}, reps={};
     var RECENT_PRES=36e5; /* show a presence pin if the user pinged within the last hour */
     if(obj){ Object.keys(obj).forEach(function(id){
-      var e=obj[id]; if(!e||e.lat==null||e.lng==null)return;
+      var e=obj[id]; if(!e)return;
+      /* v243+ may write latitude/longitude or nested location — normalise to lat/lng */
+      var _lat=e.lat!=null?e.lat:(e.latitude!=null?e.latitude:(e.location&&e.location.lat!=null?e.location.lat:null));
+      var _lng=e.lng!=null?e.lng:(e.longitude!=null?e.longitude:(e.location&&e.location.lng!=null?e.location.lng:null));
+      if(_lat==null||_lng==null)return;
+      e.lat=_lat; e.lng=_lng;
       var recent=(now-(e.ts||0))<=DAY;
       var inTerr=haversine(c.lat,c.lng,e.lat,e.lng)<=18;
       if(recent&&e.by){ active24[e.by]=1; if(inTerr) active24Terr[e.by]=1; }
-      if(e.type==='presence'){
+      /* accept presence regardless of type — v243 may omit the field entirely */
+      var isPresence=e.type==='presence'||e.type==='pres'||(!e.type&&!e.cat&&!e.status&&!e.desc);
+      if(isPresence){
         var fresh=(now-(e.ts||0))<=ONLINE;
         if(fresh&&e.by){ onlineUsers[e.by]=1; if(inTerr) onlineTerrUsers[e.by]=1; }
         /* every SHOMER user seen in the last hour gets a map pin — network-wide for the admin
