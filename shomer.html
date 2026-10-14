@@ -10502,7 +10502,7 @@ function showTestEvent(){
   }catch(e){}
 }
 try{
-  if(location.search.indexOf('testevent=1')>=0){
+  if(location.search.indexOf('testevent=1')>=0 && isFounder()){
     if(document.readyState!=='loading') setTimeout(showTestEvent, 1500);
     else document.addEventListener('DOMContentLoaded', function(){ setTimeout(showTestEvent, 1500); });
   }
