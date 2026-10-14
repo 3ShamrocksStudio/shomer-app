@@ -587,22 +587,43 @@ function donutSVG(segs,center,sub){var tot=segs.reduce(function(s,x){return s+x.
 function ringSVG(frac,label,sub,col){var sz=150,r=sz/2-12,cx=sz/2,cy=sz/2,C=2*Math.PI*r,len=Math.max(0,Math.min(1,frac))*C;
  return '<svg viewBox="0 0 '+sz+' '+sz+'" width="150" height="150"><circle cx="'+cx+'" cy="'+cy+'" r="'+r+'" fill="none" stroke="#15284b" stroke-width="14"/><circle cx="'+cx+'" cy="'+cy+'" r="'+r+'" fill="none" stroke="'+col+'" stroke-width="14" stroke-linecap="round" stroke-dasharray="'+len.toFixed(1)+' '+(C-len).toFixed(1)+'" transform="rotate(-90 '+cx+' '+cy+')"/><text x="'+cx+'" y="'+(cy-1)+'" text-anchor="middle" fill="#e8eefc" font-size="26" font-weight="800">'+label+'</text><text x="'+cx+'" y="'+(cy+18)+'" text-anchor="middle" fill="#6b82ab" font-size="10">'+sub+'</text></svg>';}
 function insp(html){var e=document.getElementById('insp'); if(!e)return; if(html){e.innerHTML=html;e.classList.add('on');} else e.classList.remove('on');}
+var _boundVisible=true;
 function toggleMapLayer(which){
  try{
   if(!MAP)return;
-  var lyr = which==='events' ? liveLayer : which==='bound' ? cityLayer : null;
-  var btn = document.getElementById(which==='events'?'tgl-events':'tgl-bound');
+  if(which==='bound'){
+   var btn=document.getElementById('tgl-bound');
+   /* cityLayer is null until render() runs — track desired state so render() can honour it */
+   if(!cityLayer){ _boundVisible=!_boundVisible; if(btn)_boundVisible?btn.classList.add('on'):btn.classList.remove('on'); return; }
+   if(MAP.hasLayer(cityLayer)){MAP.removeLayer(cityLayer);_boundVisible=false;if(btn)btn.classList.remove('on');}
+   else{MAP.addLayer(cityLayer);_boundVisible=true;if(btn)btn.classList.add('on');}
+   return;
+  }
+  var lyr=which==='events'?liveLayer:null;
+  var btn2=document.getElementById(which==='events'?'tgl-events':'tgl-bound');
   if(!lyr)return;
-  if(MAP.hasLayer(lyr)){ MAP.removeLayer(lyr); if(btn)btn.classList.remove('on'); }
-  else { MAP.addLayer(lyr); if(btn)btn.classList.add('on'); }
+  if(MAP.hasLayer(lyr)){MAP.removeLayer(lyr);if(btn2)btn2.classList.remove('on');}
+  else{MAP.addLayer(lyr);if(btn2)btn2.classList.add('on');}
  }catch(e){}
 }
 var spreadLayer=null;
 function toggleSpread(c){
  var btn=document.getElementById('spread-btn');
+ /* REAL-AUTH MODE: שומרים button toggles presLayer (real network pins from loadLive) */
+ if(CLIENT&&!CLIENT.demo){
+  if(presLayer){
+   if(MAP.hasLayer(presLayer)){MAP.removeLayer(presLayer);if(btn)btn.classList.remove('on');}
+   else{MAP.addLayer(presLayer);if(btn)btn.classList.add('on');}
+  } else {
+   /* presLayer not yet populated — flip btn; renderPresenceLayer will add markers when loadLive returns */
+   if(btn)btn.classList.toggle('on');
+  }
+  return;
+ }
+ /* DEMO MODE: random scatter simulation */
  if(spreadLayer){ MAP.removeLayer(spreadLayer); spreadLayer=null; if(btn)btn.classList.remove('on'); return; }
  spreadLayer=L.layerGroup().addTo(MAP); if(btn)btn.classList.add('on');
- var n=(CLIENT&&CLIENT.demo)?180:0;
+ var n=180;
  for(var i=0;i<n;i++){ var a=Math.random()*Math.PI*2, d=Math.random()*0.045; var la=c.lat+Math.cos(a)*d, ln=c.lng+Math.sin(a)*d/Math.cos(c.lat*Math.PI/180);
    L.circleMarker([la,ln],{radius:2.6,color:'#18c29c',weight:0,fillColor:'#18c29c',fillOpacity:.65}).addTo(spreadLayer); }
 }
@@ -1313,7 +1334,7 @@ var presLayer=null;
 function _founderStar(){ return L.divIcon({className:'founder-div',html:'<div class="founder-beacon"><svg viewBox="0 0 48 48" width="34" height="34"><defs><radialGradient id="fga" cx="50%" cy="50%" r="50%"><stop offset="0" stop-color="#F7D66A" stop-opacity=".6"/><stop offset="70%" stop-color="#E0A828" stop-opacity="0"/></radialGradient><linearGradient id="fgs" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#FDEBA6"/><stop offset=".5" stop-color="#E7B434"/><stop offset="1" stop-color="#B8801C"/></linearGradient></defs><circle cx="24" cy="24" r="23" fill="url(#fga)"/><path d="M24 7 32 21 16 21Z M24 41 16 27 32 27Z" fill="none" stroke="url(#fgs)" stroke-width="3" stroke-linejoin="round"/></svg></div>',iconSize:[34,34],iconAnchor:[17,17]}); }
 function renderPresenceLayer(list, fit){
   try{ if(!MAP)return; if(presLayer){MAP.removeLayer(presLayer);presLayer=null;} if(!list||!list.length)return;
-    presLayer=L.layerGroup().addTo(MAP); var pts=[];
+    presLayer=L.layerGroup(); var pts=[]; /* build layer without auto-adding to map */
     list.forEach(function(p){ pts.push([p.lat,p.lng]);
       if(p.founder){
         L.marker([p.lat,p.lng],{icon:_founderStar(),zIndexOffset:900,title:'SH✡MER · מייסד/מנהל'}).addTo(presLayer);
@@ -1321,8 +1342,11 @@ function renderPresenceLayer(list, fit){
         L.circleMarker([p.lat,p.lng],{radius:p._online?5.5:4,color:'#0f7a4a',weight:1.6,fillColor:p._online?'#2ecc71':'#7fcf9e',fillOpacity:p._online?.9:.55}).addTo(presLayer);
       }
     });
-    /* admin/live view: frame all SHOMER users across the network so the founder (and anyone
-       outside the selected territory) is always visible, not just the Tel-Aviv cluster. */
+    /* add to map only if: live-admin mode (always visible) OR the שומרים button is toggled ON */
+    var sbtn=document.getElementById('spread-btn');
+    var showNow=(CLIENT&&CLIENT.live)||(sbtn&&sbtn.classList.contains('on'));
+    if(showNow){ presLayer.addTo(MAP); }
+    /* admin/live view: frame all SHOMER users across the network */
     if(fit && pts.length){ try{ if(pts.length===1){ MAP.setView(pts[0],13,{animate:true}); } else { MAP.fitBounds(L.latLngBounds(pts).pad(0.25),{maxZoom:13,animate:true}); } _sosFocusLock=true; }catch(e){} }
   }catch(e){}
 }
@@ -1553,7 +1577,7 @@ function render(idx){
  if(ts&&!ts.options.length){cities.forEach(function(x){var o=document.createElement('option');o.value=x.city;o.textContent=x.city;ts.appendChild(o);});}
  if(ts)ts.value=c.city;
  buildKPIs(idx);
- if(cityLayer){MAP.removeLayer(cityLayer);}cityLayer=L.layerGroup().addTo(MAP);
+ if(cityLayer){MAP.removeLayer(cityLayer);}cityLayer=L.layerGroup().addTo(MAP);if(!_boundVisible){MAP.removeLayer(cityLayer);}
  if(spreadLayer){MAP.removeLayer(spreadLayer);spreadLayer=null;var sp=document.getElementById('spread-btn');if(sp)sp.classList.remove('on');}
  var cats=Object.keys(c.cats),maxCat=Math.max.apply(null,cats.map(function(k){return c.cats[k];}));
  drawTerritory(c);
