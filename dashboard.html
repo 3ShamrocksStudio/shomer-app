@@ -565,7 +565,7 @@ async function boot(){
   await loadData();
   if(!document.getElementById('su-terr').options.length) fillTerr(document.getElementById('su-terr'));
   var u=(await sb.auth.getUser()).data.user;
-  if(!u){ document.getElementById('gate').classList.remove('hidden'); document.getElementById('app').classList.add('hidden'); return; }
+  if(!u){ liveBoot(); return; }
   var md=u.user_metadata||{};
   CLIENT={org:md.org||'',territory:md.territory||'',email:u.email};
   if(!CLIENT.territory){ // shouldn't happen, but guard
