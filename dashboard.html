@@ -1152,7 +1152,7 @@ function loadLive(c){
       activeEvents:evList.length, reportersTerr:Object.keys(reps).length };
     window._liveNet=evList.length; window._liveReporters=window._liveStats.reportersTerr;
     try{ updateLiveBanner(); }catch(e){}
-    try{ renderPresenceLayer((CLIENT&&CLIENT.live)?presAll:presTerr, !!(CLIENT&&CLIENT.live)); }catch(e){}
+    try{ renderPresenceLayer((CLIENT&&(CLIENT.live||!CLIENT.demo))?presAll:presTerr, !!(CLIENT&&CLIENT.live)); }catch(e){}
     renderLive(c,evList,{demo:false,initial:initial}); _liveInitDone=true;
   });
   if(!_liveTimer){ _liveTimer=setInterval(function(){ if(_curCityObj && !(CLIENT&&CLIENT.demo)){ loadLive(_curCityObj); } }, 12000); }
