@@ -621,8 +621,9 @@ function toggleSpread(c){
    if(MAP.hasLayer(presLayer)){MAP.removeLayer(presLayer);if(btn)btn.classList.remove('on');}
    else{MAP.addLayer(presLayer);if(btn)btn.classList.add('on');}
   } else {
-   /* presLayer not yet populated — flip btn; renderPresenceLayer will add markers when loadLive returns */
+   /* presLayer not yet populated — flip btn and force fresh load so layer appears immediately */
    if(btn)btn.classList.toggle('on');
+   if(btn&&btn.classList.contains('on')&&_curCityObj) loadLive(_curCityObj);
   }
   return;
  }
@@ -1346,19 +1347,21 @@ var KICO={
 var presLayer=null;
 function _founderStar(){ return L.divIcon({className:'founder-div',html:'<div class="founder-beacon"><svg viewBox="0 0 48 48" width="34" height="34"><defs><radialGradient id="fga" cx="50%" cy="50%" r="50%"><stop offset="0" stop-color="#F7D66A" stop-opacity=".6"/><stop offset="70%" stop-color="#E0A828" stop-opacity="0"/></radialGradient><linearGradient id="fgs" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#FDEBA6"/><stop offset=".5" stop-color="#E7B434"/><stop offset="1" stop-color="#B8801C"/></linearGradient></defs><circle cx="24" cy="24" r="23" fill="url(#fga)"/><path d="M24 7 32 21 16 21Z M24 41 16 27 32 27Z" fill="none" stroke="url(#fgs)" stroke-width="3" stroke-linejoin="round"/></svg></div>',iconSize:[34,34],iconAnchor:[17,17]}); }
 function renderPresenceLayer(list, fit){
-  try{ if(!MAP)return; if(presLayer){MAP.removeLayer(presLayer);presLayer=null;} if(!list||!list.length)return;
-    presLayer=L.layerGroup(); var pts=[]; /* build layer without auto-adding to map */
-    list.forEach(function(p){ pts.push([p.lat,p.lng]);
+  try{ if(!MAP)return; if(presLayer){MAP.removeLayer(presLayer);presLayer=null;}
+    /* always create presLayer so toggle works even when list is empty */
+    presLayer=L.layerGroup(); var pts=[];
+    if(list&&list.length){ list.forEach(function(p){ pts.push([p.lat,p.lng]);
       if(p.founder){
         L.marker([p.lat,p.lng],{icon:_founderStar(),zIndexOffset:900,title:'SH✡MER · מייסד/מנהל'}).addTo(presLayer);
       } else {
         L.circleMarker([p.lat,p.lng],{radius:p._online?5.5:4,color:'#0f7a4a',weight:1.6,fillColor:p._online?'#2ecc71':'#7fcf9e',fillOpacity:p._online?.9:.55}).addTo(presLayer);
       }
-    });
-    /* add to map only if: live-admin mode (always visible) OR the שומרים button is toggled ON */
+    }); }
+    /* show layer: live-admin always; paying non-demo users auto-on; or button explicitly toggled ON */
     var sbtn=document.getElementById('spread-btn');
-    var showNow=(CLIENT&&CLIENT.live)||(sbtn&&sbtn.classList.contains('on'));
-    if(showNow){ presLayer.addTo(MAP); }
+    var isPaying=CLIENT&&!CLIENT.demo&&!CLIENT.live;
+    var showNow=(CLIENT&&CLIENT.live)||isPaying||(sbtn&&sbtn.classList.contains('on'));
+    if(showNow){ presLayer.addTo(MAP); if(isPaying&&sbtn&&!sbtn.classList.contains('on')) sbtn.classList.add('on'); }
     /* admin/live view: frame all SHOMER users across the network */
     if(fit && pts.length){ try{ if(pts.length===1){ MAP.setView(pts[0],13,{animate:true}); } else { MAP.fitBounds(L.latLngBounds(pts).pad(0.25),{maxZoom:13,animate:true}); } _sosFocusLock=true; }catch(e){} }
   }catch(e){}
