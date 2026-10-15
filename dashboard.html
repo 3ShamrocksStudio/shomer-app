@@ -1144,15 +1144,21 @@ function loadLive(c){
   fetch(DB+'/dashfeed.json').then(function(r){return r.ok?r.json():null;}).catch(function(){return null;}).then(function(obj){
     var now=Date.now(), DAY=864e5, ONLINE=18e4; /* 3 min = "online" */
     var evList=[], presTerr=[], presAll=[], active24={}, onlineUsers={}, onlineTerrUsers={}, active24Terr={}, reps={};
-    var RECENT_PRES=36e5; /* show a presence pin if the user pinged within the last hour */
+    var RECENT_PRES=216e5; /* show a presence pin seen within last 6 hours */
     if(obj){ Object.keys(obj).forEach(function(id){
       var e=obj[id]; if(!e)return;
-      /* v243+ may write latitude/longitude or nested location — normalise to lat/lng */
-      var _lat=e.lat!=null?e.lat:(e.latitude!=null?e.latitude:(e.location&&e.location.lat!=null?e.location.lat:null));
-      var _lng=e.lng!=null?e.lng:(e.longitude!=null?e.longitude:(e.location&&e.location.lng!=null?e.location.lng:null));
+      /* normalise lat/lng — accept lat/lng, latitude/longitude, nested location object */
+      var _lat=e.lat!=null?e.lat:(e.latitude!=null?e.latitude:(e.location&&e.location.lat!=null?e.location.lat:(e.location&&e.location.latitude!=null?e.location.latitude:null)));
+      var _lng=e.lng!=null?e.lng:(e.longitude!=null?e.longitude:(e.location&&e.location.lng!=null?e.location.lng:(e.location&&e.location.longitude!=null?e.location.longitude:null)));
       if(_lat==null||_lng==null)return;
-      e.lat=_lat; e.lng=_lng;
-      var recent=(now-(e.ts||0))<=DAY;
+      e.lat=+_lat; e.lng=+_lng;
+      if(isNaN(e.lat)||isNaN(e.lng))return;
+      /* normalise timestamp — accept ts, timestamp, createdAt, created_at, t, time as ms or ISO string */
+      var _rawTs=e.ts!=null?e.ts:(e.timestamp!=null?e.timestamp:(e.createdAt!=null?e.createdAt:(e.created_at!=null?e.created_at:(e.t!=null?e.t:(e.time!=null?e.time:null)))));
+      var _ts=_rawTs==null?now:(typeof _rawTs==='number'?_rawTs:Date.parse(String(_rawTs)));
+      if(isNaN(_ts)||_ts<=0) _ts=now; /* if still bad, treat as "right now" so entry is never silently dropped */
+      e._ts=_ts;
+      var recent=(now-_ts)<=DAY;
       var inTerr=haversine(c.lat,c.lng,e.lat,e.lng)<=18;
       /* count activity — use record key as uid fallback when e.by is absent */
       var uid=e.by||e.uid||id;
@@ -1160,11 +1166,10 @@ function loadLive(c){
       /* accept presence regardless of type — also accept location/ping/heartbeat/loc; v243 may omit type entirely */
       var isPresence=e.type==='presence'||e.type==='pres'||e.type==='location'||e.type==='loc'||e.type==='ping'||e.type==='heartbeat'||(!e.type&&!e.cat&&!e.status&&!e.desc);
       if(isPresence){
-        var fresh=(now-(e.ts||0))<=ONLINE;
+        var fresh=(now-_ts)<=ONLINE;
         if(fresh){ onlineUsers[uid]=1; if(inTerr) onlineTerrUsers[uid]=1; }
-        /* every SHOMER user seen in the last hour gets a map pin — network-wide for the admin
-           (live) view, territory-only for a paying customer. Founder keeps a distinct crest. */
-        if((now-(e.ts||0))<=RECENT_PRES){ e.id=id; e._online=fresh; presAll.push(e); if(inTerr) presTerr.push(e); }
+        /* every SHOMER user seen within RECENT_PRES window gets a map pin */
+        if((now-_ts)<=RECENT_PRES){ e.id=id; e._online=fresh; presAll.push(e); if(inTerr) presTerr.push(e); }
         return;
       }
       if(e.status==='resolved')return; if(!recent)return;
