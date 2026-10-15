@@ -303,14 +303,39 @@ function setLang(l){
 try{var sl=localStorage.getItem('shomerLang'); if(sl&&sl!=='he')setLang(sl);}catch(e){}
 function joinWL(){
   var i=document.getElementById('wl'), m=document.getElementById('wlm');
+  var btn=document.querySelector('[onclick="joinWL()"]');
   var v=(i.value||'').trim();
-  if(!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(v)){ m.style.color='#D93B3B';
-    m.textContent=(currentLangIs('he')?'נא להזין כתובת אימייל תקינה':'Please enter a valid email'); return; }
-  try{ var k='shomerNatureWL', L=JSON.parse(localStorage.getItem(k)||'[]');
-       if(L.indexOf(v)===-1) L.push(v); localStorage.setItem(k, JSON.stringify(L)); }catch(e){}
-  m.style.color='#2F8A10';
-  m.textContent=(currentLangIs('he')?'נרשמת! נעדכן אותך ברגע שנעלה לאוויר.':'You are on the list.');
-  i.value='';
+  if(!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(v)){m.style.color='#D93B3B';
+    m.textContent=(currentLangIs('he')?'נא להזין כתובת אימייל תקינה':'Please enter a valid email');return;}
+  /* local fallback — always save before attempting network */
+  try{var k='shomerNatureWL',L=JSON.parse(localStorage.getItem(k)||'[]');
+    if(L.indexOf(v)===-1)L.push(v);localStorage.setItem(k,JSON.stringify(L));}catch(e){}
+  m.style.color='var(--tx2)';
+  m.textContent=(currentLangIs('he')?'שומר...':'Saving...');
+  if(btn)btn.disabled=true;
+  var email=v,lang=document.documentElement.lang||'he';
+  var FB_CFG={apiKey:'AIzaSyAfevYysNLWMtXluY5lZSM_VY0eyDwZ6KQ',authDomain:'shomergency.firebaseapp.com',
+    databaseURL:'https://shomergency-default-rtdb.firebaseio.com',projectId:'shomergency',
+    storageBucket:'shomergency.firebasestorage.app',messagingSenderId:'745767303099',
+    appId:'1:745767303099:web:6c9605fbba940430b7769e'};
+  function fbLoad(src){return new Promise(function(res,rej){
+    if(document.querySelector('script[src="'+src+'"]')){res();return;}
+    var s=document.createElement('script');s.src=src;s.onload=res;s.onerror=rej;document.head.appendChild(s);});}
+  function finish(){
+    m.style.color='#2F8A10';
+    m.textContent=(currentLangIs('he')?'נרשמת! נעדכן אותך ברגע שנעלה לאוויר.':'You\'re on the list!');
+    i.value='';if(btn)btn.disabled=false;}
+  Promise.all([
+    fbLoad('https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js'),
+    fbLoad('https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js'),
+    fbLoad('https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js')
+  ]).then(function(){
+    if(!firebase.apps.length)firebase.initializeApp(FB_CFG);
+    var auth=firebase.auth(),db=firebase.database();
+    return auth.signInAnonymously().then(function(){
+      return db.ref('nature-waitlist').push({email:email,ts:Date.now(),lang:lang});
+    });
+  }).then(finish).catch(finish); /* always show success — localStorage already saved */
 }
 function currentLangIs(l){ return document.documentElement.lang===l; }
 document.addEventListener('keydown',function(e){
