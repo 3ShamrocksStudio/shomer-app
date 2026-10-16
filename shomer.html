@@ -2399,6 +2399,13 @@ body.otp-active .ob-steps{display:none!important;}
      <div id="ag-hint" class="agf-hint" aria-live="polite"></div>
 
      <button class="agf-add" onclick="addGuardian()">הוסף שומר</button>
+
+     <!-- Way back in for someone who was invited. Essential on the installed app:
+          it cannot read the website's stashed token, so pasting the invite link
+          (gdEnterCodeSubmit parses g= out of the whole message) is the only path. -->
+     <button class="agf-hascode" type="button" onclick="gdEnterCodeOpen()">
+      <span data-he="קיבלת הזמנה? הדבק/י את הקישור" data-en="Got an invite? Paste the link" data-ar="تلقيت دعوة؟ الصق الرابط">קיבלת הזמנה? הדבק/י את הקישור</span>
+     </button>
     </div>
    </div>
 
@@ -12832,6 +12839,7 @@ html[dir="rtl"] .sh-back svg{transform:scaleX(-1)}
 .agf-invite{width:100%;display:flex;align-items:center;justify-content:center;gap:9px;padding:14px 12px;border-radius:999px;border:0;background:var(--gold-grad,linear-gradient(135deg,#C09020,#E0A828 60%,#F5C840));color:#23170a;font-family:inherit;font-weight:900;font-size:14px;line-height:1.25;text-align:center;cursor:pointer;margin-bottom:14px}
 .agf-invite svg{width:18px;height:18px;flex:0 0 auto}
 .agf-invite:active{transform:scale(.98)}
+.agf-hascode{display:block;width:100%;margin:12px 0 0;padding:8px;background:none;border:0;color:var(--g3);font-family:inherit;font-size:12.5px;font-weight:700;text-decoration:underline;text-underline-offset:3px;cursor:pointer}
 .agf-or{display:flex;align-items:center;gap:10px;margin:0 0 12px;color:var(--tx3);font-size:12px;font-weight:700}
 .agf-or::before,.agf-or::after{content:"";flex:1;height:1px;background:var(--b2)}
 .agf-field{display:flex;align-items:center;gap:10px;margin-bottom:10px}
