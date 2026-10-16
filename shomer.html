@@ -4240,6 +4240,43 @@ function nudgeMaybeShow(){
  }catch(e){}
 }
 
+/* ═══ "Did you know?" feature-discovery tips — shown at most once per 2 days ═══ */
+var DYK_TIPS=[
+ {k:'checkin', he:'הגדר/י טיימר צ׳ק-אין: אם לא תאשר/י בזמן, SHOMER מתריע למעגל שלך.', en:'Set a check-in timer: if you don\'t confirm in time, SHOMER alerts your circle.', ar:'اضبط مؤقت تسجيل الوصول: إن لم تؤكد في الوقت المحدد، ينبّه SHOMER دائرتك.', act:function(){ try{op('sh-dms');}catch(e){} }},
+ {k:'pin', he:'קוד ביטול שקט: בטל/י SOS שגוי עם PIN — בלי שמישהו יראה.', en:'Silent-cancel PIN: dismiss a false SOS with a PIN so no one sees.', ar:'رمز الإلغاء الصامت: ألغِ SOS خاطئاً برمز دون أن يرى أحد.', act:function(){ try{openSetPin();}catch(e){} }},
+ {k:'map', he:'מפה חיה: ראה/י דיווחים על אירועים באזורך ב-REAL TIME.', en:'Live map: see real-time community incidents in your area — and add your own report.', ar:'الخريطة الحية: شاهد بلاغات المجتمع الفورية وأضف بلاغك الخاص.', act:function(){ try{var u=document.getElementById('nav-upd');if(u)u.click();}catch(e){} }},
+ {k:'invite', he:'כל שומר שמזמין חבר חדש — מחזק את הרשת שמגינה על כולנו.', en:'Every SHOMER who invites a friend strengthens the whole community network.', ar:'كل حارس يدعو صديقاً يعزز شبكة الحماية للجميع.', act:function(){ try{shareInvite();}catch(e){} }},
+ {k:'stalk', he:'זיהוי עקיבה: אם מישהו עוקב אחריך — SHOMER מזהה ומתריע. הפעל/י בהגדרות.', en:'Stalking detection: if someone follows your movements, SHOMER detects and alerts. Enable in Settings.', ar:'كشف المتابعة: يكتشف SHOMER أي شخص يتعقبك. فعّله من الإعدادات.', act:function(){ try{op('sh-set');}catch(e){} }},
+ {k:'nature', he:'נסה/י SHOMER NATURE — מפת נתיבים לשימוש בשטח פתוח.', en:'Try SHOMER NATURE — trails and nature-area map for outdoor use.', ar:'جرّب SHOMER NATURE — خرائط المسارات للاستخدام في الهواء الطلق.', act:function(){ try{location.href='nature.html';}catch(e){} }},
+ {k:'dms', he:'שומר אוטומטי: אם לא תגיב/י תוך זמן — SOS יישלח אוטומטית. מנוחת דעת מלאה.', en:'Dead-man switch: if you don\'t respond in time, SOS is sent automatically. Total peace of mind.', ar:'مفتاح الأمان: إن لم تستجب في الوقت المحدد، يُرسَل SOS تلقائياً.', act:function(){ try{op('sh-dms');}catch(e){} }}
+];
+/* "Did you know?" banner — centred, same style as nudge-bar, at most once per 2 days */
+function dykMaybeShow(){
+ try{
+  if(_emergencyBusy()) return;
+  if(document.getElementById('nudge-bar')||document.getElementById('dyk-bar')) return;
+  if(!SS.dyk) SS.dyk={lastTs:0,idx:0};
+  var st=SS.dyk;
+  if(st.lastTs && (Date.now()-st.lastTs) < 2*24*3600000) return;
+  var he=currentLang==='he', ar=currentLang==='ar';
+  var tip=DYK_TIPS[(st.idx||0)%DYK_TIPS.length];
+  var tx=he?tip.he:ar?tip.ar:tip.en;
+  var lbl=he?'ידעת?':ar?'هل تعلم؟':'Did you know?';
+  var cta=he?'הראה לי':ar?'أرني':'Show me';
+  var bar=document.createElement('div'); bar.id='dyk-bar'; bar.className='nudge-bar';
+  bar.innerHTML='<span class="nudge-ic" aria-hidden="true">'+_nic(_NIC.bulb)+'</span>'
+   +'<div style="font-size:11px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:#E0A828;margin-bottom:1px">'+lbl+'</div>'
+   +'<span class="nudge-tx">'+ESC(tx)+'</span>'
+   +'<button class="nudge-cta">'+ESC(cta)+'</button>'
+   +'<button class="nudge-x" aria-label="dismiss">✕</button>';
+  var app=document.getElementById('app')||document.body; app.appendChild(bar);
+  st.lastTs=Date.now(); st.idx=((st.idx||0)+1)%DYK_TIPS.length; try{saveStore();}catch(e){}
+  bar.querySelector('.nudge-cta').onclick=function(){ try{tip.act();}catch(e){} bar.remove(); };
+  bar.querySelector('.nudge-x').onclick=function(){ bar.remove(); };
+  setTimeout(function(){ try{if(bar&&bar.parentNode){bar.style.transition='opacity .4s';bar.style.opacity='0';setTimeout(function(){bar.remove();},400);}}catch(e){} }, 16000);
+ }catch(e){}
+}
+
 /* ═══ v211: software-update notice, notification test, profile data (Phase A) ═══ */
 function _emergencyBusy(){ try{ return (typeof sosActive!=='undefined'&&sosActive) || (typeof sosPhase!=='undefined'&&sosPhase&&sosPhase!=='idle') || !!(SS&&SS.dms&&SS.dms.active); }catch(e){ return false; } }
 function fireUpdateNotice(){
@@ -4312,6 +4349,7 @@ function enterApp(returning){
  try{ guardianInit(); }catch(e){}
  try{ fbListenPersonAlerts(); }catch(e){}
  try{ setTimeout(nudgeMaybeShow, 4500); }catch(e){}
+ try{ setTimeout(dykMaybeShow, 5*60000); }catch(e){}  /* DYK tip: show after 5 min of use */
  try{ setTimeout(scheduleRetentionNudges, 9000); }catch(e){}
  try{ renderProfile2(); }catch(e){}
  try{ setTimeout(checkSoftwareUpdate, 6500); }catch(e){}
@@ -11648,12 +11686,14 @@ function updSetBadge(txt,stale){
  var b=document.getElementById('ver-badge'); if(b){ b.textContent=txt; b.style.color=stale?'#F5C840':'#6b7a9c'; }
  var s=document.getElementById('set-ver'); if(s){ s.textContent=txt; s.style.color=stale?'#F5C840':''; }   // Settings → About build row
 }
-function updShowBanner(pubV,done){
+function updShowBanner(pubV,done,notes){
   if(document.getElementById('upd-modal')) return;
   var he=currentLang==='he', ar=currentLang==='ar';
   var title=done?(he?'SH\u2721MER \u05e2\u05d5\u05d3\u05db\u05df':ar?'\u062a\u0645 \u062a\u062d\u062f\u064a\u062b SH\u2721MER':'SH\u2721MER updated'):(he?'\u05e2\u05d3\u05db\u05d5\u05df \u05d6\u05de\u05d9\u05df':ar?'\u062a\u062d\u062f\u064a\u062b \u0645\u062a\u0627\u062d':'Update available');
   var sub=done?(he?'\u05d4\u05d0\u05e4\u05dc\u05d9\u05e7\u05e6\u05d9\u05d4 \u05e2\u05d5\u05d3\u05db\u05e0\u05d4 \u05dc\u05d2\u05e8\u05e1\u05d4 \u05d4\u05d0\u05d7\u05e8\u05d5\u05e0\u05d4 \u2014 \u05ea\u05d5\u05d3\u05d4!':ar?'\u062a\u0645 \u0627\u0644\u062a\u062d\u062f\u064a\u062b':'Updated to the latest version \u2014 thank you!'):(he?'\u05d2\u05e8\u05e1\u05d4 \u05d7\u05d3\u05e9\u05d4 \u05e9\u05dc SH\u2721MER \u05de\u05d5\u05db\u05e0\u05d4 \u2014 \u05e9\u05d9\u05e4\u05d5\u05e8\u05d9\u05dd, \u05de\u05d4\u05d9\u05e8\u05d5\u05ea \u05d5\u05ea\u05d9\u05e7\u05d5\u05e0\u05d9 \u05d0\u05d1\u05d8\u05d7\u05d4.':ar?'\u0646\u0633\u062e\u0629 \u062c\u062f\u064a\u062f\u0629 \u062c\u0627\u0647\u0632\u0629':'A new version of SH\u2721MER is ready \u2014 improvements, speed & security.');
   var nowL=done?(he?'\u05de\u05e2\u05d5\u05dc\u05d4':ar?'\u0645\u062a\u0627\u0628\u0639\u0629':'Continue'):(he?'\u05e2\u05d3\u05db\u05df \u05e2\u05db\u05e9\u05d9\u05d5':ar?'\u062d\u062f\u0651\u062b \u0627\u0644\u0622\u0646':'Update now');
+  var hasNotes=Array.isArray(notes)&&notes.length>0;
+  var notesHdr=he?'\u05de\u05d4 \u05d7\u05d3\u05e9:':ar?'\u0627\u0644\u062c\u062f\u064a\u062f:':'What\'s new:';
   var ov=document.createElement('div'); ov.id='upd-modal';
   ov.setAttribute('style','position:fixed;inset:0;z-index:99998;display:flex;align-items:center;justify-content:center;padding:22px;background:rgba(6,11,22,.74);font-family:Rubik,system-ui,-apple-system,Segoe UI,Roboto,sans-serif');
   ov.innerHTML='<div style="width:100%;max-width:340px;background:linear-gradient(180deg,#141a27,#0f1218);border:1px solid #2a3450;border-radius:22px;padding:26px 22px 18px;text-align:center;box-shadow:0 24px 70px rgba(0,0,0,.6)">'
@@ -11665,7 +11705,11 @@ function updShowBanner(pubV,done){
     +'</div>'
     +'<div style="font-size:12px;font-weight:800;letter-spacing:.14em;color:#E0A828;text-transform:uppercase;margin-bottom:6px">SH<span style="color:#F5C840">\u2721</span>MER</div>'
     +'<div style="font-size:21px;font-weight:800;color:#f2f5fb;margin-bottom:8px">'+title+'</div>'
-    +'<div style="font-size:13.5px;color:#9aa6bd;line-height:1.55;margin-bottom:20px">'+sub+'</div>'
+    +'<div style="font-size:13.5px;color:#9aa6bd;line-height:1.55;margin-bottom:'+(hasNotes?'10':'20')+'px">'+sub+'</div>'
+    +(hasNotes?'<div style="text-align:start;background:rgba(255,255,255,.05);border-radius:10px;padding:10px 14px;margin-bottom:16px">'
+      +'<div style="font-size:10px;font-weight:800;letter-spacing:.1em;color:#E0A828;text-transform:uppercase;margin-bottom:6px">'+notesHdr+'</div>'
+      +notes.map(function(n){return '<div style="font-size:12.5px;color:#b8c3d8;line-height:1.6;padding:2px 0;display:flex;gap:7px"><span style="color:#E0A828;flex-shrink:0">\u203a</span><span>'+ESC(n)+'</span></div>';}).join('')
+      +'</div>':'')
     +'<button id="upd-refresh" style="width:100%;height:50px;border:none;border-radius:13px;background:linear-gradient(135deg,#b8841c,#e0a828 60%,#f3cf6a);color:#23180a;font-weight:800;font-size:16px;cursor:pointer;font-family:inherit">'+nowL+'</button>'
     +(done?'':'<button id="upd-x" style="width:100%;margin-top:10px;background:none;border:none;color:#8a93a6;font-size:13px;cursor:pointer;font-family:inherit">'+(he?'\u05d0\u05d7\u05e8 \u05db\u05da':ar?'\u0644\u0627\u062d\u0642\u064b\u0627':'Later')+'</button>')
     +'<div style="font-size:10px;color:#5f6b82;margin-top:10px">'+(he?'\u05d2\u05e8\u05e1\u05d4 ':ar?'\u0625\u0635\u062f\u0627\u0631 ':'version ')+pubV+'</div>'
@@ -11696,10 +11740,10 @@ function updCheck(manual){
              stale becomes false. If it's still stale after that, we fall back to the banner. */
           if(_firstRun && !window._updAutoApplied && !/[?&]u=\d+/.test(location.search)){
             window._updAutoApplied=true;
-            try{ setTimeout(function(){ try{forceFreshReload();}catch(e){ try{updShowBanner(d.v);}catch(_){} } }, 900); }
-            catch(e){ try{updShowBanner(d.v);}catch(_){} }
+            try{ setTimeout(function(){ try{forceFreshReload();}catch(e){ try{updShowBanner(d.v,false,d.notes);}catch(_){} } }, 900); }
+            catch(e){ try{updShowBanner(d.v,false,d.notes);}catch(_){} }
           } else {
-            updShowBanner(d.v);
+            updShowBanner(d.v,false,d.notes);
           }
         }
         else if(manual){ try{ toast((currentLang==='he'?'✓ מעודכן - ':'✓ Up to date - ')+APP_VER,'grn'); }catch(e){} }

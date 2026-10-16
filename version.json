@@ -1,1 +1,1 @@
-{ "v": "v246" }
+{ "v": "v246", "notes": ["Improved connection stability and faster map loading", "Faster circle alerts with reduced latency", "Background alert reliability improvements"] }
