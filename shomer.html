@@ -7207,7 +7207,10 @@ async function shareInvite(){
       fbWatchApproval(tok, null);
     }
   }catch(e){}
-  var link='https://www.shomer-app.co.il/shomer.html?g='+encodeURIComponent(tok);
+  /* Point invitees at the download page, not straight into the web app — most people
+     should install first. index.html stashes ?g= and forwards it on to the app, so the
+     pairing token survives the detour. */
+  var link='https://www.shomer-app.co.il/?g='+encodeURIComponent(tok);
   var txt=he
     ? ('הצטרף/י למעגל השומרים שלי ב-SH\u2721MER - אפליקציית בטיחות קהילתית חינמית. אם יקרה לי משהו, תדע/י איפה אני.\n'+link)
     : ('Join my SH\u2721MER SHOMER circle - a free community safety app. If something happens to me, you will know where I am.\n'+link);
@@ -8159,6 +8162,19 @@ function gdCheckInviteParam(){
  let tok='',nm='';
  try{ const u=new URL(location.href); tok=u.searchParams.get('g')||''; }catch(e){}
  if(!tok){ const m=(location.hash||'').match(/[#&]g=([^&]+)/); if(m){ try{tok=decodeURIComponent(m[1]);}catch(e){tok=m[1];} } }
+ /* Invite links now land on the download page first (index.html), which stashes the
+    token for us. Same origin, so we can pick it up here. One-shot, and expires after
+    24h so an old link can never surprise someone with an accept dialog. */
+ if(!tok){
+   try{
+     const raw=localStorage.getItem('shomer_pending_invite');
+     if(raw){
+       localStorage.removeItem('shomer_pending_invite');
+       const p=JSON.parse(raw);
+       if(p&&p.tok&&p.ts&&(Date.now()-p.ts)<86400000){ tok=p.tok; if(p.nm)nm=p.nm; }
+     }
+   }catch(e){}
+ }
  if(!tok) return;
  const hn=(location.hash||'').match(/[#&]n=([^&]+)/); if(hn){ try{nm=decodeURIComponent(hn[1]);}catch(e){nm=hn[1];} }
  try{ history.replaceState(null,'',gdBaseUrl()); }catch(e){}

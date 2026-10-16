@@ -5,6 +5,26 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#0C1B3A">
 <script>try{if(window.top!==window.self){window.top.location.replace(window.self.location.href);}}catch(e){}</script>
+<script>
+/* SH✡MER invite hand-off.
+   Guardian invites shared from the app link here (the download page) rather than
+   straight into the web app, so the invitee installs first. Stash the pairing token
+   — same origin as shomer.html, which picks it up — and forward it on any link into
+   the app so a direct tap works too. Expires in 24h; see gdCheckInviteParam(). */
+(function(){
+  try{
+    var tok=new URL(location.href).searchParams.get('g');
+    if(!tok) return;
+    try{ localStorage.setItem('shomer_pending_invite', JSON.stringify({tok:tok, ts:Date.now()})); }catch(e){}
+    var q='?g='+encodeURIComponent(tok);
+    document.addEventListener('DOMContentLoaded', function(){
+      try{
+        document.querySelectorAll('a[href="shomer.html"]').forEach(function(a){ a.href='shomer.html'+q; });
+      }catch(e){}
+    });
+  }catch(e){}
+})();
+</script>
 <title>SH✡MER - הרשת החברתית הראשונה בישראל של אזרחים למען אזרחים</title>
 <meta name="description" content="SH✡MER - רשת השומרים הראשונה בישראל. ברגעי סכנה ומצוקה, מי שנמצא הכי קרוב מגיע ראשון. אזעקה, מיקום ומעגל שומרים בלחיצה אחת. חינם לאזרחים.">
 <meta property="og:type" content="website">
