@@ -2366,19 +2366,23 @@ body.otp-active .ob-steps{display:none!important;}
     <div class="shm-h">הוספה לשומרים שלי</div>
 
     <div class="agf">
+     <!-- Primary path: share invite. Works on web, Android and iOS with no contacts
+          permission. Tap handling is delegated (capture phase) so one tap fires exactly
+          once — shareInvite() mints a real pairing token, so a double-fire makes two. -->
+     <button class="agf-invite" type="button">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
+       <path d="M4 12v7a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-7"/><path d="M16 6l-4-4-4 4"/><path d="M12 2v14"/></svg>
+      <span data-he="הזמן/י שומר/ת בוואטסאפ" data-en="Invite a SH✡MER via WhatsApp" data-ar="ادعُ حارساً عبر واتساب">הזמן/י שומר/ת בוואטסאפ</span>
+     </button>
+
+     <div class="agf-or"><span data-he="או הוסף/י לפי מספר" data-en="or add by number" data-ar="أو أضف برقم">או הוסף/י לפי מספר</span></div>
+
      <!-- number · dial code · country -->
      <div class="agf-row2" dir="ltr">
        <select class="agf-sel" id="ag-country" aria-label="Country code" onchange="agCountryPick()"></select>
        <input class="agf-in" id="ag-phone" type="tel" inputmode="tel" dir="ltr" autocomplete="tel" placeholder="50 123 4567" aria-label="Mobile number" oninput="agPhoneHint()" onkeydown="if(event.key==='Enter')addGuardian()">
        <input type="hidden" id="ag-cc">
       </div>
-
-     <!-- contacts -->
-     <button class="agf-contacts" onclick="agPickContact()">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
-       <path d="M16 21v-2a4 4 0 0 0-4-4H7a4 4 0 0 0-4 4v2"/><circle cx="9.5" cy="7" r="4"/><path d="M19 8v6M22 11h-6"/></svg>
-      <span>בחר מתוך אנשי קשר</span>
-     </button>
 
      <!-- my name for them -->
      <div class="agf-field">
@@ -3623,15 +3627,18 @@ function setLang(code){
     }catch(_e){}
   }
   document.addEventListener('click', _langFromTap, true);   // capture phase — the only handler
-  /* Same bulletproofing for the "pick from contacts" button — some webviews weren't
-     delivering its tap either. A capture-phase delegated handler guarantees it fires. */
+  /* Same bulletproofing for the "invite a SH✡MER" button — some webviews weren't
+     delivering its tap either. A capture-phase delegated handler guarantees it fires.
+     This is the ONLY handler for it (the button carries no inline onclick): shareInvite()
+     mints a pairing token and writes a pending pair, so firing twice would create two.
+     .agf-contacts is kept in the selector for any older cached shell still in the wild. */
   var _contactsBusy=false;
   function _contactsFromTap(e){
     try{
-      var el=e.target && e.target.closest ? e.target.closest('.agf-contacts') : null;
+      var el=e.target && e.target.closest ? e.target.closest('.agf-invite,.agf-contacts') : null;
       if(!el) return;
-      if(_contactsBusy) return; _contactsBusy=true; setTimeout(function(){_contactsBusy=false;},800);
-      try{ agPickContact(); }catch(_){}
+      if(_contactsBusy) return; _contactsBusy=true; setTimeout(function(){_contactsBusy=false;},1200);
+      try{ shareInvite(); }catch(_){}
     }catch(_e){}
   }
   document.addEventListener('click', _contactsFromTap, true); // capture phase — single path
@@ -12805,6 +12812,12 @@ html[dir="rtl"] .sh-back svg{transform:scaleX(-1)}
 .agf-sel.wide{width:100%}
 .agf-contacts{width:100%;display:flex;align-items:center;justify-content:center;gap:8px;padding:12px;border-radius:11px;border:1px solid var(--b2);background:var(--n3);color:var(--g3);font-family:inherit;font-weight:800;font-size:13.5px;cursor:pointer;margin-bottom:12px}
 .agf-contacts svg{width:17px;height:17px}
+/* Primary invite action — gold, matching .agf-add, since this is now the main path */
+.agf-invite{width:100%;display:flex;align-items:center;justify-content:center;gap:9px;padding:14px 12px;border-radius:999px;border:0;background:var(--gold-grad,linear-gradient(135deg,#C09020,#E0A828 60%,#F5C840));color:#23170a;font-family:inherit;font-weight:900;font-size:14px;line-height:1.25;text-align:center;cursor:pointer;margin-bottom:14px}
+.agf-invite svg{width:18px;height:18px;flex:0 0 auto}
+.agf-invite:active{transform:scale(.98)}
+.agf-or{display:flex;align-items:center;gap:10px;margin:0 0 12px;color:var(--tx3);font-size:12px;font-weight:700}
+.agf-or::before,.agf-or::after{content:"";flex:1;height:1px;background:var(--b2)}
 .agf-field{display:flex;align-items:center;gap:10px;margin-bottom:10px}
 .agf-field label{flex:0 0 auto;font-size:13px;font-weight:700;color:var(--tx2);white-space:nowrap}
 .agf-field .agf-in,.agf-field .agf-sel{flex:1}
