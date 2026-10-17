@@ -8300,6 +8300,9 @@ function gdFillIdentity(inv){
   var u=unpackInvite(inv&&inv.name);
   try{ if(u.salt && inv && inv.fromUid) setGuardianSalt(inv.fromUid, u.salt); }catch(e){}
   var nm=u.name, ph=u.phone, code=u.code;
+  /* Approve is only possible once the 4-digit code matches the one in the invite.
+     A missing or wrong code = we can't confirm who sent it, so we don't let it through. */
+  gdFillIdentity._ok=false; gdSetApproveEnabled(false);
   var av=document.getElementById('gd-ident-av');
   if(av) av.textContent=(nm.trim()[0]||'?').toUpperCase();
   var n=document.getElementById('gd-ident-n');
@@ -8319,11 +8322,13 @@ function gdFillIdentity(inv){
       var v=(inp.value||'').replace(/\D/g,'').slice(0,4);
       inp.value=v;
       if(!st) return;
-      if(v.length<4){ st.textContent=''; st.className='gd-code-st'; return; }
+      if(v.length<4){ st.textContent=''; st.className='gd-code-st'; gdFillIdentity._ok=false; gdSetApproveEnabled(false); return; }
       if(code && v===String(code)){
         st.textContent=he?'\u2713 מאומת - זה באמת הם':'\u2713 Verified - it really is them';
         st.className='gd-code-st ok';
+        gdFillIdentity._ok=true; gdSetApproveEnabled(true);
       } else {
+        gdFillIdentity._ok=false; gdSetApproveEnabled(false);
         st.textContent=he?'\u2717 הקוד לא תואם - אל תאשר/י':'\u2717 Code does not match - do NOT approve';
         st.className='gd-code-st bad';
       }
@@ -8350,7 +8355,17 @@ function gdLoadInvite(token){
     }).catch(function(){ gdFillIdentity(null); });
   }catch(e){ gdFillIdentity(null); }
 }
-function gdAcceptInvite(){ gdClose('gd-accept'); gdConnect(gdAcceptInvite._tok,gdAcceptInvite._nm,true); }
+function gdSetApproveEnabled(on){
+  try{ var b=document.getElementById('gd-accept-yes'); if(!b) return;
+    b.disabled=!on; b.style.opacity=on?'':'.45'; b.style.pointerEvents=on?'':'none'; }catch(e){}
+}
+function gdAcceptInvite(){
+  if(!gdFillIdentity._ok){
+    try{ toast(currentLang==='he'?'\u05d4\u05e7\u05dc\u05d3/\u05d9 \u05d0\u05ea \u05d4\u05e7\u05d5\u05d3 \u05e9\u05e7\u05d9\u05d1\u05dc\u05ea \u05de\u05d4\u05e9\u05d5\u05dc\u05d7/\u05ea \u05dc\u05e4\u05e0\u05d9 \u05d0\u05d9\u05e9\u05d5\u05e8':'Enter the code from the sender before approving','amb'); }catch(e){}
+    return;
+  }
+  gdClose('gd-accept'); gdConnect(gdAcceptInvite._tok,gdAcceptInvite._nm,true);
+}
 function gdDeclineInvite(){ gdClose('gd-accept'); }
 /* Create/confirm a pairing for a token, then start exchanging live position. */
 function gdConnect(tok,nm,fromLink){
@@ -9100,7 +9115,7 @@ try{ hydrateIcons(document); }catch(e){}
 /* Loaded-build version - shown in the diagnostic panel so a phone can prove
    whether it's on the latest build or a STALE cached one. Keep in lock-step
    with sw.js SW_VERSION on every deploy. */
-var APP_VER='v249';
+var APP_VER='v250';
 var FB={ready:false,uid:null,db:null,_presTimer:null,connected:false,listening:false,pushState:'default',near:0,swVer:'?',
   authState:'connecting',sdkLoaded:false,persist:'',permErr:null,err:null,wsProbe:'',csp:''};
 /* Always log connection diagnostics to the console so the real failure can be SEEN in Chrome. */
