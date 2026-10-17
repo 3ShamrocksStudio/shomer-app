@@ -9,7 +9,7 @@
 <meta name="apple-mobile-web-app-title" content="שומר">
 <meta http-equiv="X-Content-Type-Options" content="nosniff"><meta http-equiv="Referrer-Policy" content="no-referrer">
 <!-- CSP: no eval. Allows Leaflet (cdnjs) + OpenStreetMap tiles at runtime; everything else self-hosted. -->
-<meta http-equiv="Content-Security-Policy" content="default-src 'self' capacitor://localhost https://localhost http://localhost; base-uri 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdnjs.cloudflare.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: blob: https://cdnjs.cloudflare.com https://*.tile.openstreetmap.org https://*.basemaps.cartocdn.com https://server.arcgisonline.com https://*.arcgisonline.com https://*.google-analytics.com https://*.googletagmanager.com; connect-src 'self' capacitor://localhost https://localhost http://localhost https://shomer-app.co.il https://www.shomer-app.co.il https://server.arcgisonline.com https://*.arcgisonline.com https://overpass-api.de https://overpass.kumi.systems https://shomer-otp.shomer3s.workers.dev https://*.twil.io https://*.tile.openstreetmap.org https://*.basemaps.cartocdn.com https://*.googleapis.com https://fcmregistrations.googleapis.com https://firebaseinstallations.googleapis.com https://router.project-osrm.org https://*.firebaseio.com wss://*.firebaseio.com https://shomergency-default-rtdb.firebaseio.com wss://shomergency-default-rtdb.firebaseio.com https://*.firebasedatabase.app wss://*.firebasedatabase.app https://*.firebaseapp.com https://*.google-analytics.com https://*.analytics.google.com https://www.googletagmanager.com; script-src 'self' 'unsafe-inline' capacitor://localhost https://localhost http://localhost https://cdnjs.cloudflare.com https://www.gstatic.com https://apis.google.com https://www.googletagmanager.com; frame-src 'self' https://shomergency.firebaseapp.com https://www.google.com https://recaptcha.google.com https://accounts.google.com; manifest-src 'self'; worker-src 'self';">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self' capacitor://localhost https://localhost http://localhost; base-uri 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdnjs.cloudflare.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: blob: https://cdnjs.cloudflare.com https://*.tile.openstreetmap.org https://*.basemaps.cartocdn.com https://server.arcgisonline.com https://*.arcgisonline.com https://*.google-analytics.com https://*.googletagmanager.com; connect-src 'self' capacitor://localhost https://localhost http://localhost https://shomer-app.co.il https://www.shomer-app.co.il https://server.arcgisonline.com https://*.arcgisonline.com https://overpass-api.de https://overpass.kumi.systems https://nominatim.openstreetmap.org https://shomer-otp.shomer3s.workers.dev https://*.twil.io https://*.tile.openstreetmap.org https://*.basemaps.cartocdn.com https://*.googleapis.com https://fcmregistrations.googleapis.com https://firebaseinstallations.googleapis.com https://router.project-osrm.org https://*.firebaseio.com wss://*.firebaseio.com https://shomergency-default-rtdb.firebaseio.com wss://shomergency-default-rtdb.firebaseio.com https://*.firebasedatabase.app wss://*.firebasedatabase.app https://*.firebaseapp.com https://*.google-analytics.com https://*.analytics.google.com https://www.googletagmanager.com; script-src 'self' 'unsafe-inline' capacitor://localhost https://localhost http://localhost https://cdnjs.cloudflare.com https://www.gstatic.com https://apis.google.com https://www.googletagmanager.com; frame-src 'self' https://shomergency.firebaseapp.com https://www.google.com https://recaptcha.google.com https://accounts.google.com; manifest-src 'self'; worker-src 'self';">
 <title>SHOMER · שומר - Citizens for Citizens</title>
 <link rel="manifest" href="manifest.json">
 <link rel="icon" type="image/png" href="logo-192.png">
@@ -3514,7 +3514,10 @@ function injectReportCard(rep,silent){
 function resumeDMS(){
  /* Safety: DMS never auto-arms after app restart - user must explicitly
     re-enable it each session to prevent surprise alarms. */
+ var _was=!!(SS.dms&&SS.dms.active&&SS.dms.deadline&&SS.dms.deadline>Date.now());
  SS.dms.active=false; if(SS.dms)SS.dms.active=false; try{saveStore();}catch(e){}
+ /* ...but never SILENTLY: someone who armed it must know it is no longer watching. */
+ if(_was){ setTimeout(function(){ try{ toast(currentLang==='he'?'השומר האוטומטי נעצר כשהאפליקציה נפתחה מחדש - הפעל/י אותו שוב אם צריך':currentLang==='ar'?'توقف الحارس التلقائي عند إعادة فتح التطبيق - شغّله مجددًا إن لزم':'The automatic guard stopped when the app restarted - turn it on again if you still need it','amb',function(){ try{op('sh-dms');}catch(e){} }); }catch(e){} }, 2500); }
  return;
  if(!SS.dms.active||!SS.dms.deadline)return;
  const remain=Math.floor((SS.dms.deadline-Date.now())/1000);
@@ -3622,6 +3625,7 @@ function setLang(code){
  });
  applyTranslations();
  refreshAutoName(); // keep the auto-filled username in step with the language
+ try{ if(typeof renderFbStatus==='function') renderFbStatus(); }catch(e){}   // connection badge text follows the language
 }
 /* ── Bulletproof language switching ──────────────────────────────────────────
    Some devices/webviews were not delivering the tap to the Hebrew button (inline
@@ -4726,7 +4730,9 @@ function stopDMS(){
 }
 function dmsTick(){
  if(!dmsActive) return;
- dmsCountdown--;
+ /* Count from the stored deadline, not by decrementing: a phone throttles/freezes timers in
+    the background, so a decrement-counter ran slow and fired late (or never). */
+ if(SS.dms&&SS.dms.deadline){ dmsCountdown=Math.max(0,Math.round((SS.dms.deadline-Date.now())/1000)); } else { dmsCountdown--; }
  const fill=document.getElementById('dms-prog-fill');
  if(fill)fill.style.width=Math.max(0,(dmsCountdown/(dmsIv*60))*100)+'%';
  updateDMSDisplay();
@@ -4738,9 +4744,13 @@ function dmsTick(){
  }
  if(dmsCountdown<=0){
  clearInterval(dmsTimer);
- dmsActive=false;
- stopDMS();
+ /* FIRE FIRST. beginSOS() only accepts a 'dms' trigger while dmsActive is true - the old
+    order (stop, then trigger) meant the automatic SOS NEVER fired, only the toast claimed it. */
  triggerSOS('dms');
+ dmsActive=false; dmsWarning=false; SS.dms.active=false; SS.dms.deadline=0; saveStore();
+ try{ document.getElementById('dms-strip').classList.remove('on','warn'); document.getElementById('dms-status-card').style.display='none';
+      const tb=document.getElementById('dms-toggle-btn');if(tb)tb.textContent=T('dms_start');
+      const badge=document.getElementById('dms-dd-badge');if(badge){badge.textContent=T('dms_off_badge');badge.classList.add('off');} }catch(e){}
  toast(currentLang==='he'?' Dead Man\'s Switch - SOS אוטומטי!':' DMS - Auto SOS!','red');
  }
 }
@@ -5355,7 +5365,9 @@ function checkinToggle(){ var c=SS.checkin,he=currentLang==='he';
  c.enabled=true; saveStore(); reflectCheckin(); checkinSchedule();
  toast(he?'✓ צ׳ק-אין הדדי פעיל - נשאל כל '+c.freqMin+' דק׳':'✓ Mutual check-in on - every '+c.freqMin+' min','grn'); cl('sh-checkin');
 }
-function checkinSchedule(){ checkinStop(); if(!SS.checkin.enabled)return; _ciTimer=setTimeout(checkinPrompt,(SS.checkin.freqMin||30)*60000); }
+function checkinSchedule(){ checkinStop(); if(!SS.checkin.enabled)return; SS.checkin.due=Date.now()+(SS.checkin.freqMin||30)*60000; try{saveStore();}catch(e){} _ciTimer=setTimeout(checkinPrompt,(SS.checkin.freqMin||30)*60000); }
+/* Timers sleep with the phone: when the app comes back and the check-in is overdue, ask now. */
+try{ document.addEventListener('visibilitychange',function(){ try{ var c=SS.checkin; if(document.visibilityState==='visible'&&c&&c.enabled&&!c.awaiting&&c.due&&Date.now()>=c.due){ checkinPrompt(); } }catch(e){} }); }catch(e){}
 function checkinStop(){ if(_ciTimer){clearTimeout(_ciTimer);_ciTimer=null;} if(_ciCountdown){clearInterval(_ciCountdown);_ciCountdown=null;} }
 function checkinPrompt(){ if(!SS.checkin.enabled)return; var he=currentLang==='he';
  SS.checkin.awaiting=true; saveStore();
@@ -6897,7 +6909,7 @@ function renderArrivals(){
             try{ toast(he2?'לא נמצאה כתובת אמיתית. התראות מיקום פועלות רק על כתובות מאומתות.':'No real address found. Location alerts only work with verified addresses.','amb'); }catch(e){}
           }
         })
-        .catch(function(){ if(st){ st.className='arr-geo bad'; st.textContent='!'; } });
+        .catch(function(){ if(st){ st.className='arr-geo bad'; st.textContent='!'; } try{ toast(he2?'לא הצלחנו לבדוק את הכתובת - בדוק/י חיבור ונסה/י שוב':'Could not check the address - check your connection and try again','amb'); }catch(e){} });
     };
   });
   host.querySelectorAll('.arr-add').forEach(function(btn){
@@ -9369,7 +9381,7 @@ try{ hydrateIcons(document); }catch(e){}
 /* Loaded-build version - shown in the diagnostic panel so a phone can prove
    whether it's on the latest build or a STALE cached one. Keep in lock-step
    with sw.js SW_VERSION on every deploy. */
-var APP_VER='v256';
+var APP_VER='v257';
 var FB={ready:false,uid:null,db:null,_presTimer:null,connected:false,listening:false,pushState:'default',near:0,swVer:'?',
   authState:'connecting',sdkLoaded:false,persist:'',permErr:null,err:null,wsProbe:'',csp:''};
 /* Always log connection diagnostics to the console so the real failure can be SEEN in Chrome. */
@@ -9420,7 +9432,7 @@ function renderFbStatus(){
   // landed (auth.uid) - i.e. presence/SOS can actually flow under the locked rules.
   // Socket-up-but-not-authed is NOT "working", so it stays amber. It never looks
   // connected while it isn't.
-  var live = FB.connected && FB._authReady;
+  var live = FB.connected && FB._authReady && navigator.onLine!==false;   // a stream can look open for a while after the device dropped offline
   /* Only SHOW the pill when the live link has really been down for a few seconds. Boot,
      a resume from background and short network hiccups reconnect silently - a pill that
      flashes "not connected" for every blip teaches people to ignore it. */
@@ -9435,7 +9447,7 @@ function renderFbStatus(){
   else { state='connecting'; msg=he?'מתחבר מחדש…':ar?'جارٍ إعادة الاتصال…':'Reconnecting…'; }
   el.classList.remove('connected','connecting','offline'); el.classList.add(state);
   el.classList.toggle('fb-hide', live || downMs<FB_PILL_GRACE_MS);
-  if(!FB._pillTick){ FB._pillTick=setInterval(function(){ try{ if(!(FB.connected&&FB._authReady)) renderFbStatus(); }catch(e){} }, 2000); }
+  if(!FB._pillTick){ FB._pillTick=setInterval(function(){ try{ if(!(FB.connected&&FB._authReady)||navigator.onLine===false||FB._downSince) renderFbStatus(); }catch(e){} }, 2000); }
   if(txt)txt.textContent=msg;
   updateDiagPanel();
 }
@@ -9642,7 +9654,7 @@ document.addEventListener('visibilitychange',function(){ if(document.visibilityS
 window.addEventListener('focus',function(){ fbOnResume('focus'); });
 window.addEventListener('pageshow',function(ev){ fbOnResume(ev&&ev.persisted?'pageshow-bfcache':'pageshow'); });
 window.addEventListener('online',function(){ fbHealth.backoff=2000; fbHealth.lastTry=0; fbHealth.downAt=0; fbHealth._bounced=false; FB._authBack=2000; FB._authLastTry=0; fbOnResume('online'); });
-window.addEventListener('offline',function(){ try{ fbHealthTick(); }catch(e){} });
+window.addEventListener('offline',function(){ try{ fbHealthTick(); renderFbStatus(); }catch(e){} });
 // THE BACKBONE: health-check every 3s while the app is in the foreground.
 setInterval(function(){ if(document.visibilityState==='visible') fbHealthTick(); }, 3000);
 // keep the diagnostic panel live (RTDB state, clock) while it's open

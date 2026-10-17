@@ -1,1 +1,1 @@
-{"v": "v256", "notes": ["SOS alerts now carry your location to your SHOMERs, and keep it updated", "Only real responders are shown during an SOS", "Invites: clearer approve screen, declines are reported, phone invites always include a working link", "Ghost mode now really pauses your location"]}
+{"v": "v257", "notes": ["The automatic guard (dead-man switch) now really sends the SOS when time runs out", "Missed check-ins are caught as soon as you reopen the app", "Arrival addresses can be verified again", "Offline badge shows when the phone loses internet"]}
