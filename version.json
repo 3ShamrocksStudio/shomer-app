@@ -1,1 +1,1 @@
-{"v": "v254", "notes": ["Approving an invite asks for your name, so the inviter knows it was you", "Private invite name: only your SHOMERs see it", "14-day tester missions"]}
+{"v": "v255", "notes": ["The connection now recovers by itself after sleep, network changes and expired logins", "The connection badge only appears when you are really offline, and tapping it retries", "No more surprise reloads on startup"]}

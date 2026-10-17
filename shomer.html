@@ -465,6 +465,8 @@ input[type=range]:focus::-webkit-slider-thumb{box-shadow:0 0 0 4px rgba(224,168,
 .fb-status.offline .fb-dot{background:var(--r3);}
 @keyframes fbpulse{0%{box-shadow:0 0 0 0 rgba(14,136,64,.5)}100%{box-shadow:0 0 0 7px rgba(14,136,64,0)}}
 body.sheet-open .fb-status{opacity:0;pointer-events:none;}
+/* Hidden while connected and during short reconnects - shown only when the live link has really been down for a few seconds. */
+.fb-status.fb-hide{opacity:0;pointer-events:none;}
 /* Diagnostic panel - read on each phone to see exactly where SOS breaks */
 .diag-panel{position:absolute;top:calc(var(--hdr-top,0px) + var(--hdr) + 44px);left:50%;transform:translateX(-50%);z-index:561;width:min(86vw,330px);display:none;flex-direction:column;gap:2px;padding:13px 15px;border-radius:14px;background:rgba(9,18,36,.97);backdrop-filter:blur(14px);border:1px solid var(--b3);box-shadow:0 16px 44px rgba(0,0,0,.6);}
 .diag-panel.on{display:flex;}
@@ -1661,7 +1663,7 @@ body.otp-active .ob-steps{display:none!important;}
 </svg>
  </div>
  <div class="hdr-right">
- <button class="fb-status connecting" id="fb-status" onclick="explainStatus()" aria-live="polite" aria-label="מצב חיבור">
+ <button class="fb-status connecting fb-hide" id="fb-status" onclick="explainStatus()" aria-live="polite" aria-label="מצב חיבור">
  <span class="fb-dot" id="fb-dot" aria-hidden="true"></span>
  <span class="fb-status-txt" id="fb-status-txt">מתחבר…</span>
  </button>
@@ -9035,9 +9037,23 @@ function _checkForUpdate(){
       .then(function(d){
         if(!d||!d.v||typeof APP_VER==='undefined')return;
         var pub=parseInt(String(d.v).replace(/\D/g,''),10), cur=parseInt(String(APP_VER).replace(/\D/g,''),10);
-        if(pub&&cur&&pub>cur){ try{fbLog('STALE BUILD: running '+APP_VER+' · published '+d.v+' → force-updating');}catch(e){} if(typeof forceFreshReload==='function') forceFreshReload(); }
+        if(pub&&cur&&pub>cur){ try{fbLog('STALE BUILD: running '+APP_VER+' · published '+d.v);}catch(e){} if(!updAutoReload(d.v)){ try{ if(!_emergencyBusy()) updShowBanner(d.v,false,d.notes); }catch(e){} } }
       }).catch(function(){});
   }catch(e){}
+}
+/* Auto-reload to a newer published build - but only ONCE per published version per session
+   (a lagging CDN could otherwise reload every 20s), and never while an SOS / check-in timer is
+   running, during sign-up, or while the person is typing. Otherwise the caller shows the
+   "Update available" card and the person decides. Returns true if a reload was started. */
+function updAutoReload(pubV){
+  try{
+    if(typeof _emergencyBusy==='function' && _emergencyBusy()) return false;
+    if(typeof SS!=='undefined' && SS && !SS.onboarded && document.getElementById('ob') && getComputedStyle(document.getElementById('ob')).display!=='none' && (document.body.classList.contains('otp-active')||document.getElementById('ob-sms-panel'))) return false;
+    var ae=document.activeElement; if(ae && /^(INPUT|TEXTAREA)$/.test(ae.tagName) && ae.value) return false;
+    if(sessionStorage.getItem('shomerAutoUpd')===String(pubV)) return false;
+    sessionStorage.setItem('shomerAutoUpd',String(pubV));
+  }catch(e){ return false; }
+  try{ forceFreshReload(); return true; }catch(e){ return false; }
 }
 /* run on load */
 _checkForUpdate();
@@ -9226,7 +9242,7 @@ try{ hydrateIcons(document); }catch(e){}
 /* Loaded-build version - shown in the diagnostic panel so a phone can prove
    whether it's on the latest build or a STALE cached one. Keep in lock-step
    with sw.js SW_VERSION on every deploy. */
-var APP_VER='v254';
+var APP_VER='v255';
 var FB={ready:false,uid:null,db:null,_presTimer:null,connected:false,listening:false,pushState:'default',near:0,swVer:'?',
   authState:'connecting',sdkLoaded:false,persist:'',permErr:null,err:null,wsProbe:'',csp:''};
 /* Always log connection diagnostics to the console so the real failure can be SEEN in Chrome. */
@@ -9261,6 +9277,7 @@ function fbPushState(){
   try{ return Notification.permission; }catch(e){ return 'default'; }
 }
 /* Render the visible connection/listening status so each phone SHOWS its real state. */
+var FB_PILL_GRACE_MS=6000;
 function renderFbStatus(){
   var el=document.getElementById('fb-status'); if(!el)return;
   var txt=document.getElementById('fb-status-txt'); var he=currentLang==='he', ar=currentLang==='ar';
@@ -9277,10 +9294,21 @@ function renderFbStatus(){
   // Socket-up-but-not-authed is NOT "working", so it stays amber. It never looks
   // connected while it isn't.
   var live = FB.connected && FB._authReady;
-  if(failed){ state='offline'; msg=he?'לא מחובר · שגיאה':ar?'غير متصل · خطأ':'Not connected · error'; }
+  /* Only SHOW the pill when the live link has really been down for a few seconds. Boot,
+     a resume from background and short network hiccups reconnect silently - a pill that
+     flashes "not connected" for every blip teaches people to ignore it. */
+  var now=Date.now();
+  if(live){ FB._downSince=0; } else if(!FB._downSince){ FB._downSince=now; }
+  var downMs=FB._downSince?(now-FB._downSince):0;
+  var offNet=(navigator.onLine===false);
+  if(failed){ state='offline'; msg=he?'לא מחובר · הקש/י לנסות שוב':ar?'غير متصل · اضغط لإعادة المحاولة':'Not connected · tap to retry'; }
   else if(live){ state='connected'; msg=he?'מחובר':ar?'متصل':'Connected'; }
-  else { state='connecting'; msg=he?'לא מחובר · מנסה להתחבר':ar?'غير متصل · تتم المحاولة':'Not connected · trying'; }
+  else if(offNet){ state='offline'; msg=he?'אין אינטרנט · נתחבר כשיחזור':ar?'لا يوجد إنترنت · سنتصل عند عودته':'No internet · will reconnect'; }
+  else if(downMs>45000){ state='connecting'; msg=he?'לא מחובר · הקש/י לנסות שוב':ar?'غير متصل · اضغط لإعادة المحاولة':'Not connected · tap to retry'; }
+  else { state='connecting'; msg=he?'מתחבר מחדש…':ar?'جارٍ إعادة الاتصال…':'Reconnecting…'; }
   el.classList.remove('connected','connecting','offline'); el.classList.add(state);
+  el.classList.toggle('fb-hide', live || downMs<FB_PILL_GRACE_MS);
+  if(!FB._pillTick){ FB._pillTick=setInterval(function(){ try{ if(!(FB.connected&&FB._authReady)) renderFbStatus(); }catch(e){} }, 2000); }
   if(txt)txt.textContent=msg;
   updateDiagPanel();
 }
@@ -9332,12 +9360,14 @@ function updateDiagPanel(){
 }
 function explainStatus(){
   var he=currentLang==='he', ar=currentLang==='ar';
+  /* Tapping the pill while disconnected = "try again now": skip every backoff timer. */
+  if(!(FB.connected&&FB._authReady)){ try{ fbForceReconnect('tap'); }catch(e){} }
   if(!FB.ready){ toast(he?'עדיין לא מחובר - מנסה להתחבר לשירות החי…':ar?'غير متصل بعد - تتم محاولة الاتصال…':'Not connected yet - trying to reach the live service…','amb'); return; }
   if(!FB.connected){
     // Be ACCURATE: only say "no internet" if the DEVICE is offline. Otherwise the socket
     // is still trying - say so honestly (never imply it already works).
     if(!navigator.onLine){ toast(he?'אין חיבור לאינטרנט - נתחבר אוטומטית כשהרשת תחזור.':ar?'لا يوجد إنترنت - سنتصل تلقائيًا عند عودة الشبكة.':'No internet - we\'ll connect automatically when the network is back.','amb'); }
-    else { toast(he?'לא מחובר - מנסה להתחבר לשירות החי… (אם זה נמשך, פתח/י אבחון בלחיצה ארוכה על הלוגו)':ar?'غير متصل - تتم محاولة الاتصال…':'Not connected - trying to reach the live service…','amb'); }
+    else { toast(he?'מנסה להתחבר שוב עכשיו… אם זה נמשך, עבר/י בין Wi-Fi לסלולר או סגור/י ופתח/י את האפליקציה.':ar?'نحاول الاتصال مجددًا الآن… إن استمر ذلك، بدّل بين Wi-Fi والبيانات أو أعد فتح التطبيق.':'Retrying now… If this continues, switch between Wi-Fi and mobile data, or reopen the app.','amb'); }
     return;
   }
   if(!FB._authReady){ toast(he?'מחובר לרשת, מאמת זהות מאובטחת… (רגע)':ar?'متصل بالشبكة، جارٍ تأمين الهوية…':'Network up - securing identity… (a moment)','amb'); return; }
@@ -9409,9 +9439,35 @@ function fbHealthSwNudge(){
   }catch(e){}
 }
 /* The autonomous monitor tick - the permanent backbone of connection resilience. */
+/* Anonymous sign-in / ID token never landed (network blip at boot, a reload that aborted
+   the request, token call failed). The streams cannot open without it and nothing else
+   retries it, so retry here with backoff (2s → 30s) until it lands. Idempotent. */
+function fbAuthRetry(force){
+  try{
+    if(!FB.ready||FB._authReady) return;
+    var n=Date.now(); FB._authBack=FB._authBack||2000;
+    if(!force && FB._authLastTry && (n-FB._authLastTry)<FB._authBack) return;
+    FB._authLastTry=n; FB._authBack=force?2000:Math.min(Math.round(FB._authBack*1.6),30000);
+    if(!navigator.onLine) return;
+    fbLog('auth retry', force?'(forced)':'');
+    try{ var a=window.firebase&&window.firebase.auth&&window.firebase.auth(); if(a&&a.currentUser&&!FB.idToken){ fbAcquireToken(a.currentUser,true); return; } }catch(e){}
+    fbAuthBootstrap();
+  }catch(e){}
+}
+/* "Try again now": skip every backoff - used on tap, on 'online' and on resume. */
+function fbForceReconnect(reason){
+  try{
+    fbLog('force reconnect ·', reason||'');
+    if(!FB.ready){ if(!FB._initing){ try{ fbInit(); }catch(e){} } return; }
+    if(!FB._authReady){ fbAuthRetry(true); return; }
+    fbHealth.backoff=2000; fbHealth.lastTry=0;
+    fbWithFreshToken(function(){ fbSseReconnectAll(); try{ fbPublishPresence(); }catch(e){} });
+  }catch(e){}
+}
 function fbHealthTick(){
   try{
-    if(!FB.ready){ if(!FB._initing){ try{fbInit();}catch(e){} } fbHealthSet('init','data layer not ready'); return; }
+    if(!FB.ready){ if(!FB._initing){ try{fbInit();}catch(e){} } fbHealthSet('init','data layer not ready'); try{ renderFbStatus(); }catch(e){} return; }
+    if(!FB._authReady){ fbAuthRetry(false); }
     if(FB.connected){
       fbHealth.downAt=0; fbHealth.attempts=0; fbHealth.backoff=2000; fbHealth._bounced=false;
       fbHealthSet('connected'); fbConnBanner(false);
@@ -9441,6 +9497,15 @@ function fbHealthTick(){
 function fbOnResume(reason){
   try{
     if(!FB.ready && !FB._initing){ try{ fbInit(); }catch(e){} }
+    /* Back from the background: mobile OSes silently kill the SSE sockets (and the 1h ID
+       token may have expired meanwhile) while FB.connected still says "live". If any stream
+       has been quiet for >40s, refresh the token if needed and reopen the streams NOW
+       instead of waiting for the stale-stream watchdog. */
+    if(FB.ready && FB._authReady && reason!=='focus'){
+      var quiet=false, nn=Date.now();
+      for(var sp in FB_STREAMS){ var s=FB_STREAMS[sp]; if(s&&s.open&&(!s.healthy||!s.lastEvent||(nn-s.lastEvent)>40000)){ quiet=true; break; } }
+      if(quiet || reason==='online' || !fbTokenFresh()){ fbForceReconnect('resume:'+reason); }
+    } else if(FB.ready && !FB._authReady){ fbAuthRetry(true); }
     fbHealthTick();
     if(FB.connected){ try{ fbPublishPresence(); }catch(e){} }
     try{ renderFbStatus(); }catch(e){}
@@ -9449,7 +9514,7 @@ function fbOnResume(reason){
 document.addEventListener('visibilitychange',function(){ if(document.visibilityState==='visible') fbOnResume('visible'); });
 window.addEventListener('focus',function(){ fbOnResume('focus'); });
 window.addEventListener('pageshow',function(ev){ fbOnResume(ev&&ev.persisted?'pageshow-bfcache':'pageshow'); });
-window.addEventListener('online',function(){ fbHealth.backoff=2000; fbHealth.lastTry=0; fbHealth.downAt=0; fbHealth._bounced=false; fbOnResume('online'); });
+window.addEventListener('online',function(){ fbHealth.backoff=2000; fbHealth.lastTry=0; fbHealth.downAt=0; fbHealth._bounced=false; FB._authBack=2000; FB._authLastTry=0; fbOnResume('online'); });
 window.addEventListener('offline',function(){ try{ fbHealthTick(); }catch(e){} });
 // THE BACKBONE: health-check every 3s while the app is in the foreground.
 setInterval(function(){ if(document.visibilityState==='visible') fbHealthTick(); }, 3000);
@@ -9512,19 +9577,34 @@ function fbMergeIn(root,path,data){
   if(data&&typeof data==='object'){ Object.keys(data).forEach(function(k){ if(data[k]===null)delete o[k]; else o[k]=data[k]; }); }
   return root;
 }
+/* Every REST call goes out with a fresh ID token; a 401 (token expired while the phone
+   slept) refreshes the token and retries ONCE, so writes like presence/SOS never die
+   silently on an expired token. */
+function fbRestFetch(path,opt){
+  return new Promise(function(res){ fbWithFreshToken(res); })
+    .then(function(){ return fetch(fbRestUrl(path),opt); })
+    .then(function(r){
+      if(r.status===401 && FB.authUser){ return new Promise(function(res){ fbWithFreshToken(res,true); }).then(function(){ return fetch(fbRestUrl(path),opt); }); }
+      return r;
+    });
+}
 function fbRestGet(path){
-  return fetch(fbRestUrl(path),{method:'GET'}).then(function(r){
+  var pr=fbRestFetch(path,{method:'GET'}).then(function(r){
     if(!r.ok){ var e=new Error('HTTP '+r.status); e.code=(r.status===401?'unauthenticated':r.status===403?'PERMISSION_DENIED':'http-'+r.status); throw e; }
     return r.json();
   }).then(function(v){ return fbSnap(v); });
+  pr.catch(function(e){ fbLog('REST GET failed',path,(e&&(e.code||e.message))||e); });   // fire-and-forget callers must not raise unhandled rejections
+  return pr;
 }
 function fbRestWrite(method,path,val){
   var opt={ method:method, keepalive:true };
   if(method!=='DELETE'){ opt.headers={'Content-Type':'application/json'}; opt.body=JSON.stringify(val===undefined?null:val); }
-  return fetch(fbRestUrl(path),opt).then(function(r){
+  var pr=fbRestFetch(path,opt).then(function(r){
     if(!r.ok){ var e=new Error('HTTP '+r.status); e.code=(r.status===401?'unauthenticated':r.status===403?'PERMISSION_DENIED':'http-'+r.status); throw e; }
     return r.json().catch(function(){ return null; });
   });
+  pr.catch(function(e){ fbLog('REST '+method+' failed',path,(e&&(e.code||e.message))||e); });
+  return pr;
 }
 /* ── Sanitized PII-free municipal dashboard feed (coarse coords, no name/photo) ── */
 function dashFeedPush(id,type,lat,lng){
@@ -9540,19 +9620,29 @@ function fbStream(path,cb,errCb){
 }
 function fbStreamConnect(st){
   if(!st.open)return;
-  if(!FB.idToken){ if(st.retryT)clearTimeout(st.retryT); st.retryT=setTimeout(function(){ fbStreamConnect(st); },400); return; }
+  if(st.retryT){ clearTimeout(st.retryT); st.retryT=null; }   // never leave a second pending connect behind
+  if(!FB.idToken){ st.retryT=setTimeout(function(){ fbStreamConnect(st); },400); return; }
+  /* Stale token → refresh first (a stream opened with an expired token just 401s and loops).
+     Two failed connects in a row without a single event → force one refresh too (clock skew /
+     revoked token), at most every 30s. */
+  var forceTok=(st.fails>=2 && (!FB._tokLastRefresh || (Date.now()-FB._tokLastRefresh)>30000));
+  if(!fbTokenFresh() || forceTok){ fbWithFreshToken(function(){ if(st.open) fbStreamOpen(st); }, forceTok); return; }
+  fbStreamOpen(st);
+}
+function fbStreamOpen(st){
+  if(!st.open)return;
   try{ if(st.es)st.es.close(); }catch(e){}
   var es; try{ es=new EventSource(fbRestUrl(st.path)); }catch(e){ fbLog('SSE create failed',st.path,e); fbStreamRetry(st); return; }
-  st.es=es;
+  st.es=es; st.connectAt=Date.now();
   es.addEventListener('put',function(ev){ try{ var d=JSON.parse(ev.data); if(d.path==='/'){ st.cache=d.data; } else { st.cache=fbSetIn(st.cache,d.path,d.data); } fbStreamHealthy(st); if(st.cb)st.cb(fbSnap(st.cache)); }catch(e){ fbLog('SSE put parse err',st.path,e); } });
   es.addEventListener('patch',function(ev){ try{ var d=JSON.parse(ev.data); st.cache=fbMergeIn(st.cache,d.path,d.data); fbStreamHealthy(st); if(st.cb)st.cb(fbSnap(st.cache)); }catch(e){} });
   es.addEventListener('keep-alive',function(){ fbStreamHealthy(st); });
   es.addEventListener('cancel',function(){ fbLog('SSE cancel (permission?)',st.path); FB.permErr='PERMISSION_DENIED'; if(st.errCb)st.errCb({code:'PERMISSION_DENIED'}); try{renderFbStatus();}catch(e){} fbStreamRetry(st); });
-  es.addEventListener('auth_revoked',function(){ fbLog('SSE auth_revoked → refreshing token',st.path); fbRefreshTokenNow(function(){ try{es.close();}catch(e){} fbStreamConnect(st); }); });
+  es.addEventListener('auth_revoked',function(){ fbLog('SSE auth_revoked → refreshing token',st.path); try{es.close();}catch(e){} fbRefreshTokenNow(function(){ fbStreamConnect(st); }); });
   es.onopen=function(){ fbLog('SSE open',st.path); };
-  es.onerror=function(){ st.healthy=false; fbConnRecompute(); try{es.close();}catch(e){} if(st.open)fbStreamRetry(st); };
+  es.onerror=function(){ if(st.es!==es) return; st.fails=(st.fails||0)+1; st.healthy=false; fbConnRecompute(); try{es.close();}catch(e){} if(st.open)fbStreamRetry(st); };
 }
-function fbStreamHealthy(st){ st.healthy=true; st.lastEvent=Date.now(); st.backoff=1500; if(FB.permErr==='PERMISSION_DENIED')FB.permErr=null; fbConnRecompute(); }
+function fbStreamHealthy(st){ st.healthy=true; st.fails=0; st.lastEvent=Date.now(); st.backoff=1500; if(FB.permErr==='PERMISSION_DENIED')FB.permErr=null; fbConnRecompute(); }
 function fbStreamRetry(st){ if(!st.open)return; if(st.retryT)clearTimeout(st.retryT); st.retryT=setTimeout(function(){ fbStreamConnect(st); },st.backoff); st.backoff=Math.min(Math.round(st.backoff*1.7),20000); }
 function fbConnRecompute(){
   var any=false; for(var p in FB_STREAMS){ if(FB_STREAMS[p].healthy){ any=true; break; } }
@@ -9566,7 +9656,11 @@ function fbStreamCloseAll(){ for(var p in FB_STREAMS){ var st=FB_STREAMS[p]; st.
 /* Stale-stream watchdog: Firebase sends keep-alive ~every 30s; if a "healthy" stream
    goes silent >50s (a silently-dead connection), force a reconnect. */
 setInterval(function(){ if(document.visibilityState!=='visible')return; var now=Date.now();
-  for(var p in FB_STREAMS){ var st=FB_STREAMS[p]; if(st&&st.open&&st.healthy&&st.lastEvent&&(now-st.lastEvent)>50000){ fbLog('SSE stale >50s → reconnect',p); st.healthy=false; fbConnRecompute(); fbStreamConnect(st); } }
+  for(var p in FB_STREAMS){ var st=FB_STREAMS[p]; if(!st||!st.open)continue;
+    if(st.healthy&&st.lastEvent&&(now-st.lastEvent)>50000){ fbLog('SSE stale >50s → reconnect',p); st.healthy=false; fbConnRecompute(); fbStreamConnect(st); }
+    /* A connect that hangs (no error, no data - typical of a half-dead mobile socket) never
+       fires onerror, so nothing would ever retry it. Give it 20s, then start over. */
+    else if(!st.healthy&&st.es&&!st.retryT&&st.connectAt&&(now-st.connectAt)>20000&&(!st.lastEvent||st.lastEvent<st.connectAt)){ fbLog('SSE connect hung >20s → retry',p); st.fails=(st.fails||0)+1; fbStreamConnect(st); } }
 },10000);
 /* onDisconnect().remove() has no REST equivalent → best-effort DELETE on page unload.
    (Presence also self-expires via its ts: readers drop entries older than 90s.) */
@@ -9587,16 +9681,38 @@ function restRef(path){
   return ref;
 }
 /* Get / refresh the anonymous ID token that authorizes every SSE/REST call. */
+/* ID-token bookkeeping. The token lives ~1h. Timers do not run while a phone is asleep,
+   so we never trust a timer alone: every stream (re)connect and every REST call checks
+   the token's own expiry and refreshes first when it is (nearly) stale. */
+function fbSetToken(tok){
+  FB.idToken=tok;
+  try{ var p=JSON.parse(atob(String(tok).split('.')[1].replace(/-/g,'+').replace(/_/g,'/'))); FB.idTokenExp=(p&&p.exp)?p.exp*1000:0; }catch(e){ FB.idTokenExp=0; }
+}
+function fbTokenFresh(){ return !!FB.idToken && (!FB.idTokenExp || (FB.idTokenExp-Date.now())>120000); }
+/* Run cb with a fresh token (refreshing once if stale). Concurrent callers share ONE refresh. */
+function fbWithFreshToken(cb,force){
+  if(!force && fbTokenFresh()){ cb&&cb(); return; }
+  if(!FB.authUser){ cb&&cb(); return; }
+  FB._tokWaiters=FB._tokWaiters||[]; FB._tokWaiters.push(cb);
+  if(FB._tokRefreshing) return; FB._tokRefreshing=true;
+  var done=function(){ FB._tokRefreshing=false; var w=FB._tokWaiters; FB._tokWaiters=[]; w.forEach(function(f){ try{ f&&f(); }catch(e){} }); };
+  try{ FB.authUser.getIdToken(true).then(function(tok){ fbSetToken(tok); FB._tokLastRefresh=Date.now(); fbLog('ID token refreshed'); done(); })
+    .catch(function(e){ fbLog('token refresh failed',(e&&e.code)||e); done(); }); }catch(e){ done(); }
+}
 function fbAcquireToken(u,startLayer){
   FB.authUser=u;
-  u.getIdToken().then(function(tok){ FB.idToken=tok; if(startLayer)fbOnAuthed(u.uid); fbScheduleTokenRefresh(u); })
-   .catch(function(e){ FB.authState='token-err:'+((e&&e.code)||e); fbLog('getIdToken failed',e); try{renderFbStatus();}catch(_){ } });
+  u.getIdToken().then(function(tok){ fbSetToken(tok); if(startLayer)fbOnAuthed(u.uid); fbScheduleTokenRefresh(u); })
+   .catch(function(e){ FB.authState='token-err:'+((e&&e.code)||e); fbLog('getIdToken failed (auth retry will run)',e); try{renderFbStatus();}catch(_){ } });
 }
 function fbScheduleTokenRefresh(u){
   if(FB._tokTimer)clearInterval(FB._tokTimer);
-  FB._tokTimer=setInterval(function(){ try{ u.getIdToken(true).then(function(tok){ FB.idToken=tok; fbLog('ID token refreshed → reconnecting streams'); fbSseReconnectAll(); }).catch(function(e){ fbLog('token refresh failed',e); }); }catch(e){} }, 50*60*1000);
+  /* Check every minute (not one 50-min timer that sleeps with the phone): refresh + reopen
+     the streams once the token is within 2 min of expiry. */
+  FB._tokTimer=setInterval(function(){ try{ if(!fbTokenFresh()) fbWithFreshToken(function(){ fbLog('ID token renewed → reconnecting streams'); fbSseReconnectAll(); }); }catch(e){} }, 60*1000);
+  /* Keep our copy in sync whenever the SDK refreshes the token on its own. */
+  try{ if(!FB._idTokListener && window.firebase&&window.firebase.auth){ FB._idTokListener=true; window.firebase.auth().onIdTokenChanged(function(usr){ if(usr){ usr.getIdToken().then(function(t){ if(t&&t!==FB.idToken) fbSetToken(t); }).catch(function(){}); } }); } }catch(e){}
 }
-function fbRefreshTokenNow(cb){ try{ if(FB.authUser){ FB.authUser.getIdToken(true).then(function(tok){ FB.idToken=tok; cb&&cb(); }).catch(function(){ cb&&cb(); }); } else { cb&&cb(); } }catch(e){ cb&&cb(); } }
+function fbRefreshTokenNow(cb){ fbWithFreshToken(cb,true); }
 
 async function fbInit(){
   if(FB.ready)return;
@@ -9711,8 +9827,9 @@ async function fbAuthBootstrap(){
    Idempotent: re-fires harmlessly if the same uid arrives again. Everything keyed by
    FB.uid (presence/SOS/registry/pairs/tokens) now uses the AUTH uid, matching the rules. */
 function fbOnAuthed(uid){
-  FB.authUid=uid; FB.authState='ok';
+  FB.authUid=uid; FB.authState='ok'; FB._authBack=2000;
   if(FB._watchdog){ clearTimeout(FB._watchdog); FB._watchdog=null; }
+  if(FB.err&&/^auth-timeout/.test(FB.err)) FB.err=null;
   if(FB._authReady && FB.uid===uid){ return; } // already running on this uid
   FB.uid=uid; FB._authReady=true;
   fbLog('AUTH READY · secure uid =', uid, '· ID token acquired · opening SSE data layer');
@@ -11739,10 +11856,14 @@ function maybeSelfHeal(){
  if(!sw||sw==='?'||sw==='no-controller'||sw==='err'||sw==='no-sw-support') return;
  if(sw===APP_VER){ FB.swStale=false; return; } // already on the latest SW - nothing to do
  FB.swStale=true;
- if(sessionStorage.getItem('shomerSwHealed')==='1') return; // already healed this session - never loop
- sessionStorage.setItem('shomerSwHealed','1');
- fbLog('SELF-HEAL: stale SW',sw,'≠ app',APP_VER,'→ clearing once');
- forceFreshReload();
+ /* NO RELOAD. Navigations are network-first, so this HTML is already current; an older
+    worker only affects cached images. Reloading here aborted the in-flight sign-in and
+    stream connects (and sw.js once reported a stale hard-coded version on EVERY load, so
+    every cold start reloaded). Ask the browser to fetch the new worker instead - sw.js
+    calls skipWaiting + clients.claim, so it takes over quietly. */
+ if(FB._swHealAsked) return; FB._swHealAsked=true;
+ fbLog('SELF-HEAL: older SW',sw,'≠ app',APP_VER,'→ update in background (no reload)');
+ try{ navigator.serviceWorker.getRegistration().then(function(r){ if(r){ try{ r.update(); }catch(e){} } }).catch(function(){}); }catch(e){}
  }catch(e){ /* storage blocked → skip auto-heal; manual escapes remain */ }
 }
 /* Guaranteed escape from a stale cached build: drop EVERY SW + cache on this
@@ -11875,6 +11996,7 @@ function updSetBadge(txt,stale){
 }
 function updShowBanner(pubV,done,notes){
   if(document.getElementById('upd-modal')) return;
+  if(!done && window._updLaterV===pubV) return;   // "Later" means later - don't re-pop every 60s poll this session
   var he=currentLang==='he', ar=currentLang==='ar';
   var title=done?(he?'SH\u2721MER \u05e2\u05d5\u05d3\u05db\u05df':ar?'\u062a\u0645 \u062a\u062d\u062f\u064a\u062b SH\u2721MER':'SH\u2721MER updated'):(he?'\u05e2\u05d3\u05db\u05d5\u05df \u05d6\u05de\u05d9\u05df':ar?'\u062a\u062d\u062f\u064a\u062b \u0645\u062a\u0627\u062d':'Update available');
   var sub=done?(he?'\u05d4\u05d0\u05e4\u05dc\u05d9\u05e7\u05e6\u05d9\u05d4 \u05e2\u05d5\u05d3\u05db\u05e0\u05d4 \u05dc\u05d2\u05e8\u05e1\u05d4 \u05d4\u05d0\u05d7\u05e8\u05d5\u05e0\u05d4 \u2014 \u05ea\u05d5\u05d3\u05d4!':ar?'\u062a\u0645 \u0627\u0644\u062a\u062d\u062f\u064a\u062b':'Updated to the latest version \u2014 thank you!'):(he?'\u05d2\u05e8\u05e1\u05d4 \u05d7\u05d3\u05e9\u05d4 \u05e9\u05dc SH\u2721MER \u05de\u05d5\u05db\u05e0\u05d4 \u2014 \u05e9\u05d9\u05e4\u05d5\u05e8\u05d9\u05dd, \u05de\u05d4\u05d9\u05e8\u05d5\u05ea \u05d5\u05ea\u05d9\u05e7\u05d5\u05e0\u05d9 \u05d0\u05d1\u05d8\u05d7\u05d4.':ar?'\u0646\u0633\u062e\u0629 \u062c\u062f\u064a\u062f\u0629 \u062c\u0627\u0647\u0632\u0629':'A new version of SH\u2721MER is ready \u2014 improvements, speed & security.');
@@ -11903,7 +12025,7 @@ function updShowBanner(pubV,done,notes){
     +'</div>';
   document.body.appendChild(ov);
   document.getElementById('upd-refresh').onclick=function(){ if(done){ ov.remove(); return; } try{forceFreshReload();}catch(e){ try{location.reload();}catch(_){} } };
-  var x=document.getElementById('upd-x'); if(x)x.onclick=function(){ ov.remove(); };
+  var x=document.getElementById('upd-x'); if(x)x.onclick=function(){ window._updLaterV=pubV; ov.remove(); };
 }
 function updCheck(manual){
   var _firstRun=!!window._updBoot; window._updBoot=false;
@@ -11911,7 +12033,7 @@ function updCheck(manual){
     if(!navigator.onLine){ if(manual){ try{ toast(currentLang==='he'?'אין חיבור לרשת':'No internet connection','amb'); }catch(e){} } return; }
     try{ if('serviceWorker' in navigator) navigator.serviceWorker.getRegistration().then(function(r){ if(r)r.update(); }).catch(function(){}); }catch(e){}
     if(!manual && /[?&]u=\d+/.test(location.search) && !window._updRecheck){ window._updRecheck=1; }
-    fetch('https://shomer-app.co.il/version.json?cb='+(new Date().getTime()),{cache:'no-store'})
+    fetch('version.json?cb='+(new Date().getTime()),{cache:'no-store'})   /* same-origin: the bare domain 301s to www and CORS-blocks */
       .then(function(r){ return r.ok?r.json():null; })
       .then(function(d){
         if(!d||!d.v||typeof APP_VER==='undefined') return;
@@ -11925,11 +12047,10 @@ function updCheck(manual){
              so the user lands on the latest version WITHOUT manually tapping. Loop-safe: the
              forced reload adds ?u=<ts>, and once fresh content loads APP_VER===published so
              stale becomes false. If it's still stale after that, we fall back to the banner. */
-          if(_firstRun && !window._updAutoApplied && !/[?&]u=\d+/.test(location.search)){
+          if(_firstRun && !window._updAutoApplied){
             window._updAutoApplied=true;
-            try{ setTimeout(function(){ try{forceFreshReload();}catch(e){ try{updShowBanner(d.v,false,d.notes);}catch(_){} } }, 900); }
-            catch(e){ try{updShowBanner(d.v,false,d.notes);}catch(_){} }
-          } else {
+            setTimeout(function(){ if(!updAutoReload(d.v)){ try{ if(!_emergencyBusy()) updShowBanner(d.v,false,d.notes); }catch(_){} } }, 900);
+          } else if(!_emergencyBusy()){
             updShowBanner(d.v,false,d.notes);
           }
         }
@@ -13422,9 +13543,7 @@ html[dir="rtl"] .sh-back svg{transform:scaleX(-1)}
   setInterval(tag, 1000);
 }catch(e){} })();
 </script>
-<script defer src="https://static.cloudflareinsights.com/beacon.min.js/v4513226cdae34746b4dedf0b4dfa099e1781791509496" integrity="sha512-ZE9pZaUXND66v380QUtch/5sE9tPFh2zg45pR2PB0CVkCtOREv2AJKkSidISWkysEuQ0EH8faUU5du78bx87UQ==" data-cf-beacon='{"version":"2024.11.0","token":"cb798ec108614ddcb55eacf0c7b5bf23","r":1,"server_timing":{"name":{"cfCacheStatus":true,"cfEdge":true,"cfExtPri":true,"cfL4":true,"cfOrigin":true,"cfSpeedBrain":true},"location_startswith":null}}' crossorigin="anonymous"></script>
-<script defer src="https://static.cloudflareinsights.com/beacon.min.js/v4513226cdae34746b4dedf0b4dfa099e1781791509496" integrity="sha512-ZE9pZaUXND66v380QUtch/5sE9tPFh2zg45pR2PB0CVkCtOREv2AJKkSidISWkysEuQ0EH8faUU5du78bx87UQ==" data-cf-beacon='{"version":"2024.11.0","token":"cb798ec108614ddcb55eacf0c7b5bf23","r":1,"server_timing":{"name":{"cfCacheStatus":true,"cfEdge":true,"cfExtPri":true,"cfL4":true,"cfOrigin":true,"cfSpeedBrain":true},"location_startswith":null}}' crossorigin="anonymous"></script>
-<script defer src="https://static.cloudflareinsights.com/beacon.min.js/v4513226cdae34746b4dedf0b4dfa099e1781791509496" integrity="sha512-ZE9pZaUXND66v380QUtch/5sE9tPFh2zg45pR2PB0CVkCtOREv2AJKkSidISWkysEuQ0EH8faUU5du78bx87UQ==" data-cf-beacon='{"version":"2024.11.0","token":"cb798ec108614ddcb55eacf0c7b5bf23","r":1,"server_timing":{"name":{"cfCacheStatus":true,"cfEdge":true,"cfExtPri":true,"cfL4":true,"cfOrigin":true,"cfSpeedBrain":true},"location_startswith":null}}' crossorigin="anonymous">
+<script>
 /* ── ONE-TIME MIGRATION: clear stale DMS active state ──
    Prevents users who had DMS accidentally enabled from getting surprise alarms.
    Runs once, sets a flag so it never runs again. */
