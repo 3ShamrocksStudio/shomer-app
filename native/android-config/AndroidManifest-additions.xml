@@ -58,3 +58,13 @@
         <action android:name="com.htc.intent.action.QUICKBOOT_POWERON" />
     </intent-filter>
 </receiver>
+
+<!-- shomer-invite-links: invite links open the installed app (verified App Links).
+     Injected into MainActivity by scripts/apply-manifest.js. -->
+<intent-filter android:autoVerify="true">
+    <action android:name="android.intent.action.VIEW" />
+    <category android:name="android.intent.category.DEFAULT" />
+    <category android:name="android.intent.category.BROWSABLE" />
+    <data android:scheme="https" android:host="www.shomer-app.co.il" android:pathPrefix="/i" />
+    <data android:scheme="https" android:host="shomer-app.co.il" android:pathPrefix="/i" />
+</intent-filter>

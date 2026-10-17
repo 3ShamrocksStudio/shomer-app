@@ -137,23 +137,35 @@ jobs:
           sed -i 's#<application#    <uses-permission android:name="android.permission.USE_EXACT_ALARM" tools:node="remove" />\n    <application#' "$M"
           echo "--- EXACT_ALARM lines after patch ---"; grep -n "EXACT_ALARM" "$M" || true
 
-      - name: Build debug APK
+      - name: Decode upload keystore
+        working-directory: native/android
+        run: echo "${{ secrets.ANDROID_KEYSTORE_B64 }}" | base64 -d > app/shomer-upload.jks
+
+      # The website APK used to be a DEBUG build, signed with a throwaway key that is
+      # regenerated on every CI run - so no update could ever install over the previous
+      # one ("App not installed") and App Links could never verify. Sign it with the
+      # same upload key as the Play bundle: stable identity, updates install in place.
+      - name: Build signed release APK (website)
         working-directory: native/android
         run: |
           chmod +x ./gradlew
-          ./gradlew assembleDebug --stacktrace
+          ./gradlew assembleRelease --stacktrace \
+            -Pandroid.injected.signing.store.file=$(pwd)/app/shomer-upload.jks \
+            -Pandroid.injected.signing.store.password="${{ secrets.ANDROID_KEYSTORE_PW }}" \
+            -Pandroid.injected.signing.key.alias="${{ secrets.ANDROID_KEY_ALIAS }}" \
+            -Pandroid.injected.signing.key.password="${{ secrets.ANDROID_KEYSTORE_PW }}"
 
       - name: Upload APK artifact
         uses: actions/upload-artifact@v4
         with:
-          name: shomer-android-debug
-          path: native/android/app/build/outputs/apk/debug/app-debug.apk
+          name: shomer-android-release
+          path: native/android/app/build/outputs/apk/release/app-release.apk
           if-no-files-found: warn
 
-      - name: Publish debug APK to website (SHOMER.apk)
+      - name: Publish signed APK to website (SHOMER.apk)
         run: |
           set -e
-          cp native/android/app/build/outputs/apk/debug/app-debug.apk SHOMER.apk
+          cp native/android/app/build/outputs/apk/release/app-release.apk SHOMER.apk
           ls -la SHOMER.apk
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
@@ -161,10 +173,6 @@ jobs:
           git commit -m "Auto-publish SHOMER.apk to website (build ${GITHUB_RUN_NUMBER}, v1.0.${GITHUB_RUN_NUMBER})" || { echo "no APK change"; exit 0; }
           git pull --rebase --autostash origin main || true
           git push origin HEAD:main
-
-      - name: Decode upload keystore
-        working-directory: native/android
-        run: echo "${{ secrets.ANDROID_KEYSTORE_B64 }}" | base64 -d > app/shomer-upload.jks
 
       - name: Build signed release AAB (Google Play)
         working-directory: native/android

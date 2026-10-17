@@ -46,5 +46,14 @@ for (const rr of receivers) {
   }
 }
 console.log('applied', rcv, 'receiver(s)');
+/* Invite App Links: the shomer-invite-links intent-filter goes inside MainActivity. */
+const linkFilter = (additions.match(/<intent-filter android:autoVerify="true">[\s\S]*?<\/intent-filter>/) || [])[0];
+if (linkFilter && manifest.indexOf('android:pathPrefix="/i"') === -1) {
+  const actRe = /(<activity\b[^>]*android:name="[^"]*MainActivity"[\s\S]*?)(<\/activity>)/;
+  if (actRe.test(manifest)) {
+    manifest = manifest.replace(actRe, function (m, body, end) { return body + '            ' + linkFilter + '\n        ' + end; });
+    console.log('applied invite App Links intent-filter to MainActivity');
+  } else { console.log('MainActivity not found - App Links filter NOT applied'); }
+}
 fs.writeFileSync(manifestPath, manifest);
 console.log('applied', added, 'permission(s) and', svc, 'service(s) to AndroidManifest.xml');
