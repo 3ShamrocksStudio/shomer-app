@@ -3083,6 +3083,10 @@ let newUpd=0, repLock=false, menuOpen=false;
 let user={name:'',phone:'',city:''};
 let camStream=null, photos=[];
 let userLat=null, userLng=null;
+/* My current position for reports / SOS bus / responders, or null when unknown. (These
+   call sites used to read an undefined `myPos`, so every SOS reached guardians WITHOUT a
+   location and every community report failed with "location needed".) */
+function _myPos(){ return (typeof userLat==='number'&&typeof userLng==='number'&&isFinite(userLat)&&isFinite(userLng))?{lat:userLat,lng:userLng}:null; }
 let obCurStep=0;
 let shakeCount=0, shakeLastT=0;
 let dmsActive=false, dmsInterval=5, dmsTimer=null, dmsCountdown=0, dmsWarning=false;
@@ -4076,8 +4080,12 @@ function _requestGeoWeb(){
  if(skipBtn)skipBtn.style.display='none';
  },
  err=>{
- const msgs={1:T('geo_err')+' - ',2:T('geo_err'),3:T('geo_wait')};
- showGeoResult(false,msgs[err.code]||T('geo_err'));
+ var _he=currentLang==='he', _ar=currentLang==='ar';
+ /* Say WHY and what to do next (it showed the title twice plus a dangling " - "). */
+ const msgs={1:_he?'הגישה למיקום חסומה. אפשר/י אותה בהגדרות הדפדפן/הטלפון ונסה/י שוב - או המשך/י בלי.':_ar?'الوصول إلى الموقع محظور. فعّله من إعدادات المتصفح/الهاتف وحاول مجددًا - أو تابع بدونه.':'Location is blocked. Allow it in your browser/phone settings and try again - or continue without it.',
+   2:_he?'לא התקבל מיקום. נסה/י שוב (עדיף ליד חלון) - או המשך/י בלי.':_ar?'لم نحصل على الموقع. حاول مجددًا - أو تابع بدونه.':'No location fix. Try again (near a window helps) - or continue without it.',
+   3:_he?'איתור המיקום לקח יותר מדי זמן. נסה/י שוב - או המשך/י בלי.':_ar?'استغرق تحديد الموقع وقتًا طويلًا. حاول مجددًا - أو تابع بدونه.':'Locating took too long. Try again - or continue without it.'};
+ showGeoResult(false,msgs[err.code]||msgs[2]);
  },
  {enableHighAccuracy:true,timeout:15000,maximumAge:0}
  );
@@ -4240,8 +4248,7 @@ function _nudgeGeoNow(){
 }
 function nudgeMaybeShow(){
  try{
-  if(_emergencyBusy()) return;
-  if(document.getElementById('nudge-bar')||document.getElementById('tp-bar')) return;
+  if(popupBusy()){ if((nudgeMaybeShow._tries=(nudgeMaybeShow._tries||0)+1)<10) setTimeout(nudgeMaybeShow, 45000); return; }
   var n=nudgeState();
   if(n.lastTs && (Date.now()-n.lastTs) < 18*3600000) return;   /* at most ~once / 18h */
   var pick=nudgePick(); if(!pick) return;
@@ -4268,8 +4275,7 @@ var DYK_TIPS=[
 /* "Did you know?" banner — centred, same style as nudge-bar, at most once per 2 days */
 function dykMaybeShow(){
  try{
-  if(_emergencyBusy()) return;
-  if(document.getElementById('nudge-bar')||document.getElementById('dyk-bar')) return;
+  if(popupBusy()){ if((dykMaybeShow._tries=(dykMaybeShow._tries||0)+1)<10) setTimeout(dykMaybeShow, 60000); return; }
   if(!SS.dyk) SS.dyk={lastTs:0,idx:0};
   var st=SS.dyk;
   if(st.lastTs && (Date.now()-st.lastTs) < 2*24*3600000) return;
@@ -4293,6 +4299,39 @@ function dykMaybeShow(){
 }
 
 /* ═══ v211: software-update notice, notification test, profile data (Phase A) ═══ */
+/* ══ ONE POPUP AT A TIME ══
+   Tester mission, nudge, "did you know", install / alerts prompts, get-the-app banner and
+   community nudges all used to fire on their own timers and stack on top of each other - and
+   on top of an invite waiting for approval. Rule: emergencies and invites come first; any
+   lower-priority card waits until the screen is clear, and is removed when an invite opens. */
+var POPUP_LOW_IDS=['tp-bar','nudge-bar','dyk-bar','community-nudge'], POPUP_LOW_SEL='.a2hs,.ios-install,.getapp-banner';
+function popupBusy(){
+  try{
+    if(_emergencyBusy()) return true;
+    if(document.querySelector('.in-sos')) return true;
+    var ob=document.getElementById('ob'); if(ob && getComputedStyle(ob).display!=='none' && !(SS&&SS.onboarded)) return true;
+    var acc=document.getElementById('gd-accept'); if(acc && acc.getAttribute('aria-hidden')==='false') return true;
+    var con=document.getElementById('gd-consent'); if(con && con.getAttribute('aria-hidden')==='false') return true;
+    if(document.getElementById('upd-modal')||document.getElementById('inbox-banner')||document.getElementById('invname-bar')) return true;
+    var sp=document.getElementById('setup-prompt'); if(sp && sp.classList.contains('on')) return true;
+    if(document.body.classList.contains('sheet-open')) return true;
+    try{ if(localStorage.getItem('shomer_pending_invite')) return true; }catch(e){}
+    for(var i=0;i<POPUP_LOW_IDS.length;i++){ if(document.getElementById(POPUP_LOW_IDS[i])) return true; }
+    if(document.querySelector(POPUP_LOW_SEL)) return true;
+  }catch(e){}
+  return false;
+}
+/* Run fn now if the screen is clear, else retry later (bounded). */
+function popupWhenClear(fn, ms, tries){
+  tries=(tries==null)?20:tries;
+  if(!popupBusy()){ try{ fn(); }catch(e){} return; }
+  if(tries>0) setTimeout(function(){ popupWhenClear(fn, ms, tries-1); }, ms||20000);
+}
+/* An invite (or other must-see card) is opening: clear the low-priority cards out of its way. */
+function popupClearLow(){
+  try{ POPUP_LOW_IDS.forEach(function(id){ var e=document.getElementById(id); if(e) e.remove(); });
+       document.querySelectorAll(POPUP_LOW_SEL).forEach(function(e){ e.remove(); }); }catch(e){}
+}
 function _emergencyBusy(){ try{ return (typeof sosActive!=='undefined'&&sosActive) || (typeof sosPhase!=='undefined'&&sosPhase&&sosPhase!=='idle') || !!(SS&&SS.dms&&SS.dms.active); }catch(e){ return false; } }
 function fireUpdateNotice(){
  try{
@@ -4382,8 +4421,7 @@ function tpMaybeShow(){
   if(idx<0||idx>=TP_DAYS) return;
   tpScheduleReminders();
   if(t.seen[day]) return;
-  var _acc=document.getElementById('gd-accept');
-  if(document.getElementById('nudge-bar')||document.getElementById('tp-bar')||(_acc&&_acc.getAttribute('aria-hidden')==='false')) { setTimeout(tpMaybeShow, 20000); return; }
+  if(popupBusy()) { if((tpMaybeShow._tries=(tpMaybeShow._tries||0)+1)<30) setTimeout(tpMaybeShow, 20000); return; }
   t.seen[day]=Date.now(); try{saveStore();}catch(e){}
   var he=currentLang==='he', m=TP_MISSIONS[idx];
   var bar=document.createElement('div'); bar.id='tp-bar'; bar.className='nudge-bar';
@@ -4993,6 +5031,7 @@ function beginSOS(trigger){
  if(sosPhase!=='idle')return;
  /* Guard: DMS-triggered SOS only fires if DMS is actually running this session */
  if(trigger==='dms'&&!dmsActive)return;
+ try{ popupClearLow(); }catch(e){}   // nothing may sit on top of an emergency
  sosPhase='countdown'; sosActive=true; curSosTrigger=trigger||'manual';
  const btn=document.getElementById('sos-btn');
  if(btn){btn.classList.add('active');btn.setAttribute('aria-pressed','true');}
@@ -5099,14 +5138,7 @@ function activateSOS(){
  const call=window.confirm(he?'לחייג למשטרה 100 אוטומטית?\n(לחץ אישור לחיוג)':'Auto-call police 100?\n(Press OK to dial)');
  if(call) window.location.href='tel:100';
  },2000);
- let r=0;
- clearInterval(sosTimer);
- sosTimer=setInterval(()=>{
- r++;
- const ss=document.getElementById('ss-s');
- if(ss) ss.textContent=`${r} ${he?'שומר'+(r>1?'ים':'')+' בדרך':'SHOMER'+(r>1?'s':'')+' responding'}`;
- if(r>=3){toast(he?'3 שומרים בדרך - הישאר במקומך!':'3 SHOMERs responding - stay put!','grn',function(){try{openUpdates();}catch(e){}});clearInterval(sosTimer);}
- },5000);
+ clearInterval(sosTimer);   /* no simulated "N SHOMERs responding" - only REAL responders are ever shown (help bar / showRespToPerson) */
  setTimeout(()=>{if(sosPhase==='active')openUpdates();},800);
 }
 
@@ -5392,9 +5424,9 @@ function _runMorse(){
 }
 function stopMorse(){ _morseTimeouts.forEach(clearTimeout); _morseTimeouts=[]; _torch(false); if(_torchTrack){ try{_torchTrack.stop();}catch(e){} _torchTrack=null; } }
 function resolveSOS(){
- try{ sosClearBroadcast(); }catch(e){}
- if(sosPhase!=='active')return;
+ if(sosPhase!=='active'){ try{ sosClearBroadcast(); }catch(e){} return; }
  var proceed=function(){
+  try{ sosClearBroadcast(); }catch(e){}   // only after the cancel code passed - a thief tapping SOS must not stand the guardians down
   clearInterval(sosTimer); stopSosAlarm(); stopMaxAttention(); releaseWake();
   try{ if(curSosId){ FB.db&&FB.db.ref('responders/'+curSosId).off&&FB.db.ref('responders/'+curSosId).off(); delete fbRespStreams[curSosId]; } fbClearResponderMarkers(); }catch(e){}
   sosPhase='idle'; sosActive=false;
@@ -5635,6 +5667,7 @@ function showCommunityNudge(msg, ctaLabel, action){
   try{
     var he=(typeof currentLang!=='undefined' && currentLang==='he');
     if(document.getElementById('community-nudge')) return;
+    if(popupBusy()) return;
     var b=document.createElement('div');
     b.id='community-nudge';
     b.style.cssText='position:fixed;left:50%;bottom:calc(var(--nav,64px) + 78px);transform:translateX(-50%);z-index:9400;max-width:90vw;width:340px;background:linear-gradient(160deg,#0F1D33,#132743);border:1px solid rgba(201,168,76,.35);border-radius:16px;box-shadow:0 12px 40px rgba(0,0,0,.5);padding:15px 16px;font-family:Heebo,sans-serif;direction:'+(he?'rtl':'ltr');
@@ -5687,17 +5720,20 @@ function communityNudge(){
     var n = nudges[opens % nudges.length];
     localStorage.setItem('shomerLastNudge', String(Date.now()));
     setTimeout(function(){
-      try{ toast(he?n.he:n.en, '', n.act); }catch(e){}
+      try{ if(!popupBusy()) toast(he?n.he:n.en, '', n.act); }catch(e){}
     }, 4500);   // let the map settle before inviting
   }catch(e){}
 }
 function checkInbox(){
   try{
     if(typeof FB==='undefined' || !FB.ready || !FB._myPhoneHash) { setTimeout(checkInbox, 1500); return; }
-    if(window._inboxChecked) return; window._inboxChecked=true;
+    if(window._inboxChecked) return; window._inboxChecked=true; window._inboxAt=Date.now();
     fbRestGet('invites/inbox_'+FB._myPhoneHash).then(function(snap){
       var box = snap && snap.val ? snap.val() : snap;
       if(!box) return;
+      if(box.fromUid && box.token){ box={}; box[snap.val().token]=snap.val(); box[snap.val().token]._flat=true; }   // current flat shape
+      /* skip invites from people already connected, or tokens already handled on this device */
+      try{ Object.keys(box).forEach(function(k){ var it=box[k]; if(it && (gdPairByToken(it.token||k) || (gdState().pairs||[]).some(function(p){return it.fromUid&&p.partnerUid===it.fromUid&&!p.pending;}))) delete box[k]; }); }catch(e){}
       var he=(typeof currentLang!=='undefined' && currentLang==='he');
       var keys=Object.keys(box).filter(function(k){ return box[k] && box[k].seen===false; });
       if(!keys.length) return;
@@ -5713,17 +5749,19 @@ function checkInbox(){
     }).catch(function(e){});
   }catch(e){}
 }
+try{ document.addEventListener('visibilitychange',function(){ if(document.visibilityState==='visible' && window._inboxChecked && (Date.now()-(window._inboxAt||0))>60000 && !document.getElementById('inbox-banner')){ window._inboxChecked=false; checkInbox(); } }); }catch(e){}
 function showInboxBanner(msg, inviteKeys, box){
   try{
     var he=(typeof currentLang!=='undefined' && currentLang==='he');
     var existing=document.getElementById('inbox-banner'); if(existing) existing.remove();
+    try{ popupClearLow(); }catch(e){}
     var b=document.createElement('div');
     b.id='inbox-banner';
     b.style.cssText='position:fixed;left:50%;top:calc(var(--hdr,64px) + 12px);transform:translateX(-50%);z-index:9500;max-width:92vw;background:linear-gradient(135deg,#C09020,#E0A828,#F5C840);color:#1a1206;padding:13px 16px;border-radius:14px;box-shadow:0 8px 28px rgba(0,0,0,.4);display:flex;align-items:center;gap:12px;font:700 13.5px Heebo,sans-serif;cursor:pointer';
     b.innerHTML='<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" style="flex-shrink:0"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/></svg><span style="flex:1">'+msg+'</span><span style="background:rgba(0,0,0,.15);border-radius:8px;padding:5px 10px;font-weight:800">'+(he?'הצג':'View')+'</span>';
     b.onclick=function(){
       /* mark seen + open the SHOMERs/circle screen so they can accept */
-      try{ inviteKeys.forEach(function(k){ fbRestWrite('PUT','invites/inbox_'+FB._myPhoneHash+'/'+k+'/seen', true); }); }catch(e){}
+      try{ inviteKeys.forEach(function(k){ fbRestWrite('PUT','invites/inbox_'+FB._myPhoneHash+((box[k]&&box[k]._flat)?'':('/'+k))+'/seen', true); }); }catch(e){}
       b.remove();
       /* Straight to the approve screen for the newest invite (name, number, code). */
       try{
@@ -5822,6 +5860,7 @@ function _startGeoWatchNow(){
  /* On every app open, center the map on the user's own location the first time we get a fix. */
  if(!_centeredOnOpen && MAP){ try{ MAP.setView([userLat,userLng], Math.max(MAP.getZoom(),15), {animate:true}); }catch(e){} _centeredOnOpen=true; }
  if(sosActive) addSOSPin(); // keep the live SOS pin on the user
+ try{ sosMaybeResendPos(); }catch(e){}
  try{ gdBroadcast(); }catch(e){} // share my real position with paired SHOMERs
  },
  ()=>{},
@@ -7371,6 +7410,10 @@ function inviteIdentityOk(then){
 async function shareInvite(){
   var he=currentLang==='he';
   if(!inviteIdentityOk(shareInvite)) return;
+  /* Inviting someone = sharing your location with them. The inviter skipped the one-time
+     sharing consent (only approvers saw it), so on Android background tracking never started
+     for them. Same gate as every other sharing path - shown once. */
+  if(!gdRequireConsent(shareInvite)) return;
   var linkCode=String(Math.floor(1000+Math.random()*9000));
   var tok='g'+Math.random().toString(36).slice(2,8)+Math.random().toString(36).slice(2,6);
   var myName=invName();   /* the private invite name - only invitees ever see it */
@@ -7443,7 +7486,10 @@ async function sendInviteSMS(phone, name, token, code){
         var digits=String(phone).replace(/[^0-9]/g,'');
         if(digits && typeof sha256Hex==='function'){
           sha256Hex(digits).then(function(ph){
-            try{ fbRestWrite('PUT','invites/inbox_'+ph+'/'+token, {
+            /* ONE flat record per recipient: the live rules validate fromUid+ts on invites/<key>
+               itself, so the old nested inbox_<hash>/<token> write was always rejected and the
+               in-app "X invited you" banner never appeared. */
+            try{ fbRestWrite('PUT','invites/inbox_'+ph, {
               fromUid:(FB.uid||''), type:'invite', token:token, fromName:invName(),
               fromPhone:((SS.user&&SS.user.phone)||''), code:String(code||''), ts:Date.now(), seen:false
             }); }catch(e){}
@@ -7466,7 +7512,7 @@ function inviteTextFor(name, token, code){
     ? ('היי '+(name||'')+', הוספתי אותך למעגל השומרים שלי ב-SH\u2721MER - אפליקציית בטיחות חינמית. אשר/י כדי שנוכל לראות זה את זה במקרה חירום:\n'+link)
     : ('Hi '+(name||'')+", I added you to my SH\u2721MER SHOMER circle - a free safety app. Approve so we can see each other in an emergency:\n"+link);
 }
-function showInvitePanel(name, phone, token, code){
+function showInvitePanel(name, phone, token, code, notOnApp){
   var he=currentLang==='he';
   var link=inviteLinkFor(token, code), txt=inviteTextFor(name, token, code);
   var old=document.getElementById('inv-panel'); if(old) old.remove();
@@ -7474,7 +7520,7 @@ function showInvitePanel(name, phone, token, code){
   p.id='inv-panel'; p.className='inv-panel';
   p.innerHTML=
     '<div class="inv-h">'+(he?('שלח/י את הבקשה ל'+ESC(name||'')):('Send the request to '+ESC(name||'')))+'</div>'
-   +'<div class="inv-sub">'+(he?'נשלחה אליהם בקשה ב-SMS. הם יראו את השם והמספר שלך.':'They were texted a request. They will see your name and number.')+'</div>'+(code?('<div class="inv-code"><span>'+(he?'קוד האימות שלך':'Your match code')+'</span><b dir="ltr">'+ESC(code)+'</b><i>'+(he?'אם הם לא בטוחים מי את/ה - תגיד/י להם את הקוד הזה':'If they are unsure who you are - tell them this code')+'</i></div>'):'')
+   +'<div class="inv-sub">'+(notOnApp?(he?'שלח/י להם את ההזמנה. אם SH\u2721MER עוד לא אצלם - הקישור מתקין את האפליקציה ופותח את הבקשה שלך.':'Send them the invite. If they don\'t have SH\u2721MER yet, the link installs it and opens your request.'):(he?'נשלחה אליהם בקשה ב-SMS. הם יראו את השם והמספר שלך.':'They were texted a request. They will see your name and number.'))+'</div>'+(code?('<div class="inv-code"><span>'+(he?'קוד האימות שלך':'Your match code')+'</span><b dir="ltr">'+ESC(code)+'</b><i>'+(he?'אם הם לא בטוחים מי את/ה - תגיד/י להם את הקוד הזה':'If they are unsure who you are - tell them this code')+'</i></div>'):'')
    +'<div class="inv-btns">'
    + (phone ? '<a class="inv-b wa" target="_blank" rel="noopener" href="https://wa.me/'+encodeURIComponent(phone)+'?text='+encodeURIComponent(txt)+'">WhatsApp</a>' : '')
    + (phone ? '<a class="inv-b sms" href="sms:+'+phone+'?&body='+encodeURIComponent(txt)+'">SMS</a>' : '')
@@ -7566,12 +7612,13 @@ function resendInvite(memberId){
   var g=gdState();
   var p=g.pairs.find(function(x){ return x.id===m.pairId; });
   if(!p||!p.token){ toast(currentLang==='he'?'אין בקשה פעילה':'No pending request','amb'); return; }
-  if(m.phoneCanon) sendInviteSMS(m.phoneCanon, m.name, p.token, p.code);
-  showInvitePanel(m.name, m.phoneCanon||'', p.token, p.code);
+  if(m.phoneCanon && m.registered) sendInviteSMS(m.phoneCanon, m.name, p.token, p.code);
+  showInvitePanel(m.name, m.phoneCanon||'', p.token, p.code, !m.registered);
 }
 async function addGuardian(){
  var he=currentLang==='he';
  if(!inviteIdentityOk(addGuardian)) return;
+ if(!gdRequireConsent(addGuardian)) return;   // one-time location-sharing consent (see shareInvite)
  var nmEl=document.getElementById('ag-name'), phEl=document.getElementById('ag-phone'), go=document.getElementById('ag-go');
  var name=((nmEl&&nmEl.value)||'').trim().substring(0,24);
  var raw=((phEl&&phEl.value)||'').trim();
@@ -7608,12 +7655,31 @@ async function addGuardian(){
      }
    }catch(e){ if(typeof fbLog==='function')fbLog('SHOMER lookup:',(e&&e.message)||e); }
  }
+ /* Not on SH✡MER yet: still create a REAL invite, so the link they get installs the app AND
+    lands on the approve screen - before, they got a bare homepage link and nothing ever tied
+    them back to this pending row. */
+ if(validPhone && !registered){
+   try{
+     agToken='g'+Math.random().toString(36).slice(2,8)+Math.random().toString(36).slice(2,6);
+     await fbRestWrite('PUT','invites/'+agToken,{fromUid:FB.uid,ts:Date.now(),name:packInvite(invName(),(SS.user&&SS.user.phone)||'',agCode)});
+   }catch(e){ agToken=null; }
+   /* The registry is not readable under the live rules, so "not found" often means "can't
+      tell". Drop the request in their in-app inbox too (free, no SMS): if they already use
+      SH\u2721MER they see "X invited you" the next time they open it. */
+   try{ if(agToken){ var _ih=await sha256Hex(canon); if(_ih) fbRestWrite('PUT','invites/inbox_'+_ih,{fromUid:FB.uid,type:'invite',token:agToken,fromName:invName(),fromPhone:((SS.user&&SS.user.phone)||''),code:agCode,ts:Date.now(),seen:false}); } }catch(e){}
+ }
  var _selC=(document.getElementById('ag-circle')||{}).value||activeCircleId;
  var m={id:genId('m'),cid:_selC,name:name,rel:'',phoneCanon:validPhone?canon:null,registered:registered,partnerUid:theirUid,pending:(validPhone&&!registered),emoji:'',color:palette[(SS.circleMembers.length)%palette.length],lat:null,lng:null,moving:false,shareTo:true,seeThem:true,sos:false};
  /* NO simulated coordinates. A SHOMER is only ever drawn where they REALLY are
     (resolved from their live presence). Until then they have no position at all -
     showing a person at a fake location in a safety app is worse than showing nothing. */
  SS.circleMembers.push(m);
+ if(!registered && agToken){
+   var g0=gdState();
+   g0.pairs.push({id:genId('g'),token:agToken,name:name,rel:'',shareToThem:true,seeThem:true,addedTs:Date.now(),initiator:true,pending:true,partnerUid:null,linked:false,cid:_selC,code:agCode,color:m.color,lat:null,lng:null,ts:0,live:false,via:'phone-invite',simLat:null,simLng:null});
+   m.pairId=g0.pairs[g0.pairs.length-1].id;
+   fbWatchApproval(agToken, null);
+ }
  // A registered SHOMER also becomes a real map-visible PAIR (so we see them live).
  if(registered && theirUid){
    var g=gdState();
@@ -7636,8 +7702,9 @@ async function addGuardian(){
    sendInviteSMS(canon, name, agToken, agCode);
    showInvitePanel(name, canon, agToken, agCode);
  } else if(validPhone){
-   var invMsg=encodeURIComponent(he?('\u05d4\u05d9\u05d9! \u05d4\u05e6\u05d8\u05e8\u05e3/\u05d9 \u05d0\u05dc\u05d9\u05d9 \u05d1-SH\u2721MER - \u05d0\u05e4\u05dc\u05d9\u05e7\u05e6\u05d9\u05d9\u05ea \u05d1\u05d8\u05d9\u05d7\u05d5\u05ea \u05e7\u05d4\u05d9\u05dc\u05ea\u05d9\u05ea. \u05d7\u05d9\u05e0\u05dd: https://www.shomer-app.co.il/'):('Join me on SH\u2721MER: https://www.shomer-app.co.il/'));
-   toast(he?('\u2713 '+name+' \u05e0\u05d5\u05e1\u05e3/\u05d4. \u05d8\u05e8\u05dd \u05d1-SH\u2721MER - \u05d4\u05e7\u05e9/\u05d9 \u05dc\u05d4\u05d6\u05de\u05e0\u05d4'):('\u2713 '+name+' added. Tap to invite'),'amb',function(){ try{ window.open('https://wa.me/'+canon+'?text='+invMsg,'_blank'); }catch(e){} });
+   var invMsg=encodeURIComponent(agToken?inviteTextFor(name, agToken, agCode):(he?('\u05d4\u05d9\u05d9! \u05d4\u05e6\u05d8\u05e8\u05e3/\u05d9 \u05d0\u05dc\u05d9\u05d9 \u05d1-SH\u2721MER - \u05d0\u05e4\u05dc\u05d9\u05e7\u05e6\u05d9\u05d9\u05ea \u05d1\u05d8\u05d9\u05d7\u05d5\u05ea \u05e7\u05d4\u05d9\u05dc\u05ea\u05d9\u05ea. \u05d7\u05d9\u05e0\u05dd: https://www.shomer-app.co.il/'):('Join me on SH\u2721MER: https://www.shomer-app.co.il/')));
+   if(agToken){ showInvitePanel(name, canon, agToken, agCode, true); }
+   else toast(he?('\u2713 '+name+' \u05e0\u05d5\u05e1\u05e3/\u05d4. \u05d8\u05e8\u05dd \u05d1-SH\u2721MER - \u05d4\u05e7\u05e9/\u05d9 \u05dc\u05d4\u05d6\u05de\u05e0\u05d4'):('\u2713 '+name+' added. Tap to invite'),'amb',function(){ try{ window.open('https://wa.me/'+canon+'?text='+invMsg,'_blank'); }catch(e){} });
  } else {
    toast(he?('\u2713 '+name+' \u05e0\u05d5\u05e1\u05e3/\u05d4 \u05dc\u05de\u05e2\u05d2\u05dc'):('\u2713 '+name+' added'),'grn');
  }
@@ -7718,6 +7785,9 @@ function toggleGhost(){
  if(gt)gt.classList.toggle('on',SS.circleGhost);
  if(gr)gr.classList.toggle('on',SS.circleGhost);
  refreshMeMarker();
+ /* take effect NOW: withdraw / restore my position for guardians and pause native tracking */
+ try{ FB._presAt=0; fbPublishPresence(); }catch(e){}
+ try{ if(SS.circleGhost){ if(window.nativeStopTracking) nativeStopTracking(); } else if(window.nativeStartTracking) nativeStartTracking(); }catch(e){}
  toast(SS.circleGhost?(currentLang==='he'?' מצב רפאים פעיל - שיתוף הושהה':' Ghost mode on - sharing paused')
  :(currentLang==='he'?'שיתוף מיקום חודש':'Location sharing resumed'),SS.circleGhost?'pur':'grn');
  renderCircles();
@@ -8322,7 +8392,7 @@ function gdFlyTo(id){
 }
 
 /* ── Invite / accept / connect flows ── */
-function gdOpen(id){ const e=document.getElementById(id); if(e){ e.classList.add('on'); e.setAttribute('aria-hidden','false'); } }
+function gdOpen(id){ if(id==='gd-accept'){ try{ popupClearLow(); }catch(_){} } const e=document.getElementById(id); if(e){ e.classList.add('on'); e.setAttribute('aria-hidden','false'); } }
 function gdClose(id){ const e=document.getElementById(id); if(e){ e.classList.remove('on'); e.setAttribute('aria-hidden','true'); } }
 
 function gdCreateInvite(){
@@ -8369,12 +8439,14 @@ function gdCheckInviteParam(){
    try{
      const raw=localStorage.getItem('shomer_pending_invite');
      if(raw){
-       localStorage.removeItem('shomer_pending_invite');
        const p=JSON.parse(raw);
        if(p&&p.tok&&p.ts&&(Date.now()-p.ts)<86400000){ tok=p.tok; if(p.nm)nm=p.nm; if(p.code)autoCode=p.code; }
      }
    }catch(e){}
  }
+ /* One-shot: whichever way the invite arrived (URL or stash), consume the stash too -
+    otherwise an invite approved via the URL re-opened the approve screen on the next launch. */
+ try{ localStorage.removeItem('shomer_pending_invite'); }catch(e){}
  if(!tok) return;
  const hn=(location.hash||'').match(/[#&]n=([^&]+)/); if(hn){ try{nm=decodeURIComponent(hn[1]);}catch(e){nm=hn[1];} }
  if(!autoCode){ const hc=(location.hash||'').match(/[#&]c=([^&]+)/); if(hc){ try{autoCode=decodeURIComponent(hc[1]);}catch(e){autoCode=hc[1];} } }
@@ -8383,13 +8455,16 @@ function gdCheckInviteParam(){
  try{ history.replaceState(null,'',gdBaseUrl()); }catch(e){}
  const existing=gdPairByToken(tok);
  if(existing&&existing.initiator){
- existing.pending=false; saveStore();
- toast(currentLang==='he'?' קישור חי פעיל בחלון זה - זוז/י ושני החלונות יתעדכנו':' Live link active here - move and both windows update','grn');
- setTimeout(()=>{ try{locMe();}catch(e){} gdBroadcast(); gdRenderMarkers(); },500);
+ /* Tapping your OWN invite link must not mark it accepted (it used to set pending=false). */
+ toast(currentLang==='he'?'זו ההזמנה ששלחת - שלח/י אותה לאדם שאת/ה רוצה להוסיף':currentLang==='ar'?'هذه دعوتك أنت - أرسلها للشخص الذي تريد إضافته':'This is your own invite - send it to the person you want to add','amb');
+ return;
+ }
+ if(existing&&!existing.initiator&&existing.linked){
+ toast(currentLang==='he'?('כבר מחובר/ת ל'+(existing.name||'שומר/ת')):currentLang==='ar'?'متصل بالفعل':('Already connected to '+(existing.name||'this SHOMER')),'grn');
  return;
  }
  gdAcceptInvite._tok=tok; gdAcceptInvite._nm=nm;
- gdFillIdentity(null);              /* clear any previous identity before showing */
+ gdInviteShowAll(); gdFillIdentity(null);              /* clear any previous identity before showing */
  gdOpen('gd-accept');
  gdLoadInvite(tok);                 /* fetch WHO is asking - name, verified phone, match code */
 }
@@ -8408,7 +8483,7 @@ function gdFillIdentity(inv){
   /* Approve is only possible once the 4-digit code matches the one in the invite.
      A missing or wrong code = we can't confirm who sent it, so we don't let it through. */
   gdFillIdentity._ok=false; gdSetApproveEnabled(false);
-  try{ var _mi=document.getElementById('gd-my-invname'); if(_mi && !_mi.value) _mi.value=invName(); }catch(e){}
+  try{ var _mi=document.getElementById('gd-my-invname'); if(_mi && !_mi.value) _mi.value=invName()||((SS.user&&SS.user.name&&!/^SH\u2721MER\d/.test(SS.user.name))?SS.user.name:''); }catch(e){}
   try{ if(!he){ var _l=document.getElementById('gd-my-invname-lbl'); if(_l) _l.textContent='Your name - so they know you approved'; var _s=document.getElementById('gd-my-invname-sub'); if(_s) _s.textContent='Only your SHOMERs see this name. Everyone else sees you as anonymous.'; } }catch(e){}
   var av=document.getElementById('gd-ident-av');
   if(av) av.textContent=(nm.trim()[0]||'?').toUpperCase();
@@ -8454,13 +8529,58 @@ function gdFillIdentity(inv){
     if(host) host.innerHTML=strangerWarning(nm, ph);
   }catch(e){}
 }
-function gdLoadInvite(token){
+/* Approve screen states other than "here is who invited you": loading / invalid / own /
+   already connected / network. Approve stays disabled; the red button becomes "Close". */
+function gdInviteMsg(kind){
+  var he=currentLang==='he', ar=currentLang==='ar';
+  var T3=function(h,e,a){ return he?h:ar?a:e; };
+  var M={
+    loading:[T3('טוען את ההזמנה…','Loading the invite…','جارٍ تحميل الدعوة…'),''],
+    invalid:[T3('ההזמנה לא נמצאה','Invite not found','الدعوة غير موجودة'),T3('ייתכן שפג תוקפה או שהקישור נקטע. בקש/י מהשולח/ת לשלוח הזמנה חדשה.','It may have expired or the link was cut. Ask the sender for a new invite.','ربما انتهت صلاحيتها. اطلب دعوة جديدة.')],
+    own:[T3('זו ההזמנה ששלחת','This is your own invite','هذه دعوتك'),T3('שלח/י אותה לאדם שאת/ה רוצה להוסיף.','Send it to the person you want to add.','أرسلها للشخص الذي تريد إضافته.')],
+    already:[T3('כבר מחוברים','Already connected','متصلان بالفعل'),T3('אתם כבר שומרים זה של זה - אין צורך לאשר שוב.','You already guard each other - nothing to approve.','أنتما متصلان بالفعل.')],
+    used:[T3('ההזמנה כבר אושרה','This invite was already used','تم استخدام هذه الدعوة'),T3('כל הזמנה מאשרים פעם אחת. בקש/י מהשולח/ת הזמנה חדשה.','Each invite can be approved once. Ask the sender for a new one.','اطلب دعوة جديدة.')],
+    net:[T3('אין חיבור כרגע','No connection right now','لا يوجد اتصال'),T3('בדוק/י את האינטרנט - ננסה שוב אוטומטית.','Check your internet - we will retry automatically.','تحقق من الإنترنت.')]
+  }[kind]||['',''];
+  gdFillIdentity(null);
+  var n=document.getElementById('gd-ident-n'); if(n) n.textContent=M[0];
+  var h=document.getElementById('gd-ident-hint'); if(h) h.textContent=M[1];
+  var av=document.getElementById('gd-ident-av'); if(av) av.textContent=(kind==='loading')?'…':'!';
+  try{ var st=document.getElementById('gd-stranger'); if(st) st.innerHTML=''; }catch(e){}
+  ['gd-code-wrap','gd-my-invname','gd-my-invname-lbl','gd-my-invname-sub','gd-accept-warn','gd-accept-sub','gd-accept-yes'].forEach(function(id){
+    var el=document.getElementById(id)||document.querySelector('#gd-accept .'+id); if(el) el.style.display=(kind==='loading')?'':'none'; });
+  var no=document.getElementById('gd-accept-no'); if(no){ no.textContent=(kind==='loading')?(he?'דחה/י':ar?'رفض':'Decline'):(he?'סגור':ar?'إغلاق':'Close'); no.style.color=(kind==='loading')?'#FF7080':''; }
+  gdInviteMsg._kind=kind;
+}
+function gdInviteShowAll(){
+  ['gd-code-wrap','gd-my-invname','gd-my-invname-lbl','gd-my-invname-sub','gd-accept-warn','gd-accept-sub','gd-accept-yes'].forEach(function(id){
+    var el=document.getElementById(id)||document.querySelector('#gd-accept .'+id); if(el) el.style.display=''; });
+  var he=currentLang==='he', ar=currentLang==='ar';
+  var no=document.getElementById('gd-accept-no'); if(no){ no.textContent=he?'דחה/י':ar?'رفض':'Decline'; no.style.color='#FF7080'; }
+  gdInviteMsg._kind='';
+}
+async function gdLoadInvite(token){
   try{
-    if(!FB.ready||!token){ gdFillIdentity(null); return; }
-    FB.db.ref('invites/'+token).once('value').then(function(s){
-      gdFillIdentity(s && s.val && s.val());
-    }).catch(function(){ gdFillIdentity(null); });
-  }catch(e){ gdFillIdentity(null); }
+    if(!token){ gdInviteMsg('invalid'); return; }
+    /* Invites are readable only once signed in. On a cold start (the usual case for a link)
+       sign-in takes a moment - wait for it instead of showing "no name / no number" forever. */
+    if(!(FB.ready&&FB._authReady)){
+      gdInviteMsg('loading');
+      var ok=false; try{ ok=await fbEnsureAuthReady(20000); }catch(e){}
+      if(gdAcceptInvite._tok!==token) return;          // a newer invite replaced this one
+      if(!ok){ gdInviteMsg('net'); setTimeout(function(){ if(gdAcceptInvite._tok===token && document.getElementById('gd-accept').getAttribute('aria-hidden')==='false') gdLoadInvite(token); }, 5000); return; }
+    }
+    var inv=null;
+    try{ var s=await fbRestGet('invites/'+token); inv=s&&s.val?s.val():null; }
+    catch(e){ if(gdAcceptInvite._tok===token){ gdInviteMsg('net'); setTimeout(function(){ if(gdAcceptInvite._tok===token && document.getElementById('gd-accept').getAttribute('aria-hidden')==='false') gdLoadInvite(token); }, 5000); } return; }
+    if(gdAcceptInvite._tok!==token) return;
+    if(!inv||!inv.fromUid){ gdInviteMsg('invalid'); return; }
+    if(inv.fromUid===FB.uid){ gdInviteMsg('own'); return; }
+    if((gdState().pairs||[]).some(function(p){ return p.partnerUid===inv.fromUid && !p.pending; })){ gdInviteMsg('already'); return; }
+    if(inv.acceptedBy && inv.acceptedBy!==FB.uid){ gdInviteMsg('used'); return; }
+    gdInviteShowAll();
+    gdFillIdentity(inv);
+  }catch(e){ gdInviteMsg('invalid'); }
 }
 function gdSetApproveEnabled(on){
   try{ var b=document.getElementById('gd-accept-yes'); if(!b) return;
@@ -8479,7 +8599,14 @@ function gdAcceptInvite(){
   invNameSave(_v);
   gdClose('gd-accept'); gdConnect(gdAcceptInvite._tok,gdAcceptInvite._nm,true);
 }
-function gdDeclineInvite(){ gdClose('gd-accept'); }
+function gdDeclineInvite(){
+  var tok=gdAcceptInvite._tok, kind=gdInviteMsg._kind;
+  gdClose('gd-accept');
+  /* A real "no" (not just closing an invalid/own invite) tells the sender, so their request
+     doesn't sit on "waiting for approval" forever. */
+  if(tok && !kind && FB.ready && FB._authReady){ try{ fbRestWrite('PATCH','invites/'+tok,{declinedBy:FB.uid,declinedTs:Date.now()}); }catch(e){} }
+  gdAcceptInvite._tok=null;
+}
 /* Create/confirm a pairing for a token, then start exchanging live position. */
 function gdConnect(tok,nm,fromLink){
  if(!gdRequireConsent(()=>gdConnect(tok,nm,fromLink))) return; // explicit opt-in before sharing
@@ -8491,7 +8618,7 @@ function gdConnect(tok,nm,fromLink){
  simLat:TLV[0]+(Math.random()-.5)*.02,simLng:TLV[1]+(Math.random()-.5)*.02}; g.pairs.push(p); }
  else { p.pending=false; if(nm&&!p.name)p.name=nm; }
  // real backend link: record the mutual pairing in RTDB (binds the two accounts)
- try{ fbAcceptInvite(tok,(invName()||gdState().myName||(SS.user&&SS.user.name)||'')).then(function(fromUid){ if(fromUid){ p.partnerUid=fromUid; p.linked=true; saveStore(); gdRenderList(); } }); }catch(e){}
+ try{ fbAcceptInvite(tok,(invName()||gdState().myName||(SS.user&&SS.user.name)||'')).then(function(fromUid){ if(fromUid){ p.partnerUid=fromUid; p.linked=true; if(!p.name&&fbAcceptInvite._name)p.name=fbAcceptInvite._name; var mm=ensureMemberForPair(p); if(mm){ mm.partnerUid=fromUid; if(!mm.name)mm.name=p.name; } saveStore(); gdRenderList(); try{ renderCircles(); syncPairsToCircles(); }catch(e){} } }); }catch(e){}
  saveStore();
  gdSend({type:'hello'}); gdBroadcast(); gdRenderMarkers(); gdRenderList();
  if(document.getElementById('sh-circles')&&document.getElementById('sh-circles').classList.contains('open')){} else openCircles();
@@ -9242,7 +9369,7 @@ try{ hydrateIcons(document); }catch(e){}
 /* Loaded-build version - shown in the diagnostic panel so a phone can prove
    whether it's on the latest build or a STALE cached one. Keep in lock-step
    with sw.js SW_VERSION on every deploy. */
-var APP_VER='v255';
+var APP_VER='v256';
 var FB={ready:false,uid:null,db:null,_presTimer:null,connected:false,listening:false,pushState:'default',near:0,swVer:'?',
   authState:'connecting',sdkLoaded:false,persist:'',permErr:null,err:null,wsProbe:'',csp:''};
 /* Always log connection diagnostics to the console so the real failure can be SEEN in Chrome. */
@@ -9435,7 +9562,7 @@ function fbHealthRecover(){
 }
 function fbHealthSwNudge(){
   try{ var now=Date.now(); if(now-fbHealth._swNudge<60000) return; fbHealth._swNudge=now;
-    if('serviceWorker' in navigator) navigator.serviceWorker.getRegistration().then(function(r){ if(r){ try{r.update();}catch(e){} } }).catch(function(){});
+    if('serviceWorker' in navigator) navigator.serviceWorker.getRegistration().then(function(r){ if(r){ try{ var _u=r.update(); if(_u&&_u.catch)_u.catch(function(){}); }catch(e){} } }).catch(function(){});
   }catch(e){}
 }
 /* The autonomous monitor tick - the permanent backbone of connection resilience. */
@@ -9612,14 +9739,57 @@ function dashFeedPush(id,type,lat,lng){
     fbRestWrite('PUT','dashfeed/'+id,{type:String(type||'event'),lat:+(+lat).toFixed(2),lng:+(+lng).toFixed(2),ts:Date.now(),status:'active',by:FB.uid}); }catch(e){}
 }
 /* ── SSE live stream (mimics ref.on('value')) ── */
+/* ── CONNECTION BUDGET ──
+   The RTDB REST endpoint speaks HTTP/1.1 only, and browsers allow 6 connections per host.
+   Every open EventSource holds one of those 6 FOREVER. With a circle of 1-2 people the app
+   opened 8-12 listeners, so every further request - including SOS and "I'm coming" writes -
+   queued behind them and never went out. Now only a few HIGH-priority paths get a live
+   stream; everything else is fetched by short polls that share the remaining connections. */
+var FB_SSE_MAX=3;
+function fbStreamPrio(path){
+  if(path==='sos'||/^pairs\//.test(path)||/^invites\/sos_/.test(path)) return 'high';      // SOS fan-out + my pairings
+  if(/^invites\/(sd_|rp_)/.test(path)||/^responders\//.test(path)) return 'urgent-poll';   // only matter during an SOS
+  if(path==='founders') return 'rare';
+  return 'low';
+}
+function fbSseCount(){ var n=0; for(var p in FB_STREAMS){ var s=FB_STREAMS[p]; if(s&&s.open&&s.mode==='sse') n++; } return n; }
 function fbStream(path,cb,errCb){
   var st=FB_STREAMS[path];
   if(st){ st.cb=cb; st.errCb=errCb; return st; }
-  st={ path:path, cb:cb, errCb:errCb, cache:undefined, es:null, healthy:false, open:true, backoff:1500, retryT:null, lastEvent:0 };
+  var pr=fbStreamPrio(path);
+  st={ path:path, cb:cb, errCb:errCb, cache:undefined, es:null, healthy:false, open:true, backoff:1500, retryT:null, lastEvent:0,
+       mode:(pr==='high'&&fbSseCount()<FB_SSE_MAX)?'sse':'poll',
+       prio:pr, pollMs:(pr==='high')?5000:(pr==='rare'?120000:20000) };
   FB_STREAMS[path]=st; fbStreamConnect(st); return st;
+}
+/* Poll mode: one short GET, deliver only on change, then schedule the next. */
+function fbPollOnce(st){
+  if(!st.open)return;
+  if(st.retryT){ clearTimeout(st.retryT); st.retryT=null; }
+  /* SOS-only paths poll fast only while an SOS is actually running (mine or one I'm answering). */
+  /* A just-sent invite: the sender is usually staring at the screen waiting - check it often
+     for its first 10 minutes, then relax. */
+  if(st.prio==='low' && /^invites\/g/.test(st.path)){ st.pollMs=((Date.now()-(st.born||(st.born=Date.now())))<600000)?4000:60000; }
+  if(st.prio==='urgent-poll'){ var _busy=(typeof sosPhase!=='undefined'&&sosPhase==='active')||(typeof SOSBUS!=='undefined'&&SOSBUS.mine&&Object.keys(SOSBUS.mine).length>0); st.pollMs=_busy?3000:30000; }
+  var next=function(ms){ if(st.open){ st.retryT=setTimeout(function(){ fbPollOnce(st); }, ms); } };
+  if(!FB.idToken){ next(500); return; }
+  if(document.visibilityState==='hidden'){ next(st.pollMs); return; }      // resumes on the next tick after foreground
+  if(st._inflight) return; st._inflight=true;
+  fbRestGet(st.path).then(function(snap){
+    st._inflight=false;
+    var v=snap.val(), j=JSON.stringify(v===undefined?null:v);
+    fbStreamHealthy(st);
+    if(j!==st._lastJ){ st._lastJ=j; st.cache=v; if(st.cb) st.cb(fbSnap(v)); }
+    next(st.pollMs);
+  }).catch(function(e){
+    st._inflight=false;
+    if(e&&e.code==='PERMISSION_DENIED'){ if(st.errCb) st.errCb({code:'PERMISSION_DENIED'}); next(Math.max(st.pollMs,30000)); return; }
+    st.healthy=false; fbConnRecompute(); next(Math.min(st.pollMs*2,30000));
+  });
 }
 function fbStreamConnect(st){
   if(!st.open)return;
+  if(st.mode==='poll'){ fbPollOnce(st); return; }
   if(st.retryT){ clearTimeout(st.retryT); st.retryT=null; }   // never leave a second pending connect behind
   if(!FB.idToken){ st.retryT=setTimeout(function(){ fbStreamConnect(st); },400); return; }
   /* Stale token → refresh first (a stream opened with an expired token just 401s and loops).
@@ -9657,6 +9827,7 @@ function fbStreamCloseAll(){ for(var p in FB_STREAMS){ var st=FB_STREAMS[p]; st.
    goes silent >50s (a silently-dead connection), force a reconnect. */
 setInterval(function(){ if(document.visibilityState!=='visible')return; var now=Date.now();
   for(var p in FB_STREAMS){ var st=FB_STREAMS[p]; if(!st||!st.open)continue;
+    if(st.mode==='poll'){ if(!st.retryT&&!st._inflight) fbPollOnce(st); continue; }
     if(st.healthy&&st.lastEvent&&(now-st.lastEvent)>50000){ fbLog('SSE stale >50s → reconnect',p); st.healthy=false; fbConnRecompute(); fbStreamConnect(st); }
     /* A connect that hangs (no error, no data - typical of a half-dead mobile socket) never
        fires onerror, so nothing would ever retry it. Give it 20s, then start over. */
@@ -9669,7 +9840,8 @@ window.addEventListener('pagehide',function(){ try{ for(var p in FB_UNLOAD_REMOV
 function restRef(path){
   var ref={
     on:function(evt,cb,errCb){ if(evt==='value')fbStream(path,cb,errCb); return ref; },
-    off:function(){ var st=FB_STREAMS[path]; if(st){ st.open=false; try{st.es&&st.es.close();}catch(e){} if(st.retryT)clearTimeout(st.retryT); delete FB_STREAMS[path]; fbConnRecompute(); } return ref; },
+    off:function(){ var st=FB_STREAMS[path]; if(st){ st.open=false; try{st.es&&st.es.close();}catch(e){} if(st.retryT)clearTimeout(st.retryT); delete FB_STREAMS[path]; fbConnRecompute();
+      if(st.mode==='sse'){ for(var q in FB_STREAMS){ var o=FB_STREAMS[q]; if(o&&o.open&&o.mode==='poll'&&fbStreamPrio(q)==='high'&&fbSseCount()<FB_SSE_MAX){ o.mode='sse'; fbStreamConnect(o); break; } } } } return ref; },
     once:function(evt){ return fbRestGet(path); },
     set:function(v){ return fbRestWrite('PUT',path,v); },
     update:function(v){ return fbRestWrite('PATCH',path,v); },
@@ -9847,6 +10019,7 @@ function fbOnAuthed(uid){
   try{ statsTrack(); }catch(e){}            // count install + daily-active (first-party, RTDB)
   try{ statsInitAnalytics(); }catch(e){}    // GA4 for historical DAU/WAU/MAU + retention
   if(FB._pendingSOS){ FB._pendingSOS=0; try{ fbPublishSOS(); }catch(e){} } // flush an SOS pressed pre-auth
+  try{ setTimeout(sosQueueFlush, 300); }catch(e){}
   setTimeout(function(){ try{ fbPrunePairsByTombstone(); }catch(e){} },2000);
   try{renderFbStatus();}catch(e){}
 }
@@ -9949,13 +10122,20 @@ function fbPublishPresence(){
   // instantly on foreground (visibilitychange hook). SOS + closed-app push are unaffected.
   if(typeof document!=='undefined' && document.visibilityState==='hidden') return;
   // coarse (~1km) location for privacy; precise location only for SOS / opt-in responder positions
-  var lat=userLat!=null?Math.round(userLat*100)/100:32.07, lng=userLng!=null?Math.round(userLng*100)/100:34.78;
-  FB.db.ref('presence/'+FB.uid).set({lat:lat,lng:lng,ts:Date.now()}).then(function(){ if(FB.permErr){FB.permErr=null;renderFbStatus();} }).catch(function(e){ FB.permErr=(e&&e.code)||'write-denied'; fbLog('presence WRITE denied:', FB.permErr, e); renderFbStatus(); });
+  if(!FB._authReady) return;   // pre-sign-in writes go to the wrong key and are rejected anyway
+  /* Unknown location or ghost mode → heartbeat WITHOUT coordinates (readers skip entries with
+     no lat). It used to publish a made-up Tel Aviv point, so guardians saw a fake position. */
+  var hide=(userLat==null||userLng==null)||!!SS.circleGhost;
+  var lat=hide?null:Math.round(userLat*100)/100, lng=hide?null:Math.round(userLng*100)/100;
+  var _pn=Date.now(), _pk=lat+','+lng;
+  if(FB._presKey===_pk && FB._presAt && (_pn-FB._presAt)<30000) return;   // coarse point unchanged → no need to rewrite every GPS tick
+  FB._presKey=_pk; FB._presAt=_pn;
+  FB.db.ref('presence/'+FB.uid).set(hide?{ts:_pn}:{lat:lat,lng:lng,ts:_pn}).then(function(){ if(FB.permErr){FB.permErr=null;renderFbStatus();} }).catch(function(e){ FB.permErr=(e&&e.code)||'write-denied'; fbLog('presence WRITE denied:', FB.permErr, e); renderFbStatus(); });
   /* Sanitized, PII-free presence heartbeat for the municipal dashboard — coarse ~1km coords,
      anonymous uid, no name/phone. Written to the public /dashfeed path (same place as events),
      so the dashboard can count online users network-wide and per-territory WITHOUT ever reading
      the locked /presence tree. One row per user, overwritten each beat. */
-  try{ if(userLat!=null&&userLng!=null){ var _hb={type:'presence',lat:lat,lng:lng,ts:Date.now(),status:'online',by:FB.uid}; try{ if(isFounder())_hb.founder=true; }catch(_f){} fbRestWrite('PUT','dashfeed/hb_'+FB.uid,_hb); } }catch(e){}
+  try{ if(!hide){ var _hb={type:'presence',lat:lat,lng:lng,ts:Date.now(),status:'online',by:FB.uid}; try{ if(isFounder())_hb.founder=true; }catch(_f){} fbRestWrite('PUT','dashfeed/hb_'+FB.uid,_hb); } }catch(e){}
 }
 function updateGuardiansNearby(n){
   var el=document.getElementById('gnear-n'); if(el)el.textContent=n;
@@ -9972,7 +10152,8 @@ function fbPublishSOS(){ if(!FB.ready||!curSosId)return;
   // landed yet (rare; ~1–3s on Android), QUEUE the broadcast and flush it the instant
   // auth is ready (fbOnAuthed) - the SOS is never silently dropped.
   if(!FB._authReady){ FB._pendingSOS=1; fbLog('SOS queued - securing identity, will broadcast on auth'); return; }
-  try{ FB.db.ref('sos/'+curSosId).set({uid:FB.uid,lat:(userLat!=null?userLat:32.07),lng:(userLng!=null?userLng:34.78),type:curSosType||'unknown',typeState:'self',ts:Date.now(),resolved:false,name:(SS.user&&SS.user.name)||'Shomer'}).then(function(){ fbTriggerPush(curSosId); try{dashFeedPush(curSosId,curSosType||'sos',(userLat!=null?userLat:null),(userLng!=null?userLng:null));}catch(e){} },function(e){ FB.permErr=(e&&e.code)||'sos-denied'; fbLog('SOS write denied:', FB.permErr); renderFbStatus(); }); }catch(e){} }
+  if(userLat==null||userLng==null){ FB._sosNeedsLoc=true; fbLog('SOS map pin waits for a location fix (never a made-up one)'); return; }
+  try{ FB.db.ref('sos/'+curSosId).set({uid:FB.uid,lat:userLat,lng:userLng,type:curSosType||'unknown',typeState:'self',ts:Date.now(),resolved:false,name:(SS.user&&SS.user.name)||'Shomer'}).then(function(){ fbTriggerPush(curSosId); try{dashFeedPush(curSosId,curSosType||'sos',(userLat!=null?userLat:null),(userLng!=null?userLng:null));}catch(e){} },function(e){ FB.permErr=(e&&e.code)||'sos-denied'; fbLog('SOS write denied:', FB.permErr); renderFbStatus(); }); }catch(e){} }
 /* Fire the FREE background-push fan-out (Cloudflare Worker) for this SOS so paired /
    nearby SHOMERs get a notification even when their app is closed or the phone is
    locked. No-op (and no error) until window.SHOMER_PUSH_URL is configured. The live
@@ -10042,6 +10223,8 @@ function playSosAlertSound(){
 var _sosBannerTimer=null;
 function showSosBanner(label,dist,s){
   var he=currentLang==='he', ar=currentLang==='ar';
+  /* My own SHOMER's SOS already has the big personal alert - don't stack a second banner. */
+  if(s && s.uid && document.getElementById('in-sos-'+s.uid)) return;
   var bar=document.getElementById('sos-incoming'); if(!bar)return;
   setText('sos-inc-ttl', he?'🆘 SOS בקרבת מקום':ar?'🆘 نداء استغاثة قريب':'🆘 SOS nearby');
   setText('sos-inc-sub', label+(dist?' · '+dist:''));
@@ -10163,7 +10346,7 @@ function showRespToPerson(n){
 }
 function fbClearResponderMarkers(){ try{ Object.keys(fbResponderMarkers).forEach(function(uid){ try{MAP&&MAP.removeLayer(fbResponderMarkers[uid]);}catch(e){} }); }catch(e){} fbResponderMarkers={}; }
 /* Register this device's FCM token + location so the Cloud Function can target it for push. */
-function fbRegisterToken(token){ if(!FB.ready||!token)return; var lat=userLat!=null?userLat:32.07, lng=userLng!=null?userLng:34.78; try{ FB.db.ref('tokens/'+FB.uid).set({token:token,lat:lat,lng:lng,ts:Date.now()}); }catch(e){} }
+function fbRegisterToken(token){ if(!FB.ready||!token)return; var rec={token:token,ts:Date.now()}; if(userLat!=null&&userLng!=null){ rec.lat=userLat; rec.lng=userLng; } try{ FB.db.ref('tokens/'+FB.uid).set(rec); }catch(e){} }
 /* Queue a targeted alarm - alarmFanout Cloud Function pushes it to the recipient even when their
    app is CLOSED (used by geofence arrival; check-in cross-device needs SHOMER-uid pairing). */
 function fbQueueAlarm(toUid,title,body,tag){ if(!FB.ready||!toUid)return; try{ FB.db.ref('alarms').push({fromUid:FB.uid,toUid:toUid,title:title,body:body,tag:tag||'shomer',ts:Date.now()}); }catch(e){} }
@@ -10187,7 +10370,9 @@ function fbAcceptInvite(token,myName){
   if(!FB.ready||!token)return Promise.resolve(null);
   return FB.db.ref('invites/'+token).once('value').then(function(snap){
     var inv=snap.val(); if(!inv||!inv.fromUid)return null;
-    try{ FB.db.ref('pairs/'+FB.uid+'/'+inv.fromUid).set({name:(inv.name||''),token:token,ts:Date.now()}); }catch(e){}
+    var _nm=unpackInvite(inv.name).name||'';
+    try{ FB.db.ref('pairs/'+FB.uid+'/'+inv.fromUid).set({name:_nm,token:token,ts:Date.now()}); }catch(e){}
+    fbAcceptInvite._name=_nm;
     try{ FB.db.ref('invites/'+token).update({acceptedBy:FB.uid,acceptedName:myName||'',acceptedTs:Date.now()}); }catch(e){}
     return inv.fromUid;
   }).catch(function(){return null;});
@@ -10208,9 +10393,21 @@ function fbWatchApproval(token, theirUid){
   FB._appr[token]=true;
   try{
     FB.db.ref('invites/'+token).on('value', function(snap){
-      var inv=snap.val(); if(!inv||!inv.acceptedBy)return;      // still awaiting approval
+      var inv=snap.val(); if(!inv)return;
       var he=currentLang==='he';
       var g=gdState();
+      if(inv.declinedBy && !inv.acceptedBy){
+        var dp=g.pairs.find(function(x){return x.token===token;});
+        if(dp && dp.pending && !dp.linked){
+          var dn=dp.name||'';
+          g.pairs=g.pairs.filter(function(x){return x!==dp;});
+          SS.circleMembers=(SS.circleMembers||[]).filter(function(m){ return m.pairId!==dp.id; });
+          saveStore(); try{ renderCircles(); gdRenderMarkers(); }catch(e){}
+          toast(he?((dn||'ההזמנה')+' - ההזמנה נדחתה'):((dn||'Your invite')+' - invite declined'),'amb');
+        }
+        return;
+      }
+      if(!inv.acceptedBy)return;      // still awaiting approval
       var p=g.pairs.find(function(x){return x.token===token;});
       if(!p||p.linked)return;
       var puid=inv.acceptedBy||theirUid;
@@ -10218,7 +10415,7 @@ function fbWatchApproval(token, theirUid){
       p.pending=false; p.linked=true; p.partnerUid=puid;
       if(inv.acceptedName&&!p.name)p.name=inv.acceptedName;
       var mm=ensureMemberForPair(p, p.cid);
-      if(mm){ mm.pending=false; mm.partnerUid=puid; }
+      if(mm){ mm.pending=false; mm.partnerUid=puid; if(p.name&&(!mm.name||mm.name===(currentLang==='he'?'שומר':'SHOMER'))) mm.name=p.name; }
       saveStore();
       try{ fbListenPeerLoc(puid); }catch(e){}
       try{ gdRenderMarkers(); renderCircles(); }catch(e){}
@@ -10234,7 +10431,7 @@ function ensureMemberForPair(p, cid){
   if(!p) return null;
   var arr=(SS.circleMembers=SS.circleMembers||[]);
   var m=arr.find(function(x){ return x.pairId===p.id || (p.partnerUid && x.partnerUid===p.partnerUid); });
-  if(m){ if(cid) m.cid=cid; m.registered=true; m.pending=!!p.pending; return m; }
+  if(m){ if(cid) m.cid=cid; m.registered=true; m.pending=!!p.pending; if(p.partnerUid&&!m.partnerUid) m.partnerUid=p.partnerUid; if(p.name&&!m.name) m.name=p.name; if(!m.pairId) m.pairId=p.id; return m; }
   var palette=['#C9A84C','#2962FF','#00C853','#E91E8C','#9C27B0','#FF6A00'];
   var list=circlesList();
   if(!list.length) return null;                       // circles not seeded yet - retry later
@@ -10617,7 +10814,7 @@ async function paCreate(m, kind, desc, lastSeen, photo){
   var he=currentLang==='he';
   if(!m || !m.partnerUid){ toast(he?'אפשר לדווח רק על אדם מקושר':'Only a linked person can be reported','amb'); return false; }
   if(typeof FB==='undefined' || !FB.ready || !FB.uid){ toast(he?'אין חיבור':'No connection','amb'); return false; }
-  if(!SS.user || !SS.user.phoneVerified){ toast(he?'צריך אימות טלפון כדי לדווח':'Phone verification required','amb'); return false; }
+  if(!(SS.security&&SS.security.phoneVerified)){ toast(he?'צריך אימות טלפון כדי לדווח':'Phone verification required','amb'); return false; }
   if(typeof MOD!=='undefined'){ var mt=MOD.checkText((desc||'')+' '+(lastSeen||'')); if(mt && !mt.ok){ toast(he?'הטקסט מכיל שפה לא הולמת. נסח/י מחדש.':'The text contains inappropriate language. Please rephrase.','amb'); return false; } }
   var now=Date.now();
   if(SS.paLast && (now-SS.paLast)<90000){ toast(he?('המתן/י '+Math.ceil((90000-(now-SS.paLast))/1000)+' שניות'):('Wait '+Math.ceil((90000-(now-SS.paLast))/1000)+'s'),'amb'); return false; }
@@ -10817,11 +11014,11 @@ async function evtCreate(type, note){
   var he=currentLang==='he';
   try{ if(typeof MOD!=='undefined' && note){ var _mt=MOD.checkText(note); if(!_mt.ok){ toast(he?'הדיווח מכיל שפה לא הולמת. אנא נסח/י מחדש בכבוד.':'Your report contains inappropriate language. Please rephrase respectfully.','amb'); return; } } }catch(e){}
   if(!FB.ready||!FB.uid){ toast(he?'אין חיבור':'No connection','amb'); return; }
-  if(!SS.user||!SS.user.phoneVerified){ toast(he?'צריך אימות טלפון כדי לדווח':'Phone verification required','amb'); return; }
+  if(!(SS.security&&SS.security.phoneVerified)){ toast(he?'צריך אימות טלפון כדי לדווח':'Phone verification required','amb'); return; }
   if(!evtCanPost()){ toast(he?'הגעת למכסת הדיווחים לשעה':'Hourly report limit reached','amb'); return; }
   var cd=evtCooldownLeft();
   if(cd>0){ toast(he?('המתן/י '+Math.ceil(cd/1000)+' שניות'):('Wait '+Math.ceil(cd/1000)+'s'),'amb'); return; }
-  var p=(typeof myPos!=='undefined'&&myPos&&myPos.lat)?myPos:null;
+  var p=_myPos();
   if(!p){ toast(he?'צריך מיקום כדי לדווח':'Location needed to report','amb'); return; }
   var spec=EVT.TYPES[type]||EVT.TYPES.suspicious;
   var id='e_'+FB.uid.slice(0,10)+'_'+Date.now().toString(36);
@@ -10886,7 +11083,7 @@ async function evtConfirm(id, ev){
   var he=currentLang==='he';
   if(!FB.ready||!FB.uid) return;
   if(ev && ev.by===FB.uid){ toast(he?'אי אפשר לאשר דיווח שלך':'Cannot confirm your own report','amb'); return; }
-  var p=(typeof myPos!=='undefined'&&myPos&&myPos.lat)?myPos:null;
+  var p=_myPos();
   if(!p || !ev || haversineM(p.lat,p.lng,ev.lat,ev.lng)>EVT.NEIGH_M){
     toast(he?'צריך להיות קרוב לאירוע כדי לאשר':'You must be near the event to confirm','amb'); return;
   }
@@ -11043,6 +11240,9 @@ async function sosQueueFlush(){
     var it=q[i];
     if(Date.now()-it.queuedAt > SOS_Q_MAX_AGE){ expired++; continue; }
     var ok=false;
+    if(!it.chan){ if(!FB._authReady){ keep.push(it); continue; }   /* pressed before sign-in: build it now with the real uid + latest position */
+      var _p=_myPos(); it.chan=sosChan(FB.uid, sosSalt());
+      it.payload={fromUid:FB.uid, ts:Date.now(), name:packSOS(true,(SS.user&&SS.user.name)||'',_p?_p.lat:null,_p?_p.lng:null,FB.uid)}; }
     try{ ok=await busWrite(it.chan, it.payload); }catch(e){ ok=false; }
     if(ok){ sent++; } else { it.tries=(it.tries||0)+1; keep.push(it); }
   }
@@ -11060,17 +11260,26 @@ try{
 async function sosBroadcast(sosId, type){
   /* accidental double-fire guard: swallow repeats within 3s (never blocks a real re-alert) */
   try{ var _now=Date.now(); if(window._sosLastFire && (_now-window._sosLastFire)<3000){ return false; } window._sosLastFire=_now; }catch(e){}
-  if(!FB.ready||!FB.uid) return false;
   var he=currentLang==='he';
-  var p=(typeof myPos!=='undefined'&&myPos&&myPos.lat)?myPos:null;
+  /* Guardians watch the channel of my SIGNED-IN uid. Pressed before sign-in finished (cold
+     start, flaky network)? Wait for it briefly instead of writing to a channel nobody watches
+     (or silently returning) - and queue it if sign-in still hasn't landed. */
+  if(!(FB.ready&&FB._authReady)){
+    var _ok=false; try{ _ok=await fbEnsureAuthReady(8000); }catch(e){}
+    if(!(_ok&&FB._authReady)){ try{ sosQueuePush(null,null); }catch(e){}
+      toast(he?'\u26A0 ההתרעה טרם נשלחה - אין חיבור. ננסה שוב אוטומטית. התקשר/י 100 עכשיו':'\u26A0 Alert not sent yet - no connection. Retrying automatically. Call 100 now','sos'); return false; }
+  }
+  /* No fix yet? Ask for one (max 4s) - an SOS without a location can't be navigated to. */
+  if(!_myPos()){ try{ await new Promise(function(res){ var t=setTimeout(res,4000); navigator.geolocation.getCurrentPosition(function(pp){ userLat=pp.coords.latitude; userLng=pp.coords.longitude; clearTimeout(t); res(); },function(){ clearTimeout(t); res(); },{enableHighAccuracy:true,timeout:4000,maximumAge:60000}); }); }catch(e){} }
+  var p=_myPos();
   var payload={
     fromUid: FB.uid,
     ts: Date.now(),
-    name: packSOS(true, (SS.user&&SS.user.name)||(typeof user!=='undefined'&&user&&user.name)||'',
+    name: packSOS(true, invName()||(SS.user&&SS.user.name)||(typeof user!=='undefined'&&user&&user.name)||'',
                   p?p.lat:null, p?p.lng:null, FB.uid)
   };
   var ok=await busWrite(sosChan(FB.uid, sosSalt()), payload);
-  SOSBUS.active=payload.sosId;
+  SOSBUS.active=payload.sosId; SOSBUS.live=!!ok; SOSBUS.sentPos=p; SOSBUS.sentAt=Date.now();
   if(ok){
     var n=(SS.circleMembers||[]).filter(function(m){return !m.pending;}).length;
     toast(he?('\u2713 נשלחה התרעה ל'+n+' שומרים'):('\u2713 Alert sent to '+n+' SHOMERs'),'grn');
@@ -11078,7 +11287,23 @@ async function sosBroadcast(sosId, type){
   } else { /* Queue it, keep retrying, and tell the user to call 100 NOW. */ try{ sosQueuePush(sosChan(FB.uid, sosSalt()), payload); }catch(e){} toast(he?'\u26A0 ההתרעה טרם נשלחה - ננסה שוב אוטומטית. התקשר/י 100 עכשיו':'\u26A0 Alert not sent yet - retrying automatically. Call 100 now','sos'); }
   return ok;
 }
+/* While my SOS is live, keep the guardians' copy of my position current: send it as soon as
+   the first fix arrives, then whenever I have moved >40 m (at most every 15 s). */
+function sosMaybeResendPos(){
+  try{
+    if(sosPhase!=='active'||!SOSBUS.live||!FB._authReady) return;
+    var p=_myPos(); if(!p) return;
+    var sp=SOSBUS.sentPos, now=Date.now();
+    if(sp && (now-(SOSBUS.sentAt||0))<15000) return;
+    if(sp && distMeters(sp.lat,sp.lng,p.lat,p.lng)<40) return;
+    SOSBUS.sentPos=p; SOSBUS.sentAt=now;
+    busWrite(sosChan(FB.uid, sosSalt()), {fromUid:FB.uid, ts:now, name:packSOS(true,invName()||(SS.user&&SS.user.name)||'',p.lat,p.lng,FB.uid)});
+    if(FB._sosNeedsLoc){ FB._sosNeedsLoc=false; try{ fbPublishSOS(); }catch(e){} }
+  }catch(e){}
+}
 async function sosClearBroadcast(){
+  try{ sosQueueWrite([]); }catch(e){}   /* a cancelled SOS must never be delivered later from the retry queue */
+  SOSBUS.live=false;
   if(!FB.ready||!FB.uid) return;
   try{ await fbRestWrite('PUT','invites/'+sosChan(FB.uid, sosSalt()),{fromUid:FB.uid,ts:Date.now(),name:packSOS(false,'',null,null,FB.uid)}); }catch(e){}
   SOSBUS.active=null;
@@ -11112,6 +11337,7 @@ function sosWatchPartners(){
   });
 }
 function onPartnerSOS(puid, v){
+  SOSBUS.lastV=SOSBUS.lastV||{}; SOSBUS.lastV[puid]=v;   /* position updates while the alert is open */
   if(SOSBUS.mine[puid]) return;      /* already showing */
   SOSBUS.mine[puid]=1;
   var he=currentLang==='he';
@@ -11132,6 +11358,7 @@ function memberByPair(puid){
 function showIncomingSOS(puid, nm, v){
   var he=currentLang==='he';
   var old=document.getElementById('in-sos-'+puid); if(old) old.remove();
+  try{ var _gb=document.getElementById('sos-incoming'); if(_gb && _gb.classList.contains('on')) dismissSosBanner(); }catch(e){}
   var d=document.createElement('div');
   d.id='in-sos-'+puid; d.className='in-sos';
   d.innerHTML=
@@ -11160,9 +11387,9 @@ function showIncomingSOS(puid, nm, v){
   }
   function nav(){
     try{
-      if(v.lat&&v.lng){
-        navChoice(v.lat,v.lng);
-      }
+      var lv=(SOSBUS.lastV&&SOSBUS.lastV[puid])||v;
+      if(isFinite(lv.lat)&&isFinite(lv.lng)){ navChoice(lv.lat,lv.lng); }
+      else { toast(he?'המיקום שלהם עוד לא התקבל - התקשר/י אליהם':'Their location has not arrived yet - call them','amb'); }
     }catch(e){}
   }
   function callThem(){
@@ -11185,10 +11412,10 @@ function showIncomingSOS(puid, nm, v){
 async function sosRespond(victimUid, mode){
   var he=currentLang==='he';
   if(!FB.ready||!FB.uid||!victimUid) return;
-  var p=(typeof myPos!=='undefined'&&myPos&&myPos.lat)?myPos:null;
+  var p=_myPos();
   var ok=await busWrite('rp_'+FB.uid, {
     fromUid: FB.uid, ts: Date.now(),
-    name: packSOS(true, (SS.user&&SS.user.name)||(typeof user!=='undefined'&&user&&user.name)||'',
+    name: packSOS(true, invName()||(SS.user&&SS.user.name)||(typeof user!=='undefined'&&user&&user.name)||'',
                   p?p.lat:null, p?p.lng:null, victimUid)
   });
   toast(ok?(he?'\u2713 נמסר להם שאת/ה בדרך':'\u2713 They know you are coming')
@@ -11237,6 +11464,7 @@ function sosPaintMyHelp(){
     document.body.appendChild(b);
     try{ if(navigator.vibrate) navigator.vibrate([80,60,80]); }catch(e){} }
   var names=ks.map(function(k){ return String(SOSBUS.responders[k].name||'').trim(); }).filter(Boolean);
+  try{ var _ss=document.getElementById('ss-s'); if(_ss&&sosPhase==='active') _ss.textContent=(ks.length===1?(he?'שומר/ת אחד/ת בדרך אליך':'1 SHOMER on the way'):(he?(ks.length+' שומרים בדרך אליך'):(ks.length+' SHOMERs on the way'))); }catch(e){}
   b.innerHTML='<div class="help-t">'+(he?'עזרה בדרך':'Help is coming')+'</div>'
    +(names.length?'<div class="help-n">'+ESC(names.slice(0,3).join(' · '))+(ks.length>3?(' +'+(ks.length-3)):'')+'</div>':'')
    +'<div class="help-s">'+(ks.length===1?(he?'שומר אחד בדרך אליך':'1 SHOMER on the way')
@@ -11776,8 +12004,8 @@ function fbListenPairs(){
         // creating a duplicate - covers both the link-invite and phone-invite flows).
         var ex=g.pairs.find(function(p){return p.partnerUid===uid;})
             || g.pairs.find(function(p){return !p.partnerUid && info.token && p.token===info.token;});
-        if(ex){ var ch=false; if(ex.partnerUid!==uid){ex.partnerUid=uid;ch=true;} if(!ex.linked){ex.linked=true;ch=true;} if(ex.pending){ex.pending=false;ch=true;} if(info.name&&!ex.name){ex.name=info.name;ch=true;} if(ch)changed=true; }
-        else { g.pairs.push({id:genId('g'),token:info.token||('p'+uid.slice(0,8)),name:info.name||'',rel:'',shareToThem:true,seeThem:true,addedTs:Date.now(),initiator:false,pending:false,partnerUid:uid,linked:true,color:GD_PALETTE[g.pairs.length%GD_PALETTE.length],lat:null,lng:null,ts:0,live:false}); changed=true; }
+        if(ex){ var ch=false; if(ex.partnerUid!==uid){ex.partnerUid=uid;ch=true;} if(!ex.linked){ex.linked=true;ch=true;} if(ex.pending){ex.pending=false;ch=true;} var _in=String(info.name||'').split('|')[0]; if(_in&&(!ex.name||ex.name.indexOf('|')>=0)){ex.name=_in;ch=true;} if(ch)changed=true; }
+        else { g.pairs.push({id:genId('g'),token:info.token||('p'+uid.slice(0,8)),name:String(info.name||'').split('|')[0],rel:'',shareToThem:true,seeThem:true,addedTs:Date.now(),initiator:false,pending:false,partnerUid:uid,linked:true,color:GD_PALETTE[g.pairs.length%GD_PALETTE.length],lat:null,lng:null,ts:0,live:false}); changed=true; }
         try{ fbListenPeerLoc(uid); }catch(e){}    // subscribe to the newly-discovered partner's location
       });
       if(changed){ saveStore(); try{gdRenderMarkers();}catch(e){} if(document.getElementById('sh-circles')&&document.getElementById('sh-circles').classList.contains('open'))gdRenderList(); }
@@ -11863,7 +12091,7 @@ function maybeSelfHeal(){
     calls skipWaiting + clients.claim, so it takes over quietly. */
  if(FB._swHealAsked) return; FB._swHealAsked=true;
  fbLog('SELF-HEAL: older SW',sw,'≠ app',APP_VER,'→ update in background (no reload)');
- try{ navigator.serviceWorker.getRegistration().then(function(r){ if(r){ try{ r.update(); }catch(e){} } }).catch(function(){}); }catch(e){}
+ try{ navigator.serviceWorker.getRegistration().then(function(r){ if(r){ try{ var _u=r.update(); if(_u&&_u.catch)_u.catch(function(){}); }catch(e){} } }).catch(function(){}); }catch(e){}
  }catch(e){ /* storage blocked → skip auto-heal; manual escapes remain */ }
 }
 /* Guaranteed escape from a stale cached build: drop EVERY SW + cache on this
@@ -11920,7 +12148,7 @@ else if('serviceWorker' in navigator){
  // HTTP cache). This was the core reason installed users sat on a stale build.
  // Update checks now also re-run on foreground/interval (see the update-manager below);
  // sw.js is byte-stable between deploys, so re-checking can't churn the worker.
- try{ reg.update(); }catch(e){}
+ try{ var _u=reg.update(); if(_u&&_u.catch)_u.catch(function(){}); }catch(e){}
  reg.addEventListener('updatefound',()=>{
  const nw=reg.installing; if(!nw)return;
  nw.addEventListener('statechange',()=>{
@@ -11952,6 +12180,7 @@ function showGetAppBanner(){
     /* Respect dismissal for 7 days. */
     try{ var d=localStorage.getItem('shomerGetAppDismissed'); if(d && (Date.now()-parseInt(d,10) < 7*24*60*60*1000)) return; }catch(e){}
     if(document.querySelector('.getapp-banner')) return;
+    if(popupBusy()){ if((showGetAppBanner._t=(showGetAppBanner._t||0)+1)<10) setTimeout(showGetAppBanner,30000); return; }
     var he=(typeof currentLang!=='undefined' && currentLang==='he');
     var b=document.createElement('div');
     b.className='getapp-banner';
@@ -11970,6 +12199,7 @@ function showGetAppBanner(){
 }
 async function showA2HS(){
  if(!deferredPrompt||document.querySelector('.a2hs'))return;
+ if(popupBusy()){ if((showA2HS._t=(showA2HS._t||0)+1)<10) setTimeout(showA2HS,30000); return; }
  const d=document.createElement('div');d.className='a2hs';
  d.innerHTML=`<img class="a2hs-icon" src="logo-192.png" alt=""><div class="a2hs-text"><div class="a2hs-t">${currentLang==='he'?'התקן את שומר':'Install Shomer'}</div><div class="a2hs-s">${currentLang==='he'?'גישה מהירה מהמסך הראשי':'Quick access from home screen'}</div></div><button class="a2hs-btn" id="a2hs-install">${currentLang==='he'?'התקן':'Install'}</button><span class="a2hs-x" id="a2hs-close"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg></span>`;
  document.body.appendChild(d);
@@ -12031,7 +12261,7 @@ function updCheck(manual){
   var _firstRun=!!window._updBoot; window._updBoot=false;
   try{
     if(!navigator.onLine){ if(manual){ try{ toast(currentLang==='he'?'אין חיבור לרשת':'No internet connection','amb'); }catch(e){} } return; }
-    try{ if('serviceWorker' in navigator) navigator.serviceWorker.getRegistration().then(function(r){ if(r)r.update(); }).catch(function(){}); }catch(e){}
+    try{ if('serviceWorker' in navigator) navigator.serviceWorker.getRegistration().then(function(r){ if(r){ var _u=r.update(); if(_u&&_u.catch)_u.catch(function(){}); } }).catch(function(){}); }catch(e){}
     if(!manual && /[?&]u=\d+/.test(location.search) && !window._updRecheck){ window._updRecheck=1; }
     fetch('version.json?cb='+(new Date().getTime()),{cache:'no-store'})   /* same-origin: the bare domain 301s to www and CORS-blocks */
       .then(function(r){ return r.ok?r.json():null; })
@@ -12232,7 +12462,7 @@ function isIOSSafariTab(){
 function maybePromptInstall(){
   try{
     if(!isIOSSafariTab()) return;
-    if(document.querySelector('.ios-install')||document.querySelector('.a2hs')) return;
+    if(popupBusy()){ if((maybePromptInstall._t=(maybePromptInstall._t||0)+1)<10) setTimeout(maybePromptInstall,30000); return; }
     var dismissed=false; try{ dismissed=sessionStorage.getItem('shomerInstallDismissed')==='1'; }catch(e){}
     if(dismissed) return;
     var he=currentLang==='he', ar=currentLang==='ar';
@@ -12251,8 +12481,8 @@ function maybePromptInstall(){
 }
 function maybePromptBackgroundAlerts(){
   try{
-    if(document.querySelector('.a2hs')||document.querySelector('.ios-install')) return;
     if(isIOSSafariTab()) return; // iOS is handled by the dedicated install prompt above
+    if(popupBusy()){ if((maybePromptBackgroundAlerts._t=(maybePromptBackgroundAlerts._t||0)+1)<10) setTimeout(maybePromptBackgroundAlerts,30000); return; }
     var dismissed=false; try{ dismissed=localStorage.getItem('shomerAlertsPrompted')==='1'; }catch(e){}
     if(dismissed) return;
     var st=bgAlertsState(); if(st==='on'||st==='unsupported'||st==='denied'||st==='ios-add-home') return;
@@ -12555,6 +12785,10 @@ async function verifyTwilioCode(){
  const code=(inp&&inp.value||"").replace(/\D/g,"");
  const errEl=document.getElementById("ob-verify-err");
  const btn=document.getElementById("ob-verify-twilio-btn");
+ /* The phone was ALREADY verified but saving the account failed (e.g. no server connection):
+    the code is used up at Twilio, so re-verifying would say "wrong code" - and the old guard
+    made the button do nothing at all. Retry only the registration step. */
+ if(window._otpVerifiedPhone && window._otpVerifiedPhone===user.phone){ try{ await completeRegistration(); }catch(e){} return; }
  if(code.length<6){if(errEl)errEl.textContent=he?"הזן/י 6 ספרות":"Enter 6 digits";return;}
  /* ROOT-CAUSE GUARD for the login loop:
     onkeyup auto-fired verify the instant 6 digits were present, and a second event could
@@ -12577,7 +12811,7 @@ async function verifyTwilioCode(){
   });
   let data=await r.json();if(typeof data==="string"){try{data=JSON.parse(data);}catch(_){}}
   if(data.verified){
-   window._otpVerifying=false;
+   window._otpVerifying=false; window._otpVerifiedPhone=user.phone;
    await completeRegistration();
   }else if(data.expired){
    window._otpVerifying=false; window._otpLastCode=null;
@@ -12693,7 +12927,8 @@ async function completeRegistration(){ try{document.body.classList.remove("otp-a
      return;
    }else{ /* Live rules accept exactly {uid,name,ts} - verified empirically. */
      try{ await fbRestWrite("PUT","registry/"+ph,{uid:uid,name:(user.name||uname).substring(0,60),ts:Date.now()}); }catch(_rw){ console.warn("[Register] registry write skipped (non-fatal):", _rw && _rw.code); }
-     toast(he?"✓ ברוך הבא/ה, "+uname:"✓ Welcome, "+uname,"grn");
+     /* no toast here - entering the app greets them by the name they typed (two stacked
+        "welcome" toasts, one with the SH✡MER#### handle, read as a glitch) */
    }
   if(!SS.security)SS.security={};
   SS.security.phoneVerified=true;SS.security.twilioVerified=true;SS.security.firebaseUid=uid;
@@ -12705,7 +12940,7 @@ async function completeRegistration(){ try{document.body.classList.remove("otp-a
   goStep(1);
  }catch(e){
   console.error("[Register]",e);
-  const msg=(e&&e.message==="auth-timeout")?(he?"⚠️ אין חיבור לשרת - נסה/י שוב":"⚠️ No server connection - try again")
+  const msg=(e&&e.message==="auth-timeout")?(he?"⚠️ המספר אומת, אבל אין חיבור לשרת - לחצ/י שוב על אימות כדי לסיים":"⚠️ Number verified, but no server connection - tap Verify again to finish")
    :(e&&e.code==="PERMISSION_DENIED")?(he?"⚠️ הרשמה נדחתה ע״י השרת":"⚠️ Registration rejected by server")
    :(he?"⚠️ שגיאה בהרשמה - נסה/י שוב":"⚠️ Registration error - try again");
   if(errEl)errEl.textContent=msg;
