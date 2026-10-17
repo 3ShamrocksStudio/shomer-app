@@ -4233,7 +4233,7 @@ function _nudgeGeoNow(){
 function nudgeMaybeShow(){
  try{
   if(_emergencyBusy()) return;
-  if(document.getElementById('nudge-bar')) return;
+  if(document.getElementById('nudge-bar')||document.getElementById('tp-bar')) return;
   var n=nudgeState();
   if(n.lastTs && (Date.now()-n.lastTs) < 18*3600000) return;   /* at most ~once / 18h */
   var pick=nudgePick(); if(!pick) return;
@@ -4327,6 +4327,69 @@ function renderProfile2(){ try{ var he=currentLang==='he';
  }catch(e){} }
 
 function scheduleRetentionNudges(){ try{ if(!_isNative()||!_ln) return; var he=currentLang==='he'; var hasCode=!!(SS.security&&/^\\d{4,6}$/.test((SS.security.pin)||'')); var hasCircle=(SS.circleMembers||[]).some(function(m){return m&&!m.pending;}); var ns=[]; if(!hasCode||!hasCircle){ ns.push({id:91001,title:'SH\u2721MER',body:he?'\u05d4\u05e9\u05dc\u05d9\u05de\u05d5 \u05d0\u05ea \u05d4\u05d4\u05d2\u05d3\u05e8\u05ea MY SHOMER \u2014 \u05de\u05e2\u05d2\u05dc \u05d0\u05de\u05d5\u05df \u05d5\u05e7\u05d5\u05d3 \u05d0\u05d1\u05d8\u05d7\u05d4':'Finish setting up MY SHOMER \u2014 trusted circle + security code',channelId:'shomer-updates',autoCancel:true,schedule:{at:new Date(Date.now()+2*3600*1000)}}); } ns.push({id:91002,title:'SH\u2721MER',body:he?'\u05d3\u05e7\u05d4 \u05dc\u05d1\u05d3\u05d5\u05e7 \u05d0\u05ea \u05d4\u05d0\u05d6\u05d5\u05e8 \u05e9\u05dc\u05da \u2014 \u05d4\u05ea\u05e8\u05d0\u05d5\u05ea \u05d1\u05d8\u05d9\u05d7\u05d5\u05ea \u05d1\u05d6\u05de\u05df \u05d0\u05de\u05ea':'A minute to check your area \u2014 live safety updates near you',channelId:'shomer-updates',autoCancel:true,schedule:{at:new Date(Date.now()+24*3600*1000)}}); try{ if(_ln&&ns.length)_ln.schedule({notifications:ns}); }catch(e){} }catch(e){} }
+
+/* ═══ TESTER PROGRAM - 14 days, one small mission a day ═══
+   Google Play only releases the app after 12+ testers stay opted in for 14 days in a
+   row. Every day gets one short, real task (no fake activity), a card on first open
+   and a 19:00 reminder, so testers keep the app and actually use it. */
+var TP_DAYS=14;
+var TP_MISSIONS=[
+ {he:'ברוכים הבאים לבדיקה! השאירו את SH✡MER מותקנת 14 יום - בדקו שהשם שלכם מופיע בפרופיל.', en:'Welcome to the test! Keep SH✡MER installed for 14 days - check your name shows in your profile.', cta_he:'לפרופיל', cta_en:'Open profile', act:function(){ op('sh-prof'); }},
+ {he:'הוסיפו את השומר/ת הראשון/ה שלכם - שלחו הזמנה בוואטסאפ.', en:'Add your first SHOMER - send an invite on WhatsApp.', cta_he:'שלח/י הזמנה', cta_en:'Send invite', act:function(){ shareInvite(); }},
+ {he:'הציצו במפה החיה - מה קורה באזור שלכם?', en:'Look at the live map - what is happening near you?', cta_he:'למפה', cta_en:'Open map', act:function(){}},
+ {he:'הגדירו קוד ביטול שקט - כדי לבטל SOS שגוי.', en:'Set your silent-cancel code - to cancel a false SOS.', cta_he:'להגדרות', cta_en:'Open settings', act:function(){ op('sh-set'); }},
+ {he:'אפשרו מיקום ברקע - כדי שה-SOS יעבוד גם כשהאפליקציה סגורה.', en:'Allow background location - so SOS works even when the app is closed.', cta_he:'להגדרות', cta_en:'Open settings', act:function(){ op('sh-set'); }},
+ {he:'נסו צ׳ק-אין הדדי עם השומר/ת שלכם.', en:'Try a mutual check-in with your SHOMER.', cta_he:'לצ׳ק-אין', cta_en:'Open check-in', act:function(){ op('sh-checkin'); }},
+ {he:'קראו את המדריך הקצר - 2 דקות.', en:'Read the short guide - 2 minutes.', cta_he:'למדריך', cta_en:'Open guide', act:function(){ op('sh-guide'); }},
+ {he:'פתחו את מסך הדיווח - ראו איך מדווחים על אירוע (אין חובה לשלוח).', en:'Open the report screen - see how reporting works (no need to send).', cta_he:'למסך הדיווח', cta_en:'Open report', act:function(){ openReport(); }},
+ {he:'הזמינו אדם נוסף למעגל השומרים שלכם.', en:'Invite one more person to your SHOMER circle.', cta_he:'שלח/י הזמנה', cta_en:'Send invite', act:function(){ shareInvite(); }},
+ {he:'הוסיפו אנשי קשר לחירום.', en:'Add emergency contacts.', cta_he:'לאנשי חירום', cta_en:'Open contacts', act:function(){ op('sh-em'); }},
+ {he:'הכירו את השומר האוטומטי - SOS אם לא הגבתם בזמן.', en:'Meet the automatic guard - SOS if you do not respond in time.', cta_he:'לשומר האוטומטי', cta_en:'Open it', act:function(){ op('sh-dms'); }},
+ {he:'נסו "הגעתי בשלום" - השומרים יודעים שהגעתם.', en:'Try "I arrived safely" - your SHOMERs know you got there.', cta_he:'להגעות', cta_en:'Open arrivals', act:function(){ op('sh-arrivals'); }},
+ {he:'ספרו לנו מה עבד ומה לא - משפט אחד מספיק.', en:'Tell us what worked and what did not - one sentence is enough.', cta_he:'שלח/י משוב', cta_en:'Send feedback', act:function(){ try{ window.open('mailto:markodave@gmail.com?subject='+encodeURIComponent('SH✡MER tester feedback'),'_blank'); }catch(e){} }},
+ {he:'יום 14 - סיימתם! תודה ענקית. השאירו את האפליקציה מותקנת - אתם חלק מהרשת.', en:'Day 14 - you made it! Huge thanks. Keep the app installed - you are part of the network.', cta_he:'סגור', cta_en:'Close', act:function(){}}
+];
+function tpState(){ SS.tp=SS.tp||{}; if(!SS.tp.start){ SS.tp.start=tpToday(); SS.tp.seen={}; SS.tp.done={}; try{saveStore();}catch(e){} } SS.tp.seen=SS.tp.seen||{}; SS.tp.done=SS.tp.done||{}; return SS.tp; }
+function tpToday(){ var d=new Date(); return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'); }
+function tpDayIdx(){ var t=tpState(); var a=new Date(t.start+'T00:00:00'), b=new Date(tpToday()+'T00:00:00'); return Math.round((b-a)/86400000); }
+function tpScheduleReminders(){
+ try{
+  if(!_isNative()||!_ln) return;
+  var he=currentLang==='he', idx=tpDayIdx(), ns=[], ids=[];
+  for(var i=0;i<TP_DAYS;i++) ids.push({id:92000+i});
+  try{ _ln.cancel({notifications:ids}); }catch(e){}
+  for(var k=Math.max(idx+1,1);k<TP_DAYS;k++){
+   var at=new Date(tpState().start+'T19:00:00'); at.setDate(at.getDate()+k);
+   if(at.getTime()<=Date.now()) continue;
+   var m=TP_MISSIONS[k];
+   ns.push({id:92000+k,title:(he?'SH✡MER · יום ':'SH✡MER · Day ')+(k+1)+'/'+TP_DAYS,body:he?m.he:m.en,channelId:'shomer-updates',autoCancel:true,schedule:{at:at}});
+  }
+  if(ns.length) _ln.schedule({notifications:ns});
+ }catch(e){}
+}
+function tpMaybeShow(){
+ try{
+  if(typeof _emergencyBusy==='function' && _emergencyBusy()) return;
+  var t=tpState(), idx=tpDayIdx(), day=tpToday();
+  if(idx<0||idx>=TP_DAYS) return;
+  tpScheduleReminders();
+  if(t.seen[day]) return;
+  var _acc=document.getElementById('gd-accept');
+  if(document.getElementById('nudge-bar')||document.getElementById('tp-bar')||(_acc&&_acc.getAttribute('aria-hidden')==='false')) { setTimeout(tpMaybeShow, 20000); return; }
+  t.seen[day]=Date.now(); try{saveStore();}catch(e){}
+  var he=currentLang==='he', m=TP_MISSIONS[idx];
+  var bar=document.createElement('div'); bar.id='tp-bar'; bar.className='nudge-bar';
+  var dots=''; for(var i=0;i<TP_DAYS;i++){ dots+='<span style="display:inline-block;width:8px;height:8px;border-radius:50%;margin:0 2px;background:'+(i<idx?'#F5C840':(i===idx?'#fff':'rgba(255,255,255,.18)'))+'"></span>'; }
+  bar.innerHTML='<div style="font-size:12px;letter-spacing:.08em;color:#F5C840;font-weight:800">'+(he?('יום '+(idx+1)+' מתוך '+TP_DAYS):('DAY '+(idx+1)+' OF '+TP_DAYS))+'</div>'
+   +'<div style="direction:ltr">'+dots+'</div>'
+   +'<span class="nudge-tx">'+ESC(he?m.he:m.en)+'</span>'
+   +'<button class="nudge-cta">'+ESC(he?m.cta_he:m.cta_en)+'</button>'
+   +'<button class="nudge-x" aria-label="dismiss">✕</button>';
+  (document.getElementById('app')||document.body).appendChild(bar);
+  bar.querySelector('.nudge-cta').onclick=function(){ try{ tpState().done[day]=Date.now(); saveStore(); }catch(e){} bar.remove(); try{ m.act(); }catch(e){} };
+  bar.querySelector('.nudge-x').onclick=function(){ bar.remove(); };
+ }catch(e){}
+}
 function enterApp(returning){
  const profNm=document.getElementById('profNm');
  if(profNm)profNm.textContent=uniqueHandle();
@@ -4357,6 +4420,7 @@ function enterApp(returning){
  try{ fbListenPersonAlerts(); }catch(e){}
  try{ setTimeout(nudgeMaybeShow, 4500); }catch(e){}
  try{ setTimeout(dykMaybeShow, 5*60000); }catch(e){}  /* DYK tip: show after 5 min of use */
+ try{ setTimeout(tpMaybeShow, 3500); }catch(e){}   /* tester program: today's mission */
  try{ setTimeout(scheduleRetentionNudges, 9000); }catch(e){}
  try{ renderProfile2(); }catch(e){}
  try{ setTimeout(checkSoftwareUpdate, 6500); }catch(e){}
@@ -9123,7 +9187,7 @@ try{ hydrateIcons(document); }catch(e){}
 /* Loaded-build version - shown in the diagnostic panel so a phone can prove
    whether it's on the latest build or a STALE cached one. Keep in lock-step
    with sw.js SW_VERSION on every deploy. */
-var APP_VER='v251';
+var APP_VER='v252';
 var FB={ready:false,uid:null,db:null,_presTimer:null,connected:false,listening:false,pushState:'default',near:0,swVer:'?',
   authState:'connecting',sdkLoaded:false,persist:'',permErr:null,err:null,wsProbe:'',csp:''};
 /* Always log connection diagnostics to the console so the real failure can be SEEN in Chrome. */
