@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl"><head><meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex">
+<title>SH✡MER - הזמנה</title>
+<script>
+/* Invite link landing for people WITHOUT the app installed (installed apps catch /i/
+   links directly). Stash the invite and go straight to the approve screen. */
+(function(){ try{
+  var u=new URL(location.href), t=u.searchParams.get('g');
+  var c=(u.searchParams.get('c')||'').replace(/\D/g,'').slice(0,4);
+  if(t){ try{ localStorage.setItem('shomer_pending_invite', JSON.stringify({tok:t, code:c, ts:Date.now()})); }catch(e){} }
+  location.replace('../shomer.html'+(t?('?g='+encodeURIComponent(t)+(c?('&c='+encodeURIComponent(c)):'')):''));
+}catch(e){ location.replace('../shomer.html'); } })();
+</script>
+</head><body style="background:#0A1628;color:#fff;font-family:sans-serif;text-align:center;padding-top:40vh">פותח את ההזמנה…</body></html>

@@ -124,6 +124,28 @@
     }, 2500);
   });
 
+  /* INVITE DEEP LINKS - https://www.shomer-app.co.il/i/?g=<token>&c=<code> opens the
+     installed app (Android App Links) instead of Chrome, so an existing user approves
+     with THEIR account instead of being asked to sign up again in the browser. */
+  function handleInviteUrl(url) {
+    try {
+      if (!url) return;
+      var u = new URL(url), t = u.searchParams.get('g');
+      if (!t) return;
+      var c = (u.searchParams.get('c') || '').replace(/\D/g, '').slice(0, 4);
+      try { localStorage.setItem('shomer_pending_invite', JSON.stringify({ tok: t, code: c, ts: Date.now() })); } catch (e) {}
+      /* Already inside the app: open the approve screen now. Otherwise the stash is
+         picked up when the app finishes starting (gdCheckInviteParam). */
+      setTimeout(function () {
+        try { if (window.SS && SS.onboarded && typeof gdCheckInviteParam === 'function') gdCheckInviteParam(); } catch (e) {}
+      }, 600);
+    } catch (e) {}
+  }
+  if (Cap.Plugins.App) {
+    try { Cap.Plugins.App.addListener('appUrlOpen', function (d) { handleInviteUrl(d && d.url); }); } catch (e) {}
+    try { if (Cap.Plugins.App.getLaunchUrl) Cap.Plugins.App.getLaunchUrl().then(function (r) { handleInviteUrl(r && r.url); }).catch(function () {}); } catch (e) {}
+  }
+
   /* Keep publishing when the app returns to the foreground. */
   if (Cap.Plugins.App) {
     Cap.Plugins.App.addListener('appStateChange', function (s) {

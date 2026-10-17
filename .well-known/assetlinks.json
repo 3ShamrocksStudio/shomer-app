@@ -1,0 +1,11 @@
+[{
+  "relation": ["delegate_permission/common.handle_all_urls"],
+  "target": {
+    "namespace": "android_app",
+    "package_name": "il.co.shomerapp",
+    "sha256_cert_fingerprints": [
+      "F6:BD:FE:63:18:01:92:A2:F0:0D:A2:76:12:BE:87:59:1F:9C:D8:0E:CB:2C:D7:3E:3E:E0:F4:EA:87:CB:2B:3D",
+      "08:EB:F0:CF:B1:96:5C:F6:37:3F:8E:25:3B:65:07:DB:4C:AD:3C:AB:CF:D5:D9:10:1A:26:CB:51:C5:D5:28:D7"
+    ]
+  }
+}]

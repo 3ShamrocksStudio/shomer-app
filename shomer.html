@@ -5653,6 +5653,14 @@ function showInboxBanner(msg, inviteKeys, box){
       /* mark seen + open the SHOMERs/circle screen so they can accept */
       try{ inviteKeys.forEach(function(k){ fbRestWrite('PUT','invites/inbox_'+FB._myPhoneHash+'/'+k+'/seen', true); }); }catch(e){}
       b.remove();
+      /* Straight to the approve screen for the newest invite (name, number, code). */
+      try{
+        var first=box&&inviteKeys.length?box[inviteKeys[0]]:null;
+        if(first&&first.token&&typeof gdCheckInviteParam==='function'){
+          localStorage.setItem('shomer_pending_invite', JSON.stringify({tok:first.token, code:String(first.code||'').replace(/\D/g,'').slice(0,4), ts:Date.now()}));
+          gdCheckInviteParam(); return;
+        }
+      }catch(e){}
       try{ if(typeof openGuardians==='function') openGuardians(); else if(typeof showCircle==='function') showCircle(); }catch(e){}
     };
     document.body.appendChild(b);
@@ -7304,7 +7312,7 @@ async function shareInvite(){
      the same way the other identification flows work. The real identification on
      that screen is the sender's name and verified phone number, which now travel
      in the packed invite record. */
-  var link='https://www.shomer-app.co.il/?g='+encodeURIComponent(tok)+'&c='+encodeURIComponent(linkCode);
+  var link='https://www.shomer-app.co.il/i/?g='+encodeURIComponent(tok)+'&c='+encodeURIComponent(linkCode);
   var txt=he
     ? ('הצטרף/י למעגל השומרים שלי ב-SH\u2721MER - אפליקציית בטיחות קהילתית חינמית. אם יקרה לי משהו, תדע/י איפה אני.\n'+link)
     : ('Join my SH\u2721MER SHOMER circle - a free community safety app. If something happens to me, you will know where I am.\n'+link);
@@ -7316,7 +7324,7 @@ async function shareInvite(){
 }
 /* ══ INVITE PANEL - the only reliable way the request reaches a human ══ */
 /* Fire the real invite SMS through our Twilio function. */
-async function sendInviteSMS(phone, name, token){
+async function sendInviteSMS(phone, name, token, code){
   var he=currentLang==='he';
   if(!phone || !token) return false;
   try{
@@ -7324,7 +7332,7 @@ async function sendInviteSMS(phone, name, token){
       method:"POST",
       headers:{"Content-Type":"application/x-www-form-urlencoded"},
       body:"phone="+encodeURIComponent("+"+phone)
-          +"&link="+encodeURIComponent(inviteLinkFor(token))
+          +"&link="+encodeURIComponent(inviteLinkFor(token, code))
           +"&fromName="+encodeURIComponent((SS.user&&SS.user.name)||'')
           +"&fromPhone="+encodeURIComponent("+"+((SS.user&&SS.user.phone)||''))
           +"&lang="+(he?'he':'en')
@@ -7340,7 +7348,7 @@ async function sendInviteSMS(phone, name, token){
           sha256Hex(digits).then(function(ph){
             try{ fbRestWrite('PUT','invites/inbox_'+ph+'/'+token, {
               fromUid:(FB.uid||''), type:'invite', token:token, fromName:((SS.user&&SS.user.name)||''),
-              fromPhone:((SS.user&&SS.user.phone)||''), ts:Date.now(), seen:false
+              fromPhone:((SS.user&&SS.user.phone)||''), code:String(code||''), ts:Date.now(), seen:false
             }); }catch(e){}
           });
         }
@@ -7353,17 +7361,17 @@ async function sendInviteSMS(phone, name, token){
   }
   return false;
 }
-function inviteLinkFor(token){ return 'https://www.shomer-app.co.il/shomer.html?g='+encodeURIComponent(token||''); }
-function inviteTextFor(name, token){
+function inviteLinkFor(token, code){ return 'https://www.shomer-app.co.il/i/?g='+encodeURIComponent(token||'')+(code?('&c='+encodeURIComponent(code)):''); }
+function inviteTextFor(name, token, code){
   var he=currentLang==='he';
-  var link=inviteLinkFor(token);
+  var link=inviteLinkFor(token, code);
   return he
     ? ('היי '+(name||'')+', הוספתי אותך למעגל השומרים שלי ב-SH\u2721MER - אפליקציית בטיחות חינמית. אשר/י כדי שנוכל לראות זה את זה במקרה חירום:\n'+link)
     : ('Hi '+(name||'')+", I added you to my SH\u2721MER SHOMER circle - a free safety app. Approve so we can see each other in an emergency:\n"+link);
 }
 function showInvitePanel(name, phone, token, code){
   var he=currentLang==='he';
-  var link=inviteLinkFor(token), txt=inviteTextFor(name, token);
+  var link=inviteLinkFor(token, code), txt=inviteTextFor(name, token, code);
   var old=document.getElementById('inv-panel'); if(old) old.remove();
   var p=document.createElement('div');
   p.id='inv-panel'; p.className='inv-panel';
@@ -7461,7 +7469,7 @@ function resendInvite(memberId){
   var g=gdState();
   var p=g.pairs.find(function(x){ return x.id===m.pairId; });
   if(!p||!p.token){ toast(currentLang==='he'?'אין בקשה פעילה':'No pending request','amb'); return; }
-  if(m.phoneCanon) sendInviteSMS(m.phoneCanon, m.name, p.token);
+  if(m.phoneCanon) sendInviteSMS(m.phoneCanon, m.name, p.token, p.code);
   showInvitePanel(m.name, m.phoneCanon||'', p.token, p.code);
 }
 async function addGuardian(){
@@ -7528,7 +7536,7 @@ async function addGuardian(){
    /* The invite now SENDS ITSELF. A Twilio function (/sendInvite) texts the person the
       approval link automatically - verified delivered. The panel stays as a manual
       fallback (WhatsApp / share / copy) in case the SMS is filtered. */
-   sendInviteSMS(canon, name, agToken);
+   sendInviteSMS(canon, name, agToken, agCode);
    showInvitePanel(name, canon, agToken, agCode);
  } else if(validPhone){
    var invMsg=encodeURIComponent(he?('\u05d4\u05d9\u05d9! \u05d4\u05e6\u05d8\u05e8\u05e3/\u05d9 \u05d0\u05dc\u05d9\u05d9 \u05d1-SH\u2721MER - \u05d0\u05e4\u05dc\u05d9\u05e7\u05e6\u05d9\u05d9\u05ea \u05d1\u05d8\u05d9\u05d7\u05d5\u05ea \u05e7\u05d4\u05d9\u05dc\u05ea\u05d9\u05ea. \u05d7\u05d9\u05e0\u05dd: https://www.shomer-app.co.il/'):('Join me on SH\u2721MER: https://www.shomer-app.co.il/'));
@@ -9115,7 +9123,7 @@ try{ hydrateIcons(document); }catch(e){}
 /* Loaded-build version - shown in the diagnostic panel so a phone can prove
    whether it's on the latest build or a STALE cached one. Keep in lock-step
    with sw.js SW_VERSION on every deploy. */
-var APP_VER='v250';
+var APP_VER='v251';
 var FB={ready:false,uid:null,db:null,_presTimer:null,connected:false,listening:false,pushState:'default',near:0,swVer:'?',
   authState:'connecting',sdkLoaded:false,persist:'',permErr:null,err:null,wsProbe:'',csp:''};
 /* Always log connection diagnostics to the console so the real failure can be SEEN in Chrome. */

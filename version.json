@@ -1,1 +1,1 @@
-{"v": "v250", "notes": ["Approve works only when the invite code matches - no more unknown connections", "Invite links open straight to the approve screen"]}
+{"v": "v251", "notes": ["Invite links open the installed app directly", "SMS and in-app invites go straight to the approve screen with the code filled in", "Approve works only when the invite code matches"]}
