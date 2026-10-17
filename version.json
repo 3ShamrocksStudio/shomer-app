@@ -1,1 +1,1 @@
-{"v": "v247", "notes": ["Invites now show who sent them, with the code filled in automatically", "Fixed invites that arrived with no name and an unmatchable code", "Invite links open the download page"]}
+{"v": "v248", "notes": ["Invites always carry your name and verified phone, so people know it's you"]}
