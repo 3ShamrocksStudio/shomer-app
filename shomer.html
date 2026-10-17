@@ -2533,6 +2533,9 @@ body.otp-active .ob-steps{display:none!important;}
       <div class="gd-code-st" id="gd-code-st"></div>
     </div>
    </div>
+   <label for="gd-my-invname" style="display:block;font-size:12.5px;font-weight:700;margin:4px 2px 6px" id="gd-my-invname-lbl">השם שלך - כדי שיזהו שאישרת</label>
+   <input id="gd-my-invname" type="text" maxlength="24" autocomplete="name" style="width:100%;box-sizing:border-box;padding:12px 14px;border-radius:12px;border:1px solid rgba(201,168,76,.45);background:rgba(255,255,255,.05);color:inherit;font:inherit;font-size:15px;margin-bottom:4px">
+   <p style="font-size:11.5px;opacity:.75;margin:0 2px 12px" id="gd-my-invname-sub">רק השומרים שלך יראו את השם. לכל השאר את/ה אנונימי/ת.</p>
    <p class="gd-warn" id="gd-accept-warn">⚠️ אשר/י <b>רק</b> אם את/ה מזהה את האדם הזה. באישור הם יוכלו לראות את מיקומך בזמן אמת.</p>
    <p style="font-size:11.5px;color:var(--tx2);line-height:1.6;margin-bottom:14px" id="gd-accept-sub">אפשר לעצור את השיתוף בכל רגע מתוך „השומרים שלי”.</p>
  <button class="cta-gold" onclick="gdAcceptInvite()" id="gd-accept-yes">✓ <span id="gd-accept-yes-lbl">אשר/י וחבר/י</span></button>
@@ -8403,6 +8406,8 @@ function gdFillIdentity(inv){
   /* Approve is only possible once the 4-digit code matches the one in the invite.
      A missing or wrong code = we can't confirm who sent it, so we don't let it through. */
   gdFillIdentity._ok=false; gdSetApproveEnabled(false);
+  try{ var _mi=document.getElementById('gd-my-invname'); if(_mi && !_mi.value) _mi.value=invName(); }catch(e){}
+  try{ if(!he){ var _l=document.getElementById('gd-my-invname-lbl'); if(_l) _l.textContent='Your name - so they know you approved'; var _s=document.getElementById('gd-my-invname-sub'); if(_s) _s.textContent='Only your SHOMERs see this name. Everyone else sees you as anonymous.'; } }catch(e){}
   var av=document.getElementById('gd-ident-av');
   if(av) av.textContent=(nm.trim()[0]||'?').toUpperCase();
   var n=document.getElementById('gd-ident-n');
@@ -8464,6 +8469,12 @@ function gdAcceptInvite(){
     try{ toast(currentLang==='he'?'\u05d4\u05e7\u05dc\u05d3/\u05d9 \u05d0\u05ea \u05d4\u05e7\u05d5\u05d3 \u05e9\u05e7\u05d9\u05d1\u05dc\u05ea \u05de\u05d4\u05e9\u05d5\u05dc\u05d7/\u05ea \u05dc\u05e4\u05e0\u05d9 \u05d0\u05d9\u05e9\u05d5\u05e8':'Enter the code from the sender before approving','amb'); }catch(e){}
     return;
   }
+  var _mi=document.getElementById('gd-my-invname'), _v=((_mi&&_mi.value)||'').trim();
+  if(_v.length<2){
+    try{ toast(currentLang==='he'?'\u05d4\u05d5\u05e1\u05e3/\u05d9 \u05d0\u05ea \u05d4\u05e9\u05dd \u05e9\u05dc\u05da \u05db\u05d3\u05d9 \u05e9\u05d9\u05d6\u05d4\u05d5 \u05d0\u05d5\u05ea\u05da':'Add your name so they recognise you','amb'); _mi&&_mi.focus(); }catch(e){}
+    return;
+  }
+  invNameSave(_v);
   gdClose('gd-accept'); gdConnect(gdAcceptInvite._tok,gdAcceptInvite._nm,true);
 }
 function gdDeclineInvite(){ gdClose('gd-accept'); }
@@ -9215,7 +9226,7 @@ try{ hydrateIcons(document); }catch(e){}
 /* Loaded-build version - shown in the diagnostic panel so a phone can prove
    whether it's on the latest build or a STALE cached one. Keep in lock-step
    with sw.js SW_VERSION on every deploy. */
-var APP_VER='v253';
+var APP_VER='v254';
 var FB={ready:false,uid:null,db:null,_presTimer:null,connected:false,listening:false,pushState:'default',near:0,swVer:'?',
   authState:'connecting',sdkLoaded:false,persist:'',permErr:null,err:null,wsProbe:'',csp:''};
 /* Always log connection diagnostics to the console so the real failure can be SEEN in Chrome. */
