@@ -19,6 +19,9 @@
     var code=(_u.searchParams.get('c')||'').replace(/\D/g,'').slice(0,4);
     try{ localStorage.setItem('shomer_pending_invite', JSON.stringify({tok:tok, code:code, ts:Date.now()})); }catch(e){}
     var q='?g='+encodeURIComponent(tok)+(code?('&c='+encodeURIComponent(code)):'');
+    /* Invitees go straight to the accept screen - no hunting for a button on the
+       marketing page. The app itself shows the install prompt once they're in. */
+    try{ location.replace('shomer.html'+q); return; }catch(e){}
     document.addEventListener('DOMContentLoaded', function(){
       try{
         document.querySelectorAll('a[href="shomer.html"]').forEach(function(a){ a.href='shomer.html'+q; });

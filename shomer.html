@@ -24,6 +24,13 @@
 <!-- Firebase (Spark plan): Realtime Database + Auth + FCM. Web apiKey/VAPID are client-public
  by design. RTDB reads/writes need the deployed auth-scoped rules (database.rules.json). -->
 <script>
+/* Keep an incoming invite (?g=&c=) safe through onboarding and any reload: stash it
+   now, gdCheckInviteParam() picks it up once the user is in. Expires in 24h. */
+(function(){ try{ var u=new URL(location.href), t=u.searchParams.get('g'); if(!t) return;
+  var c=(u.searchParams.get('c')||'').replace(/\D/g,'').slice(0,4);
+  localStorage.setItem('shomer_pending_invite', JSON.stringify({tok:t, code:c, ts:Date.now()})); }catch(e){} })();
+</script>
+<script>
  window.SHOMER_FB = {
    apiKey: 'AIzaSyAfevYysNLWMtXluY5lZSM_VY0eyDwZ6KQ',
    authDomain: 'shomergency.firebaseapp.com',
@@ -9093,7 +9100,7 @@ try{ hydrateIcons(document); }catch(e){}
 /* Loaded-build version - shown in the diagnostic panel so a phone can prove
    whether it's on the latest build or a STALE cached one. Keep in lock-step
    with sw.js SW_VERSION on every deploy. */
-var APP_VER='v248';
+var APP_VER='v249';
 var FB={ready:false,uid:null,db:null,_presTimer:null,connected:false,listening:false,pushState:'default',near:0,swVer:'?',
   authState:'connecting',sdkLoaded:false,persist:'',permErr:null,err:null,wsProbe:'',csp:''};
 /* Always log connection diagnostics to the console so the real failure can be SEEN in Chrome. */
