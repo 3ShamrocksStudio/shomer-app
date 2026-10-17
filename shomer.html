@@ -2202,6 +2202,9 @@ body.otp-active .ob-steps{display:none!important;}
  <div class="pcirc rep"><div class="pc-n" id="stat-reports">0</div><div class="pc-l" id="stat-reports-lbl">דיווחתי</div></div>
  </div>
  <div style="display:none"><span id="stat-sos">0</span><span id="stat-sos-lbl"></span></div>
+ <div class="sec-cap mb12">השם שלי בהזמנות</div>
+ <input id="prof-invname" type="text" maxlength="24" autocomplete="name" placeholder="למשל: דוד מרקוביץ׳" oninput="invNameSave(this.value)" style="width:100%;box-sizing:border-box;padding:12px 14px;border-radius:12px;border:1px solid rgba(201,168,76,.35);background:rgba(255,255,255,.04);color:inherit;font:inherit;font-size:15px">
+ <p class="sr-sb" style="margin:6px 2px 16px;line-height:1.6">רק מי שתזמין/י יראה את השם הזה. לכל שאר המשתמשים את/ה נשאר/ת אנונימי/ת.</p>
  <div class="sec-cap mb12" id="prof-prof-cap">תפקיד מקצועי (מתנדב/ת מגיב/ה)</div>
  <p class="sr-sb" id="prof-prof-hint" style="margin:-4px 2px 12px;line-height:1.6">בחר/י תפקיד אם את/ה מגיב/ה מקצועי/ת - סמל יוצג בפרופיל ועל הסמן שלך במפה.</p>
  <div class="prof-grid mb20" id="prof-grid" role="group" aria-label="תפקיד מקצועי">
@@ -4319,7 +4322,7 @@ var PF_OPTS={
 };
 function _pfKey(f){ return f==='gender'?'gender':f==='age'?'ageBand':'residency'; }
 function setProfileField2(f,val){ try{ if(!SS.user)SS.user={}; var k=_pfKey(f); SS.user[k]=(SS.user[k]===val?'':val); saveStore(); renderProfile2(); }catch(e){} }
-function renderProfile2(){ try{ var he=currentLang==='he';
+function renderProfile2(){ try{ var he=currentLang==='he'; try{ var _pi=document.getElementById('prof-invname'); if(_pi && document.activeElement!==_pi) _pi.value=invName(); }catch(e){}
   [['gender','pf-gender'],['age','pf-age'],['res','pf-res']].forEach(function(p){
    var box=document.getElementById(p[1]); if(!box)return; var k=_pfKey(p[0]); var cur=(SS.user&&SS.user[k])||'';
    box.innerHTML=PF_OPTS[p[0]].map(function(o){ return '<button type="button" class="prof2-b'+(cur===o[0]?' sel':'')+'" onclick="setProfileField2(\''+p[0]+'\',\''+o[0]+'\')">'+(he?o[1]:o[2])+'</button>'; }).join('');
@@ -7317,9 +7320,33 @@ async function agPickContact(){
 /* INVITE IDENTITY GATE - an invite must always carry who sent it.
    No verified phone or no name = the receiver sees "No name / no verified number"
    and cannot tell a friend from a stranger. Block the invite until both exist. */
-function inviteIdentityOk(){
+/* PRIVATE INVITE NAME - the real name a user wants their invitees to recognise.
+   Stored on this device and sent ONLY inside invites (invite record + SMS/inbox),
+   never in presence, reports, the map or the registry. Everyone else keeps seeing
+   the anonymous SH✡MER#### handle. */
+function invName(){ return ((SS.user&&SS.user.inviteName)||'').trim(); }
+function invNameSave(v){ try{ SS.user=SS.user||{}; SS.user.inviteName=String(v||'').replace(/\|/g,' ').trim().slice(0,24); saveStore(); }catch(e){} }
+function invNameAsk(then){
   var he=currentLang==='he';
-  var nm=((SS.user&&SS.user.name)||(typeof user!=='undefined'&&user&&user.name)||'').trim();
+  var old=document.getElementById('invname-bar'); if(old) old.remove();
+  var bar=document.createElement('div'); bar.id='invname-bar'; bar.className='nudge-bar';
+  bar.innerHTML='<span class="nudge-tx" style="font-weight:800">'+(he?'\u05d0\u05d9\u05da \u05d9\u05d6\u05d4\u05d5 \u05d0\u05d5\u05ea\u05da?':'How will they recognise you?')+'</span>'
+   +'<span class="nudge-tx" style="font-size:13px;opacity:.85">'+(he?'\u05d4\u05e9\u05dd \u05d9\u05d5\u05e4\u05d9\u05e2 \u05e8\u05e7 \u05dc\u05de\u05d9 \u05e9\u05ea\u05d6\u05de\u05d9\u05df/\u05d9. \u05dc\u05db\u05dc \u05d4\u05e9\u05d0\u05e8 \u05ea\u05d9\u05e9\u05d0\u05e8/\u05d9 \u05d0\u05e0\u05d5\u05e0\u05d9\u05de\u05d9/\u05ea.':'Only people you invite see this name. Everyone else still sees you as anonymous.')+'</span>'
+   +'<input id="invname-in" type="text" maxlength="24" autocomplete="name" style="width:100%;box-sizing:border-box;padding:12px 14px;border-radius:12px;border:1px solid rgba(201,168,76,.5);background:rgba(255,255,255,.06);color:#fff;font-size:16px" placeholder="'+(he?'\u05d4\u05e9\u05dd \u05e9\u05dc\u05da':'Your name')+'">'
+   +'<button class="nudge-cta">'+(he?'\u05e9\u05de\u05d5\u05e8 \u05d5\u05d4\u05de\u05e9\u05da':'Save and continue')+'</button>'
+   +'<button class="nudge-x" aria-label="close">\u2715</button>';
+  (document.getElementById('app')||document.body).appendChild(bar);
+  var inp=bar.querySelector('#invname-in'); setTimeout(function(){ try{inp.focus();}catch(e){} },120);
+  bar.querySelector('.nudge-x').onclick=function(){ bar.remove(); };
+  bar.querySelector('.nudge-cta').onclick=function(){
+    var v=(inp.value||'').trim(); if(v.length<2){ try{inp.focus();}catch(e){} return; }
+    invNameSave(v); try{ var pf=document.getElementById('prof-invname'); if(pf) pf.value=invName(); }catch(e){}
+    bar.remove(); if(typeof then==='function') then();
+  };
+}
+function inviteIdentityOk(then){
+  var he=currentLang==='he';
+  var nm=invName();
   var ph=((SS.user&&SS.user.phone)||'').replace(/[^0-9]/g,'');
   var verified=!!(SS.security&&SS.security.phoneVerified);
   if(!ph || !verified){
@@ -7327,6 +7354,7 @@ function inviteIdentityOk(){
     return false;
   }
   if(!nm){
+    invNameAsk(then); return false;
     try{ toast(he?'\u05d4\u05d5\u05e1\u05e3/\u05d9 \u05e9\u05dd \u05d1\u05e4\u05e8\u05d5\u05e4\u05d9\u05dc \u05dc\u05e4\u05e0\u05d9 \u05e9\u05dc\u05d9\u05d7\u05ea \u05d4\u05d6\u05de\u05e0\u05d4':'Add your name in your profile before sending invites','amb'); }catch(e){}
     return false;
   }
@@ -7337,10 +7365,10 @@ function inviteIdentityOk(){
    anything). Whoever taps it lands in SH✡MER with an approve screen. */
 async function shareInvite(){
   var he=currentLang==='he';
-  if(!inviteIdentityOk()) return;
+  if(!inviteIdentityOk(shareInvite)) return;
   var linkCode=String(Math.floor(1000+Math.random()*9000));
   var tok='g'+Math.random().toString(36).slice(2,8)+Math.random().toString(36).slice(2,6);
-  var myName=(SS.user&&SS.user.name)||(typeof user!=='undefined'&&user&&user.name)||(SS.user&&SS.user.username)||'';   /* the name lives in the global `user` too - read BOTH */
+  var myName=invName();   /* the private invite name - only invitees ever see it */
   var myPhone=(SS.user&&SS.user.phone)||'';
   /* Auth may not have landed yet on a cold start. Sharing a link whose invite was
      never written hands the other side a dead token: they see "no name / no verified
@@ -7397,7 +7425,7 @@ async function sendInviteSMS(phone, name, token, code){
       headers:{"Content-Type":"application/x-www-form-urlencoded"},
       body:"phone="+encodeURIComponent("+"+phone)
           +"&link="+encodeURIComponent(inviteLinkFor(token, code))
-          +"&fromName="+encodeURIComponent((SS.user&&SS.user.name)||'')
+          +"&fromName="+encodeURIComponent(invName())
           +"&fromPhone="+encodeURIComponent("+"+((SS.user&&SS.user.phone)||''))
           +"&lang="+(he?'he':'en')
     });
@@ -7411,7 +7439,7 @@ async function sendInviteSMS(phone, name, token, code){
         if(digits && typeof sha256Hex==='function'){
           sha256Hex(digits).then(function(ph){
             try{ fbRestWrite('PUT','invites/inbox_'+ph+'/'+token, {
-              fromUid:(FB.uid||''), type:'invite', token:token, fromName:((SS.user&&SS.user.name)||''),
+              fromUid:(FB.uid||''), type:'invite', token:token, fromName:invName(),
               fromPhone:((SS.user&&SS.user.phone)||''), code:String(code||''), ts:Date.now(), seen:false
             }); }catch(e){}
           });
@@ -7538,7 +7566,7 @@ function resendInvite(memberId){
 }
 async function addGuardian(){
  var he=currentLang==='he';
- if(!inviteIdentityOk()) return;
+ if(!inviteIdentityOk(addGuardian)) return;
  var nmEl=document.getElementById('ag-name'), phEl=document.getElementById('ag-phone'), go=document.getElementById('ag-go');
  var name=((nmEl&&nmEl.value)||'').trim().substring(0,24);
  var raw=((phEl&&phEl.value)||'').trim();
@@ -7567,7 +7595,7 @@ async function addGuardian(){
             RTDB rules only let each side write its OWN pairs: they write theirs on accept,
             we write ours only once we see their acceptance. */
          try{
-           var myName=(SS.user&&SS.user.name)||(SS.user&&SS.user.username)||'';
+           var myName=invName();
            agToken='g'+Math.random().toString(36).slice(2,8)+Math.random().toString(36).slice(2,6);
            await fbRestWrite('PUT','invites/'+agToken,{fromUid:FB.uid,ts:Date.now(),name:packInvite(myName,(SS.user&&SS.user.phone)||'',agCode)});
          }catch(e){ if(typeof fbLog==='function')fbLog('invite create:',(e&&e.message)||e); }
@@ -8450,7 +8478,7 @@ function gdConnect(tok,nm,fromLink){
  simLat:TLV[0]+(Math.random()-.5)*.02,simLng:TLV[1]+(Math.random()-.5)*.02}; g.pairs.push(p); }
  else { p.pending=false; if(nm&&!p.name)p.name=nm; }
  // real backend link: record the mutual pairing in RTDB (binds the two accounts)
- try{ fbAcceptInvite(tok,(gdState().myName||(SS.user&&SS.user.name)||'')).then(function(fromUid){ if(fromUid){ p.partnerUid=fromUid; p.linked=true; saveStore(); gdRenderList(); } }); }catch(e){}
+ try{ fbAcceptInvite(tok,(invName()||gdState().myName||(SS.user&&SS.user.name)||'')).then(function(fromUid){ if(fromUid){ p.partnerUid=fromUid; p.linked=true; saveStore(); gdRenderList(); } }); }catch(e){}
  saveStore();
  gdSend({type:'hello'}); gdBroadcast(); gdRenderMarkers(); gdRenderList();
  if(document.getElementById('sh-circles')&&document.getElementById('sh-circles').classList.contains('open')){} else openCircles();
@@ -9187,7 +9215,7 @@ try{ hydrateIcons(document); }catch(e){}
 /* Loaded-build version - shown in the diagnostic panel so a phone can prove
    whether it's on the latest build or a STALE cached one. Keep in lock-step
    with sw.js SW_VERSION on every deploy. */
-var APP_VER='v252';
+var APP_VER='v253';
 var FB={ready:false,uid:null,db:null,_presTimer:null,connected:false,listening:false,pushState:'default',near:0,swVer:'?',
   authState:'connecting',sdkLoaded:false,persist:'',permErr:null,err:null,wsProbe:'',csp:''};
 /* Always log connection diagnostics to the console so the real failure can be SEEN in Chrome. */
