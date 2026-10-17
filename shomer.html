@@ -3926,7 +3926,7 @@ function obPaintSignIn(){
   try{
     setText('si-h',  obTx('כניסה לחשבון קיים','Sign in to your account','تسجيل الدخول إلى حسابك'));
     setText('si-d',  obTx('הזן/י את מספר הטלפון שאיתו נרשמת. נשלח קוד אימות ב-SMS ונשחזר את החשבון שלך.','Enter the number you registered with. We will text you a code and restore your account.','أدخل الرقم الذي سجّلت به. سنرسل رمز تحقق ونستعيد حسابك.'));
-    setText('si-why',obTx('נשחזר את השם, מעגלי האמון והשומרים השמורים שלך.','We will restore your name, circles of trust and saved SHOMERs.','سنستعيد اسمك ودوائر الثقة والحراس المحفوظين.'));
+    setText('si-why',obTx('אחרי האימות תיכנס/י לאפליקציה. השומרים שלך ישובו אליך כשיאשרו אותך מחדש.','After verifying you are in. Your SHOMERs reconnect when they approve you again.','بعد التحقق تدخل التطبيق. يعود حرّاسك عندما يوافقون عليك مجددًا.'));   /* honest: circles live on the old device; the live rules cannot restore them */
     setText('si-cta-t',obTx('התחבר/י','Sign in','تسجيل الدخول'));
     var b=document.getElementById('si-back');
     if(b) b.textContent=obTx('משתמש חדש? יצירת חשבון','New here? Create an account','مستخدم جديد؟ إنشاء حساب');
@@ -9374,7 +9374,7 @@ try{ hydrateIcons(document); }catch(e){}
 /* Loaded-build version - shown in the diagnostic panel so a phone can prove
    whether it's on the latest build or a STALE cached one. Keep in lock-step
    with sw.js SW_VERSION on every deploy. */
-var APP_VER='v259';
+var APP_VER='v260';
 var FB={ready:false,uid:null,db:null,_presTimer:null,connected:false,listening:false,pushState:'default',near:0,swVer:'?',
   authState:'connecting',sdkLoaded:false,persist:'',permErr:null,err:null,wsProbe:'',csp:''};
 /* Always log connection diagnostics to the console so the real failure can be SEEN in Chrome. */
@@ -10153,6 +10153,7 @@ function fbPublishPresence(){
 }
 function updateGuardiansNearby(n){
   var el=document.getElementById('gnear-n'); if(el)el.textContent=n;
+  try{ var lb=document.getElementById('gnear-lbl'); if(lb) lb.textContent=(n===1)?(currentLang==='he'?'שומר':currentLang==='ar'?'حارس':'SH✡MER'):(currentLang==='he'?'שומרים':currentLang==='ar'?'حُرّاس':'SH✡MERs'); }catch(e){}   // "1 שומרים" → "1 שומר" 
   var box=document.getElementById('hdr-near'); if(box)box.style.display=(FB.ready&&n>0)?'flex':'none';
   FB.near=n; renderFbStatus();
   // cue when a new SHOMER joins nearby (skip the first/baseline sync)
