@@ -30,7 +30,8 @@
       "$uid": {
         ".read": "auth != null && ($uid === auth.uid || root.child('pairs').child(auth.uid).child($uid).exists())",
         ".write": "auth != null && auth.uid == $uid"
-      }
+      },
+      ".read": "auth != null && root.child('founders').child(auth.uid).exists()"
     },
     "ping": {
       "$uid": {
