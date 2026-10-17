@@ -468,6 +468,30 @@ body.sheet-open .fb-status{opacity:0;pointer-events:none;}
 /* Hidden while connected and during short reconnects - shown only when the live link has really been down for a few seconds. */
 .fb-status.fb-hide{opacity:0;pointer-events:none;}
 .fb-status.fb-grace .fb-dot{background:var(--tx3);}
+.dr-card{max-height:calc(100vh - 220px);overflow:auto}
+.dr-hd{font-size:12px;letter-spacing:.08em;color:#F5C840;font-weight:800}
+.dr-q{font-size:15px;font-weight:700;line-height:1.45;margin:6px 0 4px}
+.dr-opts{display:flex;flex-direction:column;gap:7px;width:100%}
+.dr-opt{width:100%;text-align:start;padding:10px 12px;border-radius:11px;border:1px solid rgba(201,168,76,.35);background:rgba(255,255,255,.05);color:inherit;font:inherit;font-size:13.5px;line-height:1.35;cursor:pointer}
+.dr-opt.ok{border-color:#2ecc71;background:rgba(46,204,113,.16)}
+.dr-opt.bad{border-color:#FF7080;background:rgba(255,112,128,.14)}
+.dr-res{width:100%;font-size:13px;line-height:1.5;margin-top:4px}
+.dr-good{color:#2ecc71}.dr-wrong{color:#FF9AA5}.dr-pts{color:#F5C840;font-weight:800}
+.dr-why{opacity:.9;margin-top:3px}.dr-meta{font-size:12px;opacity:.8;margin-top:4px}
+.dr-learn{background:none;border:0;color:#F5C840;text-decoration:underline;font:inherit;font-size:12.5px;padding:6px 0;cursor:pointer}
+.dr-mission{width:100%;border-top:1px solid rgba(255,255,255,.1);padding-top:8px;margin-top:4px;display:flex;flex-direction:column;gap:6px}
+.dr-pulse{width:100%;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.dr-pulse-b{padding:8px 14px;border-radius:10px;border:0;background:#2ecc71;color:#06210f;font-weight:800;font:inherit;cursor:pointer}
+.dr-pulse-b:disabled{opacity:.7}
+.dr-rk{display:inline-block;font-size:10px;letter-spacing:-1px;color:#F5C840;vertical-align:middle}
+.p-rank{display:inline-flex;align-items:center;gap:4px;font-size:12px;font-weight:800;color:#F5C840;margin-inline-end:6px}
+.dr-prof-row{display:flex;gap:8px;text-align:center}.dr-prof-row>div{flex:1;background:rgba(255,255,255,.04);border:1px solid var(--b2);border-radius:12px;padding:8px 4px}
+.dr-prof-row b{display:block;font-size:18px;color:#F5C840}.dr-prof-row small{font-size:11px;color:var(--tx2)}
+.dr-prof-next{font-size:11.5px;color:var(--tx2);margin-top:8px;line-height:1.5}
+.dr-book{display:grid;grid-template-columns:repeat(auto-fill,minmax(88px,1fr));gap:6px}
+.dr-bk{display:flex;flex-direction:column;align-items:center;gap:2px;padding:7px 4px;border-radius:10px;background:rgba(255,255,255,.04);border:1px solid var(--b2);font-size:16px;text-align:center}
+.dr-bk small{font-size:10.5px;color:var(--tx2);line-height:1.2}.dr-bk.lv3{border-color:rgba(245,200,64,.6)}
+
 /* Diagnostic panel - read on each phone to see exactly where SOS breaks */
 .diag-panel{position:absolute;top:calc(var(--hdr-top,0px) + var(--hdr) + 44px);left:50%;transform:translateX(-50%);z-index:561;width:min(86vw,330px);display:none;flex-direction:column;gap:2px;padding:13px 15px;border-radius:14px;background:rgba(9,18,36,.97);backdrop-filter:blur(14px);border:1px solid var(--b3);box-shadow:0 16px 44px rgba(0,0,0,.6);}
 .diag-panel.on{display:flex;}
@@ -2197,7 +2221,7 @@ body.otp-active .ob-steps{display:none!important;}
  <div class="p-badges">
  <!-- "SHOMER level" removed (vanity gamification trivialises a safety app). Only a real
       trust/anti-abuse reputation mechanic would justify a status indicator here. -->
- <span id="founder-slot"></span><span class="p-prof-badge" id="prof-prof-badge"><span class="ic" id="prof-prof-ic"></span><span id="prof-prof-nm"></span></span>
+ <span class="p-rank" id="prof-rank"></span><span id="founder-slot"></span><span class="p-prof-badge" id="prof-prof-badge"><span class="ic" id="prof-prof-ic"></span><span id="prof-prof-nm"></span></span>
  </div>
  </div>
  <div class="pstats" role="group" aria-label="הפעילות שלי">
@@ -2205,6 +2229,8 @@ body.otp-active .ob-steps{display:none!important;}
  <div class="pcirc rep"><div class="pc-n" id="stat-reports">0</div><div class="pc-l" id="stat-reports-lbl">דיווחתי</div></div>
  </div>
  <div style="display:none"><span id="stat-sos">0</span><span id="stat-sos-lbl"></span></div>
+ <div class="sec-cap mb12" data-he="המשמרת היומית" data-en="Daily drill" data-ar="التمرين اليومي">המשמרת היומית</div>
+ <div id="prof-drill"></div>
  <div class="sec-cap mb12">השם שלי בהזמנות</div>
  <input id="prof-invname" type="text" maxlength="24" autocomplete="name" placeholder="למשל: דוד מרקוביץ׳" oninput="invNameSave(this.value)" style="width:100%;box-sizing:border-box;padding:12px 14px;border-radius:12px;border:1px solid rgba(201,168,76,.35);background:rgba(255,255,255,.04);color:inherit;font:inherit;font-size:15px">
  <p class="sr-sb" style="margin:6px 2px 16px;line-height:1.6">רק מי שתזמין/י יראה את השם הזה. לכל שאר המשתמשים את/ה נשאר/ת אנונימי/ת.</p>
@@ -4371,7 +4397,7 @@ var PF_OPTS={
 };
 function _pfKey(f){ return f==='gender'?'gender':f==='age'?'ageBand':'residency'; }
 function setProfileField2(f,val){ try{ if(!SS.user)SS.user={}; var k=_pfKey(f); SS.user[k]=(SS.user[k]===val?'':val); saveStore(); renderProfile2(); }catch(e){} }
-function renderProfile2(){ try{ var he=currentLang==='he'; try{ var _pi=document.getElementById('prof-invname'); if(_pi && document.activeElement!==_pi) _pi.value=invName(); }catch(e){}
+function renderProfile2(){ try{ drillRenderProfile(); }catch(e){} try{ var he=currentLang==='he'; try{ var _pi=document.getElementById('prof-invname'); if(_pi && document.activeElement!==_pi) _pi.value=invName(); }catch(e){}
   [['gender','pf-gender'],['age','pf-age'],['res','pf-res']].forEach(function(p){
    var box=document.getElementById(p[1]); if(!box)return; var k=_pfKey(p[0]); var cur=(SS.user&&SS.user[k])||'';
    box.innerHTML=PF_OPTS[p[0]].map(function(o){ return '<button type="button" class="prof2-b'+(cur===o[0]?' sel':'')+'" onclick="setProfileField2(\''+p[0]+'\',\''+o[0]+'\')">'+(he?o[1]:o[2])+'</button>'; }).join('');
@@ -4397,50 +4423,14 @@ var TP_MISSIONS=[
  {he:'הזמינו אדם נוסף למעגל השומרים שלכם.', en:'Invite one more person to your SHOMER circle.', cta_he:'שלח/י הזמנה', cta_en:'Send invite', act:function(){ shareInvite(); }},
  {he:'הוסיפו אנשי קשר לחירום.', en:'Add emergency contacts.', cta_he:'לאנשי חירום', cta_en:'Open contacts', act:function(){ op('sh-em'); }},
  {he:'הכירו את השומר האוטומטי - SOS אם לא הגבתם בזמן.', en:'Meet the automatic guard - SOS if you do not respond in time.', cta_he:'לשומר האוטומטי', cta_en:'Open it', act:function(){ op('sh-dms'); }},
- {he:'נסו "הגעתי בשלום" - השומרים יודעים שהגעתם.', en:'Try "I arrived safely" - your SHOMERs know you got there.', cta_he:'להגעות', cta_en:'Open arrivals', act:function(){ op('sh-arrivals'); }},
+ {he:'הגדירו התראת הגעה - תדעו כשהשומר/ת שלכם מגיע/ה הביתה.', en:'Set an arrival alert - know when your SHOMER gets home.', cta_he:'להגעות', cta_en:'Open arrivals', act:function(){ op('sh-arrivals'); }},
  {he:'ספרו לנו מה עבד ומה לא - משפט אחד מספיק.', en:'Tell us what worked and what did not - one sentence is enough.', cta_he:'שלח/י משוב', cta_en:'Send feedback', act:function(){ try{ window.open('mailto:markodave@gmail.com?subject='+encodeURIComponent('SH✡MER tester feedback'),'_blank'); }catch(e){} }},
  {he:'יום 14 - סיימתם! תודה ענקית. השאירו את האפליקציה מותקנת - אתם חלק מהרשת.', en:'Day 14 - you made it! Huge thanks. Keep the app installed - you are part of the network.', cta_he:'סגור', cta_en:'Close', act:function(){}}
 ];
 function tpState(){ SS.tp=SS.tp||{}; if(!SS.tp.start){ SS.tp.start=tpToday(); SS.tp.seen={}; SS.tp.done={}; try{saveStore();}catch(e){} } SS.tp.seen=SS.tp.seen||{}; SS.tp.done=SS.tp.done||{}; return SS.tp; }
 function tpToday(){ var d=new Date(); return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'); }
 function tpDayIdx(){ var t=tpState(); var a=new Date(t.start+'T00:00:00'), b=new Date(tpToday()+'T00:00:00'); return Math.round((b-a)/86400000); }
-function tpScheduleReminders(){
- try{
-  if(!_isNative()||!_ln) return;
-  var he=currentLang==='he', idx=tpDayIdx(), ns=[], ids=[];
-  for(var i=0;i<TP_DAYS;i++) ids.push({id:92000+i});
-  try{ _ln.cancel({notifications:ids}); }catch(e){}
-  for(var k=Math.max(idx+1,1);k<TP_DAYS;k++){
-   var at=new Date(tpState().start+'T19:00:00'); at.setDate(at.getDate()+k);
-   if(at.getTime()<=Date.now()) continue;
-   var m=TP_MISSIONS[k];
-   ns.push({id:92000+k,title:(he?'SH✡MER · יום ':'SH✡MER · Day ')+(k+1)+'/'+TP_DAYS,body:he?m.he:m.en,channelId:'shomer-updates',autoCancel:true,schedule:{at:at}});
-  }
-  if(ns.length) _ln.schedule({notifications:ns});
- }catch(e){}
-}
-function tpMaybeShow(){
- try{
-  if(typeof _emergencyBusy==='function' && _emergencyBusy()) return;
-  var t=tpState(), idx=tpDayIdx(), day=tpToday();
-  if(idx<0||idx>=TP_DAYS) return;
-  tpScheduleReminders();
-  if(t.seen[day]) return;
-  if(popupBusy()) { if((tpMaybeShow._tries=(tpMaybeShow._tries||0)+1)<30) setTimeout(tpMaybeShow, 20000); return; }
-  t.seen[day]=Date.now(); try{saveStore();}catch(e){}
-  var he=currentLang==='he', m=TP_MISSIONS[idx];
-  var bar=document.createElement('div'); bar.id='tp-bar'; bar.className='nudge-bar';
-  var dots=''; for(var i=0;i<TP_DAYS;i++){ dots+='<span style="display:inline-block;width:8px;height:8px;border-radius:50%;margin:0 2px;background:'+(i<idx?'#F5C840':(i===idx?'#fff':'rgba(255,255,255,.18)'))+'"></span>'; }
-  bar.innerHTML='<div style="font-size:12px;letter-spacing:.08em;color:#F5C840;font-weight:800">'+(he?('יום '+(idx+1)+' מתוך '+TP_DAYS):('DAY '+(idx+1)+' OF '+TP_DAYS))+'</div>'
-   +'<div style="direction:ltr">'+dots+'</div>'
-   +'<span class="nudge-tx">'+ESC(he?m.he:m.en)+'</span>'
-   +'<button class="nudge-cta">'+ESC(he?m.cta_he:m.cta_en)+'</button>'
-   +'<button class="nudge-x" aria-label="dismiss">✕</button>';
-  (document.getElementById('app')||document.body).appendChild(bar);
-  bar.querySelector('.nudge-cta').onclick=function(){ try{ tpState().done[day]=Date.now(); saveStore(); }catch(e){} bar.remove(); try{ m.act(); }catch(e){} };
-  bar.querySelector('.nudge-x').onclick=function(){ bar.remove(); };
- }catch(e){}
-}
+/* tpScheduleReminders() / tpMaybeShow() now live in the DAILY GUARDIAN DRILL block (one daily card). */
 function enterApp(returning){
  const profNm=document.getElementById('profNm');
  if(profNm)profNm.textContent=uniqueHandle();
@@ -4471,7 +4461,7 @@ function enterApp(returning){
  try{ fbListenPersonAlerts(); }catch(e){}
  try{ setTimeout(nudgeMaybeShow, 4500); }catch(e){}
  try{ setTimeout(dykMaybeShow, 5*60000); }catch(e){}  /* DYK tip: show after 5 min of use */
- try{ setTimeout(tpMaybeShow, 3500); }catch(e){}   /* tester program: today's mission */
+ setTimeout(function(){ try{ tpMaybeShow(); }catch(e){} }, 3500);   /* the daily card (drill + tester mission) - wrapped: it is defined in a later script block */
  try{ setTimeout(scheduleRetentionNudges, 9000); }catch(e){}
  try{ renderProfile2(); }catch(e){}
  try{ setTimeout(checkSoftwareUpdate, 6500); }catch(e){}
@@ -7129,7 +7119,7 @@ function buildMemberRow(m,he){
  row.innerHTML=`
  <div class="cm-av" style="--cc:${m.color}"><span aria-hidden="true">${m.emoji||''}</span><span class="live ${m.seeThem?'':'off'}" aria-hidden="true"></span></div>
  <div class="cm-main">
- <div class="cm-nm">${ESC(m.name)}</div>
+ <div class="cm-nm">${ESC(m.name)}${(typeof m.rk==='number'&&m.partnerUid)?(' '+drillRankBadge(m.rk)):''}</div>
  <div class="cm-rel">${ESC(m.rel||'')}</div>
  <span class="cm-status ${st.cls}">${st.txt}</span>
  </div>
@@ -7713,6 +7703,7 @@ async function addGuardian(){
       approval link automatically - verified delivered. The panel stays as a manual
       fallback (WhatsApp / share / copy) in case the SMS is filtered. */
    sendInviteSMS(canon, name, agToken, agCode);
+   try{ if(agToken){ var _ih2=await sha256Hex(canon); if(_ih2) fbRestWrite('PUT','invites/inbox_'+_ih2,{fromUid:FB.uid,type:'invite',token:agToken,fromName:invName(),fromPhone:((SS.user&&SS.user.phone)||''),code:agCode,ts:Date.now(),seen:false}); } }catch(e){}   // in-app inbox even if the SMS is filtered
    showInvitePanel(name, canon, agToken, agCode);
  } else if(validPhone){
    var invMsg=encodeURIComponent(agToken?inviteTextFor(name, agToken, agCode):(he?('\u05d4\u05d9\u05d9! \u05d4\u05e6\u05d8\u05e8\u05e3/\u05d9 \u05d0\u05dc\u05d9\u05d9 \u05d1-SH\u2721MER - \u05d0\u05e4\u05dc\u05d9\u05e7\u05e6\u05d9\u05d9\u05ea \u05d1\u05d8\u05d9\u05d7\u05d5\u05ea \u05e7\u05d4\u05d9\u05dc\u05ea\u05d9\u05ea. \u05d7\u05d9\u05e0\u05dd: https://www.shomer-app.co.il/'):('Join me on SH\u2721MER: https://www.shomer-app.co.il/')));
@@ -8584,6 +8575,7 @@ async function gdLoadInvite(token){
       if(!ok){ gdInviteMsg('net'); setTimeout(function(){ if(gdAcceptInvite._tok===token && document.getElementById('gd-accept').getAttribute('aria-hidden')==='false') gdLoadInvite(token); }, 5000); return; }
     }
     var inv=null;
+    if(gdInviteMsg._kind!=='loading') gdInviteMsg('loading');   // never flash "No name" while the record is on its way
     try{ var s=await fbRestGet('invites/'+token); inv=s&&s.val?s.val():null; }
     catch(e){ if(gdAcceptInvite._tok===token){ gdInviteMsg('net'); setTimeout(function(){ if(gdAcceptInvite._tok===token && document.getElementById('gd-accept').getAttribute('aria-hidden')==='false') gdLoadInvite(token); }, 5000); } return; }
     if(gdAcceptInvite._tok!==token) return;
@@ -9382,7 +9374,7 @@ try{ hydrateIcons(document); }catch(e){}
 /* Loaded-build version - shown in the diagnostic panel so a phone can prove
    whether it's on the latest build or a STALE cached one. Keep in lock-step
    with sw.js SW_VERSION on every deploy. */
-var APP_VER='v258';
+var APP_VER='v259';
 var FB={ready:false,uid:null,db:null,_presTimer:null,connected:false,listening:false,pushState:'default',near:0,swVer:'?',
   authState:'connecting',sdkLoaded:false,persist:'',permErr:null,err:null,wsProbe:'',csp:''};
 /* Always log connection diagnostics to the console so the real failure can be SEEN in Chrome. */
@@ -10147,9 +10139,12 @@ function fbPublishPresence(){
   var hide=(userLat==null||userLng==null)||!!SS.circleGhost;
   var lat=hide?null:Math.round(userLat*100)/100, lng=hide?null:Math.round(userLng*100)/100;
   var _pn=Date.now(), _pk=lat+','+lng;
-  if(FB._presKey===_pk && FB._presAt && (_pn-FB._presAt)<30000) return;   // coarse point unchanged → no need to rewrite every GPS tick
+  if(FB._presKey===_pk && FB._presAt && (_pn-FB._presAt)<30000 && !(SS.drill&&SS.drill.start&&FB._presRk!==drillRank().i)) return;   // coarse point unchanged → no need to rewrite every GPS tick
   FB._presKey=_pk; FB._presAt=_pn;
-  FB.db.ref('presence/'+FB.uid).set(hide?{ts:_pn}:{lat:lat,lng:lng,ts:_pn}).then(function(){ if(FB.permErr){FB.permErr=null;renderFbStatus();} }).catch(function(e){ FB.permErr=(e&&e.code)||'write-denied'; fbLog('presence WRITE denied:', FB.permErr, e); renderFbStatus(); });
+  var _pres=hide?{ts:_pn}:{lat:lat,lng:lng,ts:_pn};
+  try{ if(SS.drill&&SS.drill.start) _pres.rk=drillRank().i; }catch(e){}   // rank badge for MY circle only (presence is paired-only)
+  if(FB._presRk!==_pres.rk){ FB._presRk=_pres.rk; FB._presAt=0; }
+  FB.db.ref('presence/'+FB.uid).set(_pres).then(function(){ if(FB.permErr){FB.permErr=null;renderFbStatus();} }).catch(function(e){ FB.permErr=(e&&e.code)||'write-denied'; fbLog('presence WRITE denied:', FB.permErr, e); renderFbStatus(); });
   /* Sanitized, PII-free presence heartbeat for the municipal dashboard — coarse ~1km coords,
      anonymous uid, no name/phone. Written to the public /dashfeed path (same place as events),
      so the dashboard can count online users network-wide and per-territory WITHOUT ever reading
@@ -11427,6 +11422,14 @@ function showIncomingSOS(puid, nm, v){
   d.querySelector('.in-x').onclick=function(){ d.remove(); };   /* ALWAYS dismissible */
 }
 
+/* ── A GUARDIAN STANDS DOWN ("לא יכול/ה") - withdraw my "I'm coming" so the person isn't
+   counting on me. The button used to call this function, which did not exist. ── */
+async function sosStandDown(){
+  var he=currentLang==='he';
+  if(!FB.ready||!FB.uid) return;
+  var ok=await busWrite('rp_'+FB.uid, {fromUid:FB.uid, ts:Date.now(), name:packSOS(false,'',null,null,'')});
+  toast(ok?(he?'עודכן שאת/ה לא בדרך. אם אפשר - התקשר/י אליהם או ל-100.':'Updated: you are not coming. If you can, call them or 100.'):(he?'לא הצלחנו לעדכן - התקשר/י אליהם':'Could not update - call them'), ok?'':'amb');
+}
 /* ── A GUARDIAN COMMITS ── */
 async function sosRespond(victimUid, mode){
   var he=currentLang==='he';
@@ -11990,6 +11993,7 @@ function fbApplyPeerPresence(all){
     g.pairs.forEach(function(p){
       if(!p.partnerUid)return;
       var pr=all[p.partnerUid];
+      if(pr && typeof pr.rk==='number' && p.rk!==pr.rk){ p.rk=pr.rk; var _cr=(SS.circleMembers||[]).find(function(x){ return x.pairId===p.id || (x.partnerUid&&x.partnerUid===p.partnerUid); }); if(_cr){ _cr.rk=pr.rk; } changed=true; try{ renderCircles(); }catch(e){} }
       if(pr && pr.lat!=null && pr.lng!=null){
         // fresh presence (< 2 min) = live; else keep last known but not "live"
         var fresh=(now-(pr.ts||0))<120000;
@@ -13812,6 +13816,277 @@ html[dir="rtl"] .sh-back svg{transform:scaleX(-1)}
     }
   }catch(e){}
 })();
+</script>
+<script>
+/* DRILL BANK - [topic, he_q, he_opts(correct FIRST), en_q, en_opts(correct FIRST), he_why, en_why]
+   Topics = EMERGENCY_GUIDE ids (feed ספר השומר) or 'app' (how SH✡MER works).
+   Every answer is taken from the in-app Emergency Guide text or from the app's own code. */
+var DRILL_BANK=[
+['call','אירוע רפואי - לאיזה מספר מתקשרים?',['101 (מד״א)','100','102','1201'],'A medical emergency - which number do you call?',['101 (MDA)','100','102','1201'],'101 מד״א לרפואה, 100 משטרה לסכנה/אלימות, 102 כבאות והצלה.','101 MDA for medical, 100 Police for danger/violence, 102 Fire & rescue.'],
+['call','מישהו מאיים באלימות ברחוב - לאן מתקשרים?',['100 (משטרה)','101','102','1201'],'Someone is threatening violence in the street - who do you call?',['100 (Police)','101','102','1201'],'100 משטרה - לסכנה ואלימות.','100 Police - for danger and violence.'],
+['call','שריפה בבניין - לאיזה מספר?',['102 (כבאות והצלה)','101','100','1201'],'A building is on fire - which number?',['102 (Fire & rescue)','101','100','1201'],'102 כבאות והצלה - לשריפה וחילוץ.','102 Fire & rescue - for fire and rescue.'],
+['call','מה הכי חשוב לעשות בזמן השיחה עם המוקד?',['לענות על כל השאלות, לתת כתובת מלאה ולהישאר על הקו','לנתק מהר כדי לפנות את הקו','לתאר רק את מה שהכי מפחיד','לחכות שיחזרו אליך'],'What matters most while on the line with the dispatcher?',['Answer every question, give the full address, stay on the line','Hang up quickly to free the line','Describe only the scariest part','Wait for them to call you back'],'השאלות של המוקדן חשובות: כתובת מלאה, מה קרה, כמה נפגעים - ולהישאר על הקו.','The dispatcher\'s questions matter: full address, what happened, how many hurt - and stay on the line.'],
+['call','למה כדאי להעביר את הטלפון לרמקול בזמן שיחת חירום?',['כדי לטפל בנפגע בזמן שמדברים','כדי שכולם ישמעו','כדי לחסוך בסוללה','כדי שהשיחה תהיה מוקלטת'],'Why put the phone on speaker during an emergency call?',['So you can treat the person while talking','So everyone can hear','To save battery','So the call is recorded'],'רמקול משאיר את הידיים פנויות לעזרה ראשונה בזמן ההנחיות.','Speaker keeps your hands free for first aid while you get instructions.'],
+['cpr','אדם לא מגיב ולא נושם כרגיל. מה הצעד הראשון אחרי שזיהית?',['להתקשר ל-101 ולבקש דפיברילטור','לחפש דופק דקה שלמה','לתת לו לשתות','להזיז אותו לצל'],'Someone is unresponsive and not breathing normally. First step after you notice?',['Call 101 and ask for an AED','Check for a pulse for a full minute','Give them water','Move them into the shade'],'במדריך: מתקשרים ל-101 ומבקשים דפיברילטור, בלי לעכב בבדיקת דופק.','Guide: call 101 and ask for an AED - do not delay to check a pulse.'],
+['cpr','באיזה קצב לוחצים בהחייאה?',['100-120 לחיצות בדקה','30 לחיצות בדקה','60 לחיצות בדקה','200 לחיצות בדקה'],'What compression rate is used in CPR?',['100-120 per minute','30 per minute','60 per minute','200 per minute'],'לוחצים חזק ומהר: 100-120 בדקה, עומק 5-6 ס״מ.','Push hard and fast: 100-120 per minute, 5-6 cm deep.'],
+['cpr','לא עברת הכשרה בהנשמות. מה עושים?',['עיסויים רצופים בלבד, בלי לעצור','רק הנשמות','מחכים לצוות בלי לגעת','לחיצה אחת כל 10 שניות'],'Not trained in rescue breaths. What do you do?',['Continuous chest compressions only, without stopping','Breaths only','Wait for the team without touching','One compression every 10 seconds'],'לא מיומנים? עיסויי חזה רצופים בלבד עד שמגיעה עזרה.','Not trained? Continuous chest compressions only until help arrives.'],
+['cpr','הגיע דפיברילטור (AED). מה עושים?',['מדליקים ופועלים לפי ההנחיות הקוליות','מחכים לרופא שיפעיל','מפסיקים החייאה לגמרי','משאירים אותו סגור'],'An AED has arrived. What now?',['Turn it on and follow the voice prompts','Wait for a doctor to operate it','Stop CPR completely','Leave it closed'],'מדליקים את הדפיברילטור ופועלים לפי ההוראות הקוליות שלו.','Turn the AED on and follow its voice prompts.'],
+['choke','מישהו נחנק אבל משתעל חזק. מה עושים?',['מעודדים להמשיך להשתעל, לא מתערבים','מכים מיד בגב','היימליך מיד','נותנים מים'],'Someone is choking but coughing hard. What do you do?',['Encourage them to keep coughing, do not intervene','Hit their back right away','Heimlich right away','Give them water'],'כל עוד משתעלים או מדברים - מעודדים שיעול חזק ולא מתערבים.','While they can cough or speak - encourage strong coughing, do not intervene.'],
+['choke','מבוגר לא מצליח להשתעל או לנשום. מה הצעד הראשון?',['להטות קדימה ולתת עד 5 מכות בין השכמות','לחפש באצבע בפה','לתת לשתות','להשכיב על הגב ולחכות'],'An adult cannot cough or breathe. First step?',['Lean them forward, up to 5 back blows between the shoulder blades','Sweep the mouth with a finger','Give a drink','Lay them down and wait'],'מטים קדימה, עד 5 מכות גב, ואם לא עזר - עד 5 לחיצות בטן, לסירוגין.','Lean forward, up to 5 back blows, then up to 5 abdominal thrusts, alternating.'],
+['choke','תינוק (מתחת לגיל שנה) נחנק. מה אסור?',['לחיצות בטן (היימליך)','מכות גב על האמה','לחיצות חזה בשתי אצבעות','להתקשר ל-101'],'An infant (under 1) is choking. What is forbidden?',['Abdominal thrusts (Heimlich)','Back blows along your forearm','Two-finger chest thrusts','Calling 101'],'בתינוק: 5 מכות גב ו-5 לחיצות חזה בשתי אצבעות - בלי לחיצות בטן.','Infant: 5 back blows and 5 two-finger chest thrusts - NO abdominal thrusts.'],
+['bleed','דימום חזק מפצע. מה עושים קודם?',['לחץ ישיר וחזק על הפצע','שוטפים במים','מחכים שיעצור לבד','מורחים משחה'],'Heavy bleeding from a wound. What first?',['Firm direct pressure on the wound','Rinse with water','Wait for it to stop','Apply ointment'],'לחץ ישיר וחזק בכף היד, ולהמשיך ללחוץ דרך תחבושת.','Firm direct pressure with your palm, and keep pressing through a bandage.'],
+['bleed','התחבושת ספוגה בדם. מה עושים?',['מוסיפים תחבושת מעל ולא מורידים','מורידים ומחליפים','משחררים את הלחץ','שוטפים את הפצע'],'The dressing is soaked with blood. What now?',['Add more on top, do not remove it','Remove and replace it','Release the pressure','Wash the wound'],'לא מסירים תחבושת ספוגה - מוסיפים עוד מעליה.','Never remove a soaked dressing - add more on top.'],
+['bleed','הנחת חוסם עורקים. מה חשוב לעשות?',['לרשום את שעת ההנחה במקום בולט','לשחרר אותו כל כמה דקות','לכסות אותו כדי שלא יראו','להסיר אחרי 5 דקות'],'You applied a tourniquet. What is important?',['Write the time it was applied somewhere obvious','Loosen it every few minutes','Cover it so it is hidden','Remove it after 5 minutes'],'רושמים את השעה במקום בולט ולא משחררים חוסם שהונח.','Write the time somewhere obvious and never loosen an applied tourniquet.'],
+['bleed','חפץ נעוץ בפצע. מה עושים?',['לא מוציאים אותו, לוחצים סביבו ומתקשרים','מוציאים מהר','מסובבים אותו','שוטפים אותו החוצה'],'An object is embedded in a wound. What do you do?',['Do not pull it out - press around it and call','Pull it out fast','Twist it','Flush it out'],'במדריך: לא שולפים חפץ נעוץ.','Guide: do not pull out an embedded object.'],
+['burn','כוויה מחום. מה עושים?',['מקררים במים זורמים לפחות 20 דקות','שמים קרח','מורחים חמאה או יוגורט','מפוצצים שלפוחיות'],'A heat burn. What do you do?',['Cool under running water for at least 20 minutes','Put ice on it','Spread butter or yogurt','Pop the blisters'],'מים זורמים קרירים 20 דקות לפחות. בלי קרח, בלי תרופות סבתא.','Cool running water for at least 20 minutes. No ice, no home remedies.'],
+['burn','במה מכסים כוויה אחרי הקירור?',['ניילון נצמד מונח ברפיון או שקית נקייה','בד רטוב','צמר גפן','פלסטר הדוק'],'What do you cover a burn with after cooling?',['Cling film laid loosely, or a clean plastic bag','A wet cloth','Cotton wool','A tight plaster'],'מכסים בניילון נצמד ברפיון (לא כורכים חזק) - לא בבד רטוב.','Cover loosely with cling film (not wrapped tight) - not a wet cloth.'],
+['burn','כוויה מחשמל. מה קודם לכל?',['לוודא שהחשמל מנותק לפני שנוגעים','לשפוך מים על המכשיר','למשוך את האדם בידיים','למרוח משחה'],'An electrical burn. What comes first?',['Make sure the power is OFF before touching','Pour water on the device','Pull the person with your hands','Apply ointment'],'בכוויית חשמל - מוודאים שהחשמל כבוי לפני מגע.','Electrical burn - make sure the power is off before touching.'],
+['stroke','מה בודקים לפי FAST בחשד לשבץ?',['פנים, ידיים, דיבור - וזמן להתקשר','חום, דופק, לחץ דם','ראייה ושמיעה','רעב וצמא'],'What does FAST check in a suspected stroke?',['Face, Arms, Speech - Time to call','Fever, pulse, blood pressure','Sight and hearing','Hunger and thirst'],'פנים (חיוך עקום), ידיים (יד צונחת), דיבור - וזמן: 101 מיד.','Face droop, Arm weakness, Speech - Time: call 101 now.'],
+['stroke','סימני השבץ חלפו אחרי כמה דקות. מה עושים?',['מתקשרים ל-101 בכל זאת ורושמים מתי התחיל','מחכים לראות אם יחזור','נותנים אספירין','שולחים לישון'],'The stroke signs faded after a few minutes. What now?',['Call 101 anyway and note when it started','Wait to see if it returns','Give aspirin','Send them to sleep'],'מתקשרים גם אם הסימנים חלפו. שעת ההתחלה קריטית לטיפול.','Call even if the signs fade. The start time is critical for treatment.'],
+['stroke','למה לא נותנים אספירין בחשד לשבץ?',['חלק מהשבצים הם דימום','כי זה מרדים','כי זה מעלה חום','מותר תמיד'],'Why not give aspirin for a suspected stroke?',['Some strokes are bleeds','It makes people drowsy','It raises fever','It is always fine'],'במדריך: לא נותנים אספירין - חלק מהשבצים הם דימום.','Guide: no aspirin - some strokes are bleeds.'],
+['heart','מה מהבאים הוא סימן אופייני להתקף לב?',['לחץ במרכז החזה שמקרין לזרוע או ללסת','כאב בכף הרגל','גירוד בעור','עיניים דומעות'],'Which is a typical heart-attack sign?',['Pressure in the centre of the chest spreading to arm or jaw','Pain in the foot','Itchy skin','Watery eyes'],'לחץ/כאב במרכז החזה, קוצר נשימה, זיעה קרה, בחילה. אצל נשים לעיתים בעיקר קוצר נשימה ועייפות.','Central chest pressure, shortness of breath, cold sweat, nausea. Women may have mainly breathlessness and fatigue.'],
+['heart','חשד להתקף לב. מה הצעד הראשון?',['להתקשר ל-101 מיד','לחפש אספירין קודם','לצאת להליכה','לחכות שעה'],'Suspected heart attack. First step?',['Call 101 immediately','Look for aspirin first','Go for a walk','Wait an hour'],'כל דקה חשובה - מתקשרים מיד ולא מעכבים בשביל אספירין.','Every minute matters - call now, never delay to find aspirin.'],
+['heart','באיזו תנוחה כדאי להושיב חשוד להתקף לב?',['ישיבה חצי-שכיבה, ברכיים כפופות','עמידה','שכיבה על הבטן','הליכה איטית'],'How should a suspected heart-attack patient rest?',['Seated, semi-reclined, knees bent','Standing','Lying face down','Walking slowly'],'מנוחה בישיבה חצי-שכיבה עם ברכיים כפופות.','Rest seated, semi-reclined, knees bent.'],
+['allergy','תגובה אלרגית קשה (אנפילקסיס) ויש מזרק אדרנלין. מתי מזריקים?',['מיד','רק אם מתעלפים','אחרי 20 דקות','רק בבית חולים'],'Severe allergic reaction (anaphylaxis) and an adrenaline pen is available. When to inject?',['Immediately','Only if they faint','After 20 minutes','Only at hospital'],'משתמשים במזרק מיד - לא מעכבים את האדרנלין.','Use the auto-injector immediately - never delay the adrenaline.'],
+['allergy','לאן מזריקים את מזרק האדרנלין?',['אמצע הירך החיצונית, אפשר דרך הבגד','לישבן','לזרוע העליונה בלבד','לבטן'],'Where do you inject the adrenaline pen?',['Middle of the outer thigh, through clothing is OK','The buttock','Upper arm only','The belly'],'אמצע הירך החיצונית, גם דרך בגדים, להחזיק כ-3 שניות. לא לישבן.','Middle of the outer thigh, works through clothing, hold ~3 seconds. Not the buttock.'],
+['allergy','אחרי הזריקה המצב השתפר. האם עדיין מתקשרים ל-101?',['כן - התסמינים יכולים לחזור אחרי שעות','לא, הכל עבר','רק אם יש פריחה','רק למחרת'],'After the injection they feel better. Still call 101?',['Yes - symptoms can return hours later','No, it is over','Only if there is a rash','Only the next day'],'מתקשרים גם אם השתפר ואומרים "אנפילקסיס" - צריך השגחה רפואית.','Call even if better and say "anaphylaxis" - medical observation is needed.'],
+['seizure','מישהו בפרכוסים. מה אסור לעשות?',['להכניס משהו לפה','להגן על הראש','לפנות חפצים מסוכנים','למדוד כמה זמן זה נמשך'],'Someone is having a seizure. What must you NOT do?',['Put something in their mouth','Protect the head','Move dangerous objects away','Time how long it lasts'],'לא מכניסים כלום לפה ולא מרסנים. מגינים על הראש ומודדים זמן.','Nothing in the mouth, no restraining. Protect the head and time it.'],
+['seizure','הפרכוסים נגמרו. מה עושים?',['משכיבים על הצד ונשארים עד התאוששות מלאה','נותנים לשתות מיד','מעמידים אותו','עוזבים'],'The convulsions stopped. What now?',['Turn them on their side and stay until fully recovered','Give a drink right away','Stand them up','Leave'],'תנוחת התאוששות על הצד, בלי אוכל ושתייה עד התאוששות מלאה.','Recovery position on the side; no food or drink until fully recovered.'],
+['seizure','מתי חובה להתקשר ל-101 בפרכוס?',['אם זה נמשך יותר מ-5 דקות','אם זה נמשך 10 שניות','אף פעם','רק אם האדם מבקש'],'When must you call 101 for a seizure?',['If it lasts over 5 minutes','If it lasts 10 seconds','Never','Only if they ask'],'101 אם מעל 5 דקות, פרכוס ראשון, חוזר בלי התעוררות, פציעה או קושי נשימה.','101 if over 5 minutes, a first seizure, repeated without waking, injury or breathing trouble.'],
+['drown','מישהו טובע ולא עברת הכשרת הצלה. מה נכון?',['להושיט או לזרוק משהו - לא להיכנס למים','לקפוץ מיד','לחכות שייצא לבד','לצעוק בלבד'],'Someone is drowning and you are not trained in rescue. What is right?',['Reach or throw something - do not go in','Jump in immediately','Wait for them to get out','Only shout'],'מגנים על עצמך: מושיטים או זורקים. לא נהיים נפגע שני.','Protect yourself: reach or throw. Do not become a second victim.'],
+['drown','הוצאת טובע, לא מגיב ולא נושם. מה קודם?',['5 הנשמות ואז החייאה','רק עיסויים','לנער אותו','לכסות ולחכות'],'You pulled out a drowning person, unresponsive and not breathing. What first?',['5 rescue breaths, then CPR','Compressions only','Shake them','Cover and wait'],'בטביעה ההנשמות חיוניות: 5 הנשמות ואז החייאה.','In drowning the breaths are essential: 5 rescue breaths, then CPR.'],
+['shock','סימני הלם (עור חיוור וקר, חולשה). מה עושים?',['101, להשכיב, לחמם ולהרים רגליים אם אין פגיעה','לתת אוכל ושתייה','להושיב ולהליך','לשפוך מים קרים'],'Signs of shock (pale cold skin, weakness). What do you do?',['101, lay down, keep warm, raise legs if no injury','Give food and drink','Sit them up and walk','Pour cold water'],'הלם מסכן חיים: 101, להשכיב, לחמם, ולהרים רגליים - אלא אם יש חשד לפגיעת ראש/צוואר/גב.','Shock is life-threatening: 101, lay down, keep warm, raise legs unless head/neck/back injury is suspected.'],
+['shock','מתי לא מרימים רגליים לנפגע בהלם?',['בחשד לפגיעה בראש, צוואר או גב','כשקר לו','כשהוא מבוגר','אף פעם לא מרימים'],'When do you NOT raise the legs of someone in shock?',['When a head, neck or back injury is suspected','When they are cold','When they are elderly','Never raise them'],'לא מרימים רגליים אם יש חשד לפגיעת ראש/צוואר/גב או אם זה כואב.','Do not raise the legs if a head/neck/back injury is suspected, or if it hurts.'],
+['faint','מרגישים שעומדים להתעלף. מה עושים?',['לשכב עם רגליים מורמות או לשבת עם ראש בין הברכיים','לקום מהר','לרוץ החוצה','לעצור נשימה'],'You feel faint. What do you do?',['Lie down with legs raised, or sit with head between knees','Stand up fast','Run outside','Hold your breath'],'שוכבים עם רגליים מורמות, או יושבים עם הראש בין הברכיים.','Lie down with legs raised, or sit with the head between the knees.'],
+['faint','מתי התעלפות היא מצב חמור?',['לא מתעוררים תוך דקה או לא נושמים','אם הפנים חיוורות לרגע','אם האדם צמא','אף פעם'],'When is fainting serious?',['Not waking within a minute, or not breathing','If the face is pale for a moment','If they are thirsty','Never'],'חמור אם: לא מתעורר תוך דקה, לא נושם, כאב בחזה, התעלף במאמץ, נפצע או בהריון.','Serious if: not waking within a minute, not breathing, chest pain, fainted on exertion, injured or pregnant.'],
+['faint','אישה בהריון התעלפה. איך משכיבים?',['על הצד','על הבטן','בישיבה זקופה','בעמידה'],'A pregnant woman fainted. How do you lay her?',['On her side','Face down','Sitting upright','Standing'],'במדריך: אישה בהריון - משכיבים על הצד.','Guide: a pregnant woman - lay her on her side.'],
+['bone','חשד לשבר ביד. מה עושים?',['מקבעים במצב הנוכחי ולא מיישרים','מיישרים את העצם','מבקשים להזיז כדי לבדוק','שמים קרח ישירות על העור'],'Suspected broken arm. What do you do?',['Support it in its current position, do not straighten','Straighten the bone','Ask them to move it to test','Put ice directly on the skin'],'מקבעים כמו שהוא, לא מיישרים, קרח עטוף במגבת - לא ישירות.','Splint it as it is, never realign, ice wrapped in a towel - not directly.'],
+['bone','נקע בקרסול - מה ראשי התיבות של הטיפול?',['מנוחה, קרח, חבישה, הרמה (RICE)','חום, עיסוי, הליכה','מתיחה וריצה','רק משכך כאבים'],'An ankle sprain - what is the treatment acronym?',['Rest, Ice, Compression, Elevation (RICE)','Heat, massage, walking','Stretch and run','Painkillers only'],'נקע: מנוחה · קרח · חבישה אלסטית נוחה · הרמה מעל גובה הלב.','Sprain: Rest · Ice · comfortable elastic Compression · Elevate above heart level.'],
+['ptsd','מישהו בהתקף חרדה. מה לא אומרים?',['"תירגע/י" או "זה לא נורא"','"אני כאן. את/ה בטוח/ה"','"נשום/נשמי איתי"','"מה את/ה רואה סביבך?"'],'Someone is in a panic attack. What should you NOT say?',['"Calm down" or "it is not a big deal"','"I am here. You are safe."','"Breathe with me"','"What can you see around you?"'],'"תירגע" מגביר מצוקה. מדברים לאט, משפטים קצרים, ונשארים.','"Calm down" increases distress. Speak slowly, short sentences, and stay.'],
+['ptsd','מה זה תרגיל הקרקוע 5-4-3-2-1?',['5 דברים שרואים, 4 נוגעים, 3 שומעים, 2 מריחים, 1 טועמים','לספור לאחור מ-5','5 נשימות עמוקות','לקפוץ 5 פעמים'],'What is the 5-4-3-2-1 grounding exercise?',['5 things you see, 4 touch, 3 hear, 2 smell, 1 taste','Counting back from 5','5 deep breaths','Jumping 5 times'],'קרקוע בחושים מחזיר לכאן ועכשיו.','Grounding through the senses brings them back to the here and now.'],
+['ptsd','חשש למחשבות אובדניות. למי פונים?',['ער״ן 1201 או 101','102','רק לחבר','לא לשאול על זה'],'Concern about suicidal thoughts. Who do you call?',['ERAN 1201 or 101','102','Only a friend','Do not ask about it'],'שואלים ישירות - זה לא "מכניס רעיון". ער״ן 1201 או 101.','Ask directly - it does not plant the idea. ERAN 1201 or 101.'],
+['app','לחצת SOS בטעות. מה קורה אם לוחצים "אני בטוח/ה - בטל" בזמן הספירה?',['זו אזעקת שווא - שום דבר לא משודר ולא מופיע במפה','השומרים מקבלים הודעה','המשטרה מוזעקת','צריך להזין קוד ביטול'],'You pressed SOS by mistake. What happens if you tap "I\'m safe - Cancel" during the countdown?',['It is a false alarm - nothing is broadcast, nothing on the map','Your SHOMERs get a message','Police are called','You must enter your cancel code'],'ביטול בזמן הספירה = אזעקת שווא. רק אחרי שהספירה נגמרת ה-SOS משודר.','Cancelling during the countdown = false alarm. The SOS is broadcast only after the countdown ends.'],
+['app','SOS כבר פעיל. מה צריך כדי לבטל אותו?',['קוד הביטול שהגדרת','טביעת אצבע','לסגור את האפליקציה','לנער את הטלפון'],'An SOS is already active. What do you need to cancel it?',['The cancel code you set','A fingerprint','Closing the app','Shaking the phone'],'SOS פעיל מבוטל רק בקוד הביטול - כדי שמי שלקח את הטלפון לא יוכל לכבות אותו.','An active SOS is cancelled only with your cancel code - so whoever grabs the phone cannot stop it.'],
+['app','למה SOS פעיל לא מבוטל בטביעת אצבע?',['כדי שאי אפשר יהיה לכבות אותו באצבע של אדם מחוסר הכרה','כי זה איטי','כי זה לא עובד באנדרואיד','זה דווקא אפשרי'],'Why can an active SOS not be cancelled with a fingerprint?',['So nobody can stop it with an unconscious person\'s finger','Because it is slow','It does not work on Android','Actually it can be'],'בכוונה: אדם מחוסר הכרה לא יכול לכבות את ההתראה שלו בעל כורחו.','By design: an unconscious person\'s alert can\'t be cancelled with their own finger.'],
+['app','כמה זמן נמשכת ברירת המחדל של ספירת ה-SOS לפני השידור?',['10 שניות','שנייה אחת','דקה','אין ספירה'],'How long is the default SOS countdown before broadcast?',['10 seconds','1 second','1 minute','There is no countdown'],'ברירת מחדל 10 שניות (אפשר 5-15). האזעקה מתחילה מיד.','Default 10 seconds (5-15 allowed). The alarm starts immediately.'],
+['app','שומר/ת מהמעגל שלך שלח/ה SOS. מה הצעד הכי מועיל?',['ללחוץ "אני בדרך" כדי שיידעו, לנווט או להתקשר','להתעלם עד שיגיע עוד מישהו','לבטל להם את ה-SOS','לפרסם ברשתות'],'A SHOMER in your circle sent an SOS. Most useful step?',['Tap "I am coming" so they know, then navigate or call','Ignore it until someone else comes','Cancel their SOS','Post it on social media'],'"אני בדרך" מראה להם שעזרה מגיעה. "נווט/י" מוביל למיקום, ו"התקשר/י" לשיחה.','"I am coming" shows them help is on the way. "Navigate" leads to them, "Call" phones them.'],
+['app','שומר/ת אחר/ת לחץ/ה "לא יכול/ה" ב-SOS שקיבל/ה. מה זה אומר?',['שהוא/היא לא יכול/ה להגיע - שאחרים יידעו','שה-SOS בוטל','שהאדם בטוח','שהטלפון כבוי'],'Another SHOMER tapped "Stand down" on an SOS. What does that mean?',['They cannot come - so others know','The SOS was cancelled','The person is safe','Their phone is off'],'"לא יכול/ה" מודיע שאת/ה לא בדרך. ה-SOS עצמו נשאר פעיל.','"Stand down" tells them you are not coming. The SOS itself stays active.'],
+['app','מה עושה הצ׳ק-אין ההדדי?',['שואל "הכל טוב?" ואם לא מאשרים בזמן - השומרים שבחרת מקבלים התראה','שולח SOS כל שעה','מראה את המיקום לכולם','מחייג למשטרה'],'What does mutual check-in do?',['Asks "Are you OK?" - if you do not confirm in time, your chosen SHOMERs are alerted','Sends an SOS every hour','Shows your location to everyone','Calls the police'],'הצ׳ק-אין שואל כל כמה זמן. לא אישרת בחלון הזמן - השומרים שבחרת מקבלים התראה.','Check-in asks every interval. No confirmation in the window - your chosen SHOMERs are alerted.'],
+['app','מה עושה "השומר האוטומטי" (Dead-man switch)?',['שולח SOS אוטומטית אם לא אישרת בזמן','מכבה את הטלפון','מצלם תמונה','שולח מיקום כל דקה לכולם'],'What does the automatic guard (dead-man switch) do?',['Sends an SOS automatically if you do not confirm in time','Turns the phone off','Takes a photo','Sends location to everyone every minute'],'כשהזמן נגמר בלי אישור - SOS נשלח אוטומטית. דקה לפני מקבלים אזהרה.','When time runs out without confirmation - an SOS is sent automatically. You get a warning a minute before.'],
+['app','השומר האוטומטי פועל. כמה זמן לפני הסוף מקבלים אזהרה?',['דקה אחת','שעה','אין אזהרה','5 שניות'],'The automatic guard is running. How long before the end do you get a warning?',['1 minute','1 hour','No warning','5 seconds'],'60 שניות לפני הסוף מגיעה אזהרה "הכל טוב?".','60 seconds before the end you get an "Are you OK?" warning.'],
+['app','מה עושה "מצב רפאים"?',['משהה את שיתוף המיקום שלך','מסתיר את האפליקציה','מוחק את החשבון','משתיק אזעקות'],'What does ghost mode do?',['Pauses sharing your location','Hides the app','Deletes your account','Mutes alarms'],'מצב רפאים משהה את שיתוף המיקום עם השומרים עד שמכבים אותו.','Ghost mode pauses location sharing with your SHOMERs until you turn it off.'],
+['app','קיבלת הזמנה להיות שומר/ת. למה יש קוד בן 4 ספרות?',['כדי לוודא שההזמנה באמת מהאדם שאת/ה מכיר/ה','כדי לשלם','כדי לפתוח את הטלפון','אין סיבה'],'You got an invite to be a SHOMER. Why is there a 4-digit code?',['To confirm the invite really is from the person you know','To pay','To unlock the phone','No reason'],'אישור אפשרי רק כשהקוד תואם - כמו מספר בטיחות. לא בטוח/ה? התקשר/י ובקש/י את הקוד.','Approve works only when the code matches - like a safety number. Unsure? Call and ask for the code.'],
+['app','מי רואה את "השם שלי בהזמנות"?',['רק מי שהזמנת או אישרת','כל משתמשי SH✡MER','כל מי שליד','אף אחד'],'Who sees "my name in invites"?',['Only people you invited or approved','Every SH✡MER user','Anyone nearby','Nobody'],'השם הפרטי מוצג רק לשומרים שלך. לכל השאר את/ה אנונימי/ת.','The private name is shown only to your SHOMERs. Everyone else sees you as anonymous.'],
+['app','אישרת שומר/ת. מה הם יכולים לראות?',['את המיקום שלך בזמן אמת ואת ה-SOS שלך','את ההודעות שלך','את אנשי הקשר שלך','את התמונות שלך'],'You approved a SHOMER. What can they see?',['Your live location and your SOS','Your messages','Your contacts','Your photos'],'באישור הם רואים את המיקום החי שלך ומקבלים את ה-SOS. אפשר לעצור בכל רגע.','Once approved they see your live location and get your SOS. You can stop anytime.'],
+['app','דיווח על אירוע במפה - למי הוא מגיע קודם?',['לשומרים שלך; לכל האזור רק אחרי ששכנים מאשרים','לכל הארץ מיד','למשטרה','לאף אחד'],'You report an event on the map - who sees it first?',['Your SHOMERs; area-wide only after neighbours confirm','The whole country instantly','The police','Nobody'],'דיווח מגיע קודם לשומרים שלך ומתפרסם לאזור רק אחרי אישור שכנים.','A report goes to your SHOMERs first, area-wide only after neighbours confirm.'],
+['app','האם דיווח במפה מחליף התקשרות למשטרה?',['לא - בסכנה מתקשרים ל-100','כן','רק בלילה','רק בסוף שבוע'],'Does a map report replace calling the police?',['No - in danger, call 100','Yes','Only at night','Only on weekends'],'SH✡MER אינו תחליף לשירותי חירום. בסכנה: 100 / 101 / 102.','SH✡MER is not a substitute for emergency services. In danger: 100 / 101 / 102.'],
+['app','מה קורה אחרי 3 קודי ביטול שגויים כשהגנת הגנב פעילה?',['האפליקציה מצלמת את מי שמחזיק את הטלפון','הטלפון ננעל לשבוע','ה-SOS מבוטל','כלום'],'With theft protection on, what happens after 3 wrong cancel codes?',['The app snaps a photo of whoever holds the phone','The phone locks for a week','The SOS is cancelled','Nothing'],'הגנת הגנב מצלמת אחרי 3 קודים שגויים - הוכחה לבעלים.','Theft protection snaps a photo after 3 wrong codes - evidence for the owner.'],
+['app','הגעת למכסת ה-SOS היומית (3). מה קורה בלחיצה נוספת?',['האזעקה בטלפון עדיין פועלת, אבל השידור מושהה','שום דבר לא קורה','החשבון נחסם','ה-SOS נשלח לכולם'],'You hit the daily SOS limit (3). What happens on another press?',['The phone alarm still sounds, but the broadcast is paused','Nothing at all','Your account is blocked','It goes to everyone'],'האזעקה האישית לעולם לא נחסמת. רק השידור מושהה (מניעת שימוש לרעה).','The personal alarm is never blocked. Only the broadcast is paused (anti-abuse).'],
+['app','איך מוודאים שהשומרים יקבלו SOS גם כשהאפליקציה שלהם סגורה?',['לאפשר התראות (ובאנדרואיד - מיקום "תמיד")','לא צריך כלום','לכבות את הטלפון','להפעיל מצב רפאים'],'How do you make sure SHOMERs get SOS even when their app is closed?',['Allow notifications (and "Always" location on Android)','Nothing is needed','Turn the phone off','Turn on ghost mode'],'בלי התראות, התראה מגיעה רק כשהאפליקציה פתוחה.','Without notifications, alerts only arrive while the app is open.'],
+['app','מה עושות "התראות מיקום השומרים שלי" (הגעות)?',['מתריעות כששומר/ת מגיע/ה לכתובת שהגדרת (למשל הביתה)','שולחות SOS','מוחקות את המיקום','מחייגות הביתה'],'What do "my SHOMERs\' location alerts" (arrivals) do?',['Alert you when a SHOMER reaches an address you set (e.g. home)','Send an SOS','Delete the location','Call home'],'בוחרים שומר/ת וכתובת מאומתת - ומקבלים התראה כשהם מגיעים.','Pick a SHOMER and a verified address - and get alerted when they arrive.'],
+['app','תג החיבור למעלה כתום "מתחבר מחדש…". מה כדאי לעשות?',['לחכות רגע או להקיש עליו לניסיון מיידי; בחירום - לחייג','למחוק את האפליקציה','לכבות את המיקום','שום דבר לא יעזור'],'The status badge shows amber "Reconnecting…". What should you do?',['Wait a moment or tap it to retry now; in an emergency - call','Delete the app','Turn off location','Nothing helps'],'הקשה על התג מנסה להתחבר מיד. בחירום אמיתי - 100/101/102.','Tapping the badge retries at once. In a real emergency - 100/101/102.'],
+['app','מה עושה ההחזקה הארוכה על כפתור ה-SOS (אם הופעלה בהגדרות)?',['מונעת SOS מלחיצה בטעות - צריך להחזיק כ-2 שניות','שולחת SOS כפול','מבטלת SOS','משתיקה את האזעקה'],'What does press-and-hold on SOS do (if enabled in Settings)?',['Prevents accidental SOS - hold about 2 seconds','Sends a double SOS','Cancels an SOS','Mutes the alarm'],'מצב החזקה מונע SOS מכיס או מלחיצה בטעות.','Hold-to-arm prevents pocket or accidental SOS.']
+];
+
+/* ═══ DAILY GUARDIAN DRILL - "המשמרת היומית" ═══
+   One short question a day about real SH✡MER use and first aid (answers taken from the
+   in-app Emergency Guide and the app's own behaviour). Points, a forgiving streak (Shabbat
+   never breaks it, 1 freeze a week, banked rest days), 5 ranks, and ספר השומר - mastery of
+   the 14 guide topics. Merged with the 14-day tester missions into ONE daily card, and it
+   takes over the same 19:00 reminder slot when the tester program ends (no day-15 gap).
+   Progress is stored on this device (the live rules have no private per-user node - see the
+   proposed users/ rule). Only the rank number rides on presence, which the live rules
+   already restrict to paired SHOMERs - so ranks are visible inside your circle only. */
+var DRILL_TOPICS=['cpr','choke','bleed','burn','stroke','heart','allergy','seizure','drown','shock','faint','bone','ptsd','call'];
+var DRILL_RANKS=[
+ {min:0,   he:'טירון',      en:'Recruit',          ar:'مبتدئ'},
+ {min:100, he:'שומר',       en:'Guardian',         ar:'حارس'},
+ {min:300, he:'שומר ותיק',  en:'Veteran Guardian', ar:'حارس متمرّس'},
+ {min:700, he:'מגן',        en:'Protector',        ar:'حامٍ'},
+ {min:1500,he:'שומר ראשי',  en:'Chief Guardian',   ar:'كبير الحرّاس'}];
+var DRILL_PTS_OK=10, DRILL_PTS_FIRST=5, DRILL_PTS_TRY=3;
+function drT(he,en,ar){ return currentLang==='he'?he:(currentLang==='ar'?(ar||en):en); }
+function drillState(){ SS.drill=SS.drill||{}; var d=SS.drill; d.pts=d.pts||0; d.days=d.days||{}; d.book=d.book||{}; if(d.shield===undefined)d.shield=true; return d; }
+function drillKey(dt){ var d=dt||new Date(); return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'); }
+function drillDayNum(dt){ var d=dt||new Date(); return Math.floor((Date.UTC(d.getFullYear(),d.getMonth(),d.getDate())-Date.UTC(2026,0,1))/86400000); }
+function _drRand(seed){ var x=(seed*2654435761)>>>0; return function(){ x^=x<<13; x>>>=0; x^=x>>17; x^=x<<5; x>>>=0; return x/4294967296; }; }
+/* Same question for everyone on a given day; the bank is walked in a fixed shuffled order. */
+function drillOrder(){ if(drillOrder._o) return drillOrder._o; var o=DRILL_BANK.map(function(_,i){return i;}), r=_drRand(77); for(var i=o.length-1;i>0;i--){ var j=Math.floor(r()*(i+1)); var t=o[i]; o[i]=o[j]; o[j]=t; } return (drillOrder._o=o); }
+function drillQuestion(dt){
+  var n=drillDayNum(dt), qi=drillOrder()[((n%DRILL_BANK.length)+DRILL_BANK.length)%DRILL_BANK.length], q=DRILL_BANK[qi];
+  var he=currentLang==='he', opts=(he?q[2]:q[4]).map(function(t,i){ return {t:t,ok:i===0}; });
+  var r=_drRand(n+1000); for(var i=opts.length-1;i>0;i--){ var j=Math.floor(r()*(i+1)); var t=opts[i]; opts[i]=opts[j]; opts[j]=t; }
+  return {i:qi, topic:q[0], q:he?q[1]:q[3], opts:opts, why:he?q[5]:q[6], right:he?q[2][0]:q[4][0]};
+}
+function drillIsShabbat(dt){ return (dt||new Date()).getDay()===6; }
+function drillIsoWeek(dt){ var d=new Date(Date.UTC(dt.getFullYear(),dt.getMonth(),dt.getDate())); var day=d.getUTCDay()||7; d.setUTCDate(d.getUTCDate()+4-day); var y=new Date(Date.UTC(d.getUTCFullYear(),0,1)); return d.getUTCFullYear()+'-'+Math.ceil((((d-y)/86400000)+1)/7); }
+/* Streak walk (pure - recomputed from history, nothing to drift out of sync):
+   done day +1 · Saturday (Shabbat shield) never breaks it · a missed day uses that week's
+   freeze, else one banked rest day (2 to start, +1 per 14-day streak reached, max 3) ·
+   a gap nothing can cover ends the streak. Today not done yet doesn't break it. */
+function drillStreak(){
+  var d=drillState(), n=0, weeks={}, banked=Math.min(3,2+Math.floor((d.best||0)/14)), used=0;
+  var cur=new Date(); cur.setHours(12,0,0,0);
+  if(!d.days[drillKey(cur)]) cur.setDate(cur.getDate()-1);
+  for(var guard=0; guard<800; guard++){
+    var k=drillKey(cur);
+    if(d.days[k]) n++;
+    else if(d.shield && drillIsShabbat(cur)) {}
+    else {
+      if(!d.start || k<d.start) break;
+      var w=drillIsoWeek(cur);
+      if(!weeks[w]) weeks[w]=1; else if(used<banked) used++; else break;
+    }
+    cur.setDate(cur.getDate()-1);
+  }
+  return {n:n, freezeLeft:(weeks[drillIsoWeek(new Date())]?0:1), offsLeft:banked-used};
+}
+function drillRank(){ var d=drillState(), s=drillStreak().n, score=(d.pts||0)+s*5, r=0; for(var i=0;i<DRILL_RANKS.length;i++){ if(score>=DRILL_RANKS[i].min) r=i; } return {i:r, score:score, next:DRILL_RANKS[r+1]||null}; }
+function drillRankName(i){ var R=DRILL_RANKS[Math.max(0,Math.min(4,i|0))]; return drT(R.he,R.en,R.ar); }
+function drillRankBadge(i){ return '<span class="dr-rk dr-rk'+(i|0)+'" title="'+ESC(drillRankName(i))+'">'+'★'.repeat((i|0)+1)+'</span>'; }
+function drillBookLevel(t){ var b=drillState().book[t]; return Math.min(3,(b&&b.length)||0); }
+function drillDoneToday(){ return !!drillState().days[drillKey()]; }
+/* Retention UI stays out of the way of anyone who just had an emergency (48h). */
+function drillSuppressed(){
+  try{ if(typeof _emergencyBusy==='function'&&_emergencyBusy()) return true;
+    var h=SS.sosHistory||[], now=Date.now(); for(var i=h.length-1;i>=0;i--){ if(h[i]&&h[i].ts&&(now-h[i].ts)<48*3600000&&h[i].broadcast!==false) return true; } }catch(e){}
+  return false;
+}
+function drillAnswer(card, pick){
+  var d=drillState(), k=drillKey(); if(d.days[k]) return;
+  var q=drillQuestion(), ok=!!(q.opts[pick]&&q.opts[pick].ok);
+  if(!d.start) d.start=k;
+  d.days[k]={q:q.i, ok:ok?1:0};
+  var add=ok?(DRILL_PTS_OK+DRILL_PTS_FIRST):DRILL_PTS_TRY; d.pts+=add;
+  if(ok && q.topic!=='app' && DRILL_TOPICS.indexOf(q.topic)>=0){ var b=d.book[q.topic]=d.book[q.topic]||[]; if(b.indexOf(k)<0) b.push(k); }
+  var st=drillStreak(); d.best=Math.max(d.best||0, st.n);
+  try{ saveStore(); }catch(e){}
+  try{ statsLogEvent('drill_done',{ok:ok?1:0}); }catch(e){}
+  try{ FB._presAt=0; fbPublishPresence(); }catch(e){}            // share the (possibly new) rank with my circle
+  try{ tpScheduleReminders(); }catch(e){}                        // today is done: drop tonight's reminder
+  try{ drillRenderProfile(); }catch(e){}
+  if(card){
+    card.querySelectorAll('.dr-opt').forEach(function(b,i){ b.disabled=true; if(q.opts[i].ok) b.classList.add('ok'); else if(i===pick) b.classList.add('bad'); });
+    var res=card.querySelector('.dr-res');
+    if(res){
+      var learn=(q.topic!=='app')?'<button class="dr-learn" type="button">'+drT('למדריך המלא','Open the full guide','افتح الدليل')+'</button>':'';
+      res.innerHTML=(ok?('<b class="dr-good">'+drT('נכון! ','Correct! ','صحيح! ')+'+'+add+'</b>'):('<b class="dr-wrong">'+drT('התשובה הנכונה: ','Right answer: ','الإجابة الصحيحة: ')+'</b>'+ESC(q.right)+' <span class="dr-pts">+'+add+'</span>'))
+        +'<div class="dr-why">'+ESC(q.why)+'</div>'
+        +'<div class="dr-meta">'+drT('רצף','Streak','سلسلة')+' '+st.n+' · '+drillRankBadge(drillRank().i)+' '+ESC(drillRankName(drillRank().i))+'</div>'+learn;
+      res.style.display='block';
+      var lb=res.querySelector('.dr-learn'); if(lb) lb.onclick=function(){ try{ openGuideTopic(q.topic); }catch(e){ try{op('sh-guide');}catch(_){} } card.remove(); };
+    }
+  }
+}
+/* PULSE ("אני בסדר") - behind a flag until the pulse/ rule is published (see report). */
+function pulseEnabled(){ return window.SHOMER_PULSE===true; }
+function pulseMine(){ var d=drillState(); return !!(d.pulse&&d.pulse[drillKey()]); }
+function pulseSend(btn){
+  var d=drillState(), k=drillKey(); d.pulse=d.pulse||{}; d.pulse[k]=Date.now(); try{saveStore();}catch(e){}
+  try{ if(FB.ready&&FB._authReady) fbRestWrite('PUT','pulse/'+FB.uid+'/'+k, Date.now()); }catch(e){}
+  try{ statsLogEvent('pulse_done'); }catch(e){}
+  if(btn){ btn.disabled=true; btn.textContent=drT('✓ סימנת שאת/ה בסדר','✓ You checked in','✓ سجّلت أنك بخير'); }
+  pulseTower();
+}
+function pulseTower(){
+  if(!pulseEnabled()) return;
+  var el=document.getElementById('dr-tower'); if(!el) return;
+  var k=drillKey(), mem=(gdState().pairs||[]).filter(function(p){ return p.partnerUid&&!p.pending; });
+  var lit=pulseMine()?1:0, total=mem.length+1, done=0;
+  var paint=function(){ el.textContent=drT('המגדל: ','The tower: ','البرج: ')+lit+'/'+total+(lit===total?drT(' · כולם בסדר היום 🕯️',' · everyone is OK today 🕯️',' · الجميع بخير اليوم 🕯️'):''); };
+  paint();
+  mem.forEach(function(p){ fbRestGet('pulse/'+p.partnerUid+'/'+k).then(function(s){ if(s&&s.val&&s.val()) lit++; done++; paint(); }).catch(function(){ done++; }); });
+}
+/* THE DAILY CARD - one card a day: today's drill question (+ the tester mission while the
+   14-day tester program runs). Shown once a day, only when the screen is clear. */
+function tpMaybeShow(){
+ try{
+  if(drillSuppressed()) return;
+  var day=drillKey(), d=drillState();
+  try{ tpScheduleReminders(); }catch(e){}
+  if(d.cardShown===day || drillDoneToday()) return;
+  if(document.getElementById('tp-bar')) return;
+  if(popupBusy()) { if((tpMaybeShow._tries=(tpMaybeShow._tries||0)+1)<30) setTimeout(tpMaybeShow, 20000); return; }
+  d.cardShown=day; try{ saveStore(); }catch(e){}
+  drillOpenCard();
+ }catch(e){}
+}
+function drillOpenCard(){
+  var old=document.getElementById('tp-bar'); if(old) old.remove();
+  var he=currentLang==='he', t=tpState(), idx=tpDayIdx(), tester=(idx>=0&&idx<TP_DAYS), m=tester?TP_MISSIONS[idx]:null;
+  var q=drillQuestion(), done=drillState().days[drillKey()], st=drillStreak();
+  var bar=document.createElement('div'); bar.id='tp-bar'; bar.className='nudge-bar dr-card';
+  var dots=''; if(tester){ for(var i=0;i<TP_DAYS;i++){ dots+='<span style="display:inline-block;width:7px;height:7px;border-radius:50%;margin:0 2px;background:'+(i<idx?'#F5C840':(i===idx?'#fff':'rgba(255,255,255,.18)'))+'"></span>'; } }
+  var hdr=tester?(he?('יום '+(idx+1)+' מתוך '+TP_DAYS):('DAY '+(idx+1)+' OF '+TP_DAYS)):(drT('המשמרת היומית','Daily drill','التمرين اليومي')+(st.n?(' · '+drT('רצף ','streak ','سلسلة ')+st.n):''));
+  var qd=(currentLang==='he')?'rtl':'ltr';   // Arabic shows the English question text (Hebrew/English bank) - keep it LTR so punctuation reads right
+  var html='<div class="dr-hd">'+ESC(hdr)+'</div>'+(tester?'<div style="direction:ltr;margin-top:2px">'+dots+'</div>':'')
+    +'<div class="dr-q" dir="'+qd+'">'+ESC(q.q)+'</div><div class="dr-opts" dir="'+qd+'">'
+    +q.opts.map(function(o,i){ return '<button class="dr-opt" type="button" data-i="'+i+'">'+ESC(o.t)+'</button>'; }).join('')
+    +'</div><div class="dr-res" dir="'+qd+'" style="display:none"></div>';
+  if(pulseEnabled()) html+='<div class="dr-pulse"><button class="dr-pulse-b" type="button">'+(pulseMine()?drT('✓ סימנת שאת/ה בסדר','✓ You checked in','✓ سجّلت أنك بخير'):drT('אני בסדר ✓','I am OK ✓','أنا بخير ✓'))+'</button><span id="dr-tower"></span></div>';
+  if(tester){
+    var mtxt=(he?m.he:m.en);
+    if(idx===TP_DAYS-1) mtxt+=(he?' מחר מתחילה המשמרת שלך - שאלה אחת ביום, באותה שעה.':' Tomorrow your shift starts - one question a day, same time.');
+    html+='<div class="dr-mission"><span class="nudge-tx">'+ESC(mtxt)+'</span><button class="nudge-cta dr-mcta" type="button">'+ESC(he?m.cta_he:m.cta_en)+'</button></div>';
+  }
+  html+='<button class="nudge-x" aria-label="dismiss">✕</button>';
+  bar.innerHTML=html;
+  (document.getElementById('app')||document.body).appendChild(bar);
+  bar.querySelectorAll('.dr-opt').forEach(function(b){ b.onclick=function(){ drillAnswer(bar, +b.getAttribute('data-i')); }; });
+  if(done){ bar.querySelectorAll('.dr-opt').forEach(function(b,i){ b.disabled=true; if(q.opts[i].ok) b.classList.add('ok'); }); var r=bar.querySelector('.dr-res'); r.innerHTML='<div class="dr-why">'+ESC(q.why)+'</div>'; r.style.display='block'; }
+  var mc=bar.querySelector('.dr-mcta'); if(mc) mc.onclick=function(){ try{ tpState().done[tpToday()]=Date.now(); saveStore(); }catch(e){} bar.remove(); try{ m.act(); }catch(e){} };
+  var pb=bar.querySelector('.dr-pulse-b'); if(pb){ if(pulseMine()) pb.disabled=true; pb.onclick=function(){ pulseSend(pb); }; pulseTower(); }
+  bar.querySelector('.nudge-x').onclick=function(){ bar.remove(); };
+  try{ if(tester) tpState().seen[tpToday()]=Date.now(); saveStore(); }catch(e){}
+}
+/* ONE 19:00 reminder per day for the next 14 days - the tester mission while the program
+   runs, the drill after it (same slot, so day 15 has no gap). Today is skipped once done;
+   no reminder lands on Shabbat (Friday moves to 13:00); after 3 missed days in a row it
+   backs off to every other day; nothing at all within 48h of an emergency. */
+function tpScheduleReminders(){
+ try{
+  if(!_isNative()||!_ln) return;
+  var he=currentLang==='he', ids=[];
+  for(var i=0;i<TP_DAYS;i++) ids.push({id:92000+i});
+  try{ _ln.cancel({notifications:ids}); }catch(e){}
+  if(drillSuppressed()) return;
+  var d=drillState(), t=tpState(), missed=0, c=new Date(); c.setDate(c.getDate()-1);
+  var _since=d.start||t.start||drillKey();   // never count days before they started as "ignored"
+  for(var g=0; g<7 && !d.days[drillKey(c)] && drillKey(c)>=_since; g++){ if(!(d.shield&&drillIsShabbat(c))) missed++; c.setDate(c.getDate()-1); }
+  var ns=[];
+  for(var k=0;k<TP_DAYS;k++){
+   var at=new Date(); at.setDate(at.getDate()+k); at.setHours(19,0,0,0);
+   if(d.shield && at.getDay()===6) continue;              // Shabbat - no reminder
+   if(d.shield && at.getDay()===5) at.setHours(13,0,0,0);   // Friday - before Shabbat
+   if(at.getTime()<=Date.now()) continue;
+   if(k===0 && drillDoneToday()) continue;
+   if(missed>=3 && (k%2)===1) continue;                    // protect the channel
+   var tIdx=Math.round((new Date(drillKey(at)+'T00:00:00')-new Date(t.start+'T00:00:00'))/86400000);
+   var body, title;
+   if(tIdx>=0 && tIdx<TP_DAYS){ var m=TP_MISSIONS[tIdx]; title=(he?'SH✡MER · יום ':'SH✡MER · Day ')+(tIdx+1)+'/'+TP_DAYS; body=(he?m.he:m.en)+(he?' · והשאלה היומית מחכה.':' · And today\'s question is waiting.'); }
+   else { title='SH✡MER'; body=drT('המשמרת שלך מחכה · שאלה אחת, דקה אחת','Your shift is waiting · one question, one minute','مناوبتك بانتظارك · سؤال واحد، دقيقة واحدة'); }
+   ns.push({id:92000+k,title:title,body:body,channelId:'shomer-updates',autoCancel:true,schedule:{at:at},extra:{tag:'daily-drill'}});
+  }
+  if(ns.length) _ln.schedule({notifications:ns});
+ }catch(e){}
+}
+/* Profile: rank badge, points, streak, ספר השומר. */
+function drillRenderProfile(){
+  var host=document.getElementById('prof-drill'); if(!host) return;
+  var d=drillState(), st=drillStreak(), rk=drillRank(), he=currentLang==='he';
+  var rb=document.getElementById('prof-rank'); if(rb) rb.innerHTML=drillRankBadge(rk.i)+' '+ESC(drillRankName(rk.i));
+  var nxt=rk.next?(drT('עוד ','','')+(rk.next.min-rk.score)+drT(' נק׳ ל'+rk.next.he,' pts to '+rk.next.en,' نقطة إلى '+rk.next.ar)):drT('הדרגה הגבוהה ביותר','Top rank','أعلى رتبة');
+  var book=DRILL_TOPICS.map(function(tp){ var lv=drillBookLevel(tp), g=(EMERGENCY_GUIDE||[]).filter(function(x){return x.id===tp;})[0], nm=g?(g.t?(he?g.t.he:(g.t[currentLang]||g.t.en)):tp):tp;
+      return '<div class="dr-bk lv'+lv+'" title="'+ESC(nm)+'"><span>'+['○','🥉','🥈','🥇'][lv]+'</span><small>'+ESC(nm)+'</small></div>'; }).join('');
+  var mastered=DRILL_TOPICS.filter(function(tp){ return drillBookLevel(tp)>=3; }).length;
+  host.innerHTML='<div class="dr-prof-row"><div><b>'+(d.pts||0)+'</b><small>'+drT('נקודות','points','نقاط')+'</small></div><div><b>'+st.n+'</b><small>'+drT('ימי רצף','day streak','أيام متتالية')+'</small></div><div><b>'+mastered+'/14</b><small>'+drT('נושאים בשליטה','topics mastered','مواضيع متقنة')+'</small></div></div>'
+    +'<div class="dr-prof-next">'+ESC(nxt)+' · '+drT('הקפאה השבוע: ','Freeze this week: ','تجميد هذا الأسبوع: ')+st.freezeLeft+' · '+drT('ימי חופש: ','Rest days: ','أيام راحة: ')+st.offsLeft+(d.shield?(' · '+drT('מגן שבת פעיל','Shabbat shield on','درع السبت مفعّل')):'')+'</div>'
+    +'<button class="cta-gold dr-open" type="button" style="width:100%;margin:10px 0 12px">'+(drillDoneToday()?drT('השאלה של היום ✓','Today\'s question ✓','سؤال اليوم ✓'):drT('לשאלה של היום','Today\'s question','سؤال اليوم'))+'</button>'
+    +'<div class="sec-cap mb12">'+drT('ספר השומר','The Guardian\'s Book','كتاب الحارس')+'</div><div class="dr-book">'+book+'</div>'
+    +'<p class="sr-sb" style="margin:6px 2px 16px;line-height:1.6">'+drT('כל נושא: 3 תשובות נכונות ב-3 ימים שונים = 🥇. הדרגה שלך גלויה רק לשומרים שלך.','Each topic: 3 correct answers on 3 different days = 🥇. Your rank is visible only to your SHOMERs.','كل موضوع: 3 إجابات صحيحة في 3 أيام مختلفة = 🥇. رتبتك مرئية لحرّاسك فقط.')+'</p>';
+  var ob=host.querySelector('.dr-open'); if(ob) ob.onclick=function(){ try{ cl('sh-prof'); }catch(e){} setTimeout(drillOpenCard, 350); };
+}
+
 </script>
 </body>
 </html>
