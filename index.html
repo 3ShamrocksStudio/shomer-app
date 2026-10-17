@@ -13,10 +13,12 @@
    the app so a direct tap works too. Expires in 24h; see gdCheckInviteParam(). */
 (function(){
   try{
-    var tok=new URL(location.href).searchParams.get('g');
+    var _u=new URL(location.href);
+    var tok=_u.searchParams.get('g');
     if(!tok) return;
-    try{ localStorage.setItem('shomer_pending_invite', JSON.stringify({tok:tok, ts:Date.now()})); }catch(e){}
-    var q='?g='+encodeURIComponent(tok);
+    var code=(_u.searchParams.get('c')||'').replace(/\D/g,'').slice(0,4);
+    try{ localStorage.setItem('shomer_pending_invite', JSON.stringify({tok:tok, code:code, ts:Date.now()})); }catch(e){}
+    var q='?g='+encodeURIComponent(tok)+(code?('&c='+encodeURIComponent(code)):'');
     document.addEventListener('DOMContentLoaded', function(){
       try{
         document.querySelectorAll('a[href="shomer.html"]').forEach(function(a){ a.href='shomer.html'+q; });

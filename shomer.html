@@ -7242,20 +7242,43 @@ async function shareInvite(){
   var he=currentLang==='he';
   var linkCode=String(Math.floor(1000+Math.random()*9000));
   var tok='g'+Math.random().toString(36).slice(2,8)+Math.random().toString(36).slice(2,6);
-  try{
-    var myName=(SS.user&&SS.user.name)||(typeof user!=='undefined'&&user&&user.name)||(SS.user&&SS.user.username)||'';   /* the name lives in the global `user` too - read BOTH */
-    if(FB.ready&&FB.uid){
-      await fbRestWrite('PUT','invites/'+tok,{fromUid:FB.uid,name:myName,fromName:myName,fromPhone:((SS.user&&SS.user.phone)||''),code:linkCode,ts:Date.now()});
-      var g=gdState();
-      g.pairs.push({id:genId('g'),token:tok,name:'',rel:'',shareToThem:true,seeThem:true,addedTs:Date.now(),initiator:true,pending:true,partnerUid:null,linked:false,cid:activeCircleId,color:'#C9A84C',lat:null,lng:null,ts:0,live:false,via:'link'});
-      saveStore();
-      fbWatchApproval(tok, null);
+  var myName=(SS.user&&SS.user.name)||(typeof user!=='undefined'&&user&&user.name)||(SS.user&&SS.user.username)||'';   /* the name lives in the global `user` too - read BOTH */
+  var myPhone=(SS.user&&SS.user.phone)||'';
+  /* Auth may not have landed yet on a cold start. Sharing a link whose invite was
+     never written hands the other side a dead token: they see "no name / no verified
+     number" and the code can never match. Wait briefly, then fail loudly. */
+  if(!(FB.ready&&FB.uid&&FB._authReady)){
+    for(var _w=0; _w<20 && !(FB.ready&&FB.uid&&FB._authReady); _w++){
+      await new Promise(function(r){ setTimeout(r,250); });
     }
-  }catch(e){}
+  }
+  if(!(FB.ready&&FB.uid)){
+    try{ toast(he?'עוד רגע - מאמת זהות. נסה/י שוב בעוד שנייה.':'Securing identity - try again in a second.','amb'); }catch(e){}
+    return;
+  }
+  try{
+    /* name MUST be packed as "name|phone|code|salt" - gdFillIdentity() unpacks it with
+       unpackInvite(). Writing a bare name left phone, code and SOS salt empty, so the
+       accept screen always showed "no verified number" and the 4-digit code could
+       never match. Same packing the phone-invite path has always used. */
+    await fbRestWrite('PUT','invites/'+tok,{fromUid:FB.uid,ts:Date.now(),name:packInvite(myName,myPhone,linkCode)});
+    var g=gdState();
+    g.pairs.push({id:genId('g'),token:tok,name:'',rel:'',shareToThem:true,seeThem:true,addedTs:Date.now(),initiator:true,pending:true,partnerUid:null,linked:false,cid:activeCircleId,color:'#C9A84C',lat:null,lng:null,ts:0,live:false,via:'link'});
+    saveStore();
+    fbWatchApproval(tok, null);
+  }catch(e){
+    try{ fbLog('shareInvite create:',(e&&e.message)||e); }catch(_){}
+    try{ toast(he?'יצירת ההזמנה נכשלה - נסה/י שוב':'Could not create the invite - try again','amb'); }catch(_){}
+    return;
+  }
   /* Point invitees at the download page, not straight into the web app — most people
      should install first. index.html stashes ?g= and forwards it on to the app, so the
      pairing token survives the detour. */
-  var link='https://www.shomer-app.co.il/?g='+encodeURIComponent(tok);
+  /* The code rides in the link so the accept screen can fill it in automatically,
+     the same way the other identification flows work. The real identification on
+     that screen is the sender's name and verified phone number, which now travel
+     in the packed invite record. */
+  var link='https://www.shomer-app.co.il/?g='+encodeURIComponent(tok)+'&c='+encodeURIComponent(linkCode);
   var txt=he
     ? ('הצטרף/י למעגל השומרים שלי ב-SH\u2721MER - אפליקציית בטיחות קהילתית חינמית. אם יקרה לי משהו, תדע/י איפה אני.\n'+link)
     : ('Join my SH\u2721MER SHOMER circle - a free community safety app. If something happens to me, you will know where I am.\n'+link);
@@ -8204,8 +8227,8 @@ function gdEnterCodeSubmit(){
 }
 /* Open with ?g=<token> - parsed at startup. Own link in another window = live demo. */
 function gdCheckInviteParam(){
- let tok='',nm='';
- try{ const u=new URL(location.href); tok=u.searchParams.get('g')||''; }catch(e){}
+ let tok='',nm='',autoCode='';
+ try{ const u=new URL(location.href); tok=u.searchParams.get('g')||''; autoCode=u.searchParams.get('c')||''; }catch(e){}
  if(!tok){ const m=(location.hash||'').match(/[#&]g=([^&]+)/); if(m){ try{tok=decodeURIComponent(m[1]);}catch(e){tok=m[1];} } }
  /* Invite links now land on the download page first (index.html), which stashes the
     token for us. Same origin, so we can pick it up here. One-shot, and expires after
@@ -8216,12 +8239,15 @@ function gdCheckInviteParam(){
      if(raw){
        localStorage.removeItem('shomer_pending_invite');
        const p=JSON.parse(raw);
-       if(p&&p.tok&&p.ts&&(Date.now()-p.ts)<86400000){ tok=p.tok; if(p.nm)nm=p.nm; }
+       if(p&&p.tok&&p.ts&&(Date.now()-p.ts)<86400000){ tok=p.tok; if(p.nm)nm=p.nm; if(p.code)autoCode=p.code; }
      }
    }catch(e){}
  }
  if(!tok) return;
  const hn=(location.hash||'').match(/[#&]n=([^&]+)/); if(hn){ try{nm=decodeURIComponent(hn[1]);}catch(e){nm=hn[1];} }
+ if(!autoCode){ const hc=(location.hash||'').match(/[#&]c=([^&]+)/); if(hc){ try{autoCode=decodeURIComponent(hc[1]);}catch(e){autoCode=hc[1];} } }
+ /* Held for gdFillIdentity, which fills the match field once the invite record lands. */
+ gdFillIdentity._autoCode=String(autoCode||'').replace(/\D/g,'').slice(0,4);
  try{ history.replaceState(null,'',gdBaseUrl()); }catch(e){}
  const existing=gdPairByToken(tok);
  if(existing&&existing.initiator){
@@ -8275,6 +8301,14 @@ function gdFillIdentity(inv){
         st.className='gd-code-st bad';
       }
     };
+    /* Auto-fill from the invite link, like the other identification flows. Only once
+       the real code has arrived from the invite record, so a bad link still fails. */
+    var auto=gdFillIdentity._autoCode;
+    if(auto && auto.length===4 && code){
+      inp.value=auto;
+      try{ inp.oninput(); }catch(e){}
+      gdFillIdentity._autoCode='';
+    }
   }
   try{
     var host=document.getElementById('gd-stranger');
@@ -9039,7 +9073,7 @@ try{ hydrateIcons(document); }catch(e){}
 /* Loaded-build version - shown in the diagnostic panel so a phone can prove
    whether it's on the latest build or a STALE cached one. Keep in lock-step
    with sw.js SW_VERSION on every deploy. */
-var APP_VER='v246';
+var APP_VER='v247';
 var FB={ready:false,uid:null,db:null,_presTimer:null,connected:false,listening:false,pushState:'default',near:0,swVer:'?',
   authState:'connecting',sdkLoaded:false,persist:'',permErr:null,err:null,wsProbe:'',csp:''};
 /* Always log connection diagnostics to the console so the real failure can be SEEN in Chrome. */

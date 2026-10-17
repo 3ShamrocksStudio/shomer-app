@@ -1,1 +1,1 @@
-{ "v": "v246", "notes": ["Improved connection stability and faster map loading", "Faster circle alerts with reduced latency", "Background alert reliability improvements"] }
+{"v": "v247", "notes": ["Invites now show who sent them, with the code filled in automatically", "Fixed invites that arrived with no name and an unmatchable code", "Invite links open the download page"]}
