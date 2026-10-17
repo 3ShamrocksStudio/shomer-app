@@ -330,7 +330,7 @@ input[type=range]:focus::-webkit-slider-thumb{box-shadow:0 0 0 4px rgba(224,168,
 .pcirc .pc-n{font-size:30px;font-weight:900;line-height:1}
 .pcirc .pc-l{font-size:11.5px;font-weight:700;opacity:.92;margin-top:3px}
 
-.hdr{position:absolute;top:0;left:0;right:0;z-index:600;height:calc(var(--hdr) + var(--hdr-top,0px));padding-top:var(--hdr-top,0px);background:rgba(8,18,36,.97);backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);border-bottom:1px solid var(--b3);display:flex;align-items:center;padding:0 12px;gap:8px;box-shadow:0 2px 24px rgba(0,0,0,.6);}
+.hdr{position:absolute;top:0;left:0;right:0;z-index:600;height:calc(var(--hdr) + var(--hdr-top,0px));padding-top:var(--hdr-top,0px);background:rgba(8,18,36,.97);backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);border-bottom:1px solid var(--b3);display:flex;align-items:center;padding:var(--hdr-top,0px) 12px 0;box-sizing:border-box;gap:8px;box-shadow:0 2px 24px rgba(0,0,0,.6);}
 .hdr::after{content:'';position:absolute;bottom:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent 5%,var(--gd) 35%,var(--gd) 65%,transparent 95%);}
 .hdr-left{display:flex;align-items:center;gap:7px;flex:1;justify-content:flex-start;}
 .hdr-guide{position:relative;width:42px;height:42px;border-radius:50%;background:rgba(13,148,82,.16);border:1px solid rgba(20,170,98,.45);display:flex;align-items:center;justify-content:center;transition:all .15s;flex-shrink:0;}
@@ -467,6 +467,7 @@ input[type=range]:focus::-webkit-slider-thumb{box-shadow:0 0 0 4px rgba(224,168,
 body.sheet-open .fb-status{opacity:0;pointer-events:none;}
 /* Hidden while connected and during short reconnects - shown only when the live link has really been down for a few seconds. */
 .fb-status.fb-hide{opacity:0;pointer-events:none;}
+.fb-status.fb-grace .fb-dot{background:var(--tx3);}
 /* Diagnostic panel - read on each phone to see exactly where SOS breaks */
 .diag-panel{position:absolute;top:calc(var(--hdr-top,0px) + var(--hdr) + 44px);left:50%;transform:translateX(-50%);z-index:561;width:min(86vw,330px);display:none;flex-direction:column;gap:2px;padding:13px 15px;border-radius:14px;background:rgba(9,18,36,.97);backdrop-filter:blur(14px);border:1px solid var(--b3);box-shadow:0 16px 44px rgba(0,0,0,.6);}
 .diag-panel.on{display:flex;}
@@ -1663,7 +1664,7 @@ body.otp-active .ob-steps{display:none!important;}
 </svg>
  </div>
  <div class="hdr-right">
- <button class="fb-status connecting fb-hide" id="fb-status" onclick="explainStatus()" aria-live="polite" aria-label="מצב חיבור">
+ <button class="fb-status connecting fb-grace" id="fb-status" onclick="explainStatus()" aria-live="polite" aria-label="מצב חיבור">
  <span class="fb-dot" id="fb-dot" aria-hidden="true"></span>
  <span class="fb-status-txt" id="fb-status-txt">מתחבר…</span>
  </button>
@@ -9381,7 +9382,7 @@ try{ hydrateIcons(document); }catch(e){}
 /* Loaded-build version - shown in the diagnostic panel so a phone can prove
    whether it's on the latest build or a STALE cached one. Keep in lock-step
    with sw.js SW_VERSION on every deploy. */
-var APP_VER='v257';
+var APP_VER='v258';
 var FB={ready:false,uid:null,db:null,_presTimer:null,connected:false,listening:false,pushState:'default',near:0,swVer:'?',
   authState:'connecting',sdkLoaded:false,persist:'',permErr:null,err:null,wsProbe:'',csp:''};
 /* Always log connection diagnostics to the console so the real failure can be SEEN in Chrome. */
@@ -9440,13 +9441,19 @@ function renderFbStatus(){
   if(live){ FB._downSince=0; } else if(!FB._downSince){ FB._downSince=now; }
   var downMs=FB._downSince?(now-FB._downSince):0;
   var offNet=(navigator.onLine===false);
+  /* ALWAYS visible (founder: he wants to see the status at a glance), but calm:
+     green "connected"; during the short grace window a blip keeps showing the last good
+     state (or a neutral grey "connecting…" at startup); amber only after the grace period;
+     red only for a real outage (no internet, failed, or down >45s). */
+  var grace=!live && downMs<FB_PILL_GRACE_MS, wasLive=!!FB._everConnected;
   if(failed){ state='offline'; msg=he?'לא מחובר · הקש/י לנסות שוב':ar?'غير متصل · اضغط لإعادة المحاولة':'Not connected · tap to retry'; }
-  else if(live){ state='connected'; msg=he?'מחובר':ar?'متصل':'Connected'; }
-  else if(offNet){ state='offline'; msg=he?'אין אינטרנט · נתחבר כשיחזור':ar?'لا يوجد إنترنت · سنتصل عند عودته':'No internet · will reconnect'; }
-  else if(downMs>45000){ state='connecting'; msg=he?'לא מחובר · הקש/י לנסות שוב':ar?'غير متصل · اضغط لإعادة المحاولة':'Not connected · tap to retry'; }
-  else { state='connecting'; msg=he?'מתחבר מחדש…':ar?'جارٍ إعادة الاتصال…':'Reconnecting…'; }
+  else if(live || (grace && wasLive && !offNet)){ state='connected'; msg=he?'מחובר':ar?'متصل':'Connected'; }
+  else if(offNet && !grace){ state='offline'; msg=he?'אין אינטרנט · נתחבר כשיחזור':ar?'لا يوجد إنترنت · سنتصل عند عودته':'No internet · will reconnect'; }
+  else if(downMs>45000){ state='offline'; msg=he?'לא מחובר · הקש/י לנסות שוב':ar?'غير متصل · اضغط لإعادة المحاولة':'Not connected · tap to retry'; }
+  else { state='connecting'; msg=grace?(he?'מתחבר…':ar?'جارٍ الاتصال…':'Connecting…'):(he?'מתחבר מחדש…':ar?'جارٍ إعادة الاتصال…':'Reconnecting…'); }
   el.classList.remove('connected','connecting','offline'); el.classList.add(state);
-  el.classList.toggle('fb-hide', live || downMs<FB_PILL_GRACE_MS);
+  el.classList.remove('fb-hide');
+  el.classList.toggle('fb-grace', state==='connecting' && grace);
   if(!FB._pillTick){ FB._pillTick=setInterval(function(){ try{ if(!(FB.connected&&FB._authReady)||navigator.onLine===false||FB._downSince) renderFbStatus(); }catch(e){} }, 2000); }
   if(txt)txt.textContent=msg;
   updateDiagPanel();

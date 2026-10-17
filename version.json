@@ -1,1 +1,1 @@
-{"v": "v257", "notes": ["The automatic guard (dead-man switch) now really sends the SOS when time runs out", "Missed check-ins are caught as soon as you reopen the app", "Arrival addresses can be verified again", "Offline badge shows when the phone loses internet"]}
+{"v": "v258", "notes": ["Connection status is always visible again - calm green when connected", "Header buttons and logo now sit on one line"]}
