@@ -2146,6 +2146,7 @@ body.otp-active .ob-steps{display:none!important;}
  <div class="set-grp">
  <div class="set-row"><div class="sr-l"><div class="sr-ic"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="11" width="14" height="9" rx="2" fill="none" stroke="currentColor" stroke-width="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3" fill="none" stroke="currentColor" stroke-width="2"/></svg></div><div><div class="sr-nm" id="hold-arm-lbl">מניעת לחיצה בטעות</div><div class="sr-sb" id="hold-arm-sub">לחיצה ארוכה של 2 שניות תפעיל SOS - כדי שלא יישלח מהכיס</div></div></div><div class="tog" id="hold-arm-tog" onclick="toggleHoldArm(this)" role="switch"></div></div>
  </div>
+ <div class="set-grp"><div class="set-row" onclick="practiceSOS()" role="button" tabindex="0" id="sos-practice-row"><div class="sr-l"><div class="sr-ic"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8.5" fill="none" stroke="currentColor" stroke-width="2"/><path d="M10 8.5l5.5 3.5-5.5 3.5z" fill="currentColor"/></svg></div><div><div class="sr-nm" data-he="תרגול SOS" data-en="Practice SOS" data-ar="تمرين SOS">תרגול SOS</div><div class="sr-sb" data-he="SOS מלא בטלפון שלך בלבד - השומרים לא מקבלים כלום" data-en="A full SOS on your phone only - your SHOMERs get nothing" data-ar="SOS كامل على هاتفك فقط - لا يصل شيء لحرّاسك">SOS מלא בטלפון שלך בלבד - השומרים לא מקבלים כלום</div></div></div></div></div>
  <div class="set-cat"><div class="set-cat-ic"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 6l6-3 6 3 6-3v15l-6 3-6-3-6 3Z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><path d="M9 3v15M15 6v15" fill="none" stroke="currentColor" stroke-width="2"/></svg></div><div class="set-cat-t" data-he="שכבות מפה" data-en="Map layers">שכבות מפה</div></div><div class="sec-cap mb12" data-he="המפה נפתחת עם כל השכבות דלוקות. אפשר לכבות או להדליק כל שכבה כאן." data-en="The map opens with every layer on. Toggle any layer on or off here." data-ar="تفتح الخريطة وكل الطبقات مفعّلة. يمكنك تشغيل أو إيقاف أي طبقة هنا.">המפה נפתחת עם כל השכבות דלוקות. אפשר לכבות או להדליק כל שכבה כאן.</div><div class="set-grp"><div class="set-row"><div class="sr-l"><div class="sr-ic"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="13" width="4" height="7" rx="1" fill="none" stroke="currentColor" stroke-width="2"/><rect x="10" y="8" width="4" height="12" rx="1" fill="none" stroke="currentColor" stroke-width="2"/><rect x="17" y="3" width="4" height="17" rx="1" fill="none" stroke="currentColor" stroke-width="2"/></svg></div><div><div class="sr-nm" data-he="סטטיסטיקת פשיעה" data-en="Crime statistics" data-ar="إحصاءات الجريمة">סטטיסטיקת פשיעה</div><div class="sr-sb" data-he="סמני ערים · נתוני משטרת ישראל" data-en="City markers · Israel Police data" data-ar="علامات المدن · بيانات الشرطة">סמני ערים · נתוני משטרת ישראל</div></div></div><div class="tog on" data-skey="map_stats" onclick="mapLayerToggle(this,'stats')" role="switch"></div></div><div class="set-row"><div class="sr-l"><div class="sr-ic"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 22s7-6.4 7-12a7 7 0 1 0-14 0c0 5.6 7 12 7 12Z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><circle cx="12" cy="10" r="2.6" fill="currentColor"/></svg></div><div><div class="sr-nm" data-he="הדיווחים שלי" data-en="My reports" data-ar="بلاغاتي">הדיווחים שלי</div><div class="sr-sb" data-he="סיכות הדיווחים שהגשת" data-en="Pins of reports you filed" data-ar="دبابيس بلاغاتك">סיכות הדיווחים שהגשת</div></div></div><div class="tog on" data-skey="map_reports" onclick="mapLayerToggle(this,'reports')" role="switch"></div></div><div class="set-row"><div class="sr-l"><div class="sr-ic"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><circle cx="9" cy="8" r="3.2" fill="none" stroke="currentColor" stroke-width="2"/><path d="M3.5 19a5.5 5.5 0 0 1 11 0" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><circle cx="17" cy="9" r="2.4" fill="none" stroke="currentColor" stroke-width="2"/><path d="M15.5 14.4A4.6 4.6 0 0 1 20.5 19" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></div><div><div class="sr-nm" data-he="המעגל שלי" data-en="My circle" data-ar="دائرتي">המעגל שלי</div><div class="sr-sb" data-he="מיקום השומרים המקושרים אליך" data-en="Your linked SHOMERs’ location" data-ar="مواقع حُرّاسك المرتبطين">מיקום השומרים המקושרים אליך</div></div></div><div class="tog on" data-skey="map_circle" onclick="mapLayerToggle(this,'circle')" role="switch"></div></div><div class="set-row"><div class="sr-l"><div class="sr-ic"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8.5" fill="none" stroke="currentColor" stroke-width="2"/><path d="M12 7.5V12l3 2" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div><div class="sr-nm" data-he="אירועי עבר" data-en="Past events" data-ar="أحداث سابقة">אירועי עבר</div><div class="sr-sb" data-he="הצג אירועי עבר על המפה — למודעות בלבד" data-en="Show past events on the map — awareness only" data-ar="عرض الأحداث السابقة على الخريطة">הצג אירועי עבר על המפה — למודעות בלבד</div></div></div><div class="tog" id="set-past-tog" onclick="togglePastEvents();this.classList.toggle('on')" role="switch"></div></div></div><div class="set-cat"><div class="set-cat-ic"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="11" width="14" height="9" rx="2" fill="none" stroke="currentColor" stroke-width="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3" fill="none" stroke="currentColor" stroke-width="2"/></svg></div><div class="set-cat-t" data-he="מיקום ופרטיות" data-en="Location &amp; Privacy">מיקום ופרטיות</div></div>
  <div class="sec-cap mb12" id="set-priv-lbl">פרטיות</div>
  <div class="set-grp">
@@ -4343,7 +4344,7 @@ function popupBusy(){
     var ob=document.getElementById('ob'); if(ob && getComputedStyle(ob).display!=='none' && !(SS&&SS.onboarded)) return true;
     var acc=document.getElementById('gd-accept'); if(acc && acc.getAttribute('aria-hidden')==='false') return true;
     var con=document.getElementById('gd-consent'); if(con && con.getAttribute('aria-hidden')==='false') return true;
-    if(document.getElementById('upd-modal')||document.getElementById('inbox-banner')||document.getElementById('invname-bar')) return true;
+    if(document.getElementById('upd-modal')||document.getElementById('inbox-banner')||document.getElementById('invname-bar')||document.getElementById('invconf-bar')) return true;
     var sp=document.getElementById('setup-prompt'); if(sp && sp.classList.contains('on')) return true;
     if(document.body.classList.contains('sheet-open')) return true;
     try{ if(localStorage.getItem('shomer_pending_invite')) return true; }catch(e){}
@@ -5069,8 +5070,19 @@ function renderCountdown(){
 
 /* CANCEL within the window - FALSE ALARM. No pin, no feed card, no broadcast, no
  mapped history. We only bump a private false-alarm counter for the trust sim. */
+/* PRACTICE SOS - one run of the real flow (alarm, countdown, cancel code) that never leaves
+   this phone. One-shot on purpose: a persistent "practice mode" could be forgotten ON and
+   swallow a real emergency. */
+function practiceSOS(){
+ if(sosPhase!=='idle') return;
+ window._sosPractice=true;
+ try{ closeAll(); }catch(e){}
+ toast(currentLang==='he'?'תרגול SOS - שום דבר לא יישלח':currentLang==='ar'?'تمرين SOS - لن يُرسل شيء':'Practice SOS - nothing will be sent','amb');
+ beginSOS('practice');
+}
 function cancelCountdown(){
  if(sosPhase!=='countdown')return;
+ window._sosPractice=false;
  clearInterval(sosCdTimer); stopSosAlarm();
  sosPhase='idle'; sosActive=false;
  const ov=document.getElementById('sos-cd');
@@ -5094,19 +5106,25 @@ function activateSOS(){
  sosRollDay();
  SS.sos._fires=(SS.sos._fires||[]); SS.sos._fires.push(Date.now());
  if(sosAbuseOver()&&!SS.sos.holdToArm){ SS.sos.holdToArm=true; saveStore(); toast(he?'⚠️ שימוש חוזר ב-SOS - מעכשיו נדרשת לחיצה ארוכה (2 שנ׳)':'⚠️ Repeated SOS use - press & hold (2s) now required','amb'); }
- const overLimit=sosRemainingToday()<=0||sosAbuseOver();
+ /* NEVER silently drop an SOS. The 4th of the day / 3 in 30 min used to sound only on this
+    phone while guardians got nothing. Now it is always sent - marked "repeated" for the
+    record - and the person is told plainly. Practice SOS (Settings) is the only mode that
+    notifies nobody. */
+ const practice=!!window._sosPractice;
+ const overLimit=!practice&&(sosRemainingToday()<=0||sosAbuseOver());
+ window._sosRepeated=overLimit;
  curSosId='s'+Date.now();
  curSosType='unknown'; // SOS fires now; type is classified after, never blocking it
  /* ⚠️ THE ALERT MUST LEAVE THE PHONE. Everything else is theatre without this. */
- try{ if(!overLimit) sosBroadcast(curSosId, curSosType); }catch(e){}
+ try{ if(!practice) sosBroadcast(curSosId, curSosType); }catch(e){}
  // Log to persistent history. broadcast=false when rate-limited (alarm still helps the
  // user locally, but nothing is shared/mapped - exactly what a server would refuse to fan out).
  try{
  SS.sosHistory.push({id:curSosId,ts:Date.now(),lat:userLat,lng:userLng,
- trigger:curSosTrigger,resolution:'pending',broadcast:!overLimit,rateLimited:overLimit,
+ trigger:curSosTrigger,resolution:'pending',broadcast:!practice,repeated:overLimit,practice:practice,
  type:'unknown',typeState:'unclassified',classifiedBy:null});
  if(SS.sosHistory.length>50)SS.sosHistory=SS.sosHistory.slice(-50);
- if(!overLimit)SS.sos.activeToday=(SS.sos.activeToday||0)+1;
+ if(!practice)SS.sos.activeToday=(SS.sos.activeToday||0)+1;
  saveStore();renderSosHistory();updateProfileStats();refreshSosSafetyUI();
  }catch(e){}
  // Strip + lock-screen push
@@ -5115,16 +5133,18 @@ function activateSOS(){
  try{ if('serviceWorker' in navigator && navigator.serviceWorker.ready)navigator.serviceWorker.ready.then(function(reg){ if(reg.sync)reg.sync.register('sos-sync').catch(function(){}); }); }catch(e){}
  startMaxAttention(); // full-screen strobe + flashlight morse (degrades gracefully on iOS)
  pushNotify(' שומר - SOS',he?'אזעקה פועלת. עזרה בדרך.':'Alarm active. Help is coming.','sos-active');
- if(overLimit){
- // RATE-LIMITED: personal alarm keeps sounding, but NO broadcast and NO map pin.
- setText('ss-t',he?' אזעקה פועלת - שידור מושהה (הגבלה יומית)':' Alarm active - broadcast paused (daily limit)');
- setText('ss-s',he?'הגעת למכסת ה-SOS היומית':'Daily active-SOS limit reached');
- toast(he?`הגעת ל-${SS.sos.maxPerDay} SOS היום. האזעקה פועלת בטלפון שלך, אך השידור מושהה (מניעת שימוש לרעה).`
- :`Reached your ${SS.sos.maxPerDay} active-SOS limit today. Alarm still sounds on your phone, but broadcast is paused (anti-abuse).`,'amb');
+ if(practice){
+ // PRACTICE: everything looks and sounds real on THIS phone; nothing leaves it.
+ setText('ss-t',he?' תרגול SOS - אף אחד לא קיבל התראה':' Practice SOS - nobody was notified');
+ setText('ss-s',he?'כך זה נראה באמת. כבה/י עם קוד הביטול.':'This is how it looks for real. Stop it with your cancel code.');
+ toast(he?'תרגול: האזעקה אמיתית בטלפון שלך בלבד. השומרים לא קיבלו כלום.':'Practice: the alarm is real on your phone only. Your SHOMERs got nothing.','amb');
  return;
  }
+ if(overLimit){
+ toast(he?'ה-SOS נשלח לשומרים שלך (מסומן כ-SOS חוזר). אם זו טעות - בטל/י עם קוד הביטול.':'SOS sent to your SHOMERs (marked as a repeated SOS). If it is a mistake, cancel it with your code.','amb');
+ }
  // Within limit → broadcast simulation + pulsing map pin + feed card.
- setText('ss-t',he?' SOS פעיל - אזעקה פועלת · מיקומך שותף':' SOS active - alarm firing · location shared');
+ setText('ss-t',overLimit?(he?' SOS חוזר נשלח · מיקומך שותף':' Repeated SOS sent · location shared'):(he?' SOS פעיל - אזעקה פועלת · מיקומך שותף':' SOS active - alarm firing · location shared'));
  setText('ss-s',he?'ממתין לתגובה...':'Waiting for response...');
  addSOSPin();
  injectSOSCard();
@@ -5429,13 +5449,14 @@ function stopMorse(){ _morseTimeouts.forEach(clearTimeout); _morseTimeouts=[]; _
 function resolveSOS(){
  if(sosPhase!=='active'){ try{ sosClearBroadcast(); }catch(e){} return; }
  var proceed=function(){
-  try{ sosClearBroadcast(); }catch(e){}   // only after the cancel code passed - a thief tapping SOS must not stand the guardians down
+  try{ if(!window._sosPractice) sosClearBroadcast(); }catch(e){}   // only after the cancel code passed - a thief tapping SOS must not stand the guardians down
   clearInterval(sosTimer); stopSosAlarm(); stopMaxAttention(); releaseWake();
   try{ if(curSosId){ FB.db&&FB.db.ref('responders/'+curSosId).off&&FB.db.ref('responders/'+curSosId).off(); delete fbRespStreams[curSosId]; } fbClearResponderMarkers(); }catch(e){}
   sosPhase='idle'; sosActive=false;
   var btn=document.getElementById('sos-btn');
   if(btn){btn.classList.remove('active');btn.setAttribute('aria-pressed','false');}
   document.getElementById('sos-strip').classList.remove('on');
+  if(window._sosPractice){ resolveAs('test'); toast(currentLang==='he'?'✓ התרגול הסתיים. כך מבטלים SOS אמיתי.':currentLang==='ar'?'✓ انتهى التمرين.':'✓ Practice done. That is how you stop a real SOS.','grn'); return; }
   var ov=document.getElementById('sos-resolve');
   if(ov){ov.classList.add('on');ov.setAttribute('aria-hidden','false');}
  };
@@ -5464,7 +5485,7 @@ function resolveAs(kind){
  saveStore();renderSosHistory();updateProfileStats();refreshSosSafetyUI();
  const ov=document.getElementById('sos-resolve');
  if(ov){ov.classList.remove('on');ov.setAttribute('aria-hidden','true');}
- curSosId=null; curSosType='unknown';
+ curSosId=null; curSosType='unknown'; window._sosPractice=false; window._sosRepeated=false;
  if(sosFallbackTimer){clearTimeout(sosFallbackTimer);sosFallbackTimer=null;}
 }
 
@@ -7304,7 +7325,7 @@ async function findShomerContacts(){
         var h=await sha256Hex(it.canon);
         if(!h||h===FB._myPhoneHash)continue;
         if(inCircle[it.canon])continue;
-        var rec=null; try{ rec=(await fbRestGet('registry/'+h)).val(); }catch(e){ rec=null; }
+        var rec=null;   /* no phone→uid lookup: registry stays unreadable (privacy) - phone invites go out as bound invite links */
         if(rec&&rec.uid){ matches.push(it); }
       }catch(e){}
     }
@@ -7644,7 +7665,7 @@ async function addGuardian(){
      var h=await sha256Hex(canon);
      if(h && h===FB._myPhoneHash){ toast(he?'\u05d6\u05d4 \u05d4\u05de\u05e1\u05e4\u05e8 \u05e9\u05dc\u05da \ud83d\ude42':'That is your own number \ud83d\ude42','amb'); if(go){go.disabled=false;go.style.opacity='';} return; }
      if(h){
-       var rec=null; try{ rec=(await fbRestGet('registry/'+h)).val(); }catch(e){ rec=null; }
+       var rec=null;   /* no phone→uid lookup: registry stays unreadable (privacy) - phone invites go out as bound invite links */
        if(rec && rec.uid){ registered=true; theirUid=rec.uid;
          /* CONSENT - never force-pair. Create an invite; they must APPROVE.
             RTDB rules only let each side write its OWN pairs: they write theirs on accept,
@@ -7679,7 +7700,8 @@ async function addGuardian(){
  SS.circleMembers.push(m);
  if(!registered && agToken){
    var g0=gdState();
-   g0.pairs.push({id:genId('g'),token:agToken,name:name,rel:'',shareToThem:true,seeThem:true,addedTs:Date.now(),initiator:true,pending:true,partnerUid:null,linked:false,cid:_selC,code:agCode,color:m.color,lat:null,lng:null,ts:0,live:false,via:'phone-invite',simLat:null,simLng:null});
+   var _toPh=null; try{ _toPh=await sha256Hex(canon); }catch(e){}
+   g0.pairs.push({id:genId('g'),token:agToken,toPh:_toPh,name:name,rel:'',shareToThem:true,seeThem:true,addedTs:Date.now(),initiator:true,pending:true,partnerUid:null,linked:false,cid:_selC,code:agCode,color:m.color,lat:null,lng:null,ts:0,live:false,via:'phone-invite',simLat:null,simLng:null});
    m.pairId=g0.pairs[g0.pairs.length-1].id;
    fbWatchApproval(agToken, null);
  }
@@ -8623,7 +8645,7 @@ function gdConnect(tok,nm,fromLink){
  simLat:TLV[0]+(Math.random()-.5)*.02,simLng:TLV[1]+(Math.random()-.5)*.02}; g.pairs.push(p); }
  else { p.pending=false; if(nm&&!p.name)p.name=nm; }
  // real backend link: record the mutual pairing in RTDB (binds the two accounts)
- try{ fbAcceptInvite(tok,(invName()||gdState().myName||(SS.user&&SS.user.name)||'')).then(function(fromUid){ if(fromUid){ p.partnerUid=fromUid; p.linked=true; if(!p.name&&fbAcceptInvite._name)p.name=fbAcceptInvite._name; var mm=ensureMemberForPair(p); if(mm){ mm.partnerUid=fromUid; if(!mm.name)mm.name=p.name; } saveStore(); gdRenderList(); try{ renderCircles(); syncPairsToCircles(); }catch(e){} } }); }catch(e){}
+ try{ fbAcceptInvite(tok,(invName()||gdState().myName||(SS.user&&SS.user.name)||'')).then(function(fromUid){ if(fromUid){ p.partnerUid=fromUid; p.linked=true; p.acceptedTs=Date.now(); try{ gdWatchMyAcceptance(p); }catch(e){} if(!p.name&&fbAcceptInvite._name)p.name=fbAcceptInvite._name; var mm=ensureMemberForPair(p); if(mm){ mm.partnerUid=fromUid; if(!mm.name)mm.name=p.name; } saveStore(); gdRenderList(); try{ renderCircles(); syncPairsToCircles(); }catch(e){} } }); }catch(e){}
  saveStore();
  gdSend({type:'hello'}); gdBroadcast(); gdRenderMarkers(); gdRenderList();
  if(document.getElementById('sh-circles')&&document.getElementById('sh-circles').classList.contains('open')){} else openCircles();
@@ -8653,8 +8675,7 @@ async function gdAddPhoneSubmit(){
    var h=await sha256Hex(canon);
    if(!h){ toast(he?'הדפדפן לא תומך בבדיקה מאובטחת':'Secure check unsupported here','amb'); if(btn)btn.disabled=false; return; }
    if(h===FB._myPhoneHash){ toast(he?'זה המספר שלך 🙂':ar?'هذا رقمك 🙂':'That\'s your own number 🙂','amb'); if(btn)btn.disabled=false; return; }
-   var snap=await FB.db.ref('registry/'+h).once('value');
-   var rec=snap.val();
+   var rec=null;   /* registry is not readable (privacy) */
    var label=((document.getElementById('gd-ph-name')||{}).value||'').trim().substring(0,24);
    if(rec && rec.uid && rec.uid!==FB.uid){
      // Contact IS a registered SHOMER → real mutual pairing.
@@ -9198,13 +9219,20 @@ applyStoredSettings();
 /* First launch: detect the device language (he/ar/en); fall back to Hebrew (primary
    audience). Once the user picks a language it's persisted in SS.lang and wins. */
 function detectDeviceLang(){
- try{ var l=String(navigator.language||navigator.userLanguage||'he').toLowerCase();
-  if(l.indexOf('ar')===0) return 'ar';
-  if(l.indexOf('en')===0) return 'en';
+ try{
+  /* first supported language in the browser's preference list (he / ar / en; 'iw' = old Hebrew code) */
+  var ls=(navigator.languages&&navigator.languages.length)?navigator.languages:[navigator.language||navigator.userLanguage||'he'];
+  for(var i=0;i<ls.length;i++){ var l=String(ls[i]||'').toLowerCase();
+    if(l.indexOf('he')===0||l.indexOf('iw')===0) return 'he';
+    if(l.indexOf('ar')===0) return 'ar';
+    if(l.indexOf('en')===0) return 'en'; }
   return 'he';
  }catch(e){ return 'he'; }
 }
-setLang(SS.lang||detectDeviceLang());
+/* SS.lang defaults to 'he', so `SS.lang||detect` never detected anything: English browsers
+   opened in Hebrew. Use the saved choice only if one was ever saved; else the device language. */
+var _hadStore=false; try{ _hadStore=!!localStorage.getItem(SKEY); }catch(e){}
+setLang((_hadStore&&SS.lang)?SS.lang:detectDeviceLang());
 // Init DMS display
 updateDMSDisplay();
 // Returning user - skip onboarding, restore everything.
@@ -9374,7 +9402,7 @@ try{ hydrateIcons(document); }catch(e){}
 /* Loaded-build version - shown in the diagnostic panel so a phone can prove
    whether it's on the latest build or a STALE cached one. Keep in lock-step
    with sw.js SW_VERSION on every deploy. */
-var APP_VER='v260';
+var APP_VER='v261';
 var FB={ready:false,uid:null,db:null,_presTimer:null,connected:false,listening:false,pushState:'default',near:0,swVer:'?',
   authState:'connecting',sdkLoaded:false,persist:'',permErr:null,err:null,wsProbe:'',csp:''};
 /* Always log connection diagnostics to the console so the real failure can be SEEN in Chrome. */
@@ -10024,6 +10052,7 @@ function fbOnAuthed(uid){
   try{ setTimeout(function(){ essFetch(false).then(function(){ essRender(); essLegPaint(); }); }, 3500); }catch(e){}
   try{ syncPairsToCircles(); }catch(e){}
   try{ fbListenAllPeerLocs(); }catch(e){}
+  try{ gdState().pairs.forEach(function(p){ if(p&&!p.initiator&&p.acceptedTs) gdWatchMyAcceptance(p); }); }catch(e){}
   try{ gdState().pairs.forEach(function(p){ if(p&&p.pending&&!p.linked&&p.token) fbWatchApproval(p.token,p.partnerUid||null); });   /* watch EVERY pending invite - a missing partnerUid must not silently kill the watcher */ }catch(e){}     // subscribe to every paired partner's live location
   try{ fbStartLocPublish(); }catch(e){}       // start writing my own live location
   try{ fbRegisterMe(); }catch(e){}
@@ -10168,19 +10197,43 @@ function fbPublishSOS(){ if(!FB.ready||!curSosId)return;
   // auth is ready (fbOnAuthed) - the SOS is never silently dropped.
   if(!FB._authReady){ FB._pendingSOS=1; fbLog('SOS queued - securing identity, will broadcast on auth'); return; }
   if(userLat==null||userLng==null){ FB._sosNeedsLoc=true; fbLog('SOS map pin waits for a location fix (never a made-up one)'); return; }
-  try{ FB.db.ref('sos/'+curSosId).set({uid:FB.uid,lat:userLat,lng:userLng,type:curSosType||'unknown',typeState:'self',ts:Date.now(),resolved:false,name:(SS.user&&SS.user.name)||'Shomer'}).then(function(){ fbTriggerPush(curSosId); try{dashFeedPush(curSosId,curSosType||'sos',(userLat!=null?userLat:null),(userLng!=null?userLng:null));}catch(e){} },function(e){ FB.permErr=(e&&e.code)||'sos-denied'; fbLog('SOS write denied:', FB.permErr); renderFbStatus(); }); }catch(e){} }
+  /* sos/<myUid> - ONE live record per person, readable only by me and the people I paired
+     with (rules), and no name in it: my SHOMERs already know my private invite name. */
+  var _rec={uid:FB.uid,id:curSosId,lat:userLat,lng:userLng,type:curSosType||'unknown',typeState:'self',ts:Date.now(),resolved:false};
+  if(window._sosRepeated) _rec.repeated=true;
+  try{ FB.db.ref('sos/'+FB.uid).set(_rec).then(function(){ fbTriggerPush(curSosId); try{dashFeedPush(FB.uid,curSosType||'sos',(userLat!=null?userLat:null),(userLng!=null?userLng:null));}catch(e){} },function(e){ FB.permErr=(e&&e.code)||'sos-denied'; fbLog('SOS write denied:', FB.permErr); renderFbStatus(); }); }catch(e){} }
 /* Fire the FREE background-push fan-out (Cloudflare Worker) for this SOS so paired /
    nearby SHOMERs get a notification even when their app is closed or the phone is
    locked. No-op (and no error) until window.SHOMER_PUSH_URL is configured. The live
    socket already covers foreground/in-app delivery; this is the closed-app path. */
 function fbTriggerPush(id){ try{ var url=window.SHOMER_PUSH_URL; if(!url||!id)return; fetch(url,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({id:id}),keepalive:true}).then(function(r){ return r.json&&r.json().catch(function(){}); }).then(function(d){ fbLog('push fan-out:', d||'sent'); }).catch(function(e){ fbLog('push fan-out failed (non-fatal):',(e&&e.message)||e); }); }catch(e){} }
-function fbUpdateSOSType(){ if(FB.ready&&curSosId){ try{ FB.db.ref('sos/'+curSosId).update({type:curSosType,typeState:'self'}); }catch(e){} } }
-function fbResolveSOS(id){ if(FB.ready&&id){ try{ FB.db.ref('sos/'+id).update({resolved:true,resolvedTs:Date.now()}); }catch(e){} } }
+function fbUpdateSOSType(){ if(FB.ready&&curSosId&&FB._authReady&&!window._sosPractice){ try{ FB.db.ref('sos/'+FB.uid).update({type:curSosType,typeState:'self'}); }catch(e){} } }
+function fbResolveSOS(id){ if(FB.ready&&id&&FB._authReady&&!window._sosPractice){ try{ FB.db.ref('sos/'+FB.uid).update({resolved:true,resolvedTs:Date.now()}); }catch(e){} try{ fbRestWrite('PATCH','dashfeed/'+FB.uid,{status:'resolved'}); }catch(e){} } }
+/* Listen to MY SHOMERS' SOS records only (sos/<theirUid>) - never the whole tree, which
+   exposed every SOS (with location) to any signed-in user. Called again whenever the
+   circle changes. Records are re-keyed by their SOS id for the existing UI. */
+FB._sosPeer=FB._sosPeer||{};
 function fbListenSOS(){
-  if(!FB.ready)return;
+  if(!FB.ready||!FB._authReady)return;
   if(!FB._alerted)FB._alerted={};
-  FB.db.ref('sos').on('value',function(snap){
-    var all=snap.val()||{};
+  var want={};
+  (gdState().pairs||[]).forEach(function(pr){ if(pr&&pr.partnerUid&&!pr.pending&&pr.linked!==false) want[pr.partnerUid]=1; });
+  Object.keys(want).forEach(function(puid){
+    if(FB._sosPeer[puid]) return;
+    FB._sosPeer[puid]={init:false, rec:null};
+    FB.db.ref('sos/'+puid).on('value',function(snap){
+      var st=FB._sosPeer[puid]; if(!st) return;
+      st.rec=snap.val()||null;
+      fbSosProcess(!st.init); st.init=true;
+    }, function(){ /* not readable until they pair back with me */ });
+  });
+  Object.keys(FB._sosPeer).forEach(function(puid){ if(!want[puid]){ try{ FB.db.ref('sos/'+puid).off(); }catch(e){} delete FB._sosPeer[puid]; fbSosProcess(false); } });
+}
+function fbSosProcess(baselineOnly){
+  (function(){
+    var all={};
+    Object.keys(FB._sosPeer).forEach(function(puid){ var r=FB._sosPeer[puid].rec; if(r&&r.uid===puid){ all[r.id||('u_'+puid)]=r; } });
+    FB._sosInit=FB._sosInit&&!baselineOnly;
     // marker cleanup (only when the map exists)
     if(MAP) Object.keys(fbSosMarkers).forEach(function(id){ if(!all[id]||all[id].resolved){ try{MAP.removeLayer(fbSosMarkers[id]);}catch(e){} delete fbSosMarkers[id]; } });
     var fresh=[], STALE=25*60*1000, now=Date.now(), firstSync=!FB._sosInit;
@@ -10190,7 +10243,7 @@ function fbListenSOS(){
       if(MAP){
         if(fbSosMarkers[id]){ fbSosMarkers[id].setLatLng([s.lat,s.lng]); fbSosMarkers[id].setIcon(sosPinIcon(s.type)); }
         else {
-          fbSosMarkers[id]=window.L.marker([s.lat,s.lng],{icon:sosPinIcon(s.type),zIndexOffset:1000,alt:'SOS '+(s.name||'')}).addTo(MAP);
+          fbSosMarkers[id]=window.L.marker([s.lat,s.lng],{icon:sosPinIcon(s.type),zIndexOffset:1000,alt:'SOS '+((memberByPair(s.uid)||{}).name||'')}).addTo(MAP);
           (function(mid){ fbSosMarkers[mid].on('click',function(){ openLiveSosDetail(mid); }); })(id);   // tap → full event detail card
         }
       }
@@ -10198,12 +10251,12 @@ function fbListenSOS(){
       //  • first snapshot after we subscribe = BASELINE (mark seen, don't alert for pre-existing events)
       //  • after that, ANY SOS id that newly appears = a real-time SOS → ALERT every connected SHOMER
       if(firstSync){ FB._alerted[id]=true; }
-      else if(!FB._alerted[id]){ FB._alerted[id]=true; fresh.push(Object.assign({id:id},s)); FB.lastSos={ts:now,type:s.type,name:s.name}; }
+      else if(!FB._alerted[id]){ FB._alerted[id]=true; fresh.push(Object.assign({id:id},s)); FB.lastSos={ts:now,type:s.type,name:(memberByPair(s.uid)||{}).name||''}; }
     });
     FB._sosInit=true;
     renderFbStatus();
     if(fresh.length){ incomingSosAlert(fresh[0]); }
-  }, function(e){ FB.err='sosRead:'+(e&&e.code||e); renderFbStatus(); });
+  })();
 }
 /* ── Incoming SOS from another SHOMER: make it impossible to miss ── */
 function incomingSosAlert(s){
@@ -10388,8 +10441,15 @@ function fbAcceptInvite(token,myName){
     var _nm=unpackInvite(inv.name).name||'';
     try{ FB.db.ref('pairs/'+FB.uid+'/'+inv.fromUid).set({name:_nm,token:token,ts:Date.now()}); }catch(e){}
     fbAcceptInvite._name=_nm;
-    try{ FB.db.ref('invites/'+token).update({acceptedBy:FB.uid,acceptedName:myName||'',acceptedTs:Date.now()}); }catch(e){}
-    return inv.fromUid;
+    /* Prove WHO accepted: my verified phone (the rules check acceptedPh against the registry
+       entry owned by my uid), so the inviter can tell their intended person from anyone
+       who got hold of a forwarded link. Reinstalled users whose registry entry still points
+       at an old uid fall back to an unverified acceptance, which the inviter must confirm. */
+    var acc={acceptedBy:FB.uid,acceptedName:myName||'',acceptedTs:Date.now(),acceptedPhone:((SS.user&&SS.user.phone)||'').replace(/\D/g,'')};
+    var withPh=Object.assign({acceptedPh:FB._myPhoneHash||''},acc);
+    return fbRestWrite('PATCH','invites/'+token, FB._myPhoneHash?withPh:acc)
+      .catch(function(){ return fbRestWrite('PATCH','invites/'+token, acc); })
+      .then(function(){ return inv.fromUid; }, function(){ return inv.fromUid; });
   }).catch(function(){return null;});
 }
 /* ══ CROSS-DEVICE LIVE LOCATION (real users see each other) ══
@@ -10407,7 +10467,7 @@ function fbWatchApproval(token, theirUid){
   if(FB._appr[token])return;
   FB._appr[token]=true;
   try{
-    FB.db.ref('invites/'+token).on('value', function(snap){
+    var _onInv=function(snap){
       var inv=snap.val(); if(!inv)return;
       var he=currentLang==='he';
       var g=gdState();
@@ -10425,6 +10485,16 @@ function fbWatchApproval(token, theirUid){
       if(!inv.acceptedBy)return;      // still awaiting approval
       var p=g.pairs.find(function(x){return x.token===token;});
       if(!p||p.linked)return;
+      /* ══ BIND THE INVITE TO ITS INTENDED RECIPIENT ══
+         A forwarded link must not let a stranger pair with me (and see my location).
+         • expected uid known → must match exactly;
+         • phone invite (toPh) → the acceptance must carry that verified phone hash;
+         • open link (no known recipient) → I confirm the person (name + number) myself.
+         Mismatch = refused, flagged, and the invite is re-issued on a fresh link. */
+      if(fbWatchApproval._busy&&fbWatchApproval._busy[token]) return;
+      var verdict=gdApprovalVerdict(p, inv, theirUid);
+      if(verdict==='reject'){ gdRejectAcceptance(p, inv, token, true); return; }
+      if(verdict==='ask'){ gdConfirmAcceptance(p, inv, token, theirUid); return; }
       var puid=inv.acceptedBy||theirUid;
       try{ fbRestWrite('PUT','pairs/'+FB.uid+'/'+puid,{name:p.name||'',token:token,ts:Date.now(),via:'phone'}); }catch(e){}
       p.pending=false; p.linked=true; p.partnerUid=puid;
@@ -10436,8 +10506,68 @@ function fbWatchApproval(token, theirUid){
       try{ gdRenderMarkers(); renderCircles(); }catch(e){}
       toast(he?('\u2713 '+(p.name||'')+' \u05d0\u05d9\u05e9\u05e8/\u05d4 - \u05ea\u05e8\u05d0\u05d5 \u05d6\u05d4 \u05d0\u05ea \u05d6\u05d4 \u05e2\u05dc \u05d4\u05de\u05e4\u05d4'):('\u2713 '+(p.name||'')+' approved - you can see each other'),'grn');
       try{ pushNotify('SHOMER', he?((p.name||'')+' \u05d0\u05d9\u05e9\u05e8/\u05d4 \u05d0\u05ea \u05d4\u05d1\u05e7\u05e9\u05d4'):((p.name||'')+' approved your request'),'gd-appr'); }catch(e){}
-    }, function(){});
+    };
+    FB.db.ref('invites/'+token).on('value', _onInv, function(){});
+    fbWatchApproval._fns=fbWatchApproval._fns||{}; fbWatchApproval._fns[token]=_onInv;
   }catch(e){}
+}
+fbWatchApproval._recheck=function(token){ try{ var f=fbWatchApproval._fns&&fbWatchApproval._fns[token]; if(f) fbRestGet('invites/'+token).then(f).catch(function(){}); }catch(e){} };
+function gdApprovalVerdict(p, inv, theirUid){
+  if(theirUid) return (inv.acceptedBy===theirUid)?'ok':'reject';
+  if(p.toPh){ if(inv.acceptedPh && inv.acceptedPh===p.toPh) return 'ok'; return inv.acceptedPh?'reject':'ask'; }
+  return p.confirmedBy===inv.acceptedBy ? 'ok' : 'ask';
+}
+/* Refuse an acceptance: forget it locally and re-issue the invite on a fresh token
+   (the old one is burned - the rules let each invite be accepted once). */
+function gdRejectAcceptance(p, inv, token, flagged){
+  var he=currentLang==='he';
+  var g=gdState(), nt='g'+Math.random().toString(36).slice(2,8)+Math.random().toString(36).slice(2,6);
+  var code=p.code||String(Math.floor(1000+Math.random()*9000));
+  try{ fbRestWrite('PATCH','invites/'+token,{rejected:inv.acceptedBy||true,rejectedTs:Date.now()}); }catch(e){}
+  try{ fbRestWrite('PUT','invites/'+nt,{fromUid:FB.uid,ts:Date.now(),name:packInvite(invName(),(SS.user&&SS.user.phone)||'',code)}); }catch(e){}
+  p.token=nt; p.code=code; p.pending=true; p.linked=false; p.partnerUid=null; saveStore();
+  try{ fbWatchApproval(nt, null); }catch(e){}
+  try{ renderCircles(); }catch(e){}
+  toast(flagged
+    ?(he?('⚠️ מישהו אחר ניסה להשתמש בהזמנה שלך ל'+(p.name||'')+'. חסמנו אותו והכנו קישור חדש - שלח/י שוב מהשורה של '+(p.name||'השומר/ת')+'.'):('⚠️ Someone else tried to use your invite to '+(p.name||'')+'. We blocked it and made a new link - resend it from their row.'))
+    :(he?'לא חוברתם. הכנו קישור חדש - שלח/י אותו שוב לאדם הנכון.':'Not connected. We made a new link - send it again to the right person.'),'amb');
+}
+/* Open link: show who accepted and let me confirm it is the person I invited. */
+function gdConfirmAcceptance(p, inv, token, theirUid){
+  var he=currentLang==='he';
+  fbWatchApproval._busy=fbWatchApproval._busy||{}; if(fbWatchApproval._busy[token]) return; fbWatchApproval._busy[token]=1;
+  var ph=String(inv.acceptedPhone||'').replace(/\D/g,'');
+  var show=function(verified){
+    var old=document.getElementById('invconf-bar'); if(old) old.remove();
+    try{ popupClearLow(); }catch(e){}
+    var bar=document.createElement('div'); bar.id='invconf-bar'; bar.className='nudge-bar';
+    bar.innerHTML='<span class="nudge-tx" style="font-weight:800">'+(he?'מישהו אישר את ההזמנה שלך':'Someone accepted your invite')+'</span>'
+      +'<span class="nudge-tx"><b>'+ESC(inv.acceptedName||(he?'ללא שם':'No name'))+'</b>'+(ph?(' · <span dir="ltr">+'+ESC(ph)+'</span>'):'')+'<br><small>'+(verified?(he?'✓ מספר מאומת':'✓ Verified number'):(he?'⚠️ המספר לא מאומת':'⚠️ Number not verified'))+'</small></span>'
+      +'<span class="nudge-tx" style="font-size:13px;opacity:.85">'+(he?'זה האדם שהזמנת? רק באישור שלך הוא יראה את המיקום שלך.':'Is this who you invited? Only if you confirm will they see your location.')+'</span>'
+      +'<button class="nudge-cta" id="invconf-yes">'+(he?'כן, חבר/י':'Yes, connect')+'</button>'
+      +'<button class="nudge-cta" id="invconf-no" style="background:transparent;border:1px solid rgba(255,112,128,.6);color:#FF9AA5">'+(he?'זה לא הם':'Not them')+'</button>';
+    (document.getElementById('app')||document.body).appendChild(bar);
+    document.getElementById('invconf-yes').onclick=function(){ bar.remove(); delete fbWatchApproval._busy[token]; p.confirmedBy=inv.acceptedBy; saveStore(); fbWatchApproval._recheck(token); };
+    document.getElementById('invconf-no').onclick=function(){ bar.remove(); delete fbWatchApproval._busy[token]; gdRejectAcceptance(p, inv, token, false); };
+  };
+  if(ph && inv.acceptedPh){ sha256Hex(ph).then(function(h){ show(h===inv.acceptedPh); }).catch(function(){ show(false); }); } else show(false);
+}
+/* Accepter side: if the inviter says "not them" (or the invite was bound to someone else),
+   undo my side so I don't sit on a connection that doesn't exist. Watched for 7 days. */
+function gdWatchMyAcceptance(p){
+  if(!p||!p.token||p.initiator||!FB.ready) return;
+  if(p.acceptedTs && (Date.now()-p.acceptedTs)>7*86400000) return;
+  FB._myAcc=FB._myAcc||{}; if(FB._myAcc[p.token]) return; FB._myAcc[p.token]=1;
+  FB.db.ref('invites/'+p.token).on('value', function(snap){
+    var inv=snap&&snap.val?snap.val():null; if(!inv||!inv.rejected||inv.rejected!==FB.uid) return;
+    var he=currentLang==='he', g=gdState(), nm=p.name||'';
+    g.pairs=g.pairs.filter(function(x){ return x!==p; });
+    SS.circleMembers=(SS.circleMembers||[]).filter(function(m){ return m.pairId!==p.id && !(p.partnerUid&&m.partnerUid===p.partnerUid&&!(g.pairs||[]).some(function(q){return q.partnerUid===p.partnerUid;})); });
+    try{ if(p.partnerUid) fbRestWrite('DELETE','pairs/'+FB.uid+'/'+p.partnerUid); }catch(e){}
+    try{ FB.db.ref('invites/'+p.token).off(); }catch(e){}
+    saveStore(); try{ renderCircles(); gdRenderMarkers(); }catch(e){}
+    toast(he?((nm||'השולח/ת')+' לא אישר/ה את החיבור - ההזמנה לא נועדה לך.'):((nm||'The sender')+' did not confirm the connection - that invite was not meant for you.'),'amb');
+  }, function(){});
 }
 /* ══ ONE PERSON, ONE RECORD ══
    Connected people used to live only in gd.pairs, so they appeared in NO circle
@@ -10463,6 +10593,7 @@ function ensureMemberForPair(p, cid){
 function syncPairsToCircles(){
   try{ setTimeout(fbWatchGuardianPresence, 400); }catch(e){}
  try{ setTimeout(sosWatchPartners, 500); }catch(e){}
+ try{ setTimeout(fbListenSOS, 600); }catch(e){}
   try{
     if(!circlesList().length) return;                 // wait until circles exist
     var g=gdState(), changed=false;
@@ -11338,12 +11469,14 @@ function sosWatchPartners(){
       var gsalt=guardianSalt(puid);
       FB.db.ref('invites/'+sosChan(puid, gsalt)).on('value', function(snap){
         var raw=snap&&snap.val?snap.val():null;
+        if(raw && raw.fromUid && raw.fromUid!==puid) raw=null;   // only the partner's OWN record counts (a squatted key must not fake or hide an SOS)
         var v=raw?unpackSOS(raw.name):null;
         if(v&&v.active) onPartnerSOS(puid, v); else onPartnerSOSClear(puid);
       });
       /* also watch for a rotated salt from this partner, and re-subscribe when it changes */
       FB.db.ref('invites/salt_'+puid.slice(0,16)+'_'+FB.uid.slice(0,16)).on('value', function(snap){
         var raw=snap&&snap.val?snap.val():null;
+        if(raw&&raw.fromUid&&raw.fromUid!==puid) raw=null;      // a salt record squatted by someone else must not redirect me to a fake channel
         if(raw&&raw.name){ var np=String(raw.name).split('|'); if(np[0]==='S'&&np[2]){
           if(np[2]!==guardianSalt(puid)){ setGuardianSalt(puid, np[2]); delete SOSBUS.watchers[puid]; sosWatchPartners(); }
         }}
@@ -12292,7 +12425,7 @@ function updCheck(manual){
       .then(function(d){
         if(!d||!d.v||typeof APP_VER==='undefined') return;
         var pub=updNum(d.v), cur=updNum(APP_VER), stale=pub>cur;
-        updSetBadge('v0.9 · beta', stale);
+        updSetBadge(APP_VER+' · beta', stale);
         if(stale){ try{fbLog('UPDATE available: '+APP_VER+' → '+d.v);}catch(e){}
           try{ if(_ln && window._updNotified!==d.v){ window._updNotified=d.v; var _he=currentLang==='he',_ar=currentLang==='ar';
             _ln.schedule({notifications:[{id:(_lnId=(_lnId%2000000)+1),title:(_he?'עדכון זמין · SH✡MER':_ar?'تحديث متاح · SH✡MER':'Update available · SH✡MER'),body:(_he?'גרסה חדשה מוכנה — פתח/י את SH✡MER כדי לעדכן.':_ar?'نسخة جديدة جاهزة — افتح SH✡MER للتحديث.':'A new version is ready — open SH✡MER to update.'),channelId:'shomer-updates',autoCancel:true,extra:{tag:'update-available'}}]}); } }catch(e){}
@@ -12316,11 +12449,11 @@ function updMountBadge(){
   if(document.getElementById('ver-badge')) return;
   var el=document.createElement('div'); el.id='ver-badge';
   el.setAttribute('style','position:fixed;left:6px;bottom:calc(3px + env(safe-area-inset-bottom));z-index:90000;font:600 10px/1 system-ui,-apple-system,sans-serif;color:#6b7a9c;background:rgba(9,18,36,.55);padding:3px 6px;border-radius:7px;letter-spacing:.3px;cursor:pointer');
-  el.textContent=(typeof APP_VER!=='undefined'?APP_VER:'?');
+  el.textContent=(typeof APP_VER!=='undefined'?APP_VER:'?')+' · beta';
   el.title='SHOMER build - tap to check for updates';
   el.onclick=function(){ try{ toast(currentLang==='he'?'בודק עדכונים…':currentLang==='ar'?'جارٍ البحث عن تحديثات…':'Checking for updates…',''); }catch(e){} updCheck(true); };
   document.body.appendChild(el);
-  var sv=document.getElementById('set-ver'); if(sv) sv.textContent='v0.9 · beta';   // Settings version row (user-facing)
+  var sv=document.getElementById('set-ver'); if(sv) sv.textContent=APP_VER+' · beta';   // Settings version row (user-facing)
 }
 try{
   if(document.readyState!=='loading'){ updMountBadge(); } else document.addEventListener('DOMContentLoaded',updMountBadge);
@@ -12925,7 +13058,7 @@ async function completeRegistration(){ try{document.body.classList.remove("otp-a
   FB._myPhoneHash=ph;
   const uname=shomerHandleFromHash(ph);
   let existing=null;
-  try{ existing=(await fbRestGet("registry/"+ph)).val(); }catch(e){ existing=null; }
+  /* the registry is not readable by design (phone→uid privacy); a returning user is treated as new */
   if(existing&&existing.uid){
      /* RETURNING USER - this phone is already registered.
         Two things must happen, and previously neither did:

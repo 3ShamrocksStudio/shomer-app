@@ -1,1 +1,1 @@
-{"v": "v260", "notes": ["Small wording fixes"]}
+{"v": "v261", "notes": ["Invites are bound to the person you invited - a forwarded link can't connect a stranger", "An SOS is never dropped: repeated SOS is still sent, and marked", "New: Practice SOS in Settings - a full drill that notifies nobody", "Opens in your phone's language (Hebrew, Arabic or English)"]}
