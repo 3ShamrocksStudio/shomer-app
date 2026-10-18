@@ -5450,6 +5450,7 @@ function resolveSOS(){
  if(sosPhase!=='active'){ try{ sosClearBroadcast(); }catch(e){} return; }
  var proceed=function(){
   try{ if(!window._sosPractice) sosClearBroadcast(); }catch(e){}   // only after the cancel code passed - a thief tapping SOS must not stand the guardians down
+  try{ if(!window._sosPractice) fbResolveSOS(curSosId); }catch(e){}   // v262: close sos/<me> now too - guardians' alerts follow it (not only after the "how did it end" choice)
   clearInterval(sosTimer); stopSosAlarm(); stopMaxAttention(); releaseWake();
   try{ if(curSosId){ FB.db&&FB.db.ref('responders/'+curSosId).off&&FB.db.ref('responders/'+curSosId).off(); delete fbRespStreams[curSosId]; } fbClearResponderMarkers(); }catch(e){}
   sosPhase='idle'; sosActive=false;
@@ -9415,7 +9416,7 @@ try{ hydrateIcons(document); }catch(e){}
 /* Loaded-build version - shown in the diagnostic panel so a phone can prove
    whether it's on the latest build or a STALE cached one. Keep in lock-step
    with sw.js SW_VERSION on every deploy. */
-var APP_VER='v262';
+var APP_VER='v263';
 var FB={ready:false,uid:null,db:null,_presTimer:null,connected:false,listening:false,pushState:'default',near:0,swVer:'?',
   authState:'connecting',sdkLoaded:false,persist:'',permErr:null,err:null,wsProbe:'',csp:''};
 /* Always log connection diagnostics to the console so the real failure can be SEEN in Chrome. */
@@ -9799,6 +9800,7 @@ function dashFeedPush(id,type,lat,lng){
    stream; everything else is fetched by short polls that share the remaining connections. */
 var FB_SSE_MAX=3;
 function fbStreamPrio(path){
+  if(/^sos\/[^\/]+$/.test(path)) return 'top';                                              // v262: a paired person's SOS record - works in BOTH directions
   if(path==='sos'||/^pairs\//.test(path)||/^invites\/sos_/.test(path)) return 'high';      // SOS fan-out + my pairings
   if(/^invites\/(sd_|rp_)/.test(path)||/^responders\//.test(path)) return 'urgent-poll';   // only matter during an SOS
   if(path==='founders') return 'rare';
@@ -9809,9 +9811,14 @@ function fbStream(path,cb,errCb){
   var st=FB_STREAMS[path];
   if(st){ st.cb=cb; st.errCb=errCb; return st; }
   var pr=fbStreamPrio(path);
+  /* 'top' (a partner's SOS record) always gets a live stream: if the budget is full it takes
+     the slot of an SOS-bus stream, which then polls every 5s (the record carries the alert). */
+  if(pr==='top' && fbSseCount()>=FB_SSE_MAX){
+    for(var _q in FB_STREAMS){ var _o=FB_STREAMS[_q]; if(_o&&_o.open&&_o.mode==='sse'&&_o.prio==='high'&&/^invites\/sos_/.test(_q)){ _o.mode='poll'; try{_o.es&&_o.es.close();}catch(e){} _o.es=null; fbStreamConnect(_o); break; } }
+  }
   st={ path:path, cb:cb, errCb:errCb, cache:undefined, es:null, healthy:false, open:true, backoff:1500, retryT:null, lastEvent:0,
-       mode:(pr==='high'&&fbSseCount()<FB_SSE_MAX)?'sse':'poll',
-       prio:pr, pollMs:(pr==='high')?5000:(pr==='rare'?120000:20000) };
+       mode:((pr==='high'||pr==='top')&&fbSseCount()<FB_SSE_MAX)?'sse':'poll',
+       prio:(pr==='top'?'high':pr), pollMs:(pr==='high'||pr==='top')?(pr==='top'?3000:5000):(pr==='rare'?120000:20000) };
   FB_STREAMS[path]=st; fbStreamConnect(st); return st;
 }
 /* Poll mode: one short GET, deliver only on change, then schedule the next. */
@@ -10263,12 +10270,21 @@ function fbSosProcess(baselineOnly){
       // Alert logic - NO proximity gate, clock-skew immune:
       //  • first snapshot after we subscribe = BASELINE (mark seen, don't alert for pre-existing events)
       //  • after that, ANY SOS id that newly appears = a real-time SOS → ALERT every connected SHOMER
-      if(firstSync){ FB._alerted[id]=true; }
-      else if(!FB._alerted[id]){ FB._alerted[id]=true; fresh.push(Object.assign({id:id},s)); FB.lastSos={ts:now,type:s.type,name:(memberByPair(s.uid)||{}).name||''}; }
+      if(!FB._alerted[id]){ FB._alerted[id]=true; fresh.push(Object.assign({id:id},s)); FB.lastSos={ts:now,type:s.type,name:(memberByPair(s.uid)||{}).name||''}; }
     });
     FB._sosInit=true;
     renderFbStatus();
-    if(fresh.length){ incomingSosAlert(fresh[0]); }
+    /* v262: every record here is a PAIRED person's own SOS (sos/<theirUid>, readable only by
+       them and their SHOMERs) - so it raises the full personal alert with "I'm coming", in BOTH
+       directions, even when the bus salt never reached this side. A live SOS present when I
+       subscribe (e.g. I opened the app from the push) alerts too. */
+    Object.keys(FB._sosPeer).forEach(function(puid){
+      var r=FB._sosPeer[puid].rec;
+      var live=r&&r.uid===puid&&!r.resolved&&r.lat!=null&&!(r.ts&&(now-r.ts)>STALE);
+      if(live) onPartnerSOS(puid,{active:true,name:'',lat:r.lat,lng:r.lng,ts:r.ts},'rec');
+      else onPartnerSOSClear(puid,'rec');
+    });
+    if(fresh.length&&MAP&&fresh[0].lat!=null){ try{ MAP.setView([fresh[0].lat,fresh[0].lng],14,{animate:true}); }catch(e){} }
   })();
 }
 /* ── Incoming SOS from another SHOMER: make it impossible to miss ── */
@@ -11478,8 +11494,10 @@ async function sosBroadcast(sosId, type){
   SOSBUS.active=payload.sosId; SOSBUS.live=!!ok; SOSBUS.sentPos=p; SOSBUS.sentAt=Date.now();
   if(ok){
     var n=(SS.circleMembers||[]).filter(function(m){return !m.pending;}).length;
-    toast(he?('\u2713 נשלחה התרעה ל'+n+' שומרים'):('\u2713 Alert sent to '+n+' SHOMERs'),'grn');
+    if(n>0) toast(he?('\u2713 נשלחה התרעה ל'+n+(n===1?' שומר':' שומרים')):('\u2713 Alert sent to '+n+(n===1?' SHOMER':' SHOMERs')),'grn');
+    else toast(he?'\u26A0 אין לך עדיין שומרים שיקבלו את ההתרעה - התקשר/י 100. אחר כך הוסף/י שומרים':'\u26A0 You have no SHOMERs to receive this yet - call 100. Then add SHOMERs','amb',function(){ try{ openCircles(); }catch(e){} });
     sosWatchMyResponders();
+    try{ sosWatchStandDown(); }catch(e){}
   } else { /* Queue it, keep retrying, and tell the user to call 100 NOW. */ try{ sosQueuePush(sosChan(FB.uid, sosSalt()), payload); }catch(e){} toast(he?'\u26A0 ההתרעה טרם נשלחה - ננסה שוב אוטומטית. התקשר/י 100 עכשיו':'\u26A0 Alert not sent yet - retrying automatically. Call 100 now','sos'); }
   return ok;
 }
@@ -11517,11 +11535,13 @@ function sosWatchPartners(){
     SOSBUS.watchers[puid]=true;
     try{
       var gsalt=guardianSalt(puid);
-      FB.db.ref('invites/'+sosChan(puid, gsalt)).on('value', function(snap){
+      /* no salt yet (I was the inviter and theirs has not arrived) = nobody writes that key:
+         don't burn a connection on it. sos/<theirUid> carries the alert meanwhile. */
+      if(gsalt) FB.db.ref('invites/'+sosChan(puid, gsalt)).on('value', function(snap){
         var raw=snap&&snap.val?snap.val():null;
         if(raw && raw.fromUid && raw.fromUid!==puid) raw=null;   // only the partner's OWN record counts (a squatted key must not fake or hide an SOS)
         var v=raw?unpackSOS(raw.name):null;
-        if(v&&v.active) onPartnerSOS(puid, v); else onPartnerSOSClear(puid);
+        if(v&&v.active) onPartnerSOS(puid, v, 'bus'); else onPartnerSOSClear(puid, 'bus');
       });
       /* also watch for a rotated salt from this partner, and re-subscribe when it changes */
       FB.db.ref('invites/salt_'+puid.slice(0,16)+'_'+FB.uid.slice(0,16)).on('value', function(snap){
@@ -11534,17 +11554,22 @@ function sosWatchPartners(){
     }catch(e){}
   });
 }
-function onPartnerSOS(puid, v){
-  SOSBUS.lastV=SOSBUS.lastV||{}; SOSBUS.lastV[puid]=v;   /* position updates while the alert is open */
+function onPartnerSOS(puid, v, src){
+  SOSBUS.src=SOSBUS.src||{}; (SOSBUS.src[puid]=SOSBUS.src[puid]||{})[src||'bus']=1;
+  SOSBUS.lastV=SOSBUS.lastV||{};
+  if(src!=='rec'||!SOSBUS.lastV[puid]) SOSBUS.lastV[puid]=v;   /* position updates while the alert is open (the bus has the freshest) */
   if(SOSBUS.mine[puid]) return;      /* already showing */
   SOSBUS.mine[puid]=1;
   var he=currentLang==='he';
-  var nm=v.name||(memberByPair(puid)||{}).name||(he?'שומר':'a SHOMER');
+  /* the name I gave them (my private invite name for them) first - it is who I know */
+  var nm=(memberByPair(puid)||{}).name||v.name||(he?'שומר':'a SHOMER');
   try{ if(navigator.vibrate) navigator.vibrate([200,90,200,90,400]); }catch(e){}
   try{ playAlarm(2500); }catch(e){}
   showIncomingSOS(puid, nm, v);
 }
-function onPartnerSOSClear(puid){
+function onPartnerSOSClear(puid, src){
+  /* the alert stays while ANY channel (bus or sos/<uid> record) still says active */
+  var sm=(SOSBUS.src=SOSBUS.src||{})[puid]; if(sm){ delete sm[src||'bus']; if(Object.keys(sm).length) return; }
   delete SOSBUS.mine[puid];
   var el=document.getElementById('in-sos-'+puid); if(el) el.remove();
 }
@@ -11568,7 +11593,8 @@ function showIncomingSOS(puid, nm, v){
    +'<button class="in-b go">'+(he?'אני בדרך':'I am coming')+'</button>'
    +'<button class="in-b map">'+(he?'נווט/י':'Navigate')+'</button>'
    +'<button class="in-b call">'+(he?'התקשר/י':'Call')+'</button>'
-   +'</div>';
+   +'</div>'
+   +'<button class="in-b sdn" style="margin-top:8px;width:100%;background:transparent;border:1px solid rgba(255,255,255,.35)">'+(he?'🔕 בדקתי שהם בטוחים - השתק אזעקה':'🔕 I checked they are safe - stand down alarm')+'</button>';
   document.body.appendChild(d);
 
   function shrink(){
@@ -11601,6 +11627,7 @@ function showIncomingSOS(puid, nm, v){
     var cl=d.querySelector('.call'); if(cl) cl.onclick=callThem;
     var st=d.querySelector('.stand'); if(st) st.onclick=function(){ sosStandDown(); d.remove(); };
     var sg=d.querySelector('.sig'); if(sg) sg.onclick=openSignalSheet;
+    var sdn=d.querySelector('.sdn'); if(sdn) sdn.onclick=function(){ sosStandDownAlarm(puid, nm); };
   }
   wire();
   d.querySelector('.in-x').onclick=function(){ d.remove(); };   /* ALWAYS dismissible */
@@ -11722,7 +11749,7 @@ function sosWatchStandDown(){
 function showStandDownPrompt(v){
   if(document.getElementById('sd-prompt')) return;
   var he=currentLang==='he', ar=currentLang==='ar', rtl=(he||ar);
-  var name=String((v&&v.name)||'').trim()||(he?'שומר/ת מהימן/ה':ar?'حارس موثوق':'a trusted SHOMER');
+  var name=String(((v&&v.fromUid&&memberByPair(v.fromUid))||{}).name||(v&&v.name)||'').trim()||(he?'שומר/ת מהימן/ה':ar?'حارس موثوق':'a trusted SHOMER');   // v262: the name I gave them
   var d=document.createElement('div'); d.id='sd-prompt';
   d.setAttribute('style','position:fixed;inset:0;z-index:100002;background:rgba(4,10,22,.93);display:flex;align-items:center;justify-content:center;padding:22px;direction:'+(rtl?'rtl':'ltr'));
   d.innerHTML='<div style="max-width:360px;background:linear-gradient(160deg,#0e1d3a,#122850);border:1px solid #E0A82e66;border-radius:18px;padding:22px;text-align:center;color:#f2f6ff;font-family:system-ui,-apple-system,sans-serif">'
@@ -11739,9 +11766,12 @@ function showStandDownPrompt(v){
 }
 function sosStandDownConfirmed(){
   var he=currentLang==='he';
-  try{ if(typeof cancelSOS==='function') cancelSOS(); else { stopSosAlarm(); if(typeof stopMaxAttention==='function')stopMaxAttention(); } }catch(e){ try{stopSosAlarm();}catch(_){} }
+  /* v262: silence the siren/strobe only. cancelSOS() went to the cancel-code screen (useless
+     for a locked-out owner), and ending the SOS itself stays behind the cancel code so a thief
+     answering the phone can't stand the guardians down. */
+  try{ stopSosAlarm(); }catch(e){} try{ if(typeof stopMaxAttention==='function') stopMaxAttention(); }catch(e){} try{ if(typeof stopMorse==='function') stopMorse(); }catch(e){}
   try{ busWrite('sd_'+FB.uid, {fromUid:FB.uid,ts:Date.now(),name:'done'}); }catch(e){}   // ack/clear (fromUid=self → ignored by watcher)
-  try{ toast(he?'האזעקה הושתקה באישורך (שומר מהימן)':'Alarm stood down with your confirmation (trusted SHOMER)','grn'); }catch(e){}
+  try{ toast(he?'האזעקה הושתקה באישורך. ה-SOS עדיין פעיל - בטל/י עם הקוד כשתוכל/י':'Alarm silenced with your confirmation. The SOS is still on - cancel it with your code when you can','grn'); }catch(e){}
 }
 var STATS={data:null, layer:[], on:true};   /* real police data is ALWAYS shown */
 
