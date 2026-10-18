@@ -563,6 +563,8 @@ body.sheet-open .diag-panel{display:none;}
 .pin-key{height:58px;border-radius:var(--r16);background:var(--n3);border:1px solid var(--b2);color:var(--tx0);font-size:23px;font-weight:700;cursor:pointer;transition:background .1s,transform .08s;display:flex;align-items:center;justify-content:center;}
 .pin-key:active{transform:scale(.94);background:var(--n4);}
 .pin-key.empty{background:none;border:none;pointer-events:none;}
+@media (max-height:520px){ .sos-cd{align-items:flex-start;overflow-y:auto;padding:8px 16px;} #sos-pin .rc-ic,#sos-pin .sos-cd-sub{display:none;} #sos-pin .sos-cd-card{padding-top:10px;padding-bottom:10px;} #sos-pin .pin-dots{margin:8px 0 4px;} #sos-pin .pin-pad{gap:6px;margin-top:2px;} #sos-pin .pin-key{height:40px;font-size:19px;} #sos-pin .ob-back{margin-top:6px!important;} body:has(#sos-pin.on) #toasts{display:none;} }
+#app:not(.on) ~ #ver-badge{display:none;}   /* v267: it sat on the sign-up legal links */
 .sos-cd-ttl{font-size:22px;font-weight:900;color:#FF8089;letter-spacing:-.3px;line-height:1.15;}
 .sos-cd-sub{font-size:12.5px;color:var(--tx1);line-height:1.55;margin-top:8px;}
 .sos-cd-ringwrap{position:relative;width:150px;height:150px;margin:18px auto 16px;}
@@ -6368,7 +6370,17 @@ function founderPaint(){
     if(s) s.innerHTML = founderBadgeHTML();
   }catch(e){}
 }
-function op(id){closeAll();const el=document.getElementById(id);if(el)el.classList.add('open');syncSheetState();
+/* v267: the phone's BACK button closes an open sheet instead of leaving the app. Opening a
+   sheet pushes one history entry; back pops it and closes the sheet; closing with the X pops
+   our entry quietly so the history stays clean. */
+var _shPopSkip=false;
+function shHistPush(){ try{ if(!(history.state&&history.state.shSheet)) history.pushState({shSheet:1},''); }catch(e){} }
+function shHistDrop(){ try{ if(history.state&&history.state.shSheet&&!document.querySelector('.sheet.open')){ _shPopSkip=true; history.back(); } }catch(e){} }
+try{ window.addEventListener('popstate',function(){
+  if(_shPopSkip){ _shPopSkip=false; return; }
+  try{ var o=document.querySelector('.sheet.open'); if(o){ SCR_STACK.length=0; cl(o.id); } }catch(e){}
+}); }catch(e){}
+function op(id){closeAll();const el=document.getElementById(id);if(el)el.classList.add('open');syncSheetState(); if(el) shHistPush();
  if(id==='sh-set'){try{renderSetContacts();}catch(e){}}
  if(id==='sh-circles'){ try{syncPairsToCircles();}catch(e){} try{renderCircles();}catch(e){} try{gdRenderList();}catch(e){} }   // was never re-rendered → circles list + toggles appeared empty
  if(id==='sh-prof'){ try{syncPairsToCircles();}catch(e){} try{renderProfile();}catch(e){} try{renderProfile2();}catch(e){} try{renderCircles();}catch(e){} }
@@ -6401,6 +6413,7 @@ function cl(id){
  syncSheetState();
  setTimeout(()=>{
  if(!document.querySelector('.sheet.open')){
+ shHistDrop();
  document.querySelectorAll('.nb').forEach(b=>b.classList.remove('on'));
  const nm=document.getElementById('nb-map');if(nm)nm.classList.add('on');
  }
@@ -9434,7 +9447,7 @@ try{ hydrateIcons(document); }catch(e){}
 /* Loaded-build version - shown in the diagnostic panel so a phone can prove
    whether it's on the latest build or a STALE cached one. Keep in lock-step
    with sw.js SW_VERSION on every deploy. */
-var APP_VER='v266';
+var APP_VER='v267';
 var FB={ready:false,uid:null,db:null,_presTimer:null,connected:false,listening:false,pushState:'default',near:0,swVer:'?',
   authState:'connecting',sdkLoaded:false,persist:'',permErr:null,err:null,wsProbe:'',csp:''};
 /* Always log connection diagnostics to the console so the real failure can be SEEN in Chrome. */
@@ -14299,9 +14312,34 @@ function drillQuestion(dt){
   return {i:qi, topic:q[0], q:he?q[1]:q[3], opts:opts, why:he?q[5]:q[6], right:he?q[2][0]:q[4][0]};
 }
 function drillIsShabbat(dt){ return (dt||new Date()).getDay()===6; }
-/* v264: no daily card popping up on Shabbat. No sunset table here, so approximate:
-   Friday 16:00 → Saturday 19:30, local time. */
-function drillShabbatNow(dt){ var t=dt||new Date(), d=t.getDay(), m=t.getHours()*60+t.getMinutes(); return (d===5&&m>=16*60)||(d===6&&m<19*60+30); }
+/* v267: Shabbat window from a sunset approximation (NOAA / standard sunrise equation) for
+   Jerusalem (31.778N 35.235E): candle lighting = Friday sunset - 18 min, end = Saturday
+   sunset + 40 min. Absolute times, so the phone's own time zone does not matter. */
+function sunsetUtcMs(y,m,d,lat,lng){
+  var rad=Math.PI/180, J=Date.UTC(y,m-1,d,12)/86400000+2440587.5;
+  var n=Math.round(J-2451545.0+0.0008), Js=n-lng/360;
+  var M=(357.5291+0.98560028*Js)%360, Mr=M*rad;
+  var C=1.9148*Math.sin(Mr)+0.02*Math.sin(2*Mr)+0.0003*Math.sin(3*Mr);
+  var L=(M+C+180+102.9372)%360, Lr=L*rad;
+  var Jt=2451545.0+Js+0.0053*Math.sin(Mr)-0.0069*Math.sin(2*Lr);
+  var dec=Math.asin(Math.sin(Lr)*Math.sin(23.4397*rad));
+  var cw=(Math.sin(-0.833*rad)-Math.sin(lat*rad)*Math.sin(dec))/(Math.cos(lat*rad)*Math.cos(dec));
+  var w=Math.acos(Math.max(-1,Math.min(1,cw)))/rad;
+  return (Jt+w/360-2440587.5)*86400000;
+}
+function drillShabbatNow(dt){
+  var t=(dt||new Date()).getTime(), LAT=31.778, LNG=35.235;
+  for(var back=0; back<2; back++){
+    /* the Israel calendar date `back` days ago (UTC+2 is close enough to pick the day) */
+    var x=new Date(t+2*3600000-back*86400000), y=x.getUTCFullYear(), mo=x.getUTCMonth()+1, da=x.getUTCDate();
+    if(x.getUTCDay()!==5) continue;
+    var start=sunsetUtcMs(y,mo,da,LAT,LNG)-18*60000;
+    var sat=new Date(Date.UTC(y,mo-1,da+1));
+    var end=sunsetUtcMs(sat.getUTCFullYear(),sat.getUTCMonth()+1,sat.getUTCDate(),LAT,LNG)+40*60000;
+    if(t>=start && t<end) return true;
+  }
+  return false;
+}
 function drillIsoWeek(dt){ var d=new Date(Date.UTC(dt.getFullYear(),dt.getMonth(),dt.getDate())); var day=d.getUTCDay()||7; d.setUTCDate(d.getUTCDate()+4-day); var y=new Date(Date.UTC(d.getUTCFullYear(),0,1)); return d.getUTCFullYear()+'-'+Math.ceil((((d-y)/86400000)+1)/7); }
 /* Streak walk (pure - recomputed from history, nothing to drift out of sync):
    done day +1 · Saturday (Shabbat shield) never breaks it · a missed day uses that week's
@@ -14403,7 +14441,7 @@ function drillOpenCard(){
   var dots=''; if(tester){ for(var i=0;i<TP_DAYS;i++){ dots+='<span style="display:inline-block;width:7px;height:7px;border-radius:50%;margin:0 2px;background:'+(i<idx?'#F5C840':(i===idx?'#fff':'rgba(255,255,255,.18)'))+'"></span>'; } }
   var hdr=tester?(he?('יום '+(idx+1)+' מתוך '+TP_DAYS):('DAY '+(idx+1)+' OF '+TP_DAYS)):(drT('המשמרת היומית','Daily drill','التمرين اليومي')+(st.n?(' · '+drT('רצף ','streak ','سلسلة ')+st.n):''));
   var qd=(currentLang==='he')?'rtl':'ltr';   // Arabic shows the English question text (Hebrew/English bank) - keep it LTR so punctuation reads right
-  var html='<div class="dr-hd">'+ESC(hdr)+'</div>'+(tester?'<div style="direction:ltr;margin-top:2px">'+dots+'</div>':'')
+  var html='<div class="dr-hd" dir="'+(he?'rtl':'ltr')+'">'+ESC(hdr)+'</div>'+(tester?'<div style="direction:ltr;margin-top:2px">'+dots+'</div>':'')
     +'<div class="dr-q" dir="'+qd+'">'+ESC(q.q)+'</div><div class="dr-opts" dir="'+qd+'">'
     +q.opts.map(function(o,i){ return '<button class="dr-opt" type="button" data-i="'+i+'">'+ESC(o.t)+'</button>'; }).join('')
     +'</div><div class="dr-res" dir="'+qd+'" style="display:none"></div>';
@@ -14411,7 +14449,7 @@ function drillOpenCard(){
   if(tester){
     var mtxt=(he?m.he:m.en);
     if(idx===TP_DAYS-1) mtxt+=(he?' מחר מתחילה המשמרת שלך - שאלה אחת ביום, באותה שעה.':' Tomorrow your shift starts - one question a day, same time.');
-    html+='<div class="dr-mission"><span class="nudge-tx">'+ESC(mtxt)+'</span><button class="nudge-cta dr-mcta" type="button">'+ESC(he?m.cta_he:m.cta_en)+'</button></div>';
+    html+='<div class="dr-mission" dir="'+(he?'rtl':'ltr')+'"><span class="nudge-tx">'+ESC(mtxt)+'</span><button class="nudge-cta dr-mcta" type="button">'+ESC(he?m.cta_he:m.cta_en)+'</button></div>';
   }
   html+='<button class="nudge-x" aria-label="dismiss">✕</button>';
   bar.innerHTML=html;
