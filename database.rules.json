@@ -21,14 +21,26 @@
     },
     "invites": {
       "$token": {
-        ".read": "auth != null && (!$token.beginsWith('inbox_') || root.child('registry').child($token.replace('inbox_', '')).child('uid').val() === auth.uid || data.child('fromUid').val() === auth.uid)",
-        ".write": "auth != null && (($token.beginsWith('rp_') && $token === 'rp_' + auth.uid) || ($token.beginsWith('rs_') && $token === 'rs_' + auth.uid) || ($token.beginsWith('sos_') && (!data.exists() || data.child('fromUid').val() === auth.uid)) || ($token.beginsWith('salt_') && (!data.exists() || data.child('fromUid').val() === auth.uid)) || ($token.beginsWith('sd_') && ($token === 'sd_' + auth.uid || root.child('pairs').child($token.replace('sd_', '')).child(auth.uid).exists())) || ($token.beginsWith('inbox_') && (newData.child('fromUid').val() === auth.uid || (data.exists() && newData.child('fromUid').val() === data.child('fromUid').val() && newData.child('token').val() === data.child('token').val() && newData.child('ts').val() === data.child('ts').val()))) || (!($token.beginsWith('rp_') || $token.beginsWith('rs_') || $token.beginsWith('sos_') || $token.beginsWith('salt_') || $token.beginsWith('sd_') || $token.beginsWith('inbox_')) && (!data.exists() || data.child('fromUid').val() === auth.uid || (newData.child('fromUid').val() === data.child('fromUid').val() && newData.child('name').val() === data.child('name').val() && newData.child('ts').val() === data.child('ts').val() && (!data.child('acceptedBy').exists() || data.child('acceptedBy').val() === auth.uid) && (!newData.child('acceptedBy').exists() || newData.child('acceptedBy').val() === auth.uid) && (!newData.child('declinedBy').exists() || newData.child('declinedBy').val() === auth.uid)))))",
+        ".read": "auth != null && (($token.beginsWith('sos_') || $token.beginsWith('salt_') || $token.beginsWith('rp_') || $token.beginsWith('rs_')) ? (!data.exists() || data.child('fromUid').val() === auth.uid || (data.child('fromUid').isString() && root.child('pairs').child(data.child('fromUid').val()).child(auth.uid).exists())) : (!$token.beginsWith('inbox_') || root.child('registry').child($token.replace('inbox_', '')).child('uid').val() === auth.uid || data.child('fromUid').val() === auth.uid))",
+        ".write": "auth != null && (($token.beginsWith('rp_') && $token === 'rp_' + auth.uid) || ($token.beginsWith('rs_') && $token === 'rs_' + auth.uid) || ($token.beginsWith('sos_') && (!data.exists() || data.child('fromUid').val() === auth.uid)) || ($token.beginsWith('salt_') && (!data.exists() || data.child('fromUid').val() === auth.uid)) || ($token.beginsWith('sd_') && ($token === 'sd_' + auth.uid || root.child('pairs').child($token.replace('sd_', '')).child(auth.uid).exists())) || ($token.beginsWith('inbox_') && (newData.child('fromUid').val() === auth.uid || (data.exists() && newData.child('fromUid').val() === data.child('fromUid').val() && newData.child('token').val() === data.child('token').val() && newData.child('ts').val() === data.child('ts').val()))) || (!($token.beginsWith('rp_') || $token.beginsWith('rs_') || $token.beginsWith('sos_') || $token.beginsWith('salt_') || $token.beginsWith('sd_') || $token.beginsWith('inbox_')) && (!data.exists() || data.child('fromUid').val() === auth.uid || (newData.child('fromUid').val() === data.child('fromUid').val() && newData.child('name').val() === data.child('name').val() && newData.child('ts').val() === data.child('ts').val() && (!data.child('acceptedBy').exists() || data.child('acceptedBy').val() === auth.uid) && (!data.child('acceptedCode').exists() || newData.child('acceptedCode').val() === data.child('acceptedCode').val()) && (!newData.child('acceptedBy').exists() || newData.child('acceptedBy').val() === auth.uid) && (!newData.child('declinedBy').exists() || newData.child('declinedBy').val() === auth.uid)))))",
         ".validate": "newData.hasChildren(['fromUid','ts']) && (($token.beginsWith('rp_') || $token.beginsWith('rs_') || $token.beginsWith('sos_') || $token.beginsWith('salt_') || $token.beginsWith('sd_')) ? newData.child('fromUid').val() === auth.uid : (data.exists() || newData.child('fromUid').val() === auth.uid))",
         "acceptedPh": {
           ".validate": "newData.isString() && root.child('registry').child(newData.val()).child('uid').val() === auth.uid"
         },
         "acceptedBy": {
           ".validate": "newData.val() === auth.uid"
+        },
+        "acceptedCode": {
+          ".validate": "newData.isString() && newData.val().length === 64"
+        },
+        "token": {
+          ".validate": "!$token.beginsWith('inbox_')"
+        },
+        "code": {
+          ".validate": "!$token.beginsWith('inbox_')"
+        },
+        "fromPhone": {
+          ".validate": "!$token.beginsWith('inbox_')"
         }
       }
     },
@@ -151,8 +163,8 @@
     "dashfeed": {
       ".read": true,
       "$id": {
-        ".write": "auth != null && (!data.exists() || data.child('by').val() === auth.uid)",
-        ".validate": "newData.hasChildren(['type','lat','lng','ts','by']) && newData.child('by').val() === auth.uid && ($id === 'hb_' + auth.uid ? newData.child('type').val() === 'presence' : (newData.child('type').val() !== 'presence' && (root.child('sos').child($id).child('uid').val() === auth.uid || root.child('palerts').child($id).child('by').val() === auth.uid || root.child('events').child($id).child('by').val() === auth.uid)))",
+        ".write": "auth != null && (($id.beginsWith('hb_') || $id.beginsWith('sf_')) ? (root.child('dashown').child($id).val() === auth.uid || ($id === 'hb_' + auth.uid && !newData.exists())) : (!data.exists() || data.child('by').val() === auth.uid))",
+        ".validate": "newData.hasChildren(['type','lat','lng','ts']) && ($id.beginsWith('hb_') ? newData.child('type').val() === 'presence' : ($id.beginsWith('sf_') ? (newData.child('type').val() !== 'presence' && root.child('sos').child(auth.uid).child('uid').val() === auth.uid) : (newData.hasChild('by') && newData.child('type').val() !== 'presence' && (root.child('sos').child($id).child('uid').val() === auth.uid || root.child('palerts').child($id).child('by').val() === auth.uid || root.child('events').child($id).child('by').val() === auth.uid))))",
         "type": {
           ".validate": "newData.isString()"
         },
@@ -169,7 +181,7 @@
           ".validate": "newData.isString()"
         },
         "by": {
-          ".validate": "newData.isString()"
+          ".validate": "newData.isString() && newData.val() === auth.uid && !$id.beginsWith('hb_') && !$id.beginsWith('sf_')"
         },
         "$other": {
           ".validate": false
@@ -195,6 +207,13 @@
           ".write": "auth != null && !data.exists()",
           ".validate": "newData.hasChildren(['ts','by','reportId']) && newData.child('by').val() === auth.uid && newData.child('reportId').isString() && newData.child('reportId').val().length < 200"
         }
+      }
+    },
+    "dashown": {
+      "$id": {
+        ".read": false,
+        ".write": "auth != null && ($id.beginsWith('hb_') || $id.beginsWith('sf_')) && (!data.exists() || data.val() === auth.uid) && (!newData.exists() || newData.val() === auth.uid)",
+        ".validate": "newData.isString()"
       }
     }
   }
