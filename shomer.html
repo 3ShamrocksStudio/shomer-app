@@ -17,6 +17,14 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
+<!-- v264 connect fast on slow networks: the sign-in SDK downloads in parallel with the page
+     (it used to start only after the page, map tiles and images), and the auth + database
+     hosts are dialled up front. Same scripts fbInit() loads - it then finds them cached. -->
+<link rel="preload" as="script" href="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js" fetchpriority="high">
+<link rel="preload" as="script" href="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js" fetchpriority="high">
+<link rel="preconnect" href="https://identitytoolkit.googleapis.com" crossorigin>
+<link rel="preconnect" href="https://securetoken.googleapis.com" crossorigin>
+<link rel="preconnect" href="https://shomergency-default-rtdb.firebaseio.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Heebo:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 <!-- Leaflet - real interactive map (loaded by the browser at runtime, CSP-pinned to cdnjs) -->
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css" crossorigin="anonymous" referrerpolicy="no-referrer">
@@ -9416,7 +9424,7 @@ try{ hydrateIcons(document); }catch(e){}
 /* Loaded-build version - shown in the diagnostic panel so a phone can prove
    whether it's on the latest build or a STALE cached one. Keep in lock-step
    with sw.js SW_VERSION on every deploy. */
-var APP_VER='v263';
+var APP_VER='v264';
 var FB={ready:false,uid:null,db:null,_presTimer:null,connected:false,listening:false,pushState:'default',near:0,swVer:'?',
   authState:'connecting',sdkLoaded:false,persist:'',permErr:null,err:null,wsProbe:'',csp:''};
 /* Always log connection diagnostics to the console so the real failure can be SEEN in Chrome. */
@@ -14133,6 +14141,9 @@ function drillQuestion(dt){
   return {i:qi, topic:q[0], q:he?q[1]:q[3], opts:opts, why:he?q[5]:q[6], right:he?q[2][0]:q[4][0]};
 }
 function drillIsShabbat(dt){ return (dt||new Date()).getDay()===6; }
+/* v264: no daily card popping up on Shabbat. No sunset table here, so approximate:
+   Friday 16:00 → Saturday 19:30, local time. */
+function drillShabbatNow(dt){ var t=dt||new Date(), d=t.getDay(), m=t.getHours()*60+t.getMinutes(); return (d===5&&m>=16*60)||(d===6&&m<19*60+30); }
 function drillIsoWeek(dt){ var d=new Date(Date.UTC(dt.getFullYear(),dt.getMonth(),dt.getDate())); var day=d.getUTCDay()||7; d.setUTCDate(d.getUTCDate()+4-day); var y=new Date(Date.UTC(d.getUTCFullYear(),0,1)); return d.getUTCFullYear()+'-'+Math.ceil((((d-y)/86400000)+1)/7); }
 /* Streak walk (pure - recomputed from history, nothing to drift out of sync):
    done day +1 · Saturday (Shabbat shield) never breaks it · a missed day uses that week's
@@ -14218,6 +14229,7 @@ function tpMaybeShow(){
   if(drillSuppressed()) return;
   var day=drillKey(), d=drillState();
   try{ tpScheduleReminders(); }catch(e){}
+  if(drillShabbatNow()) return;                    // Shabbat: no pop-up (not marked shown - it can come after havdalah)
   if(d.cardShown===day || drillDoneToday()) return;
   if(document.getElementById('tp-bar')) return;
   if(popupBusy()) { if((tpMaybeShow._tries=(tpMaybeShow._tries||0)+1)<30) setTimeout(tpMaybeShow, 20000); return; }

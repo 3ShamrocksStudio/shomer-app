@@ -1102,7 +1102,10 @@ function renderLive(c,list,opts){
    mk.on('click',(function(eid){return function(){openResponse(eid);};})(id)); if(mk.setZIndexOffset){} try{if(mk._path)mk._path.style.cursor='pointer';}catch(_e){} mk.addTo(liveLayer); liveLayer._byId[id]=mk;
   }
   if(id===_topSosId){ return ''; }
-  if(m.sos&&!opts.demo&&!_seenSos[id]){ _seenSos[id]=1; if(!opts.initial) newSos={lat:e.lat,lng:e.lng,id:id}; }
+  /* SOS rows are keyed by the person's uid (one row each), so a REPEAT SOS reuses the id:
+     the event key is id + the row's start ts (set once per SOS by the app). */
+  var _sk=id+'@'+(e.ts||0);
+  if(m.sos&&!opts.demo&&!_seenSos[_sk]){ _seenSos[_sk]=1; if(!opts.initial) newSos={lat:e.lat,lng:e.lng,id:id}; }
   var mins=Math.round((now-(e.ts||now))/60000); var ago=mins<1?'\u05e2\u05db\u05e9\u05d9\u05d5':mins<60?('\u05dc\u05e4\u05e0\u05d9 '+mins+' \u05d3\u05e7\u05f3'):('\u05dc\u05e4\u05e0\u05d9 '+Math.round(mins/60)+' \u05e9\u05e2\u05f3');
   return '<div class="item'+(m.sos?' sos':'')+'" data-id="'+id+'" onclick="openResponse(\''+id+'\')"><span class="sev" style="background:'+m.c+'"></span><div class="dot" style="color:'+m.c+'">'+m.i+'</div><div style="flex:1"><div class="nm">'+ESC(m.t)+(m.sos?'<span class="live-badge">\u25cf LIVE</span>':'')+'</div><div class="mt">'+ago+' \u00b7 '+(+e.lat).toFixed(2)+','+(+e.lng).toFixed(2)+' \u00b7 \u05d0\u05d6\u05d5\u05e8</div></div><span class="live-go">\u2922</span></div>';
  }).join('');
@@ -1129,7 +1132,7 @@ function renderLive(c,list,opts){
        try{ stripGeocode(+e0.lat,+e0.lng); }catch(e){}
        strip.onclick=function(){ try{ openResponse(id0); }catch(e){} };
        _sosFocusLock=true;
-       if(id0!==_alarmId){ _alarmId=id0; _alarmSilenced=false; strip.style.animation=''; strip.style.background=''; strip.style.boxShadow=''; strip.classList.remove('attended'); startAlarm(); try{ flyToLive(+e0.lat,+e0.lng,id0); }catch(_f){} }
+       if((id0+'@'+(e0.ts||0))!==_alarmId){ _alarmId=id0+'@'+(e0.ts||0); _alarmSilenced=false; strip.style.animation=''; strip.style.background=''; strip.style.boxShadow=''; strip.classList.remove('attended'); startAlarm(); try{ flyToLive(+e0.lat,+e0.lng,id0); }catch(_f){} }
        else if(!_alarmSilenced){ startAlarm(); }
      } else { strip.style.display='none'; strip.innerHTML=''; stopAlarm(); _alarmId=null; _sosFocusLock=false; }
    }

@@ -4,7 +4,7 @@
                   the mutual check-in miss + geofence arrival), then delete the queue item.
    Deploy:  firebase deploy --only functions
    Cost note: FCM is free; these only run on real events (SOS / missed check-in / arrival). */
-const {onValueCreated} = require('firebase-functions/v2/database');
+const {onValueCreated, onValueWritten} = require('firebase-functions/v2/database');
 const {setGlobalOptions} = require('firebase-functions/v2');
 const admin = require('firebase-admin');
 
@@ -20,10 +20,16 @@ function distM(aLat, aLng, bLat, bLng) {
   return 2 * R * Math.asin(Math.min(1, Math.sqrt(s)));
 }
 
-/* SOS fan-out → nearby guardians (≤5 km), excluding the sender. */
-exports.sosFanout = onValueCreated('/sos/{id}', async (event) => {
-  const sos = event.data.val();
+/* SOS fan-out → nearby guardians (≤5 km), excluding the sender.
+   sos/<uid> is ONE record per person (v261+), overwritten by every new SOS, so this fires on
+   any write and pushes only when a NEW SOS event starts (new id/ts, or re-opened after resolve).
+   Type / position / resolve updates on the same event do not re-push. */
+exports.sosFanout = onValueWritten('/sos/{id}', async (event) => {
+  const sos = event.data.after.val();
+  const prev = event.data.before.val();
   if (!sos || sos.resolved || sos.lat == null) return;
+  const isNew = !prev || prev.resolved || (sos.id || sos.ts) !== (prev.id || prev.ts);
+  if (!isNew) return;
   // Targets = every PAIRED guardian (always, any distance) + every NEARBY SHOMER (≤5 km).
   const [toksSnap, pairsSnap] = await Promise.all([
     db.ref('tokens').get(),
@@ -46,7 +52,7 @@ exports.sosFanout = onValueCreated('/sos/{id}', async (event) => {
   await admin.messaging().sendEachForMulticast({
     tokens: tokens.slice(0, 500),
     notification: {title: '🚨 SH✡MER — SOS nearby', body: (sos.name || 'Someone') + ' needs help' + type},
-    data: {tag: 'sos-' + event.params.id, url: LINK},
+    data: {tag: 'sos-' + (sos.id || event.params.id), url: LINK},
     webpush: {fcmOptions: {link: LINK}, headers: {Urgency: 'high', TTL: '600'}},
     android: {priority: 'high'}, apns: {headers: {'apns-priority': '10'}}
   });
