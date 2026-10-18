@@ -7133,6 +7133,7 @@ function agoTxt(ts,he){
 }
 function statusOf(m,he){
  if(m.sos)return{cls:'sos',txt:he?' SOS פעיל':' SOS active'};
+ if(m.awaitConfirm) return {cls:'wait', txt: he?('ממתין לאישור של '+(m.name||'השולח/ת')):currentLang==='ar'?('بانتظار تأكيد '+(m.name||'المرسل')):('Waiting for '+(m.name||'the sender')+' to confirm')};
  /* An invite that has not been delivered is NOT "pending approval" - it is not sent. Say so. */
  if(m.pending) return {cls:'wait', txt: he?'לא נשלח עדיין - הקש/י „שלח/י בקשה”':'Not sent yet - tap "Send request"'};
  /* Honest state: if they are not live, say when they were last seen - not "waiting". */
@@ -7475,7 +7476,7 @@ async function shareInvite(){
        never match. Same packing the phone-invite path has always used. */
     await fbRestWrite('PUT','invites/'+tok,{fromUid:FB.uid,ts:Date.now(),name:packInvite(myName,myPhone,linkCode)});
     var g=gdState();
-    g.pairs.push({id:genId('g'),token:tok,name:'',rel:'',shareToThem:true,seeThem:true,addedTs:Date.now(),initiator:true,pending:true,partnerUid:null,linked:false,cid:activeCircleId,color:'#C9A84C',lat:null,lng:null,ts:0,live:false,via:'link'});
+    g.pairs.push({id:genId('g'),token:tok,code:linkCode,name:'',rel:'',shareToThem:true,seeThem:true,addedTs:Date.now(),initiator:true,pending:true,partnerUid:null,linked:false,cid:activeCircleId,color:'#C9A84C',lat:null,lng:null,ts:0,live:false,via:'link'});
     saveStore();
     fbWatchApproval(tok, null);
   }catch(e){
@@ -8523,7 +8524,7 @@ function gdCheckInviteParam(){
    with - it cannot be casually faked). The 4-digit code is the second factor: the inviter
    sees the same code on their screen and can read it aloud, exactly like a safety number. */
 function gdFillIdentity(inv){
-  var he=currentLang==='he';
+  var he=currentLang==='he', ar0=currentLang==='ar';
   var u=unpackInvite(inv&&inv.name);
   try{ if(u.salt && inv && inv.fromUid) setGuardianSalt(inv.fromUid, u.salt); }catch(e){}
   var nm=u.name, ph=u.phone, code=u.code;
@@ -8556,6 +8557,12 @@ function gdFillIdentity(inv){
         st.textContent=he?'\u2713 מאומת - זה באמת הם':'\u2713 Verified - it really is them';
         st.className='gd-code-st ok';
         gdFillIdentity._ok=true; gdFillIdentity._code=v; gdSetApproveEnabled(true);
+      } else if(!code && inv){
+        /* v265: the record no longer carries the code (it was readable by anyone with the link).
+           The sender's phone checks it when I approve. */
+        st.textContent=he?'הקוד ייבדק מול השולח/ת כשתאשר/י':ar0?'سيتحقق المرسل من الرمز عند الموافقة':'The sender checks this code when you approve';
+        st.className='gd-code-st';
+        gdFillIdentity._ok=true; gdFillIdentity._code=v; gdSetApproveEnabled(true);
       } else {
         gdFillIdentity._ok=false; gdSetApproveEnabled(false);
         st.textContent=he?'\u2717 הקוד לא תואם - אל תאשר/י':'\u2717 Code does not match - do NOT approve';
@@ -8565,7 +8572,7 @@ function gdFillIdentity(inv){
     /* Auto-fill from the invite link, like the other identification flows. Only once
        the real code has arrived from the invite record, so a bad link still fails. */
     var auto=gdFillIdentity._autoCode;
-    if(auto && auto.length===4 && code){
+    if(auto && auto.length===4 && (code || inv)){
       inp.value=auto;
       try{ inp.oninput(); }catch(e){}
       gdFillIdentity._autoCode='';
@@ -8667,12 +8674,12 @@ function gdConnect(tok,nm,fromLink){
  simLat:TLV[0]+(Math.random()-.5)*.02,simLng:TLV[1]+(Math.random()-.5)*.02}; g.pairs.push(p); }
  else { p.pending=false; if(nm&&!p.name)p.name=nm; }
  // real backend link: record the mutual pairing in RTDB (binds the two accounts)
- try{ fbAcceptInvite(tok,(invName()||gdState().myName||(SS.user&&SS.user.name)||'')).then(function(fromUid){ if(fromUid){ p.partnerUid=fromUid; p.linked=true; p.acceptedTs=Date.now(); try{ gdWatchMyAcceptance(p); }catch(e){} if(!p.name&&fbAcceptInvite._name)p.name=fbAcceptInvite._name; var mm=ensureMemberForPair(p); if(mm){ mm.partnerUid=fromUid; if(!mm.name)mm.name=p.name; } saveStore(); gdRenderList(); try{ renderCircles(); syncPairsToCircles(); }catch(e){} } }); }catch(e){}
+ try{ fbAcceptInvite(tok,(invName()||gdState().myName||(SS.user&&SS.user.name)||'')).then(function(fromUid){ if(fromUid){ p.partnerUid=fromUid; p.linked=true; p.acceptedTs=Date.now(); p.awaitConfirm=true; try{ gdWatchMyAcceptance(p); }catch(e){} if(!p.name&&fbAcceptInvite._name)p.name=fbAcceptInvite._name; var mm=ensureMemberForPair(p); if(mm){ mm.partnerUid=fromUid; if(!mm.name)mm.name=p.name; mm.awaitConfirm=true; } saveStore(); gdRenderList(); try{ renderCircles(); syncPairsToCircles(); }catch(e){} try{ gdWatchConfirm(p); }catch(e){} } }); }catch(e){}
  saveStore();
  gdSend({type:'hello'}); gdBroadcast(); gdRenderMarkers(); gdRenderList();
  if(document.getElementById('sh-circles')&&document.getElementById('sh-circles').classList.contains('open')){} else openCircles();
- toast(currentLang==='he'?'✓ חוברת ל'+(p.name||'שומר/ת'):'✓ Connected to '+(p.name||'SHOMER'),'grn');
- try{ pushNotify(' SHOMER',(currentLang==='he'?'חוברת לשומר/ת':'SHOMER connected'),'gd-pair'); }catch(e){}
+ /* v265: not "connected" yet - the sender still has to confirm it is me */
+ toast(currentLang==='he'?('✓ אישרת. ממתין לאישור של '+(p.name||'השולח/ת')):currentLang==='ar'?('✓ تمت الموافقة. بانتظار تأكيد '+(p.name||'المرسل')):('✓ Approved. Waiting for '+(p.name||'the sender')+' to confirm'),'grn');
 }
 /* ══ ADD MY SHOMER BY PHONE ══
    Only a real, registered SHOMER user can be added (verified via the hashed-phone
@@ -9424,7 +9431,7 @@ try{ hydrateIcons(document); }catch(e){}
 /* Loaded-build version - shown in the diagnostic panel so a phone can prove
    whether it's on the latest build or a STALE cached one. Keep in lock-step
    with sw.js SW_VERSION on every deploy. */
-var APP_VER='v264';
+var APP_VER='v265';
 var FB={ready:false,uid:null,db:null,_presTimer:null,connected:false,listening:false,pushState:'default',near:0,swVer:'?',
   authState:'connecting',sdkLoaded:false,persist:'',permErr:null,err:null,wsProbe:'',csp:''};
 /* Always log connection diagnostics to the console so the real failure can be SEEN in Chrome. */
@@ -10081,6 +10088,7 @@ function fbOnAuthed(uid){
   try{ syncPairsToCircles(); }catch(e){}
   try{ fbListenAllPeerLocs(); }catch(e){}
   try{ gdState().pairs.forEach(function(p){ if(p&&!p.initiator&&p.acceptedTs) gdWatchMyAcceptance(p); }); }catch(e){}
+  try{ gdState().pairs.forEach(function(p){ if(p&&p.awaitConfirm) gdWatchConfirm(p); }); }catch(e){}
   try{ gdState().pairs.forEach(function(p){ if(p&&p.pending&&!p.linked&&p.token) fbWatchApproval(p.token,p.partnerUid||null); });   /* watch EVERY pending invite - a missing partnerUid must not silently kill the watcher */ }catch(e){}     // subscribe to every paired partner's live location
   try{ fbStartLocPublish(); }catch(e){}       // start writing my own live location
   try{ fbRegisterMe(); }catch(e){}
@@ -10206,7 +10214,38 @@ function fbPublishPresence(){
      anonymous uid, no name/phone. Written to the public /dashfeed path (same place as events),
      so the dashboard can count online users network-wide and per-territory WITHOUT ever reading
      the locked /presence tree. One row per user, overwritten each beat. */
-  try{ if(!hide){ var _hb={type:'presence',lat:lat,lng:lng,ts:Date.now(),status:'online',by:FB.uid}; try{ if(isFounder())_hb.founder=true; }catch(_f){} fbRestWrite('PUT','dashfeed/hb_'+FB.uid,_hb); } }catch(e){}
+  try{ fbDashBeat(hide, lat, lng); }catch(e){}
+}
+/* v265: the PUBLIC dashboard heartbeat no longer names me. Its key is a random per-session id
+   (hb_<random>), owned through the private dashown/<id> record, and the row carries no uid.
+   Ghost mode / no location = my row is DELETED, not just left to go stale. The previous
+   session's row and my old uid-keyed row are removed on start. Under the older rules (no
+   dashown node) it falls back to the old hb_<uid> row so the dashboard keeps counting me. */
+function fbDashKey(prefix){ var a=new Uint8Array(8); try{ crypto.getRandomValues(a); }catch(e){ for(var i=0;i<8;i++) a[i]=Math.floor(Math.random()*256); } return prefix+Array.prototype.map.call(a,function(b){return ('0'+b.toString(16)).slice(-2);}).join(''); }
+function fbDashInit(){
+  var st=FB._hb||(FB._hb={});
+  if(st.ready) return st.ready;
+  st.id=fbDashKey('hb_');
+  var prev=null; try{ prev=localStorage.getItem('shomerHbPrev'); }catch(e){}
+  st.ready=fbRestWrite('PUT','dashown/'+st.id, FB.uid).then(function(){
+    st.mode='new';
+    try{ localStorage.setItem('shomerHbPrev', st.id); }catch(e){}
+    if(prev && prev!==st.id){ fbRestWrite('DELETE','dashfeed/'+prev).catch(function(){}).then(function(){ fbRestWrite('DELETE','dashown/'+prev).catch(function(){}); }); }
+    fbRestWrite('DELETE','dashfeed/hb_'+FB.uid).catch(function(){});   /* my legacy row named me - drop it */
+  }, function(){ st.mode='legacy'; });
+  return st.ready;
+}
+function fbDashBeat(hide, lat, lng){
+  if(!FB._authReady||!FB.uid) return;
+  fbDashInit().then(function(){
+    var st=FB._hb, key=(st.mode==='new')?st.id:('hb_'+FB.uid);
+    if(hide){ if(!st.gone){ st.gone=true; fbRestWrite('DELETE','dashfeed/'+key).catch(function(){}); } return; }
+    st.gone=false;
+    var _hb={type:'presence',lat:lat,lng:lng,ts:Date.now(),status:'online'};
+    if(st.mode!=='new') _hb.by=FB.uid;
+    try{ if(isFounder())_hb.founder=true; }catch(_f){}
+    fbRestWrite('PUT','dashfeed/'+key,_hb).catch(function(){});
+  });
 }
 function updateGuardiansNearby(n){
   var el=document.getElementById('gnear-n'); if(el)el.textContent=n;
@@ -10229,14 +10268,26 @@ function fbPublishSOS(){ if(!FB.ready||!curSosId)return;
      with (rules), and no name in it: my SHOMERs already know my private invite name. */
   var _rec={uid:FB.uid,id:curSosId,lat:userLat,lng:userLng,type:curSosType||'unknown',typeState:'self',ts:Date.now(),resolved:false};
   if(window._sosRepeated) _rec.repeated=true;
-  try{ FB.db.ref('sos/'+FB.uid).set(_rec).then(function(){ fbTriggerPush(curSosId); try{dashFeedPush(FB.uid,curSosType||'sos',(userLat!=null?userLat:null),(userLng!=null?userLng:null));}catch(e){} },function(e){ FB.permErr=(e&&e.code)||'sos-denied'; fbLog('SOS write denied:', FB.permErr); renderFbStatus(); }); }catch(e){} }
+  try{ FB.db.ref('sos/'+FB.uid).set(_rec).then(function(){ fbTriggerPush(curSosId); try{ fbDashSos(curSosType||'sos',(userLat!=null?userLat:null),(userLng!=null?userLng:null)); }catch(e){} },function(e){ FB.permErr=(e&&e.code)||'sos-denied'; fbLog('SOS write denied:', FB.permErr); renderFbStatus(); }); }catch(e){} }
 /* Fire the FREE background-push fan-out (Cloudflare Worker) for this SOS so paired /
    nearby SHOMERs get a notification even when their app is closed or the phone is
    locked. No-op (and no error) until window.SHOMER_PUSH_URL is configured. The live
    socket already covers foreground/in-app delivery; this is the closed-app path. */
 function fbTriggerPush(id){ try{ var url=window.SHOMER_PUSH_URL; if(!url||!id)return; fetch(url,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({id:id}),keepalive:true}).then(function(r){ return r.json&&r.json().catch(function(){}); }).then(function(d){ fbLog('push fan-out:', d||'sent'); }).catch(function(e){ fbLog('push fan-out failed (non-fatal):',(e&&e.message)||e); }); }catch(e){} }
 function fbUpdateSOSType(){ if(FB.ready&&curSosId&&FB._authReady&&!window._sosPractice){ try{ FB.db.ref('sos/'+FB.uid).update({type:curSosType,typeState:'self'}); }catch(e){} } }
-function fbResolveSOS(id){ if(FB.ready&&id&&FB._authReady&&!window._sosPractice){ try{ FB.db.ref('sos/'+FB.uid).update({resolved:true,resolvedTs:Date.now()}); }catch(e){} try{ fbRestWrite('PATCH','dashfeed/'+FB.uid,{status:'resolved'}); }catch(e){} } }
+function fbResolveSOS(id){ if(FB.ready&&id&&FB._authReady&&!window._sosPractice){ try{ FB.db.ref('sos/'+FB.uid).update({resolved:true,resolvedTs:Date.now()}); }catch(e){} try{ fbRestWrite('PATCH','dashfeed/'+(FB._sosFeedKey||FB.uid),{status:'resolved'}).catch(function(){}); }catch(e){} } }
+/* v265: the dashboard's SOS row - same idea as the heartbeat: sf_<random> owned via dashown,
+   no uid in key or row. Older rules: the old uid-keyed row. */
+function fbDashSos(type, lat, lng){
+  if(lat==null||lng==null) return;
+  fbDashInit().then(function(){
+    if(FB._hb.mode!=='new'){ FB._sosFeedKey=FB.uid; dashFeedPush(FB.uid,type,lat,lng); return; }
+    var k=fbDashKey('sf_'); FB._sosFeedKey=k;
+    fbRestWrite('PUT','dashown/'+k, FB.uid).then(function(){
+      return fbRestWrite('PUT','dashfeed/'+k,{type:String(type||'sos'),lat:+(+lat).toFixed(2),lng:+(+lng).toFixed(2),ts:Date.now(),status:'active'});
+    }).catch(function(){});
+  });
+}
 /* Listen to MY SHOMERS' SOS records only (sos/<theirUid>) - never the whole tree, which
    exposed every SOS (with location) to any signed-in user. Called again whenever the
    circle changes. Records are re-keyed by their SOS id for the existing UI. */
@@ -10487,7 +10538,7 @@ function fbAcceptInvite(token,myName){
       var withPh=Object.assign({acceptedPh:FB._myPhoneHash||''},acc);
       return fbRestWrite('PATCH','invites/'+token, FB._myPhoneHash?withPh:acc)
         .catch(function(){ return fbRestWrite('PATCH','invites/'+token, acc); });
-    }).then(function(){ fbSendMySalt(inv.fromUid); return inv.fromUid; }, function(){ return inv.fromUid; });
+    }).then(function(){ return inv.fromUid; }, function(){ return inv.fromUid; });   /* v265: my SOS salt goes out only once they confirm (gdWatchConfirm) */
   }).catch(function(){return null;});
 }
 /* v262: SOS salt goes BOTH ways. The inviter's salt reaches me in the invite; mine reaches the
@@ -10580,10 +10631,10 @@ function gdApprovalVerdict(p, inv, theirUid, codeOk){
   if(p.confirmedBy && p.confirmedBy===inv.acceptedBy) return 'ok';
   if(codeOk===true){
     /* right code but a DIFFERENT registered phone than the one I invited = forwarded link: ask */
-    if(p.toPh && inv.acceptedPh && inv.acceptedPh!==p.toPh) return 'ask';
+    if(p.toPh && inv.acceptedPh!==p.toPh) return 'ask';     /* v265: a MISSING phone proof is a mismatch too */
     return 'ok';
   }
-  if(p.toPh && inv.acceptedPh && inv.acceptedPh!==p.toPh) return 'reject';
+  if(p.toPh && inv.acceptedPh!==p.toPh) return 'reject';
   return 'ask';
 }
 /* Refuse an acceptance: forget it locally and re-issue the invite on a fresh token
@@ -10596,6 +10647,7 @@ function gdRejectAcceptance(p, inv, token, flagged){
   try{ fbRestWrite('PUT','invites/'+nt,{fromUid:FB.uid,ts:Date.now(),name:packInvite(invName(),(SS.user&&SS.user.phone)||'',code)}); }catch(e){}
   p.token=nt; p.code=code; p.pending=true; p.linked=false; p.partnerUid=null; saveStore();
   try{ fbWatchApproval(nt, null); }catch(e){}
+  try{ sosRotateSalt(); }catch(e){}   /* v265: whoever was refused must not hold a working SOS channel key */
   try{ renderCircles(); }catch(e){}
   toast(flagged
     ?(he?('⚠️ מישהו אחר ניסה להשתמש בהזמנה שלך ל'+(p.name||'')+'. חסמנו אותו והכנו קישור חדש - שלח/י שוב מהשורה של '+(p.name||'השומר/ת')+'.'):('⚠️ Someone else tried to use your invite to '+(p.name||'')+'. We blocked it and made a new link - resend it from their row.'))
@@ -10613,7 +10665,7 @@ function gdConfirmAcceptance(p, inv, token, theirUid, codeOk){
     try{ var _ip=document.getElementById('inv-panel'); if(_ip) _ip.remove(); }catch(e){}
     var bar=document.createElement('div'); bar.id='invconf-bar'; bar.className='nudge-bar'; bar.style.zIndex='100001';
     /* a registry stamp is first-come, not proof of the number - never call it "verified" */
-    var note=codeOk===true?(he?'⚠️ הקישור נפתח ממספר אחר מזה שהזמנת':'⚠️ The link was opened from a different number than the one you invited')
+    var note=codeOk===true?(inv.acceptedPh?(he?'⚠️ הקישור נפתח ממספר אחר מזה שהזמנת':'⚠️ The link was opened from a different number than the one you invited'):(he?'⚠️ לא ניתן לאמת את המספר שלהם':'⚠️ Their number could not be verified'))
                           :(he?'⚠️ לא הוזן הקוד שלך - ייתכן שזה לא הם':'⚠️ Your code was not entered - this may not be them');
     bar.innerHTML='<span class="nudge-tx" style="font-weight:800">'+(he?'מישהו אישר את ההזמנה שלך':'Someone accepted your invite')+'</span>'
       +'<span class="nudge-tx"><b>'+ESC(inv.acceptedName||(he?'ללא שם':'No name'))+'</b>'+(ph?(' · <span dir="ltr">+'+ESC(ph)+'</span>'):'')+'<br><small>'+note+'</small></span>'
@@ -10625,6 +10677,28 @@ function gdConfirmAcceptance(p, inv, token, theirUid, codeOk){
     document.getElementById('invconf-no').onclick=function(){ bar.remove(); delete fbWatchApproval._busy[token]; gdRejectAcceptance(p, inv, token, false); };
   };
   if(ph && inv.acceptedPh){ sha256Hex(ph).then(function(h){ show(h===inv.acceptedPh); }).catch(function(){ show(false); }); } else show(false);
+}
+/* v265 accepter side: I approved, but I am not connected until the SENDER confirms me. Their
+   confirmation is what lets me read their presence (pairs/<them>/<me>), so a successful read
+   = confirmed. Works with older senders too (no new field needed). Then my SOS salt goes out. */
+function gdWatchConfirm(p){
+  if(!p||p.initiator||!p.awaitConfirm||!p.partnerUid) return;
+  FB._cfw=FB._cfw||{}; if(FB._cfw[p.id]) return; FB._cfw[p.id]=1;
+  var tick=function(){
+    var g=gdState(); if(g.pairs.indexOf(p)<0||!p.awaitConfirm){ delete FB._cfw[p.id]; return; }
+    if(!(FB.ready&&FB._authReady)||document.visibilityState==='hidden'){ setTimeout(tick,5000); return; }
+    fbRestGet('presence/'+p.partnerUid).then(function(){
+      if(!p.awaitConfirm) return;
+      p.awaitConfirm=false; delete FB._cfw[p.id];
+      var mm=ensureMemberForPair(p); if(mm) mm.awaitConfirm=false;
+      saveStore(); try{ renderCircles(); gdRenderList(); }catch(e){}
+      var he=currentLang==='he';
+      toast(he?('\u2713 '+(p.name||'השומר/ת')+' אישר/ה - אתם מחוברים'):currentLang==='ar'?('\u2713 '+(p.name||'')+' أكّد - أنتما متصلان'):('\u2713 '+(p.name||'Your SHOMER')+' confirmed - you are connected'),'grn');
+      try{ pushNotify(' SHOMER',(he?'חוברת לשומר/ת':'SHOMER connected'),'gd-pair'); }catch(e){}
+      try{ fbSendMySalt(p.partnerUid); sosWatchPartners(); fbListenSOS(); fbWatchGuardianPresence(); }catch(e){}
+    }).catch(function(){ setTimeout(tick,5000); });
+  };
+  tick();
 }
 /* Accepter side: if the inviter says "not them" (or the invite was bound to someone else),
    undo my side so I don't sit on a connection that doesn't exist. Watched for 7 days. */
@@ -10650,7 +10724,7 @@ function ensureMemberForPair(p, cid){
   if(!p) return null;
   var arr=(SS.circleMembers=SS.circleMembers||[]);
   var m=arr.find(function(x){ return x.pairId===p.id || (p.partnerUid && x.partnerUid===p.partnerUid); });
-  if(m){ if(cid) m.cid=cid; m.registered=true; m.pending=!!p.pending; if(p.partnerUid&&!m.partnerUid) m.partnerUid=p.partnerUid; if(p.name&&!m.name) m.name=p.name; if(!m.pairId) m.pairId=p.id; return m; }
+  if(m){ if(cid) m.cid=cid; m.registered=true; m.pending=!!p.pending; m.awaitConfirm=!!p.awaitConfirm; if(p.partnerUid&&!m.partnerUid) m.partnerUid=p.partnerUid; if(p.name&&!m.name) m.name=p.name; if(!m.pairId) m.pairId=p.id; return m; }
   var palette=['#C9A84C','#2962FF','#00C853','#E91E8C','#9C27B0','#FF6A00'];
   var list=circlesList();
   if(!list.length) return null;                       // circles not seeded yet - retry later
@@ -11367,6 +11441,9 @@ function setGuardianSalt(puid, salt){
 async function sosRotateSalt(){
   var oldSalt=SS.sosSalt;
   var ns=sosNewSalt(); SS.sosSalt=ns; saveStore();
+  /* an SOS running right now moves to the new channel at once (guardians follow the new salt) */
+  try{ if(sosPhase==='active' && SOSBUS.live && !window._sosPractice && FB.uid){ var _rp=_myPos();
+    busWrite(sosChan(FB.uid, ns), {fromUid:FB.uid, ts:Date.now(), name:packSOS(true,invName()||(SS.user&&SS.user.name)||'',_rp?_rp.lat:null,_rp?_rp.lng:null,FB.uid)}); } }catch(e){}
   /* actively wipe any SOS sitting on the OLD channel so a removed SHOMER can never read
      a lingering broadcast - belt and suspenders on top of them not knowing the new salt */
   if(oldSalt){ try{ await fbRestWrite('PUT','invites/'+sosChan(FB.uid, oldSalt),
@@ -11397,7 +11474,10 @@ function cut(s,n){ return String(s||'').replace(/\|/g,' ').trim().slice(0,n); }
 function co(v){ return (typeof v==='number' && isFinite(v)) ? v.toFixed(4) : ''; }
 
 /* invite identity → "name|phone|code"  (fits: 18 + 15 + 4 + 2 separators = 39) */
-function packInvite(nm, phone, code){ return packFit(cut(nm,14)+'|'+cut(phone,14)+'|'+cut(code,4)+'|'+sosSalt()); }
+/* v265: the record carries NO code and NO SOS salt any more - anyone holding the token could read
+   both. The code stays on the inviter's phone (and in the link); the salt is sent only after the
+   inviter confirms the pairing (fbSendMySalt). Field slots kept so older readers still parse it. */
+function packInvite(nm, phone, code){ return packFit(cut(nm,14)+'|'+cut(phone,14)+'||'); }
 function unpackInvite(s){
   var p=String(s||'').split('|');
   return { name:p[0]||'', phone:p[1]||'', code:p[2]||'', salt:p[3]||'' };
