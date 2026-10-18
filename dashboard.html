@@ -646,7 +646,7 @@ function toggleSpread(c){
   } else {
    /* presLayer not yet populated — flip btn and force fresh load so layer appears immediately */
    if(btn)btn.classList.toggle('on');
-   if(btn&&btn.classList.contains('on')&&_curCityObj) loadLive(_curCityObj);
+   if(btn&&btn.classList.contains('on')) loadLive(_curCityObj||c);
   }
   return;
  }
