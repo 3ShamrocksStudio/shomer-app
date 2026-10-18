@@ -7154,7 +7154,7 @@ function statusOf(m,he){
  if(m.pending) return {cls:'wait', txt: he?'לא נשלח עדיין - הקש/י „שלח/י בקשה”':'Not sent yet - tap "Send request"'};
  /* Honest state: if they are not live, say when they were last seen - not "waiting". */
  if(m.registered && !m.live){
-   var seen=agoTxt(m.ts, he);
+   var seen=(m.ts&&(Date.now()-m.ts)<86400000)?(function(d){ return ('0'+d.getHours()).slice(-2)+':'+('0'+d.getMinutes()).slice(-2); })(new Date(m.ts)):agoTxt(m.ts, he);   /* v268: HH:MM today */
    return {cls:'wait', txt: (he?('נראתה/נראה לאחרונה: '+seen):('last seen: '+seen))};
  }
  if(SS.circleGhost&&m.shareTo)return{cls:'paused',txt:he?' שיתוף מושהה':' sharing paused'};
@@ -9447,7 +9447,7 @@ try{ hydrateIcons(document); }catch(e){}
 /* Loaded-build version - shown in the diagnostic panel so a phone can prove
    whether it's on the latest build or a STALE cached one. Keep in lock-step
    with sw.js SW_VERSION on every deploy. */
-var APP_VER='v267';
+var APP_VER='v268';
 var FB={ready:false,uid:null,db:null,_presTimer:null,connected:false,listening:false,pushState:'default',near:0,swVer:'?',
   authState:'connecting',sdkLoaded:false,persist:'',permErr:null,err:null,wsProbe:'',csp:''};
 /* Always log connection diagnostics to the console so the real failure can be SEEN in Chrome. */
@@ -10300,6 +10300,7 @@ function fbDashSos(type, lat, lng){
   fbDashInit().then(function(){
     if(FB._hb.mode!=='new'){ FB._sosFeedKey=FB.uid; dashFeedPush(FB.uid,type,lat,lng); return; }
     var k=fbDashKey('sf_'); FB._sosFeedKey=k;
+    try{ if(SS.sosLive&&SS.sosLive.id===curSosId){ SS.sosLive.fk=k; saveStore(); } }catch(e){}   /* v268: a reload must still resolve THIS dashboard row */
     fbRestWrite('PUT','dashown/'+k, FB.uid).then(function(){
       return fbRestWrite('PUT','dashfeed/'+k,{type:String(type||'sos'),lat:+(+lat).toFixed(2),lng:+(+lng).toFixed(2),ts:Date.now(),status:'active'});
     }).catch(function(){});
@@ -10445,7 +10446,7 @@ function openLiveSosDetail(sosId){
       +'<div class="ev-fact"><span class="ev-k">'+(he?'מתי':ar?'متى':'When')+'</span><span class="ev-v ev-when2"></span></div>'
       +'<div class="ev-fact"><span class="ev-k">'+(he?'מרחק ממך':ar?'المسافة':'Distance')+'</span><span class="ev-v ev-dist"></span></div>'
     +'</div>'
-    +'<div id="ev-resp-live" class="ev-resp-live mb16">'+respLiveHtml(0,[])+'</div>'
+    +'<div id="ev-resp-live" class="ev-resp-live mb16">'+respLiveHtml(mine?1:0, mine?[{name:invName()||(SS.user&&SS.user.name)||''}]:[])+'</div>'
     +'<button class="dcta pr" style="width:100%;margin-bottom:8px;background:linear-gradient(135deg,#0E8840,#14A857)" onclick="navFromLive(\''+sosId+'\')"><svg class="ic" viewBox="0 0 24 24" style="width:18px;height:18px;vertical-align:-3px;margin-inline-end:6px" aria-hidden="true"><path d="M3 11l18-8-8 18-2-8-8-2z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></svg>'+(he?'נווט לאירוע · מסלול חי':ar?'التوجّه · مسار مباشر':'Navigate · live route')+'</button>'
     +'<div class="det-ctas"><button class="dcta pr" id="ev-respond-btn" onclick="'+respAct+'" style="'+(mine?'background:var(--rb);color:#FF9aa3;box-shadow:none':'')+'">'+respLbl+'</button><button class="dcta gd" onclick="callNum(\'100\')">'+T('call100')+'</button><button class="dcta sc" onclick="cl(\'det-sheet\')">'+T('close')+'</button></div>';
   body.querySelector('.det-title').textContent=label+' · SOS';
@@ -10472,27 +10473,26 @@ var fbRespStreams={}, fbResponderMarkers={}, _myResponders={}, _liveDetailId=nul
 function respondOnMyWay(sosId){
   var s=fbLiveSos[sosId]||{}; var he=currentLang==='he';
   if(!FB.ready||!FB._authReady){ toast(he?'עדיין מתחבר - נסה/י שוב':'Still connecting - try again','amb'); return; }
-  var eta=(userLat!=null&&s.lat!=null)?Math.round(distMeters(userLat,userLng,s.lat,s.lng)/1.4/60):0; // ~walking min
-  var rec={name:(SS.user&&SS.user.name)||'Shomer',lat:(userLat!=null?userLat:32.07),lng:(userLng!=null?userLng:34.78),eta:eta,ts:Date.now()};
   _myResponders[sosId]=1;                                 // optimistic → instant UI flip to "cancel"
   try{ if(s.lat!=null) respondToSOS(s.lat,s.lng,(he?'אירוע חי':'Live event')); }catch(e){}   // draw my live route
   if(_liveDetailId===sosId) openLiveSosDetail(sosId);     // refresh the card to "cancel" state
-  FB.db.ref('responders/'+sosId+'/'+FB.uid).set(rec).then(function(){
-    toast(he?'✓ סימנת „אני בדרך" - הנפגע/ת והשומרים רואים אותך':'✓ On-my-way - the person + SHOMERs can see you','grn');
-  }).catch(function(e){ fbLog('responder write (needs /responders rule published):',(e&&e.code)||e); toast(he?'סומן - שידור בין-מכשירי יופעל לאחר פרסום הכללים':'Marked - cross-device broadcast activates after the rules publish','amb'); });
+  /* v268: the PRIVATE channel (rp_<me>, readable only by my paired SHOMERs) - never the old
+     responders/<sosId> list, which any signed-in user could read with a guessable id. */
+  sosRespond(s.uid,'enroute');
 }
 function cancelOnMyWay(sosId){
   var he=currentLang==='he';
-  try{ FB.db.ref('responders/'+sosId+'/'+FB.uid).remove(); }catch(e){}
   delete _myResponders[sosId];
   try{ stopResponderNav(); }catch(e){}
-  toast(he?'ביטלת - הוסרת מרשימת המגיבים':'Cancelled - removed from responders','');
+  try{ sosStandDown(); }catch(e){}   /* v268: withdraw on the same private channel (it toasts) */
   if(_liveDetailId===sosId) openLiveSosDetail(sosId);
 }
 function navFromLive(sosId){ var s=fbLiveSos[sosId]||{}; try{ cl('det-sheet'); }catch(e){} if(s.lat!=null) respondToSOS(s.lat,s.lng,(currentLang==='he'?'אירוע חי':'Live event')); }
 /* Stream the live responder list for an event → update the count, the detail card, and
    converging markers on the map. Real responders only (those who tapped "אני בדרך"). */
 function fbRespondersListen(sosId){
+  return;   /* v268: responders/<sosId> is retired (public + guessable). Who is coming reaches the
+               person over the private rp_ channel (sosWatchMyResponders). */
   if(!FB.ready)return;
   if(fbRespStreams[sosId])return; fbRespStreams[sosId]=1;
   FB.db.ref('responders/'+sosId).on('value',function(snap){
@@ -10648,7 +10648,7 @@ function gdApprovalVerdict(p, inv, theirUid, codeOk){
   if(p.confirmedBy && p.confirmedBy===inv.acceptedBy) return 'ok';
   if(codeOk===true){
     /* right code but a DIFFERENT registered phone than the one I invited = forwarded link: ask */
-    if(p.toPh && inv.acceptedPh!==p.toPh) return 'ask';     /* v265: a MISSING phone proof is a mismatch too */
+    if(p.toPh) return 'ask';   /* v268: phone invite - the registry stamp is first-come (squattable), so I ALWAYS confirm the first link myself */
     return 'ok';
   }
   if(p.toPh && inv.acceptedPh!==p.toPh) return 'reject';
@@ -10682,10 +10682,11 @@ function gdConfirmAcceptance(p, inv, token, theirUid, codeOk){
     try{ var _ip=document.getElementById('inv-panel'); if(_ip) _ip.remove(); }catch(e){}
     var bar=document.createElement('div'); bar.id='invconf-bar'; bar.className='nudge-bar'; bar.style.zIndex='100001';
     /* a registry stamp is first-come, not proof of the number - never call it "verified" */
-    var note=codeOk===true?(inv.acceptedPh?(he?'⚠️ הקישור נפתח ממספר אחר מזה שהזמנת':'⚠️ The link was opened from a different number than the one you invited'):(he?'⚠️ לא ניתן לאמת את המספר שלהם':'⚠️ Their number could not be verified'))
+    var same=!!(verified&&p.toPh&&inv.acceptedPh===p.toPh);
+    var note=codeOk===true?(same?(he?'ℹ️ אותו מספר שהזמנת - לא מאומת (SH✡MER לא יכול להוכיח שהמספר שלהם)':'ℹ️ Same number you invited - unverified (SH✡MER cannot prove the number is theirs)'):inv.acceptedPh?(he?'⚠️ הקישור נפתח ממספר אחר מזה שהזמנת':'⚠️ The link was opened from a different number than the one you invited'):(he?'⚠️ לא ניתן לאמת את המספר שלהם':'⚠️ Their number could not be verified'))
                           :(he?'⚠️ לא הוזן הקוד שלך - ייתכן שזה לא הם':'⚠️ Your code was not entered - this may not be them');
     bar.innerHTML='<span class="nudge-tx" style="font-weight:800">'+(he?'מישהו אישר את ההזמנה שלך':'Someone accepted your invite')+'</span>'
-      +'<span class="nudge-tx"><b>'+ESC(inv.acceptedName||(he?'ללא שם':'No name'))+'</b>'+(ph?(' · <span dir="ltr">+'+ESC(ph)+'</span>'):'')+'<br><small>'+note+'</small></span>'
+      +'<span class="nudge-tx"><b>'+ESC(inv.acceptedName||(he?'ללא שם':'No name'))+'</b>'+(ph?(' · <span dir="ltr">+'+ESC(ph)+'</span>'):'')+(p.name?('<br><small>'+(he?'הזמנת את: ':'You invited: ')+ESC(p.name)+'</small>'):'')+'<br><small>'+note+'</small></span>'
       +'<span class="nudge-tx" style="font-size:13px;opacity:.85">'+(he?'זה האדם שהזמנת? רק באישור שלך הוא יראה את המיקום שלך.':'Is this who you invited? Only if you confirm will they see your location.')+'</span>'
       +'<button class="nudge-cta" id="invconf-yes">'+(he?'כן, חבר/י':'Yes, connect')+'</button>'
       +'<button class="nudge-cta" id="invconf-no" style="background:transparent;border:1px solid rgba(255,112,128,.6);color:#FF9AA5">'+(he?'זה לא הם':'Not them')+'</button>';
@@ -11664,7 +11665,8 @@ function sosRestore(id, ts){
   var he=currentLang==='he', ar=currentLang==='ar';
   curSosId=id; curSosType='unknown'; window._sosPractice=false;
   sosPhase='active'; sosActive=true;
-  SS.sosLive={id:id, ts:ts||Date.now()}; saveStore();
+  var _fk=(SS.sosLive&&SS.sosLive.id===id&&SS.sosLive.fk)||null;
+  SS.sosLive={id:id, ts:ts||Date.now()}; if(_fk){ SS.sosLive.fk=_fk; FB._sosFeedKey=_fk; } saveStore();
   try{ if(!(SS.sosHistory||[]).some(function(e){return e.id===id;})) SS.sosHistory.push({id:id,ts:ts||Date.now(),lat:userLat,lng:userLng,trigger:'restored',resolution:'pending',broadcast:true,type:'unknown',typeState:'unclassified',classifiedBy:null}); saveStore(); }catch(e){}
   var btn=document.getElementById('sos-btn'); if(btn){btn.classList.add('active');btn.setAttribute('aria-pressed','true');}
   try{ document.getElementById('sos-strip').classList.add('on'); }catch(e){}
@@ -12394,7 +12396,12 @@ function fbApplyPeerPresence(all){
         p.lat=pr.lat; p.lng=pr.lng; p.ts=(pr.ts||now); p.live=fresh; p.pending=false;
         // mirror the REAL position onto the circle-member row so its pin is truthful
         var cm=(SS.circleMembers||[]).find(function(x){ return x.pairId===p.id || (x.partnerUid&&x.partnerUid===p.partnerUid); });
-        if(cm){ cm.lat=pr.lat; cm.lng=pr.lng; cm.live=fresh; cm.moving=fresh; changed=true; }
+        if(cm){ cm.lat=pr.lat; cm.lng=pr.lng; cm.live=fresh; cm.moving=fresh; cm.ts=p.ts; changed=true; }
+      } else if(pr && (p.live || ((SS.circleMembers||[]).find(function(x){ return x.pairId===p.id || (x.partnerUid&&x.partnerUid===p.partnerUid); })||{}).live)){
+        /* v268: ghost mode / no fix = a heartbeat with NO coords. Not "live" - "last seen" at the last real fix. */
+        p.live=false; changed=true;
+        var cg=(SS.circleMembers||[]).find(function(x){ return x.pairId===p.id || (x.partnerUid&&x.partnerUid===p.partnerUid); });
+        if(cg){ cg.live=false; cg.moving=false; if(!cg.ts) cg.ts=p.ts||0; }
       }
     });
     if(changed){
