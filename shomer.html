@@ -5123,6 +5123,8 @@ function activateSOS(){
  window._sosRepeated=overLimit;
  curSosId='s'+Date.now();
  curSosType='unknown'; // SOS fires now; type is classified after, never blocking it
+ /* v266: remember a REAL live SOS across an app kill / reload - it must come back on screen */
+ try{ if(!practice){ SS.sosLive={id:curSosId, ts:Date.now()}; } }catch(e){}
  /* ⚠️ THE ALERT MUST LEAVE THE PHONE. Everything else is theatre without this. */
  try{ if(!practice) sosBroadcast(curSosId, curSosType); }catch(e){}
  // Log to persistent history. broadcast=false when rate-limited (alarm still helps the
@@ -5458,6 +5460,7 @@ function resolveSOS(){
  if(sosPhase!=='active'){ try{ sosClearBroadcast(); }catch(e){} return; }
  var proceed=function(){
   try{ if(!window._sosPractice) sosClearBroadcast(); }catch(e){}   // only after the cancel code passed - a thief tapping SOS must not stand the guardians down
+  try{ delete SS.sosLive; saveStore(); var _rs=document.getElementById('sos-restore-bar'); if(_rs) _rs.remove(); }catch(e){}
   try{ if(!window._sosPractice) fbResolveSOS(curSosId); }catch(e){}   // v262: close sos/<me> now too - guardians' alerts follow it (not only after the "how did it end" choice)
   clearInterval(sosTimer); stopSosAlarm(); stopMaxAttention(); releaseWake();
   try{ if(curSosId){ FB.db&&FB.db.ref('responders/'+curSosId).off&&FB.db.ref('responders/'+curSosId).off(); delete fbRespStreams[curSosId]; } fbClearResponderMarkers(); }catch(e){}
@@ -9431,7 +9434,7 @@ try{ hydrateIcons(document); }catch(e){}
 /* Loaded-build version - shown in the diagnostic panel so a phone can prove
    whether it's on the latest build or a STALE cached one. Keep in lock-step
    with sw.js SW_VERSION on every deploy. */
-var APP_VER='v265';
+var APP_VER='v266';
 var FB={ready:false,uid:null,db:null,_presTimer:null,connected:false,listening:false,pushState:'default',near:0,swVer:'?',
   authState:'connecting',sdkLoaded:false,persist:'',permErr:null,err:null,wsProbe:'',csp:''};
 /* Always log connection diagnostics to the console so the real failure can be SEEN in Chrome. */
@@ -10089,6 +10092,7 @@ function fbOnAuthed(uid){
   try{ fbListenAllPeerLocs(); }catch(e){}
   try{ gdState().pairs.forEach(function(p){ if(p&&!p.initiator&&p.acceptedTs) gdWatchMyAcceptance(p); }); }catch(e){}
   try{ gdState().pairs.forEach(function(p){ if(p&&p.awaitConfirm) gdWatchConfirm(p); }); }catch(e){}
+  try{ setTimeout(sosRestoreOnStart, 1500); }catch(e){}
   try{ gdState().pairs.forEach(function(p){ if(p&&p.pending&&!p.linked&&p.token) fbWatchApproval(p.token,p.partnerUid||null); });   /* watch EVERY pending invite - a missing partnerUid must not silently kill the watcher */ }catch(e){}     // subscribe to every paired partner's live location
   try{ fbStartLocPublish(); }catch(e){}       // start writing my own live location
   try{ fbRegisterMe(); }catch(e){}
@@ -10339,7 +10343,7 @@ function fbSosProcess(baselineOnly){
        subscribe (e.g. I opened the app from the push) alerts too. */
     Object.keys(FB._sosPeer).forEach(function(puid){
       var r=FB._sosPeer[puid].rec;
-      var live=r&&r.uid===puid&&!r.resolved&&r.lat!=null&&!(r.ts&&(now-r.ts)>STALE);
+      var live=r&&r.uid===puid&&!r.resolved&&r.lat!=null;   /* v266: an old one still shows - as "older SOS, check on them", no siren (onPartnerSOS) */
       if(live) onPartnerSOS(puid,{active:true,name:'',lat:r.lat,lng:r.lng,ts:r.ts},'rec');
       else onPartnerSOSClear(puid,'rec');
     });
@@ -11579,6 +11583,7 @@ async function sosBroadcast(sosId, type){
                   p?p.lat:null, p?p.lng:null, FB.uid)
   };
   var ok=await busWrite(sosChan(FB.uid, sosSalt()), payload);
+  SOSBUS.chan=sosChan(FB.uid, sosSalt());
   SOSBUS.active=payload.sosId; SOSBUS.live=!!ok; SOSBUS.sentPos=p; SOSBUS.sentAt=Date.now();
   if(ok){
     var n=(SS.circleMembers||[]).filter(function(m){return !m.pending;}).length;
@@ -11593,7 +11598,7 @@ async function sosBroadcast(sosId, type){
    the first fix arrives, then whenever I have moved >40 m (at most every 15 s). */
 function sosMaybeResendPos(){
   try{
-    if(sosPhase!=='active'||!SOSBUS.live||!FB._authReady) return;
+    if(sosPhase!=='active'||!SOSBUS.live||!FB._authReady||SOSBUS.hbOff) return;
     var p=_myPos(); if(!p) return;
     var sp=SOSBUS.sentPos, now=Date.now();
     if(sp && (now-(SOSBUS.sentAt||0))<15000) return;
@@ -11603,11 +11608,76 @@ function sosMaybeResendPos(){
     if(FB._sosNeedsLoc){ FB._sosNeedsLoc=false; try{ fbPublishSOS(); }catch(e){} }
   }catch(e){}
 }
+/* v266 HEARTBEAT: a live SOS refreshes its timestamp on both channels every ~4 min even when I
+   do not move, so my SHOMERs can tell a live alert from a zombie left by a killed app. */
+var SOS_OLD_MS=30*60*1000;
+function sosHeartbeat(force){
+  try{
+    if(sosPhase!=='active'||window._sosPractice||!FB._authReady||!FB.uid) return;
+    if(SOSBUS.hbOff && !force) return;
+    var now=Date.now(); if(!force && (now-(SOSBUS.hbAt||SOSBUS.sentAt||0))<240000) return;
+    SOSBUS.hbAt=now; SOSBUS.live=true; SOSBUS.hbOff=false;
+    var p=_myPos();
+    busWrite(sosChan(FB.uid, sosSalt()), {fromUid:FB.uid, ts:now, name:packSOS(true,invName()||(SS.user&&SS.user.name)||'',p?p.lat:null,p?p.lng:null,FB.uid)});
+    SOSBUS.chan=sosChan(FB.uid, sosSalt());
+    var up={ts:now, resolved:false}; if(p){ up.lat=p.lat; up.lng=p.lng; }
+    fbRestGet('sos/'+FB.uid).then(function(sn){ var r=sn&&sn.val(); if(r&&r.uid===FB.uid&&r.id===curSosId) return fbRestWrite('PATCH','sos/'+FB.uid, up); if(p&&curSosId){ return fbRestWrite('PUT','sos/'+FB.uid,{uid:FB.uid,id:curSosId,lat:p.lat,lng:p.lng,type:curSosType||'unknown',typeState:'self',ts:now,resolved:false}); } }).catch(function(){});
+    if(SS.sosLive){ SS.sosLive.ts=now; saveStore(); }
+  }catch(e){}
+}
+try{ setInterval(function(){ sosHeartbeat(false); }, 60000); }catch(e){}
+/* v266 RESTORE: the app was killed / reloaded during a live SOS. My SHOMERs still see it, so
+   it must not vanish from MY screen: show "SOS active" with cancel-by-code. A fresh one keeps
+   beating; one older than 30 min asks first (no surprise re-alarm for my SHOMERs). Also catches
+   a live record on the server that this phone forgot (cleared storage). */
+function sosRestoreOnStart(){
+  try{
+    if(sosRestoreOnStart._done||sosPhase!=='idle'||!FB._authReady||!FB.uid) return; sosRestoreOnStart._done=true;
+    var L=SS.sosLive;
+    fbRestGet('sos/'+FB.uid).then(function(sn){
+      var r=sn&&sn.val();
+      /* what my SHOMERs see (the server record) decides the age; this phone's copy is the fallback */
+      if(L&&L.id){ if(r&&r.id===L.id&&r.resolved){ delete SS.sosLive; saveStore(); return; } sosRestore(L.id, (r&&r.id===L.id&&r.ts)?r.ts:(L.ts||0)); return; }
+      if(r&&r.uid===FB.uid&&!r.resolved&&r.id){ sosRestore(r.id, r.ts||0); return; }
+      return busRead(sosChan(FB.uid, sosSalt())).then(function(raw){
+        var v=raw&&raw.fromUid===FB.uid?unpackSOS(raw.name):null;
+        if(v&&v.active&&sosPhase==='idle') sosRestore((r&&r.id)||('s'+(raw.ts||Date.now())), raw.ts||0);
+      });
+    }).catch(function(){ if(L&&L.id&&sosPhase==='idle') sosRestore(L.id, L.ts||0); });
+  }catch(e){}
+}
+function sosRestore(id, ts){
+  if(sosPhase!=='idle') return;
+  var he=currentLang==='he', ar=currentLang==='ar';
+  curSosId=id; curSosType='unknown'; window._sosPractice=false;
+  sosPhase='active'; sosActive=true;
+  SS.sosLive={id:id, ts:ts||Date.now()}; saveStore();
+  try{ if(!(SS.sosHistory||[]).some(function(e){return e.id===id;})) SS.sosHistory.push({id:id,ts:ts||Date.now(),lat:userLat,lng:userLng,trigger:'restored',resolution:'pending',broadcast:true,type:'unknown',typeState:'unclassified',classifiedBy:null}); saveStore(); }catch(e){}
+  var btn=document.getElementById('sos-btn'); if(btn){btn.classList.add('active');btn.setAttribute('aria-pressed','true');}
+  try{ document.getElementById('sos-strip').classList.add('on'); }catch(e){}
+  setText('ss-t',he?' SOS פעיל - השומרים שלך רואים אותו':ar?' SOS نشط - حُرّاسك يرونه':' SOS active - your SHOMERs can see it');
+  setText('ss-s',he?'לביטול - קוד הביטול':ar?'للإلغاء - رمز الإلغاء':'To cancel - use your cancel code');
+  var old=ts && (Date.now()-ts)>SOS_OLD_MS;
+  SOSBUS.live=true; SOSBUS.hbOff=!!old;
+  try{ sosWatchMyResponders(); }catch(e){} try{ sosWatchStandDown(); }catch(e){}
+  if(!old) sosHeartbeat(true);
+  var b=document.getElementById('sos-restore-bar'); if(b) b.remove();
+  b=document.createElement('div'); b.id='sos-restore-bar'; b.className='nudge-bar'; b.style.zIndex='100002';
+  b.innerHTML='<span class="nudge-tx" style="font-weight:800">'+(he?'ה-SOS שלך עדיין פעיל':ar?'نداء SOS الخاص بك لا يزال نشطًا':'Your SOS is still active')+'</span>'
+    +'<span class="nudge-tx" style="font-size:13px;opacity:.9">'+(old?(he?'הוא נשלח לפני יותר מחצי שעה. עדיין צריך/ה עזרה?':ar?'أُرسل قبل أكثر من نصف ساعة. هل ما زلت بحاجة للمساعدة؟':'It was sent over 30 minutes ago. Still need help?'):(he?'השומרים שלך עדיין רואים התרעה. אם את/ה בטוח/ה - בטל/י עם קוד הביטול.':ar?'حُرّاسك ما زالوا يرون التنبيه. إن كنت بأمان - ألغِه برمز الإلغاء.':'Your SHOMERs still see the alert. If you are safe, cancel it with your code.'))+'</span>'
+    +'<button class="nudge-cta" id="sosr-cancel">'+(he?'בטל/י SOS (קוד)':ar?'إلغاء SOS (رمز)':'Cancel SOS (code)')+'</button>'
+    +'<button class="nudge-cta" id="sosr-keep" style="background:transparent;border:1px solid rgba(255,112,128,.6);color:#FF9AA5">'+(he?'עדיין צריך/ה עזרה':ar?'ما زلت بحاجة للمساعدة':'I still need help')+'</button>';
+  document.body.appendChild(b);
+  document.getElementById('sosr-cancel').onclick=function(){ resolveSOS(); };
+  document.getElementById('sosr-keep').onclick=function(){ b.remove(); sosHeartbeat(true); toast(he?'\u2713 ההתרעה עודכנה אצל השומרים שלך':ar?'\u2713 تم تحديث التنبيه':'\u2713 Your SHOMERs got a fresh alert','grn'); };
+}
 async function sosClearBroadcast(){
   try{ sosQueueWrite([]); }catch(e){}   /* a cancelled SOS must never be delivered later from the retry queue */
   SOSBUS.live=false;
   if(!FB.ready||!FB.uid) return;
   try{ await fbRestWrite('PUT','invites/'+sosChan(FB.uid, sosSalt()),{fromUid:FB.uid,ts:Date.now(),name:packSOS(false,'',null,null,FB.uid)}); }catch(e){}
+  try{ if(SOSBUS.chan && SOSBUS.chan!==sosChan(FB.uid, sosSalt())) await fbRestWrite('PUT','invites/'+SOSBUS.chan,{fromUid:FB.uid,ts:Date.now(),name:packSOS(false,'',null,null,FB.uid)}); }catch(e){}
+  SOSBUS.chan=null;
   SOSBUS.active=null;
   Object.keys(SOSBUS.responders).forEach(function(k){ delete SOSBUS.responders[k]; });
   sosPaintResponders(); sosPaintMyHelp();
@@ -11629,6 +11699,7 @@ function sosWatchPartners(){
         var raw=snap&&snap.val?snap.val():null;
         if(raw && raw.fromUid && raw.fromUid!==puid) raw=null;   // only the partner's OWN record counts (a squatted key must not fake or hide an SOS)
         var v=raw?unpackSOS(raw.name):null;
+        if(v) v.ts=raw.ts||0;
         if(v&&v.active) onPartnerSOS(puid, v, 'bus'); else onPartnerSOSClear(puid, 'bus');
       });
       /* also watch for a rotated salt from this partner, and re-subscribe when it changes */
@@ -11646,14 +11717,20 @@ function onPartnerSOS(puid, v, src){
   SOSBUS.src=SOSBUS.src||{}; (SOSBUS.src[puid]=SOSBUS.src[puid]||{})[src||'bus']=1;
   SOSBUS.lastV=SOSBUS.lastV||{};
   if(src!=='rec'||!SOSBUS.lastV[puid]) SOSBUS.lastV[puid]=v;   /* position updates while the alert is open (the bus has the freshest) */
-  if(SOSBUS.mine[puid]) return;      /* already showing */
-  SOSBUS.mine[puid]=1;
+  /* v266 AGE CUTOFF: the newest timestamp across both channels decides. Older than 30 min and
+     not updated = most likely a phone that died mid-SOS: shown, but quietly - no siren. */
+  SOSBUS.lastTs=SOSBUS.lastTs||{}; if(v.ts && v.ts>(SOSBUS.lastTs[puid]||0)) SOSBUS.lastTs[puid]=v.ts;
+  var _newest=SOSBUS.lastTs[puid]||0, old=!!(_newest && (Date.now()-_newest)>SOS_OLD_MS);
+  if(SOSBUS.mine[puid]){ if(SOSBUS.mine[puid]==='old' && !old){ delete SOSBUS.mine[puid]; } else return; }   /* already showing (an old one that just got UPDATED escalates) */
+  SOSBUS.mine[puid]=old?'old':1;
   var he=currentLang==='he';
   /* the name I gave them (my private invite name for them) first - it is who I know */
   var nm=(memberByPair(puid)||{}).name||v.name||(he?'שומר':'a SHOMER');
-  try{ if(navigator.vibrate) navigator.vibrate([200,90,200,90,400]); }catch(e){}
-  try{ playAlarm(2500); }catch(e){}
-  showIncomingSOS(puid, nm, v);
+  if(!old){
+    try{ if(navigator.vibrate) navigator.vibrate([200,90,200,90,400]); }catch(e){}
+    try{ playAlarm(2500); }catch(e){}
+  }
+  showIncomingSOS(puid, nm, v, old?_newest:0);
 }
 function onPartnerSOSClear(puid, src){
   /* the alert stays while ANY channel (bus or sos/<uid> record) still says active */
@@ -11666,7 +11743,7 @@ function memberByPair(puid){
 }
 
 /* The alert a SHOMER actually sees. This is the whole product. */
-function showIncomingSOS(puid, nm, v){
+function showIncomingSOS(puid, nm, v, oldTs){
   var he=currentLang==='he';
   var old=document.getElementById('in-sos-'+puid); if(old) old.remove();
   try{ var _gb=document.getElementById('sos-incoming'); if(_gb && _gb.classList.contains('on')) dismissSosBanner(); }catch(e){}
@@ -11674,15 +11751,16 @@ function showIncomingSOS(puid, nm, v){
   d.id='in-sos-'+puid; d.className='in-sos';
   d.innerHTML=
     '<button class="in-x" aria-label="'+(he?'סגור':'Dismiss')+'">✕</button>'
-   +'<div class="in-sos-h">'+(he?'התרעת SOS':'SOS ALERT')+'</div>'
+   +'<div class="in-sos-h">'+(oldTs?(he?'SOS ישן':'OLDER SOS'):(he?'התרעת SOS':'SOS ALERT'))+'</div>'
    +'<div class="in-sos-n">'+ESC(nm)+'</div>'
-   +'<div class="in-sos-s">'+(he?'זקוק/ה לעזרה - עכשיו':'needs help - right now')+'</div>'
+   +'<div class="in-sos-s">'+(oldTs?(he?('נשלח לפני '+Math.round((Date.now()-oldTs)/60000)+' דק׳ ולא עודכן - בדוק/י מה שלומם'):('sent '+Math.round((Date.now()-oldTs)/60000)+' min ago, not updated - check on them')):(he?'זקוק/ה לעזרה - עכשיו':'needs help - right now'))+'</div>'
    +'<div class="in-sos-btns">'
    +'<button class="in-b go">'+(he?'אני בדרך':'I am coming')+'</button>'
    +'<button class="in-b map">'+(he?'נווט/י':'Navigate')+'</button>'
    +'<button class="in-b call">'+(he?'התקשר/י':'Call')+'</button>'
    +'</div>'
    +'<button class="in-b sdn" style="margin-top:8px;width:100%;background:transparent;border:1px solid rgba(255,255,255,.35)">'+(he?'🔕 בדקתי שהם בטוחים - השתק אזעקה':'🔕 I checked they are safe - stand down alarm')+'</button>';
+  if(oldTs){ d.classList.add('old'); d.style.animation='none'; }
   document.body.appendChild(d);
 
   function shrink(){
