@@ -3002,16 +3002,7 @@ const SOS_TYPES=[['viol','fist'],['med','medcross'],['sex','hand'],['stalk','eye
 
 /* ═══ PAST EVENTS - awareness layer (historical, NOT live). Off by default. ═══ */
 var PAST_EVT_COLOR='#5B8CA8'; /* distinct archival slate-blue */
-var PAST_EVENTS=[
-  {lat:32.0853,lng:34.7818,yr:2023,he:'גבר צעיר נדקר למוות בקטטה אלימה במרחב ציבורי.',src:'public'},
-  {lat:32.0180,lng:34.7460,yr:2024,he:'עימות אלים בין קבוצות שהסתיים בפצוע אנוש.',src:'public'},
-  {lat:31.7683,lng:35.2137,yr:2023,he:'אירוע דקירה במרחב עירוני; נפגע פונה לבית חולים.',src:'public'},
-  {lat:32.1660,lng:34.8433,yr:2024,he:'ניסיון חטיפה מדווח באזור מגורים; המשטרה נקראה למקום.',src:'public'},
-  {lat:32.16272,lng:34.75145,yr:2024,he:'תאונת דרכים עם נפגע קשה (נתוני הלמ״ס).',src:'cbs'},
-  {lat:32.20462,lng:34.82387,yr:2024,he:'תאונת דרכים עם נפגע קשה (נתוני הלמ״ס).',src:'cbs'},
-  {lat:32.07752,lng:34.75034,yr:2024,he:'תאונת דרכים עם נפגע קשה (נתוני הלמ״ס).',src:'cbs'},
-  {lat:32.20076,lng:34.79188,yr:2024,he:'תאונת דרכים עם נפגע קשה (נתוני הלמ״ס).',src:'cbs'}
-];
+var PAST_EVENTS=[]; /* v269: unverified sample pins removed (several sat in the sea). Only verified, dated, geocoded records may return here. */
 var _pastLayer=null, _pastOn=false;
 function pastMarkerHTML(ev){
   return '<div style="position:relative;width:38px;height:48px">'
@@ -7151,6 +7142,7 @@ function statusOf(m,he){
  if(m.sos)return{cls:'sos',txt:he?' SOS פעיל':' SOS active'};
  if(m.awaitConfirm) return {cls:'wait', txt: he?('ממתין לאישור של '+(m.name||'השולח/ת')):currentLang==='ar'?('بانتظار تأكيد '+(m.name||'المرسل')):('Waiting for '+(m.name||'the sender')+' to confirm')};
  /* An invite that has not been delivered is NOT "pending approval" - it is not sent. Say so. */
+ if(m.pending && m.via==='link') return {cls:'wait', txt: he?'הזמנה בוואטסאפ · ממתין/ה להצטרפות':'WhatsApp invite · waiting to join'};   /* v269 */
  if(m.pending) return {cls:'wait', txt: he?'לא נשלח עדיין - הקש/י „שלח/י בקשה”':'Not sent yet - tap "Send request"'};
  /* Honest state: if they are not live, say when they were last seen - not "waiting". */
  if(m.registered && !m.live){
@@ -7163,6 +7155,14 @@ function statusOf(m,he){
  if(!m.shareTo&&m.seeThem)return{cls:'oneway',txt:he?'אני רואה בלבד':currentLang==='ar'?'أنا أرى فقط':'I see only'};
  return{cls:'none',txt:he?'ללא שיתוף':'No sharing'};
 }
+/* v269: a guardian row must always say who it is. Unnamed WhatsApp-link invites get a dated label
+   until the person joins (their name then arrives with the pairing) or the user renames them. */
+function memberLabel(m,he){
+ if(m&&m.name&&String(m.name).trim()) return m.name;
+ if(m&&m.toPh) return String(m.toPh);
+ var d=new Date((m&&m.addedTs)||Date.now()), dd=('0'+d.getDate()).slice(-2)+'/'+('0'+(d.getMonth()+1)).slice(-2);
+ return he?('הזמנה מ-'+dd+' · הקש/י לשינוי שם'):('Invite from '+dd+' · tap to rename');
+}
 function buildMemberRow(m,he){
  const wrap=document.createElement('div');
  const st=statusOf(m,he);
@@ -7171,7 +7171,7 @@ function buildMemberRow(m,he){
  row.innerHTML=`
  <div class="cm-av" style="--cc:${m.color}"><span aria-hidden="true">${m.emoji||''}</span><span class="live ${m.seeThem?'':'off'}" aria-hidden="true"></span></div>
  <div class="cm-main">
- <div class="cm-nm">${ESC(m.name)}${(typeof m.rk==='number'&&m.partnerUid)?(' '+drillRankBadge(m.rk)):''}</div>
+ <div class="cm-nm">${ESC(memberLabel(m,he))}${(typeof m.rk==='number'&&m.partnerUid)?(' '+drillRankBadge(m.rk)):''}</div>
  <div class="cm-rel">${ESC(m.rel||'')}</div>
  <span class="cm-status ${st.cls}">${st.txt}</span>
  </div>
@@ -9447,7 +9447,7 @@ try{ hydrateIcons(document); }catch(e){}
 /* Loaded-build version - shown in the diagnostic panel so a phone can prove
    whether it's on the latest build or a STALE cached one. Keep in lock-step
    with sw.js SW_VERSION on every deploy. */
-var APP_VER='v268';
+var APP_VER='v269';
 var FB={ready:false,uid:null,db:null,_presTimer:null,connected:false,listening:false,pushState:'default',near:0,swVer:'?',
   authState:'connecting',sdkLoaded:false,persist:'',permErr:null,err:null,wsProbe:'',csp:''};
 /* Always log connection diagnostics to the console so the real failure can be SEEN in Chrome. */
@@ -14169,6 +14169,7 @@ html[dir="rtl"] .sh-back svg{transform:scaleX(-1)}
 .past-fab .ic{width:20px;height:20px}
 .past-fab-lbl{font:800 8px/1 Heebo,sans-serif;letter-spacing:.3px}
 .past-fab{display:none!important}
+#leg-past-sec,.set-row:has(#set-past-tog){display:none!important} /* v269: no verified past events yet */
 .past-fab[aria-pressed="false"]{background:rgba(8,18,36,.85);color:#5a6a8a;border-color:rgba(140,155,189,.15);opacity:.82}
 .past-fab[aria-pressed="true"]{background:#5B8CA8;color:#fff;border-color:#7FB4CC;box-shadow:0 0 0 3px rgba(91,140,168,.55),0 0 18px rgba(91,140,168,.7),0 4px 14px rgba(0,0,0,.4);transform:scale(1.06)}
 </style>
