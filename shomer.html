@@ -5755,7 +5755,7 @@ function checkInbox(){
     fbRestGet('invites/inbox_'+FB._myPhoneHash).then(function(snap){
       var box = snap && snap.val ? snap.val() : snap;
       if(!box) return;
-      if(box.fromUid && box.token){ box={}; box[snap.val().token]=snap.val(); box[snap.val().token]._flat=true; }   // current flat shape
+      if(box.fromUid){ var _v=snap.val(), _k=_v.token||'inbox'; box={}; box[_k]=_v; box[_k]._flat=true; }   // current flat shape (v262: no token in it)
       /* skip invites from people already connected, or tokens already handled on this device */
       try{ Object.keys(box).forEach(function(k){ var it=box[k]; if(it && (gdPairByToken(it.token||k) || (gdState().pairs||[]).some(function(p){return it.fromUid&&p.partnerUid===it.fromUid&&!p.pending;}))) delete box[k]; }); }catch(e){}
       var he=(typeof currentLang!=='undefined' && currentLang==='he');
@@ -5766,8 +5766,8 @@ function checkInbox(){
       if(invites.length){
         var first=box[invites[0]];
         var msg = he
-          ? (invites.length===1 ? ((first.fromName||'מישהו')+' הזמין/ה אותך להיות שומר/ת') : ('יש לך '+invites.length+' הזמנות ממתינות'))
-          : (invites.length===1 ? ((first.fromName||'Someone')+' invited you to be their SHOMER') : ('You have '+invites.length+' pending invites'));
+          ? (invites.length===1 ? ((first.fromName||'מישהו')+' הזמין/ה אותך להיות שומר/ת - פתח/י את הקישור שנשלח אליך') : ('יש לך '+invites.length+' הזמנות ממתינות'))
+          : (invites.length===1 ? ((first.fromName||'Someone')+' invited you - open the link they sent you') : ('You have '+invites.length+' pending invites'));
         showInboxBanner(msg, invites, box);
       }
     }).catch(function(e){});
@@ -5787,13 +5787,18 @@ function showInboxBanner(msg, inviteKeys, box){
       /* mark seen + open the SHOMERs/circle screen so they can accept */
       try{ inviteKeys.forEach(function(k){ fbRestWrite('PUT','invites/inbox_'+FB._myPhoneHash+((box[k]&&box[k]._flat)?'':('/'+k))+'/seen', true); }); }catch(e){}
       b.remove();
-      /* Straight to the approve screen for the newest invite (name, number, code). */
+      /* v262: the inbox never carries the token or the code - approving needs the link the
+         inviter sent (SMS / WhatsApp), which holds the 4-digit code. Legacy records from older
+         senders may still hold a token: open the approve screen, but never auto-fill a code. */
       try{
         var first=box&&inviteKeys.length?box[inviteKeys[0]]:null;
         if(first&&first.token&&typeof gdCheckInviteParam==='function'){
-          localStorage.setItem('shomer_pending_invite', JSON.stringify({tok:first.token, code:String(first.code||'').replace(/\D/g,'').slice(0,4), ts:Date.now()}));
+          localStorage.setItem('shomer_pending_invite', JSON.stringify({tok:first.token, ts:Date.now()}));
           gdCheckInviteParam(); return;
         }
+        var _fn=(first&&first.fromName)||'';
+        toast(he?('פתח/י את הקישור ש'+(_fn||'השולח/ת')+' שלח/ה לך ב-SMS או בוואטסאפ כדי לאשר. אפשר גם להדביק אותו כאן.'):('Open the link '+(_fn||'they')+' sent you by SMS or WhatsApp to approve. You can also paste it here.'),'amb',function(){ try{ gdEnterCodeOpen(); }catch(_){} });
+        return;
       }catch(e){}
       try{ if(typeof openGuardians==='function') openGuardians(); else if(typeof showCircle==='function') showCircle(); }catch(e){}
     };
@@ -7513,9 +7518,11 @@ async function sendInviteSMS(phone, name, token, code){
             /* ONE flat record per recipient: the live rules validate fromUid+ts on invites/<key>
                itself, so the old nested inbox_<hash>/<token> write was always rejected and the
                in-app "X invited you" banner never appeared. */
+            /* v262: NO token / code / phone in the inbox. Anyone who claims a phone's registry
+               entry first can read inbox_<hash>, so it only says "X invited you - open the link
+               they sent you". The link (with the code) travels out-of-band to the real phone. */
             try{ fbRestWrite('PUT','invites/inbox_'+ph, {
-              fromUid:(FB.uid||''), type:'invite', token:token, fromName:invName(),
-              fromPhone:((SS.user&&SS.user.phone)||''), code:String(code||''), ts:Date.now(), seen:false
+              fromUid:(FB.uid||''), type:'invite', fromName:invName(), ts:Date.now(), seen:false
             }); }catch(e){}
           });
         }
@@ -7690,7 +7697,7 @@ async function addGuardian(){
    /* The registry is not readable under the live rules, so "not found" often means "can't
       tell". Drop the request in their in-app inbox too (free, no SMS): if they already use
       SH\u2721MER they see "X invited you" the next time they open it. */
-   try{ if(agToken){ var _ih=await sha256Hex(canon); if(_ih) fbRestWrite('PUT','invites/inbox_'+_ih,{fromUid:FB.uid,type:'invite',token:agToken,fromName:invName(),fromPhone:((SS.user&&SS.user.phone)||''),code:agCode,ts:Date.now(),seen:false}); } }catch(e){}
+   try{ if(agToken){ var _ih=await sha256Hex(canon); if(_ih) fbRestWrite('PUT','invites/inbox_'+_ih,{fromUid:FB.uid,type:'invite',fromName:invName(),ts:Date.now(),seen:false});   /* no token/code/phone (v262) */ } }catch(e){}
  }
  var _selC=(document.getElementById('ag-circle')||{}).value||activeCircleId;
  var m={id:genId('m'),cid:_selC,name:name,rel:'',phoneCanon:validPhone?canon:null,registered:registered,partnerUid:theirUid,pending:(validPhone&&!registered),emoji:'',color:palette[(SS.circleMembers.length)%palette.length],lat:null,lng:null,moving:false,shareTo:true,seeThem:true,sos:false};
@@ -7725,7 +7732,7 @@ async function addGuardian(){
       approval link automatically - verified delivered. The panel stays as a manual
       fallback (WhatsApp / share / copy) in case the SMS is filtered. */
    sendInviteSMS(canon, name, agToken, agCode);
-   try{ if(agToken){ var _ih2=await sha256Hex(canon); if(_ih2) fbRestWrite('PUT','invites/inbox_'+_ih2,{fromUid:FB.uid,type:'invite',token:agToken,fromName:invName(),fromPhone:((SS.user&&SS.user.phone)||''),code:agCode,ts:Date.now(),seen:false}); } }catch(e){}   // in-app inbox even if the SMS is filtered
+   try{ if(agToken){ var _ih2=await sha256Hex(canon); if(_ih2) fbRestWrite('PUT','invites/inbox_'+_ih2,{fromUid:FB.uid,type:'invite',fromName:invName(),ts:Date.now(),seen:false}); } }catch(e){}   // in-app inbox even if the SMS is filtered
    showInvitePanel(name, canon, agToken, agCode);
  } else if(validPhone){
    var invMsg=encodeURIComponent(agToken?inviteTextFor(name, agToken, agCode):(he?('\u05d4\u05d9\u05d9! \u05d4\u05e6\u05d8\u05e8\u05e3/\u05d9 \u05d0\u05dc\u05d9\u05d9 \u05d1-SH\u2721MER - \u05d0\u05e4\u05dc\u05d9\u05e7\u05e6\u05d9\u05d9\u05ea \u05d1\u05d8\u05d9\u05d7\u05d5\u05ea \u05e7\u05d4\u05d9\u05dc\u05ea\u05d9\u05ea. \u05d7\u05d9\u05e0\u05dd: https://www.shomer-app.co.il/'):('Join me on SH\u2721MER: https://www.shomer-app.co.il/')));
@@ -8451,7 +8458,12 @@ function gdEnterCodeSubmit(){
  const m=v.match(/[?#&]g=([^&\s]+)/); if(m){ try{tok=decodeURIComponent(m[1]);}catch(e){tok=m[1];} } else { tok=v.split(/[?#&\s]/)[0]; }
  const hn=v.match(/[#&]n=([^&\s]+)/); if(hn){ try{nm=decodeURIComponent(hn[1]);}catch(e){nm=hn[1];} }
  if(!tok){ toast(currentLang==='he'?'קוד לא תקין':'Invalid code','amb'); return; }
- gdClose('gd-enter'); gdConnect(tok,nm,false);
+ /* v262: a pasted link goes through the same approve screen (identity + 4-digit code) as a
+    tapped one - it used to connect straight away, with no code at all. */
+ let cd=''; const hc=v.match(/[?#&]c=([0-9]{4})/); if(hc) cd=hc[1];
+ gdClose('gd-enter');
+ try{ localStorage.setItem('shomer_pending_invite', JSON.stringify({tok:tok, nm:nm, code:cd, ts:Date.now()})); }catch(e){}
+ gdCheckInviteParam();
 }
 /* Open with ?g=<token> - parsed at startup. Own link in another window = live demo. */
 function gdCheckInviteParam(){
@@ -8508,7 +8520,7 @@ function gdFillIdentity(inv){
   var nm=u.name, ph=u.phone, code=u.code;
   /* Approve is only possible once the 4-digit code matches the one in the invite.
      A missing or wrong code = we can't confirm who sent it, so we don't let it through. */
-  gdFillIdentity._ok=false; gdSetApproveEnabled(false);
+  gdFillIdentity._ok=false; gdFillIdentity._code=''; gdSetApproveEnabled(false);
   try{ var _mi=document.getElementById('gd-my-invname'); if(_mi && !_mi.value) _mi.value=invName()||((SS.user&&SS.user.name&&!/^SH\u2721MER\d/.test(SS.user.name))?SS.user.name:''); }catch(e){}
   try{ if(!he){ var _l=document.getElementById('gd-my-invname-lbl'); if(_l) _l.textContent='Your name - so they know you approved'; var _s=document.getElementById('gd-my-invname-sub'); if(_s) _s.textContent='Only your SHOMERs see this name. Everyone else sees you as anonymous.'; } }catch(e){}
   var av=document.getElementById('gd-ident-av');
@@ -8534,7 +8546,7 @@ function gdFillIdentity(inv){
       if(code && v===String(code)){
         st.textContent=he?'\u2713 מאומת - זה באמת הם':'\u2713 Verified - it really is them';
         st.className='gd-code-st ok';
-        gdFillIdentity._ok=true; gdSetApproveEnabled(true);
+        gdFillIdentity._ok=true; gdFillIdentity._code=v; gdSetApproveEnabled(true);
       } else {
         gdFillIdentity._ok=false; gdSetApproveEnabled(false);
         st.textContent=he?'\u2717 הקוד לא תואם - אל תאשר/י':'\u2717 Code does not match - do NOT approve';
@@ -8624,6 +8636,7 @@ function gdAcceptInvite(){
     return;
   }
   invNameSave(_v);
+  gdAcceptInvite._code=gdFillIdentity._code||'';   /* proof for the inviter: hash(token:code) */
   gdClose('gd-accept'); gdConnect(gdAcceptInvite._tok,gdAcceptInvite._nm,true);
 }
 function gdDeclineInvite(){
@@ -9402,7 +9415,7 @@ try{ hydrateIcons(document); }catch(e){}
 /* Loaded-build version - shown in the diagnostic panel so a phone can prove
    whether it's on the latest build or a STALE cached one. Keep in lock-step
    with sw.js SW_VERSION on every deploy. */
-var APP_VER='v261';
+var APP_VER='v262';
 var FB={ready:false,uid:null,db:null,_presTimer:null,connected:false,listening:false,pushState:'default',near:0,swVer:'?',
   authState:'connecting',sdkLoaded:false,persist:'',permErr:null,err:null,wsProbe:'',csp:''};
 /* Always log connection diagnostics to the console so the real failure can be SEEN in Chrome. */
@@ -10426,13 +10439,8 @@ function fbQueueAlarm(toUid,title,body,tag){ if(!FB.ready||!toUid)return; try{ F
 function fbRegisterInvite(token,name){
   if(!FB.ready||!token)return;
   try{ FB.db.ref('invites/'+token).set({fromUid:FB.uid,name:name||'',ts:Date.now()}); }catch(e){}
-  // inviter watches for the acceptance, then completes the mutual link from its own node
-  try{ FB.db.ref('invites/'+token+'/acceptedBy').on('value',function(snap){
-    var other=snap.val(); if(!other||other===FB.uid)return;
-    FB.db.ref('invites/'+token+'/acceptedName').once('value').then(function(s2){
-      try{ FB.db.ref('pairs/'+FB.uid+'/'+other).set({name:(s2.val()||''),token:token,ts:Date.now()}); }catch(e){}
-    });
-  }); }catch(e){}
+  /* v262: never auto-pair on a bare acceptedBy - the approval handshake decides (code or my confirm). */
+  try{ fbWatchApproval(token, null); }catch(e){}
 }
 function fbAcceptInvite(token,myName){
   if(!FB.ready||!token)return Promise.resolve(null);
@@ -10446,11 +10454,25 @@ function fbAcceptInvite(token,myName){
        who got hold of a forwarded link. Reinstalled users whose registry entry still points
        at an old uid fall back to an unverified acceptance, which the inviter must confirm. */
     var acc={acceptedBy:FB.uid,acceptedName:myName||'',acceptedTs:Date.now(),acceptedPhone:((SS.user&&SS.user.phone)||'').replace(/\D/g,'')};
-    var withPh=Object.assign({acceptedPh:FB._myPhoneHash||''},acc);
-    return fbRestWrite('PATCH','invites/'+token, FB._myPhoneHash?withPh:acc)
-      .catch(function(){ return fbRestWrite('PATCH','invites/'+token, acc); })
-      .then(function(){ return inv.fromUid; }, function(){ return inv.fromUid; });
+    /* v262: the real proof is the 4-digit code the inviter sent out-of-band (link / SMS):
+       acceptedCode = sha256(token:code). The inviter checks it against the code only it and
+       the link hold. The phone stamp alone is never enough (the registry is first-come). */
+    var _cd=(gdAcceptInvite._tok===token&&gdAcceptInvite._code)?String(gdAcceptInvite._code):'';
+    return (_cd?sha256Hex(token+':'+_cd).catch(function(){return '';}):Promise.resolve('')).then(function(ch){
+      if(ch) acc.acceptedCode=ch;
+      var withPh=Object.assign({acceptedPh:FB._myPhoneHash||''},acc);
+      return fbRestWrite('PATCH','invites/'+token, FB._myPhoneHash?withPh:acc)
+        .catch(function(){ return fbRestWrite('PATCH','invites/'+token, acc); });
+    }).then(function(){ fbSendMySalt(inv.fromUid); return inv.fromUid; }, function(){ return inv.fromUid; });
   }).catch(function(){return null;});
+}
+/* v262: SOS salt goes BOTH ways. The inviter's salt reaches me in the invite; mine reaches the
+   inviter here, on salt_<me>_<them> (only I can write it; they ignore anyone else's record). */
+function fbSendMySalt(puid){
+  try{ if(!FB.ready||!FB.uid||!puid) return;
+    fbRestWrite('PUT','invites/salt_'+FB.uid.slice(0,16)+'_'+String(puid).slice(0,16),
+      {fromUid:FB.uid, ts:Date.now(), name:'S|'+cut(invName()||(SS.user&&SS.user.name)||'',16)+'|'+sosSalt()}).catch(function(){});
+  }catch(e){}
 }
 /* ══ CROSS-DEVICE LIVE LOCATION (real users see each other) ══
    Uses the EXISTING presence/<uid> node (verified writable+readable under live rules).
@@ -10492,9 +10514,13 @@ function fbWatchApproval(token, theirUid){
          • open link (no known recipient) → I confirm the person (name + number) myself.
          Mismatch = refused, flagged, and the invite is re-issued on a fresh link. */
       if(fbWatchApproval._busy&&fbWatchApproval._busy[token]) return;
-      var verdict=gdApprovalVerdict(p, inv, theirUid);
+      fbWatchApproval._busy=fbWatchApproval._busy||{}; fbWatchApproval._busy[token]='chk';
+      gdCodeCheck(p, inv, token).then(function(codeOk){
+      if(fbWatchApproval._busy[token]==='chk') delete fbWatchApproval._busy[token];
+      if(p.linked||p.token!==token) return;
+      var verdict=gdApprovalVerdict(p, inv, theirUid, codeOk);
       if(verdict==='reject'){ gdRejectAcceptance(p, inv, token, true); return; }
-      if(verdict==='ask'){ gdConfirmAcceptance(p, inv, token, theirUid); return; }
+      if(verdict==='ask'){ gdConfirmAcceptance(p, inv, token, theirUid, codeOk); return; }
       var puid=inv.acceptedBy||theirUid;
       try{ fbRestWrite('PUT','pairs/'+FB.uid+'/'+puid,{name:p.name||'',token:token,ts:Date.now(),via:'phone'}); }catch(e){}
       p.pending=false; p.linked=true; p.partnerUid=puid;
@@ -10506,16 +10532,35 @@ function fbWatchApproval(token, theirUid){
       try{ gdRenderMarkers(); renderCircles(); }catch(e){}
       toast(he?('\u2713 '+(p.name||'')+' \u05d0\u05d9\u05e9\u05e8/\u05d4 - \u05ea\u05e8\u05d0\u05d5 \u05d6\u05d4 \u05d0\u05ea \u05d6\u05d4 \u05e2\u05dc \u05d4\u05de\u05e4\u05d4'):('\u2713 '+(p.name||'')+' approved - you can see each other'),'grn');
       try{ pushNotify('SHOMER', he?((p.name||'')+' \u05d0\u05d9\u05e9\u05e8/\u05d4 \u05d0\u05ea \u05d4\u05d1\u05e7\u05e9\u05d4'):((p.name||'')+' approved your request'),'gd-appr'); }catch(e){}
+      try{ fbSendMySalt(puid); sosWatchPartners(); fbListenSOS(); sosWatchMyResponders(); }catch(e){}
+      });
     };
     FB.db.ref('invites/'+token).on('value', _onInv, function(){});
     fbWatchApproval._fns=fbWatchApproval._fns||{}; fbWatchApproval._fns[token]=_onInv;
   }catch(e){}
 }
 fbWatchApproval._recheck=function(token){ try{ var f=fbWatchApproval._fns&&fbWatchApproval._fns[token]; if(f) fbRestGet('invites/'+token).then(f).catch(function(){}); }catch(e){} };
-function gdApprovalVerdict(p, inv, theirUid){
+/* v262: the acceptance proves the 4-digit code (sha256(token:code)) that only the link I sent
+   out-of-band holds. true = proven, false = WRONG code (someone guessing), null = no proof. */
+function gdCodeCheck(p, inv, token){
+  if(!inv||!inv.acceptedCode) return Promise.resolve(null);
+  if(!p||!p.code) return Promise.resolve(null);
+  return sha256Hex(token+':'+String(p.code)).then(function(h){ return h===inv.acceptedCode; }).catch(function(){ return null; });
+}
+/* Never auto-link on the phone stamp alone - registry entries are first-come, so anyone can
+   claim a number that is not on SH\u2721MER yet and read/forge with it. Auto-link only with
+   the code; otherwise I confirm the person myself (and "Yes" is final - no loop). */
+function gdApprovalVerdict(p, inv, theirUid, codeOk){
   if(theirUid) return (inv.acceptedBy===theirUid)?'ok':'reject';
-  if(p.toPh){ if(inv.acceptedPh && inv.acceptedPh===p.toPh) return 'ok'; return inv.acceptedPh?'reject':'ask'; }
-  return p.confirmedBy===inv.acceptedBy ? 'ok' : 'ask';
+  if(codeOk===false) return 'reject';
+  if(p.confirmedBy && p.confirmedBy===inv.acceptedBy) return 'ok';
+  if(codeOk===true){
+    /* right code but a DIFFERENT registered phone than the one I invited = forwarded link: ask */
+    if(p.toPh && inv.acceptedPh && inv.acceptedPh!==p.toPh) return 'ask';
+    return 'ok';
+  }
+  if(p.toPh && inv.acceptedPh && inv.acceptedPh!==p.toPh) return 'reject';
+  return 'ask';
 }
 /* Refuse an acceptance: forget it locally and re-issue the invite on a fresh token
    (the old one is burned - the rules let each invite be accepted once). */
@@ -10533,20 +10578,25 @@ function gdRejectAcceptance(p, inv, token, flagged){
     :(he?'לא חוברתם. הכנו קישור חדש - שלח/י אותו שוב לאדם הנכון.':'Not connected. We made a new link - send it again to the right person.'),'amb');
 }
 /* Open link: show who accepted and let me confirm it is the person I invited. */
-function gdConfirmAcceptance(p, inv, token, theirUid){
+function gdConfirmAcceptance(p, inv, token, theirUid, codeOk){
   var he=currentLang==='he';
   fbWatchApproval._busy=fbWatchApproval._busy||{}; if(fbWatchApproval._busy[token]) return; fbWatchApproval._busy[token]=1;
   var ph=String(inv.acceptedPhone||'').replace(/\D/g,'');
   var show=function(verified){
     var old=document.getElementById('invconf-bar'); if(old) old.remove();
     try{ popupClearLow(); }catch(e){}
-    var bar=document.createElement('div'); bar.id='invconf-bar'; bar.className='nudge-bar';
+    /* the invite panel for this person is done - it must not cover the confirm buttons */
+    try{ var _ip=document.getElementById('inv-panel'); if(_ip) _ip.remove(); }catch(e){}
+    var bar=document.createElement('div'); bar.id='invconf-bar'; bar.className='nudge-bar'; bar.style.zIndex='100001';
+    /* a registry stamp is first-come, not proof of the number - never call it "verified" */
+    var note=codeOk===true?(he?'⚠️ הקישור נפתח ממספר אחר מזה שהזמנת':'⚠️ The link was opened from a different number than the one you invited')
+                          :(he?'⚠️ לא הוזן הקוד שלך - ייתכן שזה לא הם':'⚠️ Your code was not entered - this may not be them');
     bar.innerHTML='<span class="nudge-tx" style="font-weight:800">'+(he?'מישהו אישר את ההזמנה שלך':'Someone accepted your invite')+'</span>'
-      +'<span class="nudge-tx"><b>'+ESC(inv.acceptedName||(he?'ללא שם':'No name'))+'</b>'+(ph?(' · <span dir="ltr">+'+ESC(ph)+'</span>'):'')+'<br><small>'+(verified?(he?'✓ מספר מאומת':'✓ Verified number'):(he?'⚠️ המספר לא מאומת':'⚠️ Number not verified'))+'</small></span>'
+      +'<span class="nudge-tx"><b>'+ESC(inv.acceptedName||(he?'ללא שם':'No name'))+'</b>'+(ph?(' · <span dir="ltr">+'+ESC(ph)+'</span>'):'')+'<br><small>'+note+'</small></span>'
       +'<span class="nudge-tx" style="font-size:13px;opacity:.85">'+(he?'זה האדם שהזמנת? רק באישור שלך הוא יראה את המיקום שלך.':'Is this who you invited? Only if you confirm will they see your location.')+'</span>'
       +'<button class="nudge-cta" id="invconf-yes">'+(he?'כן, חבר/י':'Yes, connect')+'</button>'
       +'<button class="nudge-cta" id="invconf-no" style="background:transparent;border:1px solid rgba(255,112,128,.6);color:#FF9AA5">'+(he?'זה לא הם':'Not them')+'</button>';
-    (document.getElementById('app')||document.body).appendChild(bar);
+    document.body.appendChild(bar);
     document.getElementById('invconf-yes').onclick=function(){ bar.remove(); delete fbWatchApproval._busy[token]; p.confirmedBy=inv.acceptedBy; saveStore(); fbWatchApproval._recheck(token); };
     document.getElementById('invconf-no').onclick=function(){ bar.remove(); delete fbWatchApproval._busy[token]; gdRejectAcceptance(p, inv, token, false); };
   };
