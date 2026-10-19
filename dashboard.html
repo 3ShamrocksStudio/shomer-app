@@ -1321,7 +1321,7 @@ function renderLive(c,list,opts){
  var openRev=revRows.filter(function(r){return r.status==='open';}).length;
  var h='<div class="fsec live fi">חי עכשיו · לטיפול מיידי<span class="sp"></span>'+liveRows.length+'</div>'
   +(liveRows.length?liveRows.map(_boardRow).join(''):'<div class="item calm fi"><i></i>אין אירוע חי בטריטוריה כעת</div>')
-  +'<div class="fsec fi">אירועים קודמים · לסקירה<span class="sp"></span>'+openRev+' פתוחים</div>'
+  +'<div class="fsec fi">אירועים קודמים · לסקירה<span class="sp"></span>פתוחים: '+openRev+'</div>'
   +(revRows.length?revRows.map(_boardRow).join(''):'<div class="item calm fi" style="cursor:pointer" onclick="boardRestoreExamples()">אין אירועים קודמים · <b style="color:var(--gold)">הצגת דוגמאות</b></div>');
  if(feed){ feed.innerHTML=h; }
  var xb=document.getElementById('ex-clear'); if(xb) xb.style.display=B.examples.length?'':'none';
@@ -1885,7 +1885,8 @@ function _trCmpSpec(c){
   series:[{k:'me',label:c.city,c:'#faac22',v:keys.map(function(k){return rate([c],k);}),raw:keys.map(function(k){return c.cats[k]||0;})},
           {k:'near',label:'5 ערים סמוכות',c:'#4f8df5',v:keys.map(function(k){return rate(near,k);}),tip:near.map(function(x){return x.city;}).join(', ')},
           {k:'nat',label:'ממוצע ארצי'+(perK?' ('+pool.length+' ערים)':''),c:'#8fa2c8',v:keys.map(function(k){return rate(pool,k);})}],
-  foot:'מקור: משטרת ישראל 2025 · data.gov.il'+(perK?' · אוכלוסייה: הערכת למ״ס':' · אין נתון אוכלוסייה — מוצג % מהעבירות')+' · אין במאגר נתוני שנה קודמת'};
+  foot:(perK?'עבירות ל-1,000 תושבים · משטרת ישראל 2025 · אוכלוסייה: הערכת למ״ס':'% מהעבירות בעיר · משטרת ישראל 2025'),
+  footTip:'מקור: משטרת ישראל 2025 · data.gov.il'+(perK?' · אוכלוסייה: הערכת למ״ס (מעוגלת)':' · אין נתון אוכלוסייה לעיר — מוצג % מהעבירות')+' · אין במאגר נתוני שנה קודמת, לכן ההשוואה היא בין ערים'};
 }
 function _trNetSpec(c){
  var N=window._net; if(!N) return {empty:'טוען נתוני רשת…'}; if(!N.ok) return {empty:'אין חיבור לנתוני הרשת כרגע — ננסה שוב אוטומטית.'};
@@ -1897,7 +1898,8 @@ function _trNetSpec(c){
  var at=new Date(N.at);
  return {kind:'line', unit:'', dec:0, x:x, xFull:xf,
   series:[{k:'all',label:'משתמשים · כל הרשת',c:'#2bc47e',v:a},{k:'terr',label:'משתמשים · בטריטוריה',c:'#faac22',v:t},{k:'ev',label:'דיווחים · בטריטוריה',c:'#ef4853',v:ev}],
-  foot:'מקור: רשת SH✡MER (זמן אמת) · משתמש נספר בשבוע פעילותו האחרונה · נכון ל-'+_p2(at.getHours())+':'+_p2(at.getMinutes())};
+  foot:'לפי שבוע הפעילות האחרונה · רשת SH✡MER · '+_p2(at.getHours())+':'+_p2(at.getMinutes()),
+  footTip:'מקור: רשת SH✡MER (dashfeed, זמן אמת). כל משתמש נספר פעם אחת — בשבוע שבו נראה לאחרונה. דיווחים = אירועים שדווחו בטריטוריה.'};
 }
 function renderTrendInline(elId){
  var el=document.getElementById(elId); if(!el||!DATA)return; var c=curC(); if(!c)return;
@@ -1909,7 +1911,7 @@ function renderTrendInline(elId){
  var rng=view==='net'?'<div class="tr-ranges sm">'+[4,12,26].map(function(r){return '<button class="tr-rg'+(r===R?' on':'')+'" onclick="_trSetRange('+r+')">'+r+' שב׳</button>';}).join('')+'</div>':'';
  var chips=(spec.series||[]).map(function(s){ var a=on[s.k]!==0; return '<button class="tr-ck'+(a?' on':'')+'" style="--cc:'+s.c+'" onclick="_trToggle(\''+view+'\',\''+s.k+'\')" title="'+(a?'הסתרת':'הצגת')+' הסדרה'+(s.tip?' · '+ESC(s.tip):'')+'"><i></i>'+ESC(s.label)+'</button>'; }).join('');
  el.innerHTML='<div class="tr-ctrl"><div style="display:flex;gap:6px;flex-wrap:wrap">'+seg+rng+'</div><div class="tr-checks">'+chips+'</div></div>'
-  +'<div class="chart-host"></div><div class="foot" style="padding-top:4px" title="'+ESC(spec.foot||'')+'">'+(spec.foot||'')+(spec.unit?' · יחידה: '+spec.unit:'')+'</div>';
+  +'<div class="chart-host"></div><div class="foot" style="padding-top:4px" title="'+ESC(spec.footTip||spec.foot||'')+'">'+(spec.foot||'')+'</div>';
  var host=el.querySelector('.chart-host'), W=Math.floor(host.clientWidth), H=Math.floor(host.clientHeight);
  if(spec.empty){ host.innerHTML='<div class="trend-empty">'+spec.empty+'</div>'; return; }
  if(W<80||H<40) return;
@@ -1972,7 +1974,7 @@ function _medPC(){ var pv=DATA._sorted.map(perCap).filter(function(v){return v!=
 function recItems(idx,fk){
  var c=cityAt(idx), cities=DATA._sorted, out=[], S=window._liveStats||{}, BR=window._boardRows||{rev:[],live:[]};
  var openRev=(BR.rev||[]).filter(function(r){return r.status==='open';}), openEx=openRev.filter(function(r){return r.ex;}).length;
- if(openRev.length) out.push({cls:'flag',i:'!',t:openRev.length+' אירועים ממתינים לסגירה'+(openEx?' (מתוכם '+openEx+' דוגמה)':''),d:'לעבור על לוח האירועים, לסמן "טופל" או "נסגר" ולכתוב מה היה הסוף — כך האירוע נכנס לדוח.',why:'לוח האירועים · מצבים שסומנו בדפדפן זה',go:'openFeedAll()'});
+ if(openRev.length) out.push({cls:'flag',i:'!',t:(openRev.length===1?'אירוע אחד ממתין לסגירה':openRev.length+' אירועים ממתינים לסגירה')+(openEx?(openEx===openRev.length?' · דוגמה':' (מתוכם '+openEx+' דוגמה)'):''),d:'לעבור על לוח האירועים, לסמן "טופל" או "נסגר" ולכתוב מה היה הסוף — כך האירוע נכנס לדוח.',why:'לוח האירועים · מצבים שסומנו בדפדפן זה',go:'openFeedAll()'});
  if(!hasStats(c)){
    out.push({cls:'info',i:'i',t:'אין נתוני פשיעה רשמיים ל'+c.city,d:'נתוני משטרת ישראל קיימים לערי ישראל בלבד. כאן מוצגים נתוני הרשת והאירועים מהשטח.',why:'המאגר הרשמי שנטען: '+(DATA.source||'')+' · '+(DATA.period||'')});
    if(c.intl) out.push({cls:'info',i:'☎',t:'מספרי חירום: לפי המדינה',d:'להעביר אירוע חירום למספר החירום המקומי (112 / 911 וכדומה). אין שיגור אוטומטי מהמערכת.'});
@@ -1994,7 +1996,7 @@ function recItems(idx,fk){
      out.push({cls:r>=1.2?'up':'info',i:'#',t:'עבירות לכל 1,000 תושבים: '+pc.toFixed(1),d:(r>=1.2?'פי '+r.toFixed(1)+' מהעיר האמצעית בארץ ('+M.med.toFixed(1)+') — נימוק לבקשת תקציב וכוח אדם.':r<=0.9?'פחות מהעיר האמצעית בארץ ('+M.med.toFixed(1)+') — לשמור על המגמה.':'קרוב לעיר האמצעית בארץ ('+M.med.toFixed(1)+') — להמשיך מעקב.'),why:'משטרת ישראל 2025 · אוכלוסייה: הערכת למ״ס · השוואה ל-'+M.n+' ערים עם נתון אוכלוסייה'}); }
    var ranked=Object.keys(c.cats).filter(function(k){return k!==tc.name;}).map(function(k){var a=c.cats[k]/c.total,b=natShare(cities,k);return{k:k,cs:a,ns:b,r:b?a/b:0};}).sort(function(a,b){return b.r-a.r;});
    var sec=ranked[0];
-   if(sec&&sec.r>1.12) out.push({cls:'flag',i:'▲',t:catPlain(sec.k)+' — יותר מהממוצע בארץ',d:Math.round(sec.cs*100)+'% כאן לעומת '+Math.round(sec.ns*100)+'% בארץ. '+(ACT_PLAIN[sec.k]||''),why:'משטרת ישראל 2025'});
+   if(sec&&sec.r>1.12&&sec.cs>=0.05) out.push({cls:'flag',i:'▲',t:catPlain(sec.k)+' — יותר מהממוצע בארץ',d:Math.round(sec.cs*100)+'% כאן לעומת '+Math.round(sec.ns*100)+'% בארץ. '+(ACT_PLAIN[sec.k]||''),why:'משטרת ישראל 2025'});
  }
  if(S.territoryActive!=null) out.push({cls:'info',i:'◉',t:'שומרים פעילים בטריטוריה היום: '+S.territoryActive,d:S.territoryActive<10?'כיסוי נמוך — לגייס מתנדבים ולהפיץ את האפליקציה בשכונות.':'יש כיסוי — אפשר להיעזר בשומרים לדיווח מהיר מהשטח.',why:'רשת SH✡MER · משתמשים פעילים ב-24 שעות, עד 18 ק״מ ממרכז הטריטוריה'});
  return out;
@@ -2014,6 +2016,34 @@ function buildAnalysis(idx,fk){
  var head=fk?'ניתוח ממוקד · <b>'+catPlain(fk)+' · '+ESC(c.city)+'</b>':'פעולות מומלצות · <b>'+ESC(c.city)+'</b>';
  var rp=document.getElementById('recspane'); if(rp){ rp.innerHTML='<div class="rh">'+head+'</div>'+items.map(ri).join(''); _fitRecs(); }
 }
+/* ---- territory model: an Israeli dataset city (idx ≥ 0) or a worldwide territory (idx −1) ----
+   Outside the dataset there are NO official crime stats: crime tiles show "—" and say so; the
+   network, events board, map and export keep working from the live feed. */
+function cityAt(idx){ if(!DATA)return null; if(idx===-1) return DATA._custom||null; return DATA._sorted[idx]||null; }
+function curC(){ return (DATA&&DATA._idx!=null)?cityAt(DATA._idx):null; }
+function hasStats(c){ return !!(c&&!c.noData&&c.cats&&c.total); }
+function isIntl(c){ return !!(c&&c.intl); }
+function fillTerrSel(){ var ts=document.getElementById('terr-sel'); if(!ts||!DATA)return; var cur=curC();
+ var h=DATA._sorted.map(function(x){return '<option value="'+ESC(x.city)+'">'+ESC(x.city)+'</option>';}).join('');
+ if(DATA._custom) h+='<option value="__custom">🌍 '+ESC(DATA._custom.city)+'</option>';
+ h+='<option value="__intl">🌍 טריטוריה אחרת…</option>';
+ ts.innerHTML=h; ts.value=(DATA._idx===-1)?'__custom':(cur?cur.city:''); }
+function onTerrChange(){ var ts=document.getElementById('terr-sel'); if(!ts||!DATA)return; var v=ts.value;
+ if(v==='__intl'){ var q=null; try{ q=prompt('שם העיר או האזור (גם מחוץ לישראל), למשל: Miami, FL'); }catch(e){} if(q&&q.trim()){ setIntlTerritory(q.trim()); } else { fillTerrSel(); } return; }
+ if(v==='__custom'){ if(DATA._custom) render(-1); return; }
+ var i=DATA._sorted.findIndex(function(x){return x.city===v;}); if(i>=0){ if(CLIENT) CLIENT.territory=v; render(i); } }
+async function setIntlTerritory(q){
+ var j=null; try{ var r=await fetch('https://nominatim.openstreetmap.org/search?format=jsonv2&polygon_geojson=1&addressdetails=1&limit=1&accept-language=he,en&q='+encodeURIComponent(q),{headers:{'Accept':'application/json'}}); j=r.ok?await r.json():null; }catch(e){ j=null; }
+ var hit=j&&j[0];
+ if(!hit){ try{ alert('לא נמצא מקום בשם "'+q+'". נסו שם עיר באנגלית, למשל "Miami, FL".'); }catch(e){} fillTerrSel(); return false; }
+ var ad=hit.address||{}, cc=String(ad.country_code||'').toLowerCase();
+ var nm=ad.city||ad.town||ad.village||ad.municipality||ad.county||hit.name||q;
+ if(cc==='il'){ var i=DATA._sorted.findIndex(function(x){return x.city===nm||x.city===String(nm).replace(/-/g,' ');}); if(i>=0){ if(CLIENT)CLIENT.territory=DATA._sorted[i].city; render(i); return true; } }
+ var c={city:String(nm), lat:+hit.lat, lng:+hit.lon, total:null, cats:{}, noData:true, intl:cc!=='il', country:ad.country||'', cc:cc};
+ _boundaryCache[c.city]=(hit.geojson&&(hit.geojson.type==='Polygon'||hit.geojson.type==='MultiPolygon'))?hit.geojson:null;
+ DATA._custom=c; if(CLIENT) CLIENT.territory=c.city; render(-1); return true;
+}
+function _applyTerrParam(){ try{ var q=new URLSearchParams(location.search).get('terr'); if(q){ var i=DATA._sorted.findIndex(function(x){return x.city===q;}); if(i>=0)render(i); else setIntlTerritory(q); } }catch(e){} }
 function render(idx){
  var cities=DATA._sorted,c=cityAt(idx);if(!c)return;
  if(_curCity!==c){ _sosFocusLock=false; _presFitFor=null; }
