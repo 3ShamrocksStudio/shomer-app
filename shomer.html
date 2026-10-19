@@ -2221,31 +2221,119 @@ body.otp-active .ob-steps{display:none!important;}
  </div>
  </div>
 
+ <style id="prof-v2-css">
+ /* PROFILE v2 - compact header, one readiness card, today's 60 seconds, collapsible sections.
+    Brand: gold #faac22 · navy #1e315f · deep navy #0c1b39. Scoped to #sh-prof (+ the daily card). */
+ #sh-prof{--pfg:#faac22;--pfn:#1e315f;--pfd:#0c1b39;}
+ .shomer-marker .mk-circle:not(.live){opacity:.55;filter:grayscale(.6);} /* v273: stale guardian position */
+ #sh-prof .sh-body{padding-top:6px;}
+ #sh-prof .pf-hd{display:flex;align-items:center;gap:12px;padding:2px 2px 12px;}
+ #sh-prof .pf-av{flex:0 0 48px;width:48px;height:48px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:20px;font-weight:900;color:var(--pfg);background:radial-gradient(circle at 35% 30%,var(--pfn),var(--pfd));box-shadow:0 0 0 2px rgba(250,172,34,.55),0 6px 16px rgba(0,0,0,.4);}
+ #sh-prof .pf-id{flex:1;min-width:0;}
+ #sh-prof .pf-id .p-nm{margin:0 0 3px;font-size:18px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+ #sh-prof .pf-id .p-badges{justify-content:flex-start;gap:5px;}
+ #sh-prof .pf-streak{flex:0 0 auto;text-align:center;padding:6px 10px;border-radius:14px;background:rgba(30,49,95,.55);border:1px solid rgba(250,172,34,.25);line-height:1.1;min-width:58px;}
+ #sh-prof .pf-streak b{display:block;font-size:19px;font-weight:900;color:var(--pfg);}
+ #sh-prof .pf-streak small{font-size:10.5px;color:var(--tx2);font-weight:600;}
+ /* readiness card */
+ .pf-rd{position:relative;border-radius:18px;background:linear-gradient(160deg,#1e315f 0%,#0c1b39 100%);border:1px solid rgba(250,172,34,.3);box-shadow:0 10px 28px rgba(0,0,0,.35);margin-bottom:10px;overflow:hidden;}
+ .pf-rd>summary{list-style:none;display:flex;align-items:center;gap:12px;padding:12px 14px;cursor:pointer;}
+ .pf-rd>summary::-webkit-details-marker,.pf-sec>summary::-webkit-details-marker{display:none;}
+ .pf-ring{flex:0 0 58px;width:58px;height:58px;border-radius:50%;display:grid;place-items:center;background:conic-gradient(var(--pfg,#faac22) calc(var(--p,0)*1%),rgba(255,255,255,.09) 0);}
+ .pf-ring span{width:46px;height:46px;border-radius:50%;background:#0c1b39;display:grid;place-items:center;font-size:14px;font-weight:900;color:#fff;}
+ .pf-rd-tx{flex:1;min-width:0;}
+ .pf-eyebrow{font-size:10.5px;font-weight:700;letter-spacing:.4px;color:var(--p3);}
+ .pf-lvl{font-size:17px;font-weight:900;color:var(--pfg,#faac22);line-height:1.25;}
+ .pf-lvl-sub{font-size:11.5px;color:var(--tx2);}
+ .pf-ladder{display:flex;gap:4px;margin-top:7px;direction:inherit;}
+ .pf-ladder i{flex:1;height:5px;border-radius:3px;background:rgba(255,255,255,.1);overflow:hidden;position:relative;}
+ .pf-ladder i b{position:absolute;inset-block:0;inset-inline-start:0;background:var(--pfg,#faac22);border-radius:3px;}
+ .pf-steps{padding:0 10px 10px;}
+ .pf-step{display:flex;align-items:center;gap:10px;width:100%;min-height:42px;padding:7px 8px;border:0;border-top:1px solid rgba(255,255,255,.07);background:none;color:var(--tx0);font:inherit;font-size:13.5px;text-align:start;cursor:pointer;border-radius:0;}
+ .pf-step:first-child{border-top:0;}
+ .pf-step .pf-ck{flex:0 0 22px;width:22px;height:22px;border-radius:50%;border:2px solid rgba(250,172,34,.55);display:grid;place-items:center;font-size:12px;font-weight:900;color:#0c1b39;}
+ .pf-step.done .pf-ck{background:var(--pfg,#faac22);border-color:var(--pfg,#faac22);}
+ .pf-step.done .pf-sl{color:var(--tx2);}
+ .pf-step .pf-sl{flex:1;min-width:0;line-height:1.35;}
+ .pf-step .pf-sl small{display:block;font-size:11px;color:var(--tx2);}
+ .pf-step .pf-go{flex:0 0 auto;font-size:11.5px;font-weight:800;color:var(--pfg,#faac22);padding:5px 10px;border-radius:999px;border:1px solid rgba(250,172,34,.4);}
+ .pf-step.done .pf-go{display:none;}
+ .pf-lvh{font-size:11px;font-weight:800;color:var(--p3);padding:10px 8px 2px;letter-spacing:.3px;}
+ .pf-lvh.cur{color:var(--pfg,#faac22);}
+ .pf-more{display:block;width:100%;padding:8px;border:0;background:none;color:var(--p3);font:inherit;font-size:12px;font-weight:700;cursor:pointer;text-decoration:underline;text-underline-offset:3px;}
+ .pf-elig{margin:4px 8px 0;padding:8px 10px;border-radius:10px;font-size:11.5px;line-height:1.5;color:var(--tx1);background:rgba(255,255,255,.04);border:1px dashed rgba(250,172,34,.35);}
+ /* today's 60 seconds */
+ .pf-today{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px;}
+ .pf-tile{display:flex;flex-direction:column;align-items:flex-start;gap:2px;min-height:62px;padding:10px 12px;border-radius:14px;border:1px solid rgba(250,172,34,.22);background:rgba(30,49,95,.45);color:var(--tx0);font:inherit;text-align:start;cursor:pointer;}
+ .pf-tile b{font-size:13.5px;font-weight:800;display:flex;align-items:center;gap:6px;}
+ .pf-tile small{font-size:11.5px;color:var(--tx2);line-height:1.35;}
+ .pf-tile.go{background:linear-gradient(135deg,#C09020 0%,#faac22 100%);border-color:transparent;color:#0c1b39;}
+ .pf-tile.go small{color:#1e315f;}
+ .pf-tile.ok b::before{content:'✓';display:inline-grid;place-items:center;width:16px;height:16px;border-radius:50%;background:var(--pfg,#faac22);color:#0c1b39;font-size:10px;}
+ /* collapsible sections */
+ #sh-prof .pf-sec{border-top:1px solid var(--b1);}
+ #sh-prof .pf-sec:last-of-type{border-bottom:1px solid var(--b1);}
+ #sh-prof .pf-sec>summary{list-style:none;display:flex;align-items:center;gap:8px;min-height:46px;padding:4px 2px;cursor:pointer;}
+ #sh-prof .pf-st{font-size:14.5px;font-weight:800;color:var(--tx0);}
+ #sh-prof .pf-sm{margin-inline-start:auto;font-size:12px;color:var(--tx2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:55%;}
+ #sh-prof .pf-chev{flex:0 0 18px;width:18px;height:18px;color:var(--p2);transition:transform .2s;}
+ #sh-prof details[open]>summary .pf-chev{transform:rotate(180deg);}
+ #sh-prof .pf-sb{padding:2px 2px 14px;}
+ #sh-prof .pf-note{font-size:11.5px;color:var(--tx2);margin:0 2px 6px;line-height:1.5;}
+ #sh-prof .pf-sb .pstats{gap:14px;margin:4px 0 12px;}
+ #sh-prof .pf-sb .pcirc{width:76px;height:76px;}
+ #sh-prof .pf-sb .pcirc .pc-n{font-size:22px;}
+ #sh-prof .pf-sb .pcirc .pc-l{font-size:10.5px;}
+ #sh-prof .pf-sb .defib-prompt{margin:4px 0 0;}
+ /* what I learned */
+ .pf-lgrid{display:grid;grid-template-columns:1fr 1fr;gap:6px;}
+ .pf-lc{display:flex;align-items:center;gap:7px;min-height:38px;padding:6px 9px;border-radius:10px;background:rgba(255,255,255,.035);border:1px solid var(--b1);color:var(--tx1);font:inherit;font-size:12px;text-align:start;cursor:pointer;}
+ .pf-lc i{flex:0 0 8px;width:8px;height:8px;border-radius:50%;}
+ .pf-lc span{flex:1;min-width:0;line-height:1.25;}
+ .pf-lc em{font-style:normal;font-size:11px;font-weight:800;color:var(--tx3);}
+ .pf-lc.rd{border-color:rgba(250,172,34,.35);color:var(--tx0);}
+ .pf-lc.rd em{color:var(--pfg,#faac22);}
+ .pf-lstat{display:flex;gap:8px;margin:0 0 10px;}
+ .pf-lstat div{flex:1;padding:8px 6px;border-radius:12px;background:rgba(30,49,95,.45);text-align:center;}
+ .pf-lstat b{display:block;font-size:17px;font-weight:900;color:var(--pfg,#faac22);}
+ .pf-lstat small{font-size:10.5px;color:var(--tx2);}
+ </style>
  <!-- ═══ PROFILE ═══ -->
  <div class="sheet" id="sh-prof" role="dialog" aria-modal="true" aria-labelledby="prof-ttl">
  <div class="sh-pill" aria-hidden="true"></div>
  <div class="sh-head"><span class="sh-ttl" id="prof-ttl">הפרופיל שלי</span><button class="sh-x" onclick="cl('sh-prof')" aria-label="סגור"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg></button></div>
  <div class="sh-body">
- <div class="prof-top">
- 
+ <!-- PROFILE v2: compact header + readiness + today + collapsible sections (fits one phone screen at rest) -->
+ <div class="pf-hd">
+ <div class="pf-av" id="pf-av" aria-hidden="true"></div>
+ <div class="pf-id">
  <div class="p-nm" id="profNm">שומר</div>
  <div class="p-badges">
- <!-- "SHOMER level" removed (vanity gamification trivialises a safety app). Only a real
-      trust/anti-abuse reputation mechanic would justify a status indicator here. -->
  <span class="p-rank" id="prof-rank"></span><span id="founder-slot"></span><span class="p-prof-badge" id="prof-prof-badge"><span class="ic" id="prof-prof-ic"></span><span id="prof-prof-nm"></span></span>
  </div>
  </div>
+ <div class="pf-streak" id="pf-streak" role="status"></div>
+ </div>
+ <div id="prof-drill"></div>
+ <details class="pf-sec" id="pf-sec-learn"><summary><span class="pf-st" data-he="מה למדתי" data-en="What I learned" data-ar="ما تعلّمته">מה למדתי</span><span class="pf-sm" id="pf-sec-learn-sm"></span><svg class="pf-chev" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></summary>
+ <div class="pf-sb">
+ <div id="pf-learn"></div>
+ </div></details>
+ <details class="pf-sec" id="pf-sec-act"><summary><span class="pf-st" data-he="הפעילות שלי" data-en="My activity" data-ar="نشاطي">הפעילות שלי</span><span class="pf-sm" id="pf-sec-act-sm"></span><svg class="pf-chev" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></summary>
+ <div class="pf-sb">
  <div class="pstats" role="group" aria-label="הפעילות שלי">
  <div class="pcirc resp"><div class="pc-n" id="stat-responded">0</div><div class="pc-l" id="stat-responded-lbl">הגבתי</div></div>
  <div class="pcirc rep"><div class="pc-n" id="stat-reports">0</div><div class="pc-l" id="stat-reports-lbl">דיווחתי</div></div>
  </div>
  <div style="display:none"><span id="stat-sos">0</span><span id="stat-sos-lbl"></span></div>
- <div class="sec-cap mb12" data-he="המשמרת היומית" data-en="Daily drill" data-ar="التمرين اليومي">המשמרת היומית</div>
- <div id="prof-drill"></div>
- <div class="sec-cap mb12">השם שלי בהזמנות</div>
- <input id="prof-invname" type="text" maxlength="24" autocomplete="name" placeholder="למשל: דוד מרקוביץ׳" oninput="invNameSave(this.value)" style="width:100%;box-sizing:border-box;padding:12px 14px;border-radius:12px;border:1px solid rgba(201,168,76,.35);background:rgba(255,255,255,.04);color:inherit;font:inherit;font-size:15px">
- <p class="sr-sb" style="margin:6px 2px 16px;line-height:1.6">רק מי שתזמין/י יראה את השם הזה. לכל שאר המשתמשים את/ה נשאר/ת אנונימי/ת.</p>
- <div class="sec-cap mb12" id="prof-prof-cap">תפקיד מקצועי (מתנדב/ת מגיב/ה)</div>
+<div class="sec-cap mb12" id="myrep-cap">הדיווחים שלי</div>
+ <div id="my-reports-list" class="mb20" role="list"></div>
+ <div class="sec-cap mb12" id="soshist-cap">היסטוריית SOS</div>
+ <div id="sos-hist-list" role="list"></div>
+ </div></details>
+ <details class="pf-sec" id="pf-sec-role"><summary><span class="pf-st" data-he="תפקיד מגיב/ה" data-en="Responder role" data-ar="دور المستجيب">תפקיד מגיב/ה</span><span class="pf-sm" id="pf-sec-role-sm"></span><svg class="pf-chev" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></summary>
+ <div class="pf-sb">
+ <div class="pf-cap" id="prof-prof-cap" hidden>תפקיד מקצועי (מתנדב/ת מגיב/ה)</div>
  <p class="sr-sb" id="prof-prof-hint" style="margin:-4px 2px 12px;line-height:1.6">בחר/י תפקיד אם את/ה מגיב/ה מקצועי/ת - סמל יוצג בפרופיל ועל הסמן שלך במפה.</p>
  <div class="prof-grid mb20" id="prof-grid" role="group" aria-label="תפקיד מקצועי">
  <div class="prof-opt" data-prof="police" onclick="selectProfession('police')" role="button" tabindex="0"><span class="pic" aria-hidden="true"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3l7 2.6v5c0 4.5-2.9 7.9-7 9.6-4.1-1.7-7-5.1-7-9.6V5.6Z"/><path d="M12 8.3l1 2 2.2.3-1.6 1.5.4 2.2-2-1-2 1 .4-2.2L8.8 10.6l2.2-.3Z"/></svg></span><span class="pl" data-pl="police">משטרה</span></div>
@@ -2255,22 +2343,23 @@ body.otp-active .ob-steps{display:none!important;}
  <div class="prof-opt" data-prof="security" onclick="selectProfession('security')" role="button" tabindex="0"><span class="pic" aria-hidden="true"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3l7 2.6v5c0 4.5-2.9 7.9-7 9.6-4.1-1.7-7-5.1-7-9.6V5.6Z"/><path d="M8.8 12.2l2.2 2.2 4.2-4.4"/></svg></span><span class="pl" data-pl="security">אבטחה</span></div>
  <div class="prof-opt" data-prof="" onclick="selectProfession('')" role="button" tabindex="0"><span class="pic" aria-hidden="true"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M6.3 6.3l11.4 11.4"/></svg></span><span class="pl" data-pl="none">ללא</span></div>
  </div>
-<!-- defib incentive: responders likely have/know a defib - invite them to add it -->
-
-   <!-- MY SH✡MER inside profile -->
-
-
- <div class="sec-cap mb12" data-he="נתוני פרופיל (אופציונלי)" data-en="Profile data (optional)">נתוני פרופיל (אופציונלי)</div><div class="sec-cap mb12" data-he="עוזר לשפר נתוני בטיחות מצרפיים ואנונימיים. לא חובה." data-en="Helps improve anonymous, aggregate safety data. Optional.">עוזר לשפר נתוני בטיחות מצרפיים ואנונימיים. לא חובה.</div><div class="set-grp" id="profile-grp"><div class="prof2-row"><span class="prof2-lbl" data-he="מגדר" data-en="Gender">מגדר</span><span class="prof2-seg" id="pf-gender"></span></div><div class="prof2-row"><span class="prof2-lbl" data-he="גיל" data-en="Age">גיל</span><span class="prof2-seg" id="pf-age"></span></div></div><div class="sec-cap mb12" id="myrep-cap">הדיווחים שלי</div>
- <div id="my-reports-list" class="mb20" role="list"></div>
- <div class="sec-cap mb12" id="soshist-cap">היסטוריית SOS</div>
- <div id="sos-hist-list" role="list"></div>
    <div class="defib-prompt" id="defib-prompt">
      <div class="defib-l">
        <span class="defib-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2L4.5 13H11l-1 9 8.5-11H12l1-9Z"/></svg></span>
-       <div><div class="defib-t" data-he="יש לך גישה לדפיברילטור?" data-en="Have access to a defibrillator?" data-ar="هل لديك وصول إلى جهاز إزالة الرجفان؟">יש לך גישה לדפיברילטור?</div><div class="defib-s" data-he="הוסף/י אותו למפה - כל שנייה קובעת בעצירת לב. יופיע לכל השומרים באזור." data-en="Add it to the map — every second counts in cardiac arrest. It'll show to all SHOMERs nearby." data-ar="أضفه إلى الخريطة — كل ثانية مهمة في السكتة القلبية. سيظهر لكل الحُرّاس في المنطقة.">הוסף/י אותו למפה - כל שנייה קובעת בעצירת לב. יופיע לכל השומרים באזור.</div></div>
+       <div><div class="defib-t" data-he="יש לך גישה לדפיברילטור?" data-en="Have access to a defibrillator?" data-ar="هل لديك وصول إلى جهاز إزالة الرجفان؟">יש לך גישה לדפיברילטור?</div><div class="defib-s" data-he="הוסף/י אותו למפה - כל שנייה קובעת בעצירת לב. יופיע לכל השומרים באזור." data-en="Add it to the map — every second counts in cardiac arrest. It'll show to all SH✡MER users nearby." data-ar="أضفه إلى الخريطة — كل ثانية مهمة في السكتة القلبية. سيظهر لكل الحُرّاس في المنطقة.">הוסף/י אותו למפה - כל שנייה קובעת בעצירת לב. יופיע לכל השומרים באזור.</div></div>
      </div>
      <button class="btn-secondary defib-add" data-he="הוסף דפיברילטור למפה" data-en="Add defibrillator to map" data-ar="أضف جهاز إزالة الرجفان إلى الخريطة" onclick="cl('sh-prof'); setTimeout(function(){ try{ aedPlaceMode(); }catch(e){} }, 300);">הוסף דפיברילטור למפה</button>
    </div>
+ </div></details>
+ <details class="pf-sec" id="pf-sec-name"><summary><span class="pf-st" data-he="השם שלי בהזמנות" data-en="My name on invites" data-ar="اسمي في الدعوات">השם שלי בהזמנות</span><span class="pf-sm" id="pf-sec-name-sm"></span><svg class="pf-chev" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></summary>
+ <div class="pf-sb">
+ <input id="prof-invname" type="text" maxlength="24" autocomplete="name" placeholder="למשל: דוד מרקוביץ׳" oninput="invNameSave(this.value)" style="width:100%;box-sizing:border-box;padding:12px 14px;border-radius:12px;border:1px solid rgba(201,168,76,.35);background:rgba(255,255,255,.04);color:inherit;font:inherit;font-size:15px">
+ <p class="sr-sb" style="margin:6px 2px 4px;line-height:1.6" data-he="רק מי שתזמין/י יראה את השם הזה. לכל שאר המשתמשים את/ה נשאר/ת אנונימי/ת." data-en="Only people you invite see this name. Everyone else sees you as anonymous." data-ar="فقط من تدعوهم يرون هذا الاسم. يراك الآخرون مجهول الهوية.">רק מי שתזמין/י יראה את השם הזה. לכל שאר המשתמשים את/ה נשאר/ת אנונימי/ת.</p>
+ </div></details>
+ <details class="pf-sec" id="pf-sec-data"><summary><span class="pf-st" data-he="נתוני פרופיל (אופציונלי)" data-en="Profile data (optional)" data-ar="بيانات الملف (اختياري)">נתוני פרופיל (אופציונלי)</span><span class="pf-sm" id="pf-sec-data-sm"></span><svg class="pf-chev" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></summary>
+ <div class="pf-sb">
+  <div class="pf-note" data-he="עוזר לשפר נתוני בטיחות מצרפיים ואנונימיים. לא חובה." data-en="Helps improve anonymous, aggregate safety data. Optional.">עוזר לשפר נתוני בטיחות מצרפיים ואנונימיים. לא חובה.</div><div class="set-grp" id="profile-grp"><div class="prof2-row"><span class="prof2-lbl" data-he="מגדר" data-en="Gender">מגדר</span><span class="prof2-seg" id="pf-gender"></span></div><div class="prof2-row"><span class="prof2-lbl" data-he="גיל" data-en="Age">גיל</span><span class="prof2-seg" id="pf-age"></span></div></div>
+ </div></details>
 
  </div>
  </div>
@@ -8245,7 +8334,7 @@ function radarPing(ll){
 ═══════════════════════════════════════════════════ */
 const GD_CH='shomer-live-v1'; // BroadcastChannel name
 const GD_RELAY='shomer_live_relay'; // localStorage relay key (cross-tab fallback)
-const GD_FRESH=300000; // v272: 5 min - presence beats every 40s, a 10s window made guardians flicker offline
+const GD_FRESH=90000; // v273: live = updated in the last 90s (beats every 40s). Older = faded pin with its age, never shown as current
 const GD_PALETTE=['#C9A84C','#2962FF','#00C853','#E91E8C','#9C27B0','#FF6A00'];
 let gdBC=null, gdTabCode='', gdLiveTimer=null, gdSimTimer=null;
 
@@ -8507,7 +8596,7 @@ function gdPos(p){ if(gdIsLive(p)) return [p.lat,p.lng]; if(p.lat!=null&&p.lng!=
 /* ── Map markers ── */
 function guardianIcon(p,live){
  return window.L.divIcon({className:'shomer-marker',
- html:`<div class="mk-circle${live?' live':''}${uidIsFounder(p)?' founder':''}" style="--cc:${p.color||'#C9A84C'}">${uidIsFounder(p)?('<span class="mk-emb">'+founderCrestSVG(42)+'</span>'):''}${live?'<div class="tag">LIVE</div>':''}<div class="pulse"></div><div class="av"></div><div class="nm">${ESC(p.name||(currentLang==='he'?'שומר/ת':'SHOMER'))}</div></div>`,
+ html:`<div class="mk-circle${live?' live':''}${uidIsFounder(p)?' founder':''}" style="--cc:${p.color||'#C9A84C'}">${uidIsFounder(p)?('<span class="mk-emb">'+founderCrestSVG(42)+'</span>'):''}${live?'<div class="tag">LIVE</div>':(p.ts?'<div class="tag" style="background:#3a4766;color:#dfe6f5">'+ESC(agoTxt(p.ts,currentLang==='he'))+'</div>':'')}<div class="pulse"></div><div class="av"></div><div class="nm">${ESC(p.name||(currentLang==='he'?'שומר/ת':'SHOMER'))}</div></div>`,
  iconSize:[38,38],iconAnchor:[19,19],popupAnchor:[0,-20]});
 }
 function gdUpdateMarker(p){
@@ -8518,6 +8607,8 @@ function gdUpdateMarker(p){
  if(mapLayers.SHOMER[p.id]){ mapLayers.SHOMER[p.id].setLatLng(ll); mapLayers.SHOMER[p.id].setIcon(guardianIcon(p,live)); }
  else mapLayers.SHOMER[p.id]=window.L.marker(ll,{icon:guardianIcon(p,live),zIndexOffset:live?760:680,alt:p.name||'SHOMER'}).addTo(MAP);
 }
+/* v273: re-draw every 30s so a pin that stopped updating visibly ages (fades + shows its time) */
+try{ setInterval(function(){ try{ gdRenderMarkers(); }catch(e){} },30000); }catch(e){}
 function gdRenderMarkers(){ if(!MAP)return; gdState().pairs.forEach(gdUpdateMarker);
  // drop markers for removed pairs
  Object.keys(mapLayers.SHOMER).forEach(id=>{ if(!gdPairById(id)){ MAP.removeLayer(mapLayers.SHOMER[id]); delete mapLayers.SHOMER[id]; } }); }
@@ -9527,7 +9618,7 @@ try{ hydrateIcons(document); }catch(e){}
 /* Loaded-build version - shown in the diagnostic panel so a phone can prove
    whether it's on the latest build or a STALE cached one. Keep in lock-step
    with sw.js SW_VERSION on every deploy. */
-var APP_VER='v272';
+var APP_VER='v273';
 var FB={ready:false,uid:null,db:null,_presTimer:null,connected:false,listening:false,pushState:'default',near:0,swVer:'?',
   authState:'connecting',sdkLoaded:false,persist:'',permErr:null,err:null,wsProbe:'',csp:''};
 /* Always log connection diagnostics to the console so the real failure can be SEEN in Chrome. */
@@ -10337,7 +10428,7 @@ function fbDashInit(){
     try{ localStorage.setItem('shomerHbPrev', st.id); }catch(e){}
     if(prev && prev!==st.id){ fbRestWrite('DELETE','dashfeed/'+prev).catch(function(){}).then(function(){ fbRestWrite('DELETE','dashown/'+prev).catch(function(){}); }); }
     fbRestWrite('DELETE','dashfeed/hb_'+FB.uid).catch(function(){});   /* my legacy row named me - drop it */
-  }, function(){ st.mode='legacy'; });
+  }, function(){ st.mode='legacy'; st.ready=null; });
   return st.ready;
 }
 function fbDashBeat(hide, lat, lng){
@@ -10348,8 +10439,8 @@ function fbDashBeat(hide, lat, lng){
     st.gone=false;
     var _hb={type:'presence',lat:lat,lng:lng,ts:Date.now(),status:'online'};
     if(st.mode!=='new') _hb.by=FB.uid;
-    try{ if(isFounder())_hb.founder=true; }catch(_f){}
-    fbRestWrite('PUT','dashfeed/'+key,_hb).catch(function(){});
+    var _fd=false; try{ _fd=isFounder(); }catch(_f){}
+    fbRestWrite('PUT','dashfeed/'+key,_hb).then(function(){ if(_fd) return fbRestWrite('PATCH','dashfeed/'+key,{founder:true}); }).catch(function(){});
   });
 }
 function updateGuardiansNearby(n){
@@ -12212,6 +12303,7 @@ function essLoad(){
     if(SS.myAeds && SS.myAeds.length){ ESS.data.aed=(ESS.data.aed||[]).concat(SS.myAeds); }
     var on=localStorage.getItem('shomer_ess_on');
     ESS.on = on ? JSON.parse(on) : {aed:true,police:true,hospital:true,fire:true,pharmacy:true};
+    if(on==='{"aed":true}') ESS.on={aed:true,police:true,hospital:true,fire:true,pharmacy:true};   /* v273: old default had only defibrillators on */
   }catch(e){ ESS.on={aed:true,police:true,hospital:true,fire:true,pharmacy:true}; }
 }
 function essSave(){
@@ -12482,7 +12574,7 @@ function fbApplyPeerPresence(all){
       if(pr && typeof pr.rk==='number' && p.rk!==pr.rk){ p.rk=pr.rk; var _cr=(SS.circleMembers||[]).find(function(x){ return x.pairId===p.id || (x.partnerUid&&x.partnerUid===p.partnerUid); }); if(_cr){ _cr.rk=pr.rk; } changed=true; try{ renderCircles(); }catch(e){} }
       if(pr && pr.lat!=null && pr.lng!=null){
         // fresh presence (< 2 min) = live; else keep last known but not "live"
-        var fresh=(now-(pr.ts||0))<300000;   /* v272: 5 min, matches GD_FRESH */
+        var fresh=(now-(pr.ts||0))<GD_FRESH;   /* v273: matches GD_FRESH */
         if(p.lat!==pr.lat||p.lng!==pr.lng||p.live!==fresh){ changed=true; }
         p.lat=pr.lat; p.lng=pr.lng; p.ts=(pr.ts||now); p.live=fresh; p.pending=false;
         // mirror the REAL position onto the circle-member row so its pin is truthful
@@ -14390,13 +14482,15 @@ var DRILL_BANK=[
    proposed users/ rule). Only the rank number rides on presence, which the live rules
    already restrict to paired SHOMERs - so ranks are visible inside your circle only. */
 var DRILL_TOPICS=['cpr','choke','bleed','burn','stroke','heart','allergy','seizure','drown','shock','faint','bone','ptsd','call'];
+/* v2: the rank IS the readiness level - earned only by real capabilities (see readySteps()),
+   never by points. Points are retired (old SS.drill.pts is kept but no longer shown or used). */
 var DRILL_RANKS=[
- {min:0,   he:'טירון',      en:'Recruit',          ar:'مبتدئ'},
- {min:100, he:'שומר',       en:'Guardian',         ar:'حارس'},
- {min:300, he:'שומר ותיק',  en:'Veteran Guardian', ar:'حارس متمرّس'},
- {min:700, he:'מגן',        en:'Protector',        ar:'حامٍ'},
- {min:1500,he:'שומר ראשי',  en:'Chief Guardian',   ar:'كبير الحرّاس'}];
-var DRILL_PTS_OK=10, DRILL_PTS_FIRST=5, DRILL_PTS_TRY=3;
+ {he:'מתחיל/ה',       en:'Getting started',   ar:'في البداية'},
+ {he:'מוגן/ת',         en:'Protected',         ar:'محميّ'},
+ {he:'מעגל מוכן',      en:'Circle ready',      ar:'دائرة جاهزة'},
+ {he:'יודע/ת להציל',   en:'Life-saver basics', ar:'أساسيات الإنقاذ'},
+ {he:'מוכן/ה לחירום',  en:'Emergency-ready',   ar:'جاهز للطوارئ'}];
+var DRILL_REST_PER_WEEK=2;   // missed weekdays per Sun-Sat week that never break the streak (covers chag days); Saturday is always free
 function drT(he,en,ar){ return currentLang==='he'?he:(currentLang==='ar'?(ar||en):en); }
 function drillState(){ SS.drill=SS.drill||{}; var d=SS.drill; d.pts=d.pts||0; d.days=d.days||{}; d.book=d.book||{}; if(d.shield===undefined)d.shield=true; return d; }
 function drillKey(dt){ var d=dt||new Date(); return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'); }
@@ -14444,8 +14538,12 @@ function drillIsoWeek(dt){ var d=new Date(Date.UTC(dt.getFullYear(),dt.getMonth(
    done day +1 · Saturday (Shabbat shield) never breaks it · a missed day uses that week's
    freeze, else one banked rest day (2 to start, +1 per 14-day streak reached, max 3) ·
    a gap nothing can cover ends the streak. Today not done yet doesn't break it. */
+/* v2 streak = days answered. Saturday never breaks it; up to DRILL_REST_PER_WEEK other missed
+   days in the same Israeli week (Sun-Sat) are rest days (Rosh Hashana + Shabbat, chag, sick day)
+   - they don't count, they don't break. A 3rd weekday miss in one week ends the streak. */
+function drillWeekKey(dt){ return drillKey(new Date(dt.getFullYear(),dt.getMonth(),dt.getDate()-dt.getDay(),12)); }
 function drillStreak(){
-  var d=drillState(), n=0, weeks={}, banked=Math.min(3,2+Math.floor((d.best||0)/14)), used=0;
+  var d=drillState(), n=0, rest={};
   var cur=new Date(); cur.setHours(12,0,0,0);
   if(!d.days[drillKey(cur)]) cur.setDate(cur.getDate()-1);
   for(var guard=0; guard<800; guard++){
@@ -14454,14 +14552,15 @@ function drillStreak(){
     else if(d.shield && drillIsShabbat(cur)) {}
     else {
       if(!d.start || k<d.start) break;
-      var w=drillIsoWeek(cur);
-      if(!weeks[w]) weeks[w]=1; else if(used<banked) used++; else break;
+      var w=drillWeekKey(cur); rest[w]=(rest[w]||0)+1;
+      if(rest[w]>DRILL_REST_PER_WEEK) break;
     }
     cur.setDate(cur.getDate()-1);
   }
-  return {n:n, freezeLeft:(weeks[drillIsoWeek(new Date())]?0:1), offsLeft:banked-used};
+  var left=Math.max(0,DRILL_REST_PER_WEEK-(rest[drillWeekKey(new Date())]||0));
+  return {n:n, restLeft:left, freezeLeft:left, offsLeft:0};
 }
-function drillRank(){ var d=drillState(), s=drillStreak().n, score=(d.pts||0)+s*5, r=0; for(var i=0;i<DRILL_RANKS.length;i++){ if(score>=DRILL_RANKS[i].min) r=i; } return {i:r, score:score, next:DRILL_RANKS[r+1]||null}; }
+function drillRank(){ var r=readiness(); return {i:r.lvl, score:r.pct, next:DRILL_RANKS[r.lvl+1]||null}; }
 function drillRankName(i){ var R=DRILL_RANKS[Math.max(0,Math.min(4,i|0))]; return drT(R.he,R.en,R.ar); }
 function drillRankBadge(i){ return '<span class="dr-rk dr-rk'+(i|0)+'" title="'+ESC(drillRankName(i))+'">'+'★'.repeat((i|0)+1)+'</span>'; }
 function drillBookLevel(t){ var b=drillState().book[t]; return Math.min(3,(b&&b.length)||0); }
@@ -14473,13 +14572,21 @@ function drillSuppressed(){
   return false;
 }
 function drillAnswer(card, pick){
-  var d=drillState(), k=drillKey(); if(d.days[k]) return;
+  var d=drillState(), k=drillKey(), now=Date.now(); if(d.days[k]) return;
+  /* clock guard: winding the phone clock back (or answering "yesterday" after a day already
+     answered further ahead) must not mint extra days. The server copy carries server time too. */
+  var last=Object.keys(d.days).sort().pop();
+  if((d.hi && now<d.hi-10*60000) || (last && last>k)){
+    try{ toast(drT('שעון הטלפון לא תואם - בדקו תאריך ושעה בהגדרות הטלפון','Your phone clock looks off - check date & time settings','ساعة الهاتف غير مضبوطة - تحقق من التاريخ والوقت'),'amb'); }catch(e){}
+    return;
+  }
   var q=drillQuestion(), ok=!!(q.opts[pick]&&q.opts[pick].ok);
   if(!d.start) d.start=k;
-  d.days[k]={q:q.i, ok:ok?1:0};
-  var add=ok?(DRILL_PTS_OK+DRILL_PTS_FIRST):DRILL_PTS_TRY; d.pts+=add;
+  d.hi=Math.max(d.hi||0, now);
+  d.days[k]={q:q.i, ok:ok?1:0, ts:now, t:q.topic};
   if(ok && q.topic!=='app' && DRILL_TOPICS.indexOf(q.topic)>=0){ var b=d.book[q.topic]=d.book[q.topic]||[]; if(b.indexOf(k)<0) b.push(k); }
   var st=drillStreak(); d.best=Math.max(d.best||0, st.n);
+  try{ learnLogAnswer(q.i, q.topic, ok, k, now); }catch(e){}
   try{ saveStore(); }catch(e){}
   try{ statsLogEvent('drill_done',{ok:ok?1:0}); }catch(e){}
   try{ FB._presAt=0; fbPublishPresence(); }catch(e){}            // share the (possibly new) rank with my circle
@@ -14490,11 +14597,13 @@ function drillAnswer(card, pick){
     var res=card.querySelector('.dr-res');
     if(res){
       var learn=(q.topic!=='app')?'<button class="dr-learn" type="button">'+drT('למדריך המלא','Open the full guide','افتح الدليل')+'</button>':'';
-      res.innerHTML=(ok?('<b class="dr-good">'+drT('נכון! ','Correct! ','صحيح! ')+'+'+add+'</b>'):('<b class="dr-wrong">'+drT('התשובה הנכונה: ','Right answer: ','الإجابة الصحيحة: ')+'</b>'+ESC(q.right)+' <span class="dr-pts">+'+add+'</span>'))
+      var _rk=drillRank().i;
+      res.innerHTML=(ok?('<b class="dr-good">'+drT('נכון!','Correct!','صحيح!')+'</b>'):('<b class="dr-wrong">'+drT('התשובה הנכונה: ','Right answer: ','الإجابة الصحيحة: ')+'</b>'+ESC(q.right)))
         +'<div class="dr-why">'+ESC(q.why)+'</div>'
-        +'<div class="dr-meta">'+drT('רצף','Streak','سلسلة')+' '+st.n+' · '+drillRankBadge(drillRank().i)+' '+ESC(drillRankName(drillRank().i))+'</div>'+learn;
+        +'<div class="dr-meta">'+drT('רצף ','Streak ','سلسلة ')+st.n+' · '+drillRankBadge(_rk)+' '+ESC(drillRankName(_rk))+'</div>'+learn;
       res.style.display='block';
-      var lb=res.querySelector('.dr-learn'); if(lb) lb.onclick=function(){ try{ openGuideTopic(q.topic); }catch(e){ try{op('sh-guide');}catch(_){} } card.remove(); };
+      /* was openGuideTopic() alone - it filled a CLOSED guide sheet, so the button did nothing */
+      var lb=res.querySelector('.dr-learn'); if(lb) lb.onclick=function(){ card.remove(); learnOpenCard(q.topic); };
     }
   }
 }
@@ -14538,7 +14647,7 @@ function drillOpenCard(){
   var q=drillQuestion(), done=drillState().days[drillKey()], st=drillStreak();
   var bar=document.createElement('div'); bar.id='tp-bar'; bar.className='nudge-bar dr-card';
   var dots=''; if(tester){ for(var i=0;i<TP_DAYS;i++){ dots+='<span style="display:inline-block;width:7px;height:7px;border-radius:50%;margin:0 2px;background:'+(i<idx?'#F5C840':(i===idx?'#fff':'rgba(255,255,255,.18)'))+'"></span>'; } }
-  var hdr=tester?(he?('יום '+(idx+1)+' מתוך '+TP_DAYS):('DAY '+(idx+1)+' OF '+TP_DAYS)):(drT('המשמרת היומית','Daily drill','التمرين اليومي')+(st.n?(' · '+drT('רצף ','streak ','سلسلة ')+st.n):''));
+  var hdr=tester?(he?('יום '+(idx+1)+' מתוך '+TP_DAYS):('DAY '+(idx+1)+' OF '+TP_DAYS)):(drT('השאלה היומית · דקה אחת','Today\'s question · one minute','سؤال اليوم · دقيقة واحدة')+(st.n?(' · '+drT('רצף ','streak ','سلسلة ')+st.n):''));
   var qd=(currentLang==='he')?'rtl':'ltr';   // Arabic shows the English question text (Hebrew/English bank) - keep it LTR so punctuation reads right
   var html='<div class="dr-hd" dir="'+(he?'rtl':'ltr')+'">'+ESC(hdr)+'</div>'+(tester?'<div style="direction:ltr;margin-top:2px">'+dots+'</div>':'')
     +'<div class="dr-q" dir="'+qd+'">'+ESC(q.q)+'</div><div class="dr-opts" dir="'+qd+'">'
@@ -14591,21 +14700,203 @@ function tpScheduleReminders(){
   if(ns.length) _ln.schedule({notifications:ns});
  }catch(e){}
 }
-/* Profile: rank badge, points, streak, ספר השומר. */
+/* ═══ MY READINESS (המוכנות שלי) - replaces ספר השומר ═══
+   Progress = real preparedness, never points. 4 tiers of concrete capabilities the app can
+   check itself; the level = tiers fully done. Each step is one tap away from doing it.
+   Learning is RECORDED: guide-card opens {cardId, ts} and daily answers {qid, correct, ts}
+   are kept on the device (SS.learn) and mirrored to analytics/learn/<uid>/ (write-only,
+   founders read) through a small outbox - if the rule is not deployed yet the writes are
+   denied and simply retried later, silently. */
+var LEARN_READ_MS=15000;                                         // a card counts as read after 15s on screen
+var LEARN_CORE=['cpr','bleed','choke','stroke','heart'];         // the 5 life-threatening ones
+var LEARN_ORDER=['cpr','bleed','choke','stroke','heart','call','allergy','seizure','burn','drown','shock','faint','bone','ptsd'];
+function learnState(){ SS.learn=SS.learn||{}; var l=SS.learn; l.cards=l.cards||{}; l.log=l.log||[]; l.ans=l.ans||[]; l.q=l.q||[]; l.flags=l.flags||{}; return l; }
+function learnSave(){ try{ saveStore(); }catch(e){} }
+function learnCardRead(id){ var c=learnState().cards[id]; return !!(c&&c.read); }
+function learnGuide(id){ return (typeof EMERGENCY_GUIDE!=='undefined'?EMERGENCY_GUIDE:[]).filter(function(g){ return g.id===id; })[0]; }
+function learnCardName(id){ var g=learnGuide(id), L=currentLang==='ar'?'ar':(currentLang==='en'?'en':'he'); return g?(g.t[L]||g.t.en):id; }
+function learnGuardians(){ try{ return (gdState().pairs||[]).filter(function(p){ return p&&p.partnerUid&&!p.pending; }).length; }catch(e){ return 0; } }
+function learnAccuracy(){ var d=drillState(), ks=Object.keys(d.days).sort().slice(-10), ok=0; ks.forEach(function(k){ if(d.days[k]&&d.days[k].ok) ok++; }); return {n:ks.length, ok:ok, pct:ks.length?Math.round(ok*100/ks.length):0}; }
+function learnNextCard(list){ list=list||LEARN_ORDER; for(var i=0;i<list.length;i++){ if(!learnCardRead(list[i])) return list[i]; } return null; }
+/* Today's card: the next unread (life-threatening first); when all are read, the one read longest ago (refresh). */
+function learnTodayCard(){
+  var l=learnState(), today=drillKey(), done=null;
+  Object.keys(l.cards).forEach(function(id){ var c=l.cards[id]; if(c&&c.lastRead&&drillKey(new Date(c.lastRead))===today) done=id; });
+  if(done) return {id:done, done:true};
+  var nx=learnNextCard(); if(nx) return {id:nx, done:false};
+  var old=LEARN_ORDER.slice().sort(function(a,b){ return ((l.cards[a]||{}).lastRead||0)-((l.cards[b]||{}).lastRead||0); })[0];
+  return {id:old, done:false, refresh:true};
+}
+function learnOpenCard(id){
+  try{ openGuide(); }catch(e){ try{ op('sh-guide'); }catch(_){} }
+  try{ openGuideTopic(id); }catch(e){}
+}
+function readySteps(){
+  var l=learnState(), g=learnGuardians(), aeds=0, acc=learnAccuracy();
+  try{ aeds=myAeds().length; }catch(e){}
+  var pin=!!(SS.security&&/^\d{4,6}$/.test(SS.security.pin||''));
+  var nRead=function(a){ return a.filter(learnCardRead).length; };
+  var cor=DRILL_TOPICS.filter(function(t){ return t!=='call' && drillBookLevel(t)>=1; }).length;
+  var toProf=function(fn){ return function(){ try{ cl('sh-prof'); }catch(e){} setTimeout(fn,320); }; };
+  var openQ=toProf(drillOpenCard);
+  return [
+   [ {he:'שומר/ת ראשון/ה במעגל', en:'Your first guardian', ar:'أول حارس لك', she:'מישהו שמקבל את ה-SOS שלך', sen:'Someone who receives your SOS', sar:'شخص يتلقى استغاثتك', v:Math.min(g,1), of:1, act:function(){ shareInvite(); }},
+     {he:'קוד ביטול SOS', en:'SOS cancel code', ar:'رمز إلغاء الاستغاثة', she:'מבטל התראת שווא בשקט', sen:'Silently cancels a false alarm', sar:'يلغي الإنذار الخاطئ بصمت', v:pin?1:0, of:1, act:function(){ op('sh-set'); }},
+     {he:'יודע/ת למי מתקשרים', en:'Know who to call', ar:'تعرف بمن تتصل', she:'100 · 101 · 102', sen:'100 · 101 · 102', sar:'100 · 101 · 102', v:(learnCardRead('call')||drillBookLevel('call')>=1)?1:0, of:1, act:function(){ learnOpenCard('call'); }} ],
+   [ {he:'3 שומרים במעגל', en:'3 guardians in your circle', ar:'3 حراس في دائرتك', she:g+'/3', sen:g+'/3', sar:g+'/3', v:Math.min(g,3), of:3, act:function(){ shareInvite(); }},
+     {he:'יודע/ת לדווח על אירוע', en:'Know how to report', ar:'تعرف كيف تبلّغ', she:'פתיחת מסך הדיווח מספיקה', sen:'Opening the report screen is enough', sar:'يكفي فتح شاشة البلاغ', v:(l.flags.report||(SS.reports||[]).length)?1:0, of:1, act:function(){ try{ openReport(); }catch(e){} }},
+     {he:'יודע/ת איפה הדפיברילטור הקרוב', en:'Know your nearest defibrillator', ar:'تعرف أقرب جهاز إزالة رجفان', she:'או הוסף/י אחד למפה', sen:'Or add one to the map', sar:'أو أضف واحدًا إلى الخريطة', v:(l.flags.aed||aeds)?1:0, of:1, act:toProf(function(){ try{ aedFindNearest(); }catch(e){} })} ],
+   [ {he:'5 כרטיסים מצילי חיים', en:'5 life-saving cards', ar:'5 بطاقات منقذة للحياة', she:'החייאה · דימום · חנק · שבץ · לב', sen:'CPR · bleeding · choking · stroke · heart', sar:'إنعاش · نزيف · اختناق · سكتة · قلب', v:nRead(LEARN_CORE), of:5, act:function(){ learnOpenCard(learnNextCard(LEARN_CORE)||'cpr'); }},
+     {he:'תשובה נכונה ב-3 נושאי עזרה ראשונה', en:'Right answers in 3 first-aid topics', ar:'إجابات صحيحة في 3 مواضيع إسعاف', she:Math.min(cor,3)+'/3 · '+'שאלה אחת ביום', sen:Math.min(cor,3)+'/3 · one question a day', sar:Math.min(cor,3)+'/3 · سؤال يوميًا', v:Math.min(cor,3), of:3, act:openQ} ],
+   [ {he:'כל 14 כרטיסי המדריך', en:'All 14 guide cards', ar:'كل بطاقات الدليل الـ14', she:nRead(LEARN_ORDER)+'/14', sen:nRead(LEARN_ORDER)+'/14', sar:nRead(LEARN_ORDER)+'/14', v:nRead(LEARN_ORDER), of:14, act:function(){ learnOpenCard(learnNextCard()||'cpr'); }},
+     {he:'70% נכון ב-10 התשובות האחרונות', en:'70% right in your last 10 answers', ar:'70% صحيحة في آخر 10 إجابات', she:acc.n+'/10 · '+acc.pct+'%', sen:acc.n+'/10 · '+acc.pct+'%', sar:acc.n+'/10 · '+acc.pct+'%', v:(acc.n>=10&&acc.pct>=70)?1:0, part:(acc.n>=10&&acc.pct>=70)?1:Math.min(acc.n,10)/20, of:1, act:openQ} ]
+  ];
+}
+function readiness(){
+  var T=readySteps(), lvl=0, tot=0, got=0, open=true;
+  T.forEach(function(tier){ var full=true;
+    tier.forEach(function(s){ s.f=(s.part!=null)?s.part:Math.min(1,s.v/s.of); s.done=s.f>=1; tot++; got+=s.f; if(!s.done) full=false; });
+    tier.f=tier.reduce(function(a,s){ return a+s.f; },0)/tier.length;
+    if(open&&full) lvl++; else open=false; });
+  return {lvl:lvl, pct:Math.round(got*100/tot), tiers:T};
+}
+/* ── recording ── */
+function learnQueue(m,p,v){
+  var l=learnState();
+  if(p==='summary') l.q=l.q.filter(function(x){ return x.p!=='summary'; });
+  l.q.push({m:m,p:p,v:v});
+  if(l.q.length>200) l.q=l.q.slice(-200);
+  learnSave(); learnFlush();
+}
+function learnFlush(){
+  try{
+    var l=learnState(); if(!l.q.length || learnFlush._busy) return;
+    if(typeof FB==='undefined'||!FB.ready||!FB._authReady||!FB.uid) return;
+    if(l.denied && Date.now()-l.denied<6*3600000) return;          // rule not live yet - retry in a few hours, silently
+    var it=l.q[0]; learnFlush._busy=true;
+    fbRestWrite(it.m,'analytics/learn/'+FB.uid+'/'+it.p,it.v).then(function(){
+      learnFlush._busy=false; if(l.q[0]===it) l.q.shift(); l.denied=0; l.okOnce=1; learnSave(); learnFlush();
+    },function(e){
+      learnFlush._busy=false; var c=e&&e.code;
+      if(c==='PERMISSION_DENIED'||c==='unauthenticated'){                // RTDB REST answers a rule denial with 401
+        if(l.okOnce && /^answers\//.test(it.p)){ if(l.q[0]===it) l.q.shift(); }   // write-once answer already stored - drop it
+        else l.denied=Date.now();
+      }
+      learnSave();
+    });
+  }catch(e){ learnFlush._busy=false; }
+}
+function learnSummary(){
+  try{ var r=readiness(), a=learnAccuracy();
+    learnQueue('PUT','summary',{level:r.lvl, pct:r.pct, cardsRead:LEARN_ORDER.filter(learnCardRead).length, answered:Object.keys(drillState().days).length,
+      acc10:a.pct, streak:drillStreak().n, guardians:learnGuardians(), ts:{'.sv':'timestamp'}});
+  }catch(e){}
+}
+function learnLogAnswer(qid,topic,ok,day,now){
+  var l=learnState();
+  l.ans.push({qid:qid, correct:!!ok, ts:now, day:day, topic:topic}); if(l.ans.length>400) l.ans=l.ans.slice(-400);
+  learnQueue('PUT','answers/'+day,{qid:qid, topic:String(topic), correct:!!ok, ts:{'.sv':'timestamp'}, cts:now});
+  learnSummary();
+}
+function learnCardOpened(id){
+  if(!id || !learnGuide(id)) return;
+  var l=learnState(), now=Date.now(), c=l.cards[id]=l.cards[id]||{n:0};
+  var dup=c.last && (now-c.last)<60000;                            // re-tapping within a minute = the same view
+  c.n=(c.n||0)+(dup?0:1); c.last=now; if(!c.first) c.first=now;
+  var cur={id:id, t0:now, eid:dup?(learnCardOpened._cur&&learnCardOpened._cur.id===id?learnCardOpened._cur.eid:null):null};
+  if(!dup){
+    cur.eid=now.toString(36)+Math.random().toString(36).slice(2,6);
+    l.log.push({cardId:id, ts:now}); if(l.log.length>300) l.log=l.log.slice(-300);
+    learnQueue('PUT','cards/'+cur.eid,{cardId:id, ts:{'.sv':'timestamp'}, cts:now, read:false});
+  } else learnSave();
+  learnCardOpened._cur=cur;
+  clearTimeout(learnCardOpened._t);
+  learnCardOpened._t=setTimeout(function(){ learnDwellCheck(id); }, LEARN_READ_MS);
+}
+function learnDwellCheck(id){
+  var cur=learnCardOpened._cur; if(!cur||cur.id!==id) return;
+  var sh=document.getElementById('sh-guide'), dv=document.getElementById('guide-detail-view');
+  if(!sh||!sh.classList.contains('open')||!dv||dv.style.display==='none'||document.hidden) return;
+  var l=learnState(), c=l.cards[id]; if(!c) return;
+  var first=!c.read; if(first) c.read=Date.now(); c.lastRead=Date.now();
+  if(cur.eid) learnQueue('PATCH','cards/'+cur.eid,{read:true, dwell:Math.round((Date.now()-cur.t0)/1000)}); else learnSave();
+  if(first) learnSummary();
+  try{ if(document.getElementById('sh-prof')) drillRenderProfile(); }catch(e){}
+}
+/* Hooks - wrap, never edit, the guide / report / AED entry points. */
+(function(){
+  try{ if(typeof openGuideTopic==='function' && !openGuideTopic._lw){ var o=openGuideTopic; openGuideTopic=function(id){ var r=o.apply(this,arguments); try{ learnCardOpened(id); }catch(e){} return r; }; openGuideTopic._lw=1; } }catch(e){}
+  try{ if(typeof openReport==='function' && !openReport._lw){ var r0=openReport; openReport=function(){ try{ var l=learnState(); if(!l.flags.report){ l.flags.report=Date.now(); learnSave(); } }catch(e){} return r0.apply(this,arguments); }; openReport._lw=1; } }catch(e){}
+  try{ if(typeof aedFindNearest==='function' && !aedFindNearest._lw){ var a0=aedFindNearest; aedFindNearest=function(){ try{ var l=learnState(); if(!l.flags.aed){ l.flags.aed=Date.now(); learnSave(); } }catch(e){} return a0.apply(this,arguments); }; aedFindNearest._lw=1; } }catch(e){}
+  try{ window.addEventListener('online', function(){ setTimeout(learnFlush, 3000); }); }catch(e){}
+  setTimeout(learnFlush, 25000);
+})();
+/* Profile v2: header (avatar, level, streak) + one readiness card + today's 60 seconds +
+   section summaries. Everything else lives in the collapsible <details> sections. */
 function drillRenderProfile(){
   var host=document.getElementById('prof-drill'); if(!host) return;
-  var d=drillState(), st=drillStreak(), rk=drillRank(), he=currentLang==='he';
-  var rb=document.getElementById('prof-rank'); if(rb) rb.innerHTML=drillRankBadge(rk.i)+' '+ESC(drillRankName(rk.i));
-  var nxt=rk.next?(drT('עוד ','','')+(rk.next.min-rk.score)+drT(' נק׳ ל'+rk.next.he,' pts to '+rk.next.en,' نقطة إلى '+rk.next.ar)):drT('הדרגה הגבוהה ביותר','Top rank','أعلى رتبة');
-  var book=DRILL_TOPICS.map(function(tp){ var lv=drillBookLevel(tp), g=(EMERGENCY_GUIDE||[]).filter(function(x){return x.id===tp;})[0], nm=g?(g.t?(he?g.t.he:(g.t[currentLang]||g.t.en)):tp):tp;
-      return '<div class="dr-bk lv'+lv+'" title="'+ESC(nm)+'"><span>'+['○','🥉','🥈','🥇'][lv]+'</span><small>'+ESC(nm)+'</small></div>'; }).join('');
-  var mastered=DRILL_TOPICS.filter(function(tp){ return drillBookLevel(tp)>=3; }).length;
-  host.innerHTML='<div class="dr-prof-row"><div><b>'+(d.pts||0)+'</b><small>'+drT('נקודות','points','نقاط')+'</small></div><div><b>'+st.n+'</b><small>'+drT('ימי רצף','day streak','أيام متتالية')+'</small></div><div><b>'+mastered+'/14</b><small>'+drT('נושאים בשליטה','topics mastered','مواضيع متقنة')+'</small></div></div>'
-    +'<div class="dr-prof-next">'+ESC(nxt)+' · '+drT('הקפאה השבוע: ','Freeze this week: ','تجميد هذا الأسبوع: ')+st.freezeLeft+' · '+drT('ימי חופש: ','Rest days: ','أيام راحة: ')+st.offsLeft+(d.shield?(' · '+drT('מגן שבת פעיל','Shabbat shield on','درع السبت مفعّل')):'')+'</div>'
-    +'<button class="cta-gold dr-open" type="button" style="width:100%;margin:10px 0 12px">'+(drillDoneToday()?drT('השאלה היומית ✓','Today\'s question ✓','سؤال اليوم ✓'):drT('לשאלה היומית','Today\'s question','سؤال اليوم'))+'</button>'
-    +'<div class="sec-cap mb12">'+drT('ספר השומר','The Guardian\'s Book','كتاب الحارس')+'</div><div class="dr-book">'+book+'</div>'
-    +'<p class="sr-sb" style="margin:6px 2px 16px;line-height:1.6">'+drT('כל נושא: 3 תשובות נכונות ב-3 ימים שונים = 🥇. הדרגה שלך גלויה רק לשומרים שלך.','Each topic: 3 correct answers on 3 different days = 🥇. Your rank is visible only to your SHOMERs.','كل موضوع: 3 إجابات صحيحة في 3 أيام مختلفة = 🥇. رتبتك مرئية لحرّاسك فقط.')+'</p>';
-  var ob=host.querySelector('.dr-open'); if(ob) ob.onclick=function(){ try{ cl('sh-prof'); }catch(e){} setTimeout(drillOpenCard, 350); };
+  var L=currentLang==='ar'?'ar':(currentLang==='en'?'en':'he');
+  var tx=function(o,p){ p=p||''; return o[p+L]||o[p+'en']||o[p+'he']||''; };
+  var d=drillState(), st=drillStreak(), R=readiness(), lv=R.lvl;
+  var rb=document.getElementById('prof-rank'); if(rb) rb.innerHTML=drillRankBadge(lv)+' '+ESC(drillRankName(lv));
+  var av=document.getElementById('pf-av'); if(av){ var nm=invName()||((document.getElementById('profNm')||{}).textContent)||'S'; av.textContent=String(nm).trim().charAt(0).toUpperCase(); }
+  var sk=document.getElementById('pf-streak');
+  if(sk){ sk.innerHTML='<b>'+st.n+'</b><small>'+drT('ימים ברצף','day streak','أيام متتالية')+'</small>';
+    sk.title=drT('שבת לא שוברת רצף, ועוד '+DRILL_REST_PER_WEEK+' ימי מנוחה בכל שבוע. נשארו השבוע: '+st.restLeft,'Shabbat never breaks it, plus '+DRILL_REST_PER_WEEK+' rest days a week. Left this week: '+st.restLeft,'السبت لا يكسر السلسلة، و'+DRILL_REST_PER_WEEK+' أيام راحة أسبوعيًا. المتبقي: '+st.restLeft); }
+  /* readiness card */
+  var cur=Math.min(lv,3), all=!!drillRenderProfile._all;
+  var row=function(s,ti,si){ return '<button type="button" class="pf-step'+(s.done?' done':'')+'" data-s="'+ti+'.'+si+'"><span class="pf-ck">'+(s.done?'✓':'')+'</span><span class="pf-sl">'+ESC(tx(s))+'<small>'+ESC(tx(s,'s'))+'</small></span><span class="pf-go">'+drT('לביצוע','Do it','نفّذ')+'</span></button>'; };
+  var steps='';
+  R.tiers.forEach(function(tier,ti){
+    if(!all && ti!==cur) return;
+    if(all) steps+='<div class="pf-lvh'+(ti===cur?' cur':'')+'">'+drT('רמה ','Level ','المستوى ')+(ti+1)+' · '+ESC(drillRankName(ti+1))+'</div>';
+    tier.forEach(function(s,si){ steps+=row(s,ti,si); });
+  });
+  var ladder=R.tiers.map(function(t){ return '<i><b style="width:'+Math.round(t.f*100)+'%"></b></i>'; }).join('');
+  var sub=lv>=4?drT('כל השלבים הושלמו · נשאר רק לרענן','All steps done · keep it fresh','اكتملت كل الخطوات · حافظ على جاهزيتك')
+                :(drT('רמה ','Level ','المستوى ')+lv+'/4 · '+drT('הבא: ','Next: ','التالي: ')+drillRankName(lv+1));
+  var prof=(SS.user&&SS.user.profession)||'', elig='';
+  if(prof) elig='<div class="pf-elig">'+(lv>=3?drT('✓ עמדת בתנאי הסף לאימות כמגיב/ה מקצועי/ת ('+profLabel(prof)+').','✓ You meet the bar for professional responder verification ('+profLabel(prof)+').','✓ أنت مؤهل للتحقق كمستجيب محترف ('+profLabel(prof)+').')
+                                           :drT('מגיב/ה מקצועי/ת? ברמה 3 עומדים בתנאי הסף לאימות.','Professional responder? Level 3 meets the verification bar.','مستجيب محترف؟ المستوى 3 يؤهلك للتحقق.'))+'</div>';
+  var closed=!!drillRenderProfile._closed;
+  var html='<details class="pf-rd" id="pf-rd"'+(closed?'':' open')+'><summary>'
+    +'<span class="pf-ring" style="--p:'+R.pct+'"><span>'+R.pct+'%</span></span>'
+    +'<span class="pf-rd-tx"><span class="pf-eyebrow">'+drT('המוכנות שלי לחירום','My emergency readiness','جاهزيتي للطوارئ')+'</span>'
+    +'<span class="pf-lvl" style="display:block">'+ESC(drillRankName(lv))+'</span><span class="pf-lvl-sub" style="display:block">'+ESC(sub)+'</span>'
+    +'<span class="pf-ladder">'+ladder+'</span></span></summary>'
+    +'<div class="pf-steps">'+steps+(all?elig:'')
+    +'<button type="button" class="pf-more">'+(all?drT('הצג רק את השלב הנוכחי','Show current level only','اعرض المستوى الحالي فقط'):drT('כל השלבים','All levels','كل المستويات'))+'</button></div></details>';
+  /* today's 60 seconds */
+  var qd=drillDoneToday(), qok=qd&&d.days[drillKey()].ok, tc=learnTodayCard();
+  html+='<div class="pf-today">'
+    +'<button type="button" class="pf-tile'+(qd?' ok':' go')+'" id="pf-t-q"><b>'+drT('השאלה היומית','Today\'s question','سؤال اليوم')+'</b><small>'
+      +(qd?(qok?drT('ענית נכון · שאלה חדשה מחר','Answered right · new one tomorrow','إجابة صحيحة · سؤال جديد غدًا'):drT('ענית · התשובה מחכה לך','Answered · see the right answer','أجبت · شاهد الإجابة الصحيحة')):drT('דקה אחת','One minute','دقيقة واحدة'))+'</small></button>'
+    +'<button type="button" class="pf-tile'+(tc.done?' ok':'')+'" id="pf-t-c"><b>'+(tc.refresh?drT('רענון היום','Today\'s refresh','مراجعة اليوم'):drT('כרטיס היום','Today\'s card','بطاقة اليوم'))+'</b><small>'+ESC(learnCardName(tc.id))+(tc.done?'':(' · '+drT('דקה קריאה','1-min read','قراءة دقيقة')))+'</small></button>'
+    +'</div>';
+  host.innerHTML=html;
+  var rd=host.querySelector('#pf-rd'); if(rd) rd.addEventListener('toggle',function(){ drillRenderProfile._closed=!rd.open; });
+  host.querySelectorAll('.pf-step').forEach(function(b){ b.onclick=function(){ var p=b.getAttribute('data-s').split('.'), s=R.tiers[+p[0]][+p[1]]; if(s&&s.act) try{ s.act(); }catch(e){} }; });
+  var mb=host.querySelector('.pf-more'); if(mb) mb.onclick=function(){ drillRenderProfile._all=!drillRenderProfile._all; drillRenderProfile(); };
+  var tq=host.querySelector('#pf-t-q'); if(tq) tq.onclick=function(){ try{ cl('sh-prof'); }catch(e){} setTimeout(drillOpenCard, 350); };
+  var tcb=host.querySelector('#pf-t-c'); if(tcb) tcb.onclick=function(){ learnOpenCard(tc.id); };
+  /* what I learned */
+  var acc=learnAccuracy(), nr=LEARN_ORDER.filter(learnCardRead).length, lg=document.getElementById('pf-learn');
+  if(lg){
+    lg.innerHTML='<div class="pf-lstat"><div><b>'+nr+'/14</b><small>'+drT('כרטיסים שנקראו','cards read','بطاقات مقروءة')+'</small></div><div><b>'+Object.keys(d.days).length+'</b><small>'+drT('שאלות שנענו','questions answered','أسئلة مُجابة')+'</small></div><div><b>'+(acc.n?acc.pct+'%':'-')+'</b><small>'+drT('נכון ב-10 האחרונות','right, last 10','صحيحة في آخر 10')+'</small></div></div>'
+      +'<div class="pf-lgrid">'+LEARN_ORDER.map(function(id){ var rd2=learnCardRead(id), c=learnState().cards[id];
+        return '<button type="button" class="pf-lc'+(rd2?' rd':'')+'" data-c="'+id+'"'+(c&&c.read?' title="'+ESC(new Date(c.lastRead||c.read).toLocaleDateString())+'"':'')+'><i style="background:'+guideCatColor(id)+'"></i><span>'+ESC(learnCardName(id))+'</span><em>'+(rd2?'✓':'')+'</em></button>'; }).join('')+'</div>'
+      +'<p class="pf-note" style="margin-top:10px">'+drT('כרטיס נספר אחרי 15 שניות קריאה. מה שקראת ועָנִית נשמר במכשיר ובענן של SH✡MER, כדי למדוד מוכנות קהילתית - בלי שם ובלי מיקום.','A card counts after 15 seconds of reading. What you read and answer is saved on this device and in SH✡MER\'s cloud to measure community readiness - no name, no location.','تُحتسب البطاقة بعد 15 ثانية من القراءة. ما تقرأه وتجيب عنه يُحفظ على جهازك وفي سحابة SH✡MER لقياس جاهزية المجتمع - دون اسم أو موقع.')+'</p>';
+    lg.querySelectorAll('.pf-lc').forEach(function(b){ b.onclick=function(){ learnOpenCard(b.getAttribute('data-c')); }; });
+  }
+  /* section summaries (one short phrase each) */
+  var put=function(id,t){ var e=document.getElementById(id); if(e) e.textContent=t; };
+  put('pf-sec-learn-sm', nr+'/14 '+drT('כרטיסים','cards','بطاقات')+(acc.n?(' · '+acc.pct+'% '+drT('נכון','right','صحيحة')):''));
+  var sr=(document.getElementById('stat-responded')||{}).textContent||'0';
+  put('pf-sec-act-sm', sr+' '+drT('הגבתי','responded','استجبت')+' · '+((SS.reports||[]).length)+' '+drT('דיווחים','reports','بلاغات'));
+  put('pf-sec-role-sm', prof?profLabel(prof):drT('לא נבחר','Not set','غير محدد'));
+  put('pf-sec-name-sm', invName()||drT('לא הוגדר','Not set','غير محدد'));
+  var ud=SS.user||{}; put('pf-sec-data-sm', (ud.gender||ud.ageBand)?drT('מולא','Filled','مكتمل'):drT('אופציונלי','Optional','اختياري'));
+  try{ learnFlush(); }catch(e){}
 }
 
 </script>
