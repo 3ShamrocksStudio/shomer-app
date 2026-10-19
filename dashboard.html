@@ -692,7 +692,7 @@ function demoLive(c){
    When no events exist yet it shows an honest "awaiting data" state — never fabricated. */
 async function liveBoot(){
   await loadData();
-  CLIENT={org:'רשת SH✡MER · תצוגה חיה', territory:DATA._sorted[0].city, email:'live', demo:false, live:true};
+  CLIENT={org:'רשת SH✡MER · תצוגה חיה', territory:DATA._sorted[0].city, email:'live', demo:false, live:true};try{var _pb=document.getElementById('plan-badge');if(_pb)_pb.textContent='Pro · תצוגה חיה';}catch(_e){};
   document.getElementById('gate').classList.add('hidden');
   document.getElementById('app').classList.remove('hidden');
   document.getElementById('terr-name').textContent=CLIENT.territory;
