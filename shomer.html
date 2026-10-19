@@ -8553,7 +8553,7 @@ var _RGCC=null; try{ _RGCC=JSON.parse(localStorage.getItem('shomer_rgcc')||'null
 var _rgccBusy=false, _rgccTry=0;
 function _kmApprox(a,b,c,d){ var x=(d-b)*Math.cos((a+c)*Math.PI/360), y=c-a; return Math.sqrt(x*x+y*y)*111.2; }
 function _rgccNear(){ try{ return !!(_RGCC&&_RGCC.cc&&userLat!=null&&userLng!=null&&_kmApprox(_RGCC.lat,_RGCC.lng,userLat,userLng)<10); }catch(e){ return false; } }
-function _rgccSet(cc,la,lo){ cc=String(cc||'').toUpperCase(); if(!/^[A-Z]{2}$/.test(cc)) return; var changed=!_RGCC||_RGCC.cc!==cc;
+function _rgccSet(cc,la,lo){ cc=String(cc||'').toUpperCase(); if(!/^[A-Z]{2}$/.test(cc)) return; if(cc==='PS') cc='IL'; /* Judea & Samaria use 100/101/102 + MDA */ var changed=!_RGCC||_RGCC.cc!==cc;
   _RGCC={cc:cc,lat:+(+la).toFixed(2),lng:+(+lo).toFixed(2),t:Date.now()}; try{ localStorage.setItem('shomer_rgcc',JSON.stringify(_RGCC)); }catch(e){}
   if(changed){ try{ emApplyCountry(); }catch(e){} } }
 function _rgccRefresh(){
