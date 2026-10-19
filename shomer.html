@@ -9327,7 +9327,7 @@ function privacyHTML(){ const he=currentLang==='he';
  <h4>איך נעשה שימוש במיקום</h4>
  <p>המיקום משמש כדי להציג אותך על המפה שלך, לצרף אותו ל-SOS/דיווח שאת/ה שולח/ת, ולשתף מיקום חי עם שומרים <strong>שאת/ה מחבר/ת בהסכמה</strong>. שיתוף מיקום הוא opt-in.</p>
  <h4>היכן המידע נשמר</h4>
- <p><strong>רוב המידע נשמר במכשירך</strong> (אחסון מקומי בדפדפן). כדי להציג שומרים בקרבת מקום ולשדר SOS, מיקום מקורב בלבד מסונכרן דרך שירות זמן-אמת מאובטח. שאר המידע אינו עוזב את מכשירך, למעט קישור הזמנה שאת/ה בוחר/ת לשתף.</p>
+ <p><strong>רוב המידע נשמר במכשירך</strong> (אחסון מקומי בדפדפן). כדי להציג אותך לשומרים שחיברת ולשדר SOS, המיקום מסונכרן דרך שירות זמן-אמת מאובטח: מיקום מדויק רק לשומרים שחיברת בהסכמה, ומיקום מקורב (כ-1 ק"מ) בלבד לכל השאר. צוות SH✡MER רשאי לגשת לנתוני מיקום רק לצורכי בטיחות ומניעת שימוש לרעה. שאר המידע אינו עוזב את מכשירך, למעט קישור הזמנה שאת/ה בוחר/ת לשתף.</p>
  <h4>שיתוף ומכירה</h4>
  <p><strong>איננו מוכרים את המידע שלך ואיננו משתפים אותו עם צדדים שלישיים.</strong> אין פרסומות ואין כלי מעקב/אנליטיקה.</p>
  <h4>השליטה שלך</h4>
@@ -9353,7 +9353,7 @@ function privacyHTML(){ const he=currentLang==='he';
  <h4>How location is used</h4>
  <p>Location is used to show you on your own map, to attach to an SOS/report you send, and to share live location with SHOMERs <strong>you connect by consent</strong>. Location sharing is opt-in.</p>
  <h4>Where data is stored</h4>
- <p><strong>Most data is stored on your device</strong> (browser local storage). To show nearby SHOMERs and broadcast an SOS, only a coarse location is synced through a secure realtime service. The rest never leaves your device, except an invite link you choose to share.</p>
+ <p><strong>Most data is stored on your device</strong> (browser local storage). To show you to the SHOMERs you connected and to broadcast an SOS, your location is synced through a secure realtime service: precise only for SHOMERs you connected by consent, coarse (~1 km) for everyone else. The SH✡MER team may access location data only for safety operations and abuse prevention. The rest never leaves your device, except an invite link you choose to share.</p>
  <h4>Sharing & selling</h4>
  <p><strong>We do not sell your data and do not share it with third parties.</strong> There are no ads and no tracking/analytics tools.</p>
  <h4>Your controls</h4>
@@ -9754,7 +9754,7 @@ try{ hydrateIcons(document); }catch(e){}
 /* Loaded-build version - shown in the diagnostic panel so a phone can prove
    whether it's on the latest build or a STALE cached one. Keep in lock-step
    with sw.js SW_VERSION on every deploy. */
-var APP_VER='v274';
+var APP_VER='v275';
 var FB={ready:false,uid:null,db:null,_presTimer:null,connected:false,listening:false,pushState:'default',near:0,swVer:'?',
   authState:'connecting',sdkLoaded:false,persist:'',permErr:null,err:null,wsProbe:'',csp:''};
 /* Always log connection diagnostics to the console so the real failure can be SEEN in Chrome. */
