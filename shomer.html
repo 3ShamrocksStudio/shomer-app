@@ -7142,7 +7142,7 @@ function statusOf(m,he){
  if(m.sos)return{cls:'sos',txt:he?' SOS פעיל':' SOS active'};
  if(m.awaitConfirm) return {cls:'wait', txt: he?('ממתין לאישור של '+(m.name||'השולח/ת')):currentLang==='ar'?('بانتظار تأكيد '+(m.name||'المرسل')):('Waiting for '+(m.name||'the sender')+' to confirm')};
  /* An invite that has not been delivered is NOT "pending approval" - it is not sent. Say so. */
- if(m.pending && (m.via||(_pairOf(m)||{}).via)==='link') return {cls:'wait', txt: he?'הזמנה בוואטסאפ · ממתין/ה להצטרפות':'WhatsApp invite · waiting to join'};   /* v269 */
+ if(m.pending && (m.via||(_pairOf(m)||{}).via)==='link') return {cls:'wait', txt: he?'ממתין/ה להצטרפות · השם והטלפון יופיעו אוטומטית':'Waiting to join · name and phone appear automatically'};   /* v269 */
  if(m.pending) return {cls:'wait', txt: he?'לא נשלח עדיין - הקש/י „שלח/י בקשה”':'Not sent yet - tap "Send request"'};
  /* Honest state: if they are not live, say when they were last seen - not "waiting". */
  if(m.registered && !m.live){
@@ -7162,11 +7162,11 @@ function _fmtPh(d){ d=String(d||'').replace(/\D/g,''); if(!d) return ''; if(d.in
 function memberLabel(m,he,short){
  var p=_pairOf(m)||{};
  var nm=(m&&m.name&&String(m.name).trim())||(p.name&&String(p.name).trim())||'';
- var ph=_fmtPh((m&&(m.toPh||m.phoneCanon))||p.toPh||p.phoneCanon||'');
+ var ph=_fmtPh((m&&(m.ph||m.phoneCanon))||p.ph||p.phoneCanon||'');
  if(nm) return ph&&!short?(nm+' · '+ph):nm;
  if(ph) return ph;
- var d=new Date(p.addedTs||(m&&m.addedTs)||Date.now()), dd=('0'+d.getDate()).slice(-2)+'/'+('0'+(d.getMonth()+1)).slice(-2);
- return he?('ללא שם · הזמנה מ-'+dd+(short?'':' · הקש/י לשינוי שם')):('No name · invite from '+dd+(short?'':' · tap to rename'));
+ var d=new Date(p.addedTs||(m&&m.addedTs)||Date.now()), dd=('0'+d.getDate()).slice(-2)+'/'+('0'+(d.getMonth()+1)).slice(-2), hh=('0'+d.getHours()).slice(-2)+':'+('0'+d.getMinutes()).slice(-2);
+ return he?('הזמנה בוואטסאפ · '+dd+' '+hh):('WhatsApp invite · '+dd+' '+hh);
 }
 function buildMemberRow(m,he){
  const wrap=document.createElement('div');
@@ -7505,7 +7505,7 @@ function inviteWhoAsk(then){
 }
 async function shareInvite(who){
   var he=currentLang==='he';
-  if(!who||!who.name){ inviteWhoAsk(function(w){ shareInvite(w); }); return; }
+  who=who||{name:'',phone:''};   /* v271: zero typing - identity arrives automatically when they join */
   var _again=function(){ shareInvite(who); };
   if(!inviteIdentityOk(_again)) return;
   /* Inviting someone = sharing your location with them. The inviter skipped the one-time
@@ -7535,7 +7535,7 @@ async function shareInvite(who){
        never match. Same packing the phone-invite path has always used. */
     await fbRestWrite('PUT','invites/'+tok,{fromUid:FB.uid,ts:Date.now(),name:packInvite(myName,myPhone,linkCode)});
     var g=gdState();
-    g.pairs.push({id:genId('g'),token:tok,code:linkCode,name:who.name,toPh:who.phone||'',rel:'',shareToThem:true,seeThem:true,addedTs:Date.now(),initiator:true,pending:true,partnerUid:null,linked:false,cid:activeCircleId,color:'#C9A84C',lat:null,lng:null,ts:0,live:false,via:'link'});
+    g.pairs.push({id:genId('g'),token:tok,code:linkCode,name:who.name||'',rel:'',shareToThem:true,seeThem:true,addedTs:Date.now(),initiator:true,pending:true,partnerUid:null,linked:false,cid:activeCircleId,color:'#C9A84C',lat:null,lng:null,ts:0,live:false,via:'link'});
     saveStore();
     fbWatchApproval(tok, null);
   }catch(e){
@@ -9493,7 +9493,7 @@ try{ hydrateIcons(document); }catch(e){}
 /* Loaded-build version - shown in the diagnostic panel so a phone can prove
    whether it's on the latest build or a STALE cached one. Keep in lock-step
    with sw.js SW_VERSION on every deploy. */
-var APP_VER='v270';
+var APP_VER='v271';
 var FB={ready:false,uid:null,db:null,_presTimer:null,connected:false,listening:false,pushState:'default',near:0,swVer:'?',
   authState:'connecting',sdkLoaded:false,persist:'',permErr:null,err:null,wsProbe:'',csp:''};
 /* Always log connection diagnostics to the console so the real failure can be SEEN in Chrome. */
@@ -10663,8 +10663,9 @@ function fbWatchApproval(token, theirUid){
       try{ fbRestWrite('PUT','pairs/'+FB.uid+'/'+puid,{name:p.name||'',token:token,ts:Date.now(),via:'phone'}); }catch(e){}
       p.pending=false; p.linked=true; p.partnerUid=puid;
       if(inv.acceptedName&&!p.name)p.name=inv.acceptedName;
+      if(inv.acceptedPhone) p.ph=String(inv.acceptedPhone).replace(/\D/g,'');   /* v271: who joined - shown in the list */
       var mm=ensureMemberForPair(p, p.cid);
-      if(mm){ mm.pending=false; mm.partnerUid=puid; if(p.name&&(!mm.name||mm.name===(currentLang==='he'?'שומר':'SHOMER'))) mm.name=p.name; }
+      if(mm){ mm.pending=false; mm.partnerUid=puid; if(p.ph) mm.ph=p.ph; if(p.name&&(!mm.name||mm.name===(currentLang==='he'?'שומר':'SHOMER'))) mm.name=p.name; }
       saveStore();
       try{ fbListenPeerLoc(puid); }catch(e){}
       try{ gdRenderMarkers(); renderCircles(); }catch(e){}
