@@ -3941,6 +3941,7 @@ function applyTranslations(){
  try{ gdApplyI18n(); gdRenderList(); gdRenderMarkers(); }catch(e){}
  try{ if(typeof guideApplyLang==='function'){ guideApplyLang(); guideFilter(); } }catch(e){}
  try{ legalApplyI18n(); }catch(e){}
+ try{ emApplyCountry(); }catch(e){}   /* v274: local emergency numbers after the data-he sweep */
  renderReportsList();renderSosHistory();
  try{ var _he=currentLang==='he',_ar=currentLang==='ar'; document.querySelectorAll('#arr-ttl').forEach(function(e){ e.textContent=_he?'התראות מיקום השומרים שלי':_ar?'تنبيهات موقع حُرّاسي':'My SHOMERs location alerts'; }); }catch(e){}
  // A language pick must flip the WHOLE app — re-render every dynamic view so none keeps the old language.
@@ -5248,8 +5249,9 @@ function activateSOS(){
  // Auto-dial prompt (opens dialer; a native app could place the call directly).
  setTimeout(()=>{
  if(sosPhase!=='active')return;
- const call=window.confirm(he?'לחייג למשטרה 100 אוטומטית?\n(לחץ אישור לחיוג)':'Auto-call police 100?\n(Press OK to dial)');
- if(call) window.location.href='tel:100';
+ const _pn=policeNum();   /* v274: local police number (911 / 999 / 112 …) - 100 only in Israel */
+ const call=window.confirm(he?'לחייג למשטרה '+_pn+' אוטומטית?\n(לחץ אישור לחיוג)':'Auto-call police '+_pn+'?\n(Press OK to dial)');
+ if(call) window.location.href='tel:'+_pn;
  },2000);
  clearInterval(sosTimer);   /* no simulated "N SHOMERs responding" - only REAL responders are ever shown (help bar / showRespToPerson) */
  setTimeout(()=>{if(sosPhase==='active')openUpdates();},800);
@@ -5918,8 +5920,11 @@ function initMap(){
  if(MAP)return;
  if(typeof window.L==='undefined'||!window.L.map){ setTimeout(initMap,90); return; } // Leaflet loads deferred
  const el=document.getElementById('map'); if(!el)return;
+ /* v274 GLOBAL: with no GPS fix yet, open on the device's country (time zone), not Tel Aviv */
+ var _c0=[32.0853,34.7818], _z0=16;
+ try{ if(userLat==null){ var _tc=tzCountry(); if(_tc && _tc!=='IL' && typeof GEO_BOX!=='undefined'){ for(var _i=0;_i<GEO_BOX.length;_i++){ var _b=GEO_BOX[_i]; if(_b[0]===_tc){ _c0=[(_b[1]+_b[2])/2,(_b[3]+_b[4])/2]; _z0=(_b[2]-_b[1])>15?4:6; break; } } } } }catch(_e){}
  MAP=window.L.map('map',{preferCanvas:true,zoomControl:false,attributionControl:true,
- center:[32.0853,34.7818],zoom:16,minZoom:3,maxZoom:19,
+ center:_c0,zoom:_z0,minZoom:3,maxZoom:19,
  zoomSnap:.5,worldCopyJump:true});
  window.L.tileLayer(TILE_BASE,{maxZoom:16,className:'tiles-base',
  attribution:'Esri · HERE · Garmin · OpenStreetMap contributors'}).addTo(MAP);
@@ -6051,7 +6056,7 @@ function openDetail(idx){
    : (he2?'אני בדרך':'I am on my way');
  ctas=`<button class="dcta pr" style="width:100%;margin-bottom:8px;background:linear-gradient(135deg,#0E8840,#14A857)" onclick="respondAndGo(this)" id="det-respond-btn">
    <svg class="ic" viewBox="0 0 24 24" aria-hidden="true" style="width:18px;height:18px;vertical-align:-3px;margin-inline-end:6px"><path d="M3 11l18-8-8 18-2-8-8-2z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></svg>${goLbl}</button>
-   <div class="det-ctas"><button class="dcta gd" onclick="callNum(policeNum())">${T('call100')}</button><button class="dcta sc" onclick="cl('det-sheet')">${T('close')}</button></div>`;
+   <div class="det-ctas"><button class="dcta gd" onclick="callNum(policeNum())">${call100Lbl()}</button><button class="dcta sc" onclick="cl('det-sheet')">${T('close')}</button></div>`;
  } else { ctas=navBtn; }
  // Use innerHTML only for trusted static HTML, user data only via textContent/ESC
  const body=document.getElementById('det-body');
@@ -6460,7 +6465,7 @@ try{ window.addEventListener('popstate',function(){
   if(_shPopSkip){ _shPopSkip=false; return; }
   try{ var o=document.querySelector('.sheet.open'); if(o){ SCR_STACK.length=0; cl(o.id); } }catch(e){}
 }); }catch(e){}
-function op(id){closeAll();const el=document.getElementById(id);if(el)el.classList.add('open');syncSheetState(); if(el) shHistPush();
+function op(id){closeAll();const el=document.getElementById(id);try{ if(typeof emApplyCountry==='function') emApplyCountry(); }catch(_e){}if(el)el.classList.add('open');syncSheetState(); if(el) shHistPush();
  if(id==='sh-set'){try{renderSetContacts();}catch(e){}}
  if(id==='sh-circles'){ try{syncPairsToCircles();}catch(e){} try{renderCircles();}catch(e){} try{gdRenderList();}catch(e){} }   // was never re-rendered → circles list + toggles appeared empty
  if(id==='sh-prof'){ try{syncPairsToCircles();}catch(e){} try{renderProfile();}catch(e){} try{renderProfile2();}catch(e){} try{renderCircles();}catch(e){} }
@@ -6693,7 +6698,7 @@ function openGuide(){ guideBackToList(); guideRenderList(''); var s=document.get
 function guideApplyLang(){ var L=currentLang==='ar'?'ar':currentLang==='en'?'en':'he', he=L==='he';
  setText('guide-ttl', he?'מדריך חירום':L==='ar'?'دليل الطوارئ':'Emergency Guide');
  setText('gd-disc', GUIDE_DISC[L]); setText('gd-back-lbl', he?'חזרה לרשימה':L==='ar'?'العودة للقائمة':'Back to list');
- setText('gd-c101', he?'מד״א':L==='ar'?'إسعاف':'MDA'); setText('gd-c100', he?'משטרה':L==='ar'?'شرطة':'Police'); setText('gd-c102', he?'כבאות':L==='ar'?'إطفاء':'Fire');
+ try{ emApplyCountry(); }catch(e){ setText('gd-c101', he?'מד״א':L==='ar'?'إسعاف':'MDA'); setText('gd-c100', he?'משטרה':L==='ar'?'شرطة':'Police'); setText('gd-c102', he?'כבאות':L==='ar'?'إطفاء':'Fire'); }   /* v274: local numbers + labels */
  var s=document.getElementById('guide-search'); if(s)s.placeholder=(he?'חיפוש נושא…':L==='ar'?'ابحث عن موضوع…':'Search a topic…');
  setText('gd-verified', he?'כל ההנחיות אומתו מול הנחיות רשמיות: מד״א · AHA · ERC/Resus Council UK · הצלב האדום הבריטי · NHS · ILCOR. אינן תחליף לעזרה רפואית מקצועית.':L==='ar'?'جميع التعليمات مُوثّقة وفق إرشادات رسمية: نجمة داوود الحمراء · AHA · ERC/Resus Council UK · الصليب الأحمر البريطاني · NHS · ILCOR. ليست بديلاً عن المساعدة الطبية.':'Every instruction is verified against official guidelines: MDA · AHA · ERC/Resus Council UK · British Red Cross · NHS · ILCOR. Not a substitute for professional medical care.'); }
 /* ── AIRPLANE-SAFETY-CARD PICTOGRAMS ──────────────────────────────────────────
@@ -6748,7 +6753,7 @@ function guideRenderList(q){
  if(!items.length){ var e=document.createElement('div'); e.className='gd-row-s'; e.style.padding='14px 4px'; e.textContent=(L==='he'?'לא נמצא - נסה/י: דימום · החייאה · חנק · כוויה · שבר':L==='ar'?'لا يوجد موضوع':'Try: bleeding · CPR · choking · burn'); box.appendChild(e); return; }
  items.forEach(function(g){ var col=guideCatColor(g.id); var b=document.createElement('button'); b.className='gd-row'; b.setAttribute('role','listitem'); b.onclick=function(){ openGuideTopic(g.id); };
   b.style.borderInlineStart='4px solid '+col;
-  b.innerHTML='<span class="gd-picwrap" style="border-color:'+col+'">'+guideImg(g.id,'gd-pic')+'</span><span style="flex:1"><span class="gd-row-t" style="color:'+col+'">'+ESC(g.t[L])+'</span><span class="gd-row-s">'+ESC(g.s[L])+'</span></span><span class="gd-chev" aria-hidden="true">›</span>';
+  b.innerHTML='<span class="gd-picwrap" style="border-color:'+col+'">'+guideImg(g.id,'gd-pic')+'</span><span style="flex:1"><span class="gd-row-t" style="color:'+col+'">'+ESC(g.t[L])+'</span><span class="gd-row-s">'+ESC(emLocalize(g.s[L]))+'</span></span><span class="gd-chev" aria-hidden="true">›</span>';
   box.appendChild(b); }); }
 /* ══ SEARCH SYNONYMS ══
    In an emergency nobody recalls the textbook term. Someone bleeding types "דם" or "תחבושת"
@@ -6797,16 +6802,18 @@ function guideFilter(){
 function openGuideTopic(id){ var L=currentLang==='ar'?'ar':currentLang==='en'?'en':'he', he=L==='he'; var g=EMERGENCY_GUIDE.find(function(x){return x.id===id;}); if(!g)return;
  var d=document.getElementById('guide-detail'); if(!d)return;
  var col=guideCatColor(g.id);
- var html='<div class="gd-d-hd" style="border-color:'+col+'"><span class="gd-d-picwrap" style="border-color:'+col+'">'+guideImg(g.id,'gd-d-pic')+'</span><span style="flex:1;min-width:0"><span class="gd-d-ttl" style="color:'+col+'">'+ESC(g.t[L])+'</span><span class="gd-d-sub">'+ESC(g.s[L])+'</span></span></div>';
- g.steps[L].forEach(function(st,i){ html+='<div class="gd-step"><span class="gd-num" style="background:'+col+'">'+(i+1)+'</span><span class="gd-step-tx">'+ESC(st)+'</span></div>'; });
- if(g.call){ html+='<div class="gd-dont" style="background:rgba(232,168,40,.12);border-color:var(--amb)"><div class="gd-dont-h" style="color:var(--amb)">📞 '+(he?'מתי לחייג 101':L==='ar'?'متى تتصل بـ101':'When to call 101')+'</div><div class="gd-dont-tx" style="color:var(--tx1)">'+ESC(g.call[L])+'</div></div>'; }
+ var html='<div class="gd-d-hd" style="border-color:'+col+'"><span class="gd-d-picwrap" style="border-color:'+col+'">'+guideImg(g.id,'gd-d-pic')+'</span><span style="flex:1;min-width:0"><span class="gd-d-ttl" style="color:'+col+'">'+ESC(g.t[L])+'</span><span class="gd-d-sub">'+ESC(emLocalize(g.s[L]))+'</span></span></div>';
+ if(!emIsIL()){ var _en=emergencyNums(), _lb=emLabels(); html+='<div class="gd-dont" style="background:rgba(232,168,40,.12);border-color:var(--amb)"><div class="gd-dont-tx" style="color:var(--tx1)">📍 '+ESC(emCountryName())+': '+ESC(_lb.p+' '+_en.p+' · '+_lb.a+' '+_en.a+' · '+_lb.f+' '+_en.f)+'</div></div>'; }   /* v274: local numbers abroad */
+ g.steps[L].forEach(function(st,i){ html+='<div class="gd-step"><span class="gd-num" style="background:'+col+'">'+(i+1)+'</span><span class="gd-step-tx">'+ESC(emLocalize(st))+'</span></div>'; });
+ if(g.call){ html+='<div class="gd-dont" style="background:rgba(232,168,40,.12);border-color:var(--amb)"><div class="gd-dont-h" style="color:var(--amb)">📞 '+(he?'מתי לחייג ':L==='ar'?'متى تتصل بـ':'When to call ')+ambulanceNum()+'</div><div class="gd-dont-tx" style="color:var(--tx1)">'+ESC(emLocalize(g.call[L]))+'</div></div>'; }
  if(g.dont){ html+='<div class="gd-dont"><div class="gd-dont-h">⛔ '+(he?'אסור':L==='ar'?'ممنوع':'Do NOT')+'</div><div class="gd-dont-tx">'+ESC(g.dont[L])+'</div></div>'; }
  if(g.id==='cpr'||g.id==='aed'||g.id==='choke'){
    html+='<button onclick="aedFindNearest()" style="width:100%;margin:4px 0 12px;padding:14px;border-radius:14px;border:0;background:linear-gradient(150deg,#3DDC97,#0E8F6E);color:#fff;font-weight:800;font-size:15px;cursor:pointer;font-family:inherit;display:flex;align-items:center;justify-content:center;gap:8px;box-shadow:0 8px 22px rgba(14,143,110,.35)">'
      +'<span style="display:inline-flex;width:22px;height:22px;background:#fff;border-radius:4px;align-items:center;justify-content:center"><svg viewBox="0 0 24 24" width="16" height="16"><path d="M12 21.2s-7.6-4.9-7.6-10.4A4.6 4.6 0 0 1 12 7.6a4.6 4.6 0 0 1 7.6 3.2c0 5.5-7.6 10.4-7.6 10.4Z" fill="#0E8F6E"/><path d="M12.9 9.3l-3.3 4.5h2.2l-.6 3.6 3.4-4.7h-2.3l.6-3.4Z" fill="#fff"/></svg></span>'
      +(he?'מצא/י דפיברילטור קרוב':L==='ar'?'ابحث عن مزيل رجفان قريب':'Find the nearest defibrillator')+'</button>';
  }
- html+='<div class="gd-calls" style="margin-top:4px"><button class="gd-call em" onclick="callNum(\'101\')"><b>101</b><span>'+(he?'מד״א':L==='ar'?'إسعاف':'MDA')+'</span></button><button class="gd-call" onclick="callNum(\'100\')"><b>100</b><span>'+(he?'משטרה':L==='ar'?'شرطة':'Police')+'</span></button><button class="gd-call" onclick="callNum(\'102\')"><b>102</b><span>'+(he?'כבאות':L==='ar'?'إطفاء':'Fire')+'</span></button></div>';
+ var _n=emergencyNums(), _l=emLabels();   /* v274: dial the local numbers, not Israel's */
+ html+='<div class="gd-calls" style="margin-top:4px"><button class="gd-call em" onclick="callNum(ambulanceNum())"><b>'+ESC(_n.a)+'</b><span>'+ESC(_l.a)+'</span></button><button class="gd-call" onclick="callNum(policeNum())"><b>'+ESC(_n.p)+'</b><span>'+ESC(_l.p)+'</span></button><button class="gd-call" onclick="callNum(fireNum())"><b>'+ESC(_n.f)+'</b><span>'+ESC(_l.f)+'</span></button></div>';
  html+='<div class="gd-disc" style="margin-top:12px">'+GUIDE_DISC[L]+'</div>';
  html+='<div class="gd-src">'+(he?'מקור: ':L==='ar'?'المصدر: ':'Source: ')+ESC(g.src)+'</div>';
  d.innerHTML=html;
@@ -7016,8 +7023,8 @@ function renderArrivals(){
       A2['g'+g].places[p]={addr:val, lat:null, lng:null, resolved:false}; saveStore();
       if(!val){ if(st){st.className='arr-geo';st.textContent='';} return; }
       if(st){ st.className='arr-geo wait'; st.textContent='…'; }
-      fetch('https://nominatim.openstreetmap.org/search?format=jsonv2&addressdetails=1&limit=1&countrycodes=il&q='+encodeURIComponent(val),{headers:{'Accept':'application/json'}})
-        .then(function(r){return r.ok?r.json():null;})
+      /* v274 GLOBAL: no Israel-only filter; biased (not bounded) to the user's area; answers in the UI language */
+      nomFetch('https://nominatim.openstreetmap.org/search?format=jsonv2&addressdetails=1&limit=1&accept-language='+geoAcceptLang()+((userLat!=null&&userLng!=null)?('&viewbox='+(userLng-0.5).toFixed(3)+','+(userLat+0.5).toFixed(3)+','+(userLng+0.5).toFixed(3)+','+(userLat-0.5).toFixed(3)):'')+'&q='+encodeURIComponent(val))
         .then(function(j){
           if(j&&j[0]&&j[0].lat){
             var pl2=A2['g'+g].places[p];
@@ -7048,8 +7055,25 @@ function renderArrivals(){
     : (ARR_G+' SHOMERs x '+ARR_P+' places - the OS limit is 20.');
 }
 function _phAddr(f){ var p=(f&&f.properties)||{}; var st=(p.street||p.name||'')+(p.housenumber?(' '+p.housenumber):''); var city=p.city||p.town||p.village||p.county||''; return (st||city)+(st&&city?(' · '+city):''); }
+/* v274 GEOCODING LANGUAGE. Photon's public server only localises en/de/fr; for he/ar (and the rest)
+   lang=default returns the LOCAL names (Hebrew in Israel, Arabic in Arab towns) instead of forcing
+   English. Nominatim honours accept-language for any language, but its usage policy forbids
+   per-keystroke autocomplete - so it is used ONLY on explicit actions (pick / reverse / submit),
+   serialised to <=1 request per 1.1 s, with an origin Referer so the app is identifiable. */
+function geoPhotonLang(){ return ({en:'en',fr:'fr',de:'de'})[currentLang]||'default'; }
+function geoAcceptLang(){ var l=currentLang||'he'; return l==='en'?'en':(l+',en'); }
+var _nomLast=0, _nomQ=Promise.resolve();
+function nomFetch(url){
+  var run=function(){ var wait=Math.max(0,_nomLast+1100-Date.now());
+    return new Promise(function(r){ setTimeout(r,wait); }).then(function(){ _nomLast=Date.now();
+      return fetch(url,{headers:{'Accept':'application/json'},referrerPolicy:'strict-origin-when-cross-origin'}); })
+      .then(function(r){ return r.ok?r.json():null; }); };
+  var p=_nomQ.then(run,run); _nomQ=p.catch(function(){}); return p;
+}
+function _nomAddr(r){ if(!r) return ''; var a=r.address||{}; var road=a.road||a.pedestrian||a.neighbourhood||a.suburb||''; var num=a.house_number?(' '+a.house_number):''; var city=a.city||a.town||a.village||a.municipality||'';
+  var first=road?(road+num):String(r.display_name||'').split(',')[0]; return first+(city&&city!==first?(' · '+city):''); }
 function arrAuto(inp, host){
-  var he=currentLang==='he', box=document.createElement('div'), tmr=null, seq=0;
+  var he=currentLang==='he', ar=currentLang==='ar', box=document.createElement('div'), tmr=null, seq=0;
   box.className='arr-sug'; box.style.cssText='display:none;position:absolute;inset-inline:0;top:100%;z-index:50;background:var(--card,#0E1B33);border:1px solid rgba(201,168,76,.45);border-radius:12px;margin-top:4px;overflow:hidden;box-shadow:0 8px 24px rgba(0,0,0,.45)';
   var row=inp.closest('.arr-row'); if(row){ row.style.position='relative'; row.appendChild(box); }
   var pick=function(addr,lat,lng){
@@ -7059,17 +7083,32 @@ function arrAuto(inp, host){
     inp.value=addr; box.style.display='none'; inp._picked=true;
     var st=host.querySelector('.arr-geo[data-g="'+g+'"][data-p="'+p+'"]'); if(st){ st.className='arr-geo ok'; st.textContent='\u2713'; }
   };
+  /* v274: Photon can't answer in he/ar - after an explicit pick, ONE Nominatim lookup relabels the
+     chosen place in the UI language (if OSM has the name). Coordinates never change. */
+  var relabel=function(addr,ot,oid){ if(geoPhotonLang()!=='default'||!ot||!oid) return;
+    nomFetch('https://nominatim.openstreetmap.org/lookup?format=jsonv2&addressdetails=1&accept-language='+geoAcceptLang()+'&osm_ids='+encodeURIComponent(String(ot).charAt(0).toUpperCase()+oid))
+      .then(function(j){ var s=_nomAddr(j&&j[0]); if(!s||s===addr||inp.value!==addr) return;
+        var g=inp.getAttribute('data-g'), p=+inp.getAttribute('data-p'), A2=arrState(), pl=A2['g'+g]&&A2['g'+g].places&&A2['g'+g].places[p];
+        if(pl&&pl.addr===addr){ pl.addr=s; saveStore(); inp.value=s; } }).catch(function(){}); };
   var item=function(label,sub,fn){ var b=document.createElement('button'); b.type='button'; b.style.cssText='display:block;width:100%;text-align:start;padding:10px 12px;background:none;border:0;border-bottom:1px solid rgba(255,255,255,.06);color:inherit;font:inherit;cursor:pointer';
     b.innerHTML='<div style="font-weight:700;font-size:14px">'+ESC(label)+'</div>'+(sub?('<div style="font-size:12px;opacity:.7">'+ESC(sub)+'</div>'):''); b.onmousedown=function(e){ e.preventDefault(); fn(); }; box.appendChild(b); };
   var here=function(){ if(userLat==null||userLng==null) return;
-    item(he?'\ud83d\udccd \u05d4\u05de\u05d9\u05e7\u05d5\u05dd \u05d4\u05e0\u05d5\u05db\u05d7\u05d9 \u05e9\u05dc\u05d9':'\ud83d\udccd My current location','',function(){
-      fetch('https://photon.komoot.io/reverse?lat='+userLat+'&lon='+userLng).then(function(r){return r.json();}).then(function(j){ var f=j&&j.features&&j.features[0]; pick(f?_phAddr(f):(userLat.toFixed(5)+','+userLng.toFixed(5)), userLat, userLng); }).catch(function(){ pick(userLat.toFixed(5)+','+userLng.toFixed(5), userLat, userLng); }); }); };
+    item(he?'\ud83d\udccd \u05d4\u05de\u05d9\u05e7\u05d5\u05dd \u05d4\u05e0\u05d5\u05db\u05d7\u05d9 \u05e9\u05dc\u05d9':ar?'\ud83d\udccd \u0645\u0648\u0642\u0639\u064a \u0627\u0644\u062d\u0627\u0644\u064a':'\ud83d\udccd My current location','',function(){
+      /* v274: reverse geocode in the UI language (Nominatim, explicit action), Photon as fallback, coords last */
+      var la=userLat, lo=userLng, raw=la.toFixed(5)+','+lo.toFixed(5);
+      var viaPhoton=function(){ return fetch('https://photon.komoot.io/reverse?lat='+la+'&lon='+lo+'&lang='+geoPhotonLang()).then(function(r){return r.json();}).then(function(j){ var f=j&&j.features&&j.features[0]; pick(f?_phAddr(f):raw, la, lo); }); };
+      nomFetch('https://nominatim.openstreetmap.org/reverse?format=jsonv2&addressdetails=1&zoom=18&accept-language='+geoAcceptLang()+'&lat='+la+'&lon='+lo)
+        .then(function(j){ try{ if(j&&j.address&&j.address.country_code&&typeof _rgccSet==='function') _rgccSet(j.address.country_code,la,lo); }catch(e){}
+          var s=(j&&!j.error)?_nomAddr(j):''; if(s){ pick(s,la,lo); return; } return viaPhoton(); })
+        .catch(function(){ return viaPhoton(); })
+        .catch(function(){ pick(raw, la, lo); }); }); };
   var run=function(){ var q=(inp.value||'').trim(), my=++seq; box.innerHTML='';
     if(q.length<3){ here(); box.style.display=box.children.length?'block':'none'; return; }
-    var url='https://photon.komoot.io/api/?limit=5&q='+encodeURIComponent(q)+((userLat!=null&&userLng!=null)?('&lat='+userLat+'&lon='+userLng):'');
+    var url='https://photon.komoot.io/api/?limit=5&lang='+geoPhotonLang()+'&q='+encodeURIComponent(q)+((userLat!=null&&userLng!=null)?('&lat='+userLat+'&lon='+userLng):'');
     fetch(url).then(function(r){return r.json();}).then(function(j){ if(my!==seq) return; box.innerHTML=''; here();
-      (j.features||[]).forEach(function(f){ var c=f.geometry&&f.geometry.coordinates; if(!c) return; var p=f.properties||{}; item(_phAddr(f), [p.state,p.country].filter(Boolean).join(', '), function(){ pick(_phAddr(f), c[1], c[0]); }); });
-      if(!box.children.length){ var d=document.createElement('div'); d.style.cssText='padding:10px 12px;font-size:13px;opacity:.75'; d.textContent=he?'\u05dc\u05d0 \u05e0\u05de\u05e6\u05d0\u05d5 \u05db\u05ea\u05d5\u05d1\u05d5\u05ea - \u05e0\u05e1\u05d5 \u05e9\u05dd \u05e8\u05d7\u05d5\u05d1 \u05d5\u05e2\u05d9\u05e8':'No addresses found - try street and city'; box.appendChild(d); }
+      var _seen={};   /* v274: Photon returns every segment of a street - show each address once */
+      (j.features||[]).forEach(function(f){ var c=f.geometry&&f.geometry.coordinates; if(!c) return; var p=f.properties||{}; var _k=_phAddr(f)+'|'+[p.state,p.country].join(','); if(_seen[_k]) return; _seen[_k]=1; item(_phAddr(f), [p.state,p.country].filter(Boolean).join(', '), function(){ var a=_phAddr(f); pick(a, c[1], c[0]); relabel(a, p.osm_type, p.osm_id); }); });
+      if(!box.children.length){ var d=document.createElement('div'); d.style.cssText='padding:10px 12px;font-size:13px;opacity:.75'; d.textContent=he?'\u05dc\u05d0 \u05e0\u05de\u05e6\u05d0\u05d5 \u05db\u05ea\u05d5\u05d1\u05d5\u05ea - \u05e0\u05e1\u05d5 \u05e9\u05dd \u05e8\u05d7\u05d5\u05d1 \u05d5\u05e2\u05d9\u05e8':ar?'\u0644\u0645 \u064a\u062a\u0645 \u0627\u0644\u0639\u062b\u0648\u0631 \u0639\u0644\u0649 \u0639\u0646\u0627\u0648\u064a\u0646 - \u062c\u0631\u0651\u0628 \u0627\u0644\u0634\u0627\u0631\u0639 \u0648\u0627\u0644\u0645\u062f\u064a\u0646\u0629':'No addresses found - try street and city'; box.appendChild(d); }
       box.style.display='block'; }).catch(function(){ box.style.display='none'; }); };
   inp.addEventListener('focus', function(){ inp._picked=false; run(); });
   inp.addEventListener('input', function(){ inp._picked=false; clearTimeout(tmr); tmr=setTimeout(run,350); });
@@ -8409,7 +8448,27 @@ var EMERG={
  AE:{p:'999',a:'998',f:'997'}, SA:{p:'999',a:'997',f:'998'},
  QA:{p:'999',a:'999',f:'999'}, JO:{p:'911',a:'911',f:'911'},
  RU:{p:'112',a:'103',f:'101'}, UA:{p:'112',a:'103',f:'101'},
- TR:{p:'112',a:'112',f:'112'}
+ TR:{p:'112',a:'112',f:'112'},
+ /* v274 GLOBAL (Chabad pilot): wider coverage. Where a country runs both 112 and legacy short
+    codes, 112 is listed when it reaches all three services. NEEDS YOUR EYES before public launch. */
+ FR:{p:'17',a:'15',f:'18'}, DE:{p:'110',a:'112',f:'112'}, AT:{p:'133',a:'144',f:'122'},
+ CH:{p:'117',a:'144',f:'118'}, IT:{p:'112',a:'118',f:'115'}, ES:{p:'112',a:'112',f:'112'},
+ PT:{p:'112',a:'112',f:'112'}, NL:{p:'112',a:'112',f:'112'}, BE:{p:'101',a:'112',f:'112'},
+ LU:{p:'113',a:'112',f:'112'}, SE:{p:'112',a:'112',f:'112'}, NO:{p:'112',a:'113',f:'110'},
+ DK:{p:'112',a:'112',f:'112'}, FI:{p:'112',a:'112',f:'112'}, IS:{p:'112',a:'112',f:'112'},
+ PL:{p:'112',a:'112',f:'112'}, CZ:{p:'158',a:'155',f:'150'}, SK:{p:'158',a:'155',f:'150'},
+ HU:{p:'107',a:'104',f:'105'}, GR:{p:'100',a:'166',f:'199'}, CY:{p:'112',a:'112',f:'112'},
+ MT:{p:'112',a:'112',f:'112'}, RO:{p:'112',a:'112',f:'112'}, BG:{p:'112',a:'112',f:'112'},
+ HR:{p:'192',a:'194',f:'193'}, RS:{p:'192',a:'194',f:'193'}, SI:{p:'113',a:'112',f:'112'},
+ EE:{p:'112',a:'112',f:'112'}, LV:{p:'112',a:'112',f:'112'}, LT:{p:'112',a:'112',f:'112'},
+ MD:{p:'112',a:'112',f:'112'}, BY:{p:'102',a:'103',f:'101'}, GE:{p:'112',a:'112',f:'112'},
+ AM:{p:'112',a:'112',f:'112'}, AZ:{p:'102',a:'103',f:'101'}, KZ:{p:'102',a:'103',f:'101'},
+ UZ:{p:'102',a:'103',f:'101'}, NP:{p:'100',a:'102',f:'101'},
+ UY:{p:'911',a:'911',f:'911'}, PY:{p:'911',a:'911',f:'911'}, BO:{p:'110',a:'118',f:'119'},
+ EC:{p:'911',a:'911',f:'911'}, VE:{p:'911',a:'911',f:'911'}, PA:{p:'911',a:'911',f:'911'},
+ CR:{p:'911',a:'911',f:'911'}, GT:{p:'110',a:'128',f:'122'}, DO:{p:'911',a:'911',f:'911'},
+ TN:{p:'197',a:'190',f:'198'}, DZ:{p:'17',a:'14',f:'14'}, ET:{p:'991',a:'907',f:'939'},
+ BH:{p:'999',a:'999',f:'999'}, OM:{p:'9999',a:'9999',f:'9999'}, KW:{p:'112',a:'112',f:'112'}
 };
 var EMERG_DEFAULT={p:'112',a:'112',f:'112'};   /* EU + GSM universal */
 
@@ -8485,10 +8544,85 @@ function myCountry(){
   return 'IL';
 }
 function myDial(){ return DIAL[myCountry()] || '972'; }
-function emergencyNums(){ return EMERG[myCountry()] || EMERG_DEFAULT; }
+/* v274 GLOBAL - which country is the user IN right now (for emergency numbers)?
+   Unlike myCountry() (the phone-number default, which prefers the saved home country), this
+   prefers where the phone physically is: reverse-geocoded country_code for the GPS fix (one
+   coarse ~1 km lookup, only after moving >10 km, <=1/min) -> offline bounding box -> device
+   time zone -> myCountry(). An Israeli visiting New York gets 911, not 100. */
+var _RGCC=null; try{ _RGCC=JSON.parse(localStorage.getItem('shomer_rgcc')||'null'); }catch(e){ _RGCC=null; }
+var _rgccBusy=false, _rgccTry=0;
+function _kmApprox(a,b,c,d){ var x=(d-b)*Math.cos((a+c)*Math.PI/360), y=c-a; return Math.sqrt(x*x+y*y)*111.2; }
+function _rgccNear(){ try{ return !!(_RGCC&&_RGCC.cc&&userLat!=null&&userLng!=null&&_kmApprox(_RGCC.lat,_RGCC.lng,userLat,userLng)<10); }catch(e){ return false; } }
+function _rgccSet(cc,la,lo){ cc=String(cc||'').toUpperCase(); if(!/^[A-Z]{2}$/.test(cc)) return; var changed=!_RGCC||_RGCC.cc!==cc;
+  _RGCC={cc:cc,lat:+(+la).toFixed(2),lng:+(+lo).toFixed(2),t:Date.now()}; try{ localStorage.setItem('shomer_rgcc',JSON.stringify(_RGCC)); }catch(e){}
+  if(changed){ try{ emApplyCountry(); }catch(e){} } }
+function _rgccRefresh(){
+  try{
+    if(typeof userLat==='undefined'||userLat==null||userLng==null||_rgccNear()) return;
+    if(_rgccBusy||(Date.now()-_rgccTry)<60000||typeof nomFetch!=='function') return;
+    _rgccBusy=true; _rgccTry=Date.now();
+    var la=+userLat.toFixed(2), lo=+userLng.toFixed(2);
+    nomFetch('https://nominatim.openstreetmap.org/reverse?format=jsonv2&zoom=3&lat='+la+'&lon='+lo)
+      .then(function(j){ var cc=j&&j.address&&j.address.country_code; if(cc) _rgccSet(cc,la,lo); })
+      .catch(function(){}).then(function(){ _rgccBusy=false; });
+  }catch(e){ _rgccBusy=false; }
+}
+function emergCountry(){
+  try{
+    if(typeof userLat!=='undefined' && userLat!=null && userLng!=null){
+      _rgccRefresh();
+      if(_rgccNear()) return _RGCC.cc;
+      var b=countryFromCoords(userLat,userLng); if(b) return b;
+    }
+    var tz=tzCountry(); if(tz) return tz;
+  }catch(e){}
+  return myCountry();
+}
+function emIsIL(){ return emergCountry()==='IL'; }
+function emergencyNums(){ return EMERG[emergCountry()] || EMERG_DEFAULT; }
 function policeNum(){ return emergencyNums().p; }
 function ambulanceNum(){ return emergencyNums().a; }
 function fireNum(){ return emergencyNums().f; }
+/* Localised service labels. In Israel the ambulance service is MDA; elsewhere a generic word. */
+function emLabels(){ var il=emIsIL(), l=currentLang;
+  if(l==='he') return {p:'משטרה',a:il?'מד״א':'אמבולנס',f:'כבאות'};
+  if(l==='ar') return {p:'شرطة',a:'إسعاف',f:'إطفاء'};
+  return {p:'Police',a:il?'MDA':'Ambulance',f:'Fire'}; }
+function emCountryName(cc){ cc=cc||emergCountry(); try{ if(window.Intl&&Intl.DisplayNames){ var n=new Intl.DisplayNames([currentLang||'en'],{type:'region'}).of(cc); if(n&&n!==cc) return n; } }catch(e){} try{ return cname(cc); }catch(e){ return cc; } }
+function call100Lbl(){ return String(T('call100')).replace('100', policeNum()); }
+/* Swap Israel's 100/101/102 inside Israeli-authored text for the local numbers (outside IL only).
+   "100" is only replaced when it is not a rate/range (100-120 compressions, 100/min). */
+function emLocalize(s){ if(s==null||emIsIL()) return s; var n=emergencyNums();
+  return String(s).replace(/1201 \((ERAN|ער"ן|ער״ן)\) (or|או) /g,'').replace(/(^|[^\d])101(?!\d)/g,'$1'+n.a).replace(/(^|[^\d])102(?!\d)/g,'$1'+n.f)
+    .replace(/(^|[^\d])100(?![\d–\-\/])/g,'$1'+n.p).replace(/\((MDA|מד״א|מד"א)\)/g,'('+emLabels().a+')'); }
+/* Re-label every static emergency control for the country the user is in. Israel = original UI. */
+function emApplyCountry(){
+  var il=emIsIL(), n=emergencyNums(), lb=emLabels(), cn=il?'':(' · '+emCountryName());
+  var sh=document.getElementById('sh-em');
+  if(sh){
+    var btns=sh.querySelectorAll('.call-btn'), defs=[[n.p,lb.p,'Police','شرطة','משטרה'],[n.a,lb.a,'Ambulance','إسعاف','אמבולנס'],[n.f,lb.f,'Fire','إطفاء','כבאות']];
+    for(var i=0;i<btns.length;i++){
+      var b=btns[i], nm=b.querySelector('.cc-nm'); if(!nm) continue;
+      if(!nm.hasAttribute('data-he0')){ nm.setAttribute('data-he0',nm.getAttribute('data-he')||nm.textContent); nm.setAttribute('data-en0',nm.getAttribute('data-en')||nm.textContent); nm.setAttribute('data-ar0',nm.getAttribute('data-ar')||''); b.setAttribute('data-al0',b.getAttribute('aria-label')||''); }
+      if(i>2){ b.style.display=il?'':'none'; continue; }   /* 1201 / 1202 are Israel-only services */
+      var d=defs[i];
+      if(il){ nm.setAttribute('data-he',nm.getAttribute('data-he0')); nm.setAttribute('data-en',nm.getAttribute('data-en0')); if(nm.getAttribute('data-ar0')) nm.setAttribute('data-ar',nm.getAttribute('data-ar0')); else nm.removeAttribute('data-ar'); }
+      else { nm.setAttribute('data-he',d[0]+' - '+d[4]+cn); nm.setAttribute('data-en',d[0]+' - '+d[2]+cn); nm.setAttribute('data-ar',d[0]+' - '+d[3]+cn);
+        var ic=b.querySelector('.cc-ic .ic'); if(ic) ic.style.color=(i===0?'#fff':i===1?'#FF1A40':'#FF7A1A'); }
+      var v=currentLang==='ar'?(nm.getAttribute('data-ar')||arTr(nm.getAttribute('data-en'))):currentLang==='en'?nm.getAttribute('data-en'):nm.getAttribute('data-he');
+      nm.textContent=v;
+      if(i===0){ var al=b.getAttribute('data-al0'); b.setAttribute('aria-label', il?al:(lb.p+' '+n.p)); }
+    }
+    var lc=sh.querySelector('.lc-b');
+    if(lc){ if(!lc.hasAttribute('data-he0')){ lc.setAttribute('data-he0',lc.getAttribute('data-he')||''); lc.setAttribute('data-en0',lc.getAttribute('data-en')||''); lc.setAttribute('data-ar0',lc.getAttribute('data-ar')||arTr(lc.getAttribute('data-en')||'')); }
+      var rep=function(s){ return il?s:String(s).replace(/(^|[^\d])100(?!\d)/g,'$1'+n.p); };
+      lc.setAttribute('data-he',rep(lc.getAttribute('data-he0'))); lc.setAttribute('data-en',rep(lc.getAttribute('data-en0'))); lc.setAttribute('data-ar',rep(lc.getAttribute('data-ar0')));
+      lc.innerHTML=currentLang==='ar'?lc.getAttribute('data-ar'):currentLang==='en'?lc.getAttribute('data-en'):lc.getAttribute('data-he'); }
+  }
+  /* Emergency-guide quick-dial row */
+  [['gd-c101',n.a,lb.a],['gd-c100',n.p,lb.p],['gd-c102',n.f,lb.f]].forEach(function(x){ var s=document.getElementById(x[0]); if(!s) return; s.textContent=x[2]; var bb=s.previousElementSibling; if(bb&&bb.tagName==='B') bb.textContent=x[1]; });
+  try{ var sec=document.getElementById('leg-stats-sec'); if(sec) sec.style.display=il?'':'none'; }catch(e){}   /* Israel Police statistics: hide the legend abroad */
+}
 /* Convert any human input into E.164 digits. Handles +, 00, national 0-prefix, or bare. */
 function phoneCanon(raw, cc){
   /* ⚠️ CRITICAL - DO NOT reintroduce dial-code guessing from bare digits.
@@ -8883,7 +9017,7 @@ async function gdAddPhoneSubmit(){
  var he=currentLang==='he', ar=currentLang==='ar';
  var raw=(document.getElementById('gd-ph-input')||{}).value||'';
  var canon=phoneCanon(raw);
- if(!phoneIsValidIL(canon)){ toast(he?'מספר נייד ישראלי לא תקין':ar?'رقم جوال إسرائيلي غير صالح':'Invalid Israeli mobile number','amb'); shakeField('gd-ph-input'); return; }
+ if(!phoneIsValidIL(canon)){ toast(he?'מספר נייד לא תקין - למספר מחו״ל הוסיפו +קידומת מדינה':ar?'رقم جوال غير صالح - للأرقام الدولية أضف + ورمز الدولة':'Invalid mobile number - for numbers abroad add + and the country code','amb'); shakeField('gd-ph-input'); return; }
  if(!gdRequireConsent(gdAddPhoneSubmit)) return; // explicit opt-in before any pairing/sharing
  if(!FB.ready||!FB.db){ toast(he?'מתחבר… נסה/י שוב בעוד רגע':ar?'جارٍ الاتصال… حاول لاحقًا':'Connecting… try again in a moment','amb'); return; }
  var btn=document.getElementById('gd-ph-go'); if(btn)btn.disabled=true;
@@ -9238,11 +9372,11 @@ function privacyHTML(){ const he=currentLang==='he';
 }
 
 function renderLegal(){
- const d=document.getElementById('disc-body'); if(d)d.innerHTML=disclaimerHTML()+(currentLang==='he'
- ?`<div class="disc-call"><button class="pr" onclick="callNum(policeNum())"> <span class="em-p">100</span> משטרה</button><button onclick="callNum(ambulanceNum())"> 101 מד״א</button><button onclick="callNum(fireNum())"> 102 כבאות</button></div>`
- :currentLang==='ar'
- ?`<div class="disc-call"><button class="pr" onclick="callNum(policeNum())"> <span class="em-p">100</span> شرطة</button><button onclick="callNum(ambulanceNum())"> 101 إسعاف</button><button onclick="callNum(fireNum())"> 102 إطفاء</button></div>`
- :`<div class="disc-call"><button class="pr" onclick="callNum(policeNum())"> <span class="em-p">100</span> Police</button><button onclick="callNum(ambulanceNum())"> 101 MDA</button><button onclick="callNum(fireNum())"> 102 Fire</button></div>`);
+ /* v274 GLOBAL: buttons show and dial the numbers of the country the user is in; abroad, a short
+    note says which country was detected (the Israel list in the text below stays as written). */
+ const _n=emergencyNums(), _l=emLabels(), _il=emIsIL();
+ const _loc=_il?'':`<div class="legal-draft" style="background:#FFF6E6;border:1px solid #E0A82e;border-radius:10px;padding:10px 12px;margin:0 0 14px;font-size:12px;color:#8a6d1a;line-height:1.55">📍 ${ESC(emCountryName())}: ${ESC(_l.p)} <b>${ESC(_n.p)}</b> · ${ESC(_l.a)} <b>${ESC(_n.a)}</b> · ${ESC(_l.f)} <b>${ESC(_n.f)}</b>${currentLang==='he'?' · מספרי ישראל שלהלן תקפים בישראל בלבד.':currentLang==='ar'?' · أرقام إسرائيل أدناه صالحة داخل إسرائيل فقط.':' · The Israel numbers below apply in Israel only.'}</div>`;
+ const d=document.getElementById('disc-body'); if(d)d.innerHTML=_loc+disclaimerHTML()+`<div class="disc-call"><button class="pr" onclick="callNum(policeNum())"> <span class="em-p">${ESC(_n.p)}</span> ${ESC(_l.p)}</button><button onclick="callNum(ambulanceNum())"> ${ESC(_n.a)} ${ESC(_l.a)}</button><button onclick="callNum(fireNum())"> ${ESC(_n.f)} ${ESC(_l.f)}</button></div>`;
  const t=document.getElementById('tos-body'); if(t)t.innerHTML=tosHTML()+legalFooter();
  const p=document.getElementById('priv-body'); if(p)p.innerHTML=privacyHTML()+legalFooter();
  const a=document.getElementById('a11y-body'); if(a)a.innerHTML=a11yHTML()+legalFooter();
@@ -9334,6 +9468,8 @@ function legalApplyI18n(){
  ?'<strong>שומר אינו תחליף לשירותי חירום.</strong> זהו כלי לבטיחות אישית ושיתוף מיקום. במצב חירום אמיתי חייגו <b>100</b> (משטרה) · <b>101</b> (מד״א) · <b>102</b> (כבאות). שומר אינו מתקשר לרשויות עבורך.'
  :ar?'<strong>شومير ليس بديلاً عن خدمات الطوارئ.</strong> هو أداة للسلامة الشخصية ومشاركة الموقع. في حالة طوارئ حقيقية اتصل بـ <b>100</b> (الشرطة) · <b>101</b> (نجمة داوود الحمراء) · <b>102</b> (الإطفاء). شومير لا يتصل بالسلطات نيابةً عنك.'
  :'<strong>Shomer is not a replacement for emergency services.</strong> It is a personal-safety & location-sharing tool. In a real emergency call <b>100</b> (Police) · <b>101</b> (MDA) · <b>102</b> (Fire). Shomer does not call authorities for you.';
+ /* v274 GLOBAL: same sentence, local numbers when the user is outside Israel */
+ try{ if(obd && !emIsIL()){ const _n=emergencyNums(), _a=emLabels().a; obd.innerHTML=obd.innerHTML.replace('<b>100</b>','<b>'+ESC(_n.p)+'</b>').replace('<b>101</b>','<b>'+ESC(_n.a)+'</b>').replace('<b>102</b>','<b>'+ESC(_n.f)+'</b>').replace(/\((MDA|מד״א|نجمة داوود الحمراء)\)/,'('+_a+')'); } }catch(_e){}
  const oba=document.getElementById('ob-agree-txt'); if(oba)oba.innerHTML=he
  ?'בכניסה את/ה מסכים/ה ל<button type="button" class="lnk-inline" onclick="openLegal(\'tos\')">תנאי השימוש</button> ול<button type="button" class="lnk-inline" onclick="openLegal(\'privacy\')">מדיניות הפרטיות</button>. שיתוף מיקום הוא בהסכמה בלבד.'
  :ar?'بالدخول فإنك توافق على <button type="button" class="lnk-inline" onclick="openLegal(\'tos\')">شروط الاستخدام</button> و<button type="button" class="lnk-inline" onclick="openLegal(\'privacy\')">سياسة الخصوصية</button>. مشاركة الموقع تتم بالموافقة فقط.'
@@ -9618,7 +9754,7 @@ try{ hydrateIcons(document); }catch(e){}
 /* Loaded-build version - shown in the diagnostic panel so a phone can prove
    whether it's on the latest build or a STALE cached one. Keep in lock-step
    with sw.js SW_VERSION on every deploy. */
-var APP_VER='v273';
+var APP_VER='v274';
 var FB={ready:false,uid:null,db:null,_presTimer:null,connected:false,listening:false,pushState:'default',near:0,swVer:'?',
   authState:'connecting',sdkLoaded:false,persist:'',permErr:null,err:null,wsProbe:'',csp:''};
 /* Always log connection diagnostics to the console so the real failure can be SEEN in Chrome. */
@@ -10627,7 +10763,7 @@ function openLiveSosDetail(sosId){
     +'</div>'
     +'<div id="ev-resp-live" class="ev-resp-live mb16">'+respLiveHtml(mine?1:0, mine?[{name:invName()||(SS.user&&SS.user.name)||''}]:[])+'</div>'
     +'<button class="dcta pr" style="width:100%;margin-bottom:8px;background:linear-gradient(135deg,#0E8840,#14A857)" onclick="navFromLive(\''+sosId+'\')"><svg class="ic" viewBox="0 0 24 24" style="width:18px;height:18px;vertical-align:-3px;margin-inline-end:6px" aria-hidden="true"><path d="M3 11l18-8-8 18-2-8-8-2z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></svg>'+(he?'נווט לאירוע · מסלול חי':ar?'التوجّه · مسار مباشر':'Navigate · live route')+'</button>'
-    +'<div class="det-ctas"><button class="dcta pr" id="ev-respond-btn" onclick="'+respAct+'" style="'+(mine?'background:var(--rb);color:#FF9aa3;box-shadow:none':'')+'">'+respLbl+'</button><button class="dcta gd" onclick="callNum(\'100\')">'+T('call100')+'</button><button class="dcta sc" onclick="cl(\'det-sheet\')">'+T('close')+'</button></div>';
+    +'<div class="det-ctas"><button class="dcta pr" id="ev-respond-btn" onclick="'+respAct+'" style="'+(mine?'background:var(--rb);color:#FF9aa3;box-shadow:none':'')+'">'+respLbl+'</button><button class="dcta gd" onclick="callNum(policeNum())">'+call100Lbl()+'</button><button class="dcta sc" onclick="cl(\'det-sheet\')">'+T('close')+'</button></div>';
   body.querySelector('.det-title').textContent=label+' · SOS';
   body.querySelector('.det-loc').textContent='📍 '+dist;
   body.querySelector('.det-when').textContent=when;
@@ -12230,6 +12366,7 @@ function statsAutoOn(){
   });
 }
 function statsLegPaint(){
+  try{ var _sec=document.getElementById('leg-stats-sec'); if(_sec) _sec.style.display=emIsIL()?'':'none'; }catch(e){}   /* v274: Israel Police data - hidden abroad */
   var b=document.getElementById('leg-stats-st'); if(!b) return;
   var he=currentLang==='he';
   b.className='leg-eye'+(STATS.on?' on':'');
@@ -12299,7 +12436,7 @@ async function aedPullCommunity(){
 function essLoad(){
   try{
     var raw=localStorage.getItem('shomer_ess');
-    if(raw){ var o=JSON.parse(raw); if(o && (Date.now()-o.t)<ESS_TTL){ ESS.data=o.d||{}; ESS.fetched=o.t; } }
+    if(raw){ var o=JSON.parse(raw); if(o && (Date.now()-o.t)<ESS_TTL){ ESS.data=o.d||{}; ESS.fetched=o.t; ESS.fLat=(o.la!=null?o.la:null); ESS.fLng=(o.lo!=null?o.lo:null); } }
     if(SS.myAeds && SS.myAeds.length){ ESS.data.aed=(ESS.data.aed||[]).concat(SS.myAeds); }
     var on=localStorage.getItem('shomer_ess_on');
     ESS.on = on ? JSON.parse(on) : {aed:true,police:true,hospital:true,fire:true,pharmacy:true};
@@ -12308,7 +12445,7 @@ function essLoad(){
 }
 function essSave(){
   try{
-    localStorage.setItem('shomer_ess', JSON.stringify({t:Date.now(), d:ESS.data}));
+    localStorage.setItem('shomer_ess', JSON.stringify({t:Date.now(), d:ESS.data, la:ESS.fLat, lo:ESS.fLng}));
     localStorage.setItem('shomer_ess_on', JSON.stringify(ESS.on));
   }catch(e){}
 }
@@ -12324,8 +12461,11 @@ function fmtKm(km){
 }
 function essFetch(force){
   if(userLat==null||userLng==null) return Promise.resolve();
-  if(!force && ESS.fetched && (Date.now()-ESS.fetched)<ESS_TTL) return Promise.resolve();
-  var d=0.10;
+  /* v274 GLOBAL: the 24h cache is only valid for the area it was fetched for (a traveller who lands
+     in New York must not keep Tel Aviv's hospitals). Refetch after moving >5 km. */
+  var _far=!(ESS.fLat!=null && _kmApprox(ESS.fLat,ESS.fLng,userLat,userLng)<5);
+  if(!force && !_far && ESS.fetched && (Date.now()-ESS.fetched)<ESS_TTL) return Promise.resolve();
+  var d=0.10, _fla=userLat, _flo=userLng;
   var bb=(userLat-d).toFixed(4)+','+(userLng-d).toFixed(4)+','+(userLat+d).toFixed(4)+','+(userLng+d).toFixed(4);
   var parts=[];
   Object.keys(ESS_TYPES).forEach(function(k){
@@ -12355,12 +12495,12 @@ function essFetch(force){
         if(lat==null||lng==null) return;
         if(!out[kind]) out[kind]=[];
         out[kind].push({id:kind+'-'+e.id, lat:lat, lng:lng, kind:kind,
-          name:t.name||t.operator||'', desc:t['defibrillator:location']||t.description||'', indoor:(t.indoor==='yes')});
+          name:t['name:'+currentLang]||t.name||t.operator||'', desc:t['defibrillator:location:'+currentLang]||t['defibrillator:location']||t.description||'', indoor:(t.indoor==='yes')});
       });
       var comm=(ESS.data.aed||[]).filter(function(x){ return x.community; });
       ESS.data=out;
       if(comm.length){ ESS.data.aed=(ESS.data.aed||[]).concat(comm); }
-      ESS.fetched=Date.now();
+      ESS.fetched=Date.now(); ESS.fLat=_fla; ESS.fLng=_flo;
       essSave();
       ESS._busy=null;
     })
@@ -14499,10 +14639,15 @@ function _drRand(seed){ var x=(seed*2654435761)>>>0; return function(){ x^=x<<13
 /* Same question for everyone on a given day; the bank is walked in a fixed shuffled order. */
 function drillOrder(){ if(drillOrder._o) return drillOrder._o; var o=DRILL_BANK.map(function(_,i){return i;}), r=_drRand(77); for(var i=o.length-1;i>0;i--){ var j=Math.floor(r()*(i+1)); var t=o[i]; o[i]=o[j]; o[j]=t; } return (drillOrder._o=o); }
 function drillQuestion(dt){
-  var n=drillDayNum(dt), qi=drillOrder()[((n%DRILL_BANK.length)+DRILL_BANK.length)%DRILL_BANK.length], q=DRILL_BANK[qi];
-  var he=currentLang==='he', opts=(he?q[2]:q[4]).map(function(t,i){ return {t:t,ok:i===0}; });
+  var n=drillDayNum(dt), N=DRILL_BANK.length, base=((n%N)+N)%N, qi=drillOrder()[base], q=DRILL_BANK[qi];
+  /* v274 GLOBAL: outside Israel, skip the "which Israeli number" questions (their answers are
+     100/101/102/1201 and would all collapse to one local number); other texts get local numbers. */
+  var _abroad=false; try{ _abroad=!emIsIL(); }catch(e){}
+  if(_abroad){ for(var k=0;k<N && (q[4]||[]).some(function(o){ return /^\s*(10[0-2]|1201)(?!\d)/.test(o)||/ERAN|1201/.test(o); });k++){ qi=drillOrder()[(base+k+1)%N]; q=DRILL_BANK[qi]; } }
+  var lz=function(x){ try{ return _abroad?emLocalize(x):x; }catch(e){ return x; } };
+  var he=currentLang==='he', opts=(he?q[2]:q[4]).map(function(t,i){ return {t:lz(t),ok:i===0}; });
   var r=_drRand(n+1000); for(var i=opts.length-1;i>0;i--){ var j=Math.floor(r()*(i+1)); var t=opts[i]; opts[i]=opts[j]; opts[j]=t; }
-  return {i:qi, topic:q[0], q:he?q[1]:q[3], opts:opts, why:he?q[5]:q[6], right:he?q[2][0]:q[4][0]};
+  return {i:qi, topic:q[0], q:lz(he?q[1]:q[3]), opts:opts, why:lz(he?q[5]:q[6]), right:lz(he?q[2][0]:q[4][0])};
 }
 function drillIsShabbat(dt){ return (dt||new Date()).getDay()===6; }
 /* v267: Shabbat window from a sunset approximation (NOAA / standard sunrise equation) for
@@ -14522,9 +14667,13 @@ function sunsetUtcMs(y,m,d,lat,lng){
 }
 function drillShabbatNow(dt){
   var t=(dt||new Date()).getTime(), LAT=31.778, LNG=35.235;
+  /* v274 GLOBAL: Shabbat follows the user's own sunset (GPS), not Jerusalem's - a Chabad user in
+     New York must not get a pop-up after candle lighting. No fix yet -> Jerusalem, as before. */
+  try{ if(typeof userLat!=='undefined' && userLat!=null && userLng!=null && Math.abs(userLat)<66){ LAT=userLat; LNG=userLng; } }catch(e){}
+  var OFF=Math.round(LNG/15)*3600000;   /* approximate local clock from longitude - only used to pick the calendar day */
   for(var back=0; back<2; back++){
-    /* the Israel calendar date `back` days ago (UTC+2 is close enough to pick the day) */
-    var x=new Date(t+2*3600000-back*86400000), y=x.getUTCFullYear(), mo=x.getUTCMonth()+1, da=x.getUTCDate();
+    /* the local calendar date `back` days ago */
+    var x=new Date(t+OFF-back*86400000), y=x.getUTCFullYear(), mo=x.getUTCMonth()+1, da=x.getUTCDate();
     if(x.getUTCDay()!==5) continue;
     var start=sunsetUtcMs(y,mo,da,LAT,LNG)-18*60000;
     var sat=new Date(Date.UTC(y,mo-1,da+1));
