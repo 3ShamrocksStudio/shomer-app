@@ -112,6 +112,27 @@
             ".write": "auth != null && auth.uid == $uid"
           }
         }
+      },
+      "learn": {
+        ".read": "auth != null && root.child('founders').child(auth.uid).exists()",
+        "$uid": {
+          "cards": {
+            "$eid": {
+              ".write": "auth != null && auth.uid == $uid",
+              ".validate": "newData.hasChildren(['cardId','ts']) && newData.child('cardId').isString() && newData.child('cardId').val().length <= 16 && newData.child('ts').isNumber() && newData.child('ts').val() <= now"
+            }
+          },
+          "answers": {
+            "$day": {
+              ".write": "auth != null && auth.uid == $uid && !data.exists()",
+              ".validate": "$day.matches(/^[0-9]{4}-[0-9]{2}-[0-9]{2}$/) && newData.hasChildren(['qid','correct','ts']) && newData.child('qid').isNumber() && newData.child('correct').isBoolean() && newData.child('ts').val() == now"
+            }
+          },
+          "summary": {
+            ".write": "auth != null && auth.uid == $uid",
+            ".validate": "newData.hasChildren(['level','pct','ts']) && newData.child('level').isNumber() && newData.child('ts').val() == now"
+          }
+        }
       }
     },
     "aeds": {
