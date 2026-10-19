@@ -9,7 +9,7 @@
 <meta name="apple-mobile-web-app-title" content="שומר">
 <meta http-equiv="X-Content-Type-Options" content="nosniff"><meta http-equiv="Referrer-Policy" content="no-referrer">
 <!-- CSP: no eval. Allows Leaflet (cdnjs) + OpenStreetMap tiles at runtime; everything else self-hosted. -->
-<meta http-equiv="Content-Security-Policy" content="default-src 'self' capacitor://localhost https://localhost http://localhost; base-uri 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdnjs.cloudflare.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: blob: https://cdnjs.cloudflare.com https://*.tile.openstreetmap.org https://*.basemaps.cartocdn.com https://server.arcgisonline.com https://*.arcgisonline.com https://*.google-analytics.com https://*.googletagmanager.com; connect-src 'self' capacitor://localhost https://localhost http://localhost https://shomer-app.co.il https://www.shomer-app.co.il https://server.arcgisonline.com https://*.arcgisonline.com https://overpass-api.de https://overpass.kumi.systems https://nominatim.openstreetmap.org https://shomer-otp.shomer3s.workers.dev https://*.twil.io https://*.tile.openstreetmap.org https://*.basemaps.cartocdn.com https://*.googleapis.com https://fcmregistrations.googleapis.com https://firebaseinstallations.googleapis.com https://router.project-osrm.org https://*.firebaseio.com wss://*.firebaseio.com https://shomergency-default-rtdb.firebaseio.com wss://shomergency-default-rtdb.firebaseio.com https://*.firebasedatabase.app wss://*.firebasedatabase.app https://*.firebaseapp.com https://*.google-analytics.com https://*.analytics.google.com https://www.googletagmanager.com; script-src 'self' 'unsafe-inline' capacitor://localhost https://localhost http://localhost https://cdnjs.cloudflare.com https://www.gstatic.com https://apis.google.com https://www.googletagmanager.com; frame-src 'self' https://shomergency.firebaseapp.com https://www.google.com https://recaptcha.google.com https://accounts.google.com; manifest-src 'self'; worker-src 'self';">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self' capacitor://localhost https://localhost http://localhost; base-uri 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdnjs.cloudflare.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: blob: https://cdnjs.cloudflare.com https://*.tile.openstreetmap.org https://*.basemaps.cartocdn.com https://server.arcgisonline.com https://*.arcgisonline.com https://*.google-analytics.com https://*.googletagmanager.com; connect-src 'self' capacitor://localhost https://localhost http://localhost https://shomer-app.co.il https://www.shomer-app.co.il https://server.arcgisonline.com https://*.arcgisonline.com https://overpass-api.de https://overpass.kumi.systems https://photon.komoot.io https://nominatim.openstreetmap.org https://shomer-otp.shomer3s.workers.dev https://*.twil.io https://*.tile.openstreetmap.org https://*.basemaps.cartocdn.com https://*.googleapis.com https://fcmregistrations.googleapis.com https://firebaseinstallations.googleapis.com https://router.project-osrm.org https://*.firebaseio.com wss://*.firebaseio.com https://shomergency-default-rtdb.firebaseio.com wss://shomergency-default-rtdb.firebaseio.com https://*.firebasedatabase.app wss://*.firebasedatabase.app https://*.firebaseapp.com https://*.google-analytics.com https://*.analytics.google.com https://www.googletagmanager.com; script-src 'self' 'unsafe-inline' capacitor://localhost https://localhost http://localhost https://cdnjs.cloudflare.com https://www.gstatic.com https://apis.google.com https://www.googletagmanager.com; frame-src 'self' https://shomergency.firebaseapp.com https://www.google.com https://recaptcha.google.com https://accounts.google.com; manifest-src 'self'; worker-src 'self';">
 <title>SHOMER · שומר - Citizens for Citizens</title>
 <link rel="manifest" href="manifest.json">
 <link rel="icon" type="image/png" href="logo-192.png">
@@ -6945,6 +6945,8 @@ function renderArrivals(){
         .catch(function(){ if(st){ st.className='arr-geo bad'; st.textContent='!'; } try{ toast(he2?'לא הצלחנו לבדוק את הכתובת - בדוק/י חיבור ונסה/י שוב':'Could not check the address - check your connection and try again','amb'); }catch(e){} });
     };
   });
+  /* v272: pick a real address from suggestions (near me first) instead of free text + error */
+  host.querySelectorAll('.arr-in').forEach(function(inp){ arrAuto(inp, host); });
   host.querySelectorAll('.arr-add').forEach(function(btn){
     var slot=btn.closest('.arr-slot');
     var upd=function(){ btn.style.display = slot.querySelector('.arr-row.arr-hidden') ? 'block':'none'; };
@@ -6955,6 +6957,35 @@ function renderArrivals(){
   if(cap) cap.textContent = he
     ? ('עד '+ARR_G+' שומרים · '+ARR_P+' מיקומים לכל אחד - מגבלת מערכת ההפעלה היא 20.')
     : (ARR_G+' SHOMERs x '+ARR_P+' places - the OS limit is 20.');
+}
+function _phAddr(f){ var p=(f&&f.properties)||{}; var st=(p.street||p.name||'')+(p.housenumber?(' '+p.housenumber):''); var city=p.city||p.town||p.village||p.county||''; return (st||city)+(st&&city?(' · '+city):''); }
+function arrAuto(inp, host){
+  var he=currentLang==='he', box=document.createElement('div'), tmr=null, seq=0;
+  box.className='arr-sug'; box.style.cssText='display:none;position:absolute;inset-inline:0;top:100%;z-index:50;background:var(--card,#0E1B33);border:1px solid rgba(201,168,76,.45);border-radius:12px;margin-top:4px;overflow:hidden;box-shadow:0 8px 24px rgba(0,0,0,.45)';
+  var row=inp.closest('.arr-row'); if(row){ row.style.position='relative'; row.appendChild(box); }
+  var pick=function(addr,lat,lng){
+    var g=inp.getAttribute('data-g'), p=+inp.getAttribute('data-p'), A2=arrState();
+    A2['g'+g]=A2['g'+g]||{places:[]}; A2['g'+g].places=A2['g'+g].places||[];
+    A2['g'+g].places[p]={addr:addr, lat:+lat, lng:+lng, resolved:true}; saveStore();
+    inp.value=addr; box.style.display='none'; inp._picked=true;
+    var st=host.querySelector('.arr-geo[data-g="'+g+'"][data-p="'+p+'"]'); if(st){ st.className='arr-geo ok'; st.textContent='\u2713'; }
+  };
+  var item=function(label,sub,fn){ var b=document.createElement('button'); b.type='button'; b.style.cssText='display:block;width:100%;text-align:start;padding:10px 12px;background:none;border:0;border-bottom:1px solid rgba(255,255,255,.06);color:inherit;font:inherit;cursor:pointer';
+    b.innerHTML='<div style="font-weight:700;font-size:14px">'+ESC(label)+'</div>'+(sub?('<div style="font-size:12px;opacity:.7">'+ESC(sub)+'</div>'):''); b.onmousedown=function(e){ e.preventDefault(); fn(); }; box.appendChild(b); };
+  var here=function(){ if(userLat==null||userLng==null) return;
+    item(he?'\ud83d\udccd \u05d4\u05de\u05d9\u05e7\u05d5\u05dd \u05d4\u05e0\u05d5\u05db\u05d7\u05d9 \u05e9\u05dc\u05d9':'\ud83d\udccd My current location','',function(){
+      fetch('https://photon.komoot.io/reverse?lat='+userLat+'&lon='+userLng).then(function(r){return r.json();}).then(function(j){ var f=j&&j.features&&j.features[0]; pick(f?_phAddr(f):(userLat.toFixed(5)+','+userLng.toFixed(5)), userLat, userLng); }).catch(function(){ pick(userLat.toFixed(5)+','+userLng.toFixed(5), userLat, userLng); }); }); };
+  var run=function(){ var q=(inp.value||'').trim(), my=++seq; box.innerHTML='';
+    if(q.length<3){ here(); box.style.display=box.children.length?'block':'none'; return; }
+    var url='https://photon.komoot.io/api/?limit=5&q='+encodeURIComponent(q)+((userLat!=null&&userLng!=null)?('&lat='+userLat+'&lon='+userLng):'');
+    fetch(url).then(function(r){return r.json();}).then(function(j){ if(my!==seq) return; box.innerHTML=''; here();
+      (j.features||[]).forEach(function(f){ var c=f.geometry&&f.geometry.coordinates; if(!c) return; var p=f.properties||{}; item(_phAddr(f), [p.state,p.country].filter(Boolean).join(', '), function(){ pick(_phAddr(f), c[1], c[0]); }); });
+      if(!box.children.length){ var d=document.createElement('div'); d.style.cssText='padding:10px 12px;font-size:13px;opacity:.75'; d.textContent=he?'\u05dc\u05d0 \u05e0\u05de\u05e6\u05d0\u05d5 \u05db\u05ea\u05d5\u05d1\u05d5\u05ea - \u05e0\u05e1\u05d5 \u05e9\u05dd \u05e8\u05d7\u05d5\u05d1 \u05d5\u05e2\u05d9\u05e8':'No addresses found - try street and city'; box.appendChild(d); }
+      box.style.display='block'; }).catch(function(){ box.style.display='none'; }); };
+  inp.addEventListener('focus', function(){ inp._picked=false; run(); });
+  inp.addEventListener('input', function(){ inp._picked=false; clearTimeout(tmr); tmr=setTimeout(run,350); });
+  inp.addEventListener('blur', function(){ setTimeout(function(){ box.style.display='none'; },150); });
+  var _oc=inp.onchange; inp.onchange=function(ev){ if(inp._picked) return; if(_oc) _oc.call(inp,ev); };
 }
 /* ══ SYSTEM UPDATES + STRANGER PROTECTION ══
    Two separate things, deliberately kept apart:
@@ -7955,7 +7986,10 @@ function openMemberEdit(id){
 }
 function renderCircleMarkers(){
  if(!MAP||mapCircleId==null)return;
- const want={}; visibleMembers(mapCircleId).forEach(m=>{ if(m.lat!=null&&m.lng!=null) want[m.id]=m; });   // only real, live positions get a pin
+ const want={}; visibleMembers(mapCircleId).forEach(m=>{ if(m.lat==null||m.lng==null) return;
+   /* v272: a linked guardian already has its pin in the SHOMER layer - one person, one pin */
+   var _pp=m.pairId&&gdPairById(m.pairId); if(_pp&&_pp.seeThem&&!_pp.pending&&gdPos(_pp)) return;
+   want[m.id]=m; });   // only real, live positions get a pin
  // remove markers no longer wanted
  Object.keys(mapLayers.circle).forEach(id=>{
  if(!want[id]){MAP.removeLayer(mapLayers.circle[id]);delete mapLayers.circle[id];}
@@ -8211,7 +8245,7 @@ function radarPing(ll){
 ═══════════════════════════════════════════════════ */
 const GD_CH='shomer-live-v1'; // BroadcastChannel name
 const GD_RELAY='shomer_live_relay'; // localStorage relay key (cross-tab fallback)
-const GD_FRESH=10000; // ms a live position stays "live"
+const GD_FRESH=300000; // v272: 5 min - presence beats every 40s, a 10s window made guardians flicker offline
 const GD_PALETTE=['#C9A84C','#2962FF','#00C853','#E91E8C','#9C27B0','#FF6A00'];
 let gdBC=null, gdTabCode='', gdLiveTimer=null, gdSimTimer=null;
 
@@ -9493,7 +9527,7 @@ try{ hydrateIcons(document); }catch(e){}
 /* Loaded-build version - shown in the diagnostic panel so a phone can prove
    whether it's on the latest build or a STALE cached one. Keep in lock-step
    with sw.js SW_VERSION on every deploy. */
-var APP_VER='v271';
+var APP_VER='v272';
 var FB={ready:false,uid:null,db:null,_presTimer:null,connected:false,listening:false,pushState:'default',near:0,swVer:'?',
   authState:'connecting',sdkLoaded:false,persist:'',permErr:null,err:null,wsProbe:'',csp:''};
 /* Always log connection diagnostics to the console so the real failure can be SEEN in Chrome. */
@@ -10146,7 +10180,8 @@ function fbOnAuthed(uid){
   try{ fbListenPairs(); }catch(e){}
   try{ purgeStalePositions(); }catch(e){}
   try{ essLoad(); essChipsBuild(); }catch(e){}
-  try{ setTimeout(function(){ essFetch(false).then(function(){ essRender(); essLegPaint(); }); }, 3500); }catch(e){}
+  /* v272: wait for a real GPS fix before asking for nearby services (it used to give up at 3.5s) */
+  try{ (function _essBoot(n){ if(userLat==null||userLng==null){ if(n<40) setTimeout(function(){ _essBoot(n+1); },3000); return; } essFetch(false).then(function(){ essRender(); essLegPaint(); }); })(0); }catch(e){}
   try{ syncPairsToCircles(); }catch(e){}
   try{ fbListenAllPeerLocs(); }catch(e){}
   try{ gdState().pairs.forEach(function(p){ if(p&&!p.initiator&&p.acceptedTs) gdWatchMyAcceptance(p); }); }catch(e){}
@@ -10236,7 +10271,9 @@ function fbProcessPresence(snap){
   try{ fbApplyPeerPresence(all); }catch(e){}   // resolve paired partners' live positions
   var n=0, mlat=userLat, mlng=userLng, radM=((SS.settings&&SS.settings.radius)||5)*1000;
   var seen={}, rendered=0, now=Date.now();
+  var _paired={}; try{ gdState().pairs.forEach(function(pp){ if(pp&&pp.partnerUid) _paired[pp.partnerUid]=1; }); }catch(e){}
   Object.keys(all).forEach(function(k){ if(k===FB.uid)return; var p=all[k]; if(!p||p.lat==null)return;
+    if(_paired[k]) return;   /* v272: my guardians are drawn once, by name - never also as an anonymous dot */
     if(p.ts && (now-p.ts)>PSTALE)return; // skip dead sessions (presence refreshes every 40s)
     var within=(mlat==null)||distMeters(mlat,mlng,p.lat,p.lng)<=radM;
     if(within)n++;
@@ -10259,14 +10296,19 @@ function fbPublishPresence(){
   // "actively guarding", and this removes the largest source of idle writes/egress (installed
   // PWAs spend most of their life backgrounded). Peers drop us after PSTALE; we republish
   // instantly on foreground (visibilitychange hook). SOS + closed-app push are unaffected.
-  if(typeof document!=='undefined' && document.visibilityState==='hidden') return;
+  /* v272: keep a slow heartbeat while hidden (screen off / app in background) so guardians still see me; the browser may still freeze us after a few minutes */
+  if(typeof document!=='undefined' && document.visibilityState==='hidden' && FB._presAt && (Date.now()-FB._presAt)<60000) return;
   // coarse (~1km) location for privacy; precise location only for SOS / opt-in responder positions
   if(!FB._authReady) return;   // pre-sign-in writes go to the wrong key and are rejected anyway
   /* Unknown location or ghost mode → heartbeat WITHOUT coordinates (readers skip entries with
      no lat). It used to publish a made-up Tel Aviv point, so guardians saw a fake position. */
   var hide=(userLat==null||userLng==null)||!!SS.circleGhost;
-  var lat=hide?null:Math.round(userLat*100)/100, lng=hide?null:Math.round(userLng*100)/100;
+  /* v272: presence/ is readable ONLY by my approved guardians - give them a usable position (~11m).
+     The public dashboard keeps the coarse ~1km point (its rules require 2 decimals). */
+  var lat=hide?null:Math.round(userLat*10000)/10000, lng=hide?null:Math.round(userLng*10000)/10000;
+  var clat=hide?null:Math.round(userLat*100)/100, clng=hide?null:Math.round(userLng*100)/100;
   var _pn=Date.now(), _pk=lat+','+lng;
+  if(FB._presAt && (_pn-FB._presAt)<8000 && !(typeof sosActive!=='undefined'&&sosActive)) return;   /* v272: finer position = cap writes at one per 8s while moving */
   if(FB._presKey===_pk && FB._presAt && (_pn-FB._presAt)<30000 && !(SS.drill&&SS.drill.start&&FB._presRk!==drillRank().i)) return;   // coarse point unchanged → no need to rewrite every GPS tick
   FB._presKey=_pk; FB._presAt=_pn;
   var _pres=hide?{ts:_pn}:{lat:lat,lng:lng,ts:_pn};
@@ -10277,7 +10319,7 @@ function fbPublishPresence(){
      anonymous uid, no name/phone. Written to the public /dashfeed path (same place as events),
      so the dashboard can count online users network-wide and per-territory WITHOUT ever reading
      the locked /presence tree. One row per user, overwritten each beat. */
-  try{ fbDashBeat(hide, lat, lng); }catch(e){}
+  try{ fbDashBeat(hide, clat, clng); }catch(e){}
 }
 /* v265: the PUBLIC dashboard heartbeat no longer names me. Its key is a random per-session id
    (hb_<random>), owned through the private dashown/<id> record, and the row carries no uid.
@@ -12125,7 +12167,7 @@ var ESS_TYPES={
              g:'<path d="M12.4 5.6a4.1 4.1 0 0 1 5.8 5.8l-6.6 6.6a4.1 4.1 0 0 1-5.8-5.8Z" fill="#fff"/><path d="M9.1 8.9l5.8 5.8" stroke="#A78BFA" stroke-width="1.7" stroke-linecap="round"/>'}
 };
 
-var ESS={data:{}, layer:{}, on:{aed:true}, fetched:0};
+var ESS={data:{}, layer:{}, on:{aed:true,police:true,hospital:true,fire:true,pharmacy:true}, fetched:0};
 var ESS_TTL=24*60*60*1000;
 
 /* ══ COMMUNITY AED SHARING ══
@@ -12169,8 +12211,8 @@ function essLoad(){
     if(raw){ var o=JSON.parse(raw); if(o && (Date.now()-o.t)<ESS_TTL){ ESS.data=o.d||{}; ESS.fetched=o.t; } }
     if(SS.myAeds && SS.myAeds.length){ ESS.data.aed=(ESS.data.aed||[]).concat(SS.myAeds); }
     var on=localStorage.getItem('shomer_ess_on');
-    ESS.on = on ? JSON.parse(on) : {aed:true};
-  }catch(e){ ESS.on={aed:true}; }
+    ESS.on = on ? JSON.parse(on) : {aed:true,police:true,hospital:true,fire:true,pharmacy:true};
+  }catch(e){ ESS.on={aed:true,police:true,hospital:true,fire:true,pharmacy:true}; }
 }
 function essSave(){
   try{
@@ -12199,12 +12241,13 @@ function essFetch(force){
     parts.push('way'+ESS_TYPES[k].q+'('+bb+');');
   });
   var q='[out:json][timeout:25];('+parts.join('')+');out center 300;';
-  return fetch('https://overpass-api.de/api/interpreter',{
-      method:'POST',
-      body:'data='+encodeURIComponent(q),
-      headers:{'Content-Type':'application/x-www-form-urlencoded'}
-    })
-    .then(function(r){ return r.json(); })
+  /* v272: the main Overpass server can take 45s+. Ask two servers at once, take the first good answer. */
+  var _ovp=function(url){ var ac=(typeof AbortController!=='undefined')?new AbortController():null; var tm=setTimeout(function(){ try{ac&&ac.abort();}catch(e){} },30000);
+    return fetch(url,{method:'POST',body:'data='+encodeURIComponent(q),headers:{'Content-Type':'application/x-www-form-urlencoded'},signal:ac?ac.signal:undefined})
+      .then(function(r){ clearTimeout(tm); if(!r.ok) throw new Error('ovp '+r.status); return r.json(); }); };
+  var _any=function(ps){ return new Promise(function(res,rej){ var n=ps.length; ps.forEach(function(p){ p.then(res,function(){ if(--n===0) rej(new Error('all failed')); }); }); }); };
+  if(ESS._busy) return ESS._busy;
+  return ESS._busy=_any([_ovp('https://overpass-api.de/api/interpreter'), _ovp('https://overpass.kumi.systems/api/interpreter')])
     .then(function(j){
       var out={};
       (j.elements||[]).forEach(function(e){
@@ -12227,8 +12270,9 @@ function essFetch(force){
       if(comm.length){ ESS.data.aed=(ESS.data.aed||[]).concat(comm); }
       ESS.fetched=Date.now();
       essSave();
+      ESS._busy=null;
     })
-    .catch(function(){});
+    .catch(function(){ ESS._busy=null; });
 }
 function essIcon(kind){
   var T=ESS_TYPES[kind];
@@ -12438,7 +12482,7 @@ function fbApplyPeerPresence(all){
       if(pr && typeof pr.rk==='number' && p.rk!==pr.rk){ p.rk=pr.rk; var _cr=(SS.circleMembers||[]).find(function(x){ return x.pairId===p.id || (x.partnerUid&&x.partnerUid===p.partnerUid); }); if(_cr){ _cr.rk=pr.rk; } changed=true; try{ renderCircles(); }catch(e){} }
       if(pr && pr.lat!=null && pr.lng!=null){
         // fresh presence (< 2 min) = live; else keep last known but not "live"
-        var fresh=(now-(pr.ts||0))<120000;
+        var fresh=(now-(pr.ts||0))<300000;   /* v272: 5 min, matches GD_FRESH */
         if(p.lat!==pr.lat||p.lng!==pr.lng||p.live!==fresh){ changed=true; }
         p.lat=pr.lat; p.lng=pr.lng; p.ts=(pr.ts||now); p.live=fresh; p.pending=false;
         // mirror the REAL position onto the circle-member row so its pin is truthful
@@ -14558,7 +14602,7 @@ function drillRenderProfile(){
   var mastered=DRILL_TOPICS.filter(function(tp){ return drillBookLevel(tp)>=3; }).length;
   host.innerHTML='<div class="dr-prof-row"><div><b>'+(d.pts||0)+'</b><small>'+drT('נקודות','points','نقاط')+'</small></div><div><b>'+st.n+'</b><small>'+drT('ימי רצף','day streak','أيام متتالية')+'</small></div><div><b>'+mastered+'/14</b><small>'+drT('נושאים בשליטה','topics mastered','مواضيع متقنة')+'</small></div></div>'
     +'<div class="dr-prof-next">'+ESC(nxt)+' · '+drT('הקפאה השבוע: ','Freeze this week: ','تجميد هذا الأسبوع: ')+st.freezeLeft+' · '+drT('ימי חופש: ','Rest days: ','أيام راحة: ')+st.offsLeft+(d.shield?(' · '+drT('מגן שבת פעיל','Shabbat shield on','درع السبت مفعّل')):'')+'</div>'
-    +'<button class="cta-gold dr-open" type="button" style="width:100%;margin:10px 0 12px">'+(drillDoneToday()?drT('השאלה של היום ✓','Today\'s question ✓','سؤال اليوم ✓'):drT('לשאלה של היום','Today\'s question','سؤال اليوم'))+'</button>'
+    +'<button class="cta-gold dr-open" type="button" style="width:100%;margin:10px 0 12px">'+(drillDoneToday()?drT('השאלה היומית ✓','Today\'s question ✓','سؤال اليوم ✓'):drT('לשאלה היומית','Today\'s question','سؤال اليوم'))+'</button>'
     +'<div class="sec-cap mb12">'+drT('ספר השומר','The Guardian\'s Book','كتاب الحارس')+'</div><div class="dr-book">'+book+'</div>'
     +'<p class="sr-sb" style="margin:6px 2px 16px;line-height:1.6">'+drT('כל נושא: 3 תשובות נכונות ב-3 ימים שונים = 🥇. הדרגה שלך גלויה רק לשומרים שלך.','Each topic: 3 correct answers on 3 different days = 🥇. Your rank is visible only to your SHOMERs.','كل موضوع: 3 إجابات صحيحة في 3 أيام مختلفة = 🥇. رتبتك مرئية لحرّاسك فقط.')+'</p>';
   var ob=host.querySelector('.dr-open'); if(ob) ob.onclick=function(){ try{ cl('sh-prof'); }catch(e){} setTimeout(drillOpenCard, 350); };
