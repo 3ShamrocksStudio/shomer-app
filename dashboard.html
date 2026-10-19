@@ -438,7 +438,7 @@
 .live-strip .ls-t{font-size:15px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .live-strip .ls-t svg{width:15px;height:15px;vertical-align:-2px}
 .live-strip .ls-addr{font-size:12px;margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.live-strip .ls-resp{font-size:11px;margin-top:4px;gap:4px 6px;flex-wrap:nowrap;justify-content:flex-start;overflow:hidden}
+.live-strip .ls-resp{font-size:11px;margin-top:4px;gap:4px 6px;flex-wrap:wrap;justify-content:flex-start;overflow:visible}
 .live-strip .ls-demo{white-space:nowrap}
 .live-strip .ls-beacon{flex-direction:column;gap:5px}
 .live-strip .ls-live{font-size:10px;padding:4px 8px}
@@ -1508,19 +1508,19 @@ function buildReportHtml(){
  var crimeHtml='';
  if(has){
    var cats=Object.keys(c.cats).sort(function(a,b){return c.cats[b]-c.cats[a];});
-   crimeHtml='<table><thead><tr><th>סוג עבירה</th><th class="num">עבירות 2025</th><th class="num">% בעיר</th><th class="num">% בארץ</th>'+(pop?'<th class="num">ל-1,000 תושבים*</th>':'')+'<th class="num">דירוג ארצי</th></tr></thead><tbody>'
+   crimeHtml='<table><thead><tr><th>סוג עבירה</th><th class="num">עבירות 2025</th><th class="num">% בעיר</th><th class="num">% בארץ</th>'+(pop?'<th class="num">ל-1,000 תושבים*</th>':'')+'<th class="num">דירוג ארצי**</th></tr></thead><tbody>'
     +cats.map(function(k){ var cs=c.cats[k]/c.total, ns=natShare(cities,k), arr=cities.map(function(x){return x.cats[k]||0;}).sort(function(a,b){return b-a;}), cr=arr.indexOf(c.cats[k])+1;
       return '<tr><td><span class="dot" style="background:'+catCol(k)+'"></span>'+ESC(k)+'</td><td class="num">'+fmt(c.cats[k])+'</td><td class="num">'+Math.round(cs*100)+'%</td><td class="num">'+Math.round(ns*100)+'%</td>'+(pop?'<td class="num">'+(c.cats[k]/pop*1000).toFixed(2)+'</td>':'')+'<td class="num">#'+cr+' / '+ncit+'</td></tr>'; }).join('')
     +'<tr class="tot"><td>סה״כ</td><td class="num">'+fmt(c.total)+'</td><td class="num">100%</td><td></td>'+(pop?'<td class="num">'+pc.toFixed(1)+'</td>':'')+'<td class="num">#'+(idx+1)+' / '+ncit+'</td></tr></tbody></table>'
-    +'<p class="note"><b>השוואה לשנה קודמת:</b> לא זמינה — המאגר שנטען כולל את שנת 2025 בלבד. ההשוואה בדוח היא מול הממוצע הארצי ('+ncit+' ערים).<br>מקור: '+srcLine+(pop?'<br>* אוכלוסייה: הערכת למ״ס (2023, מעוגלת) — '+fmt(pop)+' תושבים. אינה נתון משטרתי.':'')+'</p>';
+    +'<p class="note"><b>השוואה לשנה קודמת:</b> לא זמינה — המאגר שנטען כולל את שנת 2025 בלבד. ההשוואה בדוח היא מול הממוצע הארצי ('+ncit+' ערים).<br>** דירוג לפי מספר העבירות המוחלט בכל סוג (1 = הכי הרבה); ערים גדולות מדורגות גבוה גם בשל גודלן — ראו עמודת ל-1,000 תושבים.<br>מקור: '+srcLine+(pop?'<br>* אוכלוסייה: הערכת למ״ס (2023, מעוגלת) — '+fmt(pop)+' תושבים. אינה נתון משטרתי.':'')+'</p>';
  } else {
    crimeHtml='<p><b>אין נתוני פשיעה רשמיים לטריטוריה זו.</b> '+(c.intl?'הטריטוריה נמצאת מחוץ לישראל'+(c.country?' ('+ESC(c.country)+')':'')+'. ':'')+'המאגר שנטען מכיל נתוני משטרת ישראל ל-'+ncit+' ערים בישראל בלבד, ולכן לא מוצגים כאן מספרי פשיעה, דירוג או השוואה. אין להסיק מכך שאין פשיעה באזור.</p><p class="note">המאגר שנטען: '+srcLine+'</p>';
  }
  /* ---------- hotspots (honest about granularity) ---------- */
  var hot='<p>נתוני המשטרה במאגר הם <b>ברמת העיר</b> — אין בהם פילוח לשכונות או לרחובות, ולכן אין בדוח "נקודות חמות" משטרתיות בתוך העיר.</p>';
  if(has){
-   var over=Object.keys(c.cats).map(function(k){var a=c.cats[k]/c.total,b=natShare(cities,k);return{k:k,a:a,b:b,r:b?a/b:0};}).filter(function(o){return o.r>1.12;}).sort(function(x,y){return y.r-x.r;});
-   hot+='<p><b>סוגי עבירה גבוהים מהממוצע הארצי:</b> '+(over.length?over.map(function(o){return ESC(catPlain(o.k))+' ('+Math.round(o.a*100)+'% לעומת '+Math.round(o.b*100)+'%)';}).join(' · '):'אין סוג עבירה החורג ביותר מ-12% מהממוצע הארצי.')+'</p>';
+   var over=Object.keys(c.cats).map(function(k){var a=c.cats[k]/c.total,b=natShare(cities,k);return{k:k,a:a,b:b,r:b?a/b:0};}).filter(function(o){return o.r>1.12&&o.a>=0.05;}).sort(function(x,y){return y.r-x.r;});
+   hot+='<p><b>סוגי עבירה גבוהים מהממוצע הארצי:</b> '+(over.length?over.map(function(o){return ESC(catPlain(o.k))+' ('+Math.round(o.a*100)+'% לעומת '+Math.round(o.b*100)+'%)';}).join(' · '):'אין סוג עבירה משמעותי (5%+ מהעבירות) החורג ביותר מ-12% מהממוצע הארצי.')+'</p>';
    var pool=cities.filter(function(x){return POP[x.city];}), near=pool.filter(function(x){return x.city!==c.city;}).map(function(x){return{x:x,d:haversine(c.lat,c.lng,x.lat,x.lng)};}).sort(function(a,b){return a.d-b.d;}).slice(0,5);
    if(pop&&near.length){ var rows=[{x:c,d:0}].concat(near);
      hot+='<table><thead><tr><th>עיר</th><th class="num">מרחק</th><th class="num">עבירות 2025</th><th class="num">ל-1,000 תושבים*</th></tr></thead><tbody>'+rows.map(function(o){return '<tr'+(o.x===c?' class="me"':'')+'><td>'+ESC(o.x.city)+'</td><td class="num">'+(o.d?Math.round(o.d)+' ק״מ':'—')+'</td><td class="num">'+fmt(o.x.total)+'</td><td class="num">'+perCap(o.x).toFixed(1)+'</td></tr>';}).join('')+'</tbody></table>'; }
@@ -1538,7 +1538,7 @@ function buildReportHtml(){
    +'</tbody></table><p class="note">מקור: רשת SH✡MER (dashfeed, ללא פרטים מזהים, מיקום מעוגל לכ-1 ק״מ) · נכון ל-'+netAt+'.</p>')
    :'<p>נתוני הרשת לא היו זמינים בעת היצוא — לא מוצגים מספרים.</p>';
  /* ---------- actions ---------- */
- var recs=recItems(idx,null);
+ var recs=recItems(idx,null,true); /* report excludes example events */
  var recHtml='<ol class="acts">'+recs.map(function(o){ return '<li><b>'+ESC(o.t)+'</b><br>'+ESC(_plain(o.d))+(o.why?'<div class="why">מבוסס על: '+ESC(o.why)+'</div>':'')+(o.url?'<div class="why">מקור מחקרי: <a href="'+ESC(o.url)+'">'+ESC(o.src)+'</a></div>':'')+'</li>'; }).join('')+'</ol>';
  /* ---------- summary ---------- */
  var sum=[];
@@ -1547,7 +1547,7 @@ function buildReportHtml(){
    if(pc&&M.med) sum.push('עבירות לכל 1,000 תושבים: <b>'+pc.toFixed(1)+'</b> (העיר האמצעית בארץ: '+M.med.toFixed(1)+'; אוכלוסייה לפי הערכת למ״ס).'); }
  else sum.push('<b>אין נתוני פשיעה רשמיים</b> לטריטוריה זו — הדוח מבוסס על נתוני הרשת והאירועים בלבד.');
  sum.push('אירועים: <b>'+liveOpen+'</b> חיים ופתוחים · <b>'+revOpen+'</b> קודמים שעדיין פתוחים · '+evRows.length+' בסך הכול בדוח'+(exCount?' ('+exCount+' אירועי דוגמה הוחרגו)':'')+'.');
- if(netOk) sum.push('רשת SH✡MER: '+v(S.territoryActive)+' משתמשים פעילים בטריטוריה ב-24 השעות האחרונות.');
+ if(netOk) sum.push('משתמשי <bdi>SH✡MER</bdi> פעילים בטריטוריה ב-24 השעות האחרונות: <b>'+v(S.territoryActive)+'</b>.');
  /* ---------- limitations ---------- */
  var lim=['נתוני המשטרה הם עבירות <b>שנרשמו</b> ברמת העיר לשנת 2025 בלבד; אין בהם נתוני שנה קודמת, פילוח לשכונות או עבירות שלא דווחו.',
   'הדירוג והממוצע הארצי מחושבים בין '+ncit+' הערים שבמאגר בלבד, לא בין כל הרשויות בישראל.',
@@ -1906,7 +1906,7 @@ function renderTrendInline(elId){
  var view=window._trView||'cmp'; if(view==='cmp'&&!hasStats(c)) view='net';
  var spec=view==='cmp'?_trCmpSpec(c):_trNetSpec(c);
  var on=((window._trOn||{})[view])||{};
- var seg='<div class="tr-ranges"><button class="tr-rg'+(view==='cmp'?' on':'')+'" onclick="_trSetView(\'cmp\')">השוואה בין ערים</button><button class="tr-rg'+(view==='net'?' on':'')+'" onclick="_trSetView(\'net\')">פעילות הרשת</button></div>';
+ var seg='<div class="tr-ranges"><button class="tr-rg'+(view==='cmp'?' on':'')+'"'+(hasStats(c)?' onclick="_trSetView(\'cmp\')"':' disabled style="opacity:.4;cursor:not-allowed" title="אין נתוני פשיעה רשמיים לטריטוריה זו"')+'>השוואה בין ערים</button><button class="tr-rg'+(view==='net'?' on':'')+'" onclick="_trSetView(\'net\')">פעילות הרשת</button></div>';
  var R=window._trRange||12;
  var rng=view==='net'?'<div class="tr-ranges sm">'+[4,12,26].map(function(r){return '<button class="tr-rg'+(r===R?' on':'')+'" onclick="_trSetRange('+r+')">'+r+' שב׳</button>';}).join('')+'</div>':'';
  var chips=(spec.series||[]).map(function(s){ var a=on[s.k]!==0; return '<button class="tr-ck'+(a?' on':'')+'" style="--cc:'+s.c+'" onclick="_trToggle(\''+view+'\',\''+s.k+'\')" title="'+(a?'הסתרת':'הצגת')+' הסדרה'+(s.tip?' · '+ESC(s.tip):'')+'"><i></i>'+ESC(s.label)+'</button>'; }).join('');
@@ -1971,9 +1971,9 @@ var ACT_PLAIN={
 };
 var HS_SRC={s:'OJP CrimeSolutions — Hot Spots Policing (דירוג "יעיל")',u:'https://crimesolutions.ojp.gov/ratedpractices/hot-spots-policing'};
 function _medPC(){ var pv=DATA._sorted.map(perCap).filter(function(v){return v!=null;}).sort(function(a,b){return a-b;}); return {med:pv[Math.floor(pv.length/2)],n:pv.length}; }
-function recItems(idx,fk){
+function recItems(idx,fk,noEx){
  var c=cityAt(idx), cities=DATA._sorted, out=[], S=window._liveStats||{}, BR=window._boardRows||{rev:[],live:[]};
- var openRev=(BR.rev||[]).filter(function(r){return r.status==='open';}), openEx=openRev.filter(function(r){return r.ex;}).length;
+ var openRev=(BR.rev||[]).filter(function(r){return r.status==='open'&&!(noEx&&r.ex);}), openEx=openRev.filter(function(r){return r.ex;}).length;
  if(openRev.length) out.push({cls:'flag',i:'!',t:(openRev.length===1?'אירוע אחד ממתין לסגירה':openRev.length+' אירועים ממתינים לסגירה')+(openEx?(openEx===openRev.length?' · דוגמה':' (מתוכם '+openEx+' דוגמה)'):''),d:'לעבור על לוח האירועים, לסמן "טופל" או "נסגר" ולכתוב מה היה הסוף — כך האירוע נכנס לדוח.',why:'לוח האירועים · מצבים שסומנו בדפדפן זה',go:'openFeedAll()'});
  if(!hasStats(c)){
    out.push({cls:'info',i:'i',t:'אין נתוני פשיעה רשמיים ל'+c.city,d:'נתוני משטרת ישראל קיימים לערי ישראל בלבד. כאן מוצגים נתוני הרשת והאירועים מהשטח.',why:'המאגר הרשמי שנטען: '+(DATA.source||'')+' · '+(DATA.period||'')});
