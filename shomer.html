@@ -9708,7 +9708,8 @@ function diagForceFresh(){ try{ if(typeof forceFreshReload==='function'){ forceF
  function bindLP(el){ if(!el)return; var t=null; var start=function(){ t=setTimeout(showDiag,700); }; var cancel=function(){ if(t)clearTimeout(t); };
   el.addEventListener('touchstart',start,{passive:true}); el.addEventListener('touchend',cancel); el.addEventListener('touchmove',cancel);
   el.addEventListener('mousedown',start); el.addEventListener('mouseup',cancel); el.addEventListener('mouseleave',cancel); }
- try{ bindLP(document.querySelector('.ob-logo')); bindLP(document.querySelector('.hdr-logo-svg')); }catch(e){}
+ /* Diagnostics panel is DEV-ONLY: reachable via the ?diag URL param, NOT by pressing the logo.
+    (Removed logo long-press binding so end users can't open the technical dump by accident.) */
  try{ if(/[?&]diag\b/.test(location.search)) setTimeout(showDiag,400); }catch(e){}
 })();
 
