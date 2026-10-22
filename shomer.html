@@ -1889,7 +1889,8 @@ body.otp-active .ob-steps{display:none!important;}
  <div class="dms-iv sel" data-sec="120" onclick="ciPick('win',120,this)" tabindex="0"><div class="dms-iv-n">2</div><div class="dms-iv-l" data-he="דק׳" data-en="min">דק׳</div></div>
  <div class="dms-iv" data-sec="300" onclick="ciPick('win',300,this)" tabindex="0"><div class="dms-iv-n">5</div><div class="dms-iv-l" data-he="דק׳" data-en="min">דק׳</div></div>
  </div>
- <button class="cta-gold mb16" style="margin-top:16px" id="ci-toggle-btn" onclick="checkinToggle()" data-he="הפעל צ׳ק-אין" data-en="Start check-in">הפעל צ׳ק-אין</button>
+ <div class="fc-set" data-fc-host="ci"></div>
+<button class="cta-gold mb16" style="margin-top:16px" id="ci-toggle-btn" onclick="checkinToggle()" data-he="הפעל צ׳ק-אין" data-en="Start check-in">הפעל צ׳ק-אין</button>
  <div class="dms-notice" data-he="אם לא תאשר/י בזמן, נשלחת התראה לשומר/ת שבחרת." data-en="If you don't confirm in time, an alert is sent to the SHOMER you chose.">אם לא תאשר/י בזמן, נשלחת התראה לשומר/ת שבחרת.</div>
  </div>
  </div>
@@ -2071,7 +2072,8 @@ body.otp-active .ob-steps{display:none!important;}
  <div class="dms-status" id="dms-status-txt" data-he="עד הבדיקה הבאה" data-en="Until next check">עד הבדיקה הבאה</div>
  <button class="dms-ok" style="margin-top:12px;padding:10px 28px;border-radius:var(--r12);font-size:14px;cursor:pointer;border:none" onclick="dmsConfirm()" id="dms-ok-big" data-he="✓ הכל טוב?" data-en="✓ I'm OK">✓ הכל טוב?</button>
  </div>
- <button class="cta-gold mb16" id="dms-toggle-btn" onclick="toggleDMS()"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 5l12 7-12 7Z" fill="currentColor"/></svg><span data-he="הפעל שומר אוטומטי" data-en="Activate שומר אוטומטי">הפעל שומר אוטומטי</span></button>
+ <div class="fc-set" data-fc-host="dms"></div>
+<button class="cta-gold mb16" id="dms-toggle-btn" onclick="toggleDMS()"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 5l12 7-12 7Z" fill="currentColor"/></svg><span data-he="הפעל שומר אוטומטי" data-en="Activate שומר אוטומטי">הפעל שומר אוטומטי</span></button>
  <div style="background:var(--n3);border:1px solid var(--b1);border-radius:var(--r12);padding:13px;font-size:12px;color:var(--tx2);line-height:1.75" id="dms-tips-txt" data-i18n-html="1" data-he=" <strong>מומלץ לשימוש:</strong> הליכות לבד בלילה · כניסה לחניון מבודד · מפגש עם זר · ריצה בשעות חשוכות" data-en=" <strong>Best used for:</strong> walking alone at night · entering an isolated car park · meeting a stranger · running after dark">
  <strong>מומלץ לשימוש:</strong> הליכות לבד בלילה · כניסה לחניון מבודד · מפגש עם זר · ריצה בשעות חשוכות
  </div>
@@ -2456,13 +2458,36 @@ body.otp-active .ob-steps{display:none!important;}
  .gd-foot{display:flex;align-items:center;justify-content:center;gap:8px;margin-top:16px;opacity:.85;}
  .gd-foot img{height:13px;}.gd-foot span{font-size:10px;color:var(--tx3);}
  
-/* v276: related cards + rating at the foot of every guide card */
-.gd-notthis{display:block;margin:-2px 0 10px auto;margin-inline-start:auto;margin-inline-end:0;background:none;border:0;padding:4px 2px;color:var(--tx2);font:inherit;font-size:12px;font-weight:700;text-decoration:underline;text-underline-offset:3px;cursor:pointer}
-.gd-rel{margin:14px 0 4px;padding:12px;border-radius:14px;background:rgba(255,255,255,.04);border:1px solid var(--b1)}
-.gd-rel-h{font-size:13.5px;font-weight:800;color:var(--tx0);margin-bottom:9px}
-.gd-rel-row{display:flex;flex-wrap:wrap;gap:8px}
-.gd-rel-b{min-height:44px;padding:9px 14px;border-radius:999px;border:1.5px solid;background:rgba(255,255,255,.03);font:inherit;font-size:14px;font-weight:800;cursor:pointer}
-.gd-rel-b.all{border-color:var(--b2,rgba(255,255,255,.25));color:var(--tx1)}
+
+/* v279 fake call */
+.fc-ov{position:fixed;inset:0;z-index:2147483000;display:flex;flex-direction:column;justify-content:space-between;align-items:center;padding:calc(54px + env(safe-area-inset-top)) 24px calc(46px + env(safe-area-inset-bottom));background:linear-gradient(180deg,#1f2a36 0%,#0d1117 100%);color:#fff;font-family:system-ui,-apple-system,Roboto,sans-serif;direction:rtl}
+.fc-top{text-align:center}.fc-sub{font-size:14px;color:#9fb0c3;margin-bottom:26px}
+.fc-av{width:104px;height:104px;margin:0 auto 18px;border-radius:50%;display:grid;place-items:center;font-size:44px;font-weight:700;background:#3d5a80;color:#fff}
+.fc-nm{font-size:34px;font-weight:600}.fc-st{margin-top:8px;font-size:15px;color:#9fb0c3;min-height:20px}
+.fc-mid{width:100%;max-width:340px;display:flex;gap:8px}
+.fc-in{flex:1;padding:12px 14px;border-radius:14px;border:1px solid #3a4756;background:#151c24;color:#fff;font-size:16px}
+.fc-go{padding:0 18px;border-radius:14px;border:0;background:#2e7d32;color:#fff;font-weight:700;font-size:15px}
+.fc-bot{display:flex;gap:90px;direction:ltr}.fc-b{width:72px;height:72px;border-radius:50%;border:0;font-size:32px;color:#fff;cursor:pointer}
+.fc-b.ans{background:#2fbf4f;animation:fcPulse 1.2s ease-in-out infinite}.fc-b.dec{background:#e5383b;transform:rotate(135deg)}
+@keyframes fcPulse{0%,100%{box-shadow:0 0 0 0 rgba(47,191,79,.55)}50%{box-shadow:0 0 0 16px rgba(47,191,79,0)}}
+.fc-row{display:flex;align-items:center;gap:8px;font-weight:700;font-size:14px;color:var(--tx0)}.fc-row input{width:20px;height:20px}
+/* v276/v279: related cards - a bright amber card that stands apart from the dark page */
+.gd-notthis{display:flex;align-items:center;justify-content:center;width:100%;min-height:46px;margin:2px 0 12px;padding:10px 14px;border:0;border-radius:14px;background:linear-gradient(135deg,#F5C840,#E0A828);color:#1b1404;font:inherit;font-size:15px;font-weight:900;cursor:pointer;box-shadow:0 6px 18px rgba(224,168,40,.35)}
+.gd-rel{margin:16px 0 6px;padding:14px 12px 12px;border-radius:18px;background:#FFF6DC;border:2px solid #E0A828;box-shadow:0 10px 28px rgba(0,0,0,.35)}
+.gd-rel-h{display:flex;align-items:center;gap:8px;font-size:17px;font-weight:900;color:#1b1404;margin:0 2px 10px}
+.gd-rel-ic{display:inline-grid;place-items:center;width:30px;height:30px;border-radius:50%;background:#E0A828;color:#1b1404;font-size:17px}
+.gd-rel-row{display:flex;flex-direction:column;gap:8px}
+.gd-rel-b{display:flex;align-items:center;gap:10px;width:100%;min-height:58px;padding:8px 10px;border-radius:14px;border:1px solid rgba(0,0,0,.12);border-inline-start:6px solid #E0A828;background:#fff;color:#14213d;font:inherit;text-align:start;cursor:pointer;box-shadow:0 2px 6px rgba(0,0,0,.08)}
+.gd-rel-b:active{transform:scale(.98)}
+.gd-rel-pic{flex:0 0 44px;width:44px;height:44px;border-radius:11px;overflow:hidden;border:2px solid;background:#fff}
+.gd-rel-pic img{width:100%;height:100%;object-fit:cover;display:block}
+.gd-rel-t{flex:1;min-width:0;display:flex;flex-direction:column;line-height:1.25}
+.gd-rel-t b{font-size:16px;font-weight:900}
+.gd-rel-t small{font-size:12.5px;color:#4a5570}
+.gd-rel-go{flex:0 0 auto;font-size:24px;font-weight:900;color:#B07A12}
+[dir=ltr] .gd-rel-go{transform:scaleX(-1)}
+.gd-rel-b.all{border-inline-start-color:#14213d;min-height:46px}
+.gd-rel-b.all .gd-rel-t b{color:#14213d;font-size:15px}
 .gd-rate{display:flex;align-items:center;justify-content:center;gap:10px;margin:12px 0 2px;font-size:13px;color:var(--tx2);font-weight:700}
 .gd-rate button{width:44px;height:44px;border-radius:50%;border:1px solid var(--b1);background:rgba(255,255,255,.05);font-size:20px;cursor:pointer}
 </style>
@@ -4831,6 +4856,7 @@ function dmsTick(){
  updateDMSDisplay();
  if(dmsCountdown<=60&&!dmsWarning){
  dmsWarning=true;
+ if(fcEnabled()){ fakeCallStart({ok:function(){ dmsConfirm(); }, fail:function(){ dmsActive=false; dmsWarning=false; clearInterval(dmsTimer); try{ SS.dms.active=false; SS.dms.deadline=0; saveStore(); document.getElementById('dms-strip').classList.remove('on','warn'); }catch(e){} silentSOS('duress'); }}); }
  document.getElementById('dms-strip').classList.add('warn');
  pushNotifyQuiet('שומר - Dead Man\'s Switch',currentLang==='he'?'האם הכל טוב?? לחץ לאישור':'Are you OK? Tap to confirm','dms');
  toast(currentLang==='he'?' DMS - 60 שניות לאישור!':' DMS - 60 seconds to confirm!','amb');
@@ -4982,6 +5008,111 @@ function playAlarm(durMs){
  SH.o.frequency.setValueAtTime(f,t);
  t+=0.06;
  }
+}
+
+/* ══ v279 "CALL FROM MOM" CHECK-IN + SILENT SOS ══════════════════════════════════════
+   When a check-in / dead-man-switch question is due and this mode is on, the phone shows a
+   realistic incoming call (caller name chosen by the user). Answer and say the code word -
+   all good. Wrong word, silence, decline or hang-up = SILENT SOS: SHOMERs get the alert and
+   live location, while this phone shows and sounds nothing (under coercion a siren can
+   escalate - and it would blast the user's ear mid-call). Like the "pizza order" call. */
+function fcState(){ SS.fakecall=SS.fakecall||{on:false,caller:'',code:''}; return SS.fakecall; }
+function fcEnabled(){ var f=fcState(); return !!(f.on && String(f.code||'').trim().length>=2); }
+function fcNorm(t){ return String(t||'').toLowerCase().replace(/[֑-ׇ]/g,'').replace(/[^\p{L}\p{N}]+/gu,' ').trim(); }
+function fcMatch(said,code){ var a=fcNorm(said), c=fcNorm(code); if(!a||!c) return false; return (' '+a+' ').indexOf(' '+c+' ')>=0 || a.replace(/ /g,'').indexOf(c.replace(/ /g,''))>=0; }
+function silentSOS(trigger){
+  if(typeof sosPhase!=='undefined' && sosPhase!=='idle') return false;
+  window._sosSilent=true; sosActive=true; curSosTrigger=trigger||'duress';
+  try{ activateSOS(); }catch(e){}
+  return true;
+}
+var _fcRingT=null, _fcCtx=null;
+function fcRing(on){
+  clearInterval(_fcRingT); _fcRingT=null;
+  try{ if(_fcCtx){ _fcCtx.close(); _fcCtx=null; } }catch(e){}
+  try{ navigator.vibrate&&navigator.vibrate(0); }catch(e){}
+  if(!on) return;
+  var burst=function(){
+    try{ if(!_fcCtx||_fcCtx.state==='closed') _fcCtx=new(window.AudioContext||window.webkitAudioContext)();
+      var c=_fcCtx, t=c.currentTime, g=c.createGain(); g.gain.value=0.0001; g.connect(c.destination);
+      [[0,1.0],[1.4,2.4]].forEach(function(w){   /* gentle phone ring: soft 420/520Hz, two pulses */
+        g.gain.setValueAtTime(0.0001,t+w[0]); g.gain.exponentialRampToValueAtTime(0.18,t+w[0]+0.05);
+        g.gain.setValueAtTime(0.18,t+w[1]-0.05); g.gain.exponentialRampToValueAtTime(0.0001,t+w[1]); });
+      [420,520].forEach(function(f){ var o=c.createOscillator(); o.type='sine'; o.frequency.value=f; o.connect(g); o.start(t); o.stop(t+2.5); });
+    }catch(e){}
+    try{ navigator.vibrate&&navigator.vibrate([900,500,900]); }catch(e){}
+  };
+  burst(); _fcRingT=setInterval(burst,4000);
+}
+async function fcListen(lang){
+  /* native on-device speech engine (Capacitor plugin) - Android WebView has no web speech API */
+  var SR=window.Capacitor&&window.Capacitor.Plugins&&window.Capacitor.Plugins.SpeechRecognition;
+  if(!SR) return null;
+  try{
+    var av=await SR.available(); if(av&&av.available===false) return null;
+    try{ await SR.requestPermissions(); }catch(e){}
+    var r=await SR.start({language:lang, maxResults:5, partialResults:false, popup:false});
+    return (r&&r.matches)||[];
+  }catch(e){ try{ fbLog('fakecall speech: '+((e&&e.message)||e)); }catch(_){} return null; }
+}
+function fakeCallStart(cb){
+  var f=fcState(), he=currentLang==='he', ar=currentLang==='ar', practice=!!(cb&&cb.practice);
+  if(document.getElementById('fc-ov')) return;
+  var who=String(f.caller||'').trim()||(he?'אמא':ar?'أمي':'Mom');
+  var ov=document.createElement('div'); ov.id='fc-ov'; ov.className='fc-ov';
+  var done=false, t0=0, tick=null, timeout=null;
+  var finish=function(ok){
+    if(done) return; done=true; fcRing(false); clearInterval(tick); clearTimeout(timeout);
+    try{ var SR=window.Capacitor&&window.Capacitor.Plugins&&window.Capacitor.Plugins.SpeechRecognition; SR&&SR.stop&&SR.stop(); }catch(e){}
+    var st=ov.querySelector('.fc-st'); if(st) st.textContent=he?'השיחה הסתיימה':ar?'انتهت المكالمة':'Call ended';
+    setTimeout(function(){ ov.remove(); }, 900);
+    if(practice){ try{ toast(ok?(he?'✓ תרגול: הקוד זוהה - הכל טוב':'✓ Practice: code recognised'):(he?'תרגול: כאן הייתה נשלחת התראה שקטה לשומרים שלך':'Practice: a silent alert would go to your SHOMERs now'), ok?'grn':'amb'); }catch(e){} return; }
+    try{ ok ? (cb.ok&&cb.ok()) : (cb.fail&&cb.fail()); }catch(e){}
+  };
+  ov.innerHTML='<div class="fc-top"><div class="fc-sub">'+(he?'שיחה נכנסת · נייד':ar?'مكالمة واردة · جوال':'Incoming call · mobile')+'</div>'
+    +'<div class="fc-av">'+ESC(who.charAt(0))+'</div><div class="fc-nm">'+ESC(who)+'</div><div class="fc-st"></div></div>'
+    +'<div class="fc-mid"></div>'
+    +'<div class="fc-bot"><button type="button" class="fc-b dec" aria-label="decline">✆</button><button type="button" class="fc-b ans" aria-label="answer">✆</button></div>';
+  document.body.appendChild(ov);
+  fcRing(true);
+  timeout=setTimeout(function(){ finish(false); }, 30000);   /* unanswered */
+  ov.querySelector('.dec').onclick=function(){ finish(false); };
+  ov.querySelector('.ans').onclick=async function(){
+    fcRing(false); clearTimeout(timeout); t0=Date.now(); ov.classList.add('live'); try{ ov.querySelector('.fc-sub').textContent=he?'בשיחה':ar?'في مكالمة':'On call'; }catch(e){}
+    var st=ov.querySelector('.fc-st');
+    tick=setInterval(function(){ var s=Math.floor((Date.now()-t0)/1000); st.textContent=('0'+Math.floor(s/60)).slice(-2)+':'+('0'+(s%60)).slice(-2); },500);
+    var bot=ov.querySelector('.fc-bot'); bot.innerHTML='<button type="button" class="fc-b dec" aria-label="end">✆</button>'; bot.querySelector('.dec').onclick=function(){ finish(false); };
+    timeout=setTimeout(function(){ finish(false); }, 25000);   /* nothing said in time */
+    try{ if(window.speechSynthesis&&window.SpeechSynthesisUtterance){ var u=new SpeechSynthesisUtterance(he?'היי, הכל בסדר?':ar?'مرحبا، كل شيء بخير؟':'Hi, is everything okay?'); u.lang=he?'he-IL':ar?'ar':'en-US'; speechSynthesis.speak(u); } }catch(e){}
+    var said=await fcListen(he?'he-IL':ar?'ar-SA':'en-US');
+    if(done) return;
+    if(said===null){
+      /* no speech engine on this phone yet - discreet typed fallback inside the call screen */
+      var mid=ov.querySelector('.fc-mid');
+      mid.innerHTML='<input class="fc-in" type="text" autocomplete="off" placeholder="'+(he?'הקלד/י את מילת הקוד':ar?'اكتب كلمة الرمز':'Type your code word')+'"><button type="button" class="fc-go">'+(he?'אישור':ar?'تأكيد':'OK')+'</button>';
+      var inp=mid.querySelector('.fc-in'); try{ inp.focus(); }catch(e){}
+      var chk=function(){ finish(fcMatch(inp.value, f.code)); };
+      mid.querySelector('.fc-go').onclick=chk; inp.onkeydown=function(e){ if(e.key==='Enter') chk(); };
+      return;
+    }
+    finish(said.some(function(x){ return fcMatch(x, f.code); }));
+  };
+}
+function fcMountSettings(){
+  var f=fcState(), he=currentLang==='he', ar=currentLang==='ar';
+  document.querySelectorAll('[data-fc-host]').forEach(function(h){
+    h.innerHTML='<div class="sec-cap mb12" style="margin-top:14px">'+(he?'שיחה מאמא (בדיקה קולית)':ar?'مكالمة من أمي (فحص صوتي)':'Call from Mom (voice check)')+'</div>'
+      +'<p class="set-help" style="margin:0 0 8px">'+(he?'במקום השאלה „הכל טוב?” הטלפון יציג שיחה נכנסת. עונים ואומרים את מילת הקוד. מילה שגויה, שתיקה או ניתוק = התראה שקטה לשומרים שלך עם המיקום החי, בלי שום סימן או צליל בטלפון.':ar?'بدل سؤال «كل شيء بخير؟» يعرض الهاتف مكالمة واردة. أجب وقل كلمة الرمز. كلمة خاطئة أو صمت أو إنهاء = تنبيه صامت لحرّاسك مع موقعك المباشر.':'Instead of the "All good?" question, your phone shows an incoming call. Answer and say your code word. Wrong word, silence or hanging up = a silent alert to your SHOMERs with your live location, with no sign or sound on your phone.')+'</p>'
+      +'<label class="fc-row"><input type="checkbox" class="fc-on"'+(f.on?' checked':'')+'> <span>'+(he?'הפעל שיחה מדומה':ar?'تفعيل المكالمة':'Use the fake call')+'</span></label>'
+      +'<input class="ob-f fc-caller" type="text" maxlength="20" placeholder="'+(he?'שם המתקשר/ת (למשל: אמא)':ar?'اسم المتصل (مثلاً: أمي)':'Caller name (e.g. Mom)')+'" value="'+ESC(f.caller||'')+'" style="margin-top:8px">'
+      +'<input class="ob-f fc-code" type="text" maxlength="24" autocomplete="off" placeholder="'+(he?'מילת קוד (למשל: פיצה)':ar?'كلمة الرمز':'Code word (e.g. pizza)')+'" value="'+ESC(f.code||'')+'" style="margin-top:8px">'
+      +'<button type="button" class="row-btn fc-test" style="width:100%;margin-top:8px;justify-content:center">'+(he?'נסה/י עכשיו (תרגול - לא נשלח כלום)':ar?'جرّب الآن (تدريب)':'Try it now (practice - nothing is sent)')+'</button>';
+    var on=h.querySelector('.fc-on'), cn=h.querySelector('.fc-caller'), cd=h.querySelector('.fc-code');
+    on.onchange=function(){ if(on.checked && String(cd.value||'').trim().length<2){ on.checked=false; try{ cd.focus(); toast(he?'קודם בחר/י מילת קוד':'Choose a code word first','amb'); }catch(e){} return; } f.on=on.checked; saveStore(); };
+    cn.oninput=function(){ f.caller=cn.value.trim(); saveStore(); };
+    cd.oninput=function(){ f.code=cd.value.trim(); if(f.code.length<2){ f.on=false; on.checked=false; } saveStore(); };
+    h.querySelector('.fc-test').onclick=function(){ if(String(f.code||'').trim().length<2){ try{ cd.focus(); toast(he?'קודם בחר/י מילת קוד':'Choose a code word first','amb'); }catch(e){} return; } fakeCallStart({practice:true}); };
+  });
 }
 /* ── LOOPING SOS ALARM + VIBRATION ──────────────────────────────────────────────
    The signature alarm buffer is finite; for an ACTIVE SOS we re-arm it seamlessly so it
@@ -5136,6 +5267,7 @@ function beginSOS(trigger){
  /* Guard: DMS-triggered SOS only fires if DMS is actually running this session */
  if(trigger==='dms'&&!dmsActive)return;
  try{ popupClearLow(); }catch(e){}   // nothing may sit on top of an emergency
+ window._sosSilent=false;
  sosPhase='countdown'; sosActive=true; curSosTrigger=trigger||'manual';
  const btn=document.getElementById('sos-btn');
  if(btn){btn.classList.add('active');btn.setAttribute('aria-pressed','true');}
@@ -5203,7 +5335,7 @@ function activateSOS(){
  const ov=document.getElementById('sos-cd');
  if(ov){ov.classList.remove('on');ov.setAttribute('aria-hidden','true');}
  sosPhase='active';
- try{ nativeAlarmStart(); }catch(e){}   // confirmed SOS -> un-silenceable native alarm
+ if(!window._sosSilent){ try{ nativeAlarmStart(); }catch(e){} }   // confirmed SOS -> un-silenceable native alarm (never for a silent/duress SOS)
  const he=currentLang==='he';
  sosRollDay();
  SS.sos._fires=(SS.sos._fires||[]); SS.sos._fires.push(Date.now());
@@ -5232,6 +5364,7 @@ function activateSOS(){
  saveStore();renderSosHistory();updateProfileStats();refreshSosSafetyUI();
  }catch(e){}
  // Strip + lock-screen push
+ if(window._sosSilent){ try{ fbPublishSOS(); }catch(e){} try{ fbAlertPairedSos(); }catch(e){} try{ if(curSosId) fbRespondersListen(curSosId); }catch(e){} try{ startGeoWatch(); }catch(e){} return; }   /* v279 SILENT SOS: alert + live location go out; nothing shows or sounds on this phone */
  document.getElementById('sos-strip').classList.add('on');
  acquireWake(); // keep the screen awake so the alarm/strobe survive idle (web maximum)
  try{ if('serviceWorker' in navigator && navigator.serviceWorker.ready)navigator.serviceWorker.ready.then(function(reg){ if(reg.sync)reg.sync.register('sos-sync').catch(function(){}); }); }catch(e){}
@@ -5487,6 +5620,7 @@ try{ document.addEventListener('visibilitychange',function(){ try{ var c=SS.chec
 function checkinStop(){ if(_ciTimer){clearTimeout(_ciTimer);_ciTimer=null;} if(_ciCountdown){clearInterval(_ciCountdown);_ciCountdown=null;} }
 function checkinPrompt(){ if(!SS.checkin.enabled)return; var he=currentLang==='he';
  SS.checkin.awaiting=true; saveStore();
+ if(fcEnabled()){ fakeCallStart({ok:function(){ checkinOk(); }, fail:function(){ SS.checkin.awaiting=false; saveStore(); checkinSchedule(); silentSOS('duress'); }}); return; }
  var ov=document.getElementById('checkin-prompt'); if(ov){ov.classList.add('on');ov.setAttribute('aria-hidden','false');}
  try{pushNotify(he?'שומר - הכל טוב??':'SHOMER - Are you OK?',he?'אשר/י אחרת תישלח התראה לשומר/ת':'Confirm, or your SHOMER is alerted','checkin');}catch(e){}
  var left=SS.checkin.windowSec||120;
@@ -6476,7 +6610,7 @@ try{ window.addEventListener('popstate',function(){
   if(_shPopSkip){ _shPopSkip=false; return; }
   try{ var o=document.querySelector('.sheet.open'); if(o){ SCR_STACK.length=0; cl(o.id); } }catch(e){}
 }); }catch(e){}
-function op(id){closeAll();const el=document.getElementById(id);try{ if(typeof emApplyCountry==='function') emApplyCountry(); }catch(_e){}if(el)el.classList.add('open');syncSheetState(); if(el) shHistPush();
+function op(id){ if(id==='sh-checkin'||id==='sh-dms'){ setTimeout(function(){ try{ fcMountSettings(); }catch(e){} },0); } closeAll();const el=document.getElementById(id);try{ if(typeof emApplyCountry==='function') emApplyCountry(); }catch(_e){}if(el)el.classList.add('open');syncSheetState(); if(el) shHistPush();
  if(id==='sh-set'){try{renderSetContacts();}catch(e){}}
  if(id==='sh-circles'){ try{syncPairsToCircles();}catch(e){} try{renderCircles();}catch(e){} try{gdRenderList();}catch(e){} }   // was never re-rendered → circles list + toggles appeared empty
  if(id==='sh-prof'){ try{syncPairsToCircles();}catch(e){} try{renderProfile();}catch(e){} try{renderProfile2();}catch(e){} try{renderCircles();}catch(e){} }
@@ -6814,7 +6948,7 @@ function openGuideTopic(id){ var L=currentLang==='ar'?'ar':currentLang==='en'?'e
  var d=document.getElementById('guide-detail'); if(!d)return;
  var col=guideCatColor(g.id);
  var html='<div class="gd-d-hd" style="border-color:'+col+'"><span class="gd-d-picwrap" style="border-color:'+col+'">'+guideImg(g.id,'gd-d-pic')+'</span><span style="flex:1;min-width:0"><span class="gd-d-ttl" style="color:'+col+'">'+ESC(g.t[L])+'</span><span class="gd-d-sub">'+ESC(emLocalize(g.s[L]))+'</span></span></div>';
- html+='<button type="button" class="gd-notthis" onclick="var r=document.getElementById(\'gd-rel\');if(r)r.scrollIntoView({behavior:\'smooth\',block:\'center\'});">'+(he?'לא מה שחיפשת? ↓':L==='ar'?'ليس ما تبحث عنه؟ ↓':'Not what you need? ↓')+'</button>';
+ html+='<button type="button" class="gd-notthis" onclick="var r=document.getElementById(\'gd-rel\');if(r)r.scrollIntoView({behavior:\'smooth\',block:\'center\'});">'+(he?'⇄ לא הכרטיס הנכון? מעבר מהיר':L==='ar'?'⇄ ليست البطاقة الصحيحة؟ انتقال سريع':'⇄ Wrong card? Quick switch')+'</button>';
  if(!emIsIL()){ var _en=emergencyNums(), _lb=emLabels(); html+='<div class="gd-dont" style="background:rgba(232,168,40,.12);border-color:var(--amb)"><div class="gd-dont-tx" style="color:var(--tx1)">📍 '+ESC(emCountryName())+': '+ESC(_lb.p+' '+_en.p+' · '+_lb.a+' '+_en.a+' · '+_lb.f+' '+_en.f)+'</div></div>'; }   /* v274: local numbers abroad */
  g.steps[L].forEach(function(st,i){ html+='<div class="gd-step"><span class="gd-num" style="background:'+col+'">'+(i+1)+'</span><span class="gd-step-tx">'+ESC(emLocalize(st))+'</span></div>'; });
  if(g.call){ html+='<div class="gd-dont" style="background:rgba(232,168,40,.12);border-color:var(--amb)"><div class="gd-dont-h" style="color:var(--amb)">📞 '+(he?'מתי לחייג ':L==='ar'?'متى تتصل بـ':'When to call ')+ambulanceNum()+'</div><div class="gd-dont-tx" style="color:var(--tx1)">'+ESC(emLocalize(g.call[L]))+'</div></div>'; }
@@ -6842,10 +6976,10 @@ var GUIDE_REL={ cpr:['heart','choke','drown','faint'], choke:['cpr','allergy','d
 function guideRelatedHtml(id,L){
   var he=L==='he', ar=L==='ar';
   var rel=(GUIDE_REL[id]||[]).map(function(r){ return EMERGENCY_GUIDE.find(function(x){return x.id===r;}); }).filter(Boolean).slice(0,4);
-  var h='<div class="gd-rel" id="gd-rel"><div class="gd-rel-h">'+(he?'לא מה שחיפשת? אולי:':ar?'ليس ما تبحث عنه؟ ربما:':'Not what you need? Maybe:')+'</div><div class="gd-rel-row">';
+  var h='<div class="gd-rel" id="gd-rel"><div class="gd-rel-h"><span class="gd-rel-ic">⇄</span>'+(he?'לא הכרטיס הנכון? עבור/י ישר אל:':ar?'ليست البطاقة الصحيحة؟ انتقل مباشرة إلى:':'Wrong card? Go straight to:')+'</div><div class="gd-rel-row">';
   rel.forEach(function(r){ var c=guideCatColor(r.id);
-    h+='<button type="button" class="gd-rel-b" style="border-color:'+c+';color:'+c+'" onclick="guideSwitch(\''+id+'\',\''+r.id+'\')">'+ESC(r.t[L])+'</button>'; });
-  h+='<button type="button" class="gd-rel-b all" onclick="guideBackToList()">'+(he?'כל הנושאים':ar?'كل المواضيع':'All topics')+'</button></div></div>';
+    h+='<button type="button" class="gd-rel-b" style="border-inline-start-color:'+c+'" onclick="guideSwitch(\''+id+'\',\''+r.id+'\')"><span class="gd-rel-pic" style="border-color:'+c+'">'+guideImg(r.id,'gd-pic')+'</span><span class="gd-rel-t"><b style="color:'+c+'">'+ESC(r.t[L])+'</b><small>'+ESC(emLocalize(r.s[L]))+'</small></span><span class="gd-rel-go">‹</span></button>'; });
+  h+='<button type="button" class="gd-rel-b all" onclick="guideBackToList()"><span class="gd-rel-t"><b>'+(he?'כל הנושאים':ar?'كل المواضيع':'All topics')+'</b></span><span class="gd-rel-go">‹</span></button></div></div>';
   h+='<div class="gd-rate" id="gd-rate"><span>'+(he?'עזר לך?':ar?'هل ساعدك؟':'Was this useful?')+'</span>'
     +'<button type="button" aria-label="'+(he?'כן, עזר':'Yes')+'" onclick="guideRate(\''+id+'\',1)">👍</button>'
     +'<button type="button" aria-label="'+(he?'לא עזר':'No')+'" onclick="guideRate(\''+id+'\',0)">👎</button></div>';
@@ -7673,8 +7807,8 @@ function inviteIdentityOk(then){
    phone optional - picked from contacts when the device allows) before anything is created. */
 function inviteWhoAsk(then){
   /* v276: restored (v271 dropped this step, and with it the contact picker + WhatsApp button).
-     Still zero typing: one tap on "pick from contacts" opens WhatsApp to that person, or one tap
-     on WhatsApp sends a general invite. Name/phone fields are optional. */
+     v279: the recipient is ALWAYS named - an invite can never go out anonymous. Picking from
+     contacts uses the name exactly as saved in the phone (the same name WhatsApp shows). */
   var he=currentLang==='he', ar=currentLang==='ar';
   var old=document.getElementById('invwho-bar'); if(old) old.remove();
   var bar=document.createElement('div'); bar.id='invwho-bar'; bar.className='nudge-bar';
@@ -7682,7 +7816,7 @@ function inviteWhoAsk(then){
   var canPick=!!((window.Capacitor&&window.Capacitor.Plugins&&window.Capacitor.Plugins.Contacts)||(navigator.contacts&&navigator.contacts.select));
   bar.innerHTML='<span class="nudge-tx" style="font-weight:800">'+(he?'למי שולחים את ההזמנה?':ar?'لمن الدعوة؟':'Who is this invite for?')+'</span>'
    +(canPick?'<button class="nudge-cta" id="invwho-pick" style="margin-top:8px">'+(he?'בחר מתוך אנשי קשר':ar?'اختر من جهات الاتصال':'Choose from contacts')+'</button>':'')
-   +'<input id="invwho-name" type="text" maxlength="24" autocomplete="off" placeholder="'+(he?'שם (לא חובה)':ar?'الاسم (اختياري)':'Name (optional)')+'" style="'+inSt+'">'
+   +'<input id="invwho-name" type="text" maxlength="24" autocomplete="off" placeholder="'+(he?'שם הנמען/ת (חובה)':ar?'اسم المستلم (إلزامي)':'Recipient name (required)')+'" style="'+inSt+'">'
    +'<input id="invwho-ph" type="tel" inputmode="tel" dir="ltr" autocomplete="tel" placeholder="'+(he?'טלפון (לא חובה)':ar?'الهاتف (اختياري)':'Phone (optional)')+'" style="'+inSt+'">'
    +'<button class="nudge-cta" id="invwho-go" style="margin-top:8px;background:#25D366;color:#062b14;border:0">'+(he?'הזמנה ב-WhatsApp':ar?'دعوة عبر واتساب':'Invite on WhatsApp')+'</button>'
    +'<button class="nudge-x" aria-label="close">✕</button>';
@@ -7691,6 +7825,7 @@ function inviteWhoAsk(then){
   bar.querySelector('.nudge-x').onclick=function(){ bar.remove(); };
   var send=function(){
     var nm=(nIn.value||'').trim();
+    if(nm.length<2){ try{ nIn.focus(); nIn.style.borderColor='#ff5a5a'; toast(he?'למי ההזמנה? בחר/י מאנשי הקשר או כתוב/י שם':ar?'لمن الدعوة؟ اختر من جهات الاتصال أو اكتب اسماً':'Who is it for? Pick a contact or type a name','amb'); }catch(e){} return; }
     var ph=''; try{ ph=(pIn.value||'').trim()?phoneCanon(pIn.value):''; }catch(e){ ph=''; }
     if(ph){ try{ if(!phoneIsValid(ph)) ph=''; }catch(e){} }
     bar.remove(); then({name:nm.slice(0,24), phone:ph});
@@ -7705,7 +7840,8 @@ function inviteWhoAsk(then){
         if(ct){ nIn.value=((ct.name&&(ct.name.display||ct.name.given))||nIn.value||'').slice(0,24); if(ct.phones&&ct.phones[0]) pIn.value=ct.phones[0].number||''; got=true; }
       } else if(navigator.contacts&&navigator.contacts.select){ var sel=await navigator.contacts.select(['name','tel'],{multiple:false});
         if(sel&&sel.length){ nIn.value=((sel[0].name&&sel[0].name[0])||nIn.value||'').slice(0,24); if(sel[0].tel&&sel[0].tel[0]) pIn.value=sel[0].tel[0]; got=true; } }
-    }catch(e){ try{ toast(he?'לא ניתן לפתוח את אנשי הקשר - אפשר לשלוח ב-WhatsApp':'Contacts unavailable - you can still invite on WhatsApp','amb'); }catch(_){} }
+    }catch(e){ try{ toast(he?'אנשי הקשר לא נפתחו - כתוב/י את שם הנמען/ת ושלח/י':'Contacts did not open - type the recipient name and send','amb'); try{ nIn.focus(); }catch(_){} try{ fbLog('contacts pick failed: '+((e&&e.message)||e)); }catch(_){} }catch(_){} }
+    if(got && (nIn.value||'').trim().length<2 && (pIn.value||'').trim()) nIn.value=(pIn.value||'').trim();   /* unnamed contact: the number IS the name */
     if(got && (pIn.value||'').trim()) send();   /* picked a person with a number: straight to their WhatsApp */
   };
   bar.querySelector('#invwho-go').onclick=send;
@@ -9803,7 +9939,7 @@ try{ hydrateIcons(document); }catch(e){}
 /* Loaded-build version - shown in the diagnostic panel so a phone can prove
    whether it's on the latest build or a STALE cached one. Keep in lock-step
    with sw.js SW_VERSION on every deploy. */
-var APP_VER='v278';
+var APP_VER='v279';
 var FB={ready:false,uid:null,db:null,_presTimer:null,connected:false,listening:false,pushState:'default',near:0,swVer:'?',
   authState:'connecting',sdkLoaded:false,persist:'',permErr:null,err:null,wsProbe:'',csp:''};
 /* Always log connection diagnostics to the console so the real failure can be SEEN in Chrome. */

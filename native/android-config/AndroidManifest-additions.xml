@@ -25,6 +25,8 @@
 <!-- Theft-protection selfie (front camera via getUserMedia in the WebView) -->
 <uses-permission android:name="android.permission.CAMERA" />
 <uses-permission android:name="android.permission.READ_CONTACTS" />
+<!-- v279: @capacitor-community/contacts requests READ+WRITE as one alias; without WRITE Android refused every pick -->
+<uses-permission android:name="android.permission.WRITE_CONTACTS" />
 
 <!-- ── BACKGROUND GEOLOCATION SERVICE (place inside <application>) ── -->
 <service
