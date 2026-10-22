@@ -4854,9 +4854,13 @@ function dmsTick(){
  const fill=document.getElementById('dms-prog-fill');
  if(fill)fill.style.width=Math.max(0,(dmsCountdown/(dmsIv*60))*100)+'%';
  updateDMSDisplay();
+ if(dmsCountdown<=60&&!dmsWarning&&fcEnabled()){
+ dmsWarning=true; clearInterval(dmsTimer);   /* the call decides now - the loud DMS countdown is paused, no warning strip / toast / notification gives it away */
+ fakeCallStart({ok:function(){ dmsWarning=false; dmsTimer=setInterval(dmsTick,1000); dmsConfirm(); }, fail:function(){ dmsActive=false; dmsWarning=false; clearInterval(dmsTimer); try{ SS.dms.active=false; SS.dms.deadline=0; saveStore(); document.getElementById('dms-strip').classList.remove('on','warn'); }catch(e){} silentSOS('duress'); }});
+ return;
+ }
  if(dmsCountdown<=60&&!dmsWarning){
  dmsWarning=true;
- if(fcEnabled()){ fakeCallStart({ok:function(){ dmsConfirm(); }, fail:function(){ dmsActive=false; dmsWarning=false; clearInterval(dmsTimer); try{ SS.dms.active=false; SS.dms.deadline=0; saveStore(); document.getElementById('dms-strip').classList.remove('on','warn'); }catch(e){} silentSOS('duress'); }}); }
  document.getElementById('dms-strip').classList.add('warn');
  pushNotifyQuiet('שומר - Dead Man\'s Switch',currentLang==='he'?'האם הכל טוב?? לחץ לאישור':'Are you OK? Tap to confirm','dms');
  toast(currentLang==='he'?' DMS - 60 שניות לאישור!':' DMS - 60 seconds to confirm!','amb');
@@ -5017,9 +5021,11 @@ function playAlarm(durMs){
    live location, while this phone shows and sounds nothing (under coercion a siren can
    escalate - and it would blast the user's ear mid-call). Like the "pizza order" call. */
 function fcState(){ SS.fakecall=SS.fakecall||{on:false,caller:'',code:''}; return SS.fakecall; }
-function fcEnabled(){ var f=fcState(); return !!(f.on && String(f.code||'').trim().length>=2); }
+function fcEnabled(){ var f=fcState(); return !!(f.on && String(f.code||'').trim().length>=3); }
 function fcNorm(t){ return String(t||'').toLowerCase().replace(/[֑-ׇ]/g,'').replace(/[^\p{L}\p{N}]+/gu,' ').trim(); }
-function fcMatch(said,code){ var a=fcNorm(said), c=fcNorm(code); if(!a||!c) return false; return (' '+a+' ').indexOf(' '+c+' ')>=0 || a.replace(/ /g,'').indexOf(c.replace(/ /g,''))>=0; }
+function fcMatch(said,code){ var a=fcNorm(said), c=fcNorm(code); if(!a||c.length<3) return false;
+  if((' '+a+' ').indexOf(' '+c+' ')>=0) return true;   /* whole word / phrase */
+  return a.split(' ').some(function(w){ return w.length===c.length+1 && /^[והבלמשכ]/.test(w) && w.slice(1)===c; });   /* one Hebrew prefix letter: ופיצה / בפיצה */ }
 function silentSOS(trigger){
   if(typeof sosPhase!=='undefined' && sosPhase!=='idle') return false;
   window._sosSilent=true; sosActive=true; curSosTrigger=trigger||'duress';
@@ -5057,16 +5063,16 @@ async function fcListen(lang){
 }
 function fakeCallStart(cb){
   var f=fcState(), he=currentLang==='he', ar=currentLang==='ar', practice=!!(cb&&cb.practice);
-  if(document.getElementById('fc-ov')) return;
+  var _old=document.getElementById('fc-ov'); if(_old){ if(practice) return; _old.remove(); }   /* a real call always wins over a practice one */
   var who=String(f.caller||'').trim()||(he?'אמא':ar?'أمي':'Mom');
   var ov=document.createElement('div'); ov.id='fc-ov'; ov.className='fc-ov';
   var done=false, t0=0, tick=null, timeout=null;
   var finish=function(ok){
-    if(done) return; done=true; fcRing(false); clearInterval(tick); clearTimeout(timeout);
+    if(done) return; done=true; fcRing(false); clearInterval(tick); clearTimeout(timeout); try{ window.speechSynthesis&&speechSynthesis.cancel(); }catch(e){}
     try{ var SR=window.Capacitor&&window.Capacitor.Plugins&&window.Capacitor.Plugins.SpeechRecognition; SR&&SR.stop&&SR.stop(); }catch(e){}
     var st=ov.querySelector('.fc-st'); if(st) st.textContent=he?'השיחה הסתיימה':ar?'انتهت المكالمة':'Call ended';
     setTimeout(function(){ ov.remove(); }, 900);
-    if(practice){ try{ toast(ok?(he?'✓ תרגול: הקוד זוהה - הכל טוב':'✓ Practice: code recognised'):(he?'תרגול: כאן הייתה נשלחת התראה שקטה לשומרים שלך':'Practice: a silent alert would go to your SHOMERs now'), ok?'grn':'amb'); }catch(e){} return; }
+    if(practice){ try{ toast(ok?(he?'✓ תרגול: הקוד זוהה - הכל טוב':ar?'✓ تدريب: تم التعرف على الرمز':'✓ Practice: code recognised'):(he?'תרגול: כאן הייתה נשלחת התראה שקטה לשומרים שלך':ar?'تدريب: هنا كان سيُرسل تنبيه صامت لحرّاسك':'Practice: a silent alert would go to your SHOMERs now'), ok?'grn':'amb'); }catch(e){} return; }
     try{ ok ? (cb.ok&&cb.ok()) : (cb.fail&&cb.fail()); }catch(e){}
   };
   ov.innerHTML='<div class="fc-top"><div class="fc-sub">'+(he?'שיחה נכנסת · נייד':ar?'مكالمة واردة · جوال':'Incoming call · mobile')+'</div>'
@@ -5108,10 +5114,10 @@ function fcMountSettings(){
       +'<input class="ob-f fc-code" type="text" maxlength="24" autocomplete="off" placeholder="'+(he?'מילת קוד (למשל: פיצה)':ar?'كلمة الرمز':'Code word (e.g. pizza)')+'" value="'+ESC(f.code||'')+'" style="margin-top:8px">'
       +'<button type="button" class="row-btn fc-test" style="width:100%;margin-top:8px;justify-content:center">'+(he?'נסה/י עכשיו (תרגול - לא נשלח כלום)':ar?'جرّب الآن (تدريب)':'Try it now (practice - nothing is sent)')+'</button>';
     var on=h.querySelector('.fc-on'), cn=h.querySelector('.fc-caller'), cd=h.querySelector('.fc-code');
-    on.onchange=function(){ if(on.checked && String(cd.value||'').trim().length<2){ on.checked=false; try{ cd.focus(); toast(he?'קודם בחר/י מילת קוד':'Choose a code word first','amb'); }catch(e){} return; } f.on=on.checked; saveStore(); };
+    on.onchange=function(){ if(on.checked && String(cd.value||'').trim().length<3){ on.checked=false; try{ cd.focus(); toast(he?'קודם בחר/י מילת קוד (3 אותיות לפחות)':ar?'اختر كلمة رمز أولاً (3 أحرف على الأقل)':'Choose a code word first (3+ letters)','amb'); }catch(e){} return; } f.on=on.checked; saveStore(); };
     cn.oninput=function(){ f.caller=cn.value.trim(); saveStore(); };
-    cd.oninput=function(){ f.code=cd.value.trim(); if(f.code.length<2){ f.on=false; on.checked=false; } saveStore(); };
-    h.querySelector('.fc-test').onclick=function(){ if(String(f.code||'').trim().length<2){ try{ cd.focus(); toast(he?'קודם בחר/י מילת קוד':'Choose a code word first','amb'); }catch(e){} return; } fakeCallStart({practice:true}); };
+    cd.oninput=function(){ f.code=cd.value.trim(); if(f.code.length<3){ f.on=false; on.checked=false; } saveStore(); };
+    h.querySelector('.fc-test').onclick=function(){ if(String(f.code||'').trim().length<3){ try{ cd.focus(); toast(he?'קודם בחר/י מילת קוד (3 אותיות לפחות)':ar?'اختر كلمة رمز أولاً (3 أحرف على الأقل)':'Choose a code word first (3+ letters)','amb'); }catch(e){} return; } fakeCallStart({practice:true}); };
   });
 }
 /* ── LOOPING SOS ALARM + VIBRATION ──────────────────────────────────────────────
@@ -5253,10 +5259,21 @@ function trustLabel(){
  get the cancel countdown so an accidental auto-fire leaves no trace). */
 function triggerSOS(trigger){
  if(sosPhase==='countdown'){cancelCountdown('repress');return;}
+ if(sosPhase==='active'&&window._sosSilent){ sosGoLoud(); return; }   /* v279: pressing SOS during a silent SOS turns it LOUD (never asks for a PIN first) */
  if(sosPhase==='active'){resolveSOS();return;}
  beginSOS(trigger||'manual');
 }
 
+function sosGoLoud(){
+ window._sosSilent=false; try{ if(SS.sosLive) delete SS.sosLive.silent; saveStore(); }catch(e){}
+ var he=currentLang==='he';
+ try{ var btn=document.getElementById('sos-btn'); if(btn){btn.classList.add('active');btn.setAttribute('aria-pressed','true');} }catch(e){}
+ try{ startSosAlarm(); }catch(e){} try{ nativeAlarmStart(); }catch(e){}
+ try{ document.getElementById('sos-strip').classList.add('on'); }catch(e){}
+ try{ acquireWake(); }catch(e){} try{ startMaxAttention(); }catch(e){}
+ try{ addSOSPin(); }catch(e){} try{ sosPaintResponders(); sosPaintMyHelp(); }catch(e){}
+ setText('ss-t',he?' SOS פעיל - אזעקה פועלת · מיקומך שותף':' SOS active - alarm firing · location shared');
+}
 /* PHASE 1 - alarm immediately, then the cancel countdown. No broadcast yet. */
 /* Anti-abuse: repeated SOS broadcasts add friction (hold-to-arm) and pause community fanout,
    but NEVER silence the personal alarm - blocking a real emergency is unacceptable. */
@@ -5318,7 +5335,7 @@ function cancelCountdown(){
  if(sosPhase!=='countdown')return;
  window._sosPractice=false;
  clearInterval(sosCdTimer); stopSosAlarm();
- sosPhase='idle'; sosActive=false;
+ sosPhase='idle'; sosActive=false; window._sosSilent=false;
  const ov=document.getElementById('sos-cd');
  if(ov){ov.classList.remove('on');ov.setAttribute('aria-hidden','true');}
  const btn=document.getElementById('sos-btn');
@@ -5339,7 +5356,7 @@ function activateSOS(){
  const he=currentLang==='he';
  sosRollDay();
  SS.sos._fires=(SS.sos._fires||[]); SS.sos._fires.push(Date.now());
- if(sosAbuseOver()&&!SS.sos.holdToArm){ SS.sos.holdToArm=true; saveStore(); toast(he?'⚠️ שימוש חוזר ב-SOS - מעכשיו נדרשת לחיצה ארוכה (2 שנ׳)':'⚠️ Repeated SOS use - press & hold (2s) now required','amb'); }
+ if(sosAbuseOver()&&!SS.sos.holdToArm){ SS.sos.holdToArm=true; saveStore(); if(!window._sosSilent) toast(he?'⚠️ שימוש חוזר ב-SOS - מעכשיו נדרשת לחיצה ארוכה (2 שנ׳)':'⚠️ Repeated SOS use - press & hold (2s) now required','amb'); }
  /* NEVER silently drop an SOS. The 4th of the day / 3 in 30 min used to sound only on this
     phone while guardians got nothing. Now it is always sent - marked "repeated" for the
     record - and the person is told plainly. Practice SOS (Settings) is the only mode that
@@ -5350,7 +5367,7 @@ function activateSOS(){
  curSosId='s'+Date.now();
  curSosType='unknown'; // SOS fires now; type is classified after, never blocking it
  /* v266: remember a REAL live SOS across an app kill / reload - it must come back on screen */
- try{ if(!practice){ SS.sosLive={id:curSosId, ts:Date.now()}; } }catch(e){}
+ try{ if(!practice){ SS.sosLive={id:curSosId, ts:Date.now()}; if(window._sosSilent) SS.sosLive.silent=true; } }catch(e){}
  /* ⚠️ THE ALERT MUST LEAVE THE PHONE. Everything else is theatre without this. */
  try{ if(!practice) sosBroadcast(curSosId, curSosType); }catch(e){}
  // Log to persistent history. broadcast=false when rate-limited (alarm still helps the
@@ -5693,7 +5710,7 @@ function resolveSOS(){
   try{ if(!window._sosPractice) fbResolveSOS(curSosId); }catch(e){}   // v262: close sos/<me> now too - guardians' alerts follow it (not only after the "how did it end" choice)
   clearInterval(sosTimer); stopSosAlarm(); stopMaxAttention(); releaseWake();
   try{ if(curSosId){ FB.db&&FB.db.ref('responders/'+curSosId).off&&FB.db.ref('responders/'+curSosId).off(); delete fbRespStreams[curSosId]; } fbClearResponderMarkers(); }catch(e){}
-  sosPhase='idle'; sosActive=false;
+  sosPhase='idle'; sosActive=false; window._sosSilent=false;
   var btn=document.getElementById('sos-btn');
   if(btn){btn.classList.remove('active');btn.setAttribute('aria-pressed','false');}
   document.getElementById('sos-strip').classList.remove('on');
@@ -5804,7 +5821,7 @@ function toggleHoldArm(el){
  SS.sos.holdToArm?'grn':'');
 }
 function addSOSPin(){
- if(!MAP)return;
+ if(!MAP||window._sosSilent)return;
  removeSOSPin();
  const ll=(userLat!=null&&userLng!=null)?[userLat,userLng]:(MAP.getCenter()?[MAP.getCenter().lat,MAP.getCenter().lng]:[32.0707,34.7805]);
  mapLayers.sosMarker=window.L.marker(ll,{icon:sosPinIcon(curSosType),zIndexOffset:1000,alt:'SOS'}).addTo(MAP);
@@ -12104,11 +12121,12 @@ async function sosBroadcast(sosId, type){
   SOSBUS.active=payload.sosId; SOSBUS.live=!!ok; SOSBUS.sentPos=p; SOSBUS.sentAt=Date.now();
   if(ok){
     var n=(SS.circleMembers||[]).filter(function(m){return !m.pending;}).length;
-    if(n>0) toast(he?('\u2713 נשלחה התרעה ל'+n+(n===1?' שומר':' שומרים')):('\u2713 Alert sent to '+n+(n===1?' SHOMER':' SHOMERs')),'grn');
+    if(window._sosSilent){ /* silent SOS: nothing visible on this phone */ }
+    else if(n>0) toast(he?('\u2713 נשלחה התרעה ל'+n+(n===1?' שומר':' שומרים')):('\u2713 Alert sent to '+n+(n===1?' SHOMER':' SHOMERs')),'grn');
     else toast(he?'\u26A0 אין לך עדיין שומרים שיקבלו את ההתרעה - התקשר/י 100. אחר כך הוסף/י שומרים':'\u26A0 You have no SHOMERs to receive this yet - call 100. Then add SHOMERs','amb',function(){ try{ openCircles(); }catch(e){} });
     sosWatchMyResponders();
     try{ sosWatchStandDown(); }catch(e){}
-  } else { /* Queue it, keep retrying, and tell the user to call 100 NOW. */ try{ sosQueuePush(sosChan(FB.uid, sosSalt()), payload); }catch(e){} toast(he?'\u26A0 ההתרעה טרם נשלחה - ננסה שוב אוטומטית. התקשר/י 100 עכשיו':'\u26A0 Alert not sent yet - retrying automatically. Call 100 now','sos'); }
+  } else { /* Queue it, keep retrying, and tell the user to call 100 NOW. */ try{ sosQueuePush(sosChan(FB.uid, sosSalt()), payload); }catch(e){} if(!window._sosSilent) toast(he?'\u26A0 ההתרעה טרם נשלחה - ננסה שוב אוטומטית. התקשר/י 100 עכשיו':'\u26A0 Alert not sent yet - retrying automatically. Call 100 now','sos'); }
   return ok;
 }
 /* While my SOS is live, keep the guardians' copy of my position current: send it as soon as
@@ -12169,8 +12187,11 @@ function sosRestore(id, ts){
   curSosId=id; curSosType='unknown'; window._sosPractice=false;
   sosPhase='active'; sosActive=true;
   var _fk=(SS.sosLive&&SS.sosLive.id===id&&SS.sosLive.fk)||null;
-  SS.sosLive={id:id, ts:ts||Date.now()}; if(_fk){ SS.sosLive.fk=_fk; FB._sosFeedKey=_fk; } saveStore();
+  var _sil=!!(SS.sosLive&&SS.sosLive.id===id&&SS.sosLive.silent);
+  SS.sosLive={id:id, ts:ts||Date.now()}; if(_fk){ SS.sosLive.fk=_fk; FB._sosFeedKey=_fk; } if(_sil) SS.sosLive.silent=true; saveStore();
+  window._sosSilent=_sil;
   try{ if(!(SS.sosHistory||[]).some(function(e){return e.id===id;})) SS.sosHistory.push({id:id,ts:ts||Date.now(),lat:userLat,lng:userLng,trigger:'restored',resolution:'pending',broadcast:true,type:'unknown',typeState:'unclassified',classifiedBy:null}); saveStore(); }catch(e){}
+  if(_sil){ var _o=ts && (Date.now()-ts)>SOS_OLD_MS; SOSBUS.live=true; SOSBUS.hbOff=!!_o; try{ sosWatchMyResponders(); }catch(e){} try{ sosWatchStandDown(); }catch(e){} if(!_o) sosHeartbeat(true); return; }   /* silent SOS survives a reload - still invisible */
   var btn=document.getElementById('sos-btn'); if(btn){btn.classList.add('active');btn.setAttribute('aria-pressed','true');}
   try{ document.getElementById('sos-strip').classList.add('on'); }catch(e){}
   setText('ss-t',he?' SOS פעיל - השומרים שלך רואים אותו':ar?' SOS نشط - حُرّاسك يرونه':' SOS active - your SHOMERs can see it');
@@ -12425,7 +12446,7 @@ function sosWatchMyResponders(){
   });
 }
 function sosPaintResponders(){
-  if(!MAP) return;
+  if(!MAP||window._sosSilent) return;
   SOSBUS._mk=SOSBUS._mk||{};
   Object.keys(SOSBUS._mk).forEach(function(uid){
     if(!SOSBUS.responders[uid]){ try{ MAP.removeLayer(SOSBUS._mk[uid]); }catch(e){} delete SOSBUS._mk[uid]; }
@@ -12442,6 +12463,7 @@ function sosPaintResponders(){
   });
 }
 function sosPaintMyHelp(){
+  if(window._sosSilent) return;   /* silent SOS: no bar, no vibration, nothing visible */
   var he=currentLang==='he';
   var ks=Object.keys(SOSBUS.responders);
   var b=document.getElementById('help-bar');
