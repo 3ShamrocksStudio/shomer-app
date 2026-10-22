@@ -1709,7 +1709,7 @@ body.otp-active .ob-steps{display:none!important;}
  </button>
  </div>
  </header>
-<div id="app-ver" style="position:fixed;bottom:4px;left:4px;font-size:9px;color:rgba(255,255,255,.3);z-index:401;pointer-events:none">v0.9 · beta</div>
+
 
 
  <!-- LIVE CONNECTION STATUS - so each device SHOWS whether it's connected + listening for SOS -->
@@ -7629,42 +7629,47 @@ function inviteIdentityOk(then){
 /* v270: an invite must always say who it went to. Ask for the recipient (name required,
    phone optional - picked from contacts when the device allows) before anything is created. */
 function inviteWhoAsk(then){
-  var he=currentLang==='he';
+  /* v276: restored (v271 dropped this step, and with it the contact picker + WhatsApp button).
+     Still zero typing: one tap on "pick from contacts" opens WhatsApp to that person, or one tap
+     on WhatsApp sends a general invite. Name/phone fields are optional. */
+  var he=currentLang==='he', ar=currentLang==='ar';
   var old=document.getElementById('invwho-bar'); if(old) old.remove();
   var bar=document.createElement('div'); bar.id='invwho-bar'; bar.className='nudge-bar';
   var inSt='width:100%;box-sizing:border-box;padding:12px 14px;border-radius:12px;border:1px solid rgba(201,168,76,.5);background:rgba(255,255,255,.06);color:inherit;font:inherit;margin-top:6px';
   var canPick=!!((window.Capacitor&&window.Capacitor.Plugins&&window.Capacitor.Plugins.Contacts)||(navigator.contacts&&navigator.contacts.select));
-  bar.innerHTML='<span class="nudge-tx" style="font-weight:800">'+(he?'למי שולחים את ההזמנה?':'Who is this invite for?')+'</span>'
-   +'<input id="invwho-name" type="text" maxlength="24" autocomplete="off" placeholder="'+(he?'שם (למשל: אמא)':'Name (e.g. Mom)')+'" style="'+inSt+'">'
-   +'<input id="invwho-ph" type="tel" inputmode="tel" dir="ltr" autocomplete="tel" placeholder="'+(he?'טלפון (מומלץ)':'Phone (recommended)')+'" style="'+inSt+'">'
-   +(canPick?'<button class="nudge-cta" id="invwho-pick" style="background:transparent;border:1px solid rgba(201,168,76,.6);color:inherit;margin-top:8px">'+(he?'בחר/י מאנשי הקשר':'Pick from contacts')+'</button>':'')
-   +'<button class="nudge-cta" id="invwho-go" style="margin-top:8px">'+(he?'המשך לוואטסאפ':'Continue to WhatsApp')+'</button>'
-   +'<button class="nudge-x" aria-label="close">\u2715</button>';
+  bar.innerHTML='<span class="nudge-tx" style="font-weight:800">'+(he?'למי שולחים את ההזמנה?':ar?'لمن الدعوة؟':'Who is this invite for?')+'</span>'
+   +(canPick?'<button class="nudge-cta" id="invwho-pick" style="margin-top:8px">'+(he?'בחר מתוך אנשי קשר':ar?'اختر من جهات الاتصال':'Choose from contacts')+'</button>':'')
+   +'<input id="invwho-name" type="text" maxlength="24" autocomplete="off" placeholder="'+(he?'שם (לא חובה)':ar?'الاسم (اختياري)':'Name (optional)')+'" style="'+inSt+'">'
+   +'<input id="invwho-ph" type="tel" inputmode="tel" dir="ltr" autocomplete="tel" placeholder="'+(he?'טלפון (לא חובה)':ar?'الهاتف (اختياري)':'Phone (optional)')+'" style="'+inSt+'">'
+   +'<button class="nudge-cta" id="invwho-go" style="margin-top:8px;background:#25D366;color:#062b14;border:0">'+(he?'הזמנה ב-WhatsApp':ar?'دعوة عبر واتساب':'Invite on WhatsApp')+'</button>'
+   +'<button class="nudge-x" aria-label="close">✕</button>';
   (document.getElementById('app')||document.body).appendChild(bar);
   var nIn=bar.querySelector('#invwho-name'), pIn=bar.querySelector('#invwho-ph');
-  setTimeout(function(){ try{ nIn.focus(); }catch(e){} },120);
   bar.querySelector('.nudge-x').onclick=function(){ bar.remove(); };
+  var send=function(){
+    var nm=(nIn.value||'').trim();
+    var ph=''; try{ ph=(pIn.value||'').trim()?phoneCanon(pIn.value):''; }catch(e){ ph=''; }
+    if(ph){ try{ if(!phoneIsValid(ph)) ph=''; }catch(e){} }
+    bar.remove(); then({name:nm.slice(0,24), phone:ph});
+  };
   var pk=bar.querySelector('#invwho-pick');
   if(pk) pk.onclick=async function(){
+    var got=false;
     try{
       var C=(window.Capacitor&&window.Capacitor.Plugins&&window.Capacitor.Plugins.Contacts);
       if(C&&typeof C.pickContact==='function'){ try{ await C.requestPermissions(); }catch(e){}
         var r=await C.pickContact({projection:{name:true,phones:true}}); var ct=r&&r.contact;
-        if(ct){ nIn.value=((ct.name&&(ct.name.display||ct.name.given))||nIn.value||'').slice(0,24); if(ct.phones&&ct.phones[0]) pIn.value=ct.phones[0].number||''; }
-        return; }
-      if(navigator.contacts&&navigator.contacts.select){ var sel=await navigator.contacts.select(['name','tel'],{multiple:false});
-        if(sel&&sel.length){ nIn.value=((sel[0].name&&sel[0].name[0])||nIn.value||'').slice(0,24); if(sel[0].tel&&sel[0].tel[0]) pIn.value=sel[0].tel[0]; } }
-    }catch(e){ try{ toast(he?'לא ניתן לפתוח את אנשי הקשר - הקלד/י ידנית':'Contacts unavailable - type it in','amb'); }catch(_){} }
+        if(ct){ nIn.value=((ct.name&&(ct.name.display||ct.name.given))||nIn.value||'').slice(0,24); if(ct.phones&&ct.phones[0]) pIn.value=ct.phones[0].number||''; got=true; }
+      } else if(navigator.contacts&&navigator.contacts.select){ var sel=await navigator.contacts.select(['name','tel'],{multiple:false});
+        if(sel&&sel.length){ nIn.value=((sel[0].name&&sel[0].name[0])||nIn.value||'').slice(0,24); if(sel[0].tel&&sel[0].tel[0]) pIn.value=sel[0].tel[0]; got=true; } }
+    }catch(e){ try{ toast(he?'לא ניתן לפתוח את אנשי הקשר - אפשר לשלוח ב-WhatsApp':'Contacts unavailable - you can still invite on WhatsApp','amb'); }catch(_){} }
+    if(got && (pIn.value||'').trim()) send();   /* picked a person with a number: straight to their WhatsApp */
   };
-  bar.querySelector('#invwho-go').onclick=function(){
-    var nm=(nIn.value||'').trim(); if(nm.length<2){ try{ nIn.focus(); toast(he?'הוסף/י שם כדי שתדע/י למי שלחת':'Add a name so you know who you sent it to','amb'); }catch(e){} return; }
-    var ph=''; try{ ph=(pIn.value||'').trim()?phoneCanon(pIn.value):''; }catch(e){ ph=''; }
-    bar.remove(); then({name:nm.slice(0,24), phone:ph});
-  };
+  bar.querySelector('#invwho-go').onclick=send;
 }
 async function shareInvite(who){
   var he=currentLang==='he';
-  who=who||{name:'',phone:''};   /* v271: zero typing - identity arrives automatically when they join */
+  if(!who){ inviteWhoAsk(function(w){ shareInvite(w); }); return; }   /* v276: picker + WhatsApp step restored */
   var _again=function(){ shareInvite(who); };
   if(!inviteIdentityOk(_again)) return;
   /* Inviting someone = sharing your location with them. The inviter skipped the one-time
@@ -7694,7 +7699,7 @@ async function shareInvite(who){
        never match. Same packing the phone-invite path has always used. */
     await fbRestWrite('PUT','invites/'+tok,{fromUid:FB.uid,ts:Date.now(),name:packInvite(myName,myPhone,linkCode)});
     var g=gdState();
-    g.pairs.push({id:genId('g'),token:tok,code:linkCode,name:who.name||'',rel:'',shareToThem:true,seeThem:true,addedTs:Date.now(),initiator:true,pending:true,partnerUid:null,linked:false,cid:activeCircleId,color:'#C9A84C',lat:null,lng:null,ts:0,live:false,via:'link'});
+    g.pairs.push({id:genId('g'),token:tok,code:linkCode,name:who.name||'',ph:who.phone||'',rel:'',shareToThem:true,seeThem:true,addedTs:Date.now(),initiator:true,pending:true,partnerUid:null,linked:false,cid:activeCircleId,color:'#C9A84C',lat:null,lng:null,ts:0,live:false,via:'link'});
     saveStore();
     fbWatchApproval(tok, null);
   }catch(e){
@@ -9755,7 +9760,7 @@ try{ hydrateIcons(document); }catch(e){}
 /* Loaded-build version - shown in the diagnostic panel so a phone can prove
    whether it's on the latest build or a STALE cached one. Keep in lock-step
    with sw.js SW_VERSION on every deploy. */
-var APP_VER='v275';
+var APP_VER='v276';
 var FB={ready:false,uid:null,db:null,_presTimer:null,connected:false,listening:false,pushState:'default',near:0,swVer:'?',
   authState:'connecting',sdkLoaded:false,persist:'',permErr:null,err:null,wsProbe:'',csp:''};
 /* Always log connection diagnostics to the console so the real failure can be SEEN in Chrome. */
@@ -13497,7 +13502,10 @@ function showSMSCodeScreen(){
  };
  const wrap=document.getElementById("ob");
  if(!wrap){console.error("[SMS] no container");return;}
- document.querySelectorAll("#ob .ob-panel").forEach(p=>p.style.display="none");
+ /* v276: .ob-panel.active is display:block!important, so an inline display:none never hid the
+    registration card - drop the active class too, or the old form sits above the code field. */
+ try{ var _ap=document.querySelector("#ob .ob-panel.active"); if(_ap) window._otpFromPanel=_ap.id; }catch(e){}
+ document.querySelectorAll("#ob .ob-panel").forEach(p=>{p.classList.remove("active");p.style.display="none";});
  let panel=document.getElementById("ob-sms-panel");
  if(!panel){panel=document.createElement("div");panel.id="ob-sms-panel";panel.style.cssText="width:100%;max-width:420px;margin:0 auto;";const ll=document.getElementById("ob-legal-links");if(ll)wrap.insertBefore(panel,ll);else wrap.appendChild(panel);}
  panel.style.display="";
@@ -13522,10 +13530,24 @@ function showSMSCodeScreen(){
    style="background:transparent;border:none;padding:5px 14px;color:var(--gold,#C9A84C);font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;text-decoration:underline;text-underline-offset:3px">
    ${lbl.resend}
   </button>
+  <button onclick="otpChangeNumber()" id="ob-chg-num"
+   style="background:transparent;border:none;padding:4px 14px;color:var(--tx3,#6b7a99);font-size:11.5px;cursor:pointer;font-family:inherit">
+   ${he?"שינוי מספר טלפון":ar?"تغيير رقم الهاتف":"Change phone number"}
+  </button>
  </div>`;
  sendTwilioOTP();
 }
 
+/* v276: back from the code screen to the form the user came from (registration or sign-in). */
+function otpChangeNumber(){
+ try{ var sp=document.getElementById("ob-sms-panel"); if(sp) sp.remove(); }catch(e){}
+ try{ var fb=document.getElementById("otp-fallbacks"); if(fb) fb.remove(); }catch(e){}
+ try{ document.body.classList.remove("otp-active"); }catch(e){}
+ try{ _otpSends=0; }catch(e){}   /* a new number starts a fresh attempt count */
+ var id=window._otpFromPanel||"step0";
+ document.querySelectorAll("#ob .ob-panel").forEach(function(p){ p.classList.remove("active"); p.style.display=""; });
+ var t=document.getElementById(id)||document.getElementById("step0"); if(t) t.classList.add("active");
+}
 async function verifyTwilioCode(){
  const he=currentLang==="he";
  const inp=document.getElementById("ob-code-inp");
