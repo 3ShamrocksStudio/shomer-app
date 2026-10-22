@@ -1406,7 +1406,7 @@ function loadLive(c){
         if((now-_ts)<=RECENT_PRES){ e.id=id; e._online=fresh; presAll.push(e); if(inTerr) presTerr.push(e); }
         return;
       }
-      netEv.push({ts:_ts,t:inTerr?1:0});
+      netEv.push({ts:_ts,t:inTerr?1:0,day:_ilDay(_ts)});
       if(!inTerr) return;
       e.id=id;
       if(e.status!=='resolved'&&recent){ evList.push(e); if(e.by)reps[e.by]=1; }
@@ -1920,16 +1920,20 @@ function _trCmpSpec(c){
   foot:(perK?'עבירות ל-1,000 תושבים · משטרת ישראל 2025 · אוכלוסייה: הערכת למ״ס':'% מהעבירות בעיר · משטרת ישראל 2025'),
   footTip:'מקור: משטרת ישראל 2025 · data.gov.il'+(perK?' · אוכלוסייה: הערכת למ״ס (מעוגלת)':' · אין נתון אוכלוסייה לעיר — מוצג % מהעבירות')+' · אין במאגר נתוני שנה קודמת, לכן ההשוואה היא בין ערים'};
 }
-var _TR_START=new Date('2026-10-22T00:00:00+03:00').getTime();
 function _trNetSpec(c){
  var N=window._net; if(!N) return {empty:'טוען נתוני רשת…'}; if(!N.ok) return {empty:'אין חיבור לנתוני הרשת כרגע — ננסה שוב אוטומטית.'};
  var R=window._trRange||12, W=7*864e5, x=[], xf=[], a=[], t=[], ev=[];
- for(var i=R-1;i>=0;i--){ var b1=N.at-i*W, b0=b1-W, d0=new Date(b0), d1=new Date(b1-1);
-   x.push(d0.getDate()+'/'+(d0.getMonth()+1)); xf.push('שבוע '+d0.getDate()+'/'+(d0.getMonth()+1)+'–'+d1.getDate()+'/'+(d1.getMonth()+1));
-   var ca={},ct={},ce=0; N.pres.forEach(function(p){ if(p.ts>=b0&&p.ts<b1){ ca[p.day+'|'+p.dev]=1; if(p.t)ct[p.day+'|'+p.dev]=1; } }); N.ev.forEach(function(p){ if(p.ts>=b0&&p.ts<b1&&p.t)ce++; });
-   /* device tags change every day (privacy), so a week shows the AVERAGE devices active per day */
-   var _st=Math.max(b0,_TR_START), _dd=Math.max(1,Math.ceil((b1-_st)/864e5)); if(b1<=_TR_START){ a.push(null); t.push(null); ev.push(null); continue; }   /* days counted in this week (counting began 22.10.2026) */
-   a.push(Math.round(Object.keys(ca).length/_dd*10)/10); t.push(Math.round(Object.keys(ct).length/_dd*10)/10); ev.push(ce); }
+ /* v280: weeks are 7 whole Israel calendar days ending today; device tags change daily, so a week shows
+    the average number of devices active per day, over the days counted since 22.10.2026 */
+ var _today=_ilDay(N.at), _base=Date.UTC(+_today.slice(0,4),+_today.slice(5,7)-1,+_today.slice(8,10),12);
+ function _dk(k){ return new Date(_base-k*864e5).toISOString().slice(0,10); }
+ for(var i=R-1;i>=0;i--){ var days={}, cnt=0; for(var k=0;k<7;k++){ var d=_dk(i*7+k); days[d]=1; if(d>='2026-10-22') cnt++; }
+   var dLast=_dk(i*7), dFirst=_dk(i*7+6);
+   x.push(+dFirst.slice(8)+'/'+(+dFirst.slice(5,7))); xf.push('שבוע '+(+dFirst.slice(8))+'/'+(+dFirst.slice(5,7))+'–'+(+dLast.slice(8))+'/'+(+dLast.slice(5,7)));
+   var ca={},ct={},ce=0; N.pres.forEach(function(p){ if(days[p.day]){ ca[p.day+'|'+p.dev]=1; if(p.t)ct[p.day+'|'+p.dev]=1; } }); N.ev.forEach(function(p){ if(days[p.day]&&p.t)ce++; });
+   ev.push(ce);
+   if(!cnt){ a.push(null); t.push(null); continue; }
+   a.push(Math.round(Object.keys(ca).length/cnt*10)/10); t.push(Math.round(Object.keys(ct).length/cnt*10)/10); }
  var at=new Date(N.at);
  return {kind:'line', unit:'', dec:1, x:x, xFull:xf,
   series:[{k:'all',label:'מכשירים ביום (ממוצע) · כל הרשת',c:'#2bc47e',v:a},{k:'terr',label:'מכשירים ביום (ממוצע) · עד 18 ק״מ ממרכז העיר',c:'#faac22',v:t},{k:'ev',label:'דיווחים · עד 18 ק״מ ממרכז העיר',c:'#ef4853',v:ev}],

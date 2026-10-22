@@ -7899,7 +7899,7 @@ function inviteBatchAsk(){
     if(!r||!document.body.contains(bar)){ if(!r) bar.remove(); return; }
     ready=r; go.disabled=false; go.style.opacity=''; go.textContent=goTx;
   }).catch(function(){ bar.remove(); });
-  go.onclick=function(){ if(!ready) return; bar.remove();
+  go.onclick=function(){ if(!ready) return; bar.remove(); try{ ready.commit(); }catch(e){}
     var w=null; try{ w=window.open('https://wa.me/?text='+encodeURIComponent(ready.txt),'_blank'); }catch(e){}
     var copy=function(){ try{ navigator.clipboard.writeText(ready.txt).then(function(){ toast(he?'ההזמנה הועתקה - הדבק/י אותה בוואטסאפ':'Invite copied - paste it in WhatsApp','grn'); }).catch(function(){}); }catch(e){} };
     if(!w){ try{ if(navigator.share){ navigator.share({title:'SH\u2721MER', text:ready.txt}).catch(function(e){ if(!(e&&e.name==='AbortError')) copy(); }); } else copy(); }catch(e){ copy(); } }
@@ -7940,11 +7940,14 @@ async function shareInvite(who){
     if(who.batch){ for(var _bi=1;_bi<INV_BATCH;_bi++) _toks.push('g'+Math.random().toString(36).slice(2,8)+Math.random().toString(36).slice(2,6)); }
     var _bid=who.batch?genId('b'):null, _ts=Date.now();
     await Promise.all(_toks.map(function(t){ return fbRestWrite('PUT','invites/'+t,{fromUid:FB.uid,ts:_ts,name:packInvite(myName,myPhone,linkCode)}); }));
+    var _commit=function(){   /* v280: the slots join my list (hidden) and get watched only once the invite is actually sent */
     var g=gdState();
     _toks.slice(1).forEach(function(t){ g.pairs.push({id:genId('g'),token:t,code:linkCode,name:'',ph:'',rel:'',shareToThem:true,seeThem:true,addedTs:_ts,initiator:true,pending:true,partnerUid:null,linked:false,cid:activeCircleId,color:'#C9A84C',lat:null,lng:null,ts:0,live:false,via:'link',batch:_bid,hidden:true}); fbWatchApproval(t,null); });
     g.pairs.push({id:genId('g'),token:tok,code:linkCode,name:who.name||'',ph:who.phone||'',rel:'',shareToThem:true,seeThem:true,addedTs:Date.now(),initiator:true,pending:true,partnerUid:null,hidden:!!who.batch,batch:_bid,linked:false,cid:activeCircleId,color:'#C9A84C',lat:null,lng:null,ts:0,live:false,via:'link'});
     saveStore();
     fbWatchApproval(tok, null);
+    };
+    if(!(who.batch&&who.prep)) _commit();
   }catch(e){
     try{ fbLog('shareInvite create:',(e&&e.message)||e); }catch(_){}
     try{ toast(he?'יצירת ההזמנה נכשלה - נסה/י שוב':'Could not create the invite - try again','amb'); }catch(_){}
@@ -7962,7 +7965,7 @@ async function shareInvite(who){
     ? ('הצטרף/י למעגל השומרים שלי ב-SH\u2721MER - אפליקציית בטיחות קהילתית חינמית. אם יקרה לי משהו, תדע/י איפה אני.\n'+link)
     : ('Join my SH\u2721MER SHOMER circle - a free community safety app. If something happens to me, you will know where I am.\n'+link);
   try{ syncPairsToCircles(); renderCircles(); }catch(e){}
-  if(who.batch&&who.prep) return {link:link, txt:txt};   /* v280: the popup opens WhatsApp itself, on the tap (popup blockers need the tap) */
+  if(who.batch&&who.prep) return {link:link, txt:txt, commit:_commit};   /* v280: the popup opens WhatsApp itself, on the tap (popup blockers need the tap) */
   if(who.batch){ try{ toast(he?'בחר/י בוואטסאפ איש קשר אחד או כמה. כל מי שיצטרף יופיע כאן עם השם והטלפון שלו':'Pick one or more chats in WhatsApp. Everyone who joins appears here with their name and phone','grn'); }catch(e){}
     var _w=null; try{ _w=window.open('https://wa.me/?text='+encodeURIComponent(txt),'_blank'); }catch(e){}
     if(_w) return;   /* blocked (iOS / installed app): fall through to the share sheet, then copy */ }
@@ -9206,7 +9209,7 @@ async function gdLoadInvite(token){
     if(!inv||!inv.fromUid){ gdInviteMsg('invalid'); return; }
     if(inv.fromUid===FB.uid){ gdInviteMsg('own'); return; }
     if((gdState().pairs||[]).some(function(p){ return p.partnerUid===inv.fromUid && !p.pending; })){ gdInviteMsg('already'); return; }
-    if(inv.rejected && inv.acceptedBy===FB.uid){ var _nr=(gdAcceptInvite._batch||[]).shift(); if(_nr){ gdAcceptInvite._tok=_nr; return gdLoadInvite(_nr); } gdInviteMsg('used'); return; }   /* refused before - not this slot again */
+    if(inv.rejected && inv.acceptedBy===FB.uid){ gdInviteMsg('used'); return; }   /* the sender said this is not who they invited - no second try on another slot */
     var _grpDead=gdAcceptInvite._isBatch && !inv.acceptedBy && (inv.declinedBy||inv.rejected||((+inv.ts||0)>0&&Date.now()-inv.ts>7*864e5));   /* group link: declined / expired (unused slots expire after a week) */
     if((inv.acceptedBy && inv.acceptedBy!==FB.uid) || _grpDead){ var _nx=(gdAcceptInvite._batch||[]).shift(); if(_nx){ gdAcceptInvite._tok=_nx; return gdLoadInvite(_nx); } gdInviteMsg('used'); return; }   /* v280: group link - take the next free slot */
     gdInviteShowAll();
@@ -9250,7 +9253,8 @@ function gdConnect(tok,nm,fromLink){
  simLat:TLV[0]+(Math.random()-.5)*.02,simLng:TLV[1]+(Math.random()-.5)*.02}; g.pairs.push(p); }
  else { p.pending=false; if(nm&&!p.name)p.name=nm; }
  // real backend link: record the mutual pairing in RTDB (binds the two accounts)
- fbAcceptInvite._tok=null; try{ fbAcceptInvite(tok,(invName()||gdState().myName||(SS.user&&SS.user.name)||'')).then(function(fromUid){ if(fbAcceptInvite._tok&&fbAcceptInvite._tok!==p.token){ p.token=fbAcceptInvite._tok; saveStore(); } if(fromUid){ p.partnerUid=fromUid; p.linked=true; p.acceptedTs=Date.now(); p.awaitConfirm=true; try{ gdWatchMyAcceptance(p); }catch(e){} if(!p.name&&fbAcceptInvite._name)p.name=fbAcceptInvite._name; var mm=ensureMemberForPair(p); if(mm){ mm.partnerUid=fromUid; if(!mm.name)mm.name=p.name; mm.awaitConfirm=true; } saveStore(); gdRenderList(); try{ renderCircles(); syncPairsToCircles(); }catch(e){} try{ gdWatchConfirm(p); }catch(e){} } }); }catch(e){}
+ fbAcceptInvite._tok=null; fbAcceptInvite._lost=false; try{ fbAcceptInvite(tok,(invName()||gdState().myName||(SS.user&&SS.user.name)||'')).then(function(fromUid){ if(!fromUid&&fbAcceptInvite._lost){ var _g=gdState(); _g.pairs=_g.pairs.filter(function(x){ return x!==p; }); SS.circleMembers=(SS.circleMembers||[]).filter(function(m){ return m.pairId!==p.id; }); saveStore(); try{ gdRenderList(); renderCircles(); }catch(e){} return; }   /* v280: every place on the group link was taken - leave nothing behind */
+ if(fbAcceptInvite._tok&&fbAcceptInvite._tok!==p.token){ p.token=fbAcceptInvite._tok; saveStore(); } if(fromUid){ p.partnerUid=fromUid; p.linked=true; p.acceptedTs=Date.now(); p.awaitConfirm=true; try{ gdWatchMyAcceptance(p); }catch(e){} if(!p.name&&fbAcceptInvite._name)p.name=fbAcceptInvite._name; var mm=ensureMemberForPair(p); if(mm){ mm.partnerUid=fromUid; if(!mm.name)mm.name=p.name; mm.awaitConfirm=true; } saveStore(); gdRenderList(); try{ renderCircles(); syncPairsToCircles(); }catch(e){} try{ gdWatchConfirm(p); }catch(e){} } }); }catch(e){}
  saveStore();
  gdSend({type:'hello'}); gdBroadcast(); gdRenderMarkers(); gdRenderList();
  if(document.getElementById('sh-circles')&&document.getElementById('sh-circles').classList.contains('open')){} else openCircles();
@@ -11165,7 +11169,7 @@ function fbAcceptInvite(token,myName){
          If someone else holds it, move to the next free slot of the same link. */
       if(!gdAcceptInvite._isBatch) return fu;
       return fbRestGet('invites/'+token).then(function(s2){ var v=s2&&s2.val?s2.val():null;
-        if(v&&v.acceptedBy&&v.acceptedBy!==FB.uid){ var nx=(gdAcceptInvite._batch||[]).shift(); if(!nx){ try{ toast(currentLang==='he'?'כל המקומות בקישור הזה כבר נתפסו - בקש/י קישור חדש':'Every place on this link is taken - ask for a new link','amb'); }catch(e){} return null; }
+        if(v&&v.acceptedBy&&v.acceptedBy!==FB.uid){ var nx=(gdAcceptInvite._batch||[]).shift(); if(!nx){ fbAcceptInvite._lost=true; try{ fbRestWrite('DELETE','pairs/'+FB.uid+'/'+inv.fromUid).catch(function(){}); }catch(e){} try{ toast(currentLang==='he'?'כל המקומות בקישור הזה כבר נתפסו - בקש/י קישור חדש':'Every place on this link is taken - ask for a new link','amb'); }catch(e){} return null; }
           gdAcceptInvite._tok=nx; fbAcceptInvite._tok=nx; return fbAcceptInvite(nx,myName); }
         return fu; }).catch(function(){ return fu; });
     });
@@ -11293,6 +11297,8 @@ function gdRejectAcceptance(p, inv, token, flagged){
     :(he?'לא חוברתם. הכנו קישור חדש - שלח/י אותו שוב לאדם הנכון.':'Not connected. We made a new link - send it again to the right person.'),'amb');
 }
 /* Open link: show who accepted and let me confirm it is the person I invited. */
+/* v280: the next person waiting for "is this who you invited?" (group links) */
+function gdConfirmNext(){ var q=gdConfirmNext._q||[]; var t=q.shift(); if(t) setTimeout(function(){ try{ fbWatchApproval._recheck(t); }catch(e){} }, 400); }
 function gdConfirmAcceptance(p, inv, token, theirUid, codeOk){
   var he=currentLang==='he';
   fbWatchApproval._busy=fbWatchApproval._busy||{}; if(fbWatchApproval._busy[token]) return; fbWatchApproval._busy[token]=1;
@@ -11301,7 +11307,7 @@ function gdConfirmAcceptance(p, inv, token, theirUid, codeOk){
     var old=document.getElementById('invconf-bar');
     if(old){ var _ot=old.getAttribute('data-tok');
       if(_ot&&_ot!==token){ /* v280: one prompt at a time - this person is asked right after the current one */
-        try{ delete fbWatchApproval._busy[token]; }catch(e){} setTimeout(function(){ try{ fbWatchApproval._recheck(token); }catch(e){} }, 3000); return; }
+        try{ delete fbWatchApproval._busy[token]; }catch(e){} gdConfirmNext._q=gdConfirmNext._q||[]; if(gdConfirmNext._q.indexOf(token)<0) gdConfirmNext._q.push(token); return; }
       old.remove(); }
     try{ popupClearLow(); }catch(e){}
     /* the invite panel for this person is done - it must not cover the confirm buttons */
@@ -11317,8 +11323,8 @@ function gdConfirmAcceptance(p, inv, token, theirUid, codeOk){
       +'<button class="nudge-cta" id="invconf-yes">'+(he?'כן, חבר/י':'Yes, connect')+'</button>'
       +'<button class="nudge-cta" id="invconf-no" style="background:transparent;border:1px solid rgba(255,112,128,.6);color:#FF9AA5">'+(he?'זה לא הם':'Not them')+'</button>';
     document.body.appendChild(bar);
-    document.getElementById('invconf-yes').onclick=function(){ bar.remove(); delete fbWatchApproval._busy[token]; p.confirmedBy=inv.acceptedBy; saveStore(); fbWatchApproval._recheck(token); };
-    document.getElementById('invconf-no').onclick=function(){ bar.remove(); delete fbWatchApproval._busy[token]; gdRejectAcceptance(p, inv, token, false); };
+    document.getElementById('invconf-yes').onclick=function(){ bar.remove(); delete fbWatchApproval._busy[token]; p.confirmedBy=inv.acceptedBy; saveStore(); fbWatchApproval._recheck(token); gdConfirmNext(); };
+    document.getElementById('invconf-no').onclick=function(){ bar.remove(); delete fbWatchApproval._busy[token]; gdRejectAcceptance(p, inv, token, false); gdConfirmNext(); };
   };
   if(ph && inv.acceptedPh){ sha256Hex(ph).then(function(h){ show(h===inv.acceptedPh); }).catch(function(){ show(false); }); } else show(false);
 }
