@@ -94,7 +94,7 @@
  --e3:0 14px 48px rgba(0,0,0,.65);
  --e4:0 24px 72px rgba(0,0,0,.75),0 8px 24px rgba(0,0,0,.4);
  /* Layout */
- --hdr:52px; --nav:94px;
+ --hdr:60px; --nav:94px;   /* v280: 60px = 9px above and below the 42px header buttons */
  --r4px:4px; --r8:8px; --r12:12px; --r16:16px; --r24:24px;
  /* Type */
  --font-main:'Inter','Heebo',system-ui,sans-serif;
@@ -565,7 +565,8 @@ body.sheet-open .diag-panel{display:none;}
 .pin-key:active{transform:scale(.94);background:var(--n4);}
 .pin-key.empty{background:none;border:none;pointer-events:none;}
 @media (max-height:520px){ .sos-cd{align-items:flex-start;overflow-y:auto;padding:8px 16px;} #sos-pin .rc-ic,#sos-pin .sos-cd-sub{display:none;} #sos-pin .sos-cd-card{padding-top:10px;padding-bottom:10px;} #sos-pin .pin-dots{margin:8px 0 4px;} #sos-pin .pin-pad{gap:6px;margin-top:2px;} #sos-pin .pin-key{height:40px;font-size:19px;} #sos-pin .ob-back{margin-top:6px!important;} body:has(#sos-pin.on) #toasts{display:none;} }
-#app:not(.on) ~ #ver-badge{display:none;}   /* v267: it sat on the sign-up legal links */
+#app:not(.on) ~ #ver-badge{display:none;}
+body.sheet-open #ver-badge{opacity:0;pointer-events:none;}   /* v267: it sat on the sign-up legal links */
 .sos-cd-ttl{font-size:22px;font-weight:900;color:#FF8089;letter-spacing:-.3px;line-height:1.15;}
 .sos-cd-sub{font-size:12.5px;color:var(--tx1);line-height:1.55;margin-top:8px;}
 .sos-cd-ringwrap{position:relative;width:150px;height:150px;margin:18px auto 16px;}
@@ -1016,6 +1017,10 @@ body.sheet-open .ff-fab{opacity:0;pointer-events:none;}
 .resp-pill.on{display:flex;}
 .resp-pill .rp-ic{width:18px;height:18px;color:#5CF0FF;flex:0 0 auto;}
 .resp-pill .rp-txt{color:#EAFEFF;font-size:13px;font-weight:800;white-space:nowrap;letter-spacing:.2px;}
+.resp-pill{border-radius:18px;}
+.resp-pill .rp-col{display:flex;flex-direction:column;gap:2px;min-width:0;}
+.resp-pill .rp-dis{color:#FFC2C8;font-size:10.5px;font-weight:700;white-space:nowrap;}
+.resp-pill.sos .rp-x{display:none;}
 .resp-pill .rp-x{background:rgba(255,255,255,.14);border:none;color:#dff;border-radius:50%;width:22px;height:22px;cursor:pointer;font-size:12px;line-height:1;flex:0 0 auto;}
 .resp-consent{position:fixed;inset:0;z-index:1200;background:rgba(4,10,22,.86);backdrop-filter:blur(6px);display:none;align-items:center;justify-content:center;padding:22px;}
 .resp-consent.on{display:flex;}
@@ -1183,7 +1188,8 @@ body.sheet-open .ff-fab{opacity:0;pointer-events:none;}
 /* live marker LIVE badge on the map */
 .mk-circle.live .av{border-color:#40C880;}
 .mk-circle.live .pulse{background:#40C880;}
-.mk-circle .tag{position:absolute;left:50%;top:-12px;transform:translateX(-50%);font-size:8px;font-weight:900;letter-spacing:.5px;color:#0A1628;background:#40C880;padding:1px 5px;border-radius:6px;z-index:4;box-shadow:0 1px 4px rgba(0,0,0,.5);}
+.mk-circle .tag{position:absolute;left:50%;top:-12px;transform:translateX(-50%);font-size:8px;font-weight:900;letter-spacing:.5px;color:#0A1628;background:#40C880;padding:1px 5px;border-radius:6px;z-index:4;box-shadow:0 1px 4px rgba(0,0,0,.5);white-space:nowrap;line-height:1.35;}
+.mk-circle .tag.stale{top:-16px;font-size:10px;letter-spacing:0;font-weight:800;background:#3a4766;color:#EEF2FA;padding:1px 7px;}
 /* Find-a-Friend picker overlay */
 .ff-pick{position:fixed;inset:0;z-index:9650;display:none;align-items:flex-end;background:rgba(6,15,30,.7);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);}
 .ff-pick.on{display:flex;animation:cdfade .2s ease;}
@@ -1851,22 +1857,8 @@ body.otp-active .ob-steps{display:none!important;}
  <!-- RESPONDER NAV - live distance pill -->
  <div class="resp-pill" id="resp-pill" role="status" aria-live="polite">
  <svg class="ic rp-ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 22s7-6.4 7-12a7 7 0 1 0-14 0c0 5.6 7 12 7 12Z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><circle cx="12" cy="10" r="2.6" fill="currentColor"/></svg>
- <span class="rp-txt" id="resp-pill-txt">-</span>
+ <span class="rp-col"><span class="rp-txt" id="resp-pill-txt">-</span><span class="rp-dis" id="resp-pill-dis">לא תחליף לחיוג 100 / 101 / 102</span></span>
  <button class="rp-x" onclick="stopResponderNav()" aria-label="עצור ניווט">✕</button>
- </div>
-
- <!-- RESPONDER NAV - opt-in safety consent -->
- <div class="resp-consent" id="resp-consent" role="alertdialog" aria-modal="true" aria-labelledby="rc-t" aria-hidden="true">
- <div class="rc-card">
- <div class="rc-ic"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3l7 3v5c0 5-3.4 8.5-7 10-3.6-1.5-7-5-7-10V6Z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></svg></div>
- <div class="rc-t" id="rc-t" data-he="להגיב כשומר/ת?" data-en="Respond as a SHOMER?">להגיב כשומר/ת?</div>
- <div class="rc-b" data-he="ניווט מגיבים מיועד בעיקר למגיבים מאומתים (כבאות/משטרה/מד״א) ולשומרים מוגדרים. הוא יציג מסלול חי ומרחק אל מי שזקוק/ה לעזרה." data-en="Responder navigation is intended primarily for verified responders (fire/police/medic) and designated SHOMERs. It shows a live route and distance to the person in need.">ניווט מגיבים מיועד בעיקר למגיבים מאומתים (כבאות/משטרה/מד״א) ולשומרים מוגדרים. הוא יציג מסלול חי ומרחק אל מי שזקוק/ה לעזרה.</div>
- <div class="rc-warn" data-he="⚠ אל תסכן/י את עצמך. שומר מחזק עזרה הדדית ואינו תחליף לשירותי חירום. בכל מצב חירום חייגו 100 / 101 / 102. אם אינך מגיב/ה מיומן/ת - התרעה וחיוג הם התרומה הטובה ביותר." data-en="⚠ Do not put yourself in danger. SHOMER augments mutual aid and is not a replacement for emergency services. In any emergency call 100 / 101 / 102. If you are not a trained responder, alerting and calling is the best help.">⚠ אל תסכן/י את עצמך. שומר מחזק עזרה הדדית ואינו תחליף לשירותי חירום. בכל מצב חירום חייגו 100 / 101 / 102. אם אינך מגיב/ה מיומן/ת - התרעה וחיוג הם התרומה הטובה ביותר.</div>
- <div class="rc-actions">
- <button class="cta-gold" onclick="respondConsentAccept()" data-he="הבנתי - הפעל/י ניווט" data-en="I understand - start navigation">הבנתי - הפעל/י ניווט</button>
- <button class="ob-back" onclick="respondConsentDecline()" data-he="לא עכשיו" data-en="Not now">לא עכשיו</button>
- </div>
- </div>
  </div>
 
  <!-- MUTUAL CHECK-IN - setup -->
@@ -2129,7 +2121,6 @@ body.otp-active .ob-steps{display:none!important;}
  </div>
  <div class="set-grp"><div class="set-row" onclick="testNotifications()" role="button" tabindex="0"><div class="sr-l"><div class="sr-ic"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M18 8a6 6 0 1 0-12 0c0 7-3 9-3 9h18s-3-2-3-9" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></svg></div><div><div class="sr-nm" data-he="בדיקת התראות" data-en="Test notifications">בדיקת התראות</div><div class="sr-sb" data-he="שולח התראת עדכון + התראת רקע (נעל/י מסך). לא בזמן חירום." data-en="Sends an update + background alert (lock screen). Not during emergency.">שולח התראת עדכון + התראת רקע.</div></div></div><span style="color:var(--tx3);font-size:18px">›</span></div></div><div class="set-cat"><div class="set-cat-ic"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3l7 3v5c0 5-3.4 8.5-7 10-3.6-1.5-7-5-7-10V6Z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></svg></div><div class="set-cat-t" data-he="בטיחות" data-en="Safety features">בטיחות</div></div>
  <div class="set-grp"><div class="set-row" onclick="opFrom('sh-dms','sh-set');cl('sh-set')" role="button" tabindex="0"><div class="sr-l"><div class="sr-ic"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8.5" fill="none" stroke="currentColor" stroke-width="2"/><path d="M12 7.5V12l3 2" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="sr-nm" data-he="שומר אוטומטי" data-en="שומר אוטומטי" data-ar="مفتاح الأمان الميت">שומר אוטומטי</div></div><span style="color:var(--tx3);font-size:18px">›</span></div><div class="set-row" onclick="opFrom('sh-alarm','sh-set');cl('sh-set')" role="button" tabindex="0"><div class="sr-l"><div class="sr-ic"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 18v-5a5 5 0 0 1 10 0v5" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><rect x="5" y="18" width="14" height="3" rx="1.5" fill="none" stroke="currentColor" stroke-width="2"/><path d="M12 3v2M4.5 7l1.5 1.3M19.5 7L18 8.3" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></div><div class="sr-nm" data-he="הגדרות אזעקה" data-en="Alarm settings">הגדרות אזעקה</div></div><span style="color:var(--tx3);font-size:18px">›</span></div></div>
- <div class="set-grp"><div class="set-row"><div class="sr-l"><div class="sr-ic"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 4 L17 18.5 L12 15.2 L7 18.5 Z" fill="currentColor"/></svg></div><div><div class="sr-nm" id="resp-tog-lbl" data-he="ניווט מגיב/ה (הצטרפות)" data-en="Responder navigation (opt-in)">ניווט מגיב/ה (הצטרפות)</div><div class="sr-sb" id="resp-tog-sub" data-he="הצג מסלול חי ומרחק כשמגיבים ל-SOS. מיועד למגיבים מאומתים ולשומרים - לא תחליף לחיוג 100/101/102." data-en="Show a live route + distance when responding to an SOS. For verified responders/SHOMERs - not a replacement for 100/101/102.">הצג מסלול חי ומרחק כשמגיבים ל-SOS.</div></div></div><div class="tog" id="resp-tog" onclick="toggleRespond(this)" role="switch"></div></div></div>
  <div class="set-grp"><div class="set-row" onclick="openSetPin()" role="button" tabindex="0"><div class="sr-l"><div class="sr-ic"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="11" width="14" height="9" rx="2" fill="none" stroke="currentColor" stroke-width="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3" fill="none" stroke="currentColor" stroke-width="2"/></svg></div><div><div class="sr-nm" data-he="קוד לביטול SOS (PIN)" data-en="SOS cancel code (PIN)">קוד לביטול SOS (PIN)</div><div class="sr-sb" data-he="נדרש לביטול SOS פעיל - לעולם לא טביעת אצבע." data-en="Required to cancel an active SOS - never a fingerprint.">נדרש לביטול SOS פעיל - לעולם לא טביעת אצבע.</div></div></div><span id="pin-set-state" style="font-size:12px;font-weight:700;color:var(--amb);white-space:nowrap">לא הוגדר</span></div></div>
  <div class="set-grp">
  <div class="set-row"><div class="sr-l"><div class="sr-ic"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="7" width="18" height="13" rx="2.5" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="12" cy="13.5" r="3.2" fill="none" stroke="currentColor" stroke-width="2"/><path d="M9 7l1.5-2h3L15 7" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></svg></div><div><div class="sr-nm" id="selfie-tog-lbl" data-he="הגנת גנב - סלפי" data-en="Theft protection - selfie" data-ar="حماية السرقة - سيلفي">הגנת גנב - סלפי</div><div class="sr-sb" id="selfie-tog-sub" data-he="אחרי 3 קודים שגויים: צילום סלפי של מי שמחזיק את הטלפון + שליחת מיקום חי לשומרים שלך. דורש הרשאת מצלמה. פועל רק כשהאפליקציה פתוחה." data-en="After 3 wrong codes: snap a selfie of whoever holds the phone + send live location to your SHOMERs. Needs camera permission. Works only while the app is open.">אחרי 3 קודים שגויים: סלפי + מיקום חי לשומרים שלך.</div></div></div><div class="tog" id="selfie-tog" onclick="toggleSelfie(this)" role="switch" aria-label="הגנה מפני גניבת מכשיר - צילום סלפי אוטומטי"></div></div>
@@ -2228,7 +2219,7 @@ body.otp-active .ob-steps{display:none!important;}
  /* PROFILE v2 - compact header, one readiness card, today's 60 seconds, collapsible sections.
     Brand: gold #faac22 · navy #1e315f · deep navy #0c1b39. Scoped to #sh-prof (+ the daily card). */
  #sh-prof{--pfg:#faac22;--pfn:#1e315f;--pfd:#0c1b39;}
- .shomer-marker .mk-circle:not(.live){opacity:.55;filter:grayscale(.6);} /* v273: stale guardian position */
+ .shomer-marker .mk-circle:not(.live) .av,.shomer-marker .mk-circle:not(.live) .pulse{opacity:.5;filter:grayscale(.7);} .shomer-marker .mk-circle:not(.live) .pulse{animation:none;} /* v273/v280: stale guardian position - faded, never pulsing, label stays readable */
  #sh-prof .sh-body{padding-top:6px;}
  #sh-prof .pf-hd{display:flex;align-items:center;gap:12px;padding:2px 2px 12px;}
  #sh-prof .pf-av{flex:0 0 48px;width:48px;height:48px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:20px;font-weight:900;color:var(--pfg);background:radial-gradient(circle at 35% 30%,var(--pfn),var(--pfd));box-shadow:0 0 0 2px rgba(250,172,34,.55),0 6px 16px rgba(0,0,0,.4);}
@@ -2534,7 +2525,7 @@ body.otp-active .ob-steps{display:none!important;}
 
    <!-- 2. השומרים שלי (wireframe: the people come BEFORE the form) -->
    <div class="shm-sec">
-    <div class="shm-h">השומרים שלי<span class="shm-live" id="shm-live"></span></div>
+    <div class="shm-h"><span class="shm-live" id="shm-live"></span></div>
     <div id="circ-members" role="list"></div>
    </div>
 
@@ -3372,7 +3363,7 @@ function applyStoredSettings(){
  alarmType='shomer'; if(SS.alarm.type!=='shomer'){ SS.alarm.type='shomer'; }
  alarmVol=(SS.alarm.vol!=null?SS.alarm.vol:1);
  dmsIv=SS.dms.interval||5; dmsInterval=dmsIv;
- try{ reflectUnits(); reflectRespondToggle(); reflectPinSetState(); reflectCheckin(); reflectSelfieToggle(); if(SS.checkin&&SS.checkin.enabled)checkinSchedule(); }catch(e){}
+ try{ reflectUnits(); reflectPinSetState(); reflectCheckin(); reflectSelfieToggle(); if(SS.checkin&&SS.checkin.enabled)checkinSchedule(); }catch(e){}
  if(SS.user){user.name=SS.user.name||'';user.phone=SS.user.phone||'';}
  reflectAlarmSelection();
  reflectDmsSelection();
@@ -7189,11 +7180,16 @@ function renderArrivals(){
   var host=document.getElementById('arr-list'); if(!host) return;
   var A=arrState();
   var members=(SS.circleMembers||[]).filter(function(m){return !m.pending;});
+  /* v280: the same SHOMER can't fill two slots - drop a stored duplicate (first slot wins)
+     and only offer people who are not already picked in another slot */
+  var _taken={}, _dd=false;
+  for(var k=0;k<ARR_G;k++){ var sk=A['g'+k]; if(sk&&sk.mid){ if(_taken[sk.mid]!=null||!memberById(sk.mid)){ sk.mid=''; _dd=true; } else _taken[sk.mid]=k; } }
+  if(_dd) saveStore();
   var html='';
   for(var i=0;i<ARR_G;i++){
     var sel=A['g'+i]||{};
     var opts='<option value="">'+(he?'בחר שומר':'Choose SHOMER')+'</option>'
-      + members.map(function(m){
+      + members.filter(function(m){ return _taken[m.id]==null||_taken[m.id]===i; }).map(function(m){
           return '<option value="'+m.id+'"'+(sel.mid===m.id?' selected':'')+'>'+ESC(m.name||'')+'</option>';
         }).join('');
     var rows='';
@@ -7218,6 +7214,7 @@ function renderArrivals(){
       var g=s.getAttribute('data-g'), A2=arrState();
       A2['g'+g]=A2['g'+g]||{places:[]};
       A2['g'+g].mid=s.value; saveStore();
+      renderArrivals();   /* v280: refresh the other slots' choices */
     };
   });
   host.querySelectorAll('.arr-in').forEach(function(inp){
@@ -7516,8 +7513,9 @@ function statusOf(m,he){
  if(m.pending) return {cls:'wait', txt: he?'לא נשלח עדיין - הקש/י „שלח/י בקשה”':'Not sent yet - tap "Send request"'};
  /* Honest state: if they are not live, say when they were last seen - not "waiting". */
  if(m.registered && !m.live){
+   if(m.ts && posShowable(m.lat,m.lng,m.ts)) return {cls:'wait', txt: (he?('נראה/תה '+agoTxt(m.ts,he)):('seen '+agoTxt(m.ts,he)))};   /* v280: recent but not live */
    var seen=(m.ts&&(Date.now()-m.ts)<86400000)?(function(d){ return ('0'+d.getHours()).slice(-2)+':'+('0'+d.getMinutes()).slice(-2); })(new Date(m.ts)):agoTxt(m.ts, he);   /* v268: HH:MM today */
-   return {cls:'wait', txt: (he?('נראתה/נראה לאחרונה: '+seen):('last seen: '+seen))};
+   return {cls:'none', txt: (he?('לא משתף/ת מיקום · נראה/תה לאחרונה: '+seen):('not sharing location · last seen: '+seen))};
  }
  if(SS.circleGhost&&m.shareTo)return{cls:'paused',txt:he?' שיתוף מושהה':' sharing paused'};
  if(m.shareTo&&m.seeThem)return{cls:'mutual',txt:he?'הדדי':currentLang==='ar'?'متبادل':'Mutual'};
@@ -7542,9 +7540,9 @@ function buildMemberRow(m,he){
  const wrap=document.createElement('div');
  const st=statusOf(m,he);
  const row=document.createElement('div');
- row.className='cm-row'+(m.sos?' sos':''); row.setAttribute('role','listitem');
+ row.className='cm-row'+(m.sos?' sos':'')+(m.pending?' pending':''); row.setAttribute('role','listitem');
  row.innerHTML=`
- <div class="cm-av" style="--cc:${m.color}"><span aria-hidden="true">${m.emoji||''}</span><span class="live ${m.seeThem?'':'off'}" aria-hidden="true"></span></div>
+ <div class="cm-av" style="--cc:${m.color}"><span aria-hidden="true">${m.emoji||''}</span><span class="live ${(m.seeThem&&m.live&&!m.pending)?'':'off'}" aria-hidden="true"></span></div>
  <div class="cm-main">
  <div class="cm-nm">${ESC(memberLabel(m,he))}${(typeof m.rk==='number'&&m.partnerUid)?(' '+drillRankBadge(m.rk)):''}</div>
  <div class="cm-rel">${ESC(m.rel||'')}</div>
@@ -7555,7 +7553,7 @@ function buildMemberRow(m,he){
  const acts=document.createElement('div'); acts.className='cm-acts';
  const shareOn = m.shareTo!==false, pingOn = m.ping!==false;
  acts.innerHTML=`
-  <button class="cm-act ${shareOn?'on':''}" data-a="share">
+  ${m.pending ? '' : `<button class="cm-act ${shareOn?'on':''}" data-a="share">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s7-6.2 7-11a7 7 0 1 0-14 0c0 4.8 7 11 7 11Z"/><circle cx="12" cy="10" r="2.4"/></svg>
     <span>${he?'שיתוף מיקום':'Location'}</span></button>
   <button class="cm-act ${pingOn?'on':''}" data-a="ping">
@@ -7563,10 +7561,13 @@ function buildMemberRow(m,he){
     <span>${he?'הכל טוב?':'All good?'}</span></button>
   <button class="cm-act" data-a="locate">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="7"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3"/></svg>
-    <span>${he?'אתר/י':'Find'}</span></button>
+    <span>${he?'אתר/י':'Find'}</span></button>`}
   ${m.pending ? `<button class="cm-act warn" data-a="resend">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 2L11 13"/><path d="M22 2l-7 20-4-9-9-4Z"/></svg>
-    <span>${he?'שלח/י בקשה':'Send request'}</span></button>` : ''}
+    <span>${(m.via||(_pairOf(m)||{}).via)==='link'?(he?'שלח/י שוב':'Send again'):(he?'שלח/י בקשה':'Send request')}</span></button>
+  <button class="cm-act danger" data-a="cancel">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>
+    <span>${he?'בטל/י הזמנה':'Cancel invite'}</span></button>` : ''}
 `;
  acts.querySelectorAll('.cm-act').forEach(function(b){
    b.onclick=function(ev){
@@ -7578,6 +7579,7 @@ function buildMemberRow(m,he){
      if(a==='ping'){ m.ping=!(m.ping!==false); b.classList.toggle('on',m.ping!==false); saveStore();
        toast(he?((m.ping!==false?'„הכל טוב?” פעיל':'„הכל טוב?” כבוי')+' · '+ESC(m.name)):'Updated', m.ping!==false?'grn':'amb'); return; }
      if(a==='resend'){ resendInvite(m.id); return; }
+     if(a==='cancel'){ if(confirm(he?'לבטל את ההזמנה? גם אם הקישור ייפתח - לא תחוברו.':'Cancel this invite? Even if the link is opened, you will not be connected.')) removeMember(m.id); return; }
      if(a==='locate'){ flyToMember(m.id); return; }
      if(a==='del'){ if(confirm(he?('להסיר את '+(m.name||'')+' מהמעגל?'):('Remove '+(m.name||'')+'?'))) removeMember(m.id); return; }
    };
@@ -7638,8 +7640,12 @@ function agFillSelects(){
   var cs=document.getElementById('ag-circle');
   if(cs){
     var cur=cs.value;
-    cs.innerHTML=circlesList().map(function(x){ return '<option value="'+x.id+'">'+ESC(x.name)+'</option>'; }).join('');
-    if(cur) try{ cs.value=cur; }catch(e){}
+    /* v280: seeded circles carry a seedKey, not a name - ESC(x.name) printed "undefined" */
+    var _cl=circlesList().filter(function(x){ return !!_circName(x); });
+    cs.innerHTML=_cl.length?_cl.map(function(x){ return '<option value="'+x.id+'">'+ESC(_circName(x))+'</option>'; }).join('')
+      :'<option value="">'+(he?'ללא קבוצה':currentLang==='ar'?'بدون مجموعة':'No group')+'</option>';
+    try{ cs.value=cur||activeCircleId||''; }catch(e){}
+    if(cs.selectedIndex<0) cs.selectedIndex=0;
   }
 }
 /* keep dial code + placeholder in sync with the chosen country */
@@ -7651,6 +7657,10 @@ function agSyncCountry(){
   if(cc){ try{ cc.value=dial; }catch(e){} }
   var iso=(s&&s.selectedOptions&&s.selectedOptions[0]&&s.selectedOptions[0].getAttribute('data-iso')) || isoForDial(dial);
   if(ph){ ph.placeholder=mobEx(iso); }
+  /* v280: the closed picker shows just flag + code (the full "flag name (+code)" was clipped on
+     phones); the open list keeps every country's full name */
+  try{ if(s){ for(var i=0;i<s.options.length;i++){ var o=s.options[i]; if(!o.getAttribute('data-full')) o.setAttribute('data-full',o.textContent);
+    var full=o.getAttribute('data-full'); o.textContent=o.selected?(full.split(' ')[0]+' +'+o.value):full; } } }catch(e){}
 }
 function agCountryPick(){
   try{ agSyncCountry(); }catch(e){}
@@ -8315,7 +8325,7 @@ function toggleGhost(){
 /* ── Circle member map markers (pulsing avatar dots) ── */
 function circleIcon(m){
  return window.L.divIcon({className:'shomer-marker',
- html:`<div class="mk-circle${m.sos?' sos':''}${isFounder()?' founder':''}" style="--cc:${m.color}">${isFounder()?('<span class="mk-founder-crown">'+founderCrestSVG(26)+'</span>'):''}<div class="pulse"></div><div class="av">${m.emoji||''}</div><div class="nm">${ESC(m.name)}${m.sos?' ':''}</div></div>`,
+ html:`<div class="mk-circle${m.sos?' sos':''}${uidIsFounder({partnerUid:m.partnerUid})?' founder':''}" style="--cc:${m.color}">${uidIsFounder({partnerUid:m.partnerUid})?('<span class="mk-founder-crown">'+founderCrestSVG(26)+'</span>'):''}<div class="pulse"></div><div class="av">${m.emoji||''}</div><div class="nm">${ESC(m.name)}${m.sos?' ':''}</div></div>`,
  iconSize:[38,38],iconAnchor:[19,19],popupAnchor:[0,-20]});
 }
 function clearCircleMarkers(){
@@ -8372,6 +8382,8 @@ function renderCircleMarkers(){
  const want={}; visibleMembers(mapCircleId).forEach(m=>{ if(m.lat==null||m.lng==null) return;
    /* v272: a linked guardian already has its pin in the SHOMER layer - one person, one pin */
    var _pp=m.pairId&&gdPairById(m.pairId); if(_pp&&_pp.seeThem&&!_pp.pending&&gdPos(_pp)) return;
+   if(_pp && !m.sos) return;                                  /* v280: a linked SHOMER is drawn ONLY from their own presence (above) */
+   if(!m.sos && !posShowable(m.lat,m.lng,m.ts)) return;       /* v280: stale / coarse / unknown = no pin */
    want[m.id]=m; });   // only real, live positions get a pin
  // remove markers no longer wanted
  Object.keys(mapLayers.circle).forEach(id=>{
@@ -8490,8 +8502,8 @@ function clearCircleAlert(){
 function locateAlertMember(){ if(alertMemberId)flyToMember(alertMemberId); }
 
 /* ═══════════════════════════════════
-   RESPONDER NAVIGATION - opt-in glowing route + live distance to an active SOS
-   Safety: OPT-IN, disclaimer shown, verified responders (fire/police/medic) + SHOMERs
+   RESPONDER NAVIGATION - always-on glowing route + live distance to an active SOS
+   Safety: disclaimer shown in the SOS UI (v280: no opt-in toggle), verified responders (fire/police/medic) + SHOMERs
    prioritised; general users are steered to ALERT + call 100/101/102. Augments, never
    replaces emergency services. Cross-device responder positions need the backend (FIREBASE-SETUP).
 ═══════════════════════════════════ */
@@ -8507,20 +8519,33 @@ function fmtDistance(m){
   if(imp){const ft=m*3.28084; return ft<1000?Math.round(ft)+' ft':(m/1609.344).toFixed((m/1609.344)<5?2:1)+' mi';}
   return m<1000?Math.round(m)+' m':(m/1000).toFixed((m/1000)<5?2:1)+' km';
 }
-/* Entry point - opt-in gated. by responders/SHOMERs for active response. */
-function respondToSOS(lat,lng,label){
-  if(!(SS.settings&&SS.settings.respond)){ openRespondConsent(lat,lng,label); return; }
-  respTarget={lat:lat,lng:lng,label:label||''};
-  drawResponderRoute(); startGeoWatch();
-  const pill=document.getElementById('resp-pill'); if(pill)pill.classList.add('on');
+/* Entry point. v280: ALWAYS on - no opt-in setting. Anyone who responds to (or opens) an SOS they
+   are allowed to see gets the live route + distance; the "not a substitute for 100/101/102" line
+   lives in the SOS UI itself (pill + alert card). opt.key ties the route to one SOS ('sos:<uid>'). */
+function respondToSOS(lat,lng,label,opt){
+  lat=+lat; lng=+lng; if(!isFinite(lat)||!isFinite(lng)) return;
+  opt=opt||{};
+  const same=!!(respTarget&&respTarget.lat===lat&&respTarget.lng===lng&&respRouteLayers.length);
+  respTarget={lat:lat,lng:lng,label:label||'',key:opt.key||null};
+  if(!same) drawResponderRoute();
+  startGeoWatch();
+  const pill=document.getElementById('resp-pill'); if(pill){ pill.classList.add('on'); pill.classList.toggle('sos',!!opt.key); }
+  const he=currentLang==='he', ar=currentLang==='ar';
+  setText('resp-pill-dis', he?'לא תחליף לחיוג 100 / 101 / 102':ar?'ليس بديلاً عن الاتصال 100 / 101 / 102':'Not a substitute for calling 100 / 101 / 102');
   updateResponderDistance();
-  const he=currentLang==='he';
-  toast(he?'ניווט מגיב/ה פעיל - מסלול חי':'Responder nav active - live route','amb');
+  if(!opt.quiet) toast(he?'ניווט מגיב/ה פעיל - מסלול חי':'Responder nav active - live route','amb');
+}
+/* the SOS person moved: follow them (route redraw throttled like my own movement) */
+function respFollowTarget(key,lat,lng){
+  if(!respTarget||respTarget.key!==key) return; lat=+lat; lng=+lng; if(!isFinite(lat)||!isFinite(lng)) return;
+  if(respTarget.lat===lat&&respTarget.lng===lng) return;
+  respTarget.lat=lat; respTarget.lng=lng; updateResponderDistance();
+  const now=Date.now(); if(now-_respRedrawTs>4000){ _respRedrawTs=now; drawResponderRoute(); }
 }
 function stopResponderNav(){
   respTarget=null;
   respRouteLayers.forEach(l=>{try{MAP.removeLayer(l);}catch(e){}}); respRouteLayers=[];
-  const pill=document.getElementById('resp-pill'); if(pill)pill.classList.remove('on');
+  const pill=document.getElementById('resp-pill'); if(pill)pill.classList.remove('on','sos');
 }
 /* Real shortest-path via OSRM (foot profile); bright glowing 3-layer polyline; straight-line fallback. */
 function drawResponderRoute(){
@@ -8533,7 +8558,9 @@ function drawResponderRoute(){
     // pulsing red dot at the event/destination - the responder's target
     const target=window.L.marker([respTarget.lat,respTarget.lng],{icon:sosIcon(),interactive:false,zIndexOffset:1100}).addTo(MAP);
     respRouteLayers=[glow,mid,core,target];
-    try{MAP.fitBounds(window.L.latLngBounds(latlngs).pad(0.28),{maxZoom:16});}catch(e){}
+    /* v280: keep the route clear of the SOS alert card on top and the SOS button below */
+    try{ const _c=document.querySelector('.in-sos'); const _t=_c?Math.round(_c.getBoundingClientRect().bottom)+16:70;
+      MAP.fitBounds(window.L.latLngBounds(latlngs),{maxZoom:16,paddingTopLeft:[40,_t],paddingBottomRight:[40,150]}); }catch(e){}
   };
   const url='https://router.project-osrm.org/route/v1/foot/'+userLng+','+userLat+';'+respTarget.lng+','+respTarget.lat+'?overview=full&geometries=geojson';
   fetch(url).then(r=>r.json()).then(j=>{
@@ -8545,23 +8572,10 @@ function updateResponderDistance(){
   if(!respTarget||userLat==null)return;
   const m=distMeters(userLat,userLng,respTarget.lat,respTarget.lng), he=currentLang==='he';
   const el=document.getElementById('resp-pill-txt');
-  if(el)el.textContent=(respTarget.label?respTarget.label+' · ':'')+(he?'מרחק ':'')+fmtDistance(m)+(he?'':' away');
-}
-/* First-time opt-in: safety disclaimer (modelled on opt-in bystander-responder programs). */
-function openRespondConsent(lat,lng,label){
-  respTarget={lat:lat,lng:lng,label:label||''}; // remembered for after consent
-  const ov=document.getElementById('resp-consent'); if(ov){ov.classList.add('on');ov.setAttribute('aria-hidden','false');}
-}
-function respondConsentAccept(){
-  if(!SS.settings)SS.settings={}; SS.settings.respond=true; saveStore();
-  const ov=document.getElementById('resp-consent'); if(ov){ov.classList.remove('on');ov.setAttribute('aria-hidden','true');}
-  if(respTarget)respondToSOS(respTarget.lat,respTarget.lng,respTarget.label);
-}
-function respondConsentDecline(){
-  respTarget=null;
-  const ov=document.getElementById('resp-consent'); if(ov){ov.classList.remove('on');ov.setAttribute('aria-hidden','true');}
-  const he=currentLang==='he';
-  toast(he?'אין בעיה - התרעה נשלחה. בחירום חייגו 100 / 101 / 102.':'No problem - the alert stands. In an emergency call 100 / 101 / 102.','');
+  const txt=(respTarget.label?respTarget.label+' · ':'')+(he?'מרחק ':'')+fmtDistance(m)+(he?'':' away');
+  if(el)el.textContent=txt;
+  /* the SOS alert card sits over the pill - it shows the same live distance */
+  if(respTarget.key&&respTarget.key.indexOf('sos:')===0){ const d=document.querySelector('#in-sos-'+respTarget.key.slice(4)+' .in-sos-dist'); if(d) d.textContent=(he?'מרחק ממך: ':'Distance: ')+fmtDistance(m)+(he?' · המסלול על המפה':' · route on the map'); }
 }
 /* Respond to the circle member whose SOS is active (the alert strip CTA). */
 function respondToAlertMember(){ const m=alertMemberId&&memberById(alertMemberId); if(m)respondToSOS(m.lat,m.lng,m.name); }
@@ -8570,8 +8584,6 @@ function reflectUnits(){
   const u=(SS.settings&&SS.settings.units)||'metric';
   ['metric','imperial'].forEach(k=>{const b=document.getElementById('units-'+k); if(b)b.classList.toggle('on',k===u);});
 }
-function toggleRespond(el){ if(!SS.settings)SS.settings={}; SS.settings.respond=el.classList.toggle('on'); saveStore(); }
-function reflectRespondToggle(){ const t=document.getElementById('resp-tog'); if(t)t.classList.toggle('on',!!(SS.settings&&SS.settings.respond)); }
 
 /* ── FIND A FRIEND - picker + smooth fly-to with radar ping ── */
 function findFriendOpen(){ try{op("sh-circles");}catch(e){} setTimeout(function(){var f=document.getElementById("ag-phone");if(f)f.focus();},150); }
@@ -8580,6 +8592,10 @@ function findFriendClose(){const p=document.getElementById('ff-pick');if(p){p.cl
 function flyToMember(id){
  const m=memberById(id);if(!m){return;}
  const he=currentLang==='he';
+ /* v280: a linked SHOMER is located by their OWN presence pin; no recent own fix = say so, no pin */
+ const _pp=m.pairId&&gdPairById(m.pairId);
+ if(!m.sos){ if(_pp&&!_pp.pending&&gdPos(_pp)){ gdFlyTo(_pp.id); return; }
+   if(_pp||!posShowable(m.lat,m.lng,m.ts)){ toast(notSharingTxt(m.name||'',(_pp&&_pp.ts)||m.ts,he),'amb'); return; } }
  // make sure this member is rendered (force-show even if normally hidden)
  mapCircleId=m.cid; renderCircleMarkers();
  if(!mapLayers.circle[m.id]&&MAP){mapLayers.circle[m.id]=window.L.marker([m.lat,m.lng],{icon:circleIcon(m),zIndexOffset:800,alt:m.name}).addTo(MAP);}
@@ -8629,6 +8645,14 @@ function radarPing(ll){
 const GD_CH='shomer-live-v1'; // BroadcastChannel name
 const GD_RELAY='shomer_live_relay'; // localStorage relay key (cross-tab fallback)
 const GD_FRESH=90000; // v273: live = updated in the last 90s (beats every 40s). Older = faded pin with its age, never shown as current
+/* v280 POSITION TRUTH: a partner's pin is ONLY their own latest presence fix, and only while it means
+   something. Older than GD_SHOW_MS (= the "sharing location" window) = not sharing: no pin at all.
+   A coarse point (both coords on the ~1km 2-decimal grid - old clients / the public dashboard
+   format) is never drawn as a person's exact position. */
+const GD_SHOW_MS=15*60000;
+function posCoarse(lat,lng){ return Math.abs(lat*100-Math.round(lat*100))<1e-7 && Math.abs(lng*100-Math.round(lng*100))<1e-7; }
+function posShowable(lat,lng,ts){ return lat!=null&&lng!=null&&isFinite(lat)&&isFinite(lng)&&!!ts&&(Date.now()-ts)<GD_SHOW_MS&&!posCoarse(+lat,+lng); }
+function notSharingTxt(nm,ts,he){ return (nm?nm+' · ':'')+(he?'לא משתף/ת מיקום כרגע':'not sharing location now')+(ts?(' · '+(he?'נראה/תה לאחרונה ':'last seen ')+agoTxt(ts,he)):''); }
 const GD_PALETTE=['#C9A84C','#2962FF','#00C853','#E91E8C','#9C27B0','#FF6A00'];
 let gdBC=null, gdTabCode='', gdLiveTimer=null, gdSimTimer=null;
 
@@ -8949,6 +8973,10 @@ function gdHandle(msg){
  if(!msg||msg.src===gdTabCode) return; // ignore our own tab's echo
  if(msg.type==='hello'){ gdBroadcast(); return; } // someone joined → tell them where I am
  if(msg.type==='pos'&&Array.isArray(msg.toks)){
+ /* v280: the pair token is shared by BOTH partners, so a second copy of MY app (PWA + browser tab)
+    relaying MY position matched my partner's pair and drew them where I am. Signed in = the
+    backend presence is the only source of a partner's position. */
+ if(typeof FB!=='undefined' && FB && FB.uid) return;
  let changed=false;
  msg.toks.forEach(tok=>{
  const p=gdPairByToken(tok); if(!p) return;
@@ -8980,12 +9008,12 @@ function gdSimWalk(){
 
 /* ── Pair position helpers (live coords if fresh, else simulated) ── */
 function gdIsLive(p){ return !!p.live && (Date.now()-(p.ts||0)<GD_FRESH); }
-function gdPos(p){ if(gdIsLive(p)) return [p.lat,p.lng]; if(p.lat!=null&&p.lng!=null) return [p.lat,p.lng]; if(p.demo&&p.simLat!=null) return [p.simLat,p.simLng]; return null; }
+function gdPos(p){ if(p.lat!=null&&p.lng!=null) return posShowable(p.lat,p.lng,p.ts)?[p.lat,p.lng]:null; if(p.demo&&p.simLat!=null) return [p.simLat,p.simLng]; return null; }   /* v280: own, recent, precise - or nothing */
 
 /* ── Map markers ── */
 function guardianIcon(p,live){
  return window.L.divIcon({className:'shomer-marker',
- html:`<div class="mk-circle${live?' live':''}${uidIsFounder(p)?' founder':''}" style="--cc:${p.color||'#C9A84C'}">${uidIsFounder(p)?('<span class="mk-emb">'+founderCrestSVG(42)+'</span>'):''}${live?'<div class="tag">LIVE</div>':(p.ts?'<div class="tag" style="background:#3a4766;color:#dfe6f5">'+ESC(agoTxt(p.ts,currentLang==='he'))+'</div>':'')}<div class="pulse"></div><div class="av"></div><div class="nm">${ESC(p.name||(currentLang==='he'?'שומר/ת':'SHOMER'))}</div></div>`,
+ html:`<div class="mk-circle${live?' live':''}${uidIsFounder(p)?' founder':''}" style="--cc:${p.color||'#C9A84C'}">${uidIsFounder(p)?('<span class="mk-emb">'+founderCrestSVG(42)+'</span>'):''}${live?'<div class="tag">LIVE</div>':(p.ts?'<div class="tag stale">'+ESC((currentLang==='he'?'נראה ':'seen ')+agoTxt(p.ts,currentLang==='he'))+'</div>':'')}<div class="pulse"></div><div class="av"></div><div class="nm">${ESC(p.name||(currentLang==='he'?'שומר/ת':'SHOMER'))}</div></div>`,
  iconSize:[38,38],iconAnchor:[19,19],popupAnchor:[0,-20]});
 }
 function gdUpdateMarker(p){
@@ -9002,7 +9030,7 @@ function gdRenderMarkers(){ if(!MAP)return; gdState().pairs.forEach(gdUpdateMark
  // drop markers for removed pairs
  Object.keys(mapLayers.SHOMER).forEach(id=>{ if(!gdPairById(id)){ MAP.removeLayer(mapLayers.SHOMER[id]); delete mapLayers.SHOMER[id]; } }); }
 function gdFlyTo(id){
- const p=gdPairById(id); const ll=p&&gdPos(p); if(!ll){ toast(currentLang==='he'?'אין מיקום זמין עדיין':'No location yet','amb'); return; }
+ const p=gdPairById(id); const ll=p&&gdPos(p); if(!ll){ toast(p?notSharingTxt(p.name||'',p.ts,currentLang==='he'):(currentLang==='he'?'אין מיקום זמין עדיין':'No location yet'),'amb'); return; }
  gdUpdateMarker(p); cl('sh-circles');
  if(MAP){ try{MAP.invalidateSize(false);}catch(e){}
  setTimeout(()=>{ try{MAP.setView(ll,16,{animate:true,duration:1.0});}catch(e){try{MAP.setView(ll,16);}catch(_){}}
@@ -11067,6 +11095,7 @@ function openLiveSosDetail(sosId){
   body.querySelector('.ev-dist').textContent=dist;
   _liveDetailId=sosId;
   op('det-sheet');
+  try{ if(s.lat!=null&&s.lng!=null) respondToSOS(s.lat,s.lng,(he?'אירוע חי':ar?'حدث مباشر':'Live event'),{key:'live:'+sosId,quiet:true}); }catch(e){}   /* v280: route always shown */
   fbRespondersListen(sosId);   // stream the REAL responder list into this card
 }
 function respLiveHtml(n,list){
@@ -11082,7 +11111,7 @@ function respondOnMyWay(sosId){
   var s=fbLiveSos[sosId]||{}; var he=currentLang==='he';
   if(!FB.ready||!FB._authReady){ toast(he?'עדיין מתחבר - נסה/י שוב':'Still connecting - try again','amb'); return; }
   _myResponders[sosId]=1;                                 // optimistic → instant UI flip to "cancel"
-  try{ if(s.lat!=null) respondToSOS(s.lat,s.lng,(he?'אירוע חי':'Live event')); }catch(e){}   // draw my live route
+  try{ if(s.lat!=null) respondToSOS(s.lat,s.lng,(he?'אירוע חי':'Live event'),{key:'live:'+sosId,quiet:true}); }catch(e){}   // draw my live route
   if(_liveDetailId===sosId) openLiveSosDetail(sosId);     // refresh the card to "cancel" state
   /* v268: the PRIVATE channel (rp_<me>, readable only by my paired SHOMERs) - never the old
      responders/<sosId> list, which any signed-in user could read with a guessable id. */
@@ -12384,6 +12413,7 @@ function onPartnerSOS(puid, v, src){
   SOSBUS.src=SOSBUS.src||{}; (SOSBUS.src[puid]=SOSBUS.src[puid]||{})[src||'bus']=1;
   SOSBUS.lastV=SOSBUS.lastV||{};
   if(src!=='rec'||!SOSBUS.lastV[puid]) SOSBUS.lastV[puid]=v;   /* position updates while the alert is open (the bus has the freshest) */
+  try{ var _lv=SOSBUS.lastV[puid]; if(_lv) respFollowTarget('sos:'+puid, _lv.lat, _lv.lng); }catch(e){}   /* v280: my route follows them */
   /* v266 AGE CUTOFF: the newest timestamp across both channels decides. Older than 30 min and
      not updated = most likely a phone that died mid-SOS: shown, but quietly - no siren. */
   SOSBUS.lastTs=SOSBUS.lastTs||{}; if(v.ts && v.ts>(SOSBUS.lastTs[puid]||0)) SOSBUS.lastTs[puid]=v.ts;
@@ -12404,6 +12434,7 @@ function onPartnerSOSClear(puid, src){
   var sm=(SOSBUS.src=SOSBUS.src||{})[puid]; if(sm){ delete sm[src||'bus']; if(Object.keys(sm).length) return; }
   delete SOSBUS.mine[puid];
   var el=document.getElementById('in-sos-'+puid); if(el) el.remove();
+  try{ if(respTarget&&respTarget.key==='sos:'+puid) stopResponderNav(); }catch(e){}   /* their SOS ended - route goes with it */
 }
 function memberByPair(puid){
   return (SS.circleMembers||[]).filter(function(m){return m.partnerUid===puid;})[0]||null;
@@ -12426,9 +12457,14 @@ function showIncomingSOS(puid, nm, v, oldTs){
    +'<button class="in-b map">'+(he?'נווט/י':'Navigate')+'</button>'
    +'<button class="in-b call">'+(he?'התקשר/י':'Call')+'</button>'
    +'</div>'
-   +'<button class="in-b sdn" style="margin-top:8px;width:100%;background:transparent;border:1px solid rgba(255,255,255,.35)">'+(he?'🔕 בדקתי שהם בטוחים - השתק אזעקה':'🔕 I checked they are safe - stand down alarm')+'</button>';
+   +'<button class="in-b sdn" style="margin-top:8px;width:100%;background:transparent;border:1px solid rgba(255,255,255,.35)">'+(he?'🔕 בדקתי שהם בטוחים - השתק אזעקה':'🔕 I checked they are safe - stand down alarm')+'</button>'
+   +'<div class="in-sos-dist"></div>'
+   +'<div class="in-sos-dis">'+(he?'⚠ SH✡MER אינו תחליף לחיוג 100 / 101 / 102':'⚠ SH✡MER is not a substitute for calling 100 / 101 / 102')+'</div>';
   if(oldTs){ d.classList.add('old'); d.style.animation='none'; }
   document.body.appendChild(d);
+  /* v280: the route to them is ALWAYS drawn as soon as the alert opens (no opt-in) */
+  function route(){ try{ var lv=(SOSBUS.lastV&&SOSBUS.lastV[puid])||v; if(isFinite(lv.lat)&&isFinite(lv.lng)) respondToSOS(lv.lat,lv.lng,nm,{key:'sos:'+puid,quiet:true}); }catch(e){} }
+  route();
 
   function shrink(){
     /* Once you have committed, the banner must SHRINK and get out of the way - it used to
@@ -12455,7 +12491,7 @@ function showIncomingSOS(puid, nm, v, oldTs){
     else toast(he?'אין מספר שמור':'No number saved','amb');
   }
   function wire(){
-    var g=d.querySelector('.go');   if(g) g.onclick=function(){ sosRespond(puid,'enroute'); shrink(); };
+    var g=d.querySelector('.go');   if(g) g.onclick=function(){ sosRespond(puid,'enroute'); shrink(); route(); };
     var mp=d.querySelector('.map'); if(mp) mp.onclick=nav;
     var cl=d.querySelector('.call'); if(cl) cl.onclick=callThem;
     var st=d.querySelector('.stand'); if(st) st.onclick=function(){ sosStandDown(); d.remove(); };
@@ -14449,6 +14485,9 @@ body.aed-placing #map{cursor:crosshair}
 .in-sos-h{font-size:11px;font-weight:900;letter-spacing:.12em;color:#FFD9DD}
 .in-sos-n{font-size:21px;font-weight:900;color:#fff;margin-top:2px}
 .in-sos-s{font-size:13px;color:rgba(255,255,255,.9);margin-bottom:12px}
+.in-sos-dist{font-size:12.5px;font-weight:800;color:#fff;margin-top:9px}
+.in-sos-dist:empty{display:none}
+.in-sos-dis{font-size:11px;font-weight:700;color:rgba(255,255,255,.82);margin-top:7px}
 .in-sos-btns{display:grid;grid-template-columns:repeat(3,1fr);gap:7px}
 .in-b{padding:11px 4px;border-radius:11px;border:0;font-family:inherit;font-weight:900;font-size:12.5px;cursor:pointer;background:rgba(255,255,255,.16);color:#fff}
 .in-b.go{background:#fff;color:#8E0C19}
@@ -14923,6 +14962,17 @@ html[dir="rtl"] .sh-back svg{transform:scaleX(-1)}
 #leg-past-sec,.set-row:has(#set-past-tog){display:none!important} /* v269: no verified past events yet */
 .past-fab[aria-pressed="false"]{background:rgba(8,18,36,.85);color:#5a6a8a;border-color:rgba(140,155,189,.15);opacity:.82}
 .past-fab[aria-pressed="true"]{background:#5B8CA8;color:#fff;border-color:#7FB4CC;box-shadow:0 0 0 3px rgba(91,140,168,.55),0 0 18px rgba(91,140,168,.7),0 4px 14px rgba(0,0,0,.4);transform:scale(1.06)}
+
+/* ══ v280 UX pass ══ */
+/* header: one axis, equal breathing room; logo never collides with the side buttons on small phones */
+.hdr-menu,.hdr-guide,.hdr-bell,.hdr-founder{width:42px;height:42px;box-sizing:border-box;}
+@media (max-width:375px){ .hdr-logo-svg{height:32px;} .hdr-left{gap:6px;} }
+/* settings: a category title is followed by its content at the same spacing everywhere */
+#sh-set .set-cat + .sec-cap{margin-top:0;}
+/* pending invite: clearly a pending state, not a live SHOMER */
+.cm-row.pending{border-style:dashed!important;}
+.cm-row.pending .cm-status{color:#E0A828;background:rgba(224,168,40,.10);}
+.cm-row.pending .cm-av{opacity:.6;}
 </style>
 <script src="native-bridge.js"></script>
 
