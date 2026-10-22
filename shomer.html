@@ -3445,7 +3445,7 @@ function setShakeSens(v){
 function simulateShake(){
  try{ shakeArmPermission(); }catch(e){}   // also arm real motion permission from this tap (iOS)
  toast(currentLang==='he'?' ניעור זוהה':' Shake detected','amb');
- if(!sosActive)setTimeout(()=>triggerSOS('shake'),400);
+ if(sosActive&&window._sosSilent){ try{ sosGoLoud(); }catch(_){} } else if(!sosActive)setTimeout(()=>triggerSOS('shake'),400);
 }
 
 /* ── Alarm settings persistence ── */
@@ -4791,7 +4791,7 @@ function startShakeDetection(){
  if(mag>THRESHOLD && now-lastPeak>MIN_GAP){
    if(!firstT || now-firstT>WINDOW){ firstT=now; count=0; }   // (re)open the counting window
    count++; lastPeak=now;
-   if(count>=REQUIRED){ count=0; firstT=0; if(!sosActive){ try{navigator.vibrate&&navigator.vibrate([90,50,90]);}catch(_){}
+   if(count>=REQUIRED){ count=0; firstT=0; if(sosActive&&window._sosSilent){ try{ sosGoLoud(); }catch(_){} } else if(!sosActive){ try{navigator.vibrate&&navigator.vibrate([90,50,90]);}catch(_){}
      triggerSOS('shake'); } }
  }
  };
@@ -4856,7 +4856,7 @@ function dmsTick(){
  updateDMSDisplay();
  if(dmsCountdown<=60&&!dmsWarning&&fcEnabled()){
  dmsWarning=true; clearInterval(dmsTimer);   /* the call decides now - the loud DMS countdown is paused, no warning strip / toast / notification gives it away */
- fakeCallStart({ok:function(){ dmsWarning=false; dmsTimer=setInterval(dmsTick,1000); dmsConfirm(); }, fail:function(){ dmsActive=false; dmsWarning=false; clearInterval(dmsTimer); try{ SS.dms.active=false; SS.dms.deadline=0; saveStore(); document.getElementById('dms-strip').classList.remove('on','warn'); }catch(e){} silentSOS('duress'); }});
+ fakeCallStart({ok:function(){ dmsWarning=false; dmsTimer=setInterval(dmsTick,1000); dmsConfirm(); }, fail:function(){ dmsActive=false; dmsWarning=false; clearInterval(dmsTimer); try{ SS.dms.active=false; SS.dms.deadline=0; saveStore(); document.getElementById('dms-strip').classList.remove('on','warn'); document.getElementById('dms-status-card').style.display='none'; var _tb=document.getElementById('dms-toggle-btn'); if(_tb)_tb.textContent=T('dms_start'); var _bd=document.getElementById('dms-dd-badge'); if(_bd){_bd.textContent=T('dms_off_badge');_bd.classList.add('off');} }catch(e){} silentSOS('duress'); }});
  return;
  }
  if(dmsCountdown<=60&&!dmsWarning){
@@ -5063,10 +5063,11 @@ async function fcListen(lang){
 }
 function fakeCallStart(cb){
   var f=fcState(), he=currentLang==='he', ar=currentLang==='ar', practice=!!(cb&&cb.practice);
-  var _old=document.getElementById('fc-ov'); if(_old){ if(practice) return; _old.remove(); }   /* a real call always wins over a practice one */
+  if(document.getElementById('fc-ov')){ if(practice) return; try{ window._fcAbort&&window._fcAbort(); }catch(e){} var _o2=document.getElementById('fc-ov'); if(_o2) _o2.remove(); }   /* a real call always wins: the old call is aborted with its timers, no callbacks */
   var who=String(f.caller||'').trim()||(he?'אמא':ar?'أمي':'Mom');
   var ov=document.createElement('div'); ov.id='fc-ov'; ov.className='fc-ov';
   var done=false, t0=0, tick=null, timeout=null;
+  window._fcAbort=function(){ if(done) return; done=true; clearInterval(tick); clearTimeout(timeout); fcRing(false); try{ window.speechSynthesis&&speechSynthesis.cancel(); }catch(e){} try{ ov.remove(); }catch(e){} };
   var finish=function(ok){
     if(done) return; done=true; fcRing(false); clearInterval(tick); clearTimeout(timeout); try{ window.speechSynthesis&&speechSynthesis.cancel(); }catch(e){}
     try{ var SR=window.Capacitor&&window.Capacitor.Plugins&&window.Capacitor.Plugins.SpeechRecognition; SR&&SR.stop&&SR.stop(); }catch(e){}
@@ -5196,7 +5197,7 @@ function nativeAlarmStart(){ try{ var p=shomerNativePlugin(); if(p&&p.startAlarm
 function nativeAlarmStop(){ try{ var p=shomerNativePlugin(); if(p&&p.stopAlarm) p.stopAlarm(); }catch(e){} }
 /* The native background-shake service launches the app and calls this to complete a REAL
    SOS over the existing REST/SSE flow (never the RTDB WebSocket SDK). */
-window.__shomerNativeSOS=function(reason){ try{ if(typeof sosActive!=='undefined' && sosActive) return; if(typeof triggerSOS==='function') triggerSOS(reason||'shake'); }catch(e){} };
+window.__shomerNativeSOS=function(reason){ try{ if(typeof sosActive!=='undefined' && sosActive){ if(window._sosSilent){ try{ sosGoLoud(); }catch(_){} } return; } if(typeof triggerSOS==='function') triggerSOS(reason||'shake'); }catch(e){} };
 (function(){
   try{
     if(!shomerIsNative()) return;
@@ -5757,6 +5758,7 @@ function onSosTap(){
  // A hold that already fired consumes the trailing click.
  if(sosHoldConsumed){sosHoldConsumed=false;return;}
  if(sosPhase==='countdown'){cancelCountdown();return;}
+ if(sosPhase==='active'&&window._sosSilent){ sosGoLoud(); return; }   /* silent SOS: the SOS button turns it LOUD */
  if(sosPhase==='active'){resolveSOS();return;}
  // idle: if hold-to-arm is on, a plain tap must NOT fire - guide the user to hold.
  if(SS.sos.holdToArm){
@@ -12085,9 +12087,9 @@ async function sosQueueFlush(){
     if(ok){ sent++; } else { it.tries=(it.tries||0)+1; keep.push(it); }
   }
   sosQueueWrite(keep);
-  if(sent){ try{ toast(he?'\u2713 התרעה שהמתינה נשלחה':'\u2713 Queued alert delivered','grn'); }catch(e){}
+  if(sent && !window._sosSilent){ try{ toast(he?'\u2713 התרעה שהמתינה נשלחה':'\u2713 Queued alert delivered','grn'); }catch(e){}
             try{ sosWatchMyResponders(); }catch(e){} }
-  if(expired){ try{ toast(he?'\u26A0 התרעה ישנה בוטלה - אם את/ה עדיין בסכנה לחצ/י SOS שוב':'\u26A0 Stale alert discarded - press SOS again if still in danger','sos'); }catch(e){} }
+  if(expired && !window._sosSilent){ try{ toast(he?'\u26A0 התרעה ישנה בוטלה - אם את/ה עדיין בסכנה לחצ/י SOS שוב':'\u26A0 Stale alert discarded - press SOS again if still in danger','sos'); }catch(e){} }
   if(!keep.length && _sosQTimer){ clearInterval(_sosQTimer); _sosQTimer=null; }
 }
 try{
@@ -12105,7 +12107,7 @@ async function sosBroadcast(sosId, type){
   if(!(FB.ready&&FB._authReady)){
     var _ok=false; try{ _ok=await fbEnsureAuthReady(8000); }catch(e){}
     if(!(_ok&&FB._authReady)){ try{ sosQueuePush(null,null); }catch(e){}
-      toast(he?'\u26A0 ההתרעה טרם נשלחה - אין חיבור. ננסה שוב אוטומטית. התקשר/י 100 עכשיו':'\u26A0 Alert not sent yet - no connection. Retrying automatically. Call 100 now','sos'); return false; }
+      if(!window._sosSilent) toast(he?'\u26A0 ההתרעה טרם נשלחה - אין חיבור. ננסה שוב אוטומטית. התקשר/י 100 עכשיו':'\u26A0 Alert not sent yet - no connection. Retrying automatically. Call 100 now','sos'); return false; }
   }
   /* No fix yet? Ask for one (max 4s) - an SOS without a location can't be navigated to. */
   if(!_myPos()){ try{ await new Promise(function(res){ var t=setTimeout(res,4000); navigator.geolocation.getCurrentPosition(function(pp){ userLat=pp.coords.latitude; userLng=pp.coords.longitude; clearTimeout(t); res(); },function(){ clearTimeout(t); res(); },{enableHighAccuracy:true,timeout:4000,maximumAge:60000}); }); }catch(e){} }
@@ -12524,6 +12526,7 @@ function sosWatchStandDown(){
   }catch(e){}
 }
 function showStandDownPrompt(v){
+  if(window._sosSilent) return;   /* silent SOS: no alarm to stand down, and nothing may appear */
   if(document.getElementById('sd-prompt')) return;
   var he=currentLang==='he', ar=currentLang==='ar', rtl=(he||ar);
   var name=String(((v&&v.fromUid&&memberByPair(v.fromUid))||{}).name||(v&&v.name)||'').trim()||(he?'שומר/ת מהימן/ה':ar?'حارس موثوق':'a trusted SHOMER');   // v262: the name I gave them
