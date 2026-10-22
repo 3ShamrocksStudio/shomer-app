@@ -8595,7 +8595,7 @@ function flyToMember(id){
  /* v280: a linked SHOMER is located by their OWN presence pin; no recent own fix = say so, no pin */
  const _pp=m.pairId&&gdPairById(m.pairId);
  if(!m.sos){ if(_pp&&!_pp.pending&&gdPos(_pp)){ gdFlyTo(_pp.id); return; }
-   if(_pp||!posShowable(m.lat,m.lng,m.ts)){ toast(notSharingTxt(m.name||'',(_pp&&_pp.ts)||m.ts,he),'amb'); return; } }
+   if(_pp||!posShowable(m.lat,m.lng,m.ts)){ toast(notSharingTxt(m.name||'',(_pp&&_pp.ts)||m.ts,he,(_pp||m).lat,(_pp||m).lng),'amb'); return; } }
  // make sure this member is rendered (force-show even if normally hidden)
  mapCircleId=m.cid; renderCircleMarkers();
  if(!mapLayers.circle[m.id]&&MAP){mapLayers.circle[m.id]=window.L.marker([m.lat,m.lng],{icon:circleIcon(m),zIndexOffset:800,alt:m.name}).addTo(MAP);}
@@ -8649,10 +8649,10 @@ const GD_FRESH=90000; // v273: live = updated in the last 90s (beats every 40s).
    something. Older than GD_SHOW_MS (= the "sharing location" window) = not sharing: no pin at all.
    A coarse point (both coords on the ~1km 2-decimal grid - old clients / the public dashboard
    format) is never drawn as a person's exact position. */
-const GD_SHOW_MS=15*60000;
+var GD_SHOW_MS=15*60000;
 function posCoarse(lat,lng){ return Math.abs(lat*100-Math.round(lat*100))<1e-7 && Math.abs(lng*100-Math.round(lng*100))<1e-7; }
 function posShowable(lat,lng,ts){ return lat!=null&&lng!=null&&isFinite(lat)&&isFinite(lng)&&!!ts&&(Date.now()-ts)<GD_SHOW_MS&&!posCoarse(+lat,+lng); }
-function notSharingTxt(nm,ts,he){ return (nm?nm+' · ':'')+(he?'לא משתף/ת מיקום כרגע':'not sharing location now')+(ts?(' · '+(he?'נראה/תה לאחרונה ':'last seen ')+agoTxt(ts,he)):''); }
+function notSharingTxt(nm,ts,he,lat,lng){ if(lat!=null&&lng!=null&&ts&&(Date.now()-ts)<GD_SHOW_MS&&posCoarse(+lat,+lng)) return (nm?nm+' · ':'')+(he?'מיקום מקורב בלבד - לא מוצג כמיקום מדויק':'approximate location only - not shown as an exact position'); return (nm?nm+' · ':'')+(he?'לא משתף/ת מיקום כרגע':'not sharing location now')+(ts?(' · '+(he?'נראה/תה לאחרונה ':'last seen ')+agoTxt(ts,he)):''); }
 const GD_PALETTE=['#C9A84C','#2962FF','#00C853','#E91E8C','#9C27B0','#FF6A00'];
 let gdBC=null, gdTabCode='', gdLiveTimer=null, gdSimTimer=null;
 
@@ -9030,7 +9030,7 @@ function gdRenderMarkers(){ if(!MAP)return; gdState().pairs.forEach(gdUpdateMark
  // drop markers for removed pairs
  Object.keys(mapLayers.SHOMER).forEach(id=>{ if(!gdPairById(id)){ MAP.removeLayer(mapLayers.SHOMER[id]); delete mapLayers.SHOMER[id]; } }); }
 function gdFlyTo(id){
- const p=gdPairById(id); const ll=p&&gdPos(p); if(!ll){ toast(p?notSharingTxt(p.name||'',p.ts,currentLang==='he'):(currentLang==='he'?'אין מיקום זמין עדיין':'No location yet'),'amb'); return; }
+ const p=gdPairById(id); const ll=p&&gdPos(p); if(!ll){ toast(p?notSharingTxt(p.name||'',p.ts,currentLang==='he',p.lat,p.lng):(currentLang==='he'?'אין מיקום זמין עדיין':'No location yet'),'amb'); return; }
  gdUpdateMarker(p); cl('sh-circles');
  if(MAP){ try{MAP.invalidateSize(false);}catch(e){}
  setTimeout(()=>{ try{MAP.setView(ll,16,{animate:true,duration:1.0});}catch(e){try{MAP.setView(ll,16);}catch(_){}}
@@ -10042,7 +10042,7 @@ try{ hydrateIcons(document); }catch(e){}
 /* Loaded-build version - shown in the diagnostic panel so a phone can prove
    whether it's on the latest build or a STALE cached one. Keep in lock-step
    with sw.js SW_VERSION on every deploy. */
-var APP_VER='v280';
+var APP_VER='v281';
 var FB={ready:false,uid:null,db:null,_presTimer:null,connected:false,listening:false,pushState:'default',near:0,swVer:'?',
   authState:'connecting',sdkLoaded:false,persist:'',permErr:null,err:null,wsProbe:'',csp:''};
 /* Always log connection diagnostics to the console so the real failure can be SEEN in Chrome. */
