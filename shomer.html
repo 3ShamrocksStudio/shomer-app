@@ -11170,7 +11170,11 @@ function fbAcceptInvite(token,myName){
       if(!gdAcceptInvite._isBatch) return fu;
       return fbRestGet('invites/'+token).then(function(s2){ var v=s2&&s2.val?s2.val():null;
         if(v&&v.acceptedBy&&v.acceptedBy!==FB.uid){ var nx=(gdAcceptInvite._batch||[]).shift(); if(!nx){ fbAcceptInvite._lost=true; try{ fbRestWrite('DELETE','pairs/'+FB.uid+'/'+inv.fromUid).catch(function(){}); }catch(e){} try{ toast(currentLang==='he'?'כל המקומות בקישור הזה כבר נתפסו - בקש/י קישור חדש':'Every place on this link is taken - ask for a new link','amb'); }catch(e){} return null; }
-          gdAcceptInvite._tok=nx; fbAcceptInvite._tok=nx; return fbAcceptInvite(nx,myName); }
+          var _walk=function(t){ return fbRestGet('invites/'+t).then(function(s3){ var w=s3&&s3.val?s3.val():null;
+              var dead=!w||!w.fromUid||w.acceptedBy||w.declinedBy||w.rejected||((+w.ts||0)>0&&Date.now()-w.ts>7*864e5);
+              if(dead){ var n2=(gdAcceptInvite._batch||[]).shift(); if(!n2){ fbAcceptInvite._lost=true; try{ fbRestWrite('DELETE','pairs/'+FB.uid+'/'+inv.fromUid).catch(function(){}); }catch(e){} try{ toast(currentLang==='he'?'כל המקומות בקישור הזה כבר נתפסו - בקש/י קישור חדש':'Every place on this link is taken - ask for a new link','amb'); }catch(e){} return null; } return _walk(n2); }
+              gdAcceptInvite._tok=t; fbAcceptInvite._tok=t; return fbAcceptInvite(t,myName); }); };   /* skip declined / expired slots too */
+          return _walk(nx); }
         return fu; }).catch(function(){ return fu; });
     });
   }).catch(function(){return null;});
@@ -11297,8 +11301,19 @@ function gdRejectAcceptance(p, inv, token, flagged){
     :(he?'לא חוברתם. הכנו קישור חדש - שלח/י אותו שוב לאדם הנכון.':'Not connected. We made a new link - send it again to the right person.'),'amb');
 }
 /* Open link: show who accepted and let me confirm it is the person I invited. */
+/* v280: drop group-link slots older than a week - only after a fresh read shows nobody joined them */
+function gdPurgeSlots(){
+  if(gdPurgeSlots._busy||!(FB.ready&&FB._authReady)) return; var wk=Date.now()-7*864e5;
+  var old=gdState().pairs.filter(function(p){ return p.hidden&&p.pending&&!p.linked&&(p.addedTs||0)<wk; });
+  if(!old.length) return; gdPurgeSlots._busy=1;
+  Promise.all(old.map(function(p){ return fbRestGet('invites/'+p.token).then(function(sn){ var v=sn&&sn.val?sn.val():null; return (v&&v.acceptedBy&&!v.rejected)?null:p; }).catch(function(){ return null; }); }))
+    .then(function(dead){ dead=dead.filter(Boolean); if(dead.length){ var g=gdState(); g.pairs=g.pairs.filter(function(p){ return dead.indexOf(p)<0; }); saveStore(); } })
+    .catch(function(){}).then(function(){ gdPurgeSlots._busy=0; });
+}
 /* v280: the next person waiting for "is this who you invited?" (group links) */
-function gdConfirmNext(){ var q=gdConfirmNext._q||[]; var t=q.shift(); if(t) setTimeout(function(){ try{ fbWatchApproval._recheck(t); }catch(e){} }, 400); }
+function gdConfirmNext(){ var q=gdConfirmNext._q||[], t;
+  while((t=q.shift())){ var pp=gdPairByToken(t); if(pp&&pp.pending&&!pp.linked) break; }   /* skip anyone already handled or removed */
+  if(t) setTimeout(function(){ try{ fbWatchApproval._recheck(t); }catch(e){} }, 400); }
 function gdConfirmAcceptance(p, inv, token, theirUid, codeOk){
   var he=currentLang==='he';
   fbWatchApproval._busy=fbWatchApproval._busy||{}; if(fbWatchApproval._busy[token]) return; fbWatchApproval._busy[token]=1;
@@ -11395,9 +11410,7 @@ function syncPairsToCircles(){
   try{
     if(!circlesList().length) return;                 // wait until circles exist
     var g=gdState(), changed=false;
-    var _wk=Date.now()-7*864e5, _n0=g.pairs.length;
-    g.pairs=g.pairs.filter(function(p){ return !(p.hidden&&p.pending&&!p.linked&&(p.addedTs||0)<_wk); });   /* unused batch slots expire after a week */
-    if(g.pairs.length!==_n0) changed=true;
+    try{ gdPurgeSlots(); }catch(e){}   /* unused group-link slots expire after a week */
     g.pairs.forEach(function(p){ if(p.hidden&&p.pending&&!p.linked) return; if(ensureMemberForPair(p)) changed=true; });   // pending ones too - you must see who you invited (unused batch slots stay invisible)
     // repair any member sitting in a circle that no longer exists
     var ids={}; circlesList().forEach(function(x){ids[x.id]=1;});
