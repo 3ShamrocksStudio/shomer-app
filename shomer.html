@@ -5004,6 +5004,7 @@ function startSosAlarm(){
  }
 }
 function stopSosAlarm(){
+ try{ helpLayerStop(); }catch(e){}
  clearInterval(_alarmLoopTimer); _alarmLoopTimer=null;
  clearInterval(_alarmVibeTimer); _alarmVibeTimer=null;
  try{ navigator.vibrate&&navigator.vibrate(0); }catch(e){}
@@ -9802,7 +9803,7 @@ try{ hydrateIcons(document); }catch(e){}
 /* Loaded-build version - shown in the diagnostic panel so a phone can prove
    whether it's on the latest build or a STALE cached one. Keep in lock-step
    with sw.js SW_VERSION on every deploy. */
-var APP_VER='v277';
+var APP_VER='v278';
 var FB={ready:false,uid:null,db:null,_presTimer:null,connected:false,listening:false,pushState:'default',near:0,swVer:'?',
   authState:'connecting',sdkLoaded:false,persist:'',permErr:null,err:null,wsProbe:'',csp:''};
 /* Always log connection diagnostics to the console so the real failure can be SEEN in Chrome. */
@@ -12182,6 +12183,7 @@ function showIncomingSOS(puid, nm, v, oldTs){
    counting on me. The button used to call this function, which did not exist. ── */
 async function sosStandDown(){
   var he=currentLang==='he';
+  clearInterval(_rpTrackT); _rpTrackT=null;
   if(!FB.ready||!FB.uid) return;
   var ok=await busWrite('rp_'+FB.uid, {fromUid:FB.uid, ts:Date.now(), name:packSOS(false,'',null,null,'')});
   toast(ok?(he?'עודכן שאת/ה לא בדרך. אם אפשר - התקשר/י אליהם או ל-100.':'Updated: you are not coming. If you can, call them or 100.'):(he?'לא הצלחנו לעדכן - התקשר/י אליהם':'Could not update - call them'), ok?'':'amb');
@@ -12198,8 +12200,76 @@ async function sosRespond(victimUid, mode){
   });
   toast(ok?(he?'\u2713 נמסר להם שאת/ה בדרך':'\u2713 They know you are coming')
           :(he?'לא הצלחנו לעדכן - התקשר/י אליהם':'Could not update - call them'), ok?'grn':'amb');
+  if(ok) rpTrackStart(victimUid);
+}
+/* v278: while I'm on my way, keep my position fresh (every 15s) so the person in trouble hears
+   and sees me getting closer. Stops when their SOS ends, when I stand down, or after 45 min. */
+var _rpTrackT=null;
+function rpTrackStart(victimUid){
+  clearInterval(_rpTrackT);
+  try{ if(typeof startGeoWatch==='function') startGeoWatch(); }catch(e){}
+  var t0=Date.now(), watched=!!(SOSBUS.mine&&SOSBUS.mine[victimUid]);
+  _rpTrackT=setInterval(function(){
+    if((watched && !(SOSBUS.mine&&SOSBUS.mine[victimUid])) || Date.now()-t0>45*60000){ clearInterval(_rpTrackT); _rpTrackT=null; return; }
+    var p=_myPos(); if(!p||!FB.ready||!FB.uid) return;
+    try{ busWrite('rp_'+FB.uid, { fromUid:FB.uid, ts:Date.now(),
+      name: packSOS(true, invName()||(SS.user&&SS.user.name)||(typeof user!=='undefined'&&user&&user.name)||'', p.lat, p.lng, victimUid) }); }catch(e){}
+  }, 15000);
 }
 
+/* ══ v278 HELP-IS-COMING LAYER ══════════════════════════════════════════════════════
+   When a SHOMER taps "on my way", the SOS phone adds a second sound on top of the siren: a
+   harmonious hi-lo call (a perfect fourth, the sound of arriving emergency vehicles). It tells
+   the person - and anyone threatening them - that help is coming. As the nearest SHOMER gets
+   closer it repeats faster and climbs in pitch; inside 100 m it ends in an arrival flourish. */
+var _helpT=null, _helpLastBand=null, _helpLastN=0;
+function helpNearestM(){
+  var me=_myPos(); if(!me) return null; var best=null;
+  Object.keys(SOSBUS.responders||{}).forEach(function(k){ var r=SOSBUS.responders[k];
+    if(r && isFinite(r.lat) && isFinite(r.lng)){ var d=haversineM(me.lat,me.lng,r.lat,r.lng); if(best==null||d<best) best=d; } });
+  return best;
+}
+function helpBand(d){ if(d==null) return 0; if(d<100) return 4; if(d<300) return 3; if(d<700) return 2; if(d<1500) return 1; return 0; }
+function helpSay(txtHe,txtEn){
+  try{ if(!window.speechSynthesis||!window.SpeechSynthesisUtterance) return;
+    var he=currentLang==='he', u=new SpeechSynthesisUtterance(he?txtHe:txtEn);
+    u.lang=he?'he-IL':(currentLang==='ar'?'ar':'en-US'); u.volume=1; u.rate=1.05;
+    window.speechSynthesis.cancel(); window.speechSynthesis.speak(u); }catch(e){}
+}
+function helpMotif(band){
+  try{
+    var ctx=getACtx(), t=ctx.currentTime+0.02;
+    var rise=1+band*0.06, len=[0.26,0.22,0.18,0.15,0.12][band];
+    var out=ctx.createGain(); out.gain.value=0.55; out.connect(ctx.destination);
+    var notes=[[466.2*rise,0],[622.3*rise,len]];                 // hi-lo perfect fourth
+    if(band>=4) notes.push([784*rise,len*2],[932.3*rise,len*3]); // arrival flourish
+    notes.forEach(function(n){
+      ['square','triangle'].forEach(function(type,i){
+        var o=ctx.createOscillator(), g=ctx.createGain();
+        o.type=type; o.frequency.value=n[0]*(i?2:1);
+        g.gain.setValueAtTime(0.0001,t+n[1]); g.gain.exponentialRampToValueAtTime(i?0.25:0.6,t+n[1]+0.012);
+        g.gain.setValueAtTime(i?0.25:0.6,t+n[1]+len*0.8); g.gain.exponentialRampToValueAtTime(0.0001,t+n[1]+len);
+        o.connect(g); g.connect(out); o.start(t+n[1]); o.stop(t+n[1]+len+0.02);
+      });
+    });
+  }catch(e){}
+}
+function helpLayerUpdate(){
+  var n=Object.keys(SOSBUS.responders||{}).length;
+  var on=(typeof sosActive!=='undefined'&&sosActive)&&n>0&&!!_alarmLoopTimer;   /* not after a stand-down silenced the alarm */
+  if(!on){ helpLayerStop(); return; }
+  var band=helpBand(helpNearestM());
+  if(n>_helpLastN) helpSay('עזרה בדרך. שומר בדרך אליך.','Help is coming. A SHOMER is on the way.');
+  else if(_helpLastBand!=null && band>=3 && band>_helpLastBand) helpSay('השומר כמעט כאן.','Your SHOMER is almost here.');
+  _helpLastN=n; _helpLastBand=band;
+  if(_helpT) return;
+  (function tick(){
+    if(!(typeof sosActive!=='undefined'&&sosActive) || !_alarmLoopTimer || !Object.keys(SOSBUS.responders||{}).length){ helpLayerStop(); return; }
+    var b=helpBand(helpNearestM()); helpMotif(b);
+    _helpT=setTimeout(tick,[2600,1900,1300,850,550][b]);
+  })();
+}
+function helpLayerStop(){ clearTimeout(_helpT); _helpT=null; _helpLastBand=null; _helpLastN=0; try{ window.speechSynthesis&&window.speechSynthesis.cancel(); }catch(e){} }
 /* ── THE VICTIM WATCHES WHO IS COMING ── */
 function sosWatchMyResponders(){
   var g=gdState();
@@ -12237,6 +12307,7 @@ function sosPaintMyHelp(){
   var he=currentLang==='he';
   var ks=Object.keys(SOSBUS.responders);
   var b=document.getElementById('help-bar');
+  try{ helpLayerUpdate(); }catch(e){}
   if(!ks.length){ if(b) b.remove(); return; }
   if(!b){ b=document.createElement('div'); b.id='help-bar'; b.className='help-bar';
     document.body.appendChild(b);
@@ -12246,7 +12317,8 @@ function sosPaintMyHelp(){
   b.innerHTML='<div class="help-t">'+(he?'עזרה בדרך':'Help is coming')+'</div>'
    +(names.length?'<div class="help-n">'+ESC(names.slice(0,3).join(' · '))+(ks.length>3?(' +'+(ks.length-3)):'')+'</div>':'')
    +'<div class="help-s">'+(ks.length===1?(he?'שומר אחד בדרך אליך':'1 SHOMER on the way')
-                                         :(he?(ks.length+' שומרים בדרך אליך'):(ks.length+' SHOMERs on the way')))+'</div>';
+                                         :(he?(ks.length+' שומרים בדרך אליך'):(ks.length+' SHOMERs on the way')))
+   +(function(){ var d=helpNearestM(); if(d==null) return ''; var t=d<1000?(Math.round(d/10)*10+(he?' מ׳':' m')):((d/1000).toFixed(1)+(he?' ק״מ':' km')); return ' · '+(he?'הקרוב/ה: ':'nearest: ')+t; })()+'</div>';
 }
 /* ══ REMOTE ALARM STAND-DOWN ══════════════════════════════════════════════════════
    A trusted, paired "My SHOMER" can ask a blaring alarm to stand down - the recovery valve
