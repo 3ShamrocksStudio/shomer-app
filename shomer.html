@@ -5067,7 +5067,7 @@ function fakeCallStart(cb){
   var who=String(f.caller||'').trim()||(he?'אמא':ar?'أمي':'Mom');
   var ov=document.createElement('div'); ov.id='fc-ov'; ov.className='fc-ov';
   var done=false, t0=0, tick=null, timeout=null;
-  window._fcAbort=function(){ if(done) return; done=true; clearInterval(tick); clearTimeout(timeout); fcRing(false); try{ window.speechSynthesis&&speechSynthesis.cancel(); }catch(e){} try{ ov.remove(); }catch(e){} };
+  window._fcAbort=function(){ if(done) return; done=true; clearInterval(tick); clearTimeout(timeout); fcRing(false); try{ window.speechSynthesis&&speechSynthesis.cancel(); }catch(e){} try{ var SR=window.Capacitor&&window.Capacitor.Plugins&&window.Capacitor.Plugins.SpeechRecognition; SR&&SR.stop&&SR.stop(); }catch(e){} try{ ov.remove(); }catch(e){} };
   var finish=function(ok){
     if(done) return; done=true; fcRing(false); clearInterval(tick); clearTimeout(timeout); try{ window.speechSynthesis&&speechSynthesis.cancel(); }catch(e){}
     try{ var SR=window.Capacitor&&window.Capacitor.Plugins&&window.Capacitor.Plugins.SpeechRecognition; SR&&SR.stop&&SR.stop(); }catch(e){}
@@ -5637,6 +5637,7 @@ function checkinSchedule(){ checkinStop(); if(!SS.checkin.enabled)return; SS.che
 try{ document.addEventListener('visibilitychange',function(){ try{ var c=SS.checkin; if(document.visibilityState==='visible'&&c&&c.enabled&&!c.awaiting&&c.due&&Date.now()>=c.due){ checkinPrompt(); } }catch(e){} }); }catch(e){}
 function checkinStop(){ if(_ciTimer){clearTimeout(_ciTimer);_ciTimer=null;} if(_ciCountdown){clearInterval(_ciCountdown);_ciCountdown=null;} }
 function checkinPrompt(){ if(!SS.checkin.enabled)return; var he=currentLang==='he';
+ if(window._sosSilent&&typeof sosActive!=='undefined'&&sosActive){ checkinSchedule(); return; }   /* a silent SOS is already out - never surface a check-in on top of it */
  SS.checkin.awaiting=true; saveStore();
  if(fcEnabled()){ fakeCallStart({ok:function(){ checkinOk(); }, fail:function(){ SS.checkin.awaiting=false; saveStore(); checkinSchedule(); silentSOS('duress'); }}); return; }
  var ov=document.getElementById('checkin-prompt'); if(ov){ov.classList.add('on');ov.setAttribute('aria-hidden','false');}
