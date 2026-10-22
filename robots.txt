@@ -1,0 +1,7 @@
+User-agent: *
+Disallow: /dashboard.html
+Disallow: /rtdb-test.html
+Disallow: /reset.html
+Disallow: /i/
+
+Sitemap: https://www.shomer-app.co.il/sitemap.xml
