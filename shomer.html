@@ -2455,7 +2455,17 @@ body.otp-active .ob-steps{display:none!important;}
  .gd-src{font-size:10.5px;color:var(--tx3);line-height:1.5;margin-top:6px;border-top:1px solid var(--b1);padding-top:9px;}
  .gd-foot{display:flex;align-items:center;justify-content:center;gap:8px;margin-top:16px;opacity:.85;}
  .gd-foot img{height:13px;}.gd-foot span{font-size:10px;color:var(--tx3);}
- </style>
+ 
+/* v276: related cards + rating at the foot of every guide card */
+.gd-notthis{display:block;margin:-2px 0 10px auto;margin-inline-start:auto;margin-inline-end:0;background:none;border:0;padding:4px 2px;color:var(--tx2);font:inherit;font-size:12px;font-weight:700;text-decoration:underline;text-underline-offset:3px;cursor:pointer}
+.gd-rel{margin:14px 0 4px;padding:12px;border-radius:14px;background:rgba(255,255,255,.04);border:1px solid var(--b1)}
+.gd-rel-h{font-size:13.5px;font-weight:800;color:var(--tx0);margin-bottom:9px}
+.gd-rel-row{display:flex;flex-wrap:wrap;gap:8px}
+.gd-rel-b{min-height:44px;padding:9px 14px;border-radius:999px;border:1.5px solid;background:rgba(255,255,255,.03);font:inherit;font-size:14px;font-weight:800;cursor:pointer}
+.gd-rel-b.all{border-color:var(--b2,rgba(255,255,255,.25));color:var(--tx1)}
+.gd-rate{display:flex;align-items:center;justify-content:center;gap:10px;margin:12px 0 2px;font-size:13px;color:var(--tx2);font-weight:700}
+.gd-rate button{width:44px;height:44px;border-radius:50%;border:1px solid var(--b1);background:rgba(255,255,255,.05);font-size:20px;cursor:pointer}
+</style>
  <div class="sheet" id="sh-guide" role="dialog" aria-modal="true" aria-labelledby="guide-ttl">
  <div class="sh-pill" aria-hidden="true"></div>
  <div class="sh-head"><span class="sh-ttl" id="guide-ttl">מדריך חירום</span><button class="sh-x" onclick="cl('sh-guide')" aria-label="סגור"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg></button></div>
@@ -6803,6 +6813,7 @@ function openGuideTopic(id){ var L=currentLang==='ar'?'ar':currentLang==='en'?'e
  var d=document.getElementById('guide-detail'); if(!d)return;
  var col=guideCatColor(g.id);
  var html='<div class="gd-d-hd" style="border-color:'+col+'"><span class="gd-d-picwrap" style="border-color:'+col+'">'+guideImg(g.id,'gd-d-pic')+'</span><span style="flex:1;min-width:0"><span class="gd-d-ttl" style="color:'+col+'">'+ESC(g.t[L])+'</span><span class="gd-d-sub">'+ESC(emLocalize(g.s[L]))+'</span></span></div>';
+ html+='<button type="button" class="gd-notthis" onclick="var r=document.getElementById(\'gd-rel\');if(r)r.scrollIntoView({behavior:\'smooth\',block:\'center\'});">'+(he?'לא מה שחיפשת? ↓':L==='ar'?'ليس ما تبحث عنه؟ ↓':'Not what you need? ↓')+'</button>';
  if(!emIsIL()){ var _en=emergencyNums(), _lb=emLabels(); html+='<div class="gd-dont" style="background:rgba(232,168,40,.12);border-color:var(--amb)"><div class="gd-dont-tx" style="color:var(--tx1)">📍 '+ESC(emCountryName())+': '+ESC(_lb.p+' '+_en.p+' · '+_lb.a+' '+_en.a+' · '+_lb.f+' '+_en.f)+'</div></div>'; }   /* v274: local numbers abroad */
  g.steps[L].forEach(function(st,i){ html+='<div class="gd-step"><span class="gd-num" style="background:'+col+'">'+(i+1)+'</span><span class="gd-step-tx">'+ESC(emLocalize(st))+'</span></div>'; });
  if(g.call){ html+='<div class="gd-dont" style="background:rgba(232,168,40,.12);border-color:var(--amb)"><div class="gd-dont-h" style="color:var(--amb)">📞 '+(he?'מתי לחייג ':L==='ar'?'متى تتصل بـ':'When to call ')+ambulanceNum()+'</div><div class="gd-dont-tx" style="color:var(--tx1)">'+ESC(emLocalize(g.call[L]))+'</div></div>'; }
@@ -6814,12 +6825,43 @@ function openGuideTopic(id){ var L=currentLang==='ar'?'ar':currentLang==='en'?'e
  }
  var _n=emergencyNums(), _l=emLabels();   /* v274: dial the local numbers, not Israel's */
  html+='<div class="gd-calls" style="margin-top:4px"><button class="gd-call em" onclick="callNum(ambulanceNum())"><b>'+ESC(_n.a)+'</b><span>'+ESC(_l.a)+'</span></button><button class="gd-call" onclick="callNum(policeNum())"><b>'+ESC(_n.p)+'</b><span>'+ESC(_l.p)+'</span></button><button class="gd-call" onclick="callNum(fireNum())"><b>'+ESC(_n.f)+'</b><span>'+ESC(_l.f)+'</span></button></div>';
+ html+=guideRelatedHtml(g.id,L);   /* v276: wrong card? jump sideways, no stress-scrolling */
  html+='<div class="gd-disc" style="margin-top:12px">'+GUIDE_DISC[L]+'</div>';
  html+='<div class="gd-src">'+(he?'מקור: ':L==='ar'?'المصدر: ':'Source: ')+ESC(g.src)+'</div>';
  d.innerHTML=html;
  document.getElementById('guide-list-view').style.display='none';
  document.getElementById('guide-detail-view').style.display='block';
  var body=document.querySelector('#sh-guide .sh-body'); if(body)body.scrollTop=0; }
+/* v276: related cards. In a panic people open the wrong card - offer the look-alikes right
+   there instead of sending them back to search. Ordered by how often each is confused. */
+var GUIDE_REL={ cpr:['heart','choke','drown','faint'], choke:['cpr','allergy','drown'], bleed:['shock','bone','burn'],
+  burn:['bleed','shock'], stroke:['heart','seizure','faint'], heart:['cpr','stroke','faint'], allergy:['choke','shock','faint'],
+  seizure:['faint','stroke','cpr'], drown:['cpr','choke','shock'], shock:['bleed','faint','allergy'], faint:['shock','seizure','heart'],
+  bone:['bleed','shock'], call:['cpr','bleed','heart'], ptsd:['call','faint'] };
+function guideRelatedHtml(id,L){
+  var he=L==='he', ar=L==='ar';
+  var rel=(GUIDE_REL[id]||[]).map(function(r){ return EMERGENCY_GUIDE.find(function(x){return x.id===r;}); }).filter(Boolean).slice(0,4);
+  var h='<div class="gd-rel" id="gd-rel"><div class="gd-rel-h">'+(he?'לא מה שחיפשת? אולי:':ar?'ليس ما تبحث عنه؟ ربما:':'Not what you need? Maybe:')+'</div><div class="gd-rel-row">';
+  rel.forEach(function(r){ var c=guideCatColor(r.id);
+    h+='<button type="button" class="gd-rel-b" style="border-color:'+c+';color:'+c+'" onclick="guideSwitch(\''+id+'\',\''+r.id+'\')">'+ESC(r.t[L])+'</button>'; });
+  h+='<button type="button" class="gd-rel-b all" onclick="guideBackToList()">'+(he?'כל הנושאים':ar?'كل المواضيع':'All topics')+'</button></div></div>';
+  h+='<div class="gd-rate" id="gd-rate"><span>'+(he?'עזר לך?':ar?'هل ساعدك؟':'Was this useful?')+'</span>'
+    +'<button type="button" aria-label="'+(he?'כן, עזר':'Yes')+'" onclick="guideRate(\''+id+'\',1)">👍</button>'
+    +'<button type="button" aria-label="'+(he?'לא עזר':'No')+'" onclick="guideRate(\''+id+'\',0)">👎</button></div>';
+  return h;
+}
+function _gdCardEid(id){ try{ var c=learnCardOpened._cur; return (c&&c.id===id&&c.eid)?c.eid:null; }catch(e){ return null; } }
+function guideSwitch(from,to){
+  try{ var e=_gdCardEid(from); if(e) learnQueue('PATCH','cards/'+e,{switchedTo:to}); }catch(_){}
+  openGuideTopic(to);
+}
+function guideRate(id,up){
+  var he=currentLang==='he', ar=currentLang==='ar';
+  try{ var e=_gdCardEid(id); if(e) learnQueue('PATCH','cards/'+e,{useful:!!up}); }catch(_){}
+  try{ var l=learnState(); l.cards[id]=l.cards[id]||{}; l.cards[id].useful=!!up; learnSave(); }catch(_){}
+  var r=document.getElementById('gd-rate');
+  if(r) r.innerHTML='<span>'+(up?(he?'תודה! 🙏':ar?'شكراً! 🙏':'Thanks! 🙏'):(he?'תודה - נשפר את הכרטיס הזה':ar?'شكراً - سنحسّن هذه البطاقة':'Thanks - we will improve this card'))+'</span>';
+}
 function guideBackToList(){ var lv=document.getElementById('guide-list-view'), dv=document.getElementById('guide-detail-view'); if(lv)lv.style.display='block'; if(dv)dv.style.display='none'; }
 /* ═══ FIRST-RUN FEATURE TOUR ═══ Coached spotlight over the REAL controls, shown once
    after onboarding: introduces SOS, the live map/route, My SHOMER, and the emergency
@@ -9760,7 +9802,7 @@ try{ hydrateIcons(document); }catch(e){}
 /* Loaded-build version - shown in the diagnostic panel so a phone can prove
    whether it's on the latest build or a STALE cached one. Keep in lock-step
    with sw.js SW_VERSION on every deploy. */
-var APP_VER='v276';
+var APP_VER='v277';
 var FB={ready:false,uid:null,db:null,_presTimer:null,connected:false,listening:false,pushState:'default',near:0,swVer:'?',
   authState:'connecting',sdkLoaded:false,persist:'',permErr:null,err:null,wsProbe:'',csp:''};
 /* Always log connection diagnostics to the console so the real failure can be SEEN in Chrome. */
