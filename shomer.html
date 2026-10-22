@@ -11307,7 +11307,7 @@ function gdPurgeSlots(){
   var old=gdState().pairs.filter(function(p){ return p.hidden&&p.pending&&!p.linked&&(p.addedTs||0)<wk; });
   if(!old.length) return; gdPurgeSlots._busy=1;
   Promise.all(old.map(function(p){ return fbRestGet('invites/'+p.token).then(function(sn){ var v=sn&&sn.val?sn.val():null; return (v&&v.acceptedBy&&!v.rejected)?null:p; }).catch(function(){ return null; }); }))
-    .then(function(dead){ dead=dead.filter(Boolean); if(dead.length){ var g=gdState(); g.pairs=g.pairs.filter(function(p){ return dead.indexOf(p)<0; }); saveStore(); } })
+    .then(function(dead){ dead=dead.filter(Boolean); if(dead.length){ var g=gdState(); g.pairs=g.pairs.filter(function(p){ return !(dead.indexOf(p)>=0&&p.pending&&!p.linked); }); saveStore(); } })
     .catch(function(){}).then(function(){ gdPurgeSlots._busy=0; });
 }
 /* v280: the next person waiting for "is this who you invited?" (group links) */
