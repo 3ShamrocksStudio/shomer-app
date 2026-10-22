@@ -10754,11 +10754,13 @@ function fbDashInit(){
 }
 function fbDashBeat(hide, lat, lng){
   if(!FB._authReady||!FB.uid) return;
+  /* v279: automated/test browsers (navigator.webdriver) never count toward the public dashboard */
+  try{ if(navigator.webdriver) return; }catch(e){}
   fbDashInit().then(function(){
     var st=FB._hb, key=(st.mode==='new')?st.id:('hb_'+FB.uid);
     if(hide){ if(!st.gone){ st.gone=true; fbRestWrite('DELETE','dashfeed/'+key).catch(function(){}); } return; }
     st.gone=false;
-    var _hb={type:'presence',lat:lat,lng:lng,ts:Date.now(),status:'online'};
+    var _hb={type:'presence',lat:lat,lng:lng,ts:Date.now(),status:'v2'};   /* v279: 'v2' = real (non-automated) app, one row per device - the only rows the dashboard counts */
     if(st.mode!=='new') _hb.by=FB.uid;
     var _fd=false; try{ _fd=isFounder(); }catch(_f){}
     fbRestWrite('PUT','dashfeed/'+key,_hb).then(function(){ if(_fd) return fbRestWrite('PATCH','dashfeed/'+key,{founder:true}); }).catch(function(){});
@@ -13339,6 +13341,7 @@ try{ window.addEventListener('appinstalled',function(){
 function statsTrack(){
   try{
     if(!FB.ready||!FB._authReady||!FB.uid) return;
+    try{ if(navigator.webdriver) return; }catch(e){}   /* v279: automated/test browsers are never counted */
     var now=Date.now();
     if(statsIsInstalled() && localStorage.getItem('shomer_install_logged')!=='1'){
       FB.db.ref('analytics/installs/'+FB.uid).set(now)
@@ -13359,6 +13362,7 @@ function statsTrack(){
    Loaded lazily and fully non-fatally: any failure here never touches the app. */
 function statsInitAnalytics(){
   try{
+    try{ if(navigator.webdriver) return; }catch(e){}   /* v279: no analytics from automated browsers */
     if(FB._analytics||FB._analyticsIniting) return; if(!(window.firebase&&window.firebase.initializeApp)) return;
     FB._analyticsIniting=true;
     fbLoad('https://www.gstatic.com/firebasejs/10.12.2/firebase-analytics-compat.js').then(function(){
