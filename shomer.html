@@ -10042,7 +10042,7 @@ try{ hydrateIcons(document); }catch(e){}
 /* Loaded-build version - shown in the diagnostic panel so a phone can prove
    whether it's on the latest build or a STALE cached one. Keep in lock-step
    with sw.js SW_VERSION on every deploy. */
-var APP_VER='v281';
+var APP_VER='v282';
 var FB={ready:false,uid:null,db:null,_presTimer:null,connected:false,listening:false,pushState:'default',near:0,swVer:'?',
   authState:'connecting',sdkLoaded:false,persist:'',permErr:null,err:null,wsProbe:'',csp:''};
 /* Always log connection diagnostics to the console so the real failure can be SEEN in Chrome. */
@@ -12445,6 +12445,8 @@ function showIncomingSOS(puid, nm, v, oldTs){
   var he=currentLang==='he';
   var old=document.getElementById('in-sos-'+puid); if(old) old.remove();
   try{ var _gb=document.getElementById('sos-incoming'); if(_gb && _gb.classList.contains('on')) dismissSosBanner(); }catch(e){}
+  /* v282: an SOS clears the informational daily-question / tip cards - they sat over the route (approval prompts stay) */
+  try{ document.querySelectorAll('#tp-bar,#nudge-bar,#dyk-bar').forEach(function(e){ e.remove(); }); }catch(e){}
   var d=document.createElement('div');
   d.id='in-sos-'+puid; d.className='in-sos';
   d.innerHTML=
