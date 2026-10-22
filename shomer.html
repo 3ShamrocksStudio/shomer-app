@@ -36,7 +36,8 @@
    now, gdCheckInviteParam() picks it up once the user is in. Expires in 24h. */
 (function(){ try{ var u=new URL(location.href), t=u.searchParams.get('g'); if(!t) return;
   var c=(u.searchParams.get('c')||'').replace(/\D/g,'').slice(0,4);
-  localStorage.setItem('shomer_pending_invite', JSON.stringify({tok:t, code:c, ts:Date.now()})); }catch(e){} })();
+  var gb=(u.searchParams.get('gb')||'').replace(/[^a-z0-9.]/gi,'').slice(0,200);
+  localStorage.setItem('shomer_pending_invite', JSON.stringify({tok:t, code:c, gb:gb, ts:Date.now()})); }catch(e){} })();
 </script>
 <script>
  window.SHOMER_FB = {
@@ -211,7 +212,7 @@ body:not(.lb-on){--hdr-top:max(env(safe-area-inset-top, 0px), 46px);}
 .nudge-bar .nudge-tx{font-size:15.5px;font-weight:600;color:#eef3fb;line-height:1.5}
 .nudge-bar .nudge-cta{width:100%;background:linear-gradient(135deg,#C09020,#E0A828 60%,#F5C840);color:#23170a;font-weight:800;font-size:15px;border:0;border-radius:12px;padding:12px;cursor:pointer;font-family:inherit}
 .nudge-bar .nudge-x{position:absolute;top:9px;inset-inline-end:12px;background:none;border:0;color:#8a93a6;font-size:17px;cursor:pointer}
-@keyframes nudgeIn{from{opacity:0;transform:translateY(-8px)}to{opacity:1;transform:none}}
+@keyframes nudgeIn{from{opacity:0;transform:translate(-50%,calc(-50% - 8px))}to{opacity:1;transform:translate(-50%,-50%)}}   /* v280: keep the centring transform while fading in (it used to start off-centre) */
 .nudge-ic{font-size:18px;flex:0 0 auto}
 .nudge-tx{flex:1;font-size:12.5px;font-weight:600;color:var(--tx1);line-height:1.4}
 .nudge-cta{flex:0 0 auto;font-size:11.5px;font-weight:800;color:#1a1206;background:linear-gradient(135deg,#E0A828,#F5C840);border:0;border-radius:9px;padding:7px 11px;cursor:pointer}
@@ -2473,21 +2474,22 @@ body.otp-active .ob-steps{display:none!important;}
 .fc-row{display:flex;align-items:center;gap:8px;font-weight:700;font-size:14px;color:var(--tx0)}.fc-row input{width:20px;height:20px}
 /* v276/v279: related cards - a bright amber card that stands apart from the dark page */
 .gd-notthis{display:flex;align-items:center;justify-content:center;width:100%;min-height:46px;margin:2px 0 12px;padding:10px 14px;border:0;border-radius:14px;background:linear-gradient(135deg,#F5C840,#E0A828);color:#1b1404;font:inherit;font-size:15px;font-weight:900;cursor:pointer;box-shadow:0 6px 18px rgba(224,168,40,.35)}
-.gd-rel{margin:16px 0 6px;padding:14px 12px 12px;border-radius:18px;background:#FFF6DC;border:2px solid #E0A828;box-shadow:0 10px 28px rgba(0,0,0,.35)}
-.gd-rel-h{display:flex;align-items:center;gap:8px;font-size:17px;font-weight:900;color:#1b1404;margin:0 2px 10px}
-.gd-rel-ic{display:inline-grid;place-items:center;width:30px;height:30px;border-radius:50%;background:#E0A828;color:#1b1404;font-size:17px}
-.gd-rel-row{display:flex;flex-direction:column;gap:8px}
-.gd-rel-b{display:flex;align-items:center;gap:10px;width:100%;min-height:58px;padding:8px 10px;border-radius:14px;border:1px solid rgba(0,0,0,.12);border-inline-start:6px solid #E0A828;background:#fff;color:#14213d;font:inherit;text-align:start;cursor:pointer;box-shadow:0 2px 6px rgba(0,0,0,.08)}
-.gd-rel-b:active{transform:scale(.98)}
-.gd-rel-pic{flex:0 0 44px;width:44px;height:44px;border-radius:11px;overflow:hidden;border:2px solid;background:#fff}
+/* v280: dark, borderless "wrong card?" block - one solid amber band you cannot miss, calm dark tiles that stay readable under stress */
+.gd-rel{margin:18px 0 6px;padding:0 0 12px;border-radius:18px;background:#101B2E;border:0;overflow:hidden;box-shadow:0 10px 28px rgba(0,0,0,.35)}
+.gd-rel-h{display:flex;align-items:center;gap:10px;font-size:17px;font-weight:900;color:#1A1200;background:#F2A007;margin:0 0 12px;padding:13px 14px}
+.gd-rel-ic{display:inline-grid;place-items:center;width:30px;height:30px;border-radius:50%;background:#1A1200;color:#F2A007;font-size:17px}
+.gd-rel-row{display:flex;flex-direction:column;gap:8px;padding:0 10px}
+.gd-rel-b{display:flex;align-items:center;gap:12px;width:100%;min-height:60px;padding:8px 10px;border-radius:14px;border:0;background:#1C2A44;color:#fff;font:inherit;text-align:start;cursor:pointer;box-shadow:none}
+.gd-rel-b:active{transform:scale(.98);background:#24355A}
+.gd-rel-pic{flex:0 0 44px;width:44px;height:44px;border-radius:11px;overflow:hidden;border:0!important;background:#0B1424}
 .gd-rel-pic img{width:100%;height:100%;object-fit:cover;display:block}
-.gd-rel-t{flex:1;min-width:0;display:flex;flex-direction:column;line-height:1.25}
-.gd-rel-t b{font-size:16px;font-weight:900}
-.gd-rel-t small{font-size:12.5px;color:#4a5570}
-.gd-rel-go{flex:0 0 auto;font-size:24px;font-weight:900;color:#B07A12}
+.gd-rel-t{flex:1;min-width:0;display:flex;flex-direction:column;line-height:1.3}
+.gd-rel-t b{font-size:16px;font-weight:900;color:#fff!important}
+.gd-rel-t small{font-size:13px;color:#B9C4D8}
+.gd-rel-go{flex:0 0 auto;font-size:26px;font-weight:900;color:#F2A007}
 [dir=ltr] .gd-rel-go{transform:scaleX(-1)}
-.gd-rel-b.all{border-inline-start-color:#14213d;min-height:46px}
-.gd-rel-b.all .gd-rel-t b{color:#14213d;font-size:15px}
+.gd-rel-b.all{min-height:48px;background:transparent;justify-content:center}
+.gd-rel-b.all .gd-rel-t b{color:#F2A007!important;font-size:15px}
 .gd-rate{display:flex;align-items:center;justify-content:center;gap:10px;margin:12px 0 2px;font-size:13px;color:var(--tx2);font-weight:700}
 .gd-rate button{width:44px;height:44px;border-radius:50%;border:1px solid var(--b1);background:rgba(255,255,255,.05);font-size:20px;cursor:pointer}
 </style>
@@ -6640,7 +6642,7 @@ function op(id){ if(id==='sh-checkin'||id==='sh-dms'){ setTimeout(function(){ tr
 function renderSetContacts(){
   var grp=document.getElementById('contacts-grp'); if(!grp)return;
   var he=currentLang==='he', ar=currentLang==='ar';
-  var pairs=(typeof gdState==='function'?(gdState().pairs||[]):[]);
+  var pairs=(typeof gdState==='function'?(gdState().pairs||[]):[]).filter(function(p){ return !(p&&p.hidden&&p.pending&&!p.linked); });   /* v280: unused group-link slots stay invisible */
   if(!pairs.length){
     grp.innerHTML='<div style="padding:16px 14px;font-size:12.5px;color:var(--tx2);line-height:1.6;">'+
       (he?'עדיין לא הוספת שומרים. הוסיפו משפחה או חברים - הם יקבלו התראה כששולחים SOS.':
@@ -6998,7 +7000,7 @@ function guideRelatedHtml(id,L){
   var rel=(GUIDE_REL[id]||[]).map(function(r){ return EMERGENCY_GUIDE.find(function(x){return x.id===r;}); }).filter(Boolean).slice(0,4);
   var h='<div class="gd-rel" id="gd-rel"><div class="gd-rel-h"><span class="gd-rel-ic">⇄</span>'+(he?'לא הכרטיס הנכון? עבור/י ישר אל:':ar?'ليست البطاقة الصحيحة؟ انتقل مباشرة إلى:':'Wrong card? Go straight to:')+'</div><div class="gd-rel-row">';
   rel.forEach(function(r){ var c=guideCatColor(r.id);
-    h+='<button type="button" class="gd-rel-b" style="border-inline-start-color:'+c+'" onclick="guideSwitch(\''+id+'\',\''+r.id+'\')"><span class="gd-rel-pic" style="border-color:'+c+'">'+guideImg(r.id,'gd-pic')+'</span><span class="gd-rel-t"><b style="color:'+c+'">'+ESC(r.t[L])+'</b><small>'+ESC(emLocalize(r.s[L]))+'</small></span><span class="gd-rel-go">‹</span></button>'; });
+    h+='<button type="button" class="gd-rel-b" onclick="guideSwitch(\''+id+'\',\''+r.id+'\')"><span class="gd-rel-pic" style="border-color:'+c+'">'+guideImg(r.id,'gd-pic')+'</span><span class="gd-rel-t"><b style="color:'+c+'">'+ESC(r.t[L])+'</b><small>'+ESC(emLocalize(r.s[L]))+'</small></span><span class="gd-rel-go">‹</span></button>'; });
   h+='<button type="button" class="gd-rel-b all" onclick="guideBackToList()"><span class="gd-rel-t"><b>'+(he?'כל הנושאים':ar?'كل المواضيع':'All topics')+'</b></span><span class="gd-rel-go">‹</span></button></div></div>';
   h+='<div class="gd-rate" id="gd-rate"><span>'+(he?'עזר לך?':ar?'هل ساعدك؟':'Was this useful?')+'</span>'
     +'<button type="button" aria-label="'+(he?'כן, עזר':'Yes')+'" onclick="guideRate(\''+id+'\',1)">👍</button>'
@@ -7017,7 +7019,19 @@ function guideRate(id,up){
   var r=document.getElementById('gd-rate');
   if(r) r.innerHTML='<span>'+(up?(he?'תודה! 🙏':ar?'شكراً! 🙏':'Thanks! 🙏'):(he?'תודה - נשפר את הכרטיס הזה':ar?'شكراً - سنحسّن هذه البطاقة':'Thanks - we will improve this card'))+'</span>';
 }
-function guideBackToList(){ var lv=document.getElementById('guide-list-view'), dv=document.getElementById('guide-detail-view'); if(lv)lv.style.display='block'; if(dv)dv.style.display='none'; }
+function guideBackToList(){ var lv=document.getElementById('guide-list-view'), dv=document.getElementById('guide-detail-view'); if(lv)lv.style.display='block'; if(dv)dv.style.display='none'; try{ var b=document.querySelector('#sh-guide .sh-body'); if(b) b.scrollTop=0; }catch(e){} }
+/* v280: every screen, sheet and popup opens at its top. Watches for anything that becomes
+   visible (class open/on/show/active, or aria-hidden="false") and resets its scroll. */
+(function(){
+  var VIS=/(^|\s)(open|on|show|active|visible)(\s|$)/;
+  function top(el){ try{ if(el.scrollTop) el.scrollTop=0; var n=el.querySelectorAll('.sh-body,[class*="scroll"],[class*="-body"],[class*="-list"]'); for(var i=0;i<n.length;i++){ if(n[i].scrollTop) n[i].scrollTop=0; } }catch(e){} }
+  function shown(m){ var el=m.target; if(!el||el.nodeType!==1) return false;
+    if(m.attributeName==='aria-hidden') return el.getAttribute('aria-hidden')==='false' && m.oldValue!=='false';
+    return VIS.test(el.className&&el.className.baseVal==null?el.className:'') && !VIS.test(m.oldValue||''); }
+  function start(){ try{ new MutationObserver(function(ms){ for(var i=0;i<ms.length;i++){ if(shown(ms[i])){ var el=ms[i].target; if(/^(BODY|HTML)$/.test(el.tagName)) continue; top(el); requestAnimationFrame(function(x){ return function(){ top(x); }; }(el)); } } })
+      .observe(document.body,{subtree:true,attributes:true,attributeOldValue:true,attributeFilter:['class','aria-hidden']}); }catch(e){} }
+  if(document.body) start(); else document.addEventListener('DOMContentLoaded',start);
+})();
 /* ═══ FIRST-RUN FEATURE TOUR ═══ Coached spotlight over the REAL controls, shown once
    after onboarding: introduces SOS, the live map/route, My SHOMER, and the emergency
    guide with a short bubble on each. Robust: skips any control not on screen, clamps the
@@ -7866,9 +7880,22 @@ function inviteWhoAsk(then){
   };
   bar.querySelector('#invwho-go').onclick=send;
 }
+var INV_BATCH=10;
+function inviteBatchAsk(){
+  var he=currentLang==='he', ar=currentLang==='ar';
+  var old=document.getElementById('invwho-bar'); if(old) old.remove();
+  var bar=document.createElement('div'); bar.id='invwho-bar'; bar.className='nudge-bar';
+  bar.innerHTML='<span class="nudge-tx" style="font-weight:800;font-size:17px">'+(he?'הזמנת שומרים בוואטסאפ':ar?'دعوة حرّاس عبر واتساب':'Invite SHOMERs on WhatsApp')+'</span>'
+   +'<span class="nudge-tx" style="font-size:14px;opacity:.9">'+(he?'בוואטסאפ בוחרים איש קשר אחד או כמה - עד '+INV_BATCH+' אנשים. כל מי שמצטרף מופיע אצלך אוטומטית עם השם והטלפון המאומתים שלו.':ar?'اختر في واتساب جهة واحدة أو أكثر (حتى '+INV_BATCH+'). كل من ينضم يظهر لديك تلقائياً باسمه وهاتفه.':'In WhatsApp pick one or more chats (up to '+INV_BATCH+'). Everyone who joins appears here automatically with their verified name and phone.')+'</span>'
+   +'<button class="nudge-cta" id="invwho-go" style="background:#25D366;color:#062b14">'+(he?'פתח/י וואטסאפ':ar?'افتح واتساب':'Open WhatsApp')+'</button>'
+   +'<button class="nudge-x" aria-label="close">\u2715</button>';
+  (document.getElementById('app')||document.body).appendChild(bar);
+  bar.querySelector('.nudge-x').onclick=function(){ bar.remove(); };
+  bar.querySelector('#invwho-go').onclick=function(){ bar.remove(); shareInvite({name:'',phone:'',batch:true}); };
+}
 async function shareInvite(who){
   var he=currentLang==='he';
-  if(!who){ inviteWhoAsk(function(w){ shareInvite(w); }); return; }   /* v276: picker + WhatsApp step restored */
+  if(!who){ inviteBatchAsk(); return; }   /* v280: pick one or more people inside WhatsApp; each joiner's verified name + phone fill in automatically */
   var _again=function(){ shareInvite(who); };
   if(!inviteIdentityOk(_again)) return;
   /* Inviting someone = sharing your location with them. The inviter skipped the one-time
@@ -7896,9 +7923,13 @@ async function shareInvite(who){
        unpackInvite(). Writing a bare name left phone, code and SOS salt empty, so the
        accept screen always showed "no verified number" and the 4-digit code could
        never match. Same packing the phone-invite path has always used. */
-    await fbRestWrite('PUT','invites/'+tok,{fromUid:FB.uid,ts:Date.now(),name:packInvite(myName,myPhone,linkCode)});
+    var _toks=[tok];
+    if(who.batch){ for(var _bi=1;_bi<INV_BATCH;_bi++) _toks.push('g'+Math.random().toString(36).slice(2,8)+Math.random().toString(36).slice(2,6)); }
+    var _bid=who.batch?genId('b'):null, _ts=Date.now();
+    await Promise.all(_toks.map(function(t){ return fbRestWrite('PUT','invites/'+t,{fromUid:FB.uid,ts:_ts,name:packInvite(myName,myPhone,linkCode)}); }));
     var g=gdState();
-    g.pairs.push({id:genId('g'),token:tok,code:linkCode,name:who.name||'',ph:who.phone||'',rel:'',shareToThem:true,seeThem:true,addedTs:Date.now(),initiator:true,pending:true,partnerUid:null,linked:false,cid:activeCircleId,color:'#C9A84C',lat:null,lng:null,ts:0,live:false,via:'link'});
+    _toks.slice(1).forEach(function(t){ g.pairs.push({id:genId('g'),token:t,code:linkCode,name:'',ph:'',rel:'',shareToThem:true,seeThem:true,addedTs:_ts,initiator:true,pending:true,partnerUid:null,linked:false,cid:activeCircleId,color:'#C9A84C',lat:null,lng:null,ts:0,live:false,via:'link',batch:_bid,hidden:true}); fbWatchApproval(t,null); });
+    g.pairs.push({id:genId('g'),token:tok,code:linkCode,name:who.name||'',ph:who.phone||'',rel:'',shareToThem:true,seeThem:true,addedTs:Date.now(),initiator:true,pending:true,partnerUid:null,hidden:!!who.batch,batch:_bid,linked:false,cid:activeCircleId,color:'#C9A84C',lat:null,lng:null,ts:0,live:false,via:'link'});
     saveStore();
     fbWatchApproval(tok, null);
   }catch(e){
@@ -7913,11 +7944,14 @@ async function shareInvite(who){
      the same way the other identification flows work. The real identification on
      that screen is the sender's name and verified phone number, which now travel
      in the packed invite record. */
-  var link='https://www.shomer-app.co.il/i/?g='+encodeURIComponent(tok)+'&c='+encodeURIComponent(linkCode);
+  var link='https://www.shomer-app.co.il/i/?g='+encodeURIComponent(tok)+(who.batch&&_toks.length>1?('&gb='+_toks.slice(1).map(encodeURIComponent).join('.')):'')+'&c='+encodeURIComponent(linkCode);
   var txt=he
     ? ('הצטרף/י למעגל השומרים שלי ב-SH\u2721MER - אפליקציית בטיחות קהילתית חינמית. אם יקרה לי משהו, תדע/י איפה אני.\n'+link)
     : ('Join my SH\u2721MER SHOMER circle - a free community safety app. If something happens to me, you will know where I am.\n'+link);
   try{ syncPairsToCircles(); renderCircles(); }catch(e){}
+  if(who.batch){ try{ toast(he?'בחר/י בוואטסאפ איש קשר אחד או כמה. כל מי שיצטרף יופיע כאן עם השם והטלפון שלו':'Pick one or more chats in WhatsApp. Everyone who joins appears here with their name and phone','grn'); }catch(e){}
+    var _w=null; try{ _w=window.open('https://wa.me/?text='+encodeURIComponent(txt),'_blank'); }catch(e){}
+    if(_w) return;   /* blocked (iOS / installed app): fall through to the share sheet, then copy */ }
   /* v270: with a phone, open WhatsApp straight to that person - no guessing who got it */
   if(who.phone){ try{ window.open('https://wa.me/'+who.phone+'?text='+encodeURIComponent(txt),'_blank'); return; }catch(e){} }
   try{
@@ -8997,13 +9031,14 @@ function gdEnterCodeSubmit(){
     tapped one - it used to connect straight away, with no code at all. */
  let cd=''; const hc=v.match(/[?#&]c=([0-9]{4})/); if(hc) cd=hc[1];
  gdClose('gd-enter');
- try{ localStorage.setItem('shomer_pending_invite', JSON.stringify({tok:tok, nm:nm, code:cd, ts:Date.now()})); }catch(e){}
+ let gb=''; const hg=v.match(/[?#&]gb=([a-z0-9.]+)/i); if(hg) gb=hg[1].slice(0,200);
+ try{ localStorage.setItem('shomer_pending_invite', JSON.stringify({tok:tok, nm:nm, code:cd, gb:gb, ts:Date.now()})); }catch(e){}
  gdCheckInviteParam();
 }
 /* Open with ?g=<token> - parsed at startup. Own link in another window = live demo. */
 function gdCheckInviteParam(){
- let tok='',nm='',autoCode='';
- try{ const u=new URL(location.href); tok=u.searchParams.get('g')||''; autoCode=u.searchParams.get('c')||''; }catch(e){}
+ let tok='',nm='',autoCode='', _gb=[];
+ try{ const u=new URL(location.href); tok=u.searchParams.get('g')||''; autoCode=u.searchParams.get('c')||''; _gb=(u.searchParams.get('gb')||'').split('.').filter(Boolean); }catch(e){}
  if(!tok){ const m=(location.hash||'').match(/[#&]g=([^&]+)/); if(m){ try{tok=decodeURIComponent(m[1]);}catch(e){tok=m[1];} } }
  /* Invite links now land on the download page first (index.html), which stashes the
     token for us. Same origin, so we can pick it up here. One-shot, and expires after
@@ -9013,7 +9048,7 @@ function gdCheckInviteParam(){
      const raw=localStorage.getItem('shomer_pending_invite');
      if(raw){
        const p=JSON.parse(raw);
-       if(p&&p.tok&&p.ts&&(Date.now()-p.ts)<86400000){ tok=p.tok; if(p.nm)nm=p.nm; if(p.code)autoCode=p.code; }
+       if(p&&p.tok&&p.ts&&(Date.now()-p.ts)<86400000){ tok=p.tok; if(p.nm)nm=p.nm; if(p.code)autoCode=p.code; if(p.gb)_gb=String(p.gb).split('.').filter(Boolean); }
      }
    }catch(e){}
  }
@@ -9036,7 +9071,7 @@ function gdCheckInviteParam(){
  toast(currentLang==='he'?('כבר מחובר/ת ל'+(existing.name||'שומר/ת')):currentLang==='ar'?'متصل بالفعل':('Already connected to '+(existing.name||'this SHOMER')),'grn');
  return;
  }
- gdAcceptInvite._tok=tok; gdAcceptInvite._nm=nm;
+ gdAcceptInvite._tok=tok; gdAcceptInvite._nm=nm; gdAcceptInvite._batch=_gb.slice(0,INV_BATCH); gdAcceptInvite._isBatch=_gb.length>0;
  gdInviteShowAll(); gdFillIdentity(null);              /* clear any previous identity before showing */
  gdOpen('gd-accept');
  gdLoadInvite(tok);                 /* fetch WHO is asking - name, verified phone, match code */
@@ -9157,7 +9192,8 @@ async function gdLoadInvite(token){
     if(!inv||!inv.fromUid){ gdInviteMsg('invalid'); return; }
     if(inv.fromUid===FB.uid){ gdInviteMsg('own'); return; }
     if((gdState().pairs||[]).some(function(p){ return p.partnerUid===inv.fromUid && !p.pending; })){ gdInviteMsg('already'); return; }
-    if(inv.acceptedBy && inv.acceptedBy!==FB.uid){ gdInviteMsg('used'); return; }
+    var _grpDead=gdAcceptInvite._isBatch && !inv.acceptedBy && (inv.declinedBy||inv.rejected||((+inv.ts||0)>0&&Date.now()-inv.ts>7*864e5));   /* group link: declined / expired (unused slots expire after a week) */
+    if((inv.acceptedBy && inv.acceptedBy!==FB.uid) || _grpDead){ var _nx=(gdAcceptInvite._batch||[]).shift(); if(_nx){ gdAcceptInvite._tok=_nx; return gdLoadInvite(_nx); } gdInviteMsg('used'); return; }   /* v280: group link - take the next free slot */
     gdInviteShowAll();
     gdFillIdentity(inv);
   }catch(e){ gdInviteMsg('invalid'); }
@@ -9199,7 +9235,7 @@ function gdConnect(tok,nm,fromLink){
  simLat:TLV[0]+(Math.random()-.5)*.02,simLng:TLV[1]+(Math.random()-.5)*.02}; g.pairs.push(p); }
  else { p.pending=false; if(nm&&!p.name)p.name=nm; }
  // real backend link: record the mutual pairing in RTDB (binds the two accounts)
- try{ fbAcceptInvite(tok,(invName()||gdState().myName||(SS.user&&SS.user.name)||'')).then(function(fromUid){ if(fromUid){ p.partnerUid=fromUid; p.linked=true; p.acceptedTs=Date.now(); p.awaitConfirm=true; try{ gdWatchMyAcceptance(p); }catch(e){} if(!p.name&&fbAcceptInvite._name)p.name=fbAcceptInvite._name; var mm=ensureMemberForPair(p); if(mm){ mm.partnerUid=fromUid; if(!mm.name)mm.name=p.name; mm.awaitConfirm=true; } saveStore(); gdRenderList(); try{ renderCircles(); syncPairsToCircles(); }catch(e){} try{ gdWatchConfirm(p); }catch(e){} } }); }catch(e){}
+ fbAcceptInvite._tok=null; try{ fbAcceptInvite(tok,(invName()||gdState().myName||(SS.user&&SS.user.name)||'')).then(function(fromUid){ if(fbAcceptInvite._tok&&fbAcceptInvite._tok!==p.token){ p.token=fbAcceptInvite._tok; saveStore(); } if(fromUid){ p.partnerUid=fromUid; p.linked=true; p.acceptedTs=Date.now(); p.awaitConfirm=true; try{ gdWatchMyAcceptance(p); }catch(e){} if(!p.name&&fbAcceptInvite._name)p.name=fbAcceptInvite._name; var mm=ensureMemberForPair(p); if(mm){ mm.partnerUid=fromUid; if(!mm.name)mm.name=p.name; mm.awaitConfirm=true; } saveStore(); gdRenderList(); try{ renderCircles(); syncPairsToCircles(); }catch(e){} try{ gdWatchConfirm(p); }catch(e){} } }); }catch(e){}
  saveStore();
  gdSend({type:'hello'}); gdBroadcast(); gdRenderMarkers(); gdRenderList();
  if(document.getElementById('sh-circles')&&document.getElementById('sh-circles').classList.contains('open')){} else openCircles();
@@ -9959,7 +9995,7 @@ try{ hydrateIcons(document); }catch(e){}
 /* Loaded-build version - shown in the diagnostic panel so a phone can prove
    whether it's on the latest build or a STALE cached one. Keep in lock-step
    with sw.js SW_VERSION on every deploy. */
-var APP_VER='v279';
+var APP_VER='v280';
 var FB={ready:false,uid:null,db:null,_presTimer:null,connected:false,listening:false,pushState:'default',near:0,swVer:'?',
   authState:'connecting',sdkLoaded:false,persist:'',permErr:null,err:null,wsProbe:'',csp:''};
 /* Always log connection diagnostics to the console so the real failure can be SEEN in Chrome. */
@@ -10371,7 +10407,8 @@ function fbPollOnce(st){
   /* SOS-only paths poll fast only while an SOS is actually running (mine or one I'm answering). */
   /* A just-sent invite: the sender is usually staring at the screen waiting - check it often
      for its first 10 minutes, then relax. */
-  if(st.prio==='low' && /^invites\/g/.test(st.path)){ st.pollMs=((Date.now()-(st.born||(st.born=Date.now())))<600000)?4000:60000; }
+  if(st.prio==='low' && /^invites\/g/.test(st.path)){ st.pollMs=((Date.now()-(st.born||(st.born=(function(){ try{ var _p=gdPairByToken(st.path.slice(8)); return (_p&&_p.addedTs)||Date.now(); }catch(e){ return Date.now(); } })())))<600000)?4000:60000; }
+  if(st.prio==='low' && st.pollMs===60000){ try{ var _hp=gdPairByToken(st.path.slice(8)); if(_hp&&_hp.hidden) st.pollMs=180000; }catch(e){} }   /* v280: spare group-link slots are checked gently */
   if(st.prio==='urgent-poll'){ var _busy=(typeof sosPhase!=='undefined'&&sosPhase==='active')||(typeof SOSBUS!=='undefined'&&SOSBUS.mine&&Object.keys(SOSBUS.mine).length>0); st.pollMs=_busy?3000:30000; }
   var next=function(ms){ if(st.open){ st.retryT=setTimeout(function(){ fbPollOnce(st); }, ms); } };
   if(!FB.idToken){ next(500); return; }
@@ -10759,6 +10796,31 @@ function fbPublishPresence(){
    session's row and my old uid-keyed row are removed on start. Under the older rules (no
    dashown node) it falls back to the old hb_<uid> row so the dashboard keeps counting me. */
 function fbDashKey(prefix){ var a=new Uint8Array(8); try{ crypto.getRandomValues(a); }catch(e){ for(var i=0;i<8;i++) a[i]=Math.floor(Math.random()*256); } return prefix+Array.prototype.map.call(a,function(b){return ('0'+b.toString(16)).slice(-2);}).join(''); }
+/* v280: anonymous per-install device tag (random, never the account) so the dashboard counts
+   a phone ONCE across sessions, and a once-a-day activity marker that is never deleted by a
+   new session - the dashboard's daily/weekly history and exports are built from these. */
+function fbDevTag(){ try{ var t=localStorage.getItem('shomerDev'); if(!t){ t=fbDashKey('').slice(0,12); localStorage.setItem('shomerDev',t); } return t; }catch(e){ return ''; } }
+function fbDayKey(){ try{ return new Intl.DateTimeFormat('en-CA',{timeZone:'Asia/Jerusalem',year:'numeric',month:'2-digit',day:'2-digit'}).format(new Date()); }catch(e){ var d=new Date(); return d.getFullYear()+'-'+('0'+(d.getMonth()+1)).slice(-2)+'-'+('0'+d.getDate()).slice(-2); } }
+/* v280 privacy: the public feed never carries a lasting device id. The tag is a hash of a
+   local random id + today's date, so it changes every day and days cannot be linked. */
+function fbDayTag(){ var dk=fbDayKey(), c=fbDayTag._c;
+  if(c&&c.dk===dk) return c.t;
+  if(!fbDayTag._busy){ fbDayTag._busy=1; var dev=fbDevTag(); if(dev) sha256Hex(dev+':'+dk).then(function(h){ fbDayTag._c={dk:dk,t:String(h).slice(0,12)}; }).catch(function(){}).then(function(){ fbDayTag._busy=0; }); else fbDayTag._busy=0; }
+  return ''; }
+function fbDayMark(lat,lng){
+  var st=FB._hb||{}; if(st.mode!=='new'||st._dayBusy) return;
+  var dk=fbDayKey(), tag=fbDayTag(); if(!tag) return;   /* today's unlinkable tag (ready after the first beat) */
+  try{ if(localStorage.getItem('shomerDayMk')===dk) return; }catch(e){ return; }
+  st._dayBusy=1; var mid=fbDashKey('hb_');
+  fbRestWrite('PUT','dashown/'+mid, FB.uid)
+    .then(function(){ return fbRestWrite('PUT','dashfeed/'+mid,{type:'presence',lat:Math.round(lat*10)/10,lng:Math.round(lng*10)/10,ts:Date.now(),status:'d1:'+tag+':'+dk});   /* ~10 km area only */ })
+    .then(function(){ try{ localStorage.setItem('shomerDayMk',dk); var L=JSON.parse(localStorage.getItem('shomerDayIds')||'[]'); L.push([mid,Date.now()]);
+        /* keep ~90 days (the 12-week trend); delete older ones - feed row first, then my ownership */
+        var cut=Date.now()-90*864e5; localStorage.setItem('shomerDayIds',JSON.stringify(L));
+        L.forEach(function(x){ if(x[1]<cut){ fbRestWrite('DELETE','dashfeed/'+x[0]).then(function(){ return fbRestWrite('DELETE','dashown/'+x[0]); }).then(function(){
+          try{ var L2=JSON.parse(localStorage.getItem('shomerDayIds')||'[]').filter(function(y){ return y[0]!==x[0]; }); localStorage.setItem('shomerDayIds',JSON.stringify(L2)); }catch(e){} }).catch(function(){}); } });   /* removed from my list only once really deleted */ }catch(e){} })
+    .catch(function(){}).then(function(){ st._dayBusy=0; });
+}
 function fbDashInit(){
   var st=FB._hb||(FB._hb={});
   if(st.ready) return st.ready;
@@ -10780,10 +10842,11 @@ function fbDashBeat(hide, lat, lng){
     var st=FB._hb, key=(st.mode==='new')?st.id:('hb_'+FB.uid);
     if(hide){ if(!st.gone){ st.gone=true; fbRestWrite('DELETE','dashfeed/'+key).catch(function(){}); } return; }
     st.gone=false;
-    var _hb={type:'presence',lat:lat,lng:lng,ts:Date.now(),status:'v2'};   /* v279: 'v2' = real (non-automated) app, one row per device - the only rows the dashboard counts */
+    var _hb={type:'presence',lat:lat,lng:lng,ts:Date.now(),status:((st.mode==='new'&&fbDayTag())?'v2:'+fbDayTag():'v2')};   /* 'v2' = real (non-automated) app; v280 adds today's anonymous tag */
     if(st.mode!=='new') _hb.by=FB.uid;
     var _fd=false; try{ _fd=isFounder(); }catch(_f){}
     fbRestWrite('PUT','dashfeed/'+key,_hb).then(function(){ if(_fd) return fbRestWrite('PATCH','dashfeed/'+key,{founder:true}); }).catch(function(){});
+    try{ fbDayMark(lat,lng); }catch(e){}
   });
 }
 function updateGuardiansNearby(n){
@@ -11077,7 +11140,16 @@ function fbAcceptInvite(token,myName){
       var withPh=Object.assign({acceptedPh:FB._myPhoneHash||''},acc);
       return fbRestWrite('PATCH','invites/'+token, FB._myPhoneHash?withPh:acc)
         .catch(function(){ return fbRestWrite('PATCH','invites/'+token, acc); });
-    }).then(function(){ return inv.fromUid; }, function(){ return inv.fromUid; });   /* v265: my SOS salt goes out only once they confirm (gdWatchConfirm) */
+    }).then(function(){ return inv.fromUid; }, function(){ return inv.fromUid; })   /* v265: my SOS salt goes out only once they confirm (gdWatchConfirm) */
+    .then(function(fu){
+      /* v280: group link - two people may grab the same slot at once; only one write wins.
+         If someone else holds it, move to the next free slot of the same link. */
+      if(!(gdAcceptInvite._batch&&gdAcceptInvite._batch.length)) return fu;
+      return fbRestGet('invites/'+token).then(function(s2){ var v=s2&&s2.val?s2.val():null;
+        if(v&&v.acceptedBy&&v.acceptedBy!==FB.uid){ var nx=gdAcceptInvite._batch.shift(); if(!nx) return null;
+          gdAcceptInvite._tok=nx; fbAcceptInvite._tok=nx; return fbAcceptInvite(nx,myName); }
+        return fu; }).catch(function(){ return fu; });
+    });
   }).catch(function(){return null;});
 }
 /* v262: SOS salt goes BOTH ways. The inviter's salt reaches me in the invite; mine reaches the
@@ -11114,7 +11186,7 @@ function fbWatchApproval(token, theirUid){
           g.pairs=g.pairs.filter(function(x){return x!==dp;});
           SS.circleMembers=(SS.circleMembers||[]).filter(function(m){ return m.pairId!==dp.id; });
           saveStore(); try{ renderCircles(); gdRenderMarkers(); }catch(e){}
-          toast(he?((dn||'ההזמנה')+' - ההזמנה נדחתה'):((dn||'Your invite')+' - invite declined'),'amb');
+          if(!dp.hidden) toast(he?((dn||'ההזמנה')+' - ההזמנה נדחתה'):((dn||'Your invite')+' - invite declined'),'amb');   /* v280: an unused group-link slot goes quietly */
         }
         return;
       }
@@ -11136,8 +11208,8 @@ function fbWatchApproval(token, theirUid){
       if(verdict==='reject'){ gdRejectAcceptance(p, inv, token, true); return; }
       if(verdict==='ask'){ gdConfirmAcceptance(p, inv, token, theirUid, codeOk); return; }
       var puid=inv.acceptedBy||theirUid;
-      try{ fbRestWrite('PUT','pairs/'+FB.uid+'/'+puid,{name:p.name||'',token:token,ts:Date.now(),via:'phone'}); }catch(e){}
-      p.pending=false; p.linked=true; p.partnerUid=puid;
+      try{ fbRestWrite('PUT','pairs/'+FB.uid+'/'+puid,{name:p.name||inv.acceptedName||'',token:token,ts:Date.now(),via:'phone'}); }catch(e){}
+      p.pending=false; p.linked=true; p.partnerUid=puid; p.hidden=false;   /* v280: a batch slot becomes a real, named SHOMER the moment someone joins */
       if(inv.acceptedName&&!p.name)p.name=inv.acceptedName;
       if(inv.acceptedPhone) p.ph=String(inv.acceptedPhone).replace(/\D/g,'');   /* v271: who joined - shown in the list */
       var mm=ensureMemberForPair(p, p.cid);
@@ -11169,6 +11241,7 @@ function gdApprovalVerdict(p, inv, theirUid, codeOk){
   if(theirUid) return (inv.acceptedBy===theirUid)?'ok':'reject';
   if(codeOk===false) return 'reject';
   if(p.confirmedBy && p.confirmedBy===inv.acceptedBy) return 'ok';
+  if(p.batch) return 'ask';   /* v280: a group link can be forwarded - you confirm each person (name + phone) before they see you */
   if(codeOk===true){
     /* right code but a DIFFERENT registered phone than the one I invited = forwarded link: ask */
     if(p.toPh) return 'ask';   /* v268: phone invite - the registry stamp is first-come (squattable), so I ALWAYS confirm the first link myself */
@@ -11181,6 +11254,13 @@ function gdApprovalVerdict(p, inv, theirUid, codeOk){
    (the old one is burned - the rules let each invite be accepted once). */
 function gdRejectAcceptance(p, inv, token, flagged){
   var he=currentLang==='he';
+  if(p&&p.batch){   /* v280: a group-link slot is not re-issued - it is simply closed */
+    try{ fbRestWrite('PATCH','invites/'+token,{rejected:inv.acceptedBy||true,rejectedTs:Date.now()}); }catch(e){}
+    var _g=gdState(); _g.pairs=_g.pairs.filter(function(x){ return x!==p; });
+    SS.circleMembers=(SS.circleMembers||[]).filter(function(m){ return m.pairId!==p.id; });
+    saveStore(); try{ sosRotateSalt(); }catch(e){} try{ renderCircles(); gdRenderMarkers(); }catch(e){}
+    toast(he?'לא חוברתם - האדם הזה לא יראה אותך.':'Not connected - this person will not see you.','amb'); return;
+  }
   var g=gdState(), nt='g'+Math.random().toString(36).slice(2,8)+Math.random().toString(36).slice(2,6);
   var code=p.code||String(Math.floor(1000+Math.random()*9000));
   try{ fbRestWrite('PATCH','invites/'+token,{rejected:inv.acceptedBy||true,rejectedTs:Date.now()}); }catch(e){}
@@ -11286,7 +11366,10 @@ function syncPairsToCircles(){
   try{
     if(!circlesList().length) return;                 // wait until circles exist
     var g=gdState(), changed=false;
-    g.pairs.forEach(function(p){ if(ensureMemberForPair(p)) changed=true; });   // pending ones too - you must see who you invited
+    var _wk=Date.now()-7*864e5, _n0=g.pairs.length;
+    g.pairs=g.pairs.filter(function(p){ return !(p.hidden&&p.pending&&!p.linked&&(p.addedTs||0)<_wk); });   /* unused batch slots expire after a week */
+    if(g.pairs.length!==_n0) changed=true;
+    g.pairs.forEach(function(p){ if(p.hidden&&p.pending&&!p.linked) return; if(ensureMemberForPair(p)) changed=true; });   // pending ones too - you must see who you invited (unused batch slots stay invisible)
     // repair any member sitting in a circle that no longer exists
     var ids={}; circlesList().forEach(function(x){ids[x.id]=1;});
     (SS.circleMembers||[]).forEach(function(m){ if(!ids[m.cid]){ m.cid=circlesList()[0].id; changed=true; } });

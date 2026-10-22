@@ -133,7 +133,8 @@
       var u = new URL(url), t = u.searchParams.get('g');
       if (!t) return;
       var c = (u.searchParams.get('c') || '').replace(/\D/g, '').slice(0, 4);
-      try { localStorage.setItem('shomer_pending_invite', JSON.stringify({ tok: t, code: c, ts: Date.now() })); } catch (e) {}
+      var gb = (u.searchParams.get('gb') || '').replace(/[^a-z0-9.]/gi, '').slice(0, 200);   /* v280: group-invite spare slots */
+      try { localStorage.setItem('shomer_pending_invite', JSON.stringify({ tok: t, code: c, gb: gb, ts: Date.now() })); } catch (e) {}
       /* Already inside the app: open the approve screen now. Otherwise the stash is
          picked up when the app finishes starting (gdCheckInviteParam). */
       setTimeout(function () {

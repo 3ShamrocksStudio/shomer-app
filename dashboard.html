@@ -171,7 +171,7 @@
   .chart-host svg{position:absolute;inset:0;display:block}
   #analysispane{display:flex;flex-direction:column;padding:8px 12px 8px}
   #donutpane{padding:8px 12px}
-  .dn{direction:ltr;display:flex;align-items:center;gap:14px;height:100%;min-height:0}
+  .dn{direction:rtl;display:flex;align-items:center;gap:14px;height:100%;min-height:0}
   .dn-ring{flex:0 0 auto;display:flex;align-items:center;justify-content:center}
   .dn-side{direction:rtl;flex:1;min-width:0;height:100%;display:flex;flex-direction:column;justify-content:center;overflow:hidden}
   .dleg .r{display:flex;align-items:center;gap:8px;padding:0 6px;border-radius:6px;cursor:pointer;min-height:0}
@@ -1362,7 +1362,12 @@ function renderLive(c,list,opts){
 /* presence row = a device heartbeat. Only status 'v2' rows are counted/drawn: written by app v279+, one per real
    device, never by automated/test browsers. Older rows ('online'/'seen'/missing) can't be verified and are ignored. */
 function _isPresRow(e){ return e.type==='presence'||e.type==='pres'||e.type==='location'||e.type==='loc'||e.type==='ping'||e.type==='heartbeat'||e.status==='v2'||(!e.type&&!e.cat&&!e.status&&!e.desc); }
-function isRealPresence(e){ return !!e&&_isPresRow(e)&&e.status==='v2'; }
+function isRealPresence(e){ return !!e&&_isPresRow(e)&&(e.status==='v2'||/^v2:/.test(String(e.status||''))||/^d1:/.test(String(e.status||''))); }
+/* v280: d1:<device>:<YYYY-MM-DD> = once-a-day activity marker (never deleted by a new session);
+   v2[:<device>] = live heartbeat. Device tag is random per install - never the account. */
+function _presDev(e,id){ var m=String(e.status||'').match(/^(?:v2|d1):([0-9a-f]{6,})/); return m?m[1]:('row:'+id); }
+function _presDay(e){ var m=String(e.status||'').match(/^d1:[0-9a-f]+:(\d{4}-\d{2}-\d{2})$/); return m?m[1]:null; }
+function _ilDay(ts){ try{ return new Intl.DateTimeFormat('en-CA',{timeZone:'Asia/Jerusalem',year:'numeric',month:'2-digit',day:'2-digit'}).format(new Date(ts)); }catch(e){ return new Date(ts).toISOString().slice(0,10); } }
 function loadLive(c){
   _curCityObj=c;
   var demo=!!(CLIENT&&CLIENT.demo);
@@ -1392,10 +1397,12 @@ function loadLive(c){
       var uid=e.by||e.uid||id;
       if(_isPresRow(e)){
         if(!isRealPresence(e)) return; /* unverified (pre-v279 / automated) heartbeat — not counted, not drawn */
-        if(recent){ active24[uid]=1; if(inTerr) active24Terr[uid]=1; else outTerr24[uid]=1; }
+        var dev=_presDev(e,id), mDay=_presDay(e), today=_ilDay(now);
+        if((mDay||_ilDay(_ts))===today){ active24[dev]=1; if(inTerr) active24Terr[dev]=1; else outTerr24[dev]=1; }   /* "today" = calendar day in Israel, kept by the daily markers */
+        netPres.push({ts:_ts,t:inTerr?1:0,dev:dev,day:(mDay||_ilDay(_ts))});
+        if(mDay) return;   /* daily markers are history only - never "online", never a map pin */
         var fresh=(now-_ts)<=ONLINE;
-        if(fresh){ onlineUsers[uid]=1; if(inTerr) onlineTerrUsers[uid]=1; }
-        netPres.push({ts:_ts,t:inTerr?1:0});
+        if(fresh){ onlineUsers[dev]=1; if(inTerr) onlineTerrUsers[dev]=1; }
         if((now-_ts)<=RECENT_PRES){ e.id=id; e._online=fresh; presAll.push(e); if(inTerr) presTerr.push(e); }
         return;
       }
@@ -1538,7 +1545,7 @@ function buildReportHtml(){
  /* ---------- network coverage ---------- */
  var netHtml=netOk?('<table><tbody>'
    +'<tr><td>מכשירים מחוברים כעת · כל הרשת (90 שניות אחרונות)</td><td class="num">'+v(S.onlineNow)+'</td></tr>'
-   +'<tr><td>מכשירים פעילים ב-24 השעות האחרונות · כל הרשת</td><td class="num">'+v(S.activeToday)+'</td></tr>'
+   +'<tr><td>מכשירים פעילים היום (מחצות) · כל הרשת</td><td class="num">'+v(S.activeToday)+'</td></tr>'
    +'<tr><td>מכשירים עד 18 ק״מ ממרכז העיר · מחוברים כעת / פעילים 24 ש׳</td><td class="num">'+v(S.onlineTerr)+' / '+v(S.territoryActive)+'</td></tr>'
    +'<tr><td>מכשירים פעילים 24 ש׳ מעבר ל-18 ק״מ ממרכז העיר</td><td class="num">'+v(S.outTerr24)+'</td></tr>'
    +'<tr><td>אירועים חיים עד 18 ק״מ ממרכז העיר (24 ש׳)'+(demo?' — בדמו: אירועי הדגמה':'')+'</td><td class="num">'+v(demo?window._demoLiveCount:S.activeEvents)+'</td></tr>'
@@ -1554,7 +1561,7 @@ function buildReportHtml(){
    if(pc&&M.med) sum.push('עבירות לכל 1,000 תושבים: <b>'+pc.toFixed(1)+'</b> (העיר האמצעית בארץ: '+M.med.toFixed(1)+'; אוכלוסייה לפי הערכת למ״ס).'); }
  else sum.push('<b>אין נתוני פשיעה רשמיים</b> לטריטוריה זו — הדוח מבוסס על נתוני הרשת והאירועים בלבד.');
  sum.push('אירועים: <b>'+liveOpen+'</b> חיים ופתוחים · <b>'+revOpen+'</b> קודמים שעדיין פתוחים · '+evRows.length+' בסך הכול בדוח'+(exCount?' ('+exCount+' אירועי דוגמה הוחרגו)':'')+'.');
- if(netOk) sum.push('מכשירי <bdi>SH✡MER</bdi> מאומתים פעילים עד 18 ק״מ ממרכז העיר ב-24 השעות האחרונות: <b>'+v(S.territoryActive)+'</b>.');
+ if(netOk) sum.push('מכשירי <bdi>SH✡MER</bdi> מאומתים פעילים עד 18 ק״מ ממרכז העיר היום (מחצות): <b>'+v(S.territoryActive)+'</b>.');
  /* ---------- limitations ---------- */
  var lim=['נתוני המשטרה הם עבירות <b>שנרשמו</b> ברמת העיר לשנת 2025 בלבד; אין בהם נתוני שנה קודמת, פילוח לשכונות או עבירות שלא דווחו.',
   'הדירוג והממוצע הארצי מחושבים בין '+ncit+' הערים שבמאגר בלבד, לא בין כל הרשויות בישראל.',
@@ -1642,8 +1649,8 @@ function buildKPIs(idx){
  el.innerHTML=''
   +'<div class="nt nt-on" title="מכשירים מאומתים (SH✡MER v279+) שדיווחו מיקום ב-90 השניות האחרונות, בכל הרשת · מקור: רשת SH✡MER (זמן אמת) · נספרים מאז 22.10.2026"><div class="nl" style="white-space:normal;line-height:1.15"><i></i>מכשירים מחוברים כעת</div><div class="nv">'+v(S.onlineNow)+'</div><div class="ns">כל הרשת</div></div>'
   +'<div class="nt-stack">'
-   +'<div class="nt-row" title="מכשירים מאומתים שדיווחו מיקום ב-24 השעות האחרונות, בכל הרשת"><span class="nl" style="white-space:normal;line-height:1.15">מכשירים פעילים היום</span><span class="nv">'+v(S.activeToday)+'</span></div>'
-   +'<div class="nt-row" title="מכשירים עד 18 ק״מ ממרכז '+ESC(c.city)+': מחוברים כעת / פעילים ב-24 השעות האחרונות"><span class="nl" style="white-space:normal;line-height:1.15">עד 18 ק״מ ממרכז העיר</span><span class="nv">'+v(S.onlineTerr)+'<small> / '+v(S.territoryActive)+'</small></span></div>'
+   +'<div class="nt-row" title="מכשירים מאומתים שהיו פעילים היום (מחצות, שעון ישראל), בכל הרשת"><span class="nl" style="white-space:normal;line-height:1.15">מכשירים פעילים היום</span><span class="nv">'+v(S.activeToday)+'</span></div>'
+   +'<div class="nt-row" title="מכשירים עד 18 ק״מ ממרכז '+ESC(c.city)+': מחוברים כעת / פעילים היום (מחצות)"><span class="nl" style="white-space:normal;line-height:1.15">עד 18 ק״מ ממרכז העיר</span><span class="nv">'+v(S.onlineTerr)+'<small> / '+v(S.territoryActive)+'</small></span></div>'
   +'</div>'
   +'<div class="nt nt-ev'+(hot?' hot':'')+'"'+(hot?' onclick="boardFocusLive()"':'')+' title="אירועים פתוחים מהרשת עד 18 ק״מ ממרכז העיר ב-24 השעות האחרונות'+(demo?' · בדמו: אירועי הדגמה':'')+'"><div class="nl">אירועים חיים</div><div class="nv">'+v(ev)+'</div><div class="ns">'+(demo?'הדגמה':(hot?'לטיפול עכשיו':(ev===0?'אין כרגע':'24 שעות')))+'</div></div>';
  try{ renderUserPanel(); }catch(e){}
@@ -1918,13 +1925,14 @@ function _trNetSpec(c){
  var R=window._trRange||12, W=7*864e5, x=[], xf=[], a=[], t=[], ev=[];
  for(var i=R-1;i>=0;i--){ var b1=N.at-i*W, b0=b1-W, d0=new Date(b0), d1=new Date(b1-1);
    x.push(d0.getDate()+'/'+(d0.getMonth()+1)); xf.push('שבוע '+d0.getDate()+'/'+(d0.getMonth()+1)+'–'+d1.getDate()+'/'+(d1.getMonth()+1));
-   var ca=0,ct=0,ce=0; N.pres.forEach(function(p){ if(p.ts>=b0&&p.ts<b1){ ca++; if(p.t)ct++; } }); N.ev.forEach(function(p){ if(p.ts>=b0&&p.ts<b1&&p.t)ce++; });
-   a.push(ca); t.push(ct); ev.push(ce); }
+   var ca={},ct={},ce=0; N.pres.forEach(function(p){ if(p.ts>=b0&&p.ts<b1){ ca[p.day+'|'+p.dev]=1; if(p.t)ct[p.day+'|'+p.dev]=1; } }); N.ev.forEach(function(p){ if(p.ts>=b0&&p.ts<b1&&p.t)ce++; });
+   /* device tags change every day (privacy), so a week shows the AVERAGE devices active per day */
+   a.push(Math.round(Object.keys(ca).length/7*10)/10); t.push(Math.round(Object.keys(ct).length/7*10)/10); ev.push(ce); }
  var at=new Date(N.at);
- return {kind:'line', unit:'', dec:0, x:x, xFull:xf,
-  series:[{k:'all',label:'מכשירים · כל הרשת',c:'#2bc47e',v:a},{k:'terr',label:'מכשירים · עד 18 ק״מ ממרכז העיר',c:'#faac22',v:t},{k:'ev',label:'דיווחים · עד 18 ק״מ ממרכז העיר',c:'#ef4853',v:ev}],
-  foot:'מכשירים מאומתים מאז 22.10.2026 · לפי שבוע הפעילות האחרונה · '+_p2(at.getHours())+':'+_p2(at.getMinutes()),
-  footTip:'מקור: רשת SH✡MER (dashfeed, זמן אמת). כל מכשיר נספר פעם אחת, בשבוע שבו נראה לאחרונה. נספרים רק מכשירים מאומתים (גרסה v279 ומעלה, ללא דפדפנים אוטומטיים) — מאז 22.10.2026. דיווחים = אירועים שדווחו עד 18 ק״מ ממרכז העיר.'};
+ return {kind:'line', unit:'', dec:1, x:x, xFull:xf,
+  series:[{k:'all',label:'מכשירים ביום (ממוצע) · כל הרשת',c:'#2bc47e',v:a},{k:'terr',label:'מכשירים ביום (ממוצע) · עד 18 ק״מ ממרכז העיר',c:'#faac22',v:t},{k:'ev',label:'דיווחים · עד 18 ק״מ ממרכז העיר',c:'#ef4853',v:ev}],
+  foot:'ממוצע מכשירים פעילים ביום, לכל שבוע · מאז 22.10.2026 · '+_p2(at.getHours())+':'+_p2(at.getMinutes()),
+  footTip:'מקור: רשת SH✡MER (dashfeed). כל מכשיר נספר פעם אחת בכל יום שבו היה פעיל (סימון יומי אנונימי שמתחלף כל יום ונשמר גם אחרי רענון); לכל שבוע מוצג הממוצע ליום. נספרים רק מכשירים מאומתים (ללא דפדפנים אוטומטיים), מאז 22.10.2026.'};
 }
 function renderTrendInline(elId){
  var el=document.getElementById(elId); if(!el||!DATA)return; var c=curC(); if(!c)return;
