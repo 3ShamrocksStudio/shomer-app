@@ -7883,6 +7883,8 @@ function inviteWhoAsk(then){
 var INV_BATCH=10;
 function inviteBatchAsk(){
   var he=currentLang==='he', ar=currentLang==='ar';
+  if(!inviteIdentityOk(inviteBatchAsk)) return;
+  if(!gdRequireConsent(inviteBatchAsk)) return;
   var old=document.getElementById('invwho-bar'); if(old) old.remove();
   var bar=document.createElement('div'); bar.id='invwho-bar'; bar.className='nudge-bar';
   bar.innerHTML='<span class="nudge-tx" style="font-weight:800;font-size:17px">'+(he?'הזמנת שומרים בוואטסאפ':ar?'دعوة حرّاس عبر واتساب':'Invite SHOMERs on WhatsApp')+'</span>'
@@ -7891,7 +7893,18 @@ function inviteBatchAsk(){
    +'<button class="nudge-x" aria-label="close">\u2715</button>';
   (document.getElementById('app')||document.body).appendChild(bar);
   bar.querySelector('.nudge-x').onclick=function(){ bar.remove(); };
-  bar.querySelector('#invwho-go').onclick=function(){ bar.remove(); shareInvite({name:'',phone:'',batch:true}); };
+  var go=bar.querySelector('#invwho-go'), goTx=go.textContent, ready=null;
+  go.disabled=true; go.style.opacity='.6'; go.textContent=he?'מכין קישור…':ar?'جارٍ التحضير…':'Preparing link…';
+  shareInvite({name:'',phone:'',batch:true,prep:true}).then(function(r){
+    if(!r||!document.body.contains(bar)){ if(!r) bar.remove(); return; }
+    ready=r; go.disabled=false; go.style.opacity=''; go.textContent=goTx;
+  }).catch(function(){ bar.remove(); });
+  go.onclick=function(){ if(!ready) return; bar.remove();
+    var w=null; try{ w=window.open('https://wa.me/?text='+encodeURIComponent(ready.txt),'_blank'); }catch(e){}
+    var copy=function(){ try{ navigator.clipboard.writeText(ready.txt).then(function(){ toast(he?'ההזמנה הועתקה - הדבק/י אותה בוואטסאפ':'Invite copied - paste it in WhatsApp','grn'); }).catch(function(){}); }catch(e){} };
+    if(!w){ try{ if(navigator.share){ navigator.share({title:'SH\u2721MER', text:ready.txt}).catch(function(e){ if(!(e&&e.name==='AbortError')) copy(); }); } else copy(); }catch(e){ copy(); } }
+    try{ toast(he?'בחר/י בוואטסאפ איש קשר אחד או כמה. כל מי שיצטרף יופיע כאן אחרי אישורך':'Pick one or more chats in WhatsApp. Everyone who joins appears here after you confirm','grn'); }catch(e){}
+  };
 }
 async function shareInvite(who){
   var he=currentLang==='he';
@@ -7916,7 +7929,7 @@ async function shareInvite(who){
   }
   if(!(FB.ready&&FB.uid)){
     try{ toast(he?'עוד רגע - מאמת זהות. נסה/י שוב בעוד שנייה.':'Securing identity - try again in a second.','amb'); }catch(e){}
-    return;
+    return null;
   }
   try{
     /* name MUST be packed as "name|phone|code|salt" - gdFillIdentity() unpacks it with
@@ -7935,7 +7948,7 @@ async function shareInvite(who){
   }catch(e){
     try{ fbLog('shareInvite create:',(e&&e.message)||e); }catch(_){}
     try{ toast(he?'יצירת ההזמנה נכשלה - נסה/י שוב':'Could not create the invite - try again','amb'); }catch(_){}
-    return;
+    return null;
   }
   /* Point invitees at the download page, not straight into the web app — most people
      should install first. index.html stashes ?g= and forwards it on to the app, so the
@@ -7949,6 +7962,7 @@ async function shareInvite(who){
     ? ('הצטרף/י למעגל השומרים שלי ב-SH\u2721MER - אפליקציית בטיחות קהילתית חינמית. אם יקרה לי משהו, תדע/י איפה אני.\n'+link)
     : ('Join my SH\u2721MER SHOMER circle - a free community safety app. If something happens to me, you will know where I am.\n'+link);
   try{ syncPairsToCircles(); renderCircles(); }catch(e){}
+  if(who.batch&&who.prep) return {link:link, txt:txt};   /* v280: the popup opens WhatsApp itself, on the tap (popup blockers need the tap) */
   if(who.batch){ try{ toast(he?'בחר/י בוואטסאפ איש קשר אחד או כמה. כל מי שיצטרף יופיע כאן עם השם והטלפון שלו':'Pick one or more chats in WhatsApp. Everyone who joins appears here with their name and phone','grn'); }catch(e){}
     var _w=null; try{ _w=window.open('https://wa.me/?text='+encodeURIComponent(txt),'_blank'); }catch(e){}
     if(_w) return;   /* blocked (iOS / installed app): fall through to the share sheet, then copy */ }
@@ -9192,6 +9206,7 @@ async function gdLoadInvite(token){
     if(!inv||!inv.fromUid){ gdInviteMsg('invalid'); return; }
     if(inv.fromUid===FB.uid){ gdInviteMsg('own'); return; }
     if((gdState().pairs||[]).some(function(p){ return p.partnerUid===inv.fromUid && !p.pending; })){ gdInviteMsg('already'); return; }
+    if(inv.rejected && inv.acceptedBy===FB.uid){ var _nr=(gdAcceptInvite._batch||[]).shift(); if(_nr){ gdAcceptInvite._tok=_nr; return gdLoadInvite(_nr); } gdInviteMsg('used'); return; }   /* refused before - not this slot again */
     var _grpDead=gdAcceptInvite._isBatch && !inv.acceptedBy && (inv.declinedBy||inv.rejected||((+inv.ts||0)>0&&Date.now()-inv.ts>7*864e5));   /* group link: declined / expired (unused slots expire after a week) */
     if((inv.acceptedBy && inv.acceptedBy!==FB.uid) || _grpDead){ var _nx=(gdAcceptInvite._batch||[]).shift(); if(_nx){ gdAcceptInvite._tok=_nx; return gdLoadInvite(_nx); } gdInviteMsg('used'); return; }   /* v280: group link - take the next free slot */
     gdInviteShowAll();
@@ -10407,7 +10422,7 @@ function fbPollOnce(st){
   /* SOS-only paths poll fast only while an SOS is actually running (mine or one I'm answering). */
   /* A just-sent invite: the sender is usually staring at the screen waiting - check it often
      for its first 10 minutes, then relax. */
-  if(st.prio==='low' && /^invites\/g/.test(st.path)){ st.pollMs=((Date.now()-(st.born||(st.born=(function(){ try{ var _p=gdPairByToken(st.path.slice(8)); return (_p&&_p.addedTs)||Date.now(); }catch(e){ return Date.now(); } })())))<600000)?4000:60000; }
+  if(st.prio==='low' && /^invites\/g/.test(st.path)){ st.pollMs=((Date.now()-(st.born||(st.born=(function(){ try{ var _p=gdPairByToken(st.path.slice(8)); return (_p&&_p.hidden&&_p.addedTs)||Date.now(); }catch(e){ return Date.now(); } })())))<600000)?4000:60000; }
   if(st.prio==='low' && st.pollMs===60000){ try{ var _hp=gdPairByToken(st.path.slice(8)); if(_hp&&_hp.hidden) st.pollMs=180000; }catch(e){} }   /* v280: spare group-link slots are checked gently */
   if(st.prio==='urgent-poll'){ var _busy=(typeof sosPhase!=='undefined'&&sosPhase==='active')||(typeof SOSBUS!=='undefined'&&SOSBUS.mine&&Object.keys(SOSBUS.mine).length>0); st.pollMs=_busy?3000:30000; }
   var next=function(ms){ if(st.open){ st.retryT=setTimeout(function(){ fbPollOnce(st); }, ms); } };
@@ -10839,6 +10854,10 @@ function fbDashBeat(hide, lat, lng){
   /* v279: automated/test browsers (navigator.webdriver) never count toward the public dashboard */
   try{ if(navigator.webdriver) return; }catch(e){}
   fbDashInit().then(function(){
+    var st=FB._hb, dk=fbDayKey();
+    if(st.mode==='new' && st.day && st.day!==dk){ st.day=dk; st.ready=null; return fbDashInit(); }   /* v280: midnight = fresh row (old one deleted) */
+    st.day=dk;
+  }).then(function(){
     var st=FB._hb, key=(st.mode==='new')?st.id:('hb_'+FB.uid);
     if(hide){ if(!st.gone){ st.gone=true; fbRestWrite('DELETE','dashfeed/'+key).catch(function(){}); } return; }
     st.gone=false;
@@ -11144,9 +11163,9 @@ function fbAcceptInvite(token,myName){
     .then(function(fu){
       /* v280: group link - two people may grab the same slot at once; only one write wins.
          If someone else holds it, move to the next free slot of the same link. */
-      if(!(gdAcceptInvite._batch&&gdAcceptInvite._batch.length)) return fu;
+      if(!gdAcceptInvite._isBatch) return fu;
       return fbRestGet('invites/'+token).then(function(s2){ var v=s2&&s2.val?s2.val():null;
-        if(v&&v.acceptedBy&&v.acceptedBy!==FB.uid){ var nx=gdAcceptInvite._batch.shift(); if(!nx) return null;
+        if(v&&v.acceptedBy&&v.acceptedBy!==FB.uid){ var nx=(gdAcceptInvite._batch||[]).shift(); if(!nx){ try{ toast(currentLang==='he'?'כל המקומות בקישור הזה כבר נתפסו - בקש/י קישור חדש':'Every place on this link is taken - ask for a new link','amb'); }catch(e){} return null; }
           gdAcceptInvite._tok=nx; fbAcceptInvite._tok=nx; return fbAcceptInvite(nx,myName); }
         return fu; }).catch(function(){ return fu; });
     });
@@ -11279,11 +11298,15 @@ function gdConfirmAcceptance(p, inv, token, theirUid, codeOk){
   fbWatchApproval._busy=fbWatchApproval._busy||{}; if(fbWatchApproval._busy[token]) return; fbWatchApproval._busy[token]=1;
   var ph=String(inv.acceptedPhone||'').replace(/\D/g,'');
   var show=function(verified){
-    var old=document.getElementById('invconf-bar'); if(old) old.remove();
+    var old=document.getElementById('invconf-bar');
+    if(old){ var _ot=old.getAttribute('data-tok');
+      if(_ot&&_ot!==token){ /* v280: one prompt at a time - this person is asked right after the current one */
+        try{ delete fbWatchApproval._busy[token]; }catch(e){} setTimeout(function(){ try{ fbWatchApproval._recheck(token); }catch(e){} }, 3000); return; }
+      old.remove(); }
     try{ popupClearLow(); }catch(e){}
     /* the invite panel for this person is done - it must not cover the confirm buttons */
     try{ var _ip=document.getElementById('inv-panel'); if(_ip) _ip.remove(); }catch(e){}
-    var bar=document.createElement('div'); bar.id='invconf-bar'; bar.className='nudge-bar'; bar.style.zIndex='100001';
+    var bar=document.createElement('div'); bar.id='invconf-bar'; bar.className='nudge-bar'; bar.style.zIndex='100001'; bar.setAttribute('data-tok',token);
     /* a registry stamp is first-come, not proof of the number - never call it "verified" */
     var same=!!(verified&&p.toPh&&inv.acceptedPh===p.toPh);
     var note=codeOk===true?(same?(he?'ℹ️ אותו מספר שהזמנת - לא מאומת (SH✡MER לא יכול להוכיח שהמספר שלהם)':'ℹ️ Same number you invited - unverified (SH✡MER cannot prove the number is theirs)'):inv.acceptedPh?(he?'⚠️ הקישור נפתח ממספר אחר מזה שהזמנת':'⚠️ The link was opened from a different number than the one you invited'):(he?'⚠️ לא ניתן לאמת את המספר שלהם':'⚠️ Their number could not be verified'))

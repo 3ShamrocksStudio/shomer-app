@@ -1546,8 +1546,8 @@ function buildReportHtml(){
  var netHtml=netOk?('<table><tbody>'
    +'<tr><td>מכשירים מחוברים כעת · כל הרשת (90 שניות אחרונות)</td><td class="num">'+v(S.onlineNow)+'</td></tr>'
    +'<tr><td>מכשירים פעילים היום (מחצות) · כל הרשת</td><td class="num">'+v(S.activeToday)+'</td></tr>'
-   +'<tr><td>מכשירים עד 18 ק״מ ממרכז העיר · מחוברים כעת / פעילים 24 ש׳</td><td class="num">'+v(S.onlineTerr)+' / '+v(S.territoryActive)+'</td></tr>'
-   +'<tr><td>מכשירים פעילים 24 ש׳ מעבר ל-18 ק״מ ממרכז העיר</td><td class="num">'+v(S.outTerr24)+'</td></tr>'
+   +'<tr><td>מכשירים עד 18 ק״מ ממרכז העיר · מחוברים כעת / פעילים היום</td><td class="num">'+v(S.onlineTerr)+' / '+v(S.territoryActive)+'</td></tr>'
+   +'<tr><td>מכשירים פעילים היום מעבר ל-18 ק״מ ממרכז העיר</td><td class="num">'+v(S.outTerr24)+'</td></tr>'
    +'<tr><td>אירועים חיים עד 18 ק״מ ממרכז העיר (24 ש׳)'+(demo?' — בדמו: אירועי הדגמה':'')+'</td><td class="num">'+v(demo?window._demoLiveCount:S.activeEvents)+'</td></tr>'
    +'</tbody></table><p class="note">מקור: רשת SH✡MER (dashfeed, ללא פרטים מזהים, מיקום מעוגל לכ-1 ק״מ). נספרים רק מכשירים מאומתים (גרסה v279 ומעלה, ללא דפדפנים אוטומטיים) — מאז 22.10.2026 · נכון ל-'+netAt+'.</p>')
    :'<p>נתוני הרשת לא היו זמינים בעת היצוא — לא מוצגים מספרים.</p>';
@@ -1920,6 +1920,7 @@ function _trCmpSpec(c){
   foot:(perK?'עבירות ל-1,000 תושבים · משטרת ישראל 2025 · אוכלוסייה: הערכת למ״ס':'% מהעבירות בעיר · משטרת ישראל 2025'),
   footTip:'מקור: משטרת ישראל 2025 · data.gov.il'+(perK?' · אוכלוסייה: הערכת למ״ס (מעוגלת)':' · אין נתון אוכלוסייה לעיר — מוצג % מהעבירות')+' · אין במאגר נתוני שנה קודמת, לכן ההשוואה היא בין ערים'};
 }
+var _TR_START=new Date('2026-10-22T00:00:00+03:00').getTime();
 function _trNetSpec(c){
  var N=window._net; if(!N) return {empty:'טוען נתוני רשת…'}; if(!N.ok) return {empty:'אין חיבור לנתוני הרשת כרגע — ננסה שוב אוטומטית.'};
  var R=window._trRange||12, W=7*864e5, x=[], xf=[], a=[], t=[], ev=[];
@@ -1927,7 +1928,8 @@ function _trNetSpec(c){
    x.push(d0.getDate()+'/'+(d0.getMonth()+1)); xf.push('שבוע '+d0.getDate()+'/'+(d0.getMonth()+1)+'–'+d1.getDate()+'/'+(d1.getMonth()+1));
    var ca={},ct={},ce=0; N.pres.forEach(function(p){ if(p.ts>=b0&&p.ts<b1){ ca[p.day+'|'+p.dev]=1; if(p.t)ct[p.day+'|'+p.dev]=1; } }); N.ev.forEach(function(p){ if(p.ts>=b0&&p.ts<b1&&p.t)ce++; });
    /* device tags change every day (privacy), so a week shows the AVERAGE devices active per day */
-   a.push(Math.round(Object.keys(ca).length/7*10)/10); t.push(Math.round(Object.keys(ct).length/7*10)/10); ev.push(ce); }
+   var _st=Math.max(b0,_TR_START), _dd=Math.max(1,Math.ceil((b1-_st)/864e5)); if(b1<=_TR_START){ a.push(null); t.push(null); ev.push(null); continue; }   /* days counted in this week (counting began 22.10.2026) */
+   a.push(Math.round(Object.keys(ca).length/_dd*10)/10); t.push(Math.round(Object.keys(ct).length/_dd*10)/10); ev.push(ce); }
  var at=new Date(N.at);
  return {kind:'line', unit:'', dec:1, x:x, xFull:xf,
   series:[{k:'all',label:'מכשירים ביום (ממוצע) · כל הרשת',c:'#2bc47e',v:a},{k:'terr',label:'מכשירים ביום (ממוצע) · עד 18 ק״מ ממרכז העיר',c:'#faac22',v:t},{k:'ev',label:'דיווחים · עד 18 ק״מ ממרכז העיר',c:'#ef4853',v:ev}],
@@ -1964,9 +1966,9 @@ function renderTrendInline(elId){
  if(bar){ var gw=Math.min(band*.78,act.length*22), bw=gw/act.length;
    act.forEach(function(s,si){ s.v.forEach(function(v,i){ if(v==null)return; var x=X(i)-gw/2+si*bw, y=Y(v), h=Math.max(1,padT+ih-y);
      marks+='<rect class="trm" data-i="'+i+'" x="'+(x+1).toFixed(1)+'" y="'+y.toFixed(1)+'" width="'+Math.max(2,bw-2).toFixed(1)+'" height="'+h.toFixed(1)+'" rx="2.5" fill="'+s.c+'"'+(anim?' opacity="0"><animate attributeName="opacity" from="0" to="1" dur="0.45s" begin="'+(i*0.04+si*0.03)+'s" fill="freeze"/></rect>':'/>'); }); }); }
- else { act.forEach(function(s,si){ var pts=s.v.map(function(v,i){return [X(i),Y(v||0)];});
+ else { act.forEach(function(s,si){ var pts=[]; s.v.forEach(function(v,i){ if(v!=null) pts.push([X(i),Y(v),i]); });   /* weeks before counting began are left empty, not drawn as 0 */
    marks+='<polyline points="'+pts.map(function(p){return p[0].toFixed(1)+','+p[1].toFixed(1);}).join(' ')+'" fill="none" stroke="'+s.c+'" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"'+(anim?' pathLength="100" stroke-dasharray="100" stroke-dashoffset="100"><animate attributeName="stroke-dashoffset" from="100" to="0" dur="0.8s" begin="'+(si*0.08)+'s" fill="freeze"/></polyline>':'/>');
-   pts.forEach(function(p,i){ marks+='<circle class="trp" data-s="'+si+'" data-i="'+i+'" cx="'+p[0].toFixed(1)+'" cy="'+p[1].toFixed(1)+'" r="3" fill="'+s.c+'" stroke="#0c1b39" stroke-width="1.2"/>'; }); }); }
+   pts.forEach(function(p){ var i=p[2]; marks+='<circle class="trp" data-s="'+si+'" data-i="'+i+'" cx="'+p[0].toFixed(1)+'" cy="'+p[1].toFixed(1)+'" r="3" fill="'+s.c+'" stroke="#0c1b39" stroke-width="1.2"/>'; }); }); }
  host.innerHTML='<svg width="'+W+'" height="'+H+'" viewBox="0 0 '+W+' '+H+'">'+g+'<line class="tr-guide" x1="0" x2="0" y1="'+padT+'" y2="'+(padT+ih)+'" stroke="rgba(250,172,34,.55)" stroke-dasharray="3 3" visibility="hidden"/>'+marks+xl+'</svg><div class="tt-tip"></div>';
  var tip=host.querySelector('.tt-tip'), guide=host.querySelector('.tr-guide'), svg=host.querySelector('svg');
  function fv(v){ return v==null?'—':(spec.dec?(+v).toFixed(spec.dec):fmt(v)); }
@@ -2031,7 +2033,7 @@ function recItems(idx,fk,noEx){
    var sec=ranked[0];
    if(sec&&sec.r>1.12&&sec.cs>=0.05) out.push({cls:'flag',i:'▲',t:catPlain(sec.k)+' — יותר מהממוצע בארץ',d:Math.round(sec.cs*100)+'% כאן לעומת '+Math.round(sec.ns*100)+'% בארץ. '+(ACT_PLAIN[sec.k]||''),why:'משטרת ישראל 2025'});
  }
- if(S.territoryActive!=null) out.push({cls:'info',i:'◉',t:'מכשירים פעילים היום עד 18 ק״מ ממרכז העיר: '+S.territoryActive,d:S.territoryActive<10?'כיסוי נמוך — לגייס מתנדבים ולהפיץ את האפליקציה בשכונות.':'יש כיסוי — אפשר להיעזר בשומרים לדיווח מהיר מהשטח.',why:'רשת SH✡MER · מכשירים מאומתים (v279+) פעילים ב-24 שעות, עד 18 ק״מ ממרכז העיר · נספרים מאז 22.10.2026'});
+ if(S.territoryActive!=null) out.push({cls:'info',i:'◉',t:'מכשירים פעילים היום עד 18 ק״מ ממרכז העיר: '+S.territoryActive,d:S.territoryActive<10?'כיסוי נמוך — לגייס מתנדבים ולהפיץ את האפליקציה בשכונות.':'יש כיסוי — אפשר להיעזר בשומרים לדיווח מהיר מהשטח.',why:'רשת SH✡MER · מכשירים מאומתים (v279+) פעילים היום (מחצות), עד 18 ק״מ ממרכז העיר · נספרים מאז 22.10.2026'});
  return out;
 }
 function closeRecDetail(){ var o=document.getElementById('rec-ov'); if(o)o.remove(); }
