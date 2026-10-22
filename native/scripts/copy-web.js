@@ -39,6 +39,20 @@ if (html.indexOf('native-bridge.js') === -1) {
   html = html.replace('</body>', '<script src="native-bridge.js"></script>\n</body>');
 }
 
+/* v276: this bundled copy is only the OFFLINE fallback (capacitor errorPath). It used to
+   become a trap: once a flaky launch landed here, its update check read its own bundled
+   version.json, so the phone stayed on the frozen build forever. Now, whenever the live
+   site is reachable (and no SOS / dead-man switch is running), hop back to the live app. */
+const LIVE_HOP = "<script>(function(){var LIVE='https://www.shomer-app.co.il/shomer.html';"
+  + "if(!/^(localhost|127\\.0\\.0\\.1)$/.test(location.hostname))return;"
+  + "function busy(){try{return typeof _emergencyBusy==='function'&&_emergencyBusy();}catch(e){return false;}}"
+  + "function tryLive(){if(navigator.onLine===false||busy())return;"
+  + "fetch('https://www.shomer-app.co.il/version.json?cb='+Date.now(),{cache:'no-store',mode:'no-cors'})"
+  + ".then(function(){if(!busy())location.replace(LIVE+'?u='+Date.now());}).catch(function(){});}"
+  + "tryLive();setInterval(tryLive,8000);window.addEventListener('online',tryLive);"
+  + "document.addEventListener('visibilitychange',function(){if(document.visibilityState==='visible')tryLive();});})();</script>";
+html = html.replace(/<head([^>]*)>/i, function (m) { return m + '\n' + LIVE_HOP; });
+
 fs.writeFileSync(path.join(WWW, 'index.html'), html);
 console.log('wrote patched index.html (CSP adjusted for native)');
 
