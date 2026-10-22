@@ -27,6 +27,8 @@
 <uses-permission android:name="android.permission.READ_CONTACTS" />
 <!-- v279: @capacitor-community/contacts requests READ+WRITE as one alias; without WRITE Android refused every pick -->
 <uses-permission android:name="android.permission.WRITE_CONTACTS" />
+<!-- v279: speech plugin needs RECORD_AUDIO, which makes Play assume a microphone is required. It is optional (typed fallback). -->
+<uses-feature android:name="android.hardware.microphone" android:required="false" />
 
 <!-- ── BACKGROUND GEOLOCATION SERVICE (place inside <application>) ── -->
 <service

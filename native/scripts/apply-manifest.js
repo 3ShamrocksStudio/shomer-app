@@ -18,6 +18,12 @@ for (const p of perms) {
     added++;
   }
 }
+/* <uses-feature> lines (e.g. microphone optional) - same de-duplication by name. */
+const feats = (additions.match(/<uses-feature[^>]*\/>/g) || []);
+for (const f of feats) {
+  const nm = f.match(/android:name="([^"]+)"/);
+  if (nm && manifest.indexOf('"' + nm[1] + '"') === -1) { manifest = manifest.replace('<application', '    ' + f + '\n    <application'); added++; }
+}
 /* SHOMER's own foreground services live in android-config too — the merger used to
    drop them, so AlarmForegroundService and ShakeService never reached the APK. */
 /* Self-closing form first (bounded so it cannot run past its own '>'), otherwise the
