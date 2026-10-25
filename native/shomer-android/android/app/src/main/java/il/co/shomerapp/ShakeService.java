@@ -94,12 +94,15 @@ public class ShakeService extends Service implements SensorEventListener {
     // Felt confirmation in the pocket: SOS is on its way (the countdown can still be cancelled).
     try {
       Vibrator v = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
-      if (v != null) v.vibrate(VibrationEffect.createWaveform(new long[]{0, 400, 150, 400, 150, 400}, -1));
-    } catch (Exception e) {}
+      if (v != null) {
+        if (Build.VERSION.SDK_INT >= 26) v.vibrate(VibrationEffect.createWaveform(new long[]{0, 400, 150, 400, 150, 400}, -1));
+        else v.vibrate(new long[]{0, 400, 150, 400, 150, 400}, -1);
+      }
+    } catch (Throwable e) {}
     // 1) The app is running (screen off / locked / in the background): fire the SOS straight
     //    into the live web app - no need to wait for the screen to come up.
     boolean fired = false;
-    try { MainActivity a = MainActivity.sActive; if (a != null) fired = a.fireWebSos("shake"); } catch (Exception e) {}
+    try { MainActivity a = MainActivity.sActive; if (a != null) fired = a.fireWebSos("shake"); } catch (Throwable e) {}
     fireSosLaunch(fired);
   }
 

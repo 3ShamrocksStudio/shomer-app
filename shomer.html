@@ -5428,8 +5428,14 @@ function activateSOS(){
  setTimeout(()=>{
  if(sosPhase!=='active')return;
  const _pn=policeNum();   /* v274: local police number (911 / 999 / 112 …) - 100 only in Israel */
- const call=window.confirm(he?'לחייג למשטרה '+_pn+' אוטומטית?\n(לחץ אישור לחיוג)':'Auto-call police '+_pn+'?\n(Press OK to dial)');
- if(call) window.location.href='tel:'+_pn;
+ /* v287: a non-blocking offer - window.confirm froze the whole SOS (retries, alerts) on a locked phone until tapped */
+ try{ var _ob=document.getElementById('callpol-bar'); if(_ob) _ob.remove();
+   var cb=document.createElement('div'); cb.className='nudge-bar'; cb.id='callpol-bar';
+   cb.innerHTML='<span class="nudge-tx" style="font-weight:800">'+(he?'לחייג למשטרה '+_pn+'?':'Call police '+_pn+'?')+'</span><button class="nudge-cta" id="callpol-go">'+(he?'חייג/י '+_pn:'Call '+_pn)+'</button><button class="nudge-x" aria-label="close">\u2715</button>';
+   document.body.appendChild(cb);
+   cb.querySelector('.nudge-x').onclick=function(){ cb.remove(); };
+   cb.querySelector('#callpol-go').onclick=function(){ cb.remove(); window.location.href='tel:'+_pn; };
+ }catch(_e){}
  },2000);
  clearInterval(sosTimer);   /* no simulated "N SHOMERs responding" - only REAL responders are ever shown (help bar / showRespToPerson) */
  setTimeout(()=>{if(sosPhase==='active')openUpdates();},800);

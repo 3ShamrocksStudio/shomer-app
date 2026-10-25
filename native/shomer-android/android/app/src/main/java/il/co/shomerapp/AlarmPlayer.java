@@ -34,8 +34,11 @@ final class AlarmPlayer {
       mp.prepare();
       mp.start();
       Vibrator v = (Vibrator) c.getSystemService(Context.VIBRATOR_SERVICE);
-      if (v != null) v.vibrate(VibrationEffect.createWaveform(new long[]{0, 500, 140, 500, 140, 500, 320}, new int[]{0, 255, 0, 255, 0, 255, 0}, 1));
-    } catch (Exception e) { mp = null; }
+      if (v != null) {
+        if (android.os.Build.VERSION.SDK_INT >= 26) v.vibrate(VibrationEffect.createWaveform(new long[]{0, 500, 140, 500, 140, 500, 320}, new int[]{0, 255, 0, 255, 0, 255, 0}, 1));
+        else v.vibrate(new long[]{0, 500, 140, 500, 140, 500, 320}, 1);
+      }
+    } catch (Throwable e) { try { if (mp != null) mp.release(); } catch (Throwable t) {} mp = null; }
   }
 
   static synchronized void stop(Context c) {

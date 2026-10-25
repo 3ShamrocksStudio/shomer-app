@@ -32,15 +32,37 @@ public class MainActivity extends BridgeActivity {
     super.onDestroy();
   }
 
-  /** Run the web SOS trigger now (screen on or off). Returns false if there is no live web app. */
+  /** Hand the SOS to the web app and KEEP TRYING until the web app confirms it took it
+   *  (the page may still be loading or reloading). Returns false if there is no bridge at all. */
   boolean fireWebSos(final String reason) {
+    if (getBridge() == null) return false;
+    deliverSos(reason.replace("'", ""), 0);
+    return true;
+  }
+
+  private void deliverSos(final String reason, final int attempt) {
+    runOnUiThread(() -> {
+      try {
+        if (getBridge() == null) return;
+        getBridge().eval("(typeof window.__shomerNativeSOS==='function')?(window.__shomerNativeSOS('" + reason + "'),'ok'):'wait'", (v) -> {
+          if (v != null && v.contains("ok")) return;
+          if (attempt < 60) getWindow().getDecorView().postDelayed(() -> deliverSos(reason, attempt + 1), 750);
+        });
+      } catch (Exception e) {
+        if (attempt < 60) getWindow().getDecorView().postDelayed(() -> deliverSos(reason, attempt + 1), 750);
+      }
+    });
+  }
+
+  // Once the SOS screen is no longer on top, stop showing SHOMER over the lock screen.
+  @Override
+  public void onStop() {
     try {
-      if (getBridge() == null) return false;
-      runOnUiThread(() -> {
-        try { getBridge().eval("window.__shomerNativeSOS && window.__shomerNativeSOS('" + reason + "');", (v) -> {}); } catch (Exception e) {}
-      });
-      return true;
-    } catch (Exception e) { return false; }
+      if (Build.VERSION.SDK_INT >= 27) { setShowWhenLocked(false); setTurnScreenOn(false); }
+      else { getWindow().clearFlags(WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED | WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON); }
+      getWindow().clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+    } catch (Exception e) {}
+    super.onStop();
   }
 
   /** A shake SOS must be visible over the lock screen and wake the display. */
@@ -69,14 +91,8 @@ public class MainActivity extends BridgeActivity {
     // ShakeService already fired the SOS into the live web app; this launch only brings the
     // screen up. Don't fire twice (a second trigger during the countdown would cancel it).
     if (intent.getBooleanExtra("shomer_sos_fired", false)) return;
-    final String reason = sos.replace("'", "");
-    getWindow().getDecorView().postDelayed(() -> {
-      try {
-        if (getBridge() != null) {
-          getBridge().eval("window.__shomerNativeSOS && window.__shomerNativeSOS('" + reason + "');", (v) -> {});
-        }
-      } catch (Exception e) {}
-    }, 1200);
+    // Not fired yet (app was closed): deliver once the web app is ready - retried, not a fixed wait.
+    deliverSos(sos.replace("'", ""), 0);
   }
 
   // Theft-protection selfie needs the front camera. Capacitor grants the WebView's

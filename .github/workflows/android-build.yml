@@ -175,11 +175,10 @@ jobs:
           git push origin HEAD:main
 
       - name: Play build only - strip background permissions that need Play policy declarations
-        # The website APK above keeps every native feature. The Play bundle drops the
-        # permissions Google requires video-backed declarations for (background location,
-        # foreground services, full-screen intent, exact alarms), so the closed test can be
-        # reviewed fast. The app UI is identical: both load https://www.shomer-app.co.il.
-        # Restore these (delete this step) together with the Play declarations before production.
+        # The website APK above keeps every native feature. The Play bundle still drops background
+        # location, exact alarms and the battery-optimisation request. Shake-to-SOS (foreground
+        # services, full-screen intent, boot restart) is KEPT - it must work on a locked phone.
+        # Both builds load https://www.shomer-app.co.il.
         working-directory: native/android
         run: |
           M=app/src/main/AndroidManifest.xml
@@ -187,7 +186,7 @@ jobs:
           # KEPT in the Play build (owner requirement - shake must fire an SOS on a locked phone):
           #   FOREGROUND_SERVICE, FOREGROUND_SERVICE_SPECIAL_USE (ShakeService), FOREGROUND_SERVICE_MEDIA_PLAYBACK
           #   (AlarmForegroundService), USE_FULL_SCREEN_INTENT (SOS screen over the lock screen), WAKE_LOCK.
-          for P in ACCESS_BACKGROUND_LOCATION FOREGROUND_SERVICE_LOCATION SCHEDULE_EXACT_ALARM REQUEST_IGNORE_BATTERY_OPTIMIZATIONS HIGH_SAMPLING_RATE_SENSORS RECEIVE_BOOT_COMPLETED; do
+          for P in ACCESS_BACKGROUND_LOCATION FOREGROUND_SERVICE_LOCATION SCHEDULE_EXACT_ALARM REQUEST_IGNORE_BATTERY_OPTIMIZATIONS HIGH_SAMPLING_RATE_SENSORS; do
             sed -i "/android.permission.$P\"/d" "$M"
             sed -i "s#<application#    <uses-permission android:name=\"android.permission.$P\" tools:node=\"remove\" />\n    <application#" "$M"
           done
@@ -196,10 +195,8 @@ jobs:
           m=sys.argv[1]; s=open(m).read()
           # drop SHOMER/plugin service + boot receiver blocks, then force-remove them from merged libraries
           s=re.sub(r'\s*<service[^>]*(BackgroundGeolocationService)[^>]*?(/>|>.*?</service>)','',s,flags=re.S)
-          s=re.sub(r'\s*<receiver[^>]*BootReceiver.*?</receiver>','',s,flags=re.S)
           rm=''.join('\n        <%s android:name="%s" tools:node="remove" />'%(t,n) for t,n in [
-            ('service','com.equimaps.capacitor_background_geolocation.BackgroundGeolocationService'),
-            ('receiver','il.co.shomerapp.BootReceiver')])
+            ('service','com.equimaps.capacitor_background_geolocation.BackgroundGeolocationService')])
           s=re.sub(r'(<application[^>]*>)',lambda x:x.group(1)+rm,s,count=1)
           open(m,'w').write(s)
           PY
