@@ -9,7 +9,7 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Alef:wght@400;700&family=Inter:wght@500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Alef:wght@400;700&family=Inter:wght@200;300;500;600;700&display=swap" rel="stylesheet">
 <style>
   /* SH✡MER Command — brand tokens: #faac22 gold · #1e315f blue · #0c1b39 navy */
   @font-face{font-family:'Marion';src:local('Marion Bold'),local('Marion-Bold'),local('Marion');font-weight:700;font-display:swap}
@@ -53,11 +53,12 @@
   .brand{display:flex;align-items:center;gap:10px;white-space:nowrap}
   .brand small{font-weight:700;font-size:10.5px;color:var(--tx2);letter-spacing:.16em;text-transform:uppercase;padding-inline-start:10px;border-inline-start:1px solid var(--line-2)}
   .tb-sp{flex:1}
-  .clk{display:flex;align-items:center;gap:12px;padding:3px 14px;border-inline:1px solid var(--line-2);direction:rtl;white-space:nowrap}
-  .clk-t{text-align:center;line-height:1.05}.clk-t b{display:block;font-size:21px;font-weight:800;color:var(--gold);font-variant-numeric:tabular-nums;letter-spacing:.5px;direction:ltr}
-  .clk-t span{font-size:10px;color:var(--tx3)}.clk-d{display:flex;flex-direction:column;font-size:12.5px;color:var(--tx);line-height:1.3}#clk-heb{font-size:11px;color:var(--tx3)}
-  #clk-short{display:none;font-size:10.5px;color:var(--tx)}
-  @media(max-width:1700px){#clk-heb{display:none}.brand small{display:none}} @media(max-width:1450px){.clk-d{display:none}.clk{padding:3px 10px}.clk-lbl{display:none}#clk-short{display:block}}
+  .clk{display:flex;align-items:center;gap:12px;padding:0 16px;height:100%;border-inline:1px solid var(--line-2);direction:rtl;white-space:nowrap}
+  .clk-il{width:30px;height:22px;flex:0 0 30px;border-radius:3px;box-shadow:0 0 0 1px rgba(255,255,255,.15)}
+  .clk-time{font-family:var(--num);font-weight:200;font-size:40px;line-height:1;color:#EEF2F8;font-variant-numeric:tabular-nums;font-feature-settings:"tnum" 1;letter-spacing:-.01em}
+  .clk-time i{font-style:normal;color:var(--gold)}
+  .clk-d{display:flex;flex-direction:column;font-size:12.5px;color:var(--tx);line-height:1.3}#clk-heb{font-size:11px;color:var(--tx3)}#clk-short{display:none}
+  @media(max-width:1700px){#clk-heb{display:none}.brand small{display:none}} @media(max-width:1450px){#clk-date{display:none}#clk-short{display:block;font-size:11.5px;white-space:normal;max-width:70px;line-height:1.25}.clk{padding:0 10px;gap:9px}.clk-time{font-size:34px}}
   .terr-pick{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--tx2)}
   .terr-pick select{height:34px;width:auto;min-width:150px;background:var(--navy-2);border-color:var(--blue-2);font-size:13.5px;font-weight:700;color:var(--tx);border-radius:8px;padding:0 10px}
   .live{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--tx2);white-space:nowrap}
@@ -572,7 +573,7 @@
 <div id="app" class="hidden">
   <div class="topbar">
     <div class="brand" dir="ltr"><img src="SHOMER_logo_big.png" alt="SH✡MER" class="logo-img"><small>Command · Municipal Intelligence</small></div>
-    <div class="clk" id="clk" title="כל הזמנים בלוח מוצגים בשעון ישראל. &quot;היום&quot; = יום קלנדרי: מ-00:00 עד 23:59:59 שעון ישראל, ומתאפס בחצות."><div class="clk-t"><b id="clk-time">--:--:--</b><span class="clk-lbl">שעון ישראל</span><span id="clk-short"></span></div><div class="clk-d"><span id="clk-date"></span><span id="clk-heb"></span></div></div>
+    <div class="clk" id="clk" title="שעון ישראל. כל הזמנים בלוח מוצגים בשעון ישראל. &quot;היום&quot; = יום קלנדרי: מ-00:00 עד 23:59:59 שעון ישראל, ומתאפס בחצות."><svg class="clk-il" viewBox="0 0 220 160" aria-label="ישראל" role="img"><rect width="220" height="160" rx="14" fill="#fff"/><rect y="15" width="220" height="25" fill="#0038b8"/><rect y="120" width="220" height="25" fill="#0038b8"/><g fill="none" stroke="#0038b8" stroke-width="5.5"><path d="M110 50 L136 95 H84 Z"/><path d="M110 110 L84 65 H136 Z"/></g></svg><b class="clk-time" id="clk-time" dir="ltr">--:--<i>:--</i></b><div class="clk-d"><span id="clk-date"></span><span id="clk-heb"></span><span id="clk-short"></span></div></div>
     <div class="tb-sp"></div>
     <div class="terr-pick"><span id="terr-static" class="hidden">טריטוריה: <b id="terr-name" style="color:var(--gold)"></b></span><select id="terr-sel"></select></div>
     <div class="live off" id="live-ind" title="אין חיבור לנתונים חיים"><span class="d"></span><span id="org-name"></span></div>
@@ -652,8 +653,8 @@ function hebNum(n){ if(!(n>0)) return ''; var H=[[400,'ת'],[300,'ש'],[200,'ר'
   while(n>0){ if(n===15){ r+='טו'; break; } if(n===16){ r+='טז'; break; } for(var i=0;i<H.length;i++){ if(H[i][0]<=n){ r+=H[i][1]; n-=H[i][0]; break; } } }
   return r.length>1?r.slice(0,-1)+'״'+r.slice(-1):r+'׳'; }
 function clkTick(){ try{ var now=Date.now(), q=ilParts(now);
-  var t=document.getElementById('clk-time'); if(!t) return; t.textContent=q.hour+':'+q.minute+':'+q.second;
-  var sh=document.getElementById('clk-short'); if(sh) sh.textContent=new Intl.DateTimeFormat('he-IL',{timeZone:IL_TZ,weekday:'short'}).format(new Date(now))+' '+q.day+'.'+q.month+'.'+q.year+' · שעון ישראל';
+  var t=document.getElementById('clk-time'); if(!t) return; t.innerHTML=q.hour+':'+q.minute+'<i>:'+q.second+'</i>';
+  var sh=document.getElementById('clk-short'); if(sh) sh.textContent=new Intl.DateTimeFormat('he-IL',{timeZone:IL_TZ,weekday:'short'}).format(new Date(now))+' '+q.day+'.'+q.month+'.'+q.year;
   var d=document.getElementById('clk-date'); if(d) d.textContent=new Intl.DateTimeFormat('he-IL',{timeZone:IL_TZ,weekday:'long',day:'numeric',month:'long',year:'numeric'}).format(new Date(now));
   var h=document.getElementById('clk-heb'); if(h){ try{ var hp={}; new Intl.DateTimeFormat('he-IL-u-ca-hebrew',{timeZone:IL_TZ,day:'numeric',month:'long',year:'numeric'}).formatToParts(new Date(now)).forEach(function(x){ hp[x.type]=x.value; });
     h.textContent=hebNum(+hp.day)+' '+(/^ב/.test(hp.month)?'':'ב')+hp.month+' '+hebNum((+hp.year)%1000); }catch(e){ h.textContent=''; } }
