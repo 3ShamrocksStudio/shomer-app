@@ -121,6 +121,12 @@ public class ShakeService extends Service implements SensorEventListener {
     open.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_SINGLE_TOP | Intent.FLAG_ACTIVITY_CLEAR_TOP);
     open.putExtra("shomer_sos", "shake");
     open.putExtra("shomer_sos_fired", alreadyFired);
+    try {
+      android.content.SharedPreferences sp = getSharedPreferences("shomer_native", MODE_PRIVATE);
+      String k = sp.getString("sos_key", null);
+      if (k == null) { k = java.util.UUID.randomUUID().toString(); sp.edit().putString("sos_key", k).commit(); }
+      open.putExtra("shomer_sos_key", k);
+    } catch (Exception e) {}
     PendingIntent pi = PendingIntent.getActivity(this, 1, open,
         PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
 

@@ -87,6 +87,14 @@ public class MainActivity extends BridgeActivity {
   private void dispatchShakeSos(Intent intent) {
     String sos = intent != null ? intent.getStringExtra("shomer_sos") : null;
     if (sos == null) return;
+    // Reopened from recents / restored after a kill: the old trigger must not start a new SOS.
+    if ((intent.getFlags() & Intent.FLAG_ACTIVITY_LAUNCHED_FROM_HISTORY) != 0) return;
+    // Only SHOMER's own shake service may start an SOS this way (the activity is exported).
+    try {
+      String k = getSharedPreferences("shomer_native", MODE_PRIVATE).getString("sos_key", null);
+      if (k == null || !k.equals(intent.getStringExtra("shomer_sos_key"))) return;
+    } catch (Exception e) { return; }
+    intent.removeExtra("shomer_sos");
     showOverLock();
     // ShakeService already fired the SOS into the live web app; this launch only brings the
     // screen up. Don't fire twice (a second trigger during the countdown would cancel it).
