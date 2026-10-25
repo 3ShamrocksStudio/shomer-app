@@ -210,6 +210,7 @@
   .leaflet-control-attribution{background:rgba(8,20,44,.7)!important;color:var(--tx3)!important;font-size:9.5px!important}
   .leaflet-bar a{background:var(--navy-1)!important;color:var(--tx)!important;border-color:var(--blue)!important}
   .leaflet-bar a:hover{background:var(--navy-2)!important;color:var(--gold)!important}
+  .leaflet-bar a.map-focus{display:flex!important;align-items:center;justify-content:center}
   .leaflet-popup-content-wrapper,.leaflet-popup-tip{background:var(--navy-1);color:var(--tx);border:1px solid var(--blue);box-shadow:0 10px 30px rgba(0,0,0,.5)}
   .leaflet-popup-content{font-family:var(--font);font-size:12.5px;margin:10px 13px}
   .leaflet-container a.leaflet-popup-close-button{color:var(--tx2)}
@@ -941,7 +942,8 @@ function geoRings(geo){ var rings=[]; function ring(cs){return cs.map(function(p
   else if(geo.type==='MultiPolygon'){geo.coordinates.forEach(function(poly){poly.forEach(function(r){rings.push(ring(r));});});}
   return rings; }
 async function drawTerritory(c){
-  if(c.pending){ try{ MAP.setView([20,0],2); }catch(e){} return; } /* worldwide territory still being located */
+  if(c.pending){ window._terrFocus=function(){ MAP.setView([20,0],2,{animate:true}); }; try{ MAP.setView([20,0],2); }catch(e){} return; } /* worldwide territory still being located */
+  window._terrFocus=function(){ MAP.setView([c.lat,c.lng],12,{animate:true}); };   /* provisional until the boundary arrives */
   var geo=_boundaryCache[c.city];
   if(geo===undefined){
     /* dataset cities are Israeli → restrict the lookup to IL; worldwide territories pre-fill the cache in setIntlTerritory */
@@ -956,11 +958,13 @@ async function drawTerritory(c){
     var world=[[85,-180],[85,180],[-85,180],[-85,-180]];
     L.polygon([world].concat(rings),{stroke:false,fillColor:'#060f1c',fillOpacity:.62,interactive:false}).addTo(cityLayer); // dim outside the jurisdiction
     var bnd=L.geoJSON(geo,{style:{color:'#ffffff',weight:1.3,dashArray:'3 6',fill:true,fillColor:'#ffffff',fillOpacity:.02}}).addTo(cityLayer);
+    var _tb=bnd.getBounds(); if(!(window.curC&&curC()&&curC().city!==c.city)) window._terrFocus=function(){ MAP.fitBounds(_tb,{padding:[24,24],animate:true}); };
     _lgClear('bound'); _lgAdd('bound','#ffffff','גבול שיפוט'); try{renderLegend();}catch(_l){}
     try{ MAP.invalidateSize(false); }catch(_s){}
     if(!_sosFocusLock){ try{ MAP.fitBounds(bnd.getBounds(),{padding:[24,24]}); }catch(e){ MAP.setView([c.lat,c.lng],12); } }
   } else {
     L.circle([c.lat,c.lng],{radius:4500,color:'#ffffff',weight:1.3,dashArray:'3 6',fillColor:'#ffffff',fillOpacity:.02}).addTo(cityLayer);
+    window._terrFocus=function(){ MAP.setView([c.lat,c.lng],12,{animate:true}); };
     _lgClear('bound'); _lgAdd('bound','#ffffff','אזור משוער (4.5 ק״מ) — גבול לא נמצא'); try{renderLegend();}catch(_l){}
     try{ MAP.invalidateSize(false); }catch(_s){}
     if(!_sosFocusLock){ MAP.setView([c.lat,c.lng],12,{animate:true}); }
@@ -1754,6 +1758,14 @@ try{ document.addEventListener('DOMContentLoaded',function(){ var ab=document.ge
 function initMap(){
   MAP=L.map('map',{zoomControl:true,attributionControl:true,zoomSnap:0.5}).setView([31.5,34.9],7);
   try{ MAP.attributionControl.setPrefix(false); }catch(e){}
+  /* "Focus" button under +/− : brings the map back to the whole territory */
+  try{ var Foc=L.Control.extend({options:{position:'topleft'},onAdd:function(){
+      var d=L.DomUtil.create('div','leaflet-bar leaflet-control'), a=L.DomUtil.create('a','map-focus',d);
+      a.href='#'; a.title='מיקוד על הטריטוריה'; a.setAttribute('role','button'); a.setAttribute('aria-label','מיקוד על הטריטוריה');
+      a.innerHTML='<svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><circle cx="12" cy="12" r="6.5" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="12" cy="12" r="2" fill="currentColor"/><path d="M12 1.5v4M12 18.5v4M1.5 12h4M18.5 12h4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>';
+      L.DomEvent.disableClickPropagation(d);
+      L.DomEvent.on(a,'click',function(ev){ L.DomEvent.preventDefault(ev); try{ (window._terrFocus||function(){ MAP.setView([31.5,34.9],7,{animate:true}); })(); }catch(e){} });
+      return d; }}); MAP.addControl(new Foc()); }catch(e){}
   /* hero basemap: Esri Dark Gray Canvas (CSP-allowed host server.arcgisonline.com; the CARTO
      raster endpoints now answer "API KEY REQUIRED"). Base tiles get a light navy tint with MORE
      contrast (the old filter crushed them to 40% brightness); labels sit in their own unfiltered
