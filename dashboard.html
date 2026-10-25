@@ -483,6 +483,9 @@
 /* KPI · crime pair (left of the centre line) */
 .c-crime .kpi{padding:8px 10px}
 .c-crime .kpi .km{white-space:nowrap;overflow:visible}
+.kpi-imp:hover{background:rgba(250,172,34,.06)}.imp-bar{height:4px;border-radius:3px;background:var(--line-2);margin-top:5px;overflow:hidden}.imp-bar i{display:block;height:100%;background:var(--gold);border-radius:3px}.imp-bar.big{height:8px}
+.imp-xp{margin:12px 0 6px}.imp-xp-h{display:flex;justify-content:space-between;font-size:12.5px;color:var(--tx2);margin-bottom:6px}.imp-xp-h b{color:var(--tx)}
+.imp-row{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:11px 0;border-top:1px solid var(--line-2)}.imp-row b{display:block;font-size:14px;color:var(--tx)}.imp-row span{font-size:12px;color:var(--tx2);line-height:1.4}.imp-v{font-family:var(--num);font-size:22px;font-weight:600;color:var(--gold);white-space:nowrap}
 /* KPI · network group (right of the centre line): green live tile · two secondary rows · dark-red events tile */
 .netgrid{direction:rtl;flex:1;min-height:0;display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,1.2fr) minmax(0,1.1fr);gap:7px;padding:7px}
 .nt{border-radius:9px;display:flex;flex-direction:column;justify-content:center;gap:2px;padding:6px 11px;min-width:0;min-height:0;cursor:default}
@@ -1269,6 +1272,7 @@ function _jsq(s){ return ESC(String(s).replace(/\\/g,'\\\\').replace(/'/g,"\\'")
 function _ago(ts){ var now=Date.now(),mn=Math.round((now-(ts||now))/60000);
  if(mn<1)return 'עכשיו'; if(mn<60)return 'לפני '+mn+' דק׳'; if(mn<48*60)return 'לפני '+Math.round(mn/60)+' שע׳';
  return ilDate(ts)+' · '+ilHM(ts); }
+function _evTip(m,e,tail){ var _t=e.ts||Date.now(); return '<b>'+ESC(m.t)+'</b><br>'+ilDate(_t)+' '+ilHM(_t)+((Date.now()-_t)<48*36e5?' · '+_ago(_t):'')+(tail?'<br><span style="opacity:.8">'+tail+'</span>':''); }
 function _boardRow(r){
  var e=r.e,m=r.m,isLive=r.live&&r.status==='open',id=_jsq(r.id);
  var st=isLive?'<span class="st-chip st-live">חי</span>':'<span class="st-chip st-'+r.status+'">'+ST_LBL[r.status]+'</span>';
@@ -1342,7 +1346,9 @@ function renderLive(c,list,opts){
   if(liveLayer){
    /* the active event (top SOS) always gets the pulsing beacon exactly on its location */
    var mk; if(m.sos||id===_topSosId){ mk=L.marker([e.lat,e.lng],{icon:_sosIcon(),zIndexOffset:1200}); } else { mk=L.circleMarker([e.lat,e.lng],{radius:9,color:'#fff',weight:2.5,fillColor:m.c,fillOpacity:1}); }
-   mk.on('click',(function(eid){return function(){openResponse(eid);};})(id)); try{if(mk._path)mk._path.style.cursor='pointer';}catch(_e){} mk.addTo(liveLayer); liveLayer._byId[id]=mk;
+   mk.on('click',(function(eid){return function(){openResponse(eid);};})(id)); try{if(mk._path)mk._path.style.cursor='pointer';}catch(_e){}
+   try{ mk.bindTooltip(_evTip(m,e,'חי · לחצו לפרטים ותגובה'),{direction:'top',offset:[0,-8]}); }catch(_t){}
+   mk.addTo(liveLayer); liveLayer._byId[id]=mk;
    _lgAdd('live',m.c,(m.sos?'SOS חי':(e.type==='abduct'||e.k==='abduct')?'חשד לחטיפה':(e.type==='missing'||e.k==='missing')?'אדם נעדר':('דיווח · '+catShort(e.t||e.type||'')))+(opts.demo?' (הדגמה)':''));
   }
   /* SOS rows are keyed by the person's uid, so a REPEAT SOS reuses the id: key = id + start ts */
@@ -1357,6 +1363,13 @@ function renderLive(c,list,opts){
  liveRows.sort(function(a,b){ return ((b.m.sos?1:0)-(a.m.sos?1:0))||((b.e.ts||0)-(a.e.ts||0)); });
  revRows.sort(function(a,b){ return ((a.status==='open'?0:1)-(b.status==='open'?0:1))||((b.e.ts||0)-(a.e.ts||0)); });
  window._boardRows={live:liveRows,rev:revRows,all:liveRows.concat(revRows),demo:!!opts.demo};
+ /* Past events (last 30 days) are on the map too - smaller and dimmer than live ones. Hover
+    previews them, a click opens the full record: when, where, status, notes and history. */
+ if(liveLayer){ var _pastN=0; revRows.forEach(function(r){ var e=r.e; if(r.ex||r.live||e.lat==null||e.lng==null||liveLayer._byId[r.id]) return;
+   var pm=L.circleMarker([+e.lat,+e.lng],{radius:6,color:'#c9d4e6',weight:1.5,dashArray:'2 2',fillColor:r.m.c,fillOpacity:.45});
+   pm.bindTooltip(_evTip(r.m,e,ST_LBL[r.status]+' · לחצו לתיעוד המלא'),{direction:'top',offset:[0,-6]});
+   pm.on('click',(function(eid){return function(){ openEvEdit(eid); };})(r.id)); pm.addTo(liveLayer); liveLayer._byId[r.id]=pm; _pastN++; });
+   if(_pastN) _lgAdd('live','#9aa6bb','אירוע קודם (30 יום) · לחצו לתיעוד'); }
  window._demoLiveCount=opts.demo?liveRows.length:null;
  var openRev=revRows.filter(function(r){return r.status==='open';}).length;
  var h='<div class="fsec live fi">חי עכשיו · לטיפול מיידי<span class="sp"></span>'+liveRows.length+'</div>'
@@ -1668,6 +1681,53 @@ var KICO={
 };
 var presLayer=null;
 function _founderStar(nudge){ return L.divIcon({className:'founder-div',html:'<div class="founder-beacon"><svg viewBox="0 0 48 48" width="34" height="34"><defs><radialGradient id="fga" cx="50%" cy="50%" r="50%"><stop offset="0" stop-color="#F7D66A" stop-opacity=".6"/><stop offset="70%" stop-color="#E0A828" stop-opacity="0"/></radialGradient><linearGradient id="fgs" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#FDEBA6"/><stop offset=".5" stop-color="#E7B434"/><stop offset="1" stop-color="#B8801C"/></linearGradient></defs><circle cx="24" cy="24" r="23" fill="url(#fga)"/><path d="M24 7 32 21 16 21Z M24 41 16 27 32 27Z" fill="none" stroke="url(#fgs)" stroke-width="3" stroke-linejoin="round"/></svg></div>',iconSize:[34,34],iconAnchor:(nudge?[4,30]:[17,17])}); }
+/* ══ IMPROVEMENT INDEX (next to the national ranking) ══
+   Official crime figures are yearly (Israel Police 2025), so they cannot show week-to-week progress.
+   This index shows what DOES move now, from real data only:
+   1) coverage - average SH✡MER devices active per day in the territory, last 7 days vs the 7 before;
+   2) handling - share of territory events (30 days) the team marked handled/closed;
+   3) time to handle - median minutes from an event to its first handling update on this board.
+   Until there are 14 days of data (counting began 22.10.2026) it says so instead of inventing a trend. */
+var IMP_START='2026-10-22';
+function impCompute(c){
+ var N=window._net||{}, today=_ilDay(Date.now()), base=Date.UTC(+today.slice(0,4),+today.slice(5,7)-1,+today.slice(8,10),12);
+ function dk(k){ return new Date(base-k*864e5).toISOString().slice(0,10); }
+ var days=0; for(var k=0;k<400;k++){ if(dk(k)>=IMP_START) days++; else break; }
+ function avg(from,to){ var set={}, cnt=0; for(var k=from;k<=to;k++){ var d=dk(k); if(d<IMP_START) continue; cnt++; } if(!cnt) return null;
+   (N.pres||[]).forEach(function(p){ var d=p.day; if(!p.t||!d||d<IMP_START) return; var kk=Math.round((base-Date.UTC(+d.slice(0,4),+d.slice(5,7)-1,+d.slice(8,10),12))/864e5); if(kk>=from&&kk<=to) set[d+'|'+p.dev]=1; });
+   return Object.keys(set).length/cnt; }
+ var sameCity=!!(N.ok&&(!N.city||!c||N.city===c.city));
+ var cov=sameCity?avg(0,6):null, covPrev=(sameCity&&days>=14)?avg(7,13):null;
+ var covChg=(cov!=null&&covPrev)?Math.round((cov-covPrev)/covPrev*100):null;
+ var rows=((window._boardRows&&window._boardRows.all)||[]).filter(function(r){ return !r.ex&&!r.demo; });
+ var handled=rows.filter(function(r){ return r.status==='handled'||r.status==='closed'; }).length;
+ var B=_boardLoad(), mins=[];
+ rows.forEach(function(r){ var lg=((B.reviews||{})[r.id]||{}).log||[]; var f=lg.filter(function(x){ return x.st&&x.st!=='open'; })[0]; if(f&&r.e.ts) mins.push(Math.max(0,(f.ts-r.e.ts)/60000)); });
+ mins.sort(function(a,b){return a-b;}); var med=mins.length?Math.round(mins[Math.floor((mins.length-1)/2)]):null;
+ return {days:days, cov:cov, covPrev:covPrev, covChg:covChg, ev:rows.length, handled:handled, rate:rows.length?Math.round(handled/rows.length*100):null, med:med, medN:mins.length};
+}
+function impTile(c){
+ var I=impCompute(c), v, m, cls, tip='מדד שיפור · נתוני אמת בלבד · לחצו לפירוט';
+ if(I.covChg!=null){ v='<span dir="ltr">'+(I.covChg>0?'▲+':I.covChg<0?'▼':'')+I.covChg+'%</span>'; cls=I.covChg>0?'ok':I.covChg<0?'bad':'gold'; m='כיסוי רשת · השבוע מול הקודם'; }
+ else { v='<span dir="ltr">'+Math.min(I.days,14)+'/14</span>'; cls='gold'; m='ימים לבסיס השוואה'; }
+ return '<div class="kpi kpi-imp" role="button" tabindex="0" title="'+ESC(tip)+'" onclick="openImprove()" style="cursor:pointer"><div class="kl"><span>מדד שיפור</span></div><div class="kv '+cls+'">'+v+'</div><div class="km">'+m+'</div>'
+  +'<div class="imp-bar"><i style="width:'+Math.round(Math.min(I.days,14)/14*100)+'%"></i></div></div>';
+}
+function openImprove(){
+ var c=curC(); if(!c) return; var I=impCompute(c), old=document.getElementById('imp-ov'); if(old) old.remove();
+ function row(t,v,sub){ return '<div class="imp-row"><div><b>'+t+'</b><span>'+sub+'</span></div><div class="imp-v">'+v+'</div></div>'; }
+ var cov=I.cov!=null?(Math.round(I.cov*10)/10)+' ליום':'—';
+ var covSub=I.covChg!=null?('לעומת '+(Math.round(I.covPrev*10)/10)+' בשבוע הקודם ('+(I.covChg>0?'+':'')+I.covChg+'%)'):('השוואה שבועית תתחיל אחרי 14 ימי נתונים · עכשיו יום '+Math.min(I.days,14));
+ var ov=document.createElement('div'); ov.id='imp-ov'; ov.className='acct-ov';
+ ov.innerHTML='<div class="acct-card" style="max-width:480px"><div class="acct-head"><h3>מדד שיפור · '+ESC(c.city)+'</h3><button class="acct-x" onclick="document.getElementById(\'imp-ov\').remove()">✕</button></div>'
+  +'<div class="acct-sub">מה משתנה עכשיו בטריטוריה בזכות הרשת והלוח. נתוני הפשיעה הרשמיים מתפרסמים פעם בשנה, ולכן אינם חלק מהמדד.'+((CLIENT&&CLIENT.demo)?'<br><b style="color:var(--gold)">במצב דמו: המדד מחושב מנתוני הרשת האמיתיים בלבד · אירועי ההדגמה לא נספרים.</b>':'')+'</div>'
+  +'<div class="imp-xp"><div class="imp-xp-h"><b>בסיס השוואה</b><span>יום '+Math.min(I.days,14)+' מתוך 14</span></div><div class="imp-bar big"><i style="width:'+Math.round(Math.min(I.days,14)/14*100)+'%"></i></div></div>'
+  +row('כיסוי רשת',cov,'מכשירים פעילים ביום (ממוצע 7 ימים, עד 18 ק״מ ממרכז העיר) · '+covSub)
+  +row('אירועים שטופלו',I.rate!=null?I.rate+'%':'—',I.ev?(I.handled+' מתוך '+I.ev+' אירועים ב-30 הימים האחרונים סומנו "טופל" או "נסגר"'):'אין עדיין אירועי רשת בטריטוריה')
+  +row('זמן עד טיפול',I.med!=null?I.med+' דק׳':'—',I.medN?('חציון, מתוך '+I.medN+' אירועים שעודכנו בלוח בדפדפן זה'):'יופיע אחרי שאירוע יסומן "טופל" בלוח')
+  +'<div class="acct-sub" style="margin-top:10px">כל הספירות בשעון ישראל · נספרים מאז 22.10.2026 · מתעדכן עם כל רענון נתונים.</div></div>';
+ document.body.appendChild(ov); ov.addEventListener('click',function(ev){ if(ev.target===ov) ov.remove(); });
+}
 function updateLiveBanner(){ try{ buildKPIs(DATA._idx!=null?DATA._idx:0); }catch(e){} }
 /* KPI panel, split on the shared centre line:
    left  (#kpis-crime) — official crime pair: total offences 2025 · rank by total offences (Israel Police)
@@ -1681,9 +1741,9 @@ function buildKPIs(idx){
  var ck=document.getElementById('kpis-crime');
  if(ck) ck.innerHTML=has
   ? kc('עבירות 2025',fmt(c.total),'משטרת ישראל','gold','סה״כ עבירות שנרשמו ב'+c.city+' בשנת 2025 · מקור: '+(DATA.source||'משטרת ישראל')+' · '+(DATA.url||''))
-   +kc('דירוג לפי סך עבירות','#'+(idx+1),'מתוך '+n,sevCls,'מקום '+(idx+1)+' מתוך '+n+' ערים לפי סה״כ עבירות (1 = הכי הרבה עבירות) · משטרת ישראל 2025')
+   +impTile(c)
   : kc('עבירות','—','אין נתון רשמי','','נתוני פשיעה רשמיים (משטרת ישראל) קיימים רק ל-'+n+' ערי ישראל שבמאגר')
-   +kc('דירוג לפי סך עבירות','—','ישראל בלבד','','הדירוג מחושב רק בין '+n+' ערי ישראל שבמאגר');
+   +impTile(c);
  function v(x){ return (x!=null&&x!=='')?String(x):'—'; }
  var ev=demo?window._demoLiveCount:S.activeEvents, hot=ev>0;
  var el=document.getElementById('kpis'); if(!el)return;
@@ -1923,11 +1983,11 @@ function renderPresenceLayer(list, fitList){
       var fnd=g.filter(function(p){return p.founder;}), oth=g.filter(function(p){return !p.founder;}), on=oth.filter(function(p){return p._online;}).length;
       if(oth.length===1){
         _lgAdd('pres',on?'#2bc47e':'#7c869c',on?'מכשיר מחובר':'מכשיר · נראה ב-30 הדק׳ האחרונות');
-        var _am=Math.max(1,Math.round((Date.now()-(+oth[0].ts||Date.now()))/60000)); L.circleMarker(ll,{radius:on?6.5:5,color:'#0c1b39',weight:2,fillColor:on?'#2bc47e':'#7c869c',fillOpacity:on?1:.55}).bindTooltip(on?'מכשיר · מחובר כעת':('מכשיר · מיקום אחרון לפני '+_am+' דק׳'),{direction:'top'}).addTo(presLayer);
+        var _am=Math.max(1,Math.round((Date.now()-(+oth[0].ts||Date.now()))/60000)); L.circleMarker(ll,{radius:on?6.5:5,color:'#0c1b39',weight:2,fillColor:on?'#2bc47e':'#7c869c',fillOpacity:on?1:.55}).bindTooltip(on?'מכשיר · מחובר כעת':('מכשיר · מיקום אחרון לפני '+_am+' דק׳'),{direction:'top'}).bindPopup('<b>מכשיר SH✡MER</b><br>'+(on?'מחובר כעת':'מיקום אחרון לפני '+_am+' דק׳')+'<br>עדכון: '+ilHM(+oth[0].ts||Date.now())+'<br><span style="color:#8aa;font-size:11px">מיקום משוער (~1 ק״מ) · ללא פרטים מזהים</span>').addTo(presLayer);
       } else if(oth.length>1){
         _lgAdd('pres',on?'#2bc47e':'#7c869c',on?'מכשירים (מספר באזור)':'מכשירים (מספר באזור) · לא מחוברים כעת');
         L.marker(ll,{icon:L.divIcon({className:'pres-div',html:'<div class="pres-grp'+(on?'':' stale')+'">'+oth.length+'</div>',iconSize:[24,24],iconAnchor:[12,12]}),zIndexOffset:500})
-          .bindTooltip(oth.length+' מכשירים באותו אזור (~1 ק״מ) · '+on+' מחוברים',{direction:'top'}).addTo(presLayer);
+          .bindTooltip(oth.length+' מכשירים באותו אזור (~1 ק״מ) · '+on+' מחוברים',{direction:'top'}).bindPopup('<b>'+oth.length+' מכשירים באזור</b><br>'+on+' מחוברים כעת<br>עדכון אחרון: '+ilHM(Math.max.apply(null,oth.map(function(p){return +p.ts||0;}))||Date.now())+'<br><span style="color:#8aa;font-size:11px">מיקום משוער (~1 ק״מ) · ללא פרטים מזהים</span>').addTo(presLayer);
       }
       fnd.forEach(function(){ _lgAdd('pres','#faac22','מייסד'); L.marker(ll,{icon:_founderStar(oth.length>0),zIndexOffset:900,title:'SH✡MER · מייסד/מנהל'}).addTo(presLayer); });
     });
