@@ -10152,7 +10152,7 @@ try{ hydrateIcons(document); }catch(e){}
 /* Loaded-build version - shown in the diagnostic panel so a phone can prove
    whether it's on the latest build or a STALE cached one. Keep in lock-step
    with sw.js SW_VERSION on every deploy. */
-var APP_VER='v284';
+var APP_VER='v285';
 var FB={ready:false,uid:null,db:null,_presTimer:null,connected:false,listening:false,pushState:'default',near:0,swVer:'?',
   authState:'connecting',sdkLoaded:false,persist:'',permErr:null,err:null,wsProbe:'',csp:''};
 /* Always log connection diagnostics to the console so the real failure can be SEEN in Chrome. */
@@ -13722,14 +13722,15 @@ async function statsRefresh(){
     var now=Date.now(), day=statsToday();
     function rd(p){ return FB.db.ref(p).once('value').then(function(s){ return s.val()||{}; }).catch(function(){ return null; }); }
     var res=await Promise.all([ rd('presence'), rd('analytics/installs'), rd('registry'), rd('analytics/seen/'+day) ]);
-    var pres=res[0]||{}, inst=res[1], reg=res[2]||{}, act=res[3];
-    var activeNow=Object.keys(pres).filter(function(k){ var p=pres[k]; return p&&p.ts&&(now-p.ts)<STATS_ACTIVE_MIN*60000; }).length;
-    statsSet('stats-active-now', activeNow);
-    statsSet('stats-registered', Object.keys(reg).length);
+    /* A denied read returns null. Never coerce that to {} - it renders as a confident
+       "0", which is a fabricated number, not a measurement. Show '-' for unreadable. */
+    var pres=res[0], inst=res[1], reg=res[2], act=res[3];
+    statsSet('stats-active-now', pres===null?'\u2013':Object.keys(pres).filter(function(k){ var p=pres[k]; return p&&p.ts&&(now-p.ts)<STATS_ACTIVE_MIN*60000; }).length);
+    statsSet('stats-registered', reg===null?'\u2013':Object.keys(reg).length);
     statsSet('stats-installs', inst===null?'–':Object.keys(inst).length);      // '–' = analytics rule not published yet
     statsSet('stats-today',    act ===null?'–':Object.keys(act).length);
-    var pend=(inst===null||act===null);
-    statsSet('stats-updated', (he?'עודכן ':ar?'حُدّث ':'updated ')+new Date().toLocaleTimeString()+(pend?(he?'  ·  התקנות/DAU: צריך לפרסם כללי analytics':ar?'  ·  التثبيتات/DAU: انشر قواعد analytics':'  ·  installs/DAU need the analytics rule'):''));
+    var pend=(inst===null||act===null||reg===null||pres===null);
+    statsSet('stats-updated', (he?'עודכן ':ar?'حُدّث ':'updated ')+new Date().toLocaleTimeString()+(pend?(he?'  ·  חסרים (–): צריך לפרסם את כללי הקריאה':ar?'  ·  الناقص (–): انشر قواعد القراءة':'  ·  the – values need the read rules published'):''));
   }catch(e){ fbLog('stats refresh err',e); }
 }
 try{ if(document.readyState!=='loading'){ statsGateCheck(); } else { document.addEventListener('DOMContentLoaded',function(){ try{statsGateCheck();}catch(e){} }); } }catch(e){}

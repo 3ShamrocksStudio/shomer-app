@@ -11,7 +11,8 @@
         ".read": false,
         ".write": "auth != null && newData.child('uid').val() === auth.uid && (!data.exists() || data.child('uid').val() === auth.uid)",
         ".validate": "newData.hasChildren(['uid'])"
-      }
+      },
+      ".read": "auth != null && root.child('founders').child(auth.uid).exists()"
     },
     "pairs": {
       "$uid": {
@@ -103,7 +104,8 @@
         "$uid": {
           ".read": false,
           ".write": "auth != null && auth.uid == $uid"
-        }
+        },
+        ".read": "auth != null && root.child('founders').child(auth.uid).exists()"
       },
       "seen": {
         "$day": {
@@ -111,7 +113,8 @@
             ".read": false,
             ".write": "auth != null && auth.uid == $uid"
           }
-        }
+        },
+        ".read": "auth != null && root.child('founders').child(auth.uid).exists()"
       },
       "learn": {
         ".read": "auth != null && root.child('founders').child(auth.uid).exists()",
