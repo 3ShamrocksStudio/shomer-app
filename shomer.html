@@ -3432,6 +3432,7 @@ function toggleShake(el){
  SS.shake.enabled=el.classList.contains('on');
  saveStore();
  if(SS.shake.enabled){ try{ shakeArmPermission(); }catch(e){} }   // this tap is a user gesture → iOS motion permission
+ try{ var _np=shomerNativePlugin(); if(_np){ if(SS.shake.enabled){ _np.enableBackgroundShake&&_np.enableBackgroundShake(); } else { _np.disableBackgroundShake&&_np.disableBackgroundShake(); } } }catch(e){}   /* v288: the switch also arms/disarms the locked-phone detector */
  toast(SS.shake.enabled?(currentLang==='he'?' Shake-to-SOS פעיל':' Shake-to-SOS on'):(currentLang==='he'?'Shake-to-SOS כבוי':'Shake-to-SOS off'),SS.shake.enabled?'grn':'');
 }
 function setShakeSens(v){
@@ -4562,6 +4563,7 @@ function enterApp(returning){
  try{ renderProfession(); }catch(e){}
  // Best-effort setup - never let a failure here trap the user.
  try{ startShakeDetection(); }catch(e){}       // Android/desktop: live immediately
+ try{ shakeNativeSync(); }catch(e){}           // native: locked-phone detector follows the saved switch
  try{ shakeArmOnFirstGesture(); }catch(e){}    // iOS: request motion permission on first tap
  try{ registerPush(); }catch(e){}
  try{ buildPins(); }catch(e){}
@@ -5192,6 +5194,8 @@ function alarmResilienceStop(){
    and background shake-to-SOS is armed as a native foreground service. On the web it all
    falls through harmlessly to the existing Web-Audio alarm + in-app shake. ONE codebase. */
 function shomerIsNative(){ try{ return !!(window.Capacitor && window.Capacitor.isNativePlatform && window.Capacitor.isNativePlatform()); }catch(e){ return false; } }
+/* v288: arm the locked-phone shake detector only when the user's switch is on (called once settings are loaded) */
+function shakeNativeSync(){ try{ var p=shomerNativePlugin(); if(!p) return; if(SS.shake && SS.shake.enabled===false){ p.disableBackgroundShake && p.disableBackgroundShake(); } else { p.enableBackgroundShake && p.enableBackgroundShake(); } }catch(e){} }
 function shomerNativePlugin(){ try{ return (window.Capacitor && window.Capacitor.Plugins && window.Capacitor.Plugins.ShomerNative) || null; }catch(e){ return null; } }
 function nativeAlarmStart(){ try{ var p=shomerNativePlugin(); if(p&&p.startAlarm) p.startAlarm(); }catch(e){} }
 function nativeAlarmStop(){ try{ var p=shomerNativePlugin(); if(p&&p.stopAlarm) p.stopAlarm(); }catch(e){} }
@@ -5199,7 +5203,7 @@ function nativeAlarmStop(){ try{ var p=shomerNativePlugin(); if(p&&p.stopAlarm) 
    SOS over the existing REST/SSE flow (never the RTDB WebSocket SDK). */
 window.__shomerNativeSOS=function(reason){ try{ if(typeof sosActive!=='undefined' && sosActive){ if(window._sosSilent){ try{ sosGoLoud(); }catch(_){} } return; }
   /* v287: the in-app detector and the native one can catch the SAME shake - a second trigger during the countdown would CANCEL it */
-  if(typeof sosPhase!=='undefined' && sosPhase!=='idle') return; if((reason||'shake')==='shake' && Date.now()-(window._shakeFiredAt||0)<8000) return; window._shakeFiredAt=Date.now();
+  if(typeof sosPhase!=='undefined' && sosPhase!=='idle') return; if((reason||'shake')==='shake' && SS.shake && SS.shake.enabled===false) return; if((reason||'shake')==='shake' && Date.now()-(window._shakeFiredAt||0)<8000) return; window._shakeFiredAt=Date.now();
   if(typeof triggerSOS==='function') triggerSOS(reason||'shake'); }catch(e){} };
 (function(){
   try{
@@ -5207,7 +5211,7 @@ window.__shomerNativeSOS=function(reason){ try{ if(typeof sosActive!=='undefined
     try{ document.documentElement.setAttribute('data-native','android'); }catch(e){}
     var p=shomerNativePlugin(); if(!p) return;
     try{ p.requestNotifications && p.requestNotifications(); }catch(e){}
-    try{ p.enableBackgroundShake && p.enableBackgroundShake(); }catch(e){}   // arm background shake-to-SOS
+    /* background shake-to-SOS is armed/disarmed by shakeNativeSync() from enterApp(), after the saved settings load */
     /* v287: Android 14+ - shake on a LOCKED phone needs permission to show the SOS over the lock
        screen. Ask once, plainly, with a button straight to the right system page. */
     try{ if(p.canFullScreen && !SS._fsiAsked){ setTimeout(function(){ p.canFullScreen().then(function(r){ if(r&&r.granted) return;
@@ -10181,7 +10185,7 @@ try{ hydrateIcons(document); }catch(e){}
 /* Loaded-build version - shown in the diagnostic panel so a phone can prove
    whether it's on the latest build or a STALE cached one. Keep in lock-step
    with sw.js SW_VERSION on every deploy. */
-var APP_VER='v287';
+var APP_VER='v288';
 var FB={ready:false,uid:null,db:null,_presTimer:null,connected:false,listening:false,pushState:'default',near:0,swVer:'?',
   authState:'connecting',sdkLoaded:false,persist:'',permErr:null,err:null,wsProbe:'',csp:''};
 /* Always log connection diagnostics to the console so the real failure can be SEEN in Chrome. */

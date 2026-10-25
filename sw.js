@@ -8,7 +8,7 @@
 // (a) uses network-first for navigations so a stale shell can never trap the
 // user, and (b) deletes every cache it does not own on activate.
 
-const CACHE_NAME = 'shomer-ctapad-cache-v287';
+const CACHE_NAME = 'shomer-ctapad-cache-v288';
 // Derived from CACHE_NAME so the two can never drift apart (a hard-coded 'v247' made every
 // page load think its worker was stale and fire a self-heal reload mid-connect).
 const SW_VERSION = CACHE_NAME.replace(/^.*-(v\d+)$/, '$1');
