@@ -5197,7 +5197,10 @@ function nativeAlarmStart(){ try{ var p=shomerNativePlugin(); if(p&&p.startAlarm
 function nativeAlarmStop(){ try{ var p=shomerNativePlugin(); if(p&&p.stopAlarm) p.stopAlarm(); }catch(e){} }
 /* The native background-shake service launches the app and calls this to complete a REAL
    SOS over the existing REST/SSE flow (never the RTDB WebSocket SDK). */
-window.__shomerNativeSOS=function(reason){ try{ if(typeof sosActive!=='undefined' && sosActive){ if(window._sosSilent){ try{ sosGoLoud(); }catch(_){} } return; } if(typeof triggerSOS==='function') triggerSOS(reason||'shake'); }catch(e){} };
+window.__shomerNativeSOS=function(reason){ try{ if(typeof sosActive!=='undefined' && sosActive){ if(window._sosSilent){ try{ sosGoLoud(); }catch(_){} } return; }
+  /* v287: the in-app detector and the native one can catch the SAME shake - a second trigger during the countdown would CANCEL it */
+  if(typeof sosPhase!=='undefined' && sosPhase!=='idle') return; if((reason||'shake')==='shake' && Date.now()-(window._shakeFiredAt||0)<8000) return; window._shakeFiredAt=Date.now();
+  if(typeof triggerSOS==='function') triggerSOS(reason||'shake'); }catch(e){} };
 (function(){
   try{
     if(!shomerIsNative()) return;
@@ -5205,6 +5208,19 @@ window.__shomerNativeSOS=function(reason){ try{ if(typeof sosActive!=='undefined
     var p=shomerNativePlugin(); if(!p) return;
     try{ p.requestNotifications && p.requestNotifications(); }catch(e){}
     try{ p.enableBackgroundShake && p.enableBackgroundShake(); }catch(e){}   // arm background shake-to-SOS
+    /* v287: Android 14+ - shake on a LOCKED phone needs permission to show the SOS over the lock
+       screen. Ask once, plainly, with a button straight to the right system page. */
+    try{ if(p.canFullScreen && !SS._fsiAsked){ setTimeout(function(){ p.canFullScreen().then(function(r){ if(r&&r.granted) return;
+      SS._fsiAsked=Date.now(); try{ saveStore(); }catch(e){}
+      var he=currentLang==='he', ar=currentLang==='ar';
+      var bar=document.createElement('div'); bar.className='nudge-bar'; bar.id='fsi-bar';
+      bar.innerHTML='<span class="nudge-tx" style="font-weight:800">'+(he?'ניעור ל-SOS גם כשהטלפון נעול':ar?'الهزّ للاستغاثة حتى والهاتف مقفل':'Shake-to-SOS on a locked phone')+'</span>'
+        +'<span class="nudge-tx" style="font-size:14px">'+(he?'כדי שמסך ה-SOS יופיע מעל מסך הנעילה, אשר/י ל-SHOMER "התראות במסך מלא".':ar?'ليظهر شاشة الاستغاثة فوق شاشة القفل، اسمح لـ SHOMER بـ"إشعارات ملء الشاشة".':'So the SOS screen can appear over the lock screen, allow SHOMER "full-screen notifications".')+'</span>'
+        +'<button class="nudge-cta" id="fsi-go">'+(he?'פתח/י הגדרה':ar?'افتح الإعداد':'Open setting')+'</button><button class="nudge-x" aria-label="close">\u2715</button>';
+      document.body.appendChild(bar);
+      bar.querySelector('.nudge-x').onclick=function(){ bar.remove(); };
+      bar.querySelector('#fsi-go').onclick=function(){ bar.remove(); try{ p.openFullScreenSettings(); }catch(e){} };
+    }).catch(function(){}); }, 6000); } }catch(e){}
     try{ fbLog && fbLog('native wrapper active - un-silenceable alarm + background shake armed'); }catch(e){}
   }catch(e){}
 })();
@@ -10159,7 +10175,7 @@ try{ hydrateIcons(document); }catch(e){}
 /* Loaded-build version - shown in the diagnostic panel so a phone can prove
    whether it's on the latest build or a STALE cached one. Keep in lock-step
    with sw.js SW_VERSION on every deploy. */
-var APP_VER='v286';
+var APP_VER='v287';
 var FB={ready:false,uid:null,db:null,_presTimer:null,connected:false,listening:false,pushState:'default',near:0,swVer:'?',
   authState:'connecting',sdkLoaded:false,persist:'',permErr:null,err:null,wsProbe:'',csp:''};
 /* Always log connection diagnostics to the console so the real failure can be SEEN in Chrome. */

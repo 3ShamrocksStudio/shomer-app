@@ -13,6 +13,9 @@ import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.os.Build;
 import android.os.IBinder;
+import android.os.PowerManager;
+import android.os.VibrationEffect;
+import android.os.Vibrator;
 
 import androidx.core.app.NotificationCompat;
 
@@ -28,6 +31,8 @@ public class ShakeService extends Service implements SensorEventListener {
   private static final String CH = "shomer_shake";
   private SensorManager sm;
   private Sensor acc;
+  private PowerManager.WakeLock wl;
+  private long lastFire;
   private float gx, gy, gz;
   private int count;
   private long firstT, lastPeak;
@@ -43,10 +48,24 @@ public class ShakeService extends Service implements SensorEventListener {
     } else {
       startForeground(2, n);
     }
-    sm = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
-    if (sm != null) {
-      acc = sm.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
-      if (acc != null) sm.registerListener(this, acc, SensorManager.SENSOR_DELAY_GAME);
+    if (sm == null) {
+      sm = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
+      if (sm != null) {
+        // With the screen off the CPU sleeps and an ordinary accelerometer stops reporting -
+        // that is why shake did nothing on a locked phone. Use the WAKE-UP accelerometer where
+        // the phone has one (it wakes the CPU itself); otherwise hold a partial wake lock.
+        acc = sm.getDefaultSensor(Sensor.TYPE_ACCELEROMETER, true);
+        if (acc == null) {
+          acc = sm.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
+          try {
+            PowerManager pm = (PowerManager) getSystemService(Context.POWER_SERVICE);
+            wl = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "shomer:shake");
+            wl.setReferenceCounted(false);
+            wl.acquire();
+          } catch (Exception e) {}
+        }
+        if (acc != null) sm.registerListener(this, acc, SensorManager.SENSOR_DELAY_GAME);
+      }
     }
     return START_STICKY;
   }
@@ -69,6 +88,23 @@ public class ShakeService extends Service implements SensorEventListener {
   }
 
   private void fireSos() {
+    long now = System.currentTimeMillis();
+    if (now - lastFire < 8000) return;   // still shaking after it fired - not a second press
+    lastFire = now;
+    // Felt confirmation in the pocket: SOS is on its way (the countdown can still be cancelled).
+    try {
+      Vibrator v = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
+      if (v != null) v.vibrate(VibrationEffect.createWaveform(new long[]{0, 400, 150, 400, 150, 400}, -1));
+    } catch (Exception e) {}
+    // 1) The app is running (screen off / locked / in the background): fire the SOS straight
+    //    into the live web app - no need to wait for the screen to come up.
+    boolean fired = false;
+    try { MainActivity a = MainActivity.sActive; if (a != null) fired = a.fireWebSos("shake"); } catch (Exception e) {}
+    fireSosLaunch(fired);
+  }
+
+  // 2) Bring the SOS screen up over the lock screen (and start the app if it was closed).
+  private void fireSosLaunch(boolean alreadyFired) {
     // Do NOT sound the alarm here. Bring up the app so the web layer runs the
     // CANCELLABLE countdown (a few seconds to abort a false alarm before anything is
     // broadcast or the loud alarm sounds). An accidental shake must never fire an
@@ -81,6 +117,7 @@ public class ShakeService extends Service implements SensorEventListener {
     Intent open = new Intent(this, MainActivity.class);
     open.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_SINGLE_TOP | Intent.FLAG_ACTIVITY_CLEAR_TOP);
     open.putExtra("shomer_sos", "shake");
+    open.putExtra("shomer_sos_fired", alreadyFired);
     PendingIntent pi = PendingIntent.getActivity(this, 1, open,
         PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
 
@@ -132,6 +169,8 @@ public class ShakeService extends Service implements SensorEventListener {
   @Override
   public void onDestroy() {
     try { if (sm != null) sm.unregisterListener(this); } catch (Exception e) {}
+    try { if (wl != null && wl.isHeld()) wl.release(); } catch (Exception e) {}
+    try { AlarmPlayer.stop(this); } catch (Exception e) {}
     super.onDestroy();
   }
 

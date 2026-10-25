@@ -39,14 +39,21 @@ public class ShomerNativePlugin extends Plugin {
   @PluginMethod
   public void startAlarm(PluginCall call) {
     Intent i = new Intent(getContext(), AlarmForegroundService.class);
-    if (Build.VERSION.SDK_INT >= 26) getContext().startForegroundService(i);
-    else getContext().startService(i);
+    try {
+      if (Build.VERSION.SDK_INT >= 26) getContext().startForegroundService(i);
+      else getContext().startService(i);
+    } catch (Exception e) {
+      // Locked / backgrounded phone: Android won't start a new foreground service here.
+      // ShakeService is already running in the foreground - sound the alarm from it.
+      AlarmPlayer.start(getContext());
+    }
     call.resolve();
   }
 
   @PluginMethod
   public void stopAlarm(PluginCall call) {
     AlarmForegroundService.stopAlarm(getContext());
+    AlarmPlayer.stop(getContext());
     call.resolve();
   }
 
@@ -91,6 +98,39 @@ public class ShomerNativePlugin extends Plugin {
       r.put("granted", false); r.put("error", String.valueOf(e.getMessage()));
       call.resolve(r);
     }
+  }
+
+  /** Android 14+: may this app show its SOS screen over the lock screen? */
+  @PluginMethod
+  public void canFullScreen(PluginCall call) {
+    JSObject r = new JSObject();
+    boolean ok = true;
+    try {
+      if (Build.VERSION.SDK_INT >= 34) {
+        android.app.NotificationManager nm = (android.app.NotificationManager) getContext().getSystemService(Context.NOTIFICATION_SERVICE);
+        ok = nm != null && nm.canUseFullScreenIntent();
+      }
+    } catch (Exception e) { ok = false; }
+    r.put("granted", ok);
+    call.resolve(r);
+  }
+
+  /** Opens the system page where the user allows SHOMER to show the SOS over the lock screen. */
+  @PluginMethod
+  public void openFullScreenSettings(PluginCall call) {
+    try {
+      Intent i;
+      if (Build.VERSION.SDK_INT >= 34) {
+        i = new Intent(Settings.ACTION_MANAGE_APP_USE_FULL_SCREEN_INTENT);
+        i.setData(Uri.parse("package:" + getContext().getPackageName()));
+      } else {
+        i = new Intent(Settings.ACTION_APP_NOTIFICATION_SETTINGS);
+        i.putExtra(Settings.EXTRA_APP_PACKAGE, getContext().getPackageName());
+      }
+      i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+      getContext().startActivity(i);
+    } catch (Exception e) {}
+    call.resolve();
   }
 
   @PluginMethod

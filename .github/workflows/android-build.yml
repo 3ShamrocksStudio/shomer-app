@@ -184,7 +184,10 @@ jobs:
         run: |
           M=app/src/main/AndroidManifest.xml
           grep -q 'xmlns:tools' "$M" || sed -i 's#<manifest #<manifest xmlns:tools="http://schemas.android.com/tools" #' "$M"
-          for P in ACCESS_BACKGROUND_LOCATION FOREGROUND_SERVICE FOREGROUND_SERVICE_LOCATION FOREGROUND_SERVICE_MEDIA_PLAYBACK FOREGROUND_SERVICE_SPECIAL_USE USE_FULL_SCREEN_INTENT SCHEDULE_EXACT_ALARM REQUEST_IGNORE_BATTERY_OPTIMIZATIONS HIGH_SAMPLING_RATE_SENSORS RECEIVE_BOOT_COMPLETED; do
+          # KEPT in the Play build (owner requirement - shake must fire an SOS on a locked phone):
+          #   FOREGROUND_SERVICE, FOREGROUND_SERVICE_SPECIAL_USE (ShakeService), FOREGROUND_SERVICE_MEDIA_PLAYBACK
+          #   (AlarmForegroundService), USE_FULL_SCREEN_INTENT (SOS screen over the lock screen), WAKE_LOCK.
+          for P in ACCESS_BACKGROUND_LOCATION FOREGROUND_SERVICE_LOCATION SCHEDULE_EXACT_ALARM REQUEST_IGNORE_BATTERY_OPTIMIZATIONS HIGH_SAMPLING_RATE_SENSORS RECEIVE_BOOT_COMPLETED; do
             sed -i "/android.permission.$P\"/d" "$M"
             sed -i "s#<application#    <uses-permission android:name=\"android.permission.$P\" tools:node=\"remove\" />\n    <application#" "$M"
           done
@@ -192,12 +195,10 @@ jobs:
           import re,sys
           m=sys.argv[1]; s=open(m).read()
           # drop SHOMER/plugin service + boot receiver blocks, then force-remove them from merged libraries
-          s=re.sub(r'\s*<service[^>]*(BackgroundGeolocationService|AlarmForegroundService|ShakeService)[^>]*?(/>|>.*?</service>)','',s,flags=re.S)
+          s=re.sub(r'\s*<service[^>]*(BackgroundGeolocationService)[^>]*?(/>|>.*?</service>)','',s,flags=re.S)
           s=re.sub(r'\s*<receiver[^>]*BootReceiver.*?</receiver>','',s,flags=re.S)
           rm=''.join('\n        <%s android:name="%s" tools:node="remove" />'%(t,n) for t,n in [
             ('service','com.equimaps.capacitor_background_geolocation.BackgroundGeolocationService'),
-            ('service','il.co.shomerapp.AlarmForegroundService'),
-            ('service','il.co.shomerapp.ShakeService'),
             ('receiver','il.co.shomerapp.BootReceiver')])
           s=re.sub(r'(<application[^>]*>)',lambda x:x.group(1)+rm,s,count=1)
           open(m,'w').write(s)
