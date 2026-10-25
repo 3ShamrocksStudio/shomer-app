@@ -4419,7 +4419,7 @@ var DYK_TIPS=[
  {k:'pin', he:'קוד ביטול שקט: בטל/י SOS שגוי עם PIN — בלי שמישהו יראה.', en:'Silent-cancel PIN: dismiss a false SOS with a PIN so no one sees.', ar:'رمز الإلغاء الصامت: ألغِ SOS خاطئاً برمز دون أن يرى أحد.', act:function(){ try{openSetPin();}catch(e){} }},
  {k:'map', he:'מפה חיה: ראה/י דיווחים על אירועים באזורך ב-REAL TIME.', en:'Live map: see real-time community incidents in your area — and add your own report.', ar:'الخريطة الحية: شاهد بلاغات المجتمع الفورية وأضف بلاغك الخاص.', act:function(){ try{var u=document.getElementById('nav-upd');if(u)u.click();}catch(e){} }},
  {k:'invite', he:'כל שומר שמזמין חבר חדש — מחזק את הרשת שמגינה על כולנו.', en:'Every SHOMER who invites a friend strengthens the whole community network.', ar:'كل حارس يدعو صديقاً يعزز شبكة الحماية للجميع.', act:function(){ try{shareInvite();}catch(e){} }},
- {k:'stalk', he:'זיהוי עקיבה: אם מישהו עוקב אחריך — SHOMER מזהה ומתריע. הפעל/י בהגדרות.', en:'Stalking detection: if someone follows your movements, SHOMER detects and alerts. Enable in Settings.', ar:'كشف المتابعة: يكتشف SHOMER أي شخص يتعقبك. فعّله من الإعدادات.', act:function(){ try{op('sh-set');}catch(e){} }},
+ {k:'stalk', he:'זיהוי עקיבה: אם מישהו עוקב אחריך — SHOMER מזהה ומתריע. הפעל/י בהגדרות.', en:'Stalking detection: if someone follows your movements, SHOMER detects and alerts. Enable in Settings.', ar:'كشف المتابعة: يكتشف SHOMER أي شخص يتعقبك. فعّله من الإعدادات.', act:function(){ try{setReveal('#n-stalk-nm');}catch(e){} }},
  {k:'nature', he:'נסה/י SHOMER NATURE — מפת נתיבים לשימוש בשטח פתוח.', en:'Try SHOMER NATURE — trails and nature-area map for outdoor use.', ar:'جرّب SHOMER NATURE — خرائط المسارات للاستخدام في الهواء الطلق.', act:function(){ try{location.href='nature.html';}catch(e){} }},
  {k:'dms', he:'שומר אוטומטי: אם לא תגיב/י תוך זמן — SOS יישלח אוטומטית. מנוחת דעת מלאה.', en:'Dead-man switch: if you don\'t respond in time, SOS is sent automatically. Total peace of mind.', ar:'مفتاح الأمان: إن لم تستجب في الوقت المحدد، يُرسَل SOS تلقائياً.', act:function(){ try{op('sh-dms');}catch(e){} }}
 ];
@@ -4535,8 +4535,8 @@ var TP_MISSIONS=[
  {he:'ברוכים הבאים לבדיקה! השאירו את SH✡MER מותקנת 14 יום - בדקו שהשם שלכם מופיע בפרופיל.', en:'Welcome to the test! Keep SH✡MER installed for 14 days - check your name shows in your profile.', cta_he:'לפרופיל', cta_en:'Open profile', act:function(){ op('sh-prof'); }},
  {he:'הוסיפו את השומר/ת הראשון/ה שלכם - שלחו הזמנה בוואטסאפ.', en:'Add your first SHOMER - send an invite on WhatsApp.', cta_he:'שלח/י הזמנה', cta_en:'Send invite', act:function(){ shareInvite(); }},
  {he:'הציצו במפה החיה - מה קורה באזור שלכם?', en:'Look at the live map - what is happening near you?', cta_he:'למפה', cta_en:'Open map', act:function(){}},
- {he:'הגדירו קוד ביטול שקט - כדי לבטל SOS שגוי.', en:'Set your silent-cancel code - to cancel a false SOS.', cta_he:'להגדרות', cta_en:'Open settings', act:function(){ op('sh-set'); }},
- {he:'אפשרו מיקום ברקע - כדי שה-SOS יעבוד גם כשהאפליקציה סגורה.', en:'Allow background location - so SOS works even when the app is closed.', cta_he:'להגדרות', cta_en:'Open settings', act:function(){ op('sh-set'); }},
+ {he:'הגדירו קוד ביטול שקט - כדי לבטל SOS שגוי.', en:'Set your silent-cancel code - to cancel a false SOS.', cta_he:'להגדרות', cta_en:'Open settings', act:function(){ setReveal('[onclick="openSetPin()"]'); }},
+ {he:'אפשרו מיקום ברקע - כדי שה-SOS יעבוד גם כשהאפליקציה סגורה.', en:'Allow background location - so SOS works even when the app is closed.', cta_he:'להגדרות', cta_en:'Open settings', act:function(){ setReveal('#p-bgloc-nm'); }},
  {he:'נסו צ׳ק-אין הדדי עם השומר/ת שלכם.', en:'Try a mutual check-in with your SHOMER.', cta_he:'לצ׳ק-אין', cta_en:'Open check-in', act:function(){ op('sh-checkin'); }},
  {he:'קראו את המדריך הקצר - 2 דקות.', en:'Read the short guide - 2 minutes.', cta_he:'למדריך', cta_en:'Open guide', act:function(){ op('sh-guide'); }},
  {he:'פתחו את מסך הדיווח - ראו איך מדווחים על אירוע (אין חובה לשלוח).', en:'Open the report screen - see how reporting works (no need to send).', cta_he:'למסך הדיווח', cta_en:'Open report', act:function(){ openReport(); }},
@@ -5715,7 +5715,7 @@ function resolveSOS(){
  };
  var hasPin=SS.security&&/^\d{4,6}$/.test(SS.security.pin||'');
  if(hasPin){ openSosPin(proceed); }
- else { toast(currentLang==='he'?'טיפ: הגדר/י קוד ביטול ב"הגדרות → בטיחות" להגנה מפני ביטול בכפייה':'Tip: set a cancel code in Settings → Safety to guard against forced cancellation','amb',function(){try{op('sh-set');}catch(e){}}); proceed(); }
+ else { toast(currentLang==='he'?'טיפ: הגדר/י קוד ביטול ב"הגדרות → בטיחות" להגנה מפני ביטול בכפייה':'Tip: set a cancel code in Settings → Safety to guard against forced cancellation','amb',function(){try{setReveal('[onclick="openSetPin()"]');}catch(e){}}); proceed(); }
 }
 /* Resolution choice. accidental/test are scrubbed from the map + feed and never shown
  to others; only confirmed-real events remain mapped. */
@@ -6623,7 +6623,7 @@ try{ window.addEventListener('popstate',function(){
   try{ var o=document.querySelector('.sheet.open'); if(o){ SCR_STACK.length=0; cl(o.id); } }catch(e){}
 }); }catch(e){}
 function op(id){ if(id==='sh-checkin'||id==='sh-dms'){ setTimeout(function(){ try{ fcMountSettings(); }catch(e){} },0); } closeAll();const el=document.getElementById(id);try{ if(typeof emApplyCountry==='function') emApplyCountry(); }catch(_e){}if(el)el.classList.add('open');syncSheetState(); if(el) shHistPush();
- if(id==='sh-set'){try{renderSetContacts();}catch(e){}}
+ if(id==='sh-set'){try{renderSetContacts();}catch(e){} try{setCatInit();}catch(e){}}   /* v284: sections fold/unfold from EVERY way into settings, not only the menu */
  if(id==='sh-circles'){ try{syncPairsToCircles();}catch(e){} try{renderCircles();}catch(e){} try{gdRenderList();}catch(e){} }   // was never re-rendered → circles list + toggles appeared empty
  if(id==='sh-prof'){ try{syncPairsToCircles();}catch(e){} try{renderProfile();}catch(e){} try{renderProfile2();}catch(e){} try{renderCircles();}catch(e){} }
 }
@@ -6694,6 +6694,17 @@ function setCatToggle(cat){
   el.classList.toggle("set-collapsible-hidden",collapse);
   el=el.nextElementSibling;
  }
+}
+/* Open Settings straight at one setting: unfold its category and bring it into view. */
+function setReveal(sel){
+ try{ op('sh-set'); }catch(e){}
+ setTimeout(function(){ try{
+  var el=document.querySelector('#sh-set '+sel); if(!el) return;
+  var body=document.querySelector('#sh-set .sh-body'), top=el; while(top&&top.parentElement!==body) top=top.parentElement;
+  var c=top; while(c&&!c.classList.contains('set-cat')) c=c.previousElementSibling;
+  if(c&&c.classList.contains('collapsed')) setCatToggle(c);
+  (el.closest('.set-row')||el).scrollIntoView({block:'center'});
+ }catch(e){} }, 120);
 }
 function setCatInit(){
  var cats=document.querySelectorAll("#sh-set .set-cat");
@@ -10141,7 +10152,7 @@ try{ hydrateIcons(document); }catch(e){}
 /* Loaded-build version - shown in the diagnostic panel so a phone can prove
    whether it's on the latest build or a STALE cached one. Keep in lock-step
    with sw.js SW_VERSION on every deploy. */
-var APP_VER='v283';
+var APP_VER='v284';
 var FB={ready:false,uid:null,db:null,_presTimer:null,connected:false,listening:false,pushState:'default',near:0,swVer:'?',
   authState:'connecting',sdkLoaded:false,persist:'',permErr:null,err:null,wsProbe:'',csp:''};
 /* Always log connection diagnostics to the console so the real failure can be SEEN in Chrome. */
@@ -15471,7 +15482,7 @@ function readySteps(){
   var openQ=toProf(drillOpenCard);
   return [
    [ {he:'שומר/ת ראשון/ה במעגל', en:'Your first guardian', ar:'أول حارس لك', she:'מישהו שמקבל את ה-SOS שלך', sen:'Someone who receives your SOS', sar:'شخص يتلقى استغاثتك', v:Math.min(g,1), of:1, act:function(){ shareInvite(); }},
-     {he:'קוד ביטול SOS', en:'SOS cancel code', ar:'رمز إلغاء الاستغاثة', she:'מבטל התראת שווא בשקט', sen:'Silently cancels a false alarm', sar:'يلغي الإنذار الخاطئ بصمت', v:pin?1:0, of:1, act:function(){ op('sh-set'); }},
+     {he:'קוד ביטול SOS', en:'SOS cancel code', ar:'رمز إلغاء الاستغاثة', she:'מבטל התראת שווא בשקט', sen:'Silently cancels a false alarm', sar:'يلغي الإنذار الخاطئ بصمت', v:pin?1:0, of:1, act:function(){ setReveal('[onclick="openSetPin()"]'); }},
      {he:'יודע/ת למי מתקשרים', en:'Know who to call', ar:'تعرف بمن تتصل', she:'100 · 101 · 102', sen:'100 · 101 · 102', sar:'100 · 101 · 102', v:(learnCardRead('call')||drillBookLevel('call')>=1)?1:0, of:1, act:function(){ learnOpenCard('call'); }} ],
    [ {he:'3 שומרים במעגל', en:'3 guardians in your circle', ar:'3 حراس في دائرتك', she:g+'/3', sen:g+'/3', sar:g+'/3', v:Math.min(g,3), of:3, act:function(){ shareInvite(); }},
      {he:'יודע/ת לדווח על אירוע', en:'Know how to report', ar:'تعرف كيف تبلّغ', she:'פתיחת מסך הדיווח מספיקה', sen:'Opening the report screen is enough', sar:'يكفي فتح شاشة البلاغ', v:(l.flags.report||(SS.reports||[]).length)?1:0, of:1, act:function(){ try{ openReport(); }catch(e){} }},
