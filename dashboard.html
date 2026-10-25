@@ -483,7 +483,7 @@
 /* KPI · crime pair (left of the centre line) */
 .c-crime .kpi{padding:8px 10px}
 .c-crime .kpi .km{white-space:nowrap;overflow:visible}
-.kpi-imp:hover{background:rgba(250,172,34,.06)}.imp-bar{height:4px;border-radius:3px;background:var(--line-2);margin-top:5px;overflow:hidden}.imp-bar i{display:block;height:100%;background:var(--gold);border-radius:3px}.imp-bar.big{height:8px}
+.kpi-imp:hover{background:rgba(250,172,34,.06)}.imp-tile{display:flex;align-items:flex-end;gap:10px}.imp-spark{flex:0 0 auto}.imp-leg{display:flex;flex-wrap:wrap;gap:14px;font-size:11.5px;color:var(--tx2);margin:6px 0 2px}.imp-leg i{display:inline-block;width:10px;height:10px;border-radius:2px;margin-inline-end:5px;vertical-align:-1px}.imp-bar{height:4px;border-radius:3px;background:var(--line-2);margin-top:5px;overflow:hidden}.imp-bar i{display:block;height:100%;background:var(--gold);border-radius:3px}.imp-bar.big{height:8px}
 .imp-xp{margin:12px 0 6px}.imp-xp-h{display:flex;justify-content:space-between;font-size:12.5px;color:var(--tx2);margin-bottom:6px}.imp-xp-h b{color:var(--tx)}
 .imp-row{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:11px 0;border-top:1px solid var(--line-2)}.imp-row b{display:block;font-size:14px;color:var(--tx)}.imp-row span{font-size:12px;color:var(--tx2);line-height:1.4}.imp-v{font-family:var(--num);font-size:22px;font-weight:600;color:var(--gold);white-space:nowrap}
 /* KPI · network group (right of the centre line): green live tile · two secondary rows · dark-red events tile */
@@ -1704,14 +1704,34 @@ function impCompute(c){
  var B=_boardLoad(), mins=[];
  rows.forEach(function(r){ var lg=((B.reviews||{})[r.id]||{}).log||[]; var f=lg.filter(function(x){ return x.st&&x.st!=='open'; })[0]; if(f&&r.e.ts) mins.push(Math.max(0,(f.ts-r.e.ts)/60000)); });
  mins.sort(function(a,b){return a-b;}); var med=mins.length?Math.round(mins[Math.floor((mins.length-1)/2)]):null;
- return {days:days, cov:cov, covPrev:covPrev, covChg:covChg, ev:rows.length, handled:handled, rate:rows.length?Math.round(handled/rows.length*100):null, med:med, medN:mins.length};
+ var series=[]; for(var k=days-1;k>=0;k--){ var d=dk(k), set={}, hd=0;
+   if(sameCity) (N.pres||[]).forEach(function(p){ if(p.t&&p.day===d) set[p.dev]=1; });
+   rows.forEach(function(r){ var lg=((B.reviews||{})[r.id]||{}).log||[]; var f=lg.filter(function(x){ return x.st&&x.st!=='open'; })[0]; if(f&&_ilDay(f.ts)===d) hd++; });
+   series.push({d:d, dev:sameCity?Object.keys(set).length:null, hd:hd}); }
+ return {series:series, days:days, cov:cov, covPrev:covPrev, covChg:covChg, ev:rows.length, handled:handled, rate:rows.length?Math.round(handled/rows.length*100):null, med:med, medN:mins.length};
 }
+function impSpark(ser,w,h){ ser=ser.slice(-30); var v=ser.map(function(x){ return x.dev||0; }), mx=Math.max(1,Math.max.apply(null,v)), n=v.length;
+ if(!n) return ''; var bw=w/Math.max(n,7), out='';
+ v.forEach(function(y,i){ if(!y) return; var bh=Math.max(2,y/mx*(h-2)); out+='<rect x="'+((Math.max(n,7)-n+i)*bw+1).toFixed(1)+'" y="'+(h-bh).toFixed(1)+'" width="'+Math.max(0.6,bw-1.5).toFixed(1)+'" height="'+bh.toFixed(1)+'" rx="1.5" fill="'+(i===n-1?'var(--gold)':'rgba(250,172,34,.45)')+'"/>'; });
+ return '<svg class="imp-spark" viewBox="0 0 '+w+' '+h+'" width="'+w+'" height="'+h+'" aria-hidden="true">'+out+'</svg>'; }
 function impTile(c){
- var I=impCompute(c), v, m, cls, tip='מדד שיפור · נתוני אמת בלבד · לחצו לפירוט';
- if(I.covChg!=null){ v='<span dir="ltr">'+(I.covChg>0?'▲+':I.covChg<0?'▼':'')+I.covChg+'%</span>'; cls=I.covChg>0?'ok':I.covChg<0?'bad':'gold'; m='כיסוי רשת · השבוע מול הקודם'; }
- else { v='<span dir="ltr">'+Math.min(I.days,14)+'/14</span>'; cls='gold'; m='ימים לבסיס השוואה'; }
- return '<div class="kpi kpi-imp" role="button" tabindex="0" title="'+ESC(tip)+'" onclick="openImprove()" style="cursor:pointer"><div class="kl"><span>מדד שיפור</span></div><div class="kv '+cls+'">'+v+'</div><div class="km">'+m+'</div>'
-  +'<div class="imp-bar"><i style="width:'+Math.round(Math.min(I.days,14)/14*100)+'%"></i></div></div>';
+ var I=impCompute(c), last=I.series.length?I.series[I.series.length-1].dev:null;
+ var m=I.covChg!=null?('<span dir="ltr">'+(I.covChg>0?'▲+':I.covChg<0?'▼':'')+I.covChg+'%</span> כיסוי מול שבוע קודם'):'מכשירים היום';
+ return '<div class="kpi kpi-imp" role="button" tabindex="0" title="מדד שיפור · נתוני אמת בלבד · לחצו לגרף המלא" onclick="openImprove()" style="cursor:pointer"><div class="kl"><span>מדד שיפור</span></div>'
+  +'<div class="imp-tile"><b class="kv gold">'+(last!=null?last:'—')+'</b>'+impSpark(I.series,62,30)+'</div><div class="km">'+m+'</div></div>';
+}
+function impChart(I){
+ var ser=I.series.slice(-30), n=ser.length; if(!n) return '<div class="acct-sub">אין עדיין נתונים.</div>';
+ var W=420,H=170,pl=26,pr=8,pt=10,pb=26, iw=W-pl-pr, ih=H-pt-pb, mx=Math.max(1,Math.max.apply(null,ser.map(function(x){return Math.max(x.dev||0,x.hd||0);})));
+ var step=mx<=4?1:mx<=10?2:Math.ceil(mx/5), top=Math.ceil(mx/step)*step, slots=Math.max(n,7), bw=iw/slots, g='', bars='';
+ for(var y=0;y<=top;y+=step){ var gy=pt+ih-(y/top)*ih; g+='<line x1="'+pl+'" x2="'+(W-pr)+'" y1="'+gy.toFixed(1)+'" y2="'+gy.toFixed(1)+'" stroke="rgba(160,184,230,.12)"/><text x="'+(pl-6)+'" y="'+(gy+3.5).toFixed(1)+'" text-anchor="end" fill="#8a97b0" font-size="10">'+y+'</text>'; }
+ ser.forEach(function(x,i){ var cx=pl+i*bw, dh=(x.dev||0)/top*ih, hh=(x.hd||0)/top*ih;
+   bars+='<g><title>'+(+x.d.slice(8))+'.'+(+x.d.slice(5,7))+' · '+(x.dev!=null?x.dev+' מכשירים':'—')+' · '+x.hd+' אירועים טופלו</title>'
+     +(dh>0?'<rect x="'+(cx+bw*.14).toFixed(1)+'" y="'+(pt+ih-dh).toFixed(1)+'" width="'+(bw*.42).toFixed(1)+'" height="'+dh.toFixed(1)+'" rx="2" fill="var(--gold)"/>':'')
+     +(hh>0?'<rect x="'+(cx+bw*.58).toFixed(1)+'" y="'+(pt+ih-hh).toFixed(1)+'" width="'+(bw*.28).toFixed(1)+'" height="'+hh.toFixed(1)+'" rx="2" fill="#4fc3e8"/>':'')+'</g>'
+     +(((n-1-i)%Math.ceil(n/10))?'':'<text x="'+(cx+bw/2).toFixed(1)+'" y="'+(H-8)+'" text-anchor="middle" fill="#a3b1cc" font-size="10">'+(+x.d.slice(8))+'.'+(+x.d.slice(5,7))+'</text>'); });
+ return '<svg viewBox="0 0 '+W+' '+H+'" width="100%" style="display:block;direction:ltr" role="img" aria-label="מכשירים פעילים ואירועים שטופלו לפי יום">'+g+bars+'</svg>'
+  +'<div class="imp-leg"><span><i style="background:var(--gold)"></i>מכשירים פעילים ביום (עד 18 ק״מ ממרכז העיר)</span><span><i style="background:#4fc3e8"></i>אירועים שסומנו טופל/נסגר</span></div>';
 }
 function openImprove(){
  var c=curC(); if(!c) return; var I=impCompute(c), old=document.getElementById('imp-ov'); if(old) old.remove();
@@ -1721,6 +1741,7 @@ function openImprove(){
  var ov=document.createElement('div'); ov.id='imp-ov'; ov.className='acct-ov';
  ov.innerHTML='<div class="acct-card" style="max-width:480px"><div class="acct-head"><h3>מדד שיפור · '+ESC(c.city)+'</h3><button class="acct-x" onclick="document.getElementById(\'imp-ov\').remove()">✕</button></div>'
   +'<div class="acct-sub">מה משתנה עכשיו בטריטוריה בזכות הרשת והלוח. נתוני הפשיעה הרשמיים מתפרסמים פעם בשנה, ולכן אינם חלק מהמדד.'+((CLIENT&&CLIENT.demo)?'<br><b style="color:var(--gold)">במצב דמו: המדד מחושב מנתוני הרשת האמיתיים בלבד · אירועי ההדגמה לא נספרים.</b>':'')+'</div>'
+  +impChart(I)
   +'<div class="imp-xp"><div class="imp-xp-h"><b>בסיס השוואה</b><span>יום '+Math.min(I.days,14)+' מתוך 14</span></div><div class="imp-bar big"><i style="width:'+Math.round(Math.min(I.days,14)/14*100)+'%"></i></div></div>'
   +row('כיסוי רשת',cov,'מכשירים פעילים ביום (ממוצע 7 ימים, עד 18 ק״מ ממרכז העיר) · '+covSub)
   +row('אירועים שטופלו',I.rate!=null?I.rate+'%':'—',I.ev?(I.handled+' מתוך '+I.ev+' אירועים ב-30 הימים האחרונים סומנו "טופל" או "נסגר"'):'אין עדיין אירועי רשת בטריטוריה')
