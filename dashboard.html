@@ -1710,28 +1710,32 @@ function impCompute(c){
    series.push({d:d, dev:sameCity?Object.keys(set).length:null, hd:hd}); }
  return {series:series, days:days, cov:cov, covPrev:covPrev, covChg:covChg, ev:rows.length, handled:handled, rate:rows.length?Math.round(handled/rows.length*100):null, med:med, medN:mins.length};
 }
-function impSpark(ser,w,h){ ser=ser.slice(-30); var v=ser.map(function(x){ return x.dev||0; }), mx=Math.max(1,Math.max.apply(null,v)), n=v.length;
- if(!n) return ''; var bw=w/Math.max(n,7), out='';
- v.forEach(function(y,i){ if(!y) return; var bh=Math.max(2,y/mx*(h-2)); out+='<rect x="'+((Math.max(n,7)-n+i)*bw+1).toFixed(1)+'" y="'+(h-bh).toFixed(1)+'" width="'+Math.max(0.6,bw-1.5).toFixed(1)+'" height="'+bh.toFixed(1)+'" rx="1.5" fill="'+(i===n-1?'var(--gold)':'rgba(250,172,34,.45)')+'"/>'; });
- return '<svg class="imp-spark" viewBox="0 0 '+w+' '+h+'" width="'+w+'" height="'+h+'" aria-hidden="true">'+out+'</svg>'; }
-function impTile(c){
- var I=impCompute(c), last=I.series.length?I.series[I.series.length-1].dev:null;
- var m=I.covChg!=null?('<span dir="ltr">'+(I.covChg>0?'▲+':I.covChg<0?'▼':'')+I.covChg+'%</span> כיסוי מול שבוע קודם'):'מכשירים היום';
- return '<div class="kpi kpi-imp" role="button" tabindex="0" title="מדד שיפור · נתוני אמת בלבד · לחצו לגרף המלא" onclick="openImprove()" style="cursor:pointer"><div class="kl"><span>מדד שיפור</span></div>'
-  +'<div class="imp-tile"><b class="kv gold">'+(last!=null?last:'—')+'</b>'+impSpark(I.series,62,30)+'</div><div class="km">'+m+'</div></div>';
+/* DECISION (25.10): the improvement index only earns a place on the main screen once it can say
+   something true and useful - at least 14 days of data AND a real baseline (last week averaged at least
+   one active device a day in the territory), so a tiny base can never produce a huge misleading %. Until then the official ranking tile stays, so the board never shows an
+   empty or near-zero chart. When it appears it is ONE clear message: this week vs last week. */
+function impReady(I){ return I.days>=14 && I.cov!=null && I.covPrev>=1; }   /* a real baseline: last week averaged at least one active device a day in the territory */
+function impTile(c,fallback){
+ var I=impCompute(c); if(!impReady(I)) return fallback;
+ var up=I.covChg>0, dn=I.covChg<0, col=up?'#5fdca2':dn?'#ff6f78':'var(--gold)';
+ return '<div class="kpi kpi-imp" role="button" tabindex="0" title="שיפור בכיסוי הרשת: מכשירים פעילים ביום בטריטוריה, 7 הימים האחרונים מול 7 הקודמים · לחצו לפירוט" onclick="openImprove()" style="cursor:pointer"><div class="kl"><span>שיפור השבוע</span></div>'
+  +'<div class="imp-tile"><b class="kv" style="color:'+col+'"><span dir="ltr">'+(up?'▲+':dn?'▼':'')+I.covChg+'%</span></b></div><div class="km">כיסוי רשת מול שבוע קודם</div></div>';
 }
 function impChart(I){
- var ser=I.series.slice(-30), n=ser.length; if(!n) return '<div class="acct-sub">אין עדיין נתונים.</div>';
- var W=420,H=170,pl=26,pr=8,pt=10,pb=26, iw=W-pl-pr, ih=H-pt-pb, mx=Math.max(1,Math.max.apply(null,ser.map(function(x){return Math.max(x.dev||0,x.hd||0);})));
- var step=mx<=4?1:mx<=10?2:Math.ceil(mx/5), top=Math.ceil(mx/step)*step, slots=Math.max(n,7), bw=iw/slots, g='', bars='';
- for(var y=0;y<=top;y+=step){ var gy=pt+ih-(y/top)*ih; g+='<line x1="'+pl+'" x2="'+(W-pr)+'" y1="'+gy.toFixed(1)+'" y2="'+gy.toFixed(1)+'" stroke="rgba(160,184,230,.12)"/><text x="'+(pl-6)+'" y="'+(gy+3.5).toFixed(1)+'" text-anchor="end" fill="#8a97b0" font-size="10">'+y+'</text>'; }
- ser.forEach(function(x,i){ var cx=pl+i*bw, dh=(x.dev||0)/top*ih, hh=(x.hd||0)/top*ih;
-   bars+='<g><title>'+(+x.d.slice(8))+'.'+(+x.d.slice(5,7))+' · '+(x.dev!=null?x.dev+' מכשירים':'—')+' · '+x.hd+' אירועים טופלו</title>'
-     +(dh>0?'<rect x="'+(cx+bw*.14).toFixed(1)+'" y="'+(pt+ih-dh).toFixed(1)+'" width="'+(bw*.42).toFixed(1)+'" height="'+dh.toFixed(1)+'" rx="2" fill="var(--gold)"/>':'')
-     +(hh>0?'<rect x="'+(cx+bw*.58).toFixed(1)+'" y="'+(pt+ih-hh).toFixed(1)+'" width="'+(bw*.28).toFixed(1)+'" height="'+hh.toFixed(1)+'" rx="2" fill="#4fc3e8"/>':'')+'</g>'
-     +(((n-1-i)%Math.ceil(n/10))?'':'<text x="'+(cx+bw/2).toFixed(1)+'" y="'+(H-8)+'" text-anchor="middle" fill="#a3b1cc" font-size="10">'+(+x.d.slice(8))+'.'+(+x.d.slice(5,7))+'</text>'); });
- return '<svg viewBox="0 0 '+W+' '+H+'" width="100%" style="display:block;direction:ltr" role="img" aria-label="מכשירים פעילים ואירועים שטופלו לפי יום">'+g+bars+'</svg>'
-  +'<div class="imp-leg"><span><i style="background:var(--gold)"></i>מכשירים פעילים ביום (עד 18 ק״מ ממרכז העיר)</span><span><i style="background:#4fc3e8"></i>אירועים שסומנו טופל/נסגר</span></div>';
+ /* weekly, not daily: one clear bar per week (avg devices per day in the territory) + events handled */
+ var ser=I.series, wk=[]; for(var e=ser.length;e>0;e-=7){ var part=ser.slice(Math.max(0,e-7),e), dv=0, hd=0; part.forEach(function(x){ dv+=(x.dev||0); hd+=x.hd; });
+   wk.unshift({from:part[0].d,to:part[part.length-1].d,dev:part.length?dv/part.length:0,hd:hd,days:part.length}); }
+ wk=wk.slice(-8); var n=wk.length; if(!n) return '';
+ var W=420,H=160,pl=26,pr=8,pt=14,pb=28, iw=W-pl-pr, ih=H-pt-pb, mx=Math.max(1,Math.max.apply(null,wk.map(function(x){return x.dev;}))), bw=iw/Math.max(n,4), out='';
+ function lb(d){ return (+d.slice(8))+'.'+(+d.slice(5,7)); }
+ wk.forEach(function(x,i){ var cx=pl+i*bw, h=x.dev/mx*ih, last=i===n-1;
+   out+='<g><title>'+lb(x.from)+'–'+lb(x.to)+' · '+(Math.round(x.dev*10)/10)+' מכשירים ביום · '+x.hd+' אירועים טופלו'+(x.days<7?' · שבוע חלקי':'')+'</title>'
+     +(h>0?'<rect x="'+(cx+bw*.2).toFixed(1)+'" y="'+(pt+ih-h).toFixed(1)+'" width="'+(bw*.6).toFixed(1)+'" height="'+h.toFixed(1)+'" rx="3" fill="'+(last?'var(--gold)':'rgba(250,172,34,.45)')+'"/>':'')
+     +'<text x="'+(cx+bw/2).toFixed(1)+'" y="'+(pt+ih-h-4).toFixed(1)+'" text-anchor="middle" fill="#eef2f8" font-size="11">'+(Math.round(x.dev*10)/10)+'</text>'
+     +'<text x="'+(cx+bw/2).toFixed(1)+'" y="'+(H-12)+'" text-anchor="middle" fill="#a3b1cc" font-size="10">'+lb(x.from)+'</text>'
+     +(x.hd?'<text x="'+(cx+bw/2).toFixed(1)+'" y="'+(H-1)+'" text-anchor="middle" fill="#4fc3e8" font-size="10">'+x.hd+' טופלו</text>':'')+'</g>'; });
+ return '<svg viewBox="0 0 '+W+' '+H+'" width="100%" style="display:block;direction:ltr;margin-top:8px" role="img" aria-label="מכשירים פעילים ביום לפי שבוע">'+out+'</svg>'
+  +'<div class="imp-leg"><span><i style="background:var(--gold)"></i>מכשירים פעילים ביום בטריטוריה (ממוצע שבועי)</span><span style="color:#4fc3e8">מספר כחול = אירועים שטופלו באותו שבוע</span></div>';
 }
 function openImprove(){
  var c=curC(); if(!c) return; var I=impCompute(c), old=document.getElementById('imp-ov'); if(old) old.remove();
@@ -1742,7 +1746,6 @@ function openImprove(){
  ov.innerHTML='<div class="acct-card" style="max-width:480px"><div class="acct-head"><h3>מדד שיפור · '+ESC(c.city)+'</h3><button class="acct-x" onclick="document.getElementById(\'imp-ov\').remove()">✕</button></div>'
   +'<div class="acct-sub">מה משתנה עכשיו בטריטוריה בזכות הרשת והלוח. נתוני הפשיעה הרשמיים מתפרסמים פעם בשנה, ולכן אינם חלק מהמדד.'+((CLIENT&&CLIENT.demo)?'<br><b style="color:var(--gold)">במצב דמו: המדד מחושב מנתוני הרשת האמיתיים בלבד · אירועי ההדגמה לא נספרים.</b>':'')+'</div>'
   +impChart(I)
-  +'<div class="imp-xp"><div class="imp-xp-h"><b>בסיס השוואה</b><span>יום '+Math.min(I.days,14)+' מתוך 14</span></div><div class="imp-bar big"><i style="width:'+Math.round(Math.min(I.days,14)/14*100)+'%"></i></div></div>'
   +row('כיסוי רשת',cov,'מכשירים פעילים ביום (ממוצע 7 ימים, עד 18 ק״מ ממרכז העיר) · '+covSub)
   +row('אירועים שטופלו',I.rate!=null?I.rate+'%':'—',I.ev?(I.handled+' מתוך '+I.ev+' אירועים ב-30 הימים האחרונים סומנו "טופל" או "נסגר"'):'אין עדיין אירועי רשת בטריטוריה')
   +row('זמן עד טיפול',I.med!=null?I.med+' דק׳':'—',I.medN?('חציון, מתוך '+I.medN+' אירועים שעודכנו בלוח בדפדפן זה'):'יופיע אחרי שאירוע יסומן "טופל" בלוח')
@@ -1762,9 +1765,9 @@ function buildKPIs(idx){
  var ck=document.getElementById('kpis-crime');
  if(ck) ck.innerHTML=has
   ? kc('עבירות 2025',fmt(c.total),'משטרת ישראל','gold','סה״כ עבירות שנרשמו ב'+c.city+' בשנת 2025 · מקור: '+(DATA.source||'משטרת ישראל')+' · '+(DATA.url||''))
-   +impTile(c)
+   +impTile(c,kc('דירוג לפי סך עבירות','#'+(idx+1),'מתוך '+n,sevCls,'מקום '+(idx+1)+' מתוך '+n+' ערים לפי סה״כ עבירות (1 = הכי הרבה עבירות) · משטרת ישראל 2025'))
   : kc('עבירות','—','אין נתון רשמי','','נתוני פשיעה רשמיים (משטרת ישראל) קיימים רק ל-'+n+' ערי ישראל שבמאגר')
-   +impTile(c);
+   +impTile(c,kc('דירוג לפי סך עבירות','—','ישראל בלבד','','הדירוג מחושב רק בין '+n+' ערי ישראל שבמאגר'));
  function v(x){ return (x!=null&&x!=='')?String(x):'—'; }
  var ev=demo?window._demoLiveCount:S.activeEvents, hot=ev>0;
  var el=document.getElementById('kpis'); if(!el)return;
