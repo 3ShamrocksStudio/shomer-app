@@ -2133,8 +2133,8 @@ body.otp-active .ob-steps{display:none!important;}
  </div>
  <div class="sl-card mb20">
  <div class="vol-row"><span class="vol-lbl" id="shake-sens-lbl">רגישות ניעור</span><span class="vol-val" id="shake-sens-v">בינונית</span></div>
- <input type="range" id="shake-sens" min="20" max="38" value="28" aria-label="shake sensitivity" oninput="setShakeSens(this.value)">
- <div style="display:flex;justify-content:space-between;font-size:10px;color:var(--tx3);margin-top:6px"><span>גבוהה</span><span>נמוכה</span></div>
+ <input type="range" id="shake-sens" min="12" max="30" value="26" aria-label="shake sensitivity" oninput="setShakeSens(this.value)">
+ <div style="display:flex;justify-content:space-between;font-size:10px;color:var(--tx3);margin-top:6px"><span>נמוכה</span><span>גבוהה</span></div>
  <button class="test-alarm-btn" style="margin-top:12px" onclick="simulateShake()" id="sim-shake-btn"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M13 2L4 14h6l-1 8 9-12h-6Z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></svg><span id="sim-shake-lbl">סימולציית ניעור (בדיקה)</span></button>
  </div>
  <div class="sec-cap mb12" id="sos-safety-cap">בטיחות SOS</div>
@@ -3375,7 +3375,7 @@ function applyStoredSettings(){
  });
  // Shake UI
  const st=document.getElementById('shake-tog');if(st)st.classList.toggle('on',SS.shake.enabled!==false);
- const ssl=document.getElementById('shake-sens');if(ssl)ssl.value=SS.shake.sensitivity||22;
+ const ssl=document.getElementById('shake-sens');if(ssl)ssl.value=shakeLevel();
  updateShakeSensLabel();
  // Settings toggles
  document.querySelectorAll('.tog[data-skey]').forEach(t=>{
@@ -3404,11 +3404,16 @@ function reflectDmsSelection(){
  d.classList.toggle('sel',m===dmsIv);
  });
 }
+/* v286: the slider is SENSITIVITY (toward 'גבוהה' = more sensitive). It used to be the raw force
+   threshold (right = harder to trigger) with a default of 28 m/s², which most people could
+   not reach - shake-to-SOS looked dead. Default threshold 16 m/s² (tested: a firm shake triggers, walking/running does not). */
+function shakeLevel(){ var l=SS.shake&&SS.shake.level; return (l>=12&&l<=30)?+l:26; }
+function shakeThreshold(){ return 42-shakeLevel(); }
 function updateShakeSensLabel(){
- const v=SS.shake.sensitivity||22;
+ const v=shakeLevel();
  const he=currentLang==='he';
  let lbl=he?'בינונית':'Medium';
- if(v<18)lbl=he?'גבוהה':'High';else if(v>26)lbl=he?'נמוכה':'Low';
+ if(v<21)lbl=he?'נמוכה':'Low';else if(v>27)lbl=he?'גבוהה':'High';
  setText('shake-sens-v',lbl);
 }
 
@@ -3430,7 +3435,7 @@ function toggleShake(el){
  toast(SS.shake.enabled?(currentLang==='he'?' Shake-to-SOS פעיל':' Shake-to-SOS on'):(currentLang==='he'?'Shake-to-SOS כבוי':'Shake-to-SOS off'),SS.shake.enabled?'grn':'');
 }
 function setShakeSens(v){
- SS.shake.sensitivity=Number(v);
+ SS.shake.level=Number(v);
  updateShakeSensLabel();
  saveStore();
 }
@@ -4773,18 +4778,20 @@ function startShakeDetection(){
  // Use includingGravity when present and high-pass out the slow gravity vector → pure
  // motion magnitude that behaves the SAME whether or not the platform pre-removes gravity.
  const ag=e.accelerationIncludingGravity||e.acceleration; if(!ag) return;
- const A=0.8;
+ const A=0.9;   /* v286: slower gravity estimate - the old 0.8 filtered out most of a real shake */
  _shakeGrav.x=A*_shakeGrav.x+(1-A)*(ag.x||0);
  _shakeGrav.y=A*_shakeGrav.y+(1-A)*(ag.y||0);
  _shakeGrav.z=A*_shakeGrav.z+(1-A)*(ag.z||0);
  const dx=(ag.x||0)-_shakeGrav.x, dy=(ag.y||0)-_shakeGrav.y, dz=(ag.z||0)-_shakeGrav.z;
  const mag=Math.sqrt(dx*dx+dy*dy+dz*dz);
- const THRESHOLD=(SS.shake&&SS.shake.sensitivity)||22;
+ const THRESHOLD=shakeThreshold();
  const now=Date.now();
  if(mag>THRESHOLD && now-lastPeak>MIN_GAP){
    if(!firstT || now-firstT>WINDOW){ firstT=now; count=0; }   // (re)open the counting window
    count++; lastPeak=now;
-   if(count>=REQUIRED){ count=0; firstT=0; if(sosActive&&window._sosSilent){ try{ sosGoLoud(); }catch(_){} } else if(!sosActive){ try{navigator.vibrate&&navigator.vibrate([90,50,90]);}catch(_){}
+   if(count>=REQUIRED){ count=0; firstT=0; if(now-(window._shakeFiredAt||0)<8000) return; window._shakeFiredAt=now;   /* v286: keep shaking after it fires must not count as a second press (that cancelled the countdown) */
+     if(typeof sosPhase!=='undefined'&&sosPhase==='countdown') return;
+     if(sosActive&&window._sosSilent){ try{ sosGoLoud(); }catch(_){} } else if(!sosActive){ try{navigator.vibrate&&navigator.vibrate([90,50,90]);}catch(_){}
      triggerSOS('shake'); } }
  }
  };
@@ -10152,7 +10159,7 @@ try{ hydrateIcons(document); }catch(e){}
 /* Loaded-build version - shown in the diagnostic panel so a phone can prove
    whether it's on the latest build or a STALE cached one. Keep in lock-step
    with sw.js SW_VERSION on every deploy. */
-var APP_VER='v285';
+var APP_VER='v286';
 var FB={ready:false,uid:null,db:null,_presTimer:null,connected:false,listening:false,pushState:'default',near:0,swVer:'?',
   authState:'connecting',sdkLoaded:false,persist:'',permErr:null,err:null,wsProbe:'',csp:''};
 /* Always log connection diagnostics to the console so the real failure can be SEEN in Chrome. */

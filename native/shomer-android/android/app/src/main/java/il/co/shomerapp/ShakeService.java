@@ -33,7 +33,7 @@ public class ShakeService extends Service implements SensorEventListener {
   private long firstT, lastPeak;
   private static final int REQUIRED = 6;
   private static final long WINDOW = 1500, MIN_GAP = 120;
-  private static final double THRESHOLD = 19.0; // m/s^2 (gravity removed) — raised so casual movement never triggers
+  private static final double THRESHOLD = 16.0; // m/s^2 (gravity removed) — raised so casual movement never triggers
 
   @Override
   public int onStartCommand(Intent intent, int flags, int startId) {
@@ -53,7 +53,7 @@ public class ShakeService extends Service implements SensorEventListener {
 
   @Override
   public void onSensorChanged(SensorEvent e) {
-    float a = 0.8f;
+    float a = 0.9f;
     gx = a * gx + (1 - a) * e.values[0];
     gy = a * gy + (1 - a) * e.values[1];
     gz = a * gz + (1 - a) * e.values[2];
