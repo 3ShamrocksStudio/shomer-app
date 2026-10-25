@@ -56,7 +56,8 @@
   .clk{display:flex;align-items:center;gap:12px;padding:3px 14px;border-inline:1px solid var(--line-2);direction:rtl;white-space:nowrap}
   .clk-t{text-align:center;line-height:1.05}.clk-t b{display:block;font-size:21px;font-weight:800;color:var(--gold);font-variant-numeric:tabular-nums;letter-spacing:.5px;direction:ltr}
   .clk-t span{font-size:10px;color:var(--tx3)}.clk-d{display:flex;flex-direction:column;font-size:12.5px;color:var(--tx);line-height:1.3}#clk-heb{font-size:11px;color:var(--tx3)}
-  @media(max-width:1250px){#clk-heb{display:none}} @media(max-width:900px){.clk-d{display:none}}
+  #clk-short{display:none;font-size:10.5px;color:var(--tx)}
+  @media(max-width:1700px){#clk-heb{display:none}.brand small{display:none}} @media(max-width:1450px){.clk-d{display:none}.clk{padding:3px 10px}.clk-lbl{display:none}#clk-short{display:block}}
   .terr-pick{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--tx2)}
   .terr-pick select{height:34px;width:auto;min-width:150px;background:var(--navy-2);border-color:var(--blue-2);font-size:13.5px;font-weight:700;color:var(--tx);border-radius:8px;padding:0 10px}
   .live{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--tx2);white-space:nowrap}
@@ -571,7 +572,7 @@
 <div id="app" class="hidden">
   <div class="topbar">
     <div class="brand" dir="ltr"><img src="SHOMER_logo_big.png" alt="SH✡MER" class="logo-img"><small>Command · Municipal Intelligence</small></div>
-    <div class="clk" id="clk" title="כל הזמנים בלוח מוצגים בשעון ישראל. &quot;היום&quot; = יום קלנדרי: מ-00:00 עד 23:59:59 שעון ישראל, ומתאפס בחצות."><div class="clk-t"><b id="clk-time">--:--:--</b><span>שעון ישראל</span></div><div class="clk-d"><span id="clk-date"></span><span id="clk-heb"></span></div></div>
+    <div class="clk" id="clk" title="כל הזמנים בלוח מוצגים בשעון ישראל. &quot;היום&quot; = יום קלנדרי: מ-00:00 עד 23:59:59 שעון ישראל, ומתאפס בחצות."><div class="clk-t"><b id="clk-time">--:--:--</b><span class="clk-lbl">שעון ישראל</span><span id="clk-short"></span></div><div class="clk-d"><span id="clk-date"></span><span id="clk-heb"></span></div></div>
     <div class="tb-sp"></div>
     <div class="terr-pick"><span id="terr-static" class="hidden">טריטוריה: <b id="terr-name" style="color:var(--gold)"></b></span><select id="terr-sel"></select></div>
     <div class="live off" id="live-ind" title="אין חיבור לנתונים חיים"><span class="d"></span><span id="org-name"></span></div>
@@ -652,6 +653,7 @@ function hebNum(n){ if(!(n>0)) return ''; var H=[[400,'ת'],[300,'ש'],[200,'ר'
   return r.length>1?r.slice(0,-1)+'״'+r.slice(-1):r+'׳'; }
 function clkTick(){ try{ var now=Date.now(), q=ilParts(now);
   var t=document.getElementById('clk-time'); if(!t) return; t.textContent=q.hour+':'+q.minute+':'+q.second;
+  var sh=document.getElementById('clk-short'); if(sh) sh.textContent=new Intl.DateTimeFormat('he-IL',{timeZone:IL_TZ,weekday:'short'}).format(new Date(now))+' '+q.day+'.'+q.month+'.'+q.year+' · שעון ישראל';
   var d=document.getElementById('clk-date'); if(d) d.textContent=new Intl.DateTimeFormat('he-IL',{timeZone:IL_TZ,weekday:'long',day:'numeric',month:'long',year:'numeric'}).format(new Date(now));
   var h=document.getElementById('clk-heb'); if(h){ try{ var hp={}; new Intl.DateTimeFormat('he-IL-u-ca-hebrew',{timeZone:IL_TZ,day:'numeric',month:'long',year:'numeric'}).formatToParts(new Date(now)).forEach(function(x){ hp[x.type]=x.value; });
     h.textContent=hebNum(+hp.day)+' '+(/^ב/.test(hp.month)?'':'ב')+hp.month+' '+hebNum((+hp.year)%1000); }catch(e){ h.textContent=''; } }
@@ -1017,7 +1019,7 @@ function respToggle(k,el){ _respSel=_respSel||{}; _respSel[k]=!_respSel[k]; if(e
 function respFitRadius(){ try{ if(_respCircle&&MAP){ MAP.fitBounds(_respCircle.getBounds(),{padding:[40,40]}); } }catch(e){} }
 function _radChip(){ try{ var mc=document.getElementById('map'); if(!mc)return; var ch=document.getElementById('rad-chip'); if(!ch){ ch=document.createElement('div'); ch.id='rad-chip'; ch.style.cssText='position:absolute;top:10px;inset-inline-start:10px;z-index:600;background:rgba(20,26,39,.92);border:1px solid #2a3450;color:#4fc3e8;font:700 12px Alef,system-ui,sans-serif;padding:6px 11px;border-radius:9px;box-shadow:0 4px 14px rgba(0,0,0,.4);pointer-events:none'; mc.appendChild(ch); } ch.textContent='\u05e8\u05d3\u05d9\u05d5\u05e1 \u05d4\u05ea\u05e8\u05d0\u05d4 \u00b7 '+_respRadius.toFixed(1)+' \u05e7"\u05de'; }catch(e){} }
 function respSetRadius(v){ _respRadius=parseFloat(v)||1.5; var rr=document.getElementById('resp-reach'); var rv=document.getElementById('resp-rv'); if(rv)rv.textContent=_respRadius.toFixed(1)+' ק"מ'; if(rr)rr.innerHTML='רדיוס התראה: <b style="color:#eef1f7">'+_respRadius.toFixed(1)+' ק"מ</b>'; try{ if(_respCircle){ _respCircle.setRadius(_respRadius*1000); } }catch(e){} try{ _radChip(); }catch(e){} }
-function respLog(id,txt){ var o=_liveEvents[id]; if(!o)return; o._log=o._log||[]; o._log.push(ilFull(Date.now())+' — '+txt); var el=document.getElementById('resp-log'); if(el)el.innerHTML=o._log.map(function(l){return '<div>• '+l+'</div>';}).join(''); }
+function respLog(id,txt){ var o=_liveEvents[id]; if(!o)return; if(!o._log){ try{ o._log=(((_boardLoad().reviews||{})[id]||{}).resp||[]).slice(); }catch(e){ o._log=[]; } } o._log.push(ilFull(Date.now())+' — '+txt); try{ var _B=_boardLoad(), _r=_B.reviews[id]||(_B.reviews[id]={}); _r.resp=(_r.resp||[]).concat([o._log[o._log.length-1]]).slice(-50); _boardSave(_B); }catch(e){}   /* kept with the event record - survives a reload */ var el=document.getElementById('resp-log'); if(el)el.innerHTML=o._log.map(function(l){return '<div>• '+l+'</div>';}).join(''); }
 function respDispatch(id){
  var sel=Object.keys(_respSel||{}).filter(function(k){return _respSel[k];});
  if(!sel.length){ try{alert('בחר/י לפחות קבוצה אחת לשיגור');}catch(e){} return; }
@@ -1315,7 +1317,7 @@ function saveEvEdit(id){
    var ty=String((document.getElementById('ev-ty')||{}).value||'event|').split('|'); x.type=ty[0]||'event'; x.t=ty[1]||'';
    var ts=Date.parse((document.getElementById('ev-dt')||{}).value||''); if(!isNaN(ts))x.ts=ts;
    x.status=st; x.note=note; } }
- else { var _pv=B.reviews[id]||{}, _lg=(_pv.log||[]).slice(-49); if(_pv.status!==st||(_pv.note||'')!==note) _lg.push({ts:Date.now(),st:st,note:note}); B.reviews[id]={status:st,note:note,at:Date.now(),log:_lg}; }   /* every change is kept with its time - a filing trail */
+ else { var _pv=B.reviews[id]||{}, _lg=(_pv.log||[]).slice(-49); if(_pv.status!==st||(_pv.note||'')!==note) _lg.push({ts:Date.now(),st:st,note:note}); B.reviews[id]={status:st,note:note,at:(_pv.status!==st||(_pv.note||'')!==note)?Date.now():(_pv.at||Date.now()),log:_lg,resp:_pv.resp}; }   /* every change is kept with its time - a filing trail */
  _boardSave(B); closeEvEdit(); boardRefresh();
 }
 function renderLive(c,list,opts){
@@ -1541,7 +1543,7 @@ function buildReportHtml(){
  /* ---------- events (examples excluded) ---------- */
  var evRows=(BR.all||[]).filter(function(r){return !r.ex;});
  var exCount=(BR.all||[]).filter(function(r){return r.ex;}).length;
- function evLog(r){ var o=_liveEvents[r.id]; return (o&&o._log&&o._log.length)?o._log.join(' | '):''; }
+ function evLog(r){ var rv=(_boardLoad().reviews||{})[r.id]; var L=(rv&&rv.resp&&rv.resp.length)?rv.resp:(((_liveEvents[r.id]||{})._log)||[]); return L.length?L.join(' | '):''; }
  var evTable=evRows.length?('<table><thead><tr><th>נרשם (שעון ישראל)</th><th>סוג</th><th>מיקום</th><th>מצב</th><th>הערת תוצאה / יומן תגובה</th><th>עדכון אחרון</th><th>מקור</th><th>מזהה</th></tr></thead><tbody>'
    +evRows.map(function(r){ var st=(r.live&&r.status==='open')?'<b style="color:#b3202d">חי · פתוח</b>':ST_LBL[r.status]; var note=[r.note,evLog(r)].filter(Boolean).join(' · ');
      var _rv=(_boardLoad().reviews||{})[r.id]||{}, _hist=(_rv.log||[]).map(function(x){ return dt(x.ts)+' '+(ST_LBL[x.st]||x.st)+(x.note?' – '+x.note:''); }).join(' | ');
