@@ -3,5 +3,6 @@ Disallow: /dashboard.html
 Disallow: /rtdb-test.html
 Disallow: /reset.html
 Disallow: /i/
+Disallow: /demo/
 
 Sitemap: https://www.shomer-app.co.il/sitemap.xml
