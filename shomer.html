@@ -1936,19 +1936,6 @@ body.otp-active .ob-steps{display:none!important;}
  </nav>
 
  <!-- ═══ UPDATES ═══ -->
- <!-- ═══ התראות מיקום השומרים שלי ═══ -->
- <div class="sheet" id="sh-arrivals" role="dialog" aria-modal="true" aria-labelledby="arr-ttl">
-  <div class="sh-pill" aria-hidden="true"></div>
-  <div class="sh-head">
-   <span class="sh-ttl" id="arr-ttl">התראות מיקום השומרים שלי</span>
-   
-  </div>
-  <div class="sh-body">
-   <p class="desc" id="arr-cap" style="font-size:11.5px;color:var(--tx3);margin-bottom:12px"></p>
-   <div id="arr-list"></div>
-  </div>
- </div>
-
  <!-- ═══ התראות מיקום השומרים שלי (wireframe) ═══ -->
  <div class="sheet" id="sh-arrivals" role="dialog" aria-modal="true" aria-labelledby="arr-ttl">
   <div class="sh-pill" aria-hidden="true"></div>
@@ -2113,10 +2100,10 @@ body.otp-active .ob-steps{display:none!important;}
  </div>
  <div class="sec-cap mb12" id="set-notif-lbl">התראות</div>
  <div class="set-grp">
- <div class="set-row"><div class="sr-l"><div class="sr-ic"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 18v-5a5 5 0 0 1 10 0v5" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><rect x="5" y="18" width="14" height="3" rx="1.5" fill="none" stroke="currentColor" stroke-width="2"/><path d="M12 3v2M4.5 7l1.5 1.3M19.5 7L18 8.3" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></div><div><div class="sr-nm" id="n-sos-nm">SOS חירום</div><div class="sr-sb" id="n-sos-sb">כל SOS באזורך - הכי דחוף, מומלץ להשאיר דלוק</div></div></div><div class="tog on" data-skey="n_sos" onclick="this.classList.toggle('on');saveToggle(this)" role="switch"></div></div>
- <div class="set-row"><div class="sr-l"><div class="sr-ic"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M2 12s3.6-6.5 10-6.5S22 12 22 12s-3.6 6.5-10 6.5S2 12 2 12Z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><circle cx="12" cy="12" r="3" fill="currentColor"/></svg></div><div><div class="sr-nm" id="n-stalk-nm">מעקב ואיומים</div><div class="sr-sb" id="n-stalk-sb">דיווחים על הטרדה/מעקב לידך</div></div></div><div class="tog on" data-skey="n_stalk" onclick="this.classList.toggle('on');saveToggle(this)" role="switch"></div></div>
- <div class="set-row"><div class="sr-l"><div class="sr-ic"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="4" width="16" height="16" rx="4" fill="none" stroke="currentColor" stroke-width="2"/><path d="M12 8v8M8 12h8" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg></div><div><div class="sr-nm" id="n-med-nm">עזרה רפואית</div><div class="sr-sb" id="n-med-sb">בקשות לעזרה רפואית בקרבתך</div></div></div><div class="tog on" data-skey="n_med" onclick="this.classList.toggle('on');saveToggle(this)" role="switch"></div></div>
- <div class="set-row"><div class="sr-l"><div class="sr-ic"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 12.5l5 5L20 6" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div><div class="sr-nm" id="n-closed-nm">אירועים שנסגרו</div><div class="sr-sb" id="n-closed-sb">עדכון כשאירוע לידך טופל ונסגר</div></div></div><div class="tog on" data-skey="n_closed" onclick="this.classList.toggle('on');saveToggle(this)" role="switch"></div></div>
+ <div class="set-row" style="display:none" data-v293="no-backend"><div class="sr-l"><div class="sr-ic"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 18v-5a5 5 0 0 1 10 0v5" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><rect x="5" y="18" width="14" height="3" rx="1.5" fill="none" stroke="currentColor" stroke-width="2"/><path d="M12 3v2M4.5 7l1.5 1.3M19.5 7L18 8.3" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></div><div><div class="sr-nm" id="n-sos-nm">SOS חירום</div><div class="sr-sb" id="n-sos-sb">כל SOS באזורך - הכי דחוף, מומלץ להשאיר דלוק</div></div></div><div class="tog on" data-skey="n_sos" onclick="this.classList.toggle('on');saveToggle(this)" role="switch"></div></div>
+ <div class="set-row" style="display:none" data-v293="no-backend"><div class="sr-l"><div class="sr-ic"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M2 12s3.6-6.5 10-6.5S22 12 22 12s-3.6 6.5-10 6.5S2 12 2 12Z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><circle cx="12" cy="12" r="3" fill="currentColor"/></svg></div><div><div class="sr-nm" id="n-stalk-nm">מעקב ואיומים</div><div class="sr-sb" id="n-stalk-sb">דיווחים על הטרדה/מעקב לידך</div></div></div><div class="tog on" data-skey="n_stalk" onclick="this.classList.toggle('on');saveToggle(this)" role="switch"></div></div>
+ <div class="set-row" style="display:none" data-v293="no-backend"><div class="sr-l"><div class="sr-ic"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="4" width="16" height="16" rx="4" fill="none" stroke="currentColor" stroke-width="2"/><path d="M12 8v8M8 12h8" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg></div><div><div class="sr-nm" id="n-med-nm">עזרה רפואית</div><div class="sr-sb" id="n-med-sb">בקשות לעזרה רפואית בקרבתך</div></div></div><div class="tog on" data-skey="n_med" onclick="this.classList.toggle('on');saveToggle(this)" role="switch"></div></div>
+ <div class="set-row" style="display:none" data-v293="no-backend"><div class="sr-l"><div class="sr-ic"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 12.5l5 5L20 6" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div><div class="sr-nm" id="n-closed-nm">אירועים שנסגרו</div><div class="sr-sb" id="n-closed-sb">עדכון כשאירוע לידך טופל ונסגר</div></div></div><div class="tog on" data-skey="n_closed" onclick="this.classList.toggle('on');saveToggle(this)" role="switch"></div></div>
  <div class="set-row"><div class="sr-l"><div class="sr-ic"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M11 5L6 9H3v6h3l5 4z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><path d="M15.5 8.5a5 5 0 0 1 0 7M18.5 6a8 8 0 0 1 0 12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></div><div><div class="sr-nm" id="n-snd-nm">צלילי אירועים חיים</div><div class="sr-sb" id="n-snd-sb">צליל עדין כששומר/ת מצטרף/ת, באירוע חדש או בעדכון</div></div></div><div class="tog on" data-skey="snd_cues" onclick="this.classList.toggle('on');saveToggle(this);if(this.classList.contains('on'))playCue('join')" role="switch"></div></div>
  </div>
  <div class="set-grp"><div class="set-row" onclick="testNotifications()" role="button" tabindex="0"><div class="sr-l"><div class="sr-ic"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M18 8a6 6 0 1 0-12 0c0 7-3 9-3 9h18s-3-2-3-9" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></svg></div><div><div class="sr-nm" data-he="בדיקת התראות" data-en="Test notifications">בדיקת התראות</div><div class="sr-sb" data-he="שולח התראת עדכון + התראת רקע (נעל/י מסך). לא בזמן חירום." data-en="Sends an update + background alert (lock screen). Not during emergency.">שולח התראת עדכון + התראת רקע.</div></div></div><span style="color:var(--tx3);font-size:18px">›</span></div></div><div class="set-cat"><div class="set-cat-ic"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3l7 3v5c0 5-3.4 8.5-7 10-3.6-1.5-7-5-7-10V6Z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></svg></div><div class="set-cat-t" data-he="בטיחות" data-en="Safety features">בטיחות</div></div>
@@ -2126,7 +2113,7 @@ body.otp-active .ob-steps{display:none!important;}
  <div class="set-row"><div class="sr-l"><div class="sr-ic"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="7" width="18" height="13" rx="2.5" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="12" cy="13.5" r="3.2" fill="none" stroke="currentColor" stroke-width="2"/><path d="M9 7l1.5-2h3L15 7" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></svg></div><div><div class="sr-nm" id="selfie-tog-lbl" data-he="הגנת גנב - סלפי" data-en="Theft protection - selfie" data-ar="حماية السرقة - سيلفي">הגנת גנב - סלפי</div><div class="sr-sb" id="selfie-tog-sub" data-he="אחרי 3 קודים שגויים: צילום סלפי של מי שמחזיק את הטלפון + שליחת מיקום חי לשומרים שלך. דורש הרשאת מצלמה. פועל רק כשהאפליקציה פתוחה." data-en="After 3 wrong codes: snap a selfie of whoever holds the phone + send live location to your SHOMERs. Needs camera permission. Works only while the app is open.">אחרי 3 קודים שגויים: סלפי + מיקום חי לשומרים שלך.</div></div></div><div class="tog" id="selfie-tog" onclick="toggleSelfie(this)" role="switch" aria-label="הגנה מפני גניבת מכשיר - צילום סלפי אוטומטי"></div></div>
  <div class="set-row" onclick="openTheftEvidence()" role="button" tabindex="0"><div class="sr-l"><div class="sr-ic"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="5" width="16" height="14" rx="2" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="12" cy="12" r="3" fill="none" stroke="currentColor" stroke-width="2"/></svg></div><div><div class="sr-nm" data-he="ראיות גניבה" data-en="Theft evidence" data-ar="أدلة السرقة">ראיות גניבה</div><div class="sr-sb" data-he="סלפי ומיקום שנלכדו - ראיה מתועדת למשטרה." data-en="Captured selfies + locations - documented proof for police.">סלפי ומיקום שנלכדו - ראיה למשטרה.</div></div></div><span id="theft-ev-state" style="font-size:12px;font-weight:700;color:var(--g3);white-space:nowrap"></span></div>
  </div>
- <div class="set-grp"><div class="set-row" onclick="opFrom('sh-checkin','dd');try{reflectCheckin()}catch(e){}" role="button" tabindex="0"><div class="sr-l"><div class="sr-ic"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3l7 3v5c0 5-3.4 8.5-7 10-3.6-1.5-7-5-7-10V6Z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><path d="M9 12l2 2 4-4" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div><div class="sr-nm" data-he="צ׳ק-אין הדדי (עם שומר/ת)" data-en="Mutual check-in (with a SHOMER)">צ׳ק-אין הדדי</div><div class="sr-sb" data-he="„הכל טוב??” תקופתי - אם לא תאשר/י, השומר/ת מקבל/ה אזעקה." data-en="Periodic 'Are you OK?' - if you don't confirm, your SHOMER is alerted.">„הכל טוב??” תקופתי.</div></div></div><span id="ci-set-state" style="font-size:12px;font-weight:700;color:var(--tx3);white-space:nowrap">כבוי</span></div></div>
+ <div class="set-grp"><div class="set-row" onclick="opFrom('sh-checkin','sh-set');try{reflectCheckin()}catch(e){}" role="button" tabindex="0"><div class="sr-l"><div class="sr-ic"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3l7 3v5c0 5-3.4 8.5-7 10-3.6-1.5-7-5-7-10V6Z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><path d="M9 12l2 2 4-4" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div><div class="sr-nm" data-he="צ׳ק-אין הדדי (עם שומר/ת)" data-en="Mutual check-in (with a SHOMER)">צ׳ק-אין הדדי</div><div class="sr-sb" data-he="„הכל טוב??” תקופתי - אם לא תאשר/י, השומר/ת מקבל/ה אזעקה." data-en="Periodic 'Are you OK?' - if you don't confirm, your SHOMER is alerted.">„הכל טוב??” תקופתי.</div></div></div><span id="ci-set-state" style="font-size:12px;font-weight:700;color:var(--tx3);white-space:nowrap">כבוי</span></div></div>
  <div class="sec-cap mb12" id="shake-set-lbl">Shake-to-SOS</div>
  <div class="set-grp">
  <div class="set-row"><div class="sr-l"><div class="sr-ic"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M13 2L4 14h6l-1 8 9-12h-6Z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></svg></div><div><div class="sr-nm" id="shake-tog-lbl">הפעל Shake-to-SOS</div><div class="sr-sb" id="shake-tog-sub">5 ניעורים חזקים → SOS</div></div></div><div class="tog on" id="shake-tog" onclick="toggleShake(this)" role="switch"></div></div>
@@ -2154,8 +2141,8 @@ body.otp-active .ob-steps{display:none!important;}
  <div class="set-cat"><div class="set-cat-ic"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 6l6-3 6 3 6-3v15l-6 3-6-3-6 3Z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><path d="M9 3v15M15 6v15" fill="none" stroke="currentColor" stroke-width="2"/></svg></div><div class="set-cat-t" data-he="שכבות מפה" data-en="Map layers">שכבות מפה</div></div><div class="sec-cap mb12" data-he="המפה נפתחת עם כל השכבות דלוקות. אפשר לכבות או להדליק כל שכבה כאן." data-en="The map opens with every layer on. Toggle any layer on or off here." data-ar="تفتح الخريطة وكل الطبقات مفعّلة. يمكنك تشغيل أو إيقاف أي طبقة هنا.">המפה נפתחת עם כל השכבות דלוקות. אפשר לכבות או להדליק כל שכבה כאן.</div><div class="set-grp"><div class="set-row"><div class="sr-l"><div class="sr-ic"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="13" width="4" height="7" rx="1" fill="none" stroke="currentColor" stroke-width="2"/><rect x="10" y="8" width="4" height="12" rx="1" fill="none" stroke="currentColor" stroke-width="2"/><rect x="17" y="3" width="4" height="17" rx="1" fill="none" stroke="currentColor" stroke-width="2"/></svg></div><div><div class="sr-nm" data-he="סטטיסטיקת פשיעה" data-en="Crime statistics" data-ar="إحصاءات الجريمة">סטטיסטיקת פשיעה</div><div class="sr-sb" data-he="סמני ערים · נתוני משטרת ישראל" data-en="City markers · Israel Police data" data-ar="علامات المدن · بيانات الشرطة">סמני ערים · נתוני משטרת ישראל</div></div></div><div class="tog on" data-skey="map_stats" onclick="mapLayerToggle(this,'stats')" role="switch"></div></div><div class="set-row"><div class="sr-l"><div class="sr-ic"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 22s7-6.4 7-12a7 7 0 1 0-14 0c0 5.6 7 12 7 12Z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><circle cx="12" cy="10" r="2.6" fill="currentColor"/></svg></div><div><div class="sr-nm" data-he="הדיווחים שלי" data-en="My reports" data-ar="بلاغاتي">הדיווחים שלי</div><div class="sr-sb" data-he="סיכות הדיווחים שהגשת" data-en="Pins of reports you filed" data-ar="دبابيس بلاغاتك">סיכות הדיווחים שהגשת</div></div></div><div class="tog on" data-skey="map_reports" onclick="mapLayerToggle(this,'reports')" role="switch"></div></div><div class="set-row"><div class="sr-l"><div class="sr-ic"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><circle cx="9" cy="8" r="3.2" fill="none" stroke="currentColor" stroke-width="2"/><path d="M3.5 19a5.5 5.5 0 0 1 11 0" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><circle cx="17" cy="9" r="2.4" fill="none" stroke="currentColor" stroke-width="2"/><path d="M15.5 14.4A4.6 4.6 0 0 1 20.5 19" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></div><div><div class="sr-nm" data-he="המעגל שלי" data-en="My circle" data-ar="دائرتي">המעגל שלי</div><div class="sr-sb" data-he="מיקום השומרים המקושרים אליך" data-en="Your linked SHOMERs’ location" data-ar="مواقع حُرّاسك المرتبطين">מיקום השומרים המקושרים אליך</div></div></div><div class="tog on" data-skey="map_circle" onclick="mapLayerToggle(this,'circle')" role="switch"></div></div><div class="set-row"><div class="sr-l"><div class="sr-ic"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8.5" fill="none" stroke="currentColor" stroke-width="2"/><path d="M12 7.5V12l3 2" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div><div class="sr-nm" data-he="אירועי עבר" data-en="Past events" data-ar="أحداث سابقة">אירועי עבר</div><div class="sr-sb" data-he="הצג אירועי עבר על המפה — למודעות בלבד" data-en="Show past events on the map — awareness only" data-ar="عرض الأحداث السابقة على الخريطة">הצג אירועי עבר על המפה — למודעות בלבד</div></div></div><div class="tog" id="set-past-tog" onclick="togglePastEvents();this.classList.toggle('on')" role="switch"></div></div></div><div class="set-cat"><div class="set-cat-ic"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="11" width="14" height="9" rx="2" fill="none" stroke="currentColor" stroke-width="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3" fill="none" stroke="currentColor" stroke-width="2"/></svg></div><div class="set-cat-t" data-he="מיקום ופרטיות" data-en="Location &amp; Privacy">מיקום ופרטיות</div></div>
  <div class="sec-cap mb12" id="set-priv-lbl">פרטיות</div>
  <div class="set-grp">
- <div class="set-row"><div class="sr-l"><div class="sr-ic"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 22s7-6.4 7-12a7 7 0 1 0-14 0c0 5.6 7 12 7 12Z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><circle cx="12" cy="10" r="2.6" fill="currentColor"/></svg></div><div><div class="sr-nm" id="p-bgloc-nm">שיתוף מיקום ברקע</div><div class="sr-sb" id="p-bgloc-sb">נדרש ל-SOS ו-DMS - בלעדיו אי אפשר לשלוח את מיקומך בחירום</div></div></div><div class="tog on" data-skey="p_bgloc" onclick="this.classList.toggle('on');saveToggle(this)" role="switch"></div></div>
- <div class="set-row"><div class="sr-l"><div class="sr-ic"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="3.7" fill="none" stroke="currentColor" stroke-width="2"/><path d="M5.5 20a6.5 6.5 0 0 1 13 0" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></div><div><div class="sr-nm" id="p-showname-nm">הצג שם בעדכונים</div><div class="sr-sb" id="p-showname-sb">כבוי = הדיווחים שלך מופיעים בעילום שם</div></div></div><div class="tog on" data-skey="p_showname" onclick="this.classList.toggle('on');saveToggle(this)" role="switch"></div></div>
+ <div class="set-row" style="display:none" data-v293="no-backend"><div class="sr-l"><div class="sr-ic"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 22s7-6.4 7-12a7 7 0 1 0-14 0c0 5.6 7 12 7 12Z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><circle cx="12" cy="10" r="2.6" fill="currentColor"/></svg></div><div><div class="sr-nm" id="p-bgloc-nm">שיתוף מיקום ברקע</div><div class="sr-sb" id="p-bgloc-sb">נדרש ל-SOS ו-DMS - בלעדיו אי אפשר לשלוח את מיקומך בחירום</div></div></div><div class="tog on" data-skey="p_bgloc" onclick="this.classList.toggle('on');saveToggle(this)" role="switch"></div></div>
+ <div class="set-row"><div class="sr-l"><div class="sr-ic"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="3.7" fill="none" stroke="currentColor" stroke-width="2"/><path d="M5.5 20a6.5 6.5 0 0 1 13 0" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></div><div><div class="sr-nm" id="p-showname-nm">הצג שם בעדכונים</div><div class="sr-sb" id="p-showname-sb">כבוי = הדיווחים שלך מופיעים בעילום שם</div></div></div><div class="tog" data-skey="p_showname" onclick="this.classList.toggle('on');saveToggle(this)" role="switch"></div></div>
  </div>
  <div class="sec-cap mb12" id="units-lbl" data-he="יחידות מרחק" data-en="Distance units">יחידות מרחק</div>
  <div class="set-grp" style="padding:10px 14px;margin-bottom:18px;">
@@ -4542,14 +4529,14 @@ var TP_MISSIONS=[
  {he:'הוסיפו את השומר/ת הראשון/ה שלכם - שלחו הזמנה בוואטסאפ.', en:'Add your first SHOMER - send an invite on WhatsApp.', cta_he:'שלח/י הזמנה', cta_en:'Send invite', act:function(){ shareInvite(); }},
  {he:'הציצו במפה החיה - מה קורה באזור שלכם?', en:'Look at the live map - what is happening near you?', cta_he:'למפה', cta_en:'Open map', act:function(){}},
  {he:'הגדירו קוד ביטול שקט - כדי לבטל SOS שגוי.', en:'Set your silent-cancel code - to cancel a false SOS.', cta_he:'להגדרות', cta_en:'Open settings', act:function(){ setReveal('[onclick="openSetPin()"]'); }},
- {he:'אפשרו מיקום ברקע - כדי שה-SOS יעבוד גם כשהאפליקציה סגורה.', en:'Allow background location - so SOS works even when the app is closed.', cta_he:'להגדרות', cta_en:'Open settings', act:function(){ setReveal('#p-bgloc-nm'); }},
+ {he:'אפשרו התראות - כדי לקבל SOS גם כשהאפליקציה ברקע.', en:'Allow notifications - so you get SOS alerts even when the app is in the background.', cta_he:'אפשר/י התראות', cta_en:'Allow notifications', act:function(){ enablePush(); }},
  {he:'נסו צ׳ק-אין הדדי עם השומר/ת שלכם.', en:'Try a mutual check-in with your SHOMER.', cta_he:'לצ׳ק-אין', cta_en:'Open check-in', act:function(){ op('sh-checkin'); }},
- {he:'קראו את המדריך הקצר - 2 דקות.', en:'Read the short guide - 2 minutes.', cta_he:'למדריך', cta_en:'Open guide', act:function(){ op('sh-guide'); }},
+ {he:'קראו את המדריך הקצר - 2 דקות.', en:'Read the short guide - 2 minutes.', cta_he:'למדריך', cta_en:'Open guide', act:function(){ openGuide(); }},
  {he:'פתחו את מסך הדיווח - ראו איך מדווחים על אירוע (אין חובה לשלוח).', en:'Open the report screen - see how reporting works (no need to send).', cta_he:'למסך הדיווח', cta_en:'Open report', act:function(){ openReport(); }},
  {he:'הזמינו אדם נוסף למעגל השומרים שלכם.', en:'Invite one more person to your SHOMER circle.', cta_he:'שלח/י הזמנה', cta_en:'Send invite', act:function(){ shareInvite(); }},
  {he:'הוסיפו אנשי קשר לחירום.', en:'Add emergency contacts.', cta_he:'לאנשי חירום', cta_en:'Open contacts', act:function(){ op('sh-em'); }},
  {he:'הכירו את השומר האוטומטי - SOS אם לא הגבתם בזמן.', en:'Meet the automatic guard - SOS if you do not respond in time.', cta_he:'לשומר האוטומטי', cta_en:'Open it', act:function(){ op('sh-dms'); }},
- {he:'הגדירו התראת הגעה - תדעו כשהשומר/ת שלכם מגיע/ה הביתה.', en:'Set an arrival alert - know when your SHOMER gets home.', cta_he:'להגעות', cta_en:'Open arrivals', act:function(){ op('sh-arrivals'); }},
+ {he:'הגדירו התראת הגעה - תדעו כשהשומר/ת שלכם מגיע/ה הביתה.', en:'Set an arrival alert - know when your SHOMER gets home.', cta_he:'להגעות', cta_en:'Open arrivals', act:function(){ openArrivals(); }},
  {he:'ספרו לנו מה עבד ומה לא - משפט אחד מספיק.', en:'Tell us what worked and what did not - one sentence is enough.', cta_he:'שלח/י משוב', cta_en:'Send feedback', act:function(){ try{ window.open('mailto:markodave@gmail.com?subject='+encodeURIComponent('SH✡MER tester feedback'),'_blank'); }catch(e){} }},
  {he:'יום 14 - סיימתם! תודה ענקית. השאירו את האפליקציה מותקנת - אתם חלק מהרשת.', en:'Day 14 - you made it! Huge thanks. Keep the app installed - you are part of the network.', cta_he:'סגור', cta_en:'Close', act:function(){}}
 ];
@@ -4871,7 +4858,7 @@ function dmsTick(){
  clearInterval(dmsTimer);
  /* FIRE FIRST. beginSOS() only accepts a 'dms' trigger while dmsActive is true - the old
     order (stop, then trigger) meant the automatic SOS NEVER fired, only the toast claimed it. */
- triggerSOS('dms');
+ if(sosPhase==='idle') triggerSOS('dms');   /* v293: never toggle off an SOS that is already running */
  dmsActive=false; dmsWarning=false; SS.dms.active=false; SS.dms.deadline=0; saveStore();
  try{ document.getElementById('dms-strip').classList.remove('on','warn'); document.getElementById('dms-status-card').style.display='none';
       const tb=document.getElementById('dms-toggle-btn');if(tb)tb.textContent=T('dms_start');
@@ -5096,7 +5083,9 @@ async function fcListen(lang){
 }
 function fakeCallStart(cb){
   var f=fcState(), he=currentLang==='he', ar=currentLang==='ar', practice=!!(cb&&cb.practice);
-  if(document.getElementById('fc-ov')){ if(practice) return; try{ window._fcAbort&&window._fcAbort(); }catch(e){} var _o2=document.getElementById('fc-ov'); if(_o2) _o2.remove(); }   /* a real call always wins: the old call is aborted with its timers, no callbacks */
+  var _prevCb=null;   /* v293: a call that takes over keeps the earlier call's job - its answer also settles the check-in / DMS it replaced */
+  if(document.getElementById('fc-ov')){ if(practice) return; _prevCb=window._fcCbCur||null; try{ window._fcAbort&&window._fcAbort(); }catch(e){} var _o2=document.getElementById('fc-ov'); if(_o2) _o2.remove(); }   /* a real call always wins: the old call is aborted with its timers, no callbacks */
+  if(!practice) window._fcCbCur=cb;
   var who=String(f.caller||'').trim()||(he?'אמא':ar?'أمي':'Mom');
   var ov=document.createElement('div'); ov.id='fc-ov'; ov.className='fc-ov';
   var done=false, t0=0, tick=null, timeout=null;
@@ -5107,7 +5096,9 @@ function fakeCallStart(cb){
     var st=ov.querySelector('.fc-st'); if(st) st.textContent=he?'השיחה הסתיימה':ar?'انتهت المكالمة':'Call ended';
     setTimeout(function(){ ov.remove(); }, 900);
     if(practice){ try{ toast(ok?(he?'✓ תרגול: ביטוי הקוד זוהה - הכל טוב':ar?'✓ تدريب: تم التعرف على الرمز':'✓ Practice: code recognised'):(he?'תרגול: כאן הייתה נשלחת התראה שקטה לשומרים שלך':ar?'تدريب: هنا كان سيُرسل تنبيه صامت لحرّاسك':'Practice: a silent alert would go to your SHOMERs now'), ok?'grn':'amb'); }catch(e){} return; }
+    if(window._fcCbCur===cb) window._fcCbCur=null;
     try{ ok ? (cb.ok&&cb.ok()) : (cb.fail&&cb.fail()); }catch(e){}
+    try{ if(_prevCb&&_prevCb!==cb){ ok ? (_prevCb.ok&&_prevCb.ok()) : (_prevCb.fail&&_prevCb.fail()); } }catch(e){}
   };
   ov.innerHTML='<div class="fc-top"><div class="fc-sub">'+(he?'שיחה נכנסת · נייד':ar?'مكالمة واردة · جوال':'Incoming call · mobile')+'</div>'
     +'<div class="fc-av">'+ESC(who.charAt(0))+'</div><div class="fc-nm">'+ESC(who)+'</div><div class="fc-st"></div></div>'
@@ -5336,7 +5327,7 @@ function sosGoLoud(){
  try{ document.getElementById('sos-strip').classList.add('on'); }catch(e){}
  try{ acquireWake(); }catch(e){} try{ startMaxAttention(); }catch(e){}
  try{ addSOSPin(); }catch(e){} try{ sosPaintResponders(); sosPaintMyHelp(); }catch(e){}
- setText('ss-t',he?' SOS פעיל - אזעקה פועלת · מיקומך שותף':' SOS active - alarm firing · location shared');
+ setText('ss-t',he?' SOS פעיל - אזעקה פועלת · מיקומך שותף':currentLang==='ar'?' SOS نشط - الإنذار يعمل · تمت مشاركة موقعك':' SOS active - alarm firing · location shared');
 }
 /* PHASE 1 - alarm immediately, then the cancel countdown. No broadcast yet. */
 /* Anti-abuse: repeated SOS broadcasts add friction (hold-to-arm) and pause community fanout,
@@ -5372,12 +5363,12 @@ function startCountdown(){
 function renderCountdown(){
  setText('sos-cd-num',String(sosCdLeft));
  const he=currentLang==='he';
- setText('sos-cd-ttl',he?' שולח SOS…':' Sending SOS…');
+ setText('sos-cd-ttl',he?' שולח SOS…':currentLang==='ar'?' جارٍ إرسال SOS…':' Sending SOS…');
  setText('sos-cd-sub',he?'האזעקה פועלת. שידור לשומרים בקרבתך בעוד…'
- :'Alarm is sounding. Broadcasting to nearby SHOMERs in…');
- setText('sos-cd-cancel',he?'אני בטוח/ה - בטל':"I'm safe - Cancel");
+ :currentLang==='ar'?'الإنذار يعمل. البث للحُرّاس القريبين خلال…':'Alarm is sounding. Broadcasting to nearby SHOMERs in…');
+ setText('sos-cd-cancel',he?'אני בטוח/ה - בטל':currentLang==='ar'?'أنا بأمان - إلغاء':"I'm safe - Cancel");
  setText('sos-cd-hint',he?'ביטול עכשיו = אזעקת שווא. שום דבר לא ישודר ולא יופיע במפה.'
- :'Cancel now = false alarm. Nothing is broadcast and nothing appears on the map.');
+ :currentLang==='ar'?'الإلغاء الآن = إنذار كاذب. لن يُبث شيء ولن يظهر على الخريطة.':'Cancel now = false alarm. Nothing is broadcast and nothing appears on the map.');
  // tighten the ring as time runs out
  const ring=document.getElementById('sos-cd-ring');
  const full=Math.max(5,Math.min(15,SS.sos.countdown||10));
@@ -5414,6 +5405,7 @@ function cancelSOS(){ if(sosPhase==='countdown')cancelCountdown(); else if(sosPh
 
 /* PHASE 2 - the countdown expired → this is a REAL active event: broadcast sim + map. */
 function activateSOS(){
+ clearInterval(sosCdTimer);   /* v293: never let a leftover countdown re-fire the SOS */
  const ov=document.getElementById('sos-cd');
  if(ov){ov.classList.remove('on');ov.setAttribute('aria-hidden','true');}
  sosPhase='active';
@@ -5452,27 +5444,27 @@ function activateSOS(){
  acquireWake(); // keep the screen awake so the alarm/strobe survive idle (web maximum)
  try{ if('serviceWorker' in navigator && navigator.serviceWorker.ready)navigator.serviceWorker.ready.then(function(reg){ if(reg.sync)reg.sync.register('sos-sync').catch(function(){}); }); }catch(e){}
  startMaxAttention(); // full-screen strobe + flashlight morse (degrades gracefully on iOS)
- pushNotify(' שומר - SOS',he?'אזעקה פועלת. עזרה בדרך.':'Alarm active. Help is coming.','sos-active');
+ pushNotify(' שומר - SOS',he?'אזעקה פועלת. עזרה בדרך.':currentLang==='ar'?'الإنذار يعمل. المساعدة في الطريق.':'Alarm active. Help is coming.','sos-active');
  if(practice){
  // PRACTICE: everything looks and sounds real on THIS phone; nothing leaves it.
- setText('ss-t',he?' תרגול SOS - אף אחד לא קיבל התראה':' Practice SOS - nobody was notified');
- setText('ss-s',he?'כך זה נראה באמת. כבה/י עם קוד הביטול.':'This is how it looks for real. Stop it with your cancel code.');
- toast(he?'תרגול: האזעקה אמיתית בטלפון שלך בלבד. השומרים לא קיבלו כלום.':'Practice: the alarm is real on your phone only. Your SHOMERs got nothing.','amb');
+ setText('ss-t',he?' תרגול SOS - אף אחד לא קיבל התראה':currentLang==='ar'?' تمرين SOS - لم يُبلَّغ أحد':' Practice SOS - nobody was notified');
+ setText('ss-s',he?'כך זה נראה באמת. כבה/י עם קוד הביטול.':currentLang==='ar'?'هكذا يبدو الأمر حقًا. أوقِفه برمز الإلغاء.':'This is how it looks for real. Stop it with your cancel code.');
+ toast(he?'תרגול: האזעקה אמיתית בטלפון שלך בלבד. השומרים לא קיבלו כלום.':currentLang==='ar'?'تمرين: الإنذار حقيقي على هاتفك فقط. لم يتلقَّ الحُرّاس شيئًا.':'Practice: the alarm is real on your phone only. Your SHOMERs got nothing.','amb');
  return;
  }
  if(overLimit){
  toast(he?'ה-SOS נשלח לשומרים שלך (מסומן כ-SOS חוזר). אם זו טעות - בטל/י עם קוד הביטול.':'SOS sent to your SHOMERs (marked as a repeated SOS). If it is a mistake, cancel it with your code.','amb');
  }
  // Within limit → broadcast simulation + pulsing map pin + feed card.
- setText('ss-t',overLimit?(he?' SOS חוזר נשלח · מיקומך שותף':' Repeated SOS sent · location shared'):(he?' SOS פעיל - אזעקה פועלת · מיקומך שותף':' SOS active - alarm firing · location shared'));
- setText('ss-s',he?'ממתין לתגובה...':'Waiting for response...');
+ setText('ss-t',overLimit?(he?' SOS חוזר נשלח · מיקומך שותף':currentLang==='ar'?' أُرسل SOS متكرر · تمت مشاركة موقعك':' Repeated SOS sent · location shared'):(he?' SOS פעיל - אזעקה פועלת · מיקומך שותף':currentLang==='ar'?' SOS نشط - الإنذار يعمل · تمت مشاركة موقعك':' SOS active - alarm firing · location shared'));
+ setText('ss-s',he?'ממתין לתגובה...':currentLang==='ar'?'بانتظار الاستجابة...':'Waiting for response...');
  addSOSPin();
  injectSOSCard();
  buildSosTypeBar(); reflectSosType(); scheduleSosFallback();
  try{ fbPublishSOS(); }catch(e){} // cross-device: broadcast this SOS over RTDB
  try{ fbAlertPairedSos(); }catch(e){} // targeted closed-app push to paired SHOMERs
  try{ if(curSosId) fbRespondersListen(curSosId); }catch(e){} // live "N שומרים בדרך" as responders commit
- toast(he?' SOS שודר - שומרים בקרבתך עודכנו':' SOS broadcast - nearby SHOMERs notified','red',function(){try{openUpdates();}catch(e){}});
+ toast(he?' SOS שודר - שומרים בקרבתך עודכנו':currentLang==='ar'?' تم بث SOS - تم إبلاغ الحُرّاس القريبين':' SOS broadcast - nearby SHOMERs notified','red',function(){try{openUpdates();}catch(e){}});
  // Auto-dial prompt (opens dialer; a native app could place the call directly).
  setTimeout(()=>{
  if(sosPhase!=='active')return;
@@ -5480,7 +5472,7 @@ function activateSOS(){
  /* v287: a non-blocking offer - window.confirm froze the whole SOS (retries, alerts) on a locked phone until tapped */
  try{ var _ob=document.getElementById('callpol-bar'); if(_ob) _ob.remove();
    var cb=document.createElement('div'); cb.className='nudge-bar'; cb.id='callpol-bar';
-   cb.innerHTML='<span class="nudge-tx" style="font-weight:800">'+(he?'לחייג למשטרה '+_pn+'?':'Call police '+_pn+'?')+'</span><button class="nudge-cta" id="callpol-go">'+(he?'חייג/י '+_pn:'Call '+_pn)+'</button><button class="nudge-x" aria-label="close">\u2715</button>';
+   cb.innerHTML='<span class="nudge-tx" style="font-weight:800">'+(he?'לחייג למשטרה '+_pn+'?':currentLang==='ar'?'الاتصال بالشرطة '+_pn+'؟':'Call police '+_pn+'?')+'</span><button class="nudge-cta" id="callpol-go">'+(he?'חייג/י '+_pn:currentLang==='ar'?'اتصل '+_pn:'Call '+_pn)+'</button><button class="nudge-x" aria-label="close">\u2715</button>';
    document.body.appendChild(cb);
    cb.querySelector('.nudge-x').onclick=function(){ cb.remove(); };
    cb.querySelector('#callpol-go').onclick=function(){ cb.remove(); window.location.href='tel:'+_pn; };
@@ -5519,9 +5511,9 @@ function pinSubmit(){
 var _pinFails=0;
 function openSosPin(cb){ _pinMode='verify';_pinBuf='';_pinFails=0;_pinCb=cb; buildPinPad(); reflectPinDots(); _pinSetTexts(); var e=document.getElementById('pin-err'); if(e)e.textContent=''; var ov=document.getElementById('sos-pin'); if(ov){ov.classList.add('on');ov.setAttribute('aria-hidden','false');} }
 function openSetPin(){ _pinMode='set';_pinBuf='';_pinCb=null; buildPinPad(); reflectPinDots(); _pinSetTexts(); var e=document.getElementById('pin-err'); if(e)e.textContent=''; var ov=document.getElementById('sos-pin'); if(ov){ov.classList.add('on');ov.setAttribute('aria-hidden','false');} }
-function _pinSetTexts(){ var he=currentLang==='he', set=_pinMode==='set';
- setText('pin-ttl',set?(he?'בחר/י קוד ביטול':'Choose a cancel code'):(he?'קוד לביטול SOS':'SOS cancel code'));
- setText('pin-sub',set?(he?'6 ספרות. יידרש כדי לבטל SOS פעיל. לעולם לא טביעת אצבע.':'6 digits. Required to cancel an active SOS. Never a fingerprint.'):(he?'ביטול SOS פעיל מחייב את הקוד האישי שלך - לעולם לא טביעת אצבע.':'Cancelling an active SOS requires your personal code - never a fingerprint.')); }
+function _pinSetTexts(){ var he=currentLang==='he', ar=currentLang==='ar', set=_pinMode==='set';
+ setText('pin-ttl',set?(he?'בחר/י קוד ביטול':ar?'اختر رمز الإلغاء':'Choose a cancel code'):(he?'קוד לביטול SOS':ar?'رمز إلغاء SOS':'SOS cancel code'));
+ setText('pin-sub',set?(he?'6 ספרות. יידרש כדי לבטל SOS פעיל. לעולם לא טביעת אצבע.':ar?'6 أرقام. مطلوب لإلغاء SOS نشط. ليس بصمة إصبع أبدًا.':'6 digits. Required to cancel an active SOS. Never a fingerprint.'):(he?'ביטול SOS פעיל מחייב את הקוד האישי שלך - לעולם לא טביעת אצבע.':ar?'إلغاء SOS نشط يتطلب رمزك الشخصي - ليس بصمة إصبع أبدًا.':'Cancelling an active SOS requires your personal code - never a fingerprint.')); }
 function reflectPinSetState(){ var el=document.getElementById('pin-set-state'); if(el){var he=currentLang==='he', has=SS.security&&/^\d{4,6}$/.test(SS.security.pin||''); el.textContent=has?(he?'מוגדר ✓':'Set ✓'):(he?'לא הוגדר':'Not set'); el.style.color=has?'var(--grn)':'var(--amb)';} }
 function closeSosPin(){ var ov=document.getElementById('sos-pin'); if(ov){ov.classList.remove('on');ov.setAttribute('aria-hidden','true');} _pinBuf='';_pinCb=null; }
 
@@ -5725,7 +5717,8 @@ function checkinOk(){ var he=currentLang==='he'; SS.checkin.awaiting=false; save
    fall back to the first linked pair. Returns null if the user has no linked SHOMER. */
 /* Back-compat single-uid resolver: first reachable selected SHOMER (or null). */
 function checkinGuardianUid(){ var u=checkinGuardianUids(); return u.length?u[0]:null; }
-function checkinMiss(){ try{ if(isReviewAccount()) return; }catch(_rv){} var he=currentLang==='he'; SS.checkin.awaiting=false; saveStore(); cl2('checkin-prompt');
+function checkinMiss(){ var he=currentLang==='he'; SS.checkin.awaiting=false; saveStore(); cl2('checkin-prompt');
+ try{ if(isReviewAccount()){ checkinSchedule(); return; } }catch(_rv){}   /* v293: test account - close the prompt and keep the schedule going (no alerts) */
  /* Real cross-device alert to EVERY selected SHOMER's phone (even when closed) via /alarms -> alarmFanout. */
  var uids=checkinGuardianUids(), sent=0;
  if(uids.length && typeof FB!=='undefined' && FB.ready){
@@ -5747,7 +5740,7 @@ function checkinMiss(){ try{ if(isReviewAccount()) return; }catch(_rv){} var he=
  try{pushNotify(he?'שומר - צ׳ק-אין הוחמץ':'SHOMER - missed check-in',he?'אפשר לשלוח SOS עבורם':'You can send an SOS on their behalf','checkin-miss');}catch(e){}
 }
 /* SHOMER-side: send an SOS on the user's behalf after a missed check-in. */
-function guardianActivateForUser(){ cl2('checkin-miss'); try{ beginSOS('checkin'); activateSOS(); }catch(e){} }
+function guardianActivateForUser(){ cl2('checkin-miss'); try{ if(sosPhase!=='idle') return; beginSOS('checkin'); if(sosPhase==='countdown'){ clearInterval(sosCdTimer); activateSOS(); } }catch(e){} }   /* v293: one SOS only - the countdown timer used to fire a second one */
 function _torch(on){ try{ if(_torchTrack)_torchTrack.applyConstraints({advanced:[{torch:!!on}]}); }catch(e){} }
 async function startMorse(){
  var he=currentLang==='he';
@@ -5784,6 +5777,7 @@ function resolveSOS(){
   clearInterval(sosTimer); stopSosAlarm(); stopMaxAttention(); releaseWake();
   try{ if(curSosId){ FB.db&&FB.db.ref('responders/'+curSosId).off&&FB.db.ref('responders/'+curSosId).off(); delete fbRespStreams[curSosId]; } fbClearResponderMarkers(); }catch(e){}
   sosPhase='idle'; sosActive=false; window._sosSilent=false;
+  try{ var _cpb=document.getElementById('callpol-bar'); if(_cpb) _cpb.remove(); }catch(e){}   /* v293: the "call police?" offer ends with the SOS */
   var btn=document.getElementById('sos-btn');
   if(btn){btn.classList.remove('active');btn.setAttribute('aria-pressed','false');}
   document.getElementById('sos-strip').classList.remove('on');
@@ -6343,7 +6337,7 @@ function openDetail(idx){
  body.querySelector('.det-time').textContent=d.time;
  body.querySelector('.det-status').textContent=d.status;
  body.querySelector('.det-desc-txt').textContent=d.desc;
- op('det-sheet');
+ opDet();
 }
 /* Declaring you are on the way and navigating there are one decision - do both. */
 
@@ -6665,6 +6659,8 @@ function opFrom(id, parent){
   op(id);
   paintBack(id);
 }
+/* v293: event details open ON TOP of the list you came from - its back arrow returns there */
+function opDet(){ var par=document.querySelector('.sheet.open'); var pid=(par&&par.id!=='det-sheet')?par.id:null; SCR_STACK.length=0; opFrom('det-sheet', pid); }
 function goBack(id){
   try{ cl(id); }catch(e){}
   var prev=SCR_STACK.pop();
@@ -6695,13 +6691,21 @@ function founderPaint(){
    our entry quietly so the history stays clean. */
 var _shPopSkip=false;
 function shHistPush(){ try{ if(!(history.state&&history.state.shSheet)) history.pushState({shSheet:1},''); }catch(e){} }
-function shHistDrop(){ try{ if(history.state&&history.state.shSheet&&!document.querySelector('.sheet.open')){ _shPopSkip=true; history.back(); } }catch(e){} }
+var _SH_LAYERS='.sheet.open, .ff-pick.on, #rep-sheet';   /* v293: phone Back also closes pop-up windows, not only full screens */
+function shHistDrop(){ try{ if(history.state&&history.state.shSheet&&!document.querySelector(_SH_LAYERS)){ _shPopSkip=true; history.back(); } }catch(e){} }
 try{ window.addEventListener('popstate',function(){
   if(_shPopSkip){ _shPopSkip=false; return; }
-  try{ var o=document.querySelector('.sheet.open'); if(o){ SCR_STACK.length=0; cl(o.id); } }catch(e){}
+  try{
+    var r=document.getElementById('rep-sheet'), f=document.querySelector('.ff-pick.on'), o=document.querySelector('.sheet.open');
+    if(r){ r.remove(); }
+    else if(f){ gdClose(f.id); }
+    else if(o){ SCR_STACK.length=0; cl(o.id); }
+    if(document.querySelector(_SH_LAYERS)) shHistPush();   /* something still open underneath - keep Back working for it */
+  }catch(e){}
 }); }catch(e){}
 function op(id){ if(id==='sh-checkin'||id==='sh-dms'){ setTimeout(function(){ try{ fcMountSettings(); }catch(e){} },0); } closeAll();const el=document.getElementById(id);try{ if(typeof emApplyCountry==='function') emApplyCountry(); }catch(_e){}if(el)el.classList.add('open');syncSheetState(); if(el) shHistPush();
- if(id==='sh-set'){try{renderSetContacts();}catch(e){} try{setCatInit();}catch(e){}}   /* v284: sections fold/unfold from EVERY way into settings, not only the menu */
+ if(id==='sh-set'){try{renderSetContacts();}catch(e){} try{setCatInit();}catch(e){}}
+ if(id==='sh-rep'){ try{ var _sn=!!(SS.settings&&SS.settings.toggles&&SS.settings.toggles.p_showname); var _at=document.querySelector('#sh-rep .tog'); if(_at){ _at.classList.toggle('on',!_sn); _at.setAttribute('aria-checked',String(!_sn)); } }catch(e){} }   /* v293: Settings "show name on reports" sets the report's anonymous switch */   /* v284: sections fold/unfold from EVERY way into settings, not only the menu */
  if(id==='sh-circles'){ try{syncPairsToCircles();}catch(e){} try{renderCircles();}catch(e){} try{gdRenderList();}catch(e){} }   // was never re-rendered → circles list + toggles appeared empty
  if(id==='sh-prof'){ try{syncPairsToCircles();}catch(e){} try{renderProfile();}catch(e){} try{renderProfile2();}catch(e){} try{renderCircles();}catch(e){} }
 }
@@ -6728,18 +6732,20 @@ function renderSetContacts(){
   }).join('');
 }
 function cl(id){
- try{stopPreview();}catch(e){} // never leave a preview tone playing after a sheet closes
+ try{stopPreview();}catch(e){}
+ if(id==='sh-rep'){ try{ stopCam(); }catch(e){} }   /* v293: closing the report screen turns the camera off */ // never leave a preview tone playing after a sheet closes
  const el=document.getElementById(id);if(el)el.classList.remove('open');
  syncSheetState();
  setTimeout(()=>{
  if(!document.querySelector('.sheet.open')){
+ SCR_STACK.length=0; try{ document.querySelectorAll('.sh-back').forEach(function(b){ b.remove(); }); }catch(e){}   /* v293: no stale back arrows next time */
  shHistDrop();
  document.querySelectorAll('.nb').forEach(b=>b.classList.remove('on'));
  const nm=document.getElementById('nb-map');if(nm)nm.classList.add('on');
  }
  },50);
 }
-function closeAll(){document.querySelectorAll('.sheet').forEach(s=>s.classList.remove('open'));syncSheetState();}
+function closeAll(){ try{ var _rp=document.getElementById('sh-rep'); if(_rp&&_rp.classList.contains('open')&&typeof camStream!=='undefined'&&camStream) stopCam(); }catch(e){} document.querySelectorAll('.sheet').forEach(s=>s.classList.remove('open'));syncSheetState();}
 function toggleDD(){
  menuOpen=!menuOpen;
  const dd=document.getElementById('dd');
@@ -8500,13 +8506,7 @@ function startCircleSim(){
  if(mapCircleId==null) mapCircleId=(SS.circles[0]||{}).id||null;
  renderCircleMarkers();
  circleSimTimer=setInterval(()=>{
- (SS.circleMembers||[]).forEach(m=>{
- if(!m.moving)return;
- const sp=m.sos?0.0016:0.0009;
- m.lat+= (Math.random()-0.5)*sp; m.lng+= (Math.random()-0.5)*sp;
- // gentle pull back toward base so they roam but don't drift away
- if(m.baseLat!=null){m.lat+=(m.baseLat-m.lat)*0.05;m.lng+=(m.baseLng-m.lng)*0.05;}
- });
+ /* v293: positions are REAL only (from the live presence feed) - the old demo jitter moved real people's pins at random */
  if(mapCircleId!=null){
  const want=visibleMembers(mapCircleId);
  want.forEach(m=>{const mk=mapLayers.circle[m.id];if(mk)mk.setLatLng([m.lat,m.lng]);});
@@ -9228,8 +9228,8 @@ function gdFlyTo(id){
 }
 
 /* ── Invite / accept / connect flows ── */
-function gdOpen(id){ if(id==='gd-accept'){ try{ popupClearLow(); }catch(_){} } const e=document.getElementById(id); if(e){ e.classList.add('on'); e.setAttribute('aria-hidden','false'); } }
-function gdClose(id){ const e=document.getElementById(id); if(e){ e.classList.remove('on'); e.setAttribute('aria-hidden','true'); } }
+function gdOpen(id){ if(id==='gd-accept'){ try{ popupClearLow(); }catch(_){} } const e=document.getElementById(id); if(e){ e.classList.add('on'); e.setAttribute('aria-hidden','false'); try{ shHistPush(); }catch(_){} } }
+function gdClose(id){ const e=document.getElementById(id); if(e){ e.classList.remove('on'); e.setAttribute('aria-hidden','true'); } setTimeout(function(){ try{ shHistDrop(); }catch(_){} },60); }
 
 function gdCreateInvite(){
  if(!gdRequireConsent(gdCreateInvite)) return; // explicit opt-in before any sharing
@@ -9899,7 +9899,7 @@ function legalFooter(){
 }
 function openLegal(which){
  renderLegal();
- op(which==='tos'?'sh-tos':which==='privacy'?'sh-privacy':'sh-disclaimer');
+ op(which==='tos'?'sh-tos':which==='privacy'?'sh-privacy':which==='a11y'?'sh-a11y':'sh-disclaimer');   /* v293: the accessibility statement opened the disclaimer */
 }
 
 /* ── Location-sharing consent gate (explicit opt-in BEFORE any sharing) ── */
@@ -10231,7 +10231,7 @@ try{ hydrateIcons(document); }catch(e){}
 /* Loaded-build version - shown in the diagnostic panel so a phone can prove
    whether it's on the latest build or a STALE cached one. Keep in lock-step
    with sw.js SW_VERSION on every deploy. */
-var APP_VER='v292';
+var APP_VER='v293';
 var FB={ready:false,uid:null,db:null,_presTimer:null,connected:false,listening:false,pushState:'default',near:0,swVer:'?',
   authState:'connecting',sdkLoaded:false,persist:'',permErr:null,err:null,wsProbe:'',csp:''};
 /* Always log connection diagnostics to the console so the real failure can be SEEN in Chrome. */
@@ -11283,7 +11283,7 @@ function openLiveSosDetail(sosId){
   body.querySelector('.ev-when2').textContent=when;
   body.querySelector('.ev-dist').textContent=dist;
   _liveDetailId=sosId;
-  op('det-sheet');
+  opDet();
   try{ if(s.lat!=null&&s.lng!=null) respondToSOS(s.lat,s.lng,(he?'אירוע חי':ar?'حدث مباشر':'Live event'),{key:'live:'+sosId,quiet:true}); }catch(e){}   /* v280: route always shown */
   fbRespondersListen(sosId);   // stream the REAL responder list into this card
 }
@@ -11773,7 +11773,7 @@ function openReport(){
     +'<textarea class="rep-note" id="rep-note" maxlength="140" placeholder="'+(he?'פרטים (לא חובה)':'Details (optional)')+'"></textarea>'
     +'<button class="btn-ghost rep-close">'+(he?'ביטול':'Cancel')+'</button>'
     +'</div>';
-  document.body.appendChild(d);
+  document.body.appendChild(d); try{ shHistPush(); }catch(_){}
   window._paPhoto=null;
   var chosen=null;
   (function(){ var pb=d.querySelector('#pa-photo-btn'), pin=d.querySelector('#pa-photo'), pv=d.querySelector('#pa-photo-prev');
@@ -11783,10 +11783,10 @@ function openReport(){
     b.onclick=function(){
       chosen=b.getAttribute('data-t');
       var note=(document.getElementById('rep-note')||{}).value||'';
-      evtCreate(chosen, note).then(function(ok){ if(ok) d.remove(); });
+      evtCreate(chosen, note).then(function(ok){ if(ok){ d.remove(); try{ shHistDrop(); }catch(_){} } });
     };
   });
-  d.querySelector('.rep-close').onclick=function(){ d.remove(); };
+  d.querySelector('.rep-close').onclick=function(){ d.remove(); try{ shHistDrop(); }catch(_){} };
 }
 function evtRenderMine(){ /* re-render map events layer if present */ try{ if(typeof renderEvents==='function') renderEvents(); }catch(e){} }
 
@@ -14089,7 +14089,7 @@ async function sendTwilioOTP(channel){
   OTP_CHANNEL = channel || PRIMARY_OTP_CHANNEL || 'sms';
  const he=currentLang==="he";
  const btn=document.getElementById("ob-resend-btn");
- if(_otpSends>=4){ const st=document.getElementById("ob-sms-status"); if(st)st.textContent=he?"יותר מדי ניסיונות - נסה/י שוב מאוחר יותר (הגנת דיוור)":"Too many attempts - try again later (anti-abuse protection)"; if(btn)btn.disabled=true; return; }
+ if(_otpSends>=4){ window._otpSending=false; const st=document.getElementById("ob-sms-status"); if(st)st.textContent=he?"יותר מדי ניסיונות - נסה/י שוב מאוחר יותר (הגנת דיוור)":"Too many attempts - try again later (anti-abuse protection)"; if(btn)btn.disabled=true; return; }
  _otpSends++;
  const statusEl=document.getElementById("ob-sms-status");
  if(btn){btn.disabled=true;btn.textContent=he?"שולח קוד...":"Sending code...";}
@@ -14136,6 +14136,7 @@ async function sendTwilioOTP(channel){
      _autoCallTried=true;
      if(statusEl)statusEl.textContent=he?"⏳ ה-SMS חסום ברשת שלך - מתקשרים אליך עם הקוד...":"⏳ SMS blocked on your network - calling you with the code...";
      _otpSends=Math.max(0,_otpSends-1); /* don't count the auto-retry against the user */
+     window._lastOtpSend=0;   /* v293: the 8s resend guard was swallowing the automatic voice call */
      setTimeout(function(){ try{ sendTwilioOTP("call"); }catch(e){} }, 400);
      return;
    }
@@ -14143,6 +14144,7 @@ async function sendTwilioOTP(channel){
    if(btn){btn.disabled=false;btn.textContent=he?"לא קיבלת/ה קוד? שלח/י שוב":"No code? Send again";}
   }
  }catch(e){
+  window._otpSending=false;   /* v293: a failed send must not lock "Send again" forever */
   if(statusEl)statusEl.textContent=he?"❌ בעיית חיבור. בדוק/י אינטרנט ונסה/י שוב. בחו״ל? ייתכן שהרשת חוסמת - נסה/י Wi-Fi אחר או כבה/י VPN":"❌ Connection problem. Check your internet and retry. Abroad? Your network may block it - try another Wi-Fi or turn off VPN";
   if(btn){btn.disabled=false;btn.textContent=he?"לא קיבלת/ה קוד? שלח/י שוב":"No code? Send again";}
  }
@@ -14202,7 +14204,7 @@ function otpChangeNumber(){
  try{ var sp=document.getElementById("ob-sms-panel"); if(sp) sp.remove(); }catch(e){}
  try{ var fb=document.getElementById("otp-fallbacks"); if(fb) fb.remove(); }catch(e){}
  try{ document.body.classList.remove("otp-active"); }catch(e){}
- try{ _otpSends=0; }catch(e){}   /* a new number starts a fresh attempt count */
+ try{ _otpSends=0; window._otpSending=false; window._lastOtpSend=0; }catch(e){}   /* a new number starts a fresh attempt count */
  var id=window._otpFromPanel||"step0";
  document.querySelectorAll("#ob .ob-panel").forEach(function(p){ p.classList.remove("active"); p.style.display=""; });
  var t=document.getElementById(id)||document.getElementById("step0"); if(t) t.classList.add("active");

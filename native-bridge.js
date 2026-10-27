@@ -138,7 +138,7 @@
       /* Already inside the app: open the approve screen now. Otherwise the stash is
          picked up when the app finishes starting (gdCheckInviteParam). */
       setTimeout(function () {
-        try { if (window.SS && SS.onboarded && typeof gdCheckInviteParam === 'function') gdCheckInviteParam(); } catch (e) {}
+        try { if (typeof SS !== 'undefined' && SS && SS.onboarded && typeof gdCheckInviteParam === 'function') gdCheckInviteParam(); } catch (e) {}   /* v293: SS is a script-level let, never on window */
       }, 600);
     } catch (e) {}
   }
