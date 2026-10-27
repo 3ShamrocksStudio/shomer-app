@@ -10185,7 +10185,7 @@ try{ hydrateIcons(document); }catch(e){}
 /* Loaded-build version - shown in the diagnostic panel so a phone can prove
    whether it's on the latest build or a STALE cached one. Keep in lock-step
    with sw.js SW_VERSION on every deploy. */
-var APP_VER='v288';
+var APP_VER='v289';
 var FB={ready:false,uid:null,db:null,_presTimer:null,connected:false,listening:false,pushState:'default',near:0,swVer:'?',
   authState:'connecting',sdkLoaded:false,persist:'',permErr:null,err:null,wsProbe:'',csp:''};
 /* Always log connection diagnostics to the console so the real failure can be SEEN in Chrome. */
@@ -11027,7 +11027,7 @@ function fbDashInit(){
 function fbDashBeat(hide, lat, lng){
   if(!FB._authReady||!FB.uid) return;
   /* v279: automated/test browsers (navigator.webdriver) never count toward the public dashboard */
-  try{ if(navigator.webdriver) return; }catch(e){}
+  try{ if(navigator.webdriver || isReviewAccount()) return; }catch(e){}
   fbDashInit().then(function(){
     var st=FB._hb, dk=fbDayKey();
     if(st.mode==='new' && st.day && st.day!==dk){ st.day=dk; st.ready=null; return fbDashInit(); }   /* v280: midnight = fresh row (old one deleted) */
@@ -11947,6 +11947,7 @@ async function paCreate(m, kind, desc, lastSeen, photo){
   if(!m || !m.partnerUid){ toast(he?'אפשר לדווח רק על אדם מקושר':'Only a linked person can be reported','amb'); return false; }
   if(typeof FB==='undefined' || !FB.ready || !FB.uid){ toast(he?'אין חיבור':'No connection','amb'); return false; }
   if(!(SS.security&&SS.security.phoneVerified)){ toast(he?'צריך אימות טלפון כדי לדווח':'Phone verification required','amb'); return false; }
+  if(isReviewAccount()){ toast(he?'חשבון בדיקה - דיווחים ציבוריים מושבתים':'Test account - public reports are disabled','amb'); return false; }   /* v289: the store-review account can't publish to the public map */
   if(typeof MOD!=='undefined'){ var mt=MOD.checkText((desc||'')+' '+(lastSeen||'')); if(mt && !mt.ok){ toast(he?'הטקסט מכיל שפה לא הולמת. נסח/י מחדש.':'The text contains inappropriate language. Please rephrase.','amb'); return false; } }
   var now=Date.now();
   if(SS.paLast && (now-SS.paLast)<90000){ toast(he?('המתן/י '+Math.ceil((90000-(now-SS.paLast))/1000)+' שניות'):('Wait '+Math.ceil((90000-(now-SS.paLast))/1000)+'s'),'amb'); return false; }
@@ -12147,6 +12148,7 @@ async function evtCreate(type, note){
   try{ if(typeof MOD!=='undefined' && note){ var _mt=MOD.checkText(note); if(!_mt.ok){ toast(he?'הדיווח מכיל שפה לא הולמת. אנא נסח/י מחדש בכבוד.':'Your report contains inappropriate language. Please rephrase respectfully.','amb'); return; } } }catch(e){}
   if(!FB.ready||!FB.uid){ toast(he?'אין חיבור':'No connection','amb'); return; }
   if(!(SS.security&&SS.security.phoneVerified)){ toast(he?'צריך אימות טלפון כדי לדווח':'Phone verification required','amb'); return; }
+  if(isReviewAccount()){ toast(he?'חשבון בדיקה - דיווחים ציבוריים מושבתים':'Test account - public reports are disabled','amb'); return; }   /* v289: the store-review account can't publish to the public map */
   if(!evtCanPost()){ toast(he?'הגעת למכסת הדיווחים לשעה':'Hourly report limit reached','amb'); return; }
   var cd=evtCooldownLeft();
   if(cd>0){ toast(he?('המתן/י '+Math.ceil(cd/1000)+' שניות'):('Wait '+Math.ceil(cd/1000)+'s'),'amb'); return; }
@@ -13673,7 +13675,7 @@ try{ window.addEventListener('appinstalled',function(){
 function statsTrack(){
   try{
     if(!FB.ready||!FB._authReady||!FB.uid) return;
-    try{ if(navigator.webdriver) return; }catch(e){}   /* v279: automated/test browsers are never counted */
+    try{ if(navigator.webdriver || isReviewAccount()) return; }catch(e){}   /* v279: automated/test browsers (v289: and the store-review account) are never counted */
     var now=Date.now();
     if(statsIsInstalled() && localStorage.getItem('shomer_install_logged')!=='1'){
       FB.db.ref('analytics/installs/'+FB.uid).set(now)
@@ -13694,7 +13696,7 @@ function statsTrack(){
    Loaded lazily and fully non-fatally: any failure here never touches the app. */
 function statsInitAnalytics(){
   try{
-    try{ if(navigator.webdriver) return; }catch(e){}   /* v279: no analytics from automated browsers */
+    try{ if(navigator.webdriver || isReviewAccount()) return; }catch(e){}   /* v279: no analytics from automated browsers or the store-review account */
     if(FB._analytics||FB._analyticsIniting) return; if(!(window.firebase&&window.firebase.initializeApp)) return;
     FB._analyticsIniting=true;
     fbLoad('https://www.gstatic.com/firebasejs/10.12.2/firebase-analytics-compat.js').then(function(){
@@ -14001,7 +14003,21 @@ function showOtpFallbacks(){
    'whatsapp' the moment the sender is live; no other code change needed. Users can always
    pick WhatsApp/voice manually via the fallback buttons regardless. */
 var PRIMARY_OTP_CHANNEL = (window.SHOMER_WA_APPROVED === true) ? 'whatsapp' : 'sms';
+/* ══ STORE-REVIEW ACCOUNT (v289) ══
+   Google Play's reviewers and test robots must be able to sign in. They used to be given the
+   founder's real number, so every new build texted and phoned the founder - and signed the
+   reviewer in AS the founder. They now use this number, which can't belong to anyone (Israeli
+   subscriber numbers never start 050-0) and never sends an SMS or call: the code is fixed and
+   only for this number. It is an ordinary account (never founder) and is never counted in
+   the public dashboard or the stats. */
+var REVIEW_PHONE='972500000000', REVIEW_CODE='246802';
+function isReviewAccount(){ try{ var p=(typeof user!=='undefined'&&user&&user.phone)||(SS&&SS.user&&SS.user.phone)||''; return String(p).replace(/\D/g,'')===REVIEW_PHONE; }catch(e){ return false; } }
 async function sendTwilioOTP(channel){
+ try{ if(String((user&&user.phone)||'').replace(/\D/g,'')===REVIEW_PHONE){
+   var _he=currentLang==='he', _st=document.getElementById('ob-sms-status');
+   if(_st) _st.textContent=_he?'✅ חשבון בדיקה - הזן/י את קוד הבדיקה':'✅ Test account - enter the test code';
+   try{ var _ci=document.getElementById('ob-code-inp'); if(_ci) _ci.focus(); }catch(e){}
+   return; } }catch(e){}
  /* VERIFY-ONCE HARD STOP: if this device already completed verification (onboarded with a
     stored phone), there is no reason to ever send another OTP - the session is device-bound.
     This is the ultimate cost protection: a returning/verified user can NEVER trigger an SMS. */
@@ -14154,6 +14170,10 @@ async function verifyTwilioCode(){
     flight, and never re-verify the same 6 digits. */
  if(window._otpVerifying) return;                 // a verify is already running
  if(window._otpLastCode===code && window._otpLastCodeFailed!==true) return; // same code, don't resubmit unless it explicitly failed
+ if(String(user.phone||'').replace(/\D/g,'')===REVIEW_PHONE){   /* store-review account: fixed code, no network */
+   if(code===REVIEW_CODE){ window._otpVerifiedPhone=user.phone; await completeRegistration(); }
+   else { if(errEl)errEl.textContent=he?"❌ קוד שגוי - נסה/י שוב":"❌ Wrong code - try again"; if(inp){inp.value="";inp.focus();} }
+   return; }
  window._otpVerifying=true;
  window._otpLastCode=code;
  window._otpLastCodeFailed=false;
