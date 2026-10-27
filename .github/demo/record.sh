@@ -15,7 +15,7 @@ REC=$!
 sleep 2
 adb shell am start -n $P/.MainActivity
 sleep 35
-adb devices -l | tee $OUT/devices.txt; adb shell dumpsys activity top | head -5 | tee -a $OUT/devices.txt
+adb devices -l | tee $OUT/devices.txt
 timeout 240 python3 .github/demo/drive.py signin | tee $OUT/drive.log
 sleep 6
 timeout 240 python3 .github/demo/drive.py settings | tee -a $OUT/drive.log
