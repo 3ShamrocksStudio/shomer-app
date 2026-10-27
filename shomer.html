@@ -5085,7 +5085,7 @@ function fakeCallStart(cb){
   var f=fcState(), he=currentLang==='he', ar=currentLang==='ar', practice=!!(cb&&cb.practice);
   var _prevCb=null;   /* v293: a call that takes over keeps the earlier call's job - its answer also settles the check-in / DMS it replaced */
   if(document.getElementById('fc-ov')){ if(practice) return; _prevCb=window._fcCbCur||null; try{ window._fcAbort&&window._fcAbort(); }catch(e){} var _o2=document.getElementById('fc-ov'); if(_o2) _o2.remove(); }   /* a real call always wins: the old call is aborted with its timers, no callbacks */
-  if(!practice) window._fcCbCur=cb;
+  if(!practice){ if(_prevCb){ var _pc=_prevCb, _nc=cb; _prevCb=null; cb={ok:function(){ try{_nc.ok&&_nc.ok();}catch(e){} try{_pc.ok&&_pc.ok();}catch(e){} }, fail:function(){ try{_nc.fail&&_nc.fail();}catch(e){} try{_pc.fail&&_pc.fail();}catch(e){} }}; } window._fcCbCur=cb; }   /* v293: every replaced call (A→B→C) is settled once */
   var who=String(f.caller||'').trim()||(he?'אמא':ar?'أمي':'Mom');
   var ov=document.createElement('div'); ov.id='fc-ov'; ov.className='fc-ov';
   var done=false, t0=0, tick=null, timeout=null;
@@ -6660,7 +6660,7 @@ function opFrom(id, parent){
   paintBack(id);
 }
 /* v293: event details open ON TOP of the list you came from - its back arrow returns there */
-function opDet(){ var par=document.querySelector('.sheet.open'); var pid=(par&&par.id!=='det-sheet')?par.id:null; SCR_STACK.length=0; opFrom('det-sheet', pid); }
+function opDet(){ var par=document.querySelector('.sheet.open'); var pid=(par&&par.id!=='det-sheet')?par.id:null; if(!pid) SCR_STACK.length=0; opFrom('det-sheet', pid); }
 function goBack(id){
   try{ cl(id); }catch(e){}
   var prev=SCR_STACK.pop();
@@ -6698,8 +6698,8 @@ try{ window.addEventListener('popstate',function(){
   try{
     var r=document.getElementById('rep-sheet'), f=document.querySelector('.ff-pick.on'), o=document.querySelector('.sheet.open');
     if(r){ r.remove(); }
-    else if(f){ gdClose(f.id); }
-    else if(o){ SCR_STACK.length=0; cl(o.id); }
+    else if(f){ if(f.id==='gd-consent'&&typeof gdConsentCancel==='function') gdConsentCancel(); else gdClose(f.id); }
+    else if(o){ if(SCR_STACK.length && o.querySelector('.sh-back')){ goBack(o.id); } else { SCR_STACK.length=0; cl(o.id); } }   /* v293: phone Back = the on-screen back arrow when there is one */
     if(document.querySelector(_SH_LAYERS)) shHistPush();   /* something still open underneath - keep Back working for it */
   }catch(e){}
 }); }catch(e){}
