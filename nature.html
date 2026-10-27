@@ -335,7 +335,11 @@ function joinWL(){
     return auth.signInAnonymously().then(function(){
       return db.ref('nature-waitlist').push({email:email,ts:Date.now(),lang:lang});
     });
-  }).then(finish).catch(finish); /* always show success — localStorage already saved */
+  }).then(finish).catch(function(){   /* v293: never claim success when the sign-up did not reach us */
+    m.style.color='#D93B3B';
+    m.textContent=(currentLangIs('he')?'לא הצלחנו לשמור - בדקו חיבור ונסו שוב':currentLangIs('ar')?'تعذّر الحفظ - تحقّق من الاتصال وحاول مجددًا':'Could not save - check your connection and try again');
+    if(btn)btn.disabled=false;
+  });
 }
 function currentLangIs(l){ return document.documentElement.lang===l; }
 document.addEventListener('keydown',function(e){
