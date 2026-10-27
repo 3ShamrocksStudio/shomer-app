@@ -15,16 +15,13 @@ REC=$!
 sleep 2
 adb shell am start -n $P/.MainActivity
 sleep 35
-adb devices -l | tee $OUT/devices.txt
-timeout 30 adb exec-out screencap -p > $OUT/1-loaded.png
+adb devices -l | tee $OUT/devices.txt; adb shell dumpsys activity top | head -5 | tee -a $OUT/devices.txt
 timeout 240 python3 .github/demo/drive.py signin | tee $OUT/drive.log
 sleep 6
-timeout 30 adb exec-out screencap -p > $OUT/2-signed-in.png
 timeout 240 python3 .github/demo/drive.py settings | tee -a $OUT/drive.log
 sleep 2
 # show the always-on "Shake-to-SOS armed" notification
-adb shell cmd statusbar expand-notifications; sleep 5
-timeout 30 adb exec-out screencap -p > $OUT/3-armed-notification.png
+adb shell cmd statusbar expand-notifications; sleep 5; adb devices | tee -a $OUT/devices.txt
 adb shell cmd statusbar collapse; sleep 2
 # lock the phone
 adb shell input keyevent KEYCODE_POWER; sleep 4
@@ -32,9 +29,7 @@ adb shell input keyevent KEYCODE_POWER; sleep 4
 for i in $(seq 1 22); do adb emu sensor set acceleration 26:0:9.8 >/dev/null; sleep 0.06; adb emu sensor set acceleration -26:0:9.8 >/dev/null; sleep 0.06; done
 adb emu sensor set acceleration 0:0:9.8
 sleep 6
-timeout 30 adb exec-out screencap -p > $OUT/4-after-shake.png
 sleep 12
-timeout 30 adb exec-out screencap -p > $OUT/5-sos.png
 timeout 240 python3 .github/demo/drive.py state | tee -a $OUT/drive.log || true
 sleep 6
 adb shell pkill -INT screenrecord || true
