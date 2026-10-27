@@ -5025,9 +5025,38 @@ function playAlarm(durMs){
 function fcState(){ SS.fakecall=SS.fakecall||{on:false,caller:'',code:''}; return SS.fakecall; }
 function fcEnabled(){ var f=fcState(); return !!(f.on && String(f.code||'').trim().length>=3); }
 function fcNorm(t){ return String(t||'').toLowerCase().replace(/[֑-ׇ]/g,'').replace(/[^\p{L}\p{N}]+/gu,' ').trim(); }
+/* v291: the code is a short PHRASE (1-3 words). Speech engines mishear a letter here and there, so each
+   word may differ by one Hebrew prefix letter (ופיצה / בפיצה) or, for words of 5+ letters, by one letter;
+   the words must still come in order, next to each other. */
+function fcLev1(a,b){ if(a===b) return true; if(Math.abs(a.length-b.length)>1) return false; var i=0,j=0,d=0;
+  while(i<a.length&&j<b.length){ if(a[i]===b[j]){i++;j++;continue;} if(++d>1) return false; if(a.length>b.length) i++; else if(b.length>a.length) j++; else {i++;j++;} }
+  return d+(a.length-i)+(b.length-j)<=1; }
+function fcWordEq(w,c){ if(w===c) return true; if(w.length===c.length+1 && /^[והבלמשכ]/.test(w) && w.slice(1)===c) return true; return c.length>=5 && fcLev1(w,c); }
 function fcMatch(said,code){ var a=fcNorm(said), c=fcNorm(code); if(!a||c.length<3) return false;
-  if((' '+a+' ').indexOf(' '+c+' ')>=0) return true;   /* whole word / phrase */
-  return a.split(' ').some(function(w){ return w.length===c.length+1 && /^[והבלמשכ]/.test(w) && w.slice(1)===c; });   /* one Hebrew prefix letter: ופיצה / בפיצה */ }
+  if((' '+a+' ').indexOf(' '+c+' ')>=0) return true;   /* exact phrase */
+  var tw=a.split(' '), cw=c.split(' ');
+  for(var j=0;j+cw.length<=tw.length;j++){ var ok=true; for(var k=0;k<cw.length;k++){ if(!fcWordEq(tw[j+k],cw[k])){ ok=false; break; } } if(ok) return true; }
+  if(cw.length>1){ var jc=c.replace(/ /g,''); if(tw.some(function(w){ return fcWordEq(w,jc); })) return true; }   /* phrase heard as one word */
+  return false; }
+function fcMatchAny(list,code){ return (list||[]).some(function(x){ return fcMatch(x,code); }); }
+/* the caller's voice: native text-to-speech in the app (the WebView has none), Web Speech elsewhere.
+   Resolves when the line has been spoken, so listening starts only after the caller stops talking. */
+function fcHush(){ try{ window.speechSynthesis&&speechSynthesis.cancel(); }catch(e){} try{ var T=window.Capacitor&&window.Capacitor.Plugins&&window.Capacitor.Plugins.TextToSpeech; T&&T.stop&&T.stop(); }catch(e){} }
+function fcSay(text,lang){
+  return new Promise(function(res){
+    var finished=false, end=function(){ if(!finished){ finished=true; res(); } };
+    setTimeout(end, 1500+text.length*90);   /* never hang the call on a silent engine */
+    try{ var T=window.Capacitor&&window.Capacitor.Plugins&&window.Capacitor.Plugins.TextToSpeech;
+      if(T&&T.speak){ T.speak({text:text, lang:lang, rate:1.0, pitch:1.0, volume:1.0, category:'playback'}).then(end,end); return; } }catch(e){}
+    try{ if(window.speechSynthesis&&window.SpeechSynthesisUtterance){ var u=new SpeechSynthesisUtterance(text); u.lang=lang; u.onend=end; u.onerror=end; speechSynthesis.speak(u); return; } }catch(e){}
+    setTimeout(end, 900);
+  });
+}
+var FC_LINES={
+  he:{greet:'היי! מה שלומך?', ask:'הכל בסדר אצלך?', again:'סליחה, לא שמעתי טוב. מה אמרת?', ok:'יופי, מעולה. טוב, נדבר אחר כך. ביי!', bye:'אוקיי, טוב. ביי.'},
+  ar:{greet:'مرحبا! كيف حالك؟', ask:'كل شيء بخير عندك؟', again:'عفوا، لم أسمع جيدا. ماذا قلت؟', ok:'ممتاز. نتكلم لاحقا. مع السلامة!', bye:'حسنا. مع السلامة.'},
+  en:{greet:'Hi! How are you?', ask:'Is everything okay with you?', again:"Sorry, I didn't catch that. What did you say?", ok:'Great. Okay, talk later. Bye!', bye:'Okay. Bye.'}
+};
 function silentSOS(trigger){
   if(typeof sosPhase!=='undefined' && sosPhase!=='idle') return false;
   window._sosSilent=true; sosActive=true; curSosTrigger=trigger||'duress';
@@ -5061,7 +5090,9 @@ async function fcListen(lang){
     try{ await SR.requestPermissions(); }catch(e){}
     var r=await SR.start({language:lang, maxResults:5, partialResults:false, popup:false});
     return (r&&r.matches)||[];
-  }catch(e){ try{ fbLog('fakecall speech: '+((e&&e.message)||e)); }catch(_){} return null; }
+  }catch(e){ try{ fbLog('fakecall speech: '+((e&&e.message)||e)); }catch(_){}
+    /* v291: "no match" / silence is an answer (nothing said), not a missing engine */
+    var m=String((e&&e.message)||e||''); if(/no match|no speech/i.test(m)) return []; return null; }   /* any other failure (network, no language pack…) = typed fallback, never a false alarm */
 }
 function fakeCallStart(cb){
   var f=fcState(), he=currentLang==='he', ar=currentLang==='ar', practice=!!(cb&&cb.practice);
@@ -5069,13 +5100,13 @@ function fakeCallStart(cb){
   var who=String(f.caller||'').trim()||(he?'אמא':ar?'أمي':'Mom');
   var ov=document.createElement('div'); ov.id='fc-ov'; ov.className='fc-ov';
   var done=false, t0=0, tick=null, timeout=null;
-  window._fcAbort=function(){ if(done) return; done=true; clearInterval(tick); clearTimeout(timeout); fcRing(false); try{ window.speechSynthesis&&speechSynthesis.cancel(); }catch(e){} try{ var SR=window.Capacitor&&window.Capacitor.Plugins&&window.Capacitor.Plugins.SpeechRecognition; SR&&SR.stop&&SR.stop(); }catch(e){} try{ ov.remove(); }catch(e){} };
+  window._fcAbort=function(){ if(done) return; done=true; clearInterval(tick); clearTimeout(timeout); fcRing(false); fcHush(); try{ var SR=window.Capacitor&&window.Capacitor.Plugins&&window.Capacitor.Plugins.SpeechRecognition; SR&&SR.stop&&SR.stop(); }catch(e){} try{ ov.remove(); }catch(e){} };
   var finish=function(ok){
-    if(done) return; done=true; fcRing(false); clearInterval(tick); clearTimeout(timeout); try{ window.speechSynthesis&&speechSynthesis.cancel(); }catch(e){}
+    if(done) return; done=true; fcRing(false); clearInterval(tick); clearTimeout(timeout); fcHush();
     try{ var SR=window.Capacitor&&window.Capacitor.Plugins&&window.Capacitor.Plugins.SpeechRecognition; SR&&SR.stop&&SR.stop(); }catch(e){}
     var st=ov.querySelector('.fc-st'); if(st) st.textContent=he?'השיחה הסתיימה':ar?'انتهت المكالمة':'Call ended';
     setTimeout(function(){ ov.remove(); }, 900);
-    if(practice){ try{ toast(ok?(he?'✓ תרגול: הקוד זוהה - הכל טוב':ar?'✓ تدريب: تم التعرف على الرمز':'✓ Practice: code recognised'):(he?'תרגול: כאן הייתה נשלחת התראה שקטה לשומרים שלך':ar?'تدريب: هنا كان سيُرسل تنبيه صامت لحرّاسك':'Practice: a silent alert would go to your SHOMERs now'), ok?'grn':'amb'); }catch(e){} return; }
+    if(practice){ try{ toast(ok?(he?'✓ תרגול: ביטוי הקוד זוהה - הכל טוב':ar?'✓ تدريب: تم التعرف على الرمز':'✓ Practice: code recognised'):(he?'תרגול: כאן הייתה נשלחת התראה שקטה לשומרים שלך':ar?'تدريب: هنا كان سيُرسل تنبيه صامت لحرّاسك':'Practice: a silent alert would go to your SHOMERs now'), ok?'grn':'amb'); }catch(e){} return; }
     try{ ok ? (cb.ok&&cb.ok()) : (cb.fail&&cb.fail()); }catch(e){}
   };
   ov.innerHTML='<div class="fc-top"><div class="fc-sub">'+(he?'שיחה נכנסת · נייד':ar?'مكالمة واردة · جوال':'Incoming call · mobile')+'</div>'
@@ -5091,36 +5122,48 @@ function fakeCallStart(cb){
     var st=ov.querySelector('.fc-st');
     tick=setInterval(function(){ var s=Math.floor((Date.now()-t0)/1000); st.textContent=('0'+Math.floor(s/60)).slice(-2)+':'+('0'+(s%60)).slice(-2); },500);
     var bot=ov.querySelector('.fc-bot'); bot.innerHTML='<button type="button" class="fc-b dec" aria-label="end">✆</button>'; bot.querySelector('.dec').onclick=function(){ finish(false); };
-    timeout=setTimeout(function(){ finish(false); }, 25000);   /* nothing said in time */
-    try{ if(window.speechSynthesis&&window.SpeechSynthesisUtterance){ var u=new SpeechSynthesisUtterance(he?'היי, הכל בסדר?':ar?'مرحبا، كل شيء بخير؟':'Hi, is everything okay?'); u.lang=he?'he-IL':ar?'ar':'en-US'; speechSynthesis.speak(u); } }catch(e){}
-    var said=await fcListen(he?'he-IL':ar?'ar-SA':'en-US');
-    if(done) return;
-    if(said===null){
-      /* no speech engine on this phone yet - discreet typed fallback inside the call screen */
+    timeout=setTimeout(function(){ finish(false); }, 75000);   /* the whole conversation */
+    /* v291: a real-sounding short conversation. The caller greets, asks, and if needed asks again;
+       the code phrase can be said at any point. Heard = "great, bye" and all good. Never heard
+       (or silence) = an ordinary "okay, bye" - nothing on screen gives it away - then the silent SOS. */
+    var L=he?'he-IL':ar?'ar-SA':'en-US', W=FC_LINES[he?'he':ar?'ar':'en'], heard=false;
+    var turn=async function(line){ if(done) return []; await fcSay(line,L); if(done) return []; return await fcListen(L); };
+    var typed=function(){
+      /* no speech engine on this phone - discreet typed fallback inside the call screen */
       var mid=ov.querySelector('.fc-mid');
-      mid.innerHTML='<input class="fc-in" type="text" autocomplete="off" placeholder="'+(he?'הקלד/י את מילת הקוד':ar?'اكتب كلمة الرمز':'Type your code word')+'"><button type="button" class="fc-go">'+(he?'אישור':ar?'تأكيد':'OK')+'</button>';
+      mid.innerHTML='<input class="fc-in" type="text" autocomplete="off" placeholder="'+(he?'הקלד/י את ביטוי הקוד':ar?'اكتب عبارة الرمز':'Type your code phrase')+'"><button type="button" class="fc-go">'+(he?'אישור':ar?'تأكيد':'OK')+'</button>';
       var inp=mid.querySelector('.fc-in'); try{ inp.focus(); }catch(e){}
       var chk=function(){ finish(fcMatch(inp.value, f.code)); };
       mid.querySelector('.fc-go').onclick=chk; inp.onkeydown=function(e){ if(e.key==='Enter') chk(); };
-      return;
+    };
+    /* each turn: the caller speaks, then we listen. If listening fails at ANY turn (no engine,
+       no network, no language pack) the discreet typed box takes over - never a false alarm. */
+    var lines=[W.greet,W.ask,W.again];
+    for(var ti=0; ti<lines.length && !heard; ti++){
+      var r=await turn(lines[ti]); if(done) return;
+      if(r===null){ typed(); return; }
+      heard=fcMatchAny(r,f.code);
     }
-    finish(said.some(function(x){ return fcMatch(x, f.code); }));
+    if(done) return;
+    clearTimeout(timeout);   /* the outcome is decided - the closing line can't flip it */
+    await fcSay(heard?W.ok:W.bye, L);
+    finish(heard);
   };
 }
 function fcMountSettings(){
   var f=fcState(), he=currentLang==='he', ar=currentLang==='ar';
   document.querySelectorAll('[data-fc-host]').forEach(function(h){
     h.innerHTML='<div class="sec-cap mb12" style="margin-top:14px">'+(he?'שיחה מאמא (בדיקה קולית)':ar?'مكالمة من أمي (فحص صوتي)':'Call from Mom (voice check)')+'</div>'
-      +'<p class="set-help" style="margin:0 0 8px">'+(he?'במקום השאלה „הכל טוב?” הטלפון יציג שיחה נכנסת. עונים ואומרים את מילת הקוד. מילה שגויה, שתיקה או ניתוק = התראה שקטה לשומרים שלך עם המיקום החי, בלי שום סימן או צליל בטלפון.':ar?'بدل سؤال «كل شيء بخير؟» يعرض الهاتف مكالمة واردة. أجب وقل كلمة الرمز. كلمة خاطئة أو صمت أو إنهاء = تنبيه صامت لحرّاسك مع موقعك المباشر.':'Instead of the "All good?" question, your phone shows an incoming call. Answer and say your code word. Wrong word, silence or hanging up = a silent alert to your SHOMERs with your live location, with no sign or sound on your phone.')+'</p>'
+      +'<p class="set-help" style="margin:0 0 8px">'+(he?'במקום השאלה „הכל טוב?” הטלפון יציג שיחה נכנסת. עונים ומנהלים שיחה קצרה - ובמהלכה אומרים את ביטוי הקוד. בלי הביטוי, שתיקה או ניתוק = התראה שקטה לשומרים שלך עם המיקום החי, בלי שום סימן או צליל בטלפון.':ar?'بدل سؤال «كل شيء بخير؟» يعرض الهاتف مكالمة واردة. أجب وتحدث قليلاً وقل عبارة الرمز خلال المكالمة. بدون العبارة أو صمت أو إنهاء = تنبيه صامت لحرّاسك مع موقعك المباشر.':'Instead of the "All good?" question, your phone shows an incoming call. Answer and chat briefly - say your code phrase during the call. No phrase, silence or hanging up = a silent alert to your SHOMERs with your live location, with no sign or sound on your phone.')+'</p>'
       +'<label class="fc-row"><input type="checkbox" class="fc-on"'+(f.on?' checked':'')+'> <span>'+(he?'הפעל שיחה מדומה':ar?'تفعيل المكالمة':'Use the fake call')+'</span></label>'
       +'<input class="ob-f fc-caller" type="text" maxlength="20" placeholder="'+(he?'שם המתקשר/ת (למשל: אמא)':ar?'اسم المتصل (مثلاً: أمي)':'Caller name (e.g. Mom)')+'" value="'+ESC(f.caller||'')+'" style="margin-top:8px">'
-      +'<input class="ob-f fc-code" type="text" maxlength="24" autocomplete="off" placeholder="'+(he?'מילת קוד (למשל: פיצה)':ar?'كلمة الرمز':'Code word (e.g. pizza)')+'" value="'+ESC(f.code||'')+'" style="margin-top:8px">'
+      +'<input class="ob-f fc-code" type="text" maxlength="32" autocomplete="off" placeholder="'+(he?'ביטוי קוד, 1-3 מילים (למשל: עוגת גבינה)':ar?'عبارة الرمز، 1-3 كلمات':'Code phrase, 1-3 words (e.g. cheese cake)')+'" value="'+ESC(f.code||'')+'" style="margin-top:8px">'
       +'<button type="button" class="row-btn fc-test" style="width:100%;margin-top:8px;justify-content:center">'+(he?'נסה/י עכשיו (תרגול - לא נשלח כלום)':ar?'جرّب الآن (تدريب)':'Try it now (practice - nothing is sent)')+'</button>';
     var on=h.querySelector('.fc-on'), cn=h.querySelector('.fc-caller'), cd=h.querySelector('.fc-code');
-    on.onchange=function(){ if(on.checked && String(cd.value||'').trim().length<3){ on.checked=false; try{ cd.focus(); toast(he?'קודם בחר/י מילת קוד (3 אותיות לפחות)':ar?'اختر كلمة رمز أولاً (3 أحرف على الأقل)':'Choose a code word first (3+ letters)','amb'); }catch(e){} return; } f.on=on.checked; saveStore(); };
+    on.onchange=function(){ if(on.checked && String(cd.value||'').trim().length<3){ on.checked=false; try{ cd.focus(); toast(he?'קודם בחר/י ביטוי קוד (3 אותיות לפחות)':ar?'اختر عبارة رمز أولاً (3 أحرف على الأقل)':'Choose a code phrase first (3+ letters)','amb'); }catch(e){} return; } f.on=on.checked; saveStore(); };
     cn.oninput=function(){ f.caller=cn.value.trim(); saveStore(); };
     cd.oninput=function(){ f.code=cd.value.trim(); if(f.code.length<3){ f.on=false; on.checked=false; } saveStore(); };
-    h.querySelector('.fc-test').onclick=function(){ if(String(f.code||'').trim().length<3){ try{ cd.focus(); toast(he?'קודם בחר/י מילת קוד (3 אותיות לפחות)':ar?'اختر كلمة رمز أولاً (3 أحرف على الأقل)':'Choose a code word first (3+ letters)','amb'); }catch(e){} return; } fakeCallStart({practice:true}); };
+    h.querySelector('.fc-test').onclick=function(){ if(String(f.code||'').trim().length<3){ try{ cd.focus(); toast(he?'קודם בחר/י ביטוי קוד (3 אותיות לפחות)':ar?'اختر عبارة رمز أولاً (3 أحرف على الأقل)':'Choose a code phrase first (3+ letters)','amb'); }catch(e){} return; } fakeCallStart({practice:true}); };
   });
 }
 /* ── LOOPING SOS ALARM + VIBRATION ──────────────────────────────────────────────
@@ -10187,7 +10230,7 @@ try{ hydrateIcons(document); }catch(e){}
 /* Loaded-build version - shown in the diagnostic panel so a phone can prove
    whether it's on the latest build or a STALE cached one. Keep in lock-step
    with sw.js SW_VERSION on every deploy. */
-var APP_VER='v290';
+var APP_VER='v291';
 var FB={ready:false,uid:null,db:null,_presTimer:null,connected:false,listening:false,pushState:'default',near:0,swVer:'?',
   authState:'connecting',sdkLoaded:false,persist:'',permErr:null,err:null,wsProbe:'',csp:''};
 /* Always log connection diagnostics to the console so the real failure can be SEEN in Chrome. */
