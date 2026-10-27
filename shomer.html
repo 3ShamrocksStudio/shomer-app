@@ -8080,6 +8080,7 @@ async function shareInvite(who){
 async function sendInviteSMS(phone, name, token, code){
   var he=currentLang==='he';
   if(!phone || !token) return false;
+  try{ if(phoneIsFounder(phone)||isReviewAccount()) return false; }catch(e){}   /* v292: no automated texts to the founder, and none from the store-review account */
   try{
     var r=await otpFetch("/sendInvite",{
       method:"POST",
@@ -10230,7 +10231,7 @@ try{ hydrateIcons(document); }catch(e){}
 /* Loaded-build version - shown in the diagnostic panel so a phone can prove
    whether it's on the latest build or a STALE cached one. Keep in lock-step
    with sw.js SW_VERSION on every deploy. */
-var APP_VER='v291';
+var APP_VER='v292';
 var FB={ready:false,uid:null,db:null,_presTimer:null,connected:false,listening:false,pushState:'default',near:0,swVer:'?',
   authState:'connecting',sdkLoaded:false,persist:'',permErr:null,err:null,wsProbe:'',csp:''};
 /* Always log connection diagnostics to the console so the real failure can be SEEN in Chrome. */
@@ -14057,8 +14058,17 @@ var PRIMARY_OTP_CHANNEL = (window.SHOMER_WA_APPROVED === true) ? 'whatsapp' : 's
    only for this number. It is an ordinary account (never founder) and is never counted in
    the public dashboard or the stats. */
 var REVIEW_PHONE='972500000000', REVIEW_CODE='246802';
+try{ if(/[?&]founder=1\b/.test(location.search)) sessionStorage.setItem('shomerFounderOk','?founder=1'); }catch(e){}   /* v292: read before the page tidies its address bar */
 function isReviewAccount(){ try{ var p=(typeof user!=='undefined'&&user&&user.phone)||(SS&&SS.user&&SS.user.phone)||''; return String(p).replace(/\D/g,'')===REVIEW_PHONE; }catch(e){ return false; } }
 async function sendTwilioOTP(channel){
+ /* v292: the founder's number receives no automated codes. Google Play's test robots were given it
+    and kept triggering SMS + calls on every build. The founder is already registered on his phones;
+    signing in on a NEW device needs the private link with ?founder=1. Everyone else is unaffected. */
+ try{ if(phoneIsFounder((user&&user.phone)||'') && !/[?&]founder=1\b/.test(location.search+' '+(sessionStorage.getItem('shomerFounderOk')||''))){
+   var _hf=currentLang==='he', _sf=document.getElementById('ob-sms-status');
+   if(_sf) _sf.textContent=_hf?'לא ניתן לשלוח קוד למספר הזה מכאן.':'A code can’t be sent to this number from here.';
+   return; }
+ }catch(e){}
  try{ if(String((user&&user.phone)||'').replace(/\D/g,'')===REVIEW_PHONE){
    var _he=currentLang==='he', _st=document.getElementById('ob-sms-status');
    if(_st) _st.textContent=_he?'✅ חשבון בדיקה - הזן/י את קוד הבדיקה':'✅ Test account - enter the test code';
