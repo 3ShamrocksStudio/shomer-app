@@ -1,0 +1,58 @@
+name: Record Shake-to-SOS demo video
+
+# Records the video Google Play asks for in the foreground-service declaration: the app's
+# own native Shake-to-SOS service detecting a shake on a LOCKED Android phone and bringing
+# up the SOS screen. Runs on an Android emulator with the store-review test account
+# (the SOS is a local practice run - it never alerts real people). Output: artifact demo-video.
+on:
+  workflow_dispatch:
+
+jobs:
+  demo:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: '20' }
+      - uses: actions/setup-java@v4
+        with: { distribution: 'zulu', java-version: '21' }
+      - name: Build debug APK (same native code as the store build)
+        working-directory: native
+        run: |
+          npm install
+          node scripts/copy-web.js
+          npx cap add android
+          cd android
+          sed -i -E 's/minSdkVersion *= *[0-9]+/minSdkVersion = 24/; s/compileSdkVersion *= *[0-9]+/compileSdkVersion = 36/; s/targetSdkVersion *= *[0-9]+/targetSdkVersion = 36/' variables.gradle
+          sed -i -E 's#com\.android\.tools\.build:gradle:[0-9.]+#com.android.tools.build:gradle:8.11.1#' build.gradle
+          sed -i -E 's#gradle-[0-9.]+-all\.zip#gradle-8.13-all.zip#' gradle/wrapper/gradle-wrapper.properties
+          cd ..
+          npx cap sync android
+          SRC=shomer-android/android/app/src/main/java/il/co/shomerapp; DST=android/app/src/main/java/il/co/shomerapp
+          mkdir -p "$DST" && cp -v "$SRC"/*.java "$DST"/
+          mkdir -p android/app/src/main/res/raw && cp -v shomer-android/android/app/src/main/res/raw/* android/app/src/main/res/raw/ || true
+          mkdir -p android/app/src/main/res/drawable && cp -v shomer-android/android/app/src/main/res/drawable/ic_stat_shomer.xml android/app/src/main/res/drawable/ || true
+          node scripts/apply-manifest.js
+          cd android && ./gradlew assembleDebug --stacktrace
+          ls -la app/build/outputs/apk/debug/
+      - name: Enable KVM
+        run: |
+          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
+          sudo udevadm control --reload-rules && sudo udevadm trigger --name-match=kvm
+      - run: pip install websocket-client
+      - name: Record on emulator
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 34
+          target: google_apis
+          arch: x86_64
+          profile: pixel_6
+          disable-animations: false
+          emulator-options: -no-snapshot -no-boot-anim -camera-back none -gpu swiftshader_indirect
+          script: bash .github/demo/record.sh
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: demo-video
+          path: demo-out/
