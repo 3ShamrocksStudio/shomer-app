@@ -34,7 +34,7 @@ def ev(ws, js, wait=True):
             return r.get('value', r.get('description'))
 
 step = sys.argv[1]
-ws = websocket.create_connection(page_ws(), timeout=60)
+ws = websocket.create_connection(page_ws(), timeout=60, suppress_origin=True)
 if step == 'signin':
     print(ev(ws, "location.href+' onboarded='+(window.SS&&SS.onboarded)"))
     print(ev(ws, """(async()=>{ if(SS.onboarded) return 'already';
