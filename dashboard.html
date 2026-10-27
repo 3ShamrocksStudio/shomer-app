@@ -955,6 +955,7 @@ async function drawTerritory(c){
       geo=(j&&j[0]&&j[0].geojson&&(j[0].geojson.type==='Polygon'||j[0].geojson.type==='MultiPolygon'))?j[0].geojson:null;
     }catch(e){ geo=null; }
     _boundaryCache[c.city]=geo;
+    if(_curCity&&_curCity.city!==c.city) return;   /* v293: the user already switched city while this boundary loaded - don't paint it on the new one */
   }
   if(geo){
     var rings=geoRings(geo);
@@ -1080,7 +1081,7 @@ function _playAlertTone(){
  }catch(e){}
 }
 var _alarmTimer=null, _alarmId=null, _alarmSilenced=false;
-function startAlarm(){ if(_alarmTimer)return; try{_playAlertTone();}catch(e){} _alarmTimer=setInterval(function(){ var st=document.getElementById('live-strip'); if(!st||st.style.display==='none'||_alarmSilenced){ stopAlarm(); return; } try{_playAlertTone();}catch(e){} },2300); }
+function startAlarm(){ if(_alarmTimer)return; try{_playAlertTone();}catch(e){} var _a0=Date.now(); _alarmTimer=setInterval(function(){ var st=document.getElementById('live-strip'); if(!st||st.style.display==='none'||_alarmSilenced){ stopAlarm(); return; } if(window._keepAlarm===false && Date.now()-_a0>60000){ stopAlarm(); return; }   /* v293: "keep alarm until acknowledged" off = the sound stops by itself after 1 minute */ try{_playAlertTone();}catch(e){} },2300); }
 function stopAlarm(){ if(_alarmTimer){clearInterval(_alarmTimer);_alarmTimer=null;} }
 function silenceAlarm(){ _alarmSilenced=true; stopAlarm(); var st=document.getElementById('live-strip'); if(st){ st.style.animation='none'; st.style.background='linear-gradient(90deg,rgba(60,72,96,.6),rgba(36,46,66,.6))'; st.style.boxShadow='0 6px 20px rgba(0,0,0,.4),0 0 0 1px rgba(255,255,255,.12) inset'; st.classList.add('attended'); } var b=document.getElementById('ls-silence'); if(b){ b.textContent='🔕 הושתק'; b.classList.add('done'); } }
 /* openResponse does NOT stop the alarm — only the user clicking "השתק אזעקה" silences it. */
@@ -1515,7 +1516,11 @@ var SOLSET={
 function ddr(l,v,col){return '<div class="ddr"><span>'+l+'</span><b'+(col?' style="color:'+col+'"':'')+'>'+v+'</b></div>';}
 
 function closeSettings(){ var o=document.getElementById('set-ov'); if(o)o.remove(); }
-function _setToggle(key,on){ window[key]=on; try{ if(key==='_alarmMuted'&&!on){ _playAlertTone(); } }catch(e){} var b=document.getElementById('tg-'+key); if(b){ b.classList.toggle('on',on); } }
+/* v293: each click flips the CURRENT value (it used to reuse the value baked in when the window opened), the switch shows the
+   real state (alarm sound = NOT muted), and the choice survives a refresh */
+var _SET_INV={_alarmMuted:true};
+try{ var _sv=JSON.parse(localStorage.getItem('shomerDashSet')||'{}'); ['_alarmMuted','_autoFocus','_keepAlarm'].forEach(function(k){ if(typeof _sv[k]==='boolean') window[k]=_sv[k]; }); }catch(e){}
+function _setToggle(key,on){ if(on==null) on=!window[key]; window[key]=on; try{ var _o=JSON.parse(localStorage.getItem('shomerDashSet')||'{}'); _o[key]=on; localStorage.setItem('shomerDashSet',JSON.stringify(_o)); }catch(e){} try{ if(key==='_alarmMuted'&&!on){ _playAlertTone(); } }catch(e){} var b=document.getElementById('tg-'+key); if(b){ b.classList.toggle('on',_SET_INV[key]?!on:!!on); } }
 function openSettings(){
  if(document.getElementById('set-ov'))return;
  var terr=(CLIENT&&CLIENT.territory)||'—';
@@ -1524,13 +1529,13 @@ function openSettings(){
  if(window._keepAlarm===undefined)window._keepAlarm=true;
  function row(ic,t,sub,key,invert){ var on=invert?!window[key]:!!window[key];
    return '<div class="set-row"><div class="set-ic">'+ic+'</div><div class="set-tx"><b>'+t+'</b><span>'+sub+'</span></div>'
-    +'<button id="tg-'+key+'" class="set-tg'+(on?' on':'')+'" onclick="_setToggle(\''+key+'\','+(!window[key])+')"><i></i></button></div>'; }
+    +'<button id="tg-'+key+'" class="set-tg'+(on?' on':'')+'" onclick="_setToggle(\''+key+'\')"><i></i></button></div>'; }
  var ov=document.createElement('div'); ov.id='set-ov'; ov.className='acct-ov';
  ov.innerHTML='<div class="acct-card" style="max-width:520px"><div class="acct-head"><h3>⚙ הגדרות מוקד</h3><button class="acct-x" onclick="closeSettings()">✕</button></div>'
   +'<div class="acct-sub">הגדרות תצוגה והתראות למוקד העירוני · '+ESC(terr)+'</div>'
   +'<div class="set-sec">התראות</div>'
   +row('🔔','צליל אזעקה','צליל אזעקה באירוע SOS חי','_alarmMuted',true)
-  +row('🔒','השארת אזעקה עד אישור','האזעקה נמשכת עד שהמוקדן משתיק ידנית','_keepAlarm')
+  +row('🔒','השארת אזעקה עד אישור','דלוק: עד השתקה ידנית · כבוי: נעצרת לבד אחרי דקה','_keepAlarm')
   +row('🗺️','מיקוד אוטומטי למפה','המפה מתמקדת אוטומטית למיקום האירוע (0.3 ק״מ)','_autoFocus')
   +'<div class="set-sec">טריטוריה ונתונים</div>'
   +'<div class="set-row"><div class="set-ic">📍</div><div class="set-tx"><b>תחום שיפוט</b><span>הטריטוריה המנוטרת כעת</span></div><b style="color:var(--gold);font-size:13px">'+ESC(terr)+'</b></div>'
@@ -2017,8 +2022,10 @@ function renderPresenceLayer(list, fitList){
     });
     var sbtn=document.getElementById('spread-btn');
     var isPaying=CLIENT&&!CLIENT.demo&&!CLIENT.live;
-    var showNow=(CLIENT&&CLIENT.live)||isPaying||(sbtn&&sbtn.classList.contains('on'));
-    if(showNow){ presLayer.addTo(MAP); if(sbtn&&!sbtn.classList.contains('on')) sbtn.classList.add('on'); }
+    /* v293: live/paying views start with guardians ON once - after that the button decides (it used to switch itself back on every 12s) */
+    if(!window._presAutoOn && ((CLIENT&&CLIENT.live)||isPaying)){ window._presAutoOn=true; if(sbtn&&!sbtn.classList.contains('on')) sbtn.classList.add('on'); }
+    var showNow=!!(sbtn&&sbtn.classList.contains('on'));
+    if(showNow){ presLayer.addTo(MAP); }
     try{ renderLegend(); }catch(_l){}
     /* frame ONLY to pins inside the territory, once per territory — users abroad (e.g. Miami) are still
        drawn, but never pull the map out to a world view; with no local pins the territory framing stays */
