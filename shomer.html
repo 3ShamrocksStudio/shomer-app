@@ -8699,7 +8699,7 @@ function gaListen(){
 }
 function gaHandle(from,v){
   if(!v||typeof v!=='object'||!v.id) return;
-  if(!gaLinked(from)) return;                                    /* only people I chose to link with */
+  if(!gaLinked(from)){ if(v.id) gaNativeHandled(v.id); return; }   /* only people I chose to link with (and never leave a background ring from anyone else) */
   if(v.level==='ok'||v.level==='help'||v.level==='coded'){        /* an answer to something I sent */
     var o=gaOut()[from]; if(!o||o.id!==v.re||o.st===v.level) return;
     o.st=v.level; o.ats=v.ts||Date.now(); try{saveStore();}catch(e){}
@@ -10590,7 +10590,7 @@ try{ hydrateIcons(document); }catch(e){}
 /* Loaded-build version - shown in the diagnostic panel so a phone can prove
    whether it's on the latest build or a STALE cached one. Keep in lock-step
    with sw.js SW_VERSION on every deploy. */
-var APP_VER='v310';
+var APP_VER='v311';
 var FB={ready:false,uid:null,db:null,_presTimer:null,connected:false,listening:false,pushState:'default',near:0,swVer:'?',
   authState:'connecting',sdkLoaded:false,persist:'',permErr:null,err:null,wsProbe:'',csp:''};
 /* Always log connection diagnostics to the console so the real failure can be SEEN in Chrome. */
