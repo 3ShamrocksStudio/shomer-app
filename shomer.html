@@ -4219,7 +4219,8 @@ async function _ensureNativeGeo(){
   var ok=function(p){ return p&&(p.location==='granted'||p.coarseLocation==='granted'); };
   var st=null; try{ st=await G.checkPermissions(); }catch(e){}
   for(var i=0;i<4 && !ok(st);i++){
-   if(st&&st.location==='denied') break;   /* the user said no for good - only Settings can change it */
+   /* v297: do NOT trust a saved 'denied' - Capacitor stores a request that bounced off another dialog as 'denied'.
+      Always really ask; Android itself returns instantly when the user chose "don't ask again". */
    var t0=Date.now();
    try{ st=await permSerial(function(){ return G.requestPermissions({permissions:['location']}); }); }catch(e){}
    if(ok(st) || Date.now()-t0>1200) break;   /* the user saw the dialog and answered - never nag */
@@ -6274,7 +6275,12 @@ function locBarShow(){
   });
  };
 }
-try{ document.addEventListener('visibilitychange',function(){ if(document.visibilityState==='visible' && userLat==null && geoWatchId===null && typeof SS!=='undefined' && SS.onboarded){ try{ startGeoWatch(); }catch(e){} } }); }catch(e){}   /* v297: came back from Settings with location allowed → start right away */
+try{ document.addEventListener('visibilitychange',function(){ if(document.visibilityState==='visible' && userLat==null && geoWatchId===null && typeof SS!=='undefined' && SS.onboarded){
+  /* only restart if location is already allowed (e.g. back from Settings) - never pop a dialog on every return */
+  var G=(window.Capacitor&&window.Capacitor.Plugins&&window.Capacitor.Plugins.Geolocation)||null;
+  if(!_isNative()||!G){ try{ _startGeoWatchNow(); }catch(e){} return; }
+  G.checkPermissions().then(function(p){ if(p&&(p.location==='granted'||p.coarseLocation==='granted')){ try{ _startGeoWatchNow(); }catch(e){} } }).catch(function(){});
+ } }); }catch(e){}   /* v297: came back from Settings with location allowed → start right away */
 window.addEventListener('DOMContentLoaded',()=>{
  // Textarea char count
  const ta=document.getElementById('rep-ta');
@@ -10310,7 +10316,7 @@ try{ hydrateIcons(document); }catch(e){}
 /* Loaded-build version - shown in the diagnostic panel so a phone can prove
    whether it's on the latest build or a STALE cached one. Keep in lock-step
    with sw.js SW_VERSION on every deploy. */
-var APP_VER='v297';
+var APP_VER='v298';
 var FB={ready:false,uid:null,db:null,_presTimer:null,connected:false,listening:false,pushState:'default',near:0,swVer:'?',
   authState:'connecting',sdkLoaded:false,persist:'',permErr:null,err:null,wsProbe:'',csp:''};
 /* Always log connection diagnostics to the console so the real failure can be SEEN in Chrome. */
