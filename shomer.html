@@ -4205,14 +4205,26 @@ function goStep(n){
    runtime location permission is granted. Declaring it in the manifest is NOT
    enough on Android 6+. Request it via the Capacitor Geolocation plugin first;
    a plain browser skips this and behaves exactly as before. */
-async function ensureNativeGeo(){
+/* v297: Android shows ONE permission dialog at a time - a request that overlaps another (camera at launch,
+   notifications) comes back "denied" without the user ever seeing it. Every runtime-permission request now
+   goes through one queue, location goes first, and a request that bounced back instantly is retried. */
+function permSerial(fn){ var p=(window._permChain||Promise.resolve()).then(fn,fn); window._permChain=p.then(function(){},function(){}); return p; }
+var _geoPermP=null;
+function ensureNativeGeo(){ if(_geoPermP) return _geoPermP; _geoPermP=_ensureNativeGeo().then(function(r){ _geoPermP=null; return r; },function(){ _geoPermP=null; return true; }); return _geoPermP; }
+async function _ensureNativeGeo(){
  try{
   if(!_isNative()) return true;
   var G=(window.Capacitor&&window.Capacitor.Plugins&&window.Capacitor.Plugins.Geolocation)||null;
   if(!G) return true;
-  var st=null; try{ st=await G.checkPermissions(); }catch(e){}
   var ok=function(p){ return p&&(p.location==='granted'||p.coarseLocation==='granted'); };
-  if(!ok(st)){ try{ st=await G.requestPermissions({permissions:['location']}); }catch(e){} }
+  var st=null; try{ st=await G.checkPermissions(); }catch(e){}
+  for(var i=0;i<4 && !ok(st);i++){
+   if(st&&st.location==='denied') break;   /* the user said no for good - only Settings can change it */
+   var t0=Date.now();
+   try{ st=await permSerial(function(){ return G.requestPermissions({permissions:['location']}); }); }catch(e){}
+   if(ok(st) || Date.now()-t0>1200) break;   /* the user saw the dialog and answered - never nag */
+   await new Promise(function(r){ setTimeout(r,1500); });   /* bounced off another dialog - try again */
+  }
   return ok(st);
  }catch(e){ return true; }
 }
@@ -4676,7 +4688,7 @@ async function initNativeAlerts(){
  try{
   if(_ln){
    var perm=await _ln.checkPermissions();
-   if(perm&&perm.display!=='granted'){ try{ perm=await _ln.requestPermissions(); }catch(e){} }
+   if(perm&&perm.display!=='granted'){ try{ await ensureNativeGeo(); }catch(e){} try{ perm=await permSerial(function(){ return _ln.requestPermissions(); }); }catch(e){} }   /* v297: location first, then one dialog at a time */
    /* MAX importance + its own channel so Android will not silence or defer it */
    try{ await _ln.createChannel({id:'shomer-sos',name:'SH\u2721MER SOS',
      description:'Emergency alerts from nearby SH\u2721MER users',
@@ -4701,7 +4713,7 @@ async function initNativeAlerts(){
  try{
   if(_pn){
    var pp=await _pn.checkPermissions();
-   if(pp&&pp.receive!=='granted'){ try{ pp=await _pn.requestPermissions(); }catch(e){} }
+   if(pp&&pp.receive!=='granted'){ try{ await ensureNativeGeo(); }catch(e){} try{ pp=await permSerial(function(){ return _pn.requestPermissions(); }); }catch(e){} }
    if(pp&&pp.receive==='granted'){
     _pn.addListener('registration',function(t){
       try{ fcmToken=(t&&t.value)||null; if(fcmToken){ SS.fcmToken=fcmToken; saveStore(); fbRegisterToken(fcmToken); } }catch(e){}
@@ -6234,12 +6246,35 @@ function _startGeoWatchNow(){
  if(sosActive) addSOSPin(); // keep the live SOS pin on the user
  try{ sosMaybeResendPos(); }catch(e){}
  try{ gdBroadcast(); }catch(e){} // share my real position with paired SHOMERs
+ locBarHide();
  },
- ()=>{},
+ err=>{ if(err&&err.code===1){ try{ navigator.geolocation.clearWatch(geoWatchId); }catch(_e){} geoWatchId=null; locBarShow(); } },   /* v297: no permission = say so, and allow a retry (it used to fail silently forever) */
  {enableHighAccuracy:true,timeout:20000,maximumAge:5000}
  );
  }catch(e){}
+ /* still no position after 40s (GPS off / no permission) - tell the user they are invisible */
+ setTimeout(function(){ if(userLat==null) locBarShow(); },40000);
 }
+/* v297: "location off" bar - without a position the user has no dot on the map, guardians can't see them
+   and the dashboard can't count them. One tap re-asks; a hard "no" points to Settings. */
+function locBarHide(){ var b=document.getElementById('loc-bar'); if(b) b.remove(); }
+function locBarShow(){
+ if(userLat!=null || document.getElementById('loc-bar')) return;
+ try{ if(typeof _emergencyBusy==='function' && _emergencyBusy()) return; }catch(e){}
+ var he=currentLang==='he', ar=currentLang==='ar';
+ var b=document.createElement('div'); b.className='nudge-bar'; b.id='loc-bar';
+ b.innerHTML='<span class="nudge-tx">'+(he?'המיקום כבוי - את/ה לא מופיע/ה במפה ולשומרים שלך':ar?'الموقع متوقف - أنت لا تظهر على الخريطة ولا لحُرّاسك':'Location is off - you are not on the map or visible to your SHOMERs')+'</span><button class="nudge-cta" id="loc-bar-go">'+(he?'הפעל/י מיקום':ar?'تفعيل الموقع':'Turn on location')+'</button><button class="nudge-x" aria-label="close">\u2715</button>';
+ document.body.appendChild(b);
+ b.querySelector('.nudge-x').onclick=function(){ b.remove(); };
+ b.querySelector('#loc-bar-go').onclick=function(){
+  ensureNativeGeo().then(function(granted){
+   if(granted===false){ toast(he?'המיקום חסום. הגדרות ← אפליקציות ← SHOMER ← הרשאות ← מיקום ← "בזמן השימוש באפליקציה"':ar?'الموقع محظور. الإعدادات ← التطبيقات ← SHOMER ← الأذونات ← الموقع ← "أثناء استخدام التطبيق"':'Location is blocked. Settings → Apps → SHOMER → Permissions → Location → "While using the app"','amb'); return; }
+   b.remove(); try{ if(geoWatchId!==null) navigator.geolocation.clearWatch(geoWatchId); }catch(e){} geoWatchId=null;
+   try{ locMe(); }catch(e){}   /* locMe re-centres and restarts the live watch */
+  });
+ };
+}
+try{ document.addEventListener('visibilitychange',function(){ if(document.visibilityState==='visible' && userLat==null && geoWatchId===null && typeof SS!=='undefined' && SS.onboarded){ try{ startGeoWatch(); }catch(e){} } }); }catch(e){}   /* v297: came back from Settings with location allowed → start right away */
 window.addEventListener('DOMContentLoaded',()=>{
  // Textarea char count
  const ta=document.getElementById('rep-ta');
@@ -10275,7 +10310,7 @@ try{ hydrateIcons(document); }catch(e){}
 /* Loaded-build version - shown in the diagnostic panel so a phone can prove
    whether it's on the latest build or a STALE cached one. Keep in lock-step
    with sw.js SW_VERSION on every deploy. */
-var APP_VER='v296';
+var APP_VER='v297';
 var FB={ready:false,uid:null,db:null,_presTimer:null,connected:false,listening:false,pushState:'default',near:0,swVer:'?',
   authState:'connecting',sdkLoaded:false,persist:'',permErr:null,err:null,wsProbe:'',csp:''};
 /* Always log connection diagnostics to the console so the real failure can be SEEN in Chrome. */
