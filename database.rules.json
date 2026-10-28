@@ -56,7 +56,8 @@
       "$uid": {
         ".read": "auth != null && auth.uid == $uid",
         "$from": {
-          ".write": "auth != null && $from === auth.uid"
+          ".write": "auth != null && $from === auth.uid && (!newData.exists() || root.child('pairs').child($uid).child($from).exists())",
+          ".validate": "newData.hasChildren(['ts','level','id']) && newData.child('ts').isNumber() && newData.child('id').isString() && newData.child('id').val().length <= 40 && newData.child('level').isString() && newData.child('level').val().matches(/^(check|alert|alarm|stop|ok|help|coded)$/) && (!newData.child('name').exists() || (newData.child('name').isString() && newData.child('name').val().length <= 60))"
         }
       }
     },
