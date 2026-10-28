@@ -1429,7 +1429,7 @@ function loadLive(c){
   var initial=!_liveInitDone, reqC=c;
   fetch(DB+'/dashfeed.json',{cache:'no-store'}).then(function(r){return r.ok?r.json():null;}).catch(function(){return null;}).then(function(obj){
     if(_curCityObj!==reqC) return; /* territory changed while loading */
-    var now=Date.now(), DAY=864e5, ONLINE=9e4; /* 90s = "online" (same as the app) */
+    var now=Date.now(), DAY=864e5, ONLINE=15e4; /* 150s = "online": the app beats every 30-40s on screen and its background service every 60s */
     var evList=[], revReal=[], presTerr=[], presAll=[], active24={}, onlineUsers={}, onlineTerrUsers={}, active24Terr={}, reps={};
     var netPres=[], netEv=[], outTerr24={};
     var RECENT_PRES=18e5; /* map pins only for users seen in the last 30 min */

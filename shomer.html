@@ -3503,6 +3503,7 @@ function deleteAccount(){
  // 2) After a short flush window (lets the remote removes commit while still authed),
  //    sign out, wipe ALL local SHOMER storage incl. the device id, and reload fresh.
  setTimeout(function(){
+   try{ fbNativeBeat({on:false,key:''}); }catch(e){}   /* v299: account removed - the background heartbeat stops too */
    try{ if(window.firebase&&window.firebase.apps&&window.firebase.apps.length){ window.firebase.auth().signOut(); } }catch(e){}
    try{ Object.keys(localStorage).forEach(function(k){ if(/^shomer/i.test(k)||k===SKEY){ try{localStorage.removeItem(k);}catch(e){} } }); }catch(e){}
    try{ localStorage.removeItem(SKEY); localStorage.removeItem('shomerCID'); }catch(e){}
@@ -10316,7 +10317,7 @@ try{ hydrateIcons(document); }catch(e){}
 /* Loaded-build version - shown in the diagnostic panel so a phone can prove
    whether it's on the latest build or a STALE cached one. Keep in lock-step
    with sw.js SW_VERSION on every deploy. */
-var APP_VER='v298';
+var APP_VER='v299';
 var FB={ready:false,uid:null,db:null,_presTimer:null,connected:false,listening:false,pushState:'default',near:0,swVer:'?',
   authState:'connecting',sdkLoaded:false,persist:'',permErr:null,err:null,wsProbe:'',csp:''};
 /* Always log connection diagnostics to the console so the real failure can be SEEN in Chrome. */
@@ -11155,6 +11156,19 @@ function fbDashInit(){
   }, function(){ st.mode='legacy'; st.ready=null; });
   return st.ready;
 }
+/* v299: Android freezes the web layer when the screen is off or another app is in front - the dashboard then lost the
+   phone after 90s. Hand the SAME anonymous row (id, coarse point, daily tag source) to the native Shake-to-SOS service,
+   which re-sends it once a minute while the app is off-screen. Throttled: settings only change when the row/point do. */
+function fbNativeBeat(o){
+  try{
+    var np=shomerNativePlugin(); if(!np||typeof np.beat!=='function') return;
+    var rt=(FB.authUser&&FB.authUser.refreshToken)||'';
+    var sig=[o.on,o.key,o.lat,o.lng,rt].join('|'); if(sig===fbNativeBeat._sig) return; fbNativeBeat._sig=sig;
+    var cfg={on:!!o.on,key:o.key||''};
+    if(o.on){ cfg.lat=o.lat; cfg.lng=o.lng; cfg.uid=FB.uid||''; cfg.dev=fbDevTag(); cfg.rt=rt; cfg.apiKey=(window.SHOMER_FB&&window.SHOMER_FB.apiKey)||''; cfg.db=(window.SHOMER_FB&&window.SHOMER_FB.databaseURL)||''; }
+    np.beat(cfg).catch(function(){});
+  }catch(e){}
+}
 function fbDashBeat(hide, lat, lng){
   if(!FB._authReady||!FB.uid) return;
   /* v279: automated/test browsers (navigator.webdriver) never count toward the public dashboard */
@@ -11165,12 +11179,13 @@ function fbDashBeat(hide, lat, lng){
     st.day=dk;
   }).then(function(){
     var st=FB._hb, key=(st.mode==='new')?st.id:('hb_'+FB.uid);
-    if(hide){ if(!st.gone){ st.gone=true; fbRestWrite('DELETE','dashfeed/'+key).catch(function(){}); } return; }
+    if(hide){ fbNativeBeat({on:false,key:key}); if(!st.gone){ st.gone=true; fbRestWrite('DELETE','dashfeed/'+key).catch(function(){}); } return; }
     st.gone=false;
     var _hb={type:'presence',lat:lat,lng:lng,ts:Date.now(),status:((st.mode==='new'&&fbDayTag())?'v2:'+fbDayTag():'v2')};   /* 'v2' = real (non-automated) app; v280 adds today's anonymous tag */
     if(st.mode!=='new') _hb.by=FB.uid;
     var _fd=false; try{ _fd=isFounder(); }catch(_f){}
     fbRestWrite('PUT','dashfeed/'+key,_hb).then(function(){ if(_fd) return fbRestWrite('PATCH','dashfeed/'+key,{founder:true}); }).catch(function(){});
+    if(st.mode==='new') fbNativeBeat({on:true,key:key,lat:lat,lng:lng});   /* v299: the background service keeps this row alive while the app is off-screen */
     try{ fbDayMark(lat,lng); }catch(e){}
   });
 }
