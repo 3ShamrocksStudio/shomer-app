@@ -15,6 +15,12 @@
 6. **Never call a staged product "launched" or "live".**
 7. **go ahead e2e autonomous proceed** = confirmed authorisation to run to completion without check-ins.
 
+## Data & privacy policy (Dave, 2026-10-28 — never override)
+1. Collect/store ONLY general, relevant, useful information and statistics that help paid users (municipalities) understand and improve crime rates in their territory, and understand use of the system.
+2. Never cross a privacy, safety or legal red line; never risk, endanger or expose a user. Always legal, respectful to free users, useful to paid users.
+- In practice: the public dashboard feed carries no account id, name, phone or precise location (~1 km for live presence, ~10 km for daily markers); rows expire (sessions 2 days, everything else 90 days); reports are anonymous unless the user opts in; nothing marks a specific person (incl. the founder) on the public map.
+- Any new data field or new reader of user data must be checked against this policy and the published privacy policy BEFORE shipping.
+
 ## Multi-agent execution rules
 
 ### Verifier gate (mandatory)
