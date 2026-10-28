@@ -2529,8 +2529,16 @@ body.otp-active .ob-steps{display:none!important;}
       <span data-he="הזמן/י שומר/ת בוואטסאפ" data-en="Invite a SH✡MER via WhatsApp" data-ar="ادعُ حارساً عبر واتساب">הזמן/י שומר/ת בוואטסאפ</span>
      </button>
 
-     <div class="agf-or"><span data-he="או הוסף/י לפי מספר" data-en="or add by number" data-ar="أو أضف برقم">או הוסף/י לפי מספר</span></div>
+     <!-- Collapsed by default. Two gold buttons competing side by side made the screen
+          read as two equal choices; the WhatsApp invite is the better path (it carries
+          name, number and code automatically), so the manual form folds away behind one
+          tap and only one primary action is ever visible. -->
+     <button class="agf-more" type="button" id="agf-more" aria-expanded="false" aria-controls="agf-manual" onclick="agfToggleManual()">
+      <span data-he="או הוסף/י לפי מספר טלפון" data-en="or add by phone number" data-ar="أو أضف برقم هاتف">או הוסף/י לפי מספר טלפון</span>
+      <span class="agf-chev" aria-hidden="true">›</span>
+     </button>
 
+     <div id="agf-manual" class="agf-manual" hidden>
      <!-- number · dial code · country -->
      <div class="agf-row2" dir="ltr">
        <select class="agf-sel" id="ag-country" aria-label="Country code" onchange="agCountryPick()"></select>
@@ -2553,22 +2561,20 @@ body.otp-active .ob-steps{display:none!important;}
      <div id="ag-hint" class="agf-hint" aria-live="polite"></div>
 
      <button class="agf-add" onclick="addGuardian()">הוסף שומר</button>
+     </div>
 
-     <!-- Way back in for someone who was invited. Essential on the installed app:
-          it cannot read the website's stashed token, so pasting the invite link
-          (gdEnterCodeSubmit parses g= out of the whole message) is the only path. -->
-     <button class="agf-hascode" type="button" onclick="gdEnterCodeOpen()">
-      <span data-he="קיבלת הזמנה? הדבק/י את הקישור" data-en="Got an invite? Paste the link" data-ar="تلقيت دعوة؟ الصق الرابط">קיבלת הזמנה? הדבק/י את הקישור</span>
-     </button>
-
-     <!-- Recommend the app WITHOUT pairing. Deliberately not shareInvite(): no token,
-          no pending slot, no location-sharing consent — "be my guardian" is a
-          relationship ask, this is just a recommendation. Reach, not depth. -->
-     <button class="agf-tellone" type="button" onclick="shareApp()">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
-       <circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="M8.6 13.5l6.8 4M15.4 6.5l-6.8 4"/></svg>
-      <span data-he="סתם לספר על SH✡MER למישהו" data-en="Just tell someone about SH✡MER" data-ar="أخبر شخصاً عن SH✡MER">סתם לספר על SH✡MER למישהו</span>
-     </button>
+     <!-- Neither of these is "add a guardian": one is for someone who WAS invited, the
+          other is a plain recommendation. Kept as small text links on one row so they
+          stop competing with the primary action. -->
+     <div class="agf-links">
+      <button class="agf-lnk" type="button" onclick="gdEnterCodeOpen()">
+       <span data-he="קיבלת הזמנה?" data-en="Got an invite?" data-ar="تلقيت دعوة؟">קיבלת הזמנה?</span>
+      </button>
+      <span class="agf-dot" aria-hidden="true">·</span>
+      <button class="agf-lnk" type="button" onclick="shareApp()">
+       <span data-he="שתף/י את SH✡MER" data-en="Share SH✡MER" data-ar="شارك SH✡MER">שתף/י את SH✡MER</span>
+      </button>
+     </div>
     </div>
    </div>
 
@@ -8019,6 +8025,16 @@ function inviteBatchAsk(){
     try{ toast(he?'בחר/י בוואטסאפ איש קשר אחד או כמה. כל מי שיצטרף יופיע כאן אחרי אישורך':'Pick one or more chats in WhatsApp. Everyone who joins appears here after you confirm','grn'); }catch(e){}
   };
 }
+/* Fold the manual add-by-number form away so only one primary action shows. */
+function agfToggleManual(){
+  var box=document.getElementById('agf-manual'), btn=document.getElementById('agf-more');
+  if(!box||!btn) return;
+  var open=box.hasAttribute('hidden');
+  if(open){ box.removeAttribute('hidden'); } else { box.setAttribute('hidden',''); }
+  btn.setAttribute('aria-expanded', open?'true':'false');
+  btn.classList.toggle('on', open);
+  if(open){ try{ var f=document.getElementById('ag-phone'); if(f)f.focus(); }catch(e){} }
+}
 /* ══ PLAIN SHARE ══
    Recommend SH✡MER to anyone without pairing with them. No token is minted, no
    pending slot is created, no consent gate — nothing about the sharer is revealed.
@@ -10259,7 +10275,7 @@ try{ hydrateIcons(document); }catch(e){}
 /* Loaded-build version - shown in the diagnostic panel so a phone can prove
    whether it's on the latest build or a STALE cached one. Keep in lock-step
    with sw.js SW_VERSION on every deploy. */
-var APP_VER='v295';
+var APP_VER='v296';
 var FB={ready:false,uid:null,db:null,_presTimer:null,connected:false,listening:false,pushState:'default',near:0,swVer:'?',
   authState:'connecting',sdkLoaded:false,persist:'',permErr:null,err:null,wsProbe:'',csp:''};
 /* Always log connection diagnostics to the console so the real failure can be SEEN in Chrome. */
@@ -14893,9 +14909,16 @@ html[dir="rtl"] .sh-back svg{transform:scaleX(-1)}
 .agf-invite{width:100%;display:flex;align-items:center;justify-content:center;gap:9px;padding:14px 12px;border-radius:999px;border:0;background:var(--gold-grad,linear-gradient(135deg,#C09020,#E0A828 60%,#F5C840));color:#23170a;font-family:inherit;font-weight:900;font-size:14px;line-height:1.25;text-align:center;cursor:pointer;margin-bottom:14px}
 .agf-invite svg{width:18px;height:18px;flex:0 0 auto}
 .agf-invite:active{transform:scale(.98)}
-.agf-tellone{width:100%;display:flex;align-items:center;justify-content:center;gap:8px;margin:14px 0 0;padding:11px;border-radius:11px;border:1px solid var(--b2);background:var(--n3);color:var(--g3);font-family:inherit;font-weight:800;font-size:13px;cursor:pointer}
-.agf-tellone svg{width:16px;height:16px;flex:0 0 auto}
-.agf-tellone:active{transform:scale(.98)}
+.agf-more{width:100%;display:flex;align-items:center;justify-content:space-between;gap:8px;margin:0 0 4px;padding:11px 2px;background:none;border:0;border-top:1px solid var(--b2);color:var(--tx2);font-family:inherit;font-weight:700;font-size:13px;cursor:pointer}
+.agf-chev{color:var(--tx3);font-size:17px;transition:transform .18s}
+.agf-more.on .agf-chev{transform:rotate(90deg)}
+.agf-manual{padding-top:6px}
+/* Scoped to the folded panel only: keeps exactly one gold gradient on screen, so the
+   WhatsApp invite stays the single primary action even while the form is open. */
+.agf-manual .agf-add{background:none;border:1.5px solid var(--gold,#C9A84C);color:var(--gold,#C9A84C)}
+.agf-links{display:flex;align-items:center;justify-content:center;gap:10px;flex-wrap:wrap;margin-top:14px;padding-top:12px;border-top:1px solid var(--b2)}
+.agf-lnk{background:none;border:0;padding:4px 2px;color:var(--g3);font-family:inherit;font-size:12.5px;font-weight:700;cursor:pointer;text-decoration:underline;text-underline-offset:3px}
+.agf-dot{color:var(--tx3);font-size:12px}
 .agf-hascode{display:block;width:100%;margin:12px 0 0;padding:8px;background:none;border:0;color:var(--g3);font-family:inherit;font-size:12.5px;font-weight:700;text-decoration:underline;text-underline-offset:3px;cursor:pointer}
 .agf-or{display:flex;align-items:center;gap:10px;margin:0 0 12px;color:var(--tx3);font-size:12px;font-weight:700}
 .agf-or::before,.agf-or::after{content:"";flex:1;height:1px;background:var(--b2)}
