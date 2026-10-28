@@ -316,6 +316,26 @@
 .acct-card h3{font-size:17px;font-weight:800;margin:0}
 .acct-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:4px}
 .acct-x{background:none;border:0;color:#9aa6bd;font-size:19px;cursor:pointer}
+.tm-row{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:8px;padding:10px 0;border-bottom:1px solid #212a3f}
+.tm-row.ask{background:rgba(224,168,40,.08);padding:10px;border-radius:10px;border:1px solid rgba(224,168,40,.35)}
+.tm-nm b{display:block;font-size:14px}.tm-nm span{display:block;font-size:11.5px;color:#9aa6bd;margin-top:2px}
+.tm-act{display:flex;gap:6px;flex-wrap:wrap}
+.tm-b{border:0;border-radius:9px;padding:7px 10px;font-family:inherit;font-weight:800;font-size:12px;cursor:pointer;color:#fff}
+.tm-b.chk{background:#1670E0}.tm-b.alr{background:#D98A00}.tm-b.alm{background:#D93B3B}.tm-b.stp{background:#2a3450}
+.tm-empty{font-size:12.5px;color:#9aa6bd;padding:10px 0}
+.tm-pend{font-size:11.5px;color:#F5C840;margin-top:8px}
+.tm-add{width:100%;margin-top:14px;padding:11px;border-radius:12px;border:1.5px dashed #F5C840;background:transparent;color:#F5C840;font-family:inherit;font-weight:800;cursor:pointer}
+.tm-inv{margin-top:12px;padding:10px;border-radius:10px;background:#0b1220;border:1px solid #2a3450}
+.tm-inv-l{font-size:12px;color:#cdd6e6;margin-bottom:6px}
+.tm-inv-in{width:100%;box-sizing:border-box;direction:ltr;font-size:12px;padding:8px;border-radius:8px;border:1px solid #2a3450;background:#141a27;color:#e8eef7}
+.tm-inv-b{display:flex;gap:8px;margin-top:8px}.tm-inv-b button,.tm-inv-b a{flex:1;text-align:center;padding:8px;border-radius:9px;border:0;background:#2a3450;color:#fff;font-weight:800;font-size:12.5px;text-decoration:none;cursor:pointer;font-family:inherit}
+.tm-inv-b a{background:#25D366;color:#062b14}
+.team-ring{position:fixed;inset:0;z-index:99995;display:flex;align-items:center;justify-content:center;background:rgba(150,20,20,.9);animation:trp .8s infinite}
+@keyframes trp{50%{filter:brightness(1.3)}}
+.tr-card{background:#141a27;border-radius:16px;padding:22px;max-width:420px;width:90%;text-align:center;color:#fff}
+.tr-t{font-size:20px;font-weight:900;margin-bottom:14px}
+.tr-b{display:flex;gap:10px}.tr-b button{flex:1;padding:12px;border-radius:12px;border:0;font-weight:900;font-size:14px;cursor:pointer;font-family:inherit}
+.tr-ok{background:#fff;color:#0b1730}.tr-open{background:#2a3450;color:#fff}
 .acct-sub{font-size:12px;color:#9aa6bd;margin-bottom:16px}
 .tier-tbl{width:100%;border-collapse:collapse;font-size:12.5px}
 .tier-tbl th,.tier-tbl td{padding:8px 6px;border-bottom:1px solid #212a3f;text-align:center}
@@ -581,7 +601,7 @@
     <div class="tb-sp"></div>
     <div class="terr-pick"><span id="terr-static" class="hidden">טריטוריה: <b id="terr-name" style="color:var(--gold)"></b></span><select id="terr-sel"></select></div>
     <div class="live off" id="live-ind" title="אין חיבור לנתונים חיים"><span class="d"></span><span id="org-name"></span></div>
-    <span class="plan-badge" id="plan-badge" title="סטטוס המוצר">גרסת בטא</span><button class="tbtn" id="trends-btn" onclick="openTrends()">📈 מגמות</button><button class="tbtn" id="acct-btn">⚙ חשבון</button><button class="tbtn" id="export-btn">⤓ ייצוא</button>
+    <span class="plan-badge" id="plan-badge" title="סטטוס המוצר">גרסת בטא</span><button class="tbtn" id="trends-btn" onclick="openTrends()">📈 מגמות</button><button class="tbtn" id="team-btn" onclick="openTeam()">👥 צוות שומרים</button><button class="tbtn" id="acct-btn">⚙ חשבון</button><button class="tbtn" id="export-btn">⤓ ייצוא</button>
     <button class="tbtn" id="signout">יציאה</button>
   </div>
   <!-- Physical layout (viewer's left → right), independent of RTL:
@@ -1515,6 +1535,134 @@ var SOLSET={
 
 function ddr(l,v,col){return '<div class="ddr"><span>'+l+'</span><b'+(col?' style="color:'+col+'"':'')+'>'+v+'</b></div>';}
 
+
+/* ══ v309 TEAM - the dashboard manager ↔ assigned SH✡MER leaders ══
+   The manager invites a leader with a link + 4-digit code; the leader accepts INSIDE the app (same consent
+   screen as any SHOMER link). Once linked, the manager can ask "All good?", send an Alert or an Alarm to the
+   leader's phone (it stops only with the leader's cancel code, or from here), stop it remotely, and sees every
+   answer - including "I need help". Leaders can also alert the manager; it rings here until acknowledged.
+   The dashboard holds its own anonymous app identity in this browser (kept by the browser). */
+var TEAM={ready:false,uid:null,db:null,leaders:{},out:{},inbox:{},busy:false};
+var TEAM_FB={apiKey:'AIzaSyAfevYysNLWMtXluY5lZSM_VY0eyDwZ6KQ',authDomain:'shomergency.firebaseapp.com',databaseURL:'https://shomergency-default-rtdb.firebaseio.com',projectId:'shomergency',storageBucket:'shomergency.firebasestorage.app',messagingSenderId:'745767303099',appId:'1:745767303099:web:6c9605fbba940430b7769e'};
+function _teamLoad(src){ return new Promise(function(res,rej){ if(document.querySelector('script[src="'+src+'"]')){res();return;} var e=document.createElement('script'); e.src=src; e.onload=res; e.onerror=rej; document.head.appendChild(e); }); }
+function teamName(){ return ('מוקד '+((CLIENT&&CLIENT.territory)||(CLIENT&&CLIENT.org)||'')).trim().slice(0,40); }
+function teamLS(k,v){ try{ if(v===undefined) return JSON.parse(localStorage.getItem('shomerTeam_'+k)||'null'); localStorage.setItem('shomerTeam_'+k,JSON.stringify(v)); }catch(e){ return null; } }
+async function teamSha(t){ var b=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(t)); return Array.from(new Uint8Array(b)).map(function(x){return ('0'+x.toString(16)).slice(-2);}).join(''); }
+function teamRand(n){ var a=new Uint8Array(n); crypto.getRandomValues(a); return Array.from(a).map(function(b){return ('0'+b.toString(16)).slice(-2);}).join(''); }
+async function teamInit(){
+  if(TEAM.ready) return true;
+  await Promise.all(['firebase-app-compat','firebase-auth-compat','firebase-database-compat'].map(function(m){ return _teamLoad('https://www.gstatic.com/firebasejs/10.12.2/'+m+'.js'); }));
+  var app=(firebase.apps||[]).find(function(a){return a.name==='team';})||firebase.initializeApp(TEAM_FB,'team');
+  var auth=app.auth(); if(!auth.currentUser){ await auth.signInAnonymously(); }
+  TEAM.uid=auth.currentUser.uid; TEAM.db=app.database(); TEAM.ready=true;
+  TEAM.out=teamLS('out')||{};
+  TEAM.db.ref('pairs/'+TEAM.uid).on('value',function(s){ TEAM.leaders=s.val()||{}; teamRender(); });
+  TEAM.db.ref('ping/'+TEAM.uid).on('value',function(s){ var all=s.val()||{}; Object.keys(all).forEach(function(f){ try{ teamOnPing(f,all[f]); }catch(e){} }); });
+  (teamLS('inv')||[]).forEach(teamWatchInvite);
+  return true;
+}
+/* ── invite a leader ── */
+async function teamInvite(){
+  if(!TEAM.ready) return;
+  var tok='g'+teamRand(6), code=String(1000+Math.floor(Math.random()*9000));
+  var nm=teamName();
+  await TEAM.db.ref('invites/'+tok).set({fromUid:TEAM.uid,ts:Date.now(),name:nm.slice(0,14)+'|||',team:true});
+  var inv=teamLS('inv')||[]; inv.push({tok:tok,code:code,ts:Date.now()}); teamLS('inv',inv); teamWatchInvite(inv[inv.length-1]);
+  var link='https://www.shomer-app.co.il/i/?g='+encodeURIComponent(tok)+'&c='+code;
+  var msg='הוזמנת לצוות השומרים של '+nm+' ב-SH✡MER. פתח/י את הקישור באפליקציה ואשר/י: '+link+' (קוד: '+code+')';
+  var box=document.getElementById('team-newinv'); if(box){ box.innerHTML='<div class="tm-inv"><div class="tm-inv-l">קישור הזמנה לראש צוות (קוד <b>'+code+'</b>) - תקף עד שמישהו מצטרף:</div><input readonly class="tm-inv-in" value="'+ESC(link)+'" onclick="this.select()"><div class="tm-inv-b"><button onclick="teamCopy(\''+ESC(link)+'\')">העתקה</button><a target="_blank" rel="noopener" href="https://wa.me/?text='+encodeURIComponent(msg)+'">וואטסאפ</a></div></div>'; }
+}
+function teamCopy(t){ try{ navigator.clipboard.writeText(t); }catch(e){} var b=event&&event.target; if(b){ b.textContent='✓ הועתק'; } }
+function teamWatchInvite(it){
+  if(!TEAM.ready||!it||!it.tok) return;
+  TEAM.db.ref('invites/'+it.tok).on('value',async function(s){
+    var v=s.val(); if(!v||!v.acceptedBy) return;
+    if(TEAM.leaders[v.acceptedBy]){ teamDropInvite(it.tok); return; }
+    var ok=false; try{ ok=!!v.acceptedCode && v.acceptedCode===await teamSha(it.tok+':'+it.code); }catch(e){}
+    if(ok){ await teamLink(v,it.tok); }
+    else { it.ask={uid:v.acceptedBy,name:v.acceptedName||'',phone:v.acceptedPhone||''}; teamRender(); }   /* no code proof: the manager confirms the person */
+  });
+}
+async function teamLink(v,tok){
+  await TEAM.db.ref('pairs/'+TEAM.uid+'/'+v.acceptedBy).set({name:(v.acceptedName||'ראש צוות').slice(0,40),token:tok,ts:Date.now(),via:'dashboard'});
+  teamDropInvite(tok);
+}
+function teamDropInvite(tok){ try{ TEAM.db.ref('invites/'+tok).off(); }catch(e){} var inv=(teamLS('inv')||[]).filter(function(x){return x.tok!==tok;}); teamLS('inv',inv); teamRender(); }
+async function teamConfirm(tok,yes){
+  var it=(teamLS('inv')||[]).find(function(x){return x.tok===tok;}); var v=null;
+  try{ v=(await TEAM.db.ref('invites/'+tok).once('value')).val(); }catch(e){}
+  if(yes&&v&&v.acceptedBy) await teamLink(v,tok); else teamDropInvite(tok);
+}
+/* ── check-in / alert / alarm ── */
+async function teamSend(uid,level){
+  var L=TEAM.leaders[uid]; if(!L) return;
+  if(level==='alarm'&&!confirm('לשלוח אזעקת חירום מלאה ל'+(L.name||'ראש הצוות')+'? היא תיעצר רק בקוד הביטול שלו/ה או מכאן.')) return;
+  var id='ga'+teamRand(8), now=Date.now();
+  try{
+    await TEAM.db.ref('ping/'+uid+'/'+TEAM.uid).set({name:teamName(),ts:now,level:level,id:id});
+    TEAM.out[uid]={id:id,level:level,ts:now,st:'sent'}; teamLS('out',TEAM.out);
+    if(level!=='check'){ try{ await TEAM.db.ref('alarms').push({fromUid:TEAM.uid,toUid:uid,ts:now,tag:'ga-'+level,title:(level==='alarm'?'🚨 ':'🔔 ')+'SH✡MER - '+teamName(),body:level==='alarm'?'אזעקת חירום - פתח/י והזן/י קוד ביטול':'התראה דחופה - פתח/י והזן/י קוד ביטול'}); }catch(e){} }
+    setTimeout(function(){ var o=TEAM.out[uid]; if(o&&o.id===id&&o.st==='sent'){ o.st='noans'; teamLS('out',TEAM.out); teamRender(); } },120000);
+  }catch(e){ alert('השליחה נכשלה - ייתכן שראש הצוות ביטל את החיבור.'); }
+  teamRender();
+}
+async function teamStop(uid){ var o=TEAM.out[uid]; if(!o) return; await TEAM.db.ref('ping/'+uid+'/'+TEAM.uid).set({name:teamName(),ts:Date.now(),level:'stop',id:o.id}); o.st='stopped'; teamLS('out',TEAM.out); teamRender(); }
+function teamOnPing(from,v){
+  if(!v||!v.id||!TEAM.leaders[from]) return;                      /* only linked leaders */
+  if(v.level==='ok'||v.level==='help'||v.level==='coded'){
+    var o=TEAM.out[from]; if(!o||o.id!==v.re||o.st===v.level) return;
+    o.st=v.level; o.ats=v.ts||Date.now(); teamLS('out',TEAM.out); teamRender();
+    if(o.level!=='check'){ try{ TEAM.db.ref('ping/'+from+'/'+TEAM.uid).set({name:teamName(),ts:Date.now(),level:'stop',id:o.id}); }catch(e){} }   /* answered - disarm it */
+    if(v.level==='help'){ teamRing((TEAM.leaders[from].name||'ראש צוות')+' ביקש/ה עזרה!',from,null); }
+    return;
+  }
+  if(['check','alert','alarm'].indexOf(v.level)<0) return;
+  var seen=teamLS('seen')||[]; if(seen.indexOf(v.id)>=0||Date.now()-(v.ts||0)>15*60000) return;
+  seen.push(v.id); teamLS('seen',seen.slice(-50));
+  teamRing((v.level==='check'?'שאלה מ':v.level==='alarm'?'אזעקת חירום מ':'התראה מ')+(TEAM.leaders[from].name||'ראש צוות'),from,v);
+}
+var _teamRingT=null;
+function teamRing(text,from,v){
+  var old=document.getElementById('team-ring'); if(old) old.remove();
+  var d=document.createElement('div'); d.id='team-ring'; d.className='team-ring';
+  d.innerHTML='<div class="tr-card"><div class="tr-t">'+ESC(text)+'</div><div class="tr-b"><button class="tr-ok">✓ קיבלתי'+(v?' - הכל טוב':'')+'</button><button class="tr-open">לצוות</button></div></div>';
+  document.body.appendChild(d);
+  var stop=function(){ clearInterval(_teamRingT); _teamRingT=null; d.remove(); };
+  d.querySelector('.tr-ok').onclick=function(){ stop(); if(v){ try{ TEAM.db.ref('ping/'+from+'/'+TEAM.uid).set({name:teamName(),ts:Date.now(),level:'ok',re:v.id,id:'gr'+teamRand(6)}); }catch(e){} } };
+  d.querySelector('.tr-open').onclick=function(){ stop(); openTeam(); };
+  clearInterval(_teamRingT); try{ _playAlertTone(); }catch(e){} _teamRingT=setInterval(function(){ try{ _playAlertTone(); }catch(e){} },2500);
+}
+function teamStatus(uid){
+  var o=TEAM.out[uid]; if(!o||Date.now()-o.ts>12*3600000) return '';
+  var t=new Date(o.ats||o.ts), hm=('0'+t.getHours()).slice(-2)+':'+('0'+t.getMinutes()).slice(-2);
+  return {ok:'✓ ענה/תה: הכל טוב',help:'🆘 ביקש/ה עזרה',coded:'✓ עצר/ה בקוד הביטול',stopped:'נעצר מכאן',noans:'⚠ לא ענה/תה',sent:'⏳ ממתין לתשובה'}[o.st]+' · '+hm;
+}
+function teamRender(){
+  var box=document.getElementById('team-list'); if(!box) return;
+  var ids=Object.keys(TEAM.leaders||{});
+  var h=ids.length?ids.map(function(uid){ var L=TEAM.leaders[uid]||{}, o=TEAM.out[uid], act=o&&o.level!=='check'&&(o.st==='sent'||o.st==='noans');
+      return '<div class="tm-row"><div class="tm-nm"><b>'+ESC(L.name||'ראש צוות')+'</b><span>'+ESC(teamStatus(uid))+'</span></div>'
+       +'<div class="tm-act"><button class="tm-b chk" onclick="teamSend(\''+uid+'\',\'check\')">הכל טוב?</button><button class="tm-b alr" onclick="teamSend(\''+uid+'\',\'alert\')">🔔 התראה</button><button class="tm-b alm" onclick="teamSend(\''+uid+'\',\'alarm\')">🚨 אזעקה</button>'
+       +(act?'<button class="tm-b stp" onclick="teamStop(\''+uid+'\')">עצירה</button>':'')+'</div></div>'; }).join('')
+    :'<div class="tm-empty">עדיין אין ראשי צוות מחוברים. הזמינו ראש צוות - הוא מאשר את החיבור באפליקציה שלו.</div>';
+  (teamLS('inv')||[]).forEach(function(it){ if(it.ask) h+='<div class="tm-row ask"><div class="tm-nm"><b>'+ESC(it.ask.name||'מישהו')+'</b><span>'+ESC(it.ask.phone?('+'+it.ask.phone):'')+' הצטרף/ה בלי הקוד - זה ראש הצוות שהזמנת?</span></div><div class="tm-act"><button class="tm-b chk" onclick="teamConfirm(\''+it.tok+'\',true)">כן, לחבר</button><button class="tm-b stp" onclick="teamConfirm(\''+it.tok+'\',false)">לא</button></div></div>'; });
+  var pend=(teamLS('inv')||[]).filter(function(x){return !x.ask;}).length;
+  if(pend) h+='<div class="tm-pend">'+pend+' הזמנות ממתינות לאישור</div>';
+  box.innerHTML=h;
+}
+async function openTeam(){
+  if(CLIENT&&CLIENT.demo){ alert('צוות שומרים זמין בחשבון עירייה מחובר.'); return; }
+  if(document.getElementById('team-ov')) return;
+  var ov=document.createElement('div'); ov.id='team-ov'; ov.className='acct-ov';
+  ov.innerHTML='<div class="acct-card" style="max-width:560px"><div class="acct-head"><h3>👥 צוות שומרים</h3><button class="acct-x" onclick="document.getElementById(\'team-ov\').remove()">✕</button></div>'
+   +'<div class="acct-sub">ראשי הצוות שלך באפליקציה. „הכל טוב?” שואל בשקט; התראה ואזעקה מצלצלות בטלפון שלהם עד שהם מזינים את קוד הביטול שלהם (או עד שעוצרים מכאן).</div>'
+   +'<div id="team-list"><div class="tm-empty">מתחבר…</div></div><div id="team-newinv"></div>'
+   +'<button class="tm-add" onclick="teamInvite()">+ הזמנת ראש צוות</button>'
+   +'<div class="acct-note">החיבור נעשה רק באישור ראש הצוות באפליקציה. הוא יכול לנתק אותו בכל רגע. הלוח לא אוסף מיקום או פרטים נוספים מעבר לשם שאישר.</div></div>';
+  ov.addEventListener('click',function(e){ if(e.target===ov) ov.remove(); });
+  document.body.appendChild(ov);
+  try{ await teamInit(); teamRender(); }catch(e){ var b=document.getElementById('team-list'); if(b) b.innerHTML='<div class="tm-empty">אין חיבור כרגע - נסו שוב בעוד רגע.</div>'; }
+}
 function closeSettings(){ var o=document.getElementById('set-ov'); if(o)o.remove(); }
 /* v293: each click flips the CURRENT value (it used to reuse the value baked in when the window opened), the switch shows the
    real state (alarm sound = NOT muted), and the choice survives a refresh */
