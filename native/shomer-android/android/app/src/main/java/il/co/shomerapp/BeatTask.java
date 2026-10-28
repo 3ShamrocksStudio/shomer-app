@@ -55,6 +55,7 @@ final class BeatTask {
   static void configure(Context c, JSONObject o) {
     final Context ctx = c.getApplicationContext();
     final SharedPreferences sp = ctx.getSharedPreferences(P, Context.MODE_PRIVATE);
+    if (o.optBoolean("wipe", false)) { sp.edit().clear().commit(); idTok = null; return; }   // account deleted: forget everything
     final String oldKey = sp.getString("key", null);
     final boolean oldNative = sp.getBoolean("nativeKey", false);
     final String newKey = o.optString("key", null);
@@ -78,6 +79,7 @@ final class BeatTask {
   private static void beatOnce() throws Exception {
     if (app == null || webForeground) return;
     SharedPreferences sp = app.getSharedPreferences(P, Context.MODE_PRIVATE);
+    try { checkGuardAlerts(sp); } catch (Throwable e) {}   // alerts from my linked SHOMERs reach a locked phone too
     if (!sp.getBoolean("on", false)) return;
     String key = sp.getString("key", null), uid = sp.getString("uid", null), dev = sp.getString("dev", null);
     String lat = sp.getString("lat", null), lng = sp.getString("lng", null);
@@ -99,6 +101,72 @@ final class BeatTask {
     row.put("status", "v2:" + sha256(dev + ":" + dk).substring(0, 12));
     int code = rest(app, "PUT", "dashfeed/" + key, row.toString(), t);
     if (code == 401) { idTok = null; }
+  }
+
+  /** GUARDIAN ALERTS while the app is off-screen: a linked SHOMER's Alert / Alarm on ping/<me>/<them>.
+   *  Sound the loud alarm and bring SHOMER up over the lock screen - the web layer then shows the
+   *  "enter your cancel code" screen (the only way to stop it besides the sender's remote stop).
+   *  Who may write here is checked when the alert is shown; the database rules limit it to linked people. */
+  static volatile String ringingId;
+  private static void checkGuardAlerts(SharedPreferences sp) throws Exception {
+    String uid = sp.getString("uid", null); if (uid == null) return;
+    String t = token(app); if (t == null) return;
+    String body = get(app, "ping/" + uid, t); if (body == null || body.equals("null")) return;
+    JSONObject all = new JSONObject(body);
+    java.util.Iterator<String> it = all.keys();
+    String seen = sp.getString("ga_seen", "");
+    long now = System.currentTimeMillis();
+    while (it.hasNext()) {
+      String from = it.next(); JSONObject v = all.optJSONObject(from); if (v == null) continue;
+      String id = v.optString("id", ""), lv = v.optString("level", "");
+      if (id.length() == 0) continue;
+      if ("stop".equals(lv) && id.equals(ringingId)) { clearGuardAlert(app); continue; }
+      if (!("alert".equals(lv) || "alarm".equals(lv))) continue;
+      if (now - v.optLong("ts", 0) > 15 * 60_000L) continue;
+      if (seen.contains("|" + id + "|")) continue;
+      seen = ("|" + id + "|" + seen); if (seen.length() > 1200) seen = seen.substring(0, 1200);
+      sp.edit().putString("ga_seen", seen).commit();
+      ringingId = id;
+      try { AlarmPlayer.start(app); } catch (Throwable e) {}
+      showGuardAlert(v.optString("name", "SHOMER"), "alarm".equals(lv));
+    }
+  }
+  private static void showGuardAlert(String name, boolean alarm) {
+    try {
+      android.app.NotificationManager nm = (android.app.NotificationManager) app.getSystemService(Context.NOTIFICATION_SERVICE);
+      if (android.os.Build.VERSION.SDK_INT >= 26) {
+        android.app.NotificationChannel ch = new android.app.NotificationChannel("shomer_guard", "SHOMER guardian alerts", android.app.NotificationManager.IMPORTANCE_HIGH);
+        ch.setDescription("Alerts from the SHOMERs you linked with"); try { ch.setBypassDnd(true); } catch (Throwable e) {}
+        nm.createNotificationChannel(ch);
+      }
+      android.content.Intent open = new android.content.Intent(app, MainActivity.class);
+      open.addFlags(android.content.Intent.FLAG_ACTIVITY_NEW_TASK | android.content.Intent.FLAG_ACTIVITY_SINGLE_TOP);
+      open.putExtra("shomer_ga", true);
+      android.app.PendingIntent pi = android.app.PendingIntent.getActivity(app, 9, open, android.app.PendingIntent.FLAG_UPDATE_CURRENT | android.app.PendingIntent.FLAG_IMMUTABLE);
+      android.app.Notification n = new androidx.core.app.NotificationCompat.Builder(app, "shomer_guard")
+          .setSmallIcon(R.drawable.ic_stat_shomer)
+          .setContentTitle((alarm ? "🚨 " : "🔔 ") + "SHOMER - " + name)
+          .setContentText("Open and enter your cancel code / פתח/י והזן/י קוד ביטול")
+          .setPriority(androidx.core.app.NotificationCompat.PRIORITY_MAX)
+          .setCategory(androidx.core.app.NotificationCompat.CATEGORY_ALARM)
+          .setFullScreenIntent(pi, true).setContentIntent(pi).setOngoing(true).setAutoCancel(false).build();
+      nm.notify(11, n);
+    } catch (Throwable e) {}
+  }
+  static void clearGuardAlert(Context c) {
+    try { AlarmPlayer.stop(c); } catch (Throwable e) {}
+    ringingId = null;
+    try { ((android.app.NotificationManager) c.getSystemService(Context.NOTIFICATION_SERVICE)).cancel(11); } catch (Throwable e) {}
+  }
+  private static String get(Context c, String path, String tok) {
+    HttpURLConnection k = null;
+    try {
+      String db = c.getSharedPreferences(P, Context.MODE_PRIVATE).getString("db", "https://shomergency-default-rtdb.firebaseio.com");
+      k = (HttpURLConnection) new URL(db + "/" + path + ".json?auth=" + URLEncoder.encode(tok, "UTF-8")).openConnection();
+      k.setConnectTimeout(15000); k.setReadTimeout(15000);
+      if (k.getResponseCode() / 100 != 2) return null;
+      try (InputStream is = k.getInputStream()) { return read(is); }
+    } catch (Throwable e) { return null; } finally { if (k != null) k.disconnect(); }
   }
 
   /** Firebase ID token from the anonymous account's refresh token (the same sign-in the app uses). */

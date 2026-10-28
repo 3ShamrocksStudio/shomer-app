@@ -72,6 +72,19 @@ public class ShomerNativePlugin extends Plugin {
     call.resolve();
   }
 
+  /** A linked SHOMER's Alert / Alarm: loud on the ALARM stream (ignores silent mode). No notification
+   *  STOP button - it stops only through the web layer after the cancel code, or the sender's remote stop. */
+  @PluginMethod
+  public void startGuardAlarm(PluginCall call) {
+    try { AlarmPlayer.start(getContext()); } catch (Throwable e) {}
+    call.resolve();
+  }
+  @PluginMethod
+  public void stopGuardAlarm(PluginCall call) {
+    try { BeatTask.clearGuardAlert(getContext()); } catch (Throwable e) {}
+    call.resolve();
+  }
+
   @PluginMethod
   public void disableBackgroundShake(PluginCall call) {
     getContext().stopService(new Intent(getContext(), ShakeService.class));
