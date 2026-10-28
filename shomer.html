@@ -2560,6 +2560,15 @@ body.otp-active .ob-steps{display:none!important;}
      <button class="agf-hascode" type="button" onclick="gdEnterCodeOpen()">
       <span data-he="קיבלת הזמנה? הדבק/י את הקישור" data-en="Got an invite? Paste the link" data-ar="تلقيت دعوة؟ الصق الرابط">קיבלת הזמנה? הדבק/י את הקישור</span>
      </button>
+
+     <!-- Recommend the app WITHOUT pairing. Deliberately not shareInvite(): no token,
+          no pending slot, no location-sharing consent — "be my guardian" is a
+          relationship ask, this is just a recommendation. Reach, not depth. -->
+     <button class="agf-tellone" type="button" onclick="shareApp()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
+       <circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="M8.6 13.5l6.8 4M15.4 6.5l-6.8 4"/></svg>
+      <span data-he="סתם לספר על SH✡MER למישהו" data-en="Just tell someone about SH✡MER" data-ar="أخبر شخصاً عن SH✡MER">סתם לספר על SH✡MER למישהו</span>
+     </button>
     </div>
    </div>
 
@@ -8010,6 +8019,25 @@ function inviteBatchAsk(){
     try{ toast(he?'בחר/י בוואטסאפ איש קשר אחד או כמה. כל מי שיצטרף יופיע כאן אחרי אישורך':'Pick one or more chats in WhatsApp. Everyone who joins appears here after you confirm','grn'); }catch(e){}
   };
 }
+/* ══ PLAIN SHARE ══
+   Recommend SH✡MER to anyone without pairing with them. No token is minted, no
+   pending slot is created, no consent gate — nothing about the sharer is revealed.
+   shareInvite() is for "be my SHOMER"; this is for "this app exists, it's free".
+   Reach (fills a territory) vs depth (fills your circle) — different jobs. */
+async function shareApp(){
+  var he=currentLang==='he', ar=currentLang==='ar';
+  var link='https://www.shomer-app.co.il/';
+  var txt = he
+    ? ('SH\u2721MER \u2014 \u05d0\u05e4\u05dc\u05d9\u05e7\u05e6\u05d9\u05d9\u05ea \u05d1\u05d8\u05d9\u05d7\u05d5\u05ea \u05e7\u05d4\u05d9\u05dc\u05ea\u05d9\u05ea, \u05d7\u05d9\u05e0\u05dd \u05dc\u05d2\u05de\u05e8\u05d9. \u05dc\u05d7\u05d9\u05e6\u05d4 \u05d0\u05d7\u05ea \u05de\u05d6\u05e2\u05d9\u05e7\u05d4 \u05dc\u05de\u05d9 \u05e9\u05d1\u05d7\u05e8\u05ea \u05e2\u05dd \u05d4\u05de\u05d9\u05e7\u05d5\u05dd \u05e9\u05dc\u05da.\n'+link)
+    : ar
+    ? ('SH\u2721MER \u2014 \u062a\u0637\u0628\u064a\u0642 \u0623\u0645\u0627\u0646 \u0645\u062c\u062a\u0645\u0639\u064a \u0645\u062c\u0627\u0646\u064a \u062a\u0645\u0627\u0645\u0627\u064b.\n'+link)
+    : ('SH\u2721MER \u2014 a free community safety app. One press alerts the people you chose, with your location.\n'+link);
+  try{
+    if(navigator.share){ await navigator.share({title:'SH\u2721MER', text:txt}); return; }
+  }catch(e){ return; }
+  try{ window.open('https://wa.me/?text='+encodeURIComponent(txt),'_blank'); }
+  catch(e){ try{ navigator.clipboard.writeText(link); toast(he?'\u05d4\u05e7\u05d9\u05e9\u05d5\u05e8 \u05d4\u05d5\u05e2\u05ea\u05e7':'Link copied','grn'); }catch(_){} }
+}
 async function shareInvite(who){
   var he=currentLang==='he';
   if(!who){ inviteBatchAsk(); return; }   /* v280: pick one or more people inside WhatsApp; each joiner's verified name + phone fill in automatically */
@@ -10231,7 +10259,7 @@ try{ hydrateIcons(document); }catch(e){}
 /* Loaded-build version - shown in the diagnostic panel so a phone can prove
    whether it's on the latest build or a STALE cached one. Keep in lock-step
    with sw.js SW_VERSION on every deploy. */
-var APP_VER='v294';
+var APP_VER='v295';
 var FB={ready:false,uid:null,db:null,_presTimer:null,connected:false,listening:false,pushState:'default',near:0,swVer:'?',
   authState:'connecting',sdkLoaded:false,persist:'',permErr:null,err:null,wsProbe:'',csp:''};
 /* Always log connection diagnostics to the console so the real failure can be SEEN in Chrome. */
@@ -14865,6 +14893,9 @@ html[dir="rtl"] .sh-back svg{transform:scaleX(-1)}
 .agf-invite{width:100%;display:flex;align-items:center;justify-content:center;gap:9px;padding:14px 12px;border-radius:999px;border:0;background:var(--gold-grad,linear-gradient(135deg,#C09020,#E0A828 60%,#F5C840));color:#23170a;font-family:inherit;font-weight:900;font-size:14px;line-height:1.25;text-align:center;cursor:pointer;margin-bottom:14px}
 .agf-invite svg{width:18px;height:18px;flex:0 0 auto}
 .agf-invite:active{transform:scale(.98)}
+.agf-tellone{width:100%;display:flex;align-items:center;justify-content:center;gap:8px;margin:14px 0 0;padding:11px;border-radius:11px;border:1px solid var(--b2);background:var(--n3);color:var(--g3);font-family:inherit;font-weight:800;font-size:13px;cursor:pointer}
+.agf-tellone svg{width:16px;height:16px;flex:0 0 auto}
+.agf-tellone:active{transform:scale(.98)}
 .agf-hascode{display:block;width:100%;margin:12px 0 0;padding:8px;background:none;border:0;color:var(--g3);font-family:inherit;font-size:12.5px;font-weight:700;text-decoration:underline;text-underline-offset:3px;cursor:pointer}
 .agf-or{display:flex;align-items:center;gap:10px;margin:0 0 12px;color:var(--tx3);font-size:12px;font-weight:700}
 .agf-or::before,.agf-or::after{content:"";flex:1;height:1px;background:var(--b2)}
