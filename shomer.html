@@ -8626,7 +8626,8 @@ function gaT(he,ar,en){ return currentLang==='he'?he:currentLang==='ar'?ar:en; }
 function gaLinked(uid){ try{ return (gdState().pairs||[]).some(function(p){ return p&&p.partnerUid===uid&&p.linked&&!p.pending; }); }catch(e){ return false; } }
 function gaOut(){ SS.gaOut=SS.gaOut||{}; return SS.gaOut; }
 function gaSeen(id){ SS.gaSeen=SS.gaSeen||[]; return SS.gaSeen.indexOf(id)>=0; }
-function gaMarkSeen(id){ SS.gaSeen=SS.gaSeen||[]; SS.gaSeen.push(id); if(SS.gaSeen.length>40) SS.gaSeen=SS.gaSeen.slice(-40); try{saveStore();}catch(e){} }
+function gaNativeHandled(id){ try{ var np=shomerNativePlugin(); if(np&&typeof np.gaHandled==='function') np.gaHandled({id:id}).catch(function(){}); }catch(e){} }
+function gaMarkSeen(id){ gaNativeHandled(id); SS.gaSeen=SS.gaSeen||[]; SS.gaSeen.push(id); if(SS.gaSeen.length>40) SS.gaSeen=SS.gaSeen.slice(-40); try{saveStore();}catch(e){} }
 function gaMyName(){ return ((SS.user&&SS.user.name)||'').slice(0,40); }
 function gaWrite(toUid,rec){ return fbRestWrite('PUT','ping/'+toUid+'/'+FB.uid,rec); }
 /* ── sender ── */
@@ -8702,6 +8703,7 @@ function gaHandle(from,v){
   if(v.level==='ok'||v.level==='help'||v.level==='coded'){        /* an answer to something I sent */
     var o=gaOut()[from]; if(!o||o.id!==v.re||o.st===v.level) return;
     o.st=v.level; o.ats=v.ts||Date.now(); try{saveStore();}catch(e){}
+    if(o.level!=='check'){ try{ gaWrite(from,{name:gaMyName(),ts:Date.now(),level:'stop',id:o.id}).catch(function(){}); }catch(e){} }   /* answered - disarm it */
     var nm=o.name||v.name||'';
     var msg=v.level==='help'?gaT('🆘 '+nm+' ביקש/ה עזרה!','🆘 '+nm+' طلب المساعدة!','🆘 '+nm+' asked for help!')
       :v.level==='coded'?gaT('✓ '+nm+' עצר/ה את ההתראה בקוד הביטול - הכל בסדר','✓ أوقف '+nm+' التنبيه برمز الإلغاء - كل شيء بخير','✓ '+nm+' stopped the alert with their code - all good')
@@ -8711,6 +8713,7 @@ function gaHandle(from,v){
     try{ renderCircles(); }catch(e){} return;
   }
   if(v.level==='stop'){ if(gaCur&&gaCur.id===v.id){ gaEnd('remote'); } gaMarkSeen(v.id); return; }
+  if(v.id&&gaSeen(v.id)){ gaNativeHandled(v.id); }   /* handled here already - make sure the background never rings it again */
   if(['check','alert','alarm'].indexOf(v.level)<0) return;
   if(gaSeen(v.id)||Date.now()-(v.ts||0)>GA_FRESH) return;
   if(gaCur&&gaCur.id===v.id) return;
@@ -9686,9 +9689,11 @@ function gdFillIdentity(inv){
   var p=document.getElementById('gd-ident-p');
   if(p) p.textContent=ph?('+'+String(ph).replace(/^\+/,'')):'';
   var h=document.getElementById('gd-ident-hint');
-  if(h) h.textContent = ph
+  if(h) h.textContent = (inv&&inv.team)
+    ? (he?'🏛 הזמנה לצוות השומרים של מוקד עירוני. אשר/י רק אם המוקד הזה ביקש ממך להצטרף. אפשר לנתק בכל רגע.':ar0?'🏛 دعوة لفريق حُرّاس مركز بلدي. وافق فقط إن طلب منك هذا المركز الانضمام. يمكن قطع الربط في أي وقت.':'🏛 Invitation to a municipal control-room SHOMER team. Accept only if this control room asked you to join. You can disconnect any time.')
+    : ph
     ? (he?'מכיר/ה את המספר הזה? בדוק/בדקי באנשי הקשר שלך.':'Do you know this number? Check your contacts.')
-    : (he?'⚠️ אין מספר מאומת - היזהר/י.':'⚠️ No verified number - be careful.');
+    : (he?'⚠️ אין מספר מאומת - היזהר/י.':'⚠️ No verified number - be careful.');   /* v309: dashboard team invites say what they are */
   var inp=document.getElementById('gd-code-in');
   var st=document.getElementById('gd-code-st');
   if(st) st.textContent='';
@@ -10584,7 +10589,7 @@ try{ hydrateIcons(document); }catch(e){}
 /* Loaded-build version - shown in the diagnostic panel so a phone can prove
    whether it's on the latest build or a STALE cached one. Keep in lock-step
    with sw.js SW_VERSION on every deploy. */
-var APP_VER='v308';
+var APP_VER='v309';
 var FB={ready:false,uid:null,db:null,_presTimer:null,connected:false,listening:false,pushState:'default',near:0,swVer:'?',
   authState:'connecting',sdkLoaded:false,persist:'',permErr:null,err:null,wsProbe:'',csp:''};
 /* Always log connection diagnostics to the console so the real failure can be SEEN in Chrome. */
