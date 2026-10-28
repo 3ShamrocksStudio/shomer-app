@@ -8715,7 +8715,8 @@ function gaHandle(from,v){
   if(v.level==='stop'){ if(gaCur&&gaCur.id===v.id){ gaEnd('remote'); } gaMarkSeen(v.id); return; }
   if(v.id&&gaSeen(v.id)){ gaNativeHandled(v.id); }   /* handled here already - make sure the background never rings it again */
   if(['check','alert','alarm'].indexOf(v.level)<0) return;
-  if(gaSeen(v.id)||Date.now()-(v.ts||0)>GA_FRESH) return;
+  if(gaSeen(v.id)) return;
+  if(Date.now()-(v.ts||0)>(v.level==='check'?GA_FRESH:12*3600000)){ gaNativeHandled(v.id); return; }   /* v310: an unanswered alert/alarm stays until the code (12h max) - it may still be ringing from the background */
   if(gaCur&&gaCur.id===v.id) return;
   if(gaCur&&(gaCur.level==='alarm'||(gaCur.level==='alert'&&v.level==='check'))) return;   /* never downgrade what is ringing */
   gaShow(from,v);
@@ -10589,7 +10590,7 @@ try{ hydrateIcons(document); }catch(e){}
 /* Loaded-build version - shown in the diagnostic panel so a phone can prove
    whether it's on the latest build or a STALE cached one. Keep in lock-step
    with sw.js SW_VERSION on every deploy. */
-var APP_VER='v309';
+var APP_VER='v310';
 var FB={ready:false,uid:null,db:null,_presTimer:null,connected:false,listening:false,pushState:'default',near:0,swVer:'?',
   authState:'connecting',sdkLoaded:false,persist:'',permErr:null,err:null,wsProbe:'',csp:''};
 /* Always log connection diagnostics to the console so the real failure can be SEEN in Chrome. */
