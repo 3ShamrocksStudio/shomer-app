@@ -10317,7 +10317,7 @@ try{ hydrateIcons(document); }catch(e){}
 /* Loaded-build version - shown in the diagnostic panel so a phone can prove
    whether it's on the latest build or a STALE cached one. Keep in lock-step
    with sw.js SW_VERSION on every deploy. */
-var APP_VER='v300';
+var APP_VER='v301';
 var FB={ready:false,uid:null,db:null,_presTimer:null,connected:false,listening:false,pushState:'default',near:0,swVer:'?',
   authState:'connecting',sdkLoaded:false,persist:'',permErr:null,err:null,wsProbe:'',csp:''};
 /* Always log connection diagnostics to the console so the real failure can be SEEN in Chrome. */
@@ -11240,7 +11240,7 @@ function fbResolveSOS(id){ if(FB.ready&&id&&FB._authReady&&!window._sosPractice)
 function fbDashSos(type, lat, lng){
   if(lat==null||lng==null) return;
   fbDashInit().then(function(){
-    if(FB._hb.mode!=='new'){ FB._sosFeedKey=FB.uid; dashFeedPush(FB.uid,type,lat,lng); return; }
+    if(FB._hb.mode!=='new'){ return; }   /* v301: without an anonymous key, skip the public feed rather than key it by my account id */
     var k=fbDashKey('sf_'); FB._sosFeedKey=k;
     try{ if(SS.sosLive&&SS.sosLive.id===curSosId){ SS.sosLive.fk=k; saveStore(); } }catch(e){}   /* v268: a reload must still resolve THIS dashboard row */
     fbRestWrite('PUT','dashown/'+k, FB.uid).then(function(){
@@ -12120,7 +12120,7 @@ async function paCreate(m, kind, desc, lastSeen, photo){
   if(!confirm(warn+(he?' דיווח כוזב עלול להוביל לחסימת החשבון.':' A false report may get your account blocked.'))) return false;
   var _go=await paCountdown(6);
   if(!_go){ toast(he?'בוטל - לא שודר':'Cancelled - not broadcast',''); return false; }
-  var id='pa_'+FB.uid.slice(0,8)+'_'+now.toString(36);
+  var id=fbDashKey('pa_');   /* v301: random id - the public feed key must not reveal who reported */
   var rec={ kind:kind, subjUid:m.partnerUid||'', subjName:(m.name||'').slice(0,60),
     desc:String(desc||'').slice(0,200), lastSeen:String(lastSeen||'').slice(0,120),
     lat:(m.lat!=null?+(+m.lat).toFixed(4):null), lng:(m.lng!=null?+(+m.lng).toFixed(4):null), locTs:m.ts||0,
@@ -12318,7 +12318,7 @@ async function evtCreate(type, note){
   var p=_myPos();
   if(!p){ toast(he?'צריך מיקום כדי לדווח':'Location needed to report','amb'); return; }
   var spec=EVT.TYPES[type]||EVT.TYPES.suspicious;
-  var id='e_'+FB.uid.slice(0,10)+'_'+Date.now().toString(36);
+  var id=fbDashKey('e_');   /* v301: random id - the public feed key must not reveal who reported */
   var ev={
     by:FB.uid, byName:((SS.settings&&SS.settings.toggles&&SS.settings.toggles.p_showname)?((SS.user&&SS.user.name)||''):''), ts:Date.now(),   /* v300: reports are anonymous unless the user turned on "show name on reports" */
     type:type, sev:spec.sev, lat:+p.lat.toFixed(4), lng:+p.lng.toFixed(4),
