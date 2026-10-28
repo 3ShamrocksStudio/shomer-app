@@ -559,6 +559,13 @@ body.sheet-open .diag-panel{display:none;}
 .pin-dots{display:flex;justify-content:center;gap:14px;margin:18px 0 6px;}
 .pin-dots span{width:14px;height:14px;border-radius:50%;border:2px solid var(--g3);transition:background .12s,transform .12s;}
 .pin-dots span.on{background:var(--g3);transform:scale(1.12);}
+.pin-dots span{display:inline-flex;align-items:center;justify-content:center;font-size:0;}
+.pin-dots span.dig{width:22px;height:26px;border-radius:7px;background:var(--n3);color:var(--tx0);font-size:17px;font-weight:800;transform:none;}
+.pin-key.pin-ok{background:var(--n2);color:var(--tx3);font-weight:900;}
+.pin-key.pin-ok.ready{background:linear-gradient(135deg,#C09020,#E0A828 60%,#F5C840);color:#23170a;}
+.pin-links{display:flex;justify-content:center;gap:16px;flex-wrap:wrap;margin-top:12px;}
+.pin-lnk{background:none;border:0;color:var(--g3);font-family:inherit;font-size:13px;font-weight:700;text-decoration:underline;text-underline-offset:3px;cursor:pointer;padding:4px;}
+.pin-lnk.danger{color:#FF7080;}
 .pin-err{min-height:16px;color:#FF7080;font-size:12px;font-weight:700;margin-bottom:6px;}
 .pin-pad{display:grid;grid-template-columns:repeat(3,1fr);gap:11px;max-width:264px;margin:6px auto 0;direction:ltr;}
 .pin-key{height:58px;border-radius:var(--r16);background:var(--n3);border:1px solid var(--b2);color:var(--tx0);font-size:23px;font-weight:700;cursor:pointer;transition:background .1s,transform .08s;display:flex;align-items:center;justify-content:center;}
@@ -1829,6 +1836,7 @@ body.otp-active .ob-steps{display:none!important;}
  <div class="pin-dots" id="pin-dots" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span><span></span></div>
  <div class="pin-err" id="pin-err" role="alert"></div>
  <div class="pin-pad" id="pin-pad"></div>
+ <div class="pin-links" id="pin-links"></div>
  <button class="ob-back" style="margin-top:14px" onclick="closeSosPin()" data-he="חזרה" data-en="Back">חזרה</button>
  </div>
  </div>
@@ -5530,36 +5538,80 @@ function activateSOS(){
 /* Cancelling an ACTIVE SOS requires the user's PIN (never biometric) - so an unconscious
    user can't have their alert force-cancelled with their own finger. The pre-broadcast
    countdown cancel stays PIN-free (it's the fast false-alarm escape, nothing was shared). */
-let _pinBuf='', _pinCb=null, _pinMode='verify';
+/* v306: CANCEL CODE - clear, forgiving flows.
+   Set:    choose 4-6 digits (tap ✓) → type it again to confirm (a typo can never lock you out).
+   Change: enter the current code → choose the new one → confirm. Remove: enter the current code → "Remove code".
+   Use:    enter it to stop an active SOS or a guardian alert; digits can be shown; "Forgot the code?" explains what to do. */
+let _pinBuf='', _pinCb=null, _pinMode='verify', _pinTmp='', _pinShow=false, _pinOpts={};
+function _pinHas(){ return !!(SS.security&&/^\d{4,6}$/.test(SS.security.pin||'')); }
+function _pinLen(){ return _pinMode==='verify'||_pinMode==='old' ? ((SS.security&&SS.security.pin)||'').length||6 : 6; }
 function buildPinPad(){
- const pad=document.getElementById('pin-pad'); if(!pad||pad.dataset.built)return; pad.dataset.built='1';
- const keys=['1','2','3','4','5','6','7','8','9','','0','del'];
- pad.innerHTML=keys.map(function(k){return k===''?'<span class="pin-key empty"></span>':k==='del'?'<button class="pin-key" onclick="pinDel()" aria-label="delete">⌫</button>':'<button class="pin-key" onclick="pinDigit(\''+k+'\')">'+k+'</button>';}).join('');
+ const pad=document.getElementById('pin-pad'); if(!pad)return;
+ const ok=(_pinMode==='set1'||_pinMode==='set2');
+ const keys=['1','2','3','4','5','6','7','8','9',ok?'ok':'','0','del'];
+ pad.innerHTML=keys.map(function(k){ return k===''?'<span class="pin-key empty"></span>'
+   :k==='del'?'<button class="pin-key" onclick="pinDel()" aria-label="'+(currentLang==='he'?'מחק':currentLang==='ar'?'حذف':'Delete')+'">⌫</button>'
+   :k==='ok'?'<button class="pin-key pin-ok" id="pin-ok" onclick="pinSubmit()" aria-label="'+(currentLang==='he'?'אישור':currentLang==='ar'?'تأكيد':'OK')+'">✓</button>'
+   :'<button class="pin-key" onclick="pinDigit(\''+k+'\')">'+k+'</button>'; }).join('');
 }
-function reflectPinDots(){ document.querySelectorAll('#pin-dots span').forEach(function(s,i){s.classList.toggle('on',i<_pinBuf.length);}); }
-function pinDigit(d){ var lim=_pinMode==='set'?6:((((SS.security&&SS.security.pin)||'').length)||6); if(_pinBuf.length>=lim)return; _pinBuf+=d; reflectPinDots(); if(_pinBuf.length===lim)setTimeout(pinSubmit,130); }
+function reflectPinDots(){
+ var box=document.getElementById('pin-dots'); if(!box) return;
+ var n=(_pinMode==='set1'||_pinMode==='set2')?Math.max(4,_pinBuf.length):_pinLen();
+ var h=''; for(var i=0;i<n;i++){ var on=i<_pinBuf.length; h+='<span class="'+(on?'on':'')+(_pinShow&&on?' dig':'')+'">'+(_pinShow&&on?_pinBuf[i]:'')+'</span>'; }
+ box.innerHTML=h;
+ var ok=document.getElementById('pin-ok'); if(ok){ ok.disabled=_pinBuf.length<4; ok.classList.toggle('ready',_pinBuf.length>=4); }
+}
+function pinDigit(d){ var lim=_pinLen(); if(_pinBuf.length>=lim)return; _pinBuf+=d; var e=document.getElementById('pin-err'); if(e&&_pinBuf.length===1)e.textContent=''; reflectPinDots();
+ if((_pinMode==='verify'||_pinMode==='old') && _pinBuf.length===lim) setTimeout(pinSubmit,130); }
 function pinDel(){ _pinBuf=_pinBuf.slice(0,-1); reflectPinDots(); var e=document.getElementById('pin-err'); if(e)e.textContent=''; }
+function _pinErr(t){ var e=document.getElementById('pin-err'); if(e) e.textContent=t; _pinBuf=''; reflectPinDots(); try{navigator.vibrate&&navigator.vibrate(180);}catch(x){} }
+function _pinGo(mode){ _pinMode=mode; _pinBuf=''; buildPinPad(); _pinSetTexts(); reflectPinDots(); }
 function pinSubmit(){
- var he=currentLang==='he';
- if(_pinMode==='set'){ if(!SS.security)SS.security={}; SS.security.pin=_pinBuf; saveStore(); closeSosPin(); reflectPinSetState(); toast(he?'✓ קוד הביטול נשמר':'✓ Cancel code saved','grn'); return; }
- if(_pinBuf===((SS.security&&SS.security.pin)||'')){ _pinFails=0; var cb=_pinCb; closeSosPin(); if(cb)cb(); }
- else {
-   var e=document.getElementById('pin-err'); _pinFails=(_pinFails||0)+1;
-   var left=3-_pinFails;
-   if(e)e.textContent=(he?'קוד שגוי':'Wrong code')+(left>0&&_pinFails>=1?(' · '+(he?('נותרו '+left):(left+' left'))):'');
-   _pinBuf=''; reflectPinDots(); try{navigator.vibrate&&navigator.vibrate(180);}catch(x){}
-   // THEFT PROTECTION: after 3 wrong codes, capture a selfie of whoever's holding the phone.
-   if(_pinFails>=3){ _pinFails=0; try{ selfieTheftTrigger(); }catch(x){} }
- }
+ var he=currentLang==='he', ar=currentLang==='ar';
+ if(_pinMode==='set1'){ if(_pinBuf.length<4){ _pinErr(he?'לפחות 4 ספרות':ar?'4 أرقام على الأقل':'At least 4 digits'); return; } _pinTmp=_pinBuf; _pinGo('set2'); return; }
+ if(_pinMode==='set2'){
+   if(_pinBuf!==_pinTmp){ _pinTmp=''; _pinGo('set1'); _pinErr(he?'הקודים לא תואמים - בחר/י שוב':ar?'الرمزان غير متطابقين - اختر من جديد':'The codes did not match - choose again'); return; }
+   if(!SS.security)SS.security={}; SS.security.pin=_pinTmp; _pinTmp=''; saveStore(); var cb0=_pinCb; closeSosPin(); reflectPinSetState();
+   toast(he?'✓ קוד הביטול נשמר - זכור/י אותו':ar?'✓ تم حفظ رمز الإلغاء - تذكّره':'✓ Cancel code saved - remember it','grn'); if(cb0) cb0(); return; }
+ var good=_pinBuf===((SS.security&&SS.security.pin)||'');
+ if(_pinMode==='old'){
+   if(good){ _pinFails=0; _pinGo('set1'); _pinOpts.canRemove=true; _pinSetTexts(); return; }
+   _pinFails=(_pinFails||0)+1; _pinErr((he?'קוד שגוי':ar?'رمز خاطئ':'Wrong code')); return; }
+ if(good){ _pinFails=0; var cb=_pinCb; closeSosPin(); if(cb)cb(); return; }
+ _pinFails=(_pinFails||0)+1; var left=3-_pinFails;
+ _pinErr((he?'קוד שגוי':ar?'رمز خاطئ':'Wrong code')+(left>0?(' · '+(he?('נותרו '+left):ar?('تبقّى '+left):(left+' left'))):''));
+ // THEFT PROTECTION: after 3 wrong codes, capture a selfie of whoever's holding the phone.
+ if(_pinFails>=3){ _pinFails=0; try{ selfieTheftTrigger(); }catch(x){} }
 }
 var _pinFails=0;
-function openSosPin(cb){ _pinMode='verify';_pinBuf='';_pinFails=0;_pinCb=cb; buildPinPad(); reflectPinDots(); _pinSetTexts(); var e=document.getElementById('pin-err'); if(e)e.textContent=''; var ov=document.getElementById('sos-pin'); if(ov){ov.classList.add('on');ov.setAttribute('aria-hidden','false');} }
-function openSetPin(){ _pinMode='set';_pinBuf='';_pinCb=null; buildPinPad(); reflectPinDots(); _pinSetTexts(); var e=document.getElementById('pin-err'); if(e)e.textContent=''; var ov=document.getElementById('sos-pin'); if(ov){ov.classList.add('on');ov.setAttribute('aria-hidden','false');} }
-function _pinSetTexts(){ var he=currentLang==='he', ar=currentLang==='ar', set=_pinMode==='set';
- setText('pin-ttl',set?(he?'בחר/י קוד ביטול':ar?'اختر رمز الإلغاء':'Choose a cancel code'):(he?'קוד לביטול SOS':ar?'رمز إلغاء SOS':'SOS cancel code'));
- setText('pin-sub',set?(he?'6 ספרות. יידרש כדי לבטל SOS פעיל. לעולם לא טביעת אצבע.':ar?'6 أرقام. مطلوب لإلغاء SOS نشط. ليس بصمة إصبع أبدًا.':'6 digits. Required to cancel an active SOS. Never a fingerprint.'):(he?'ביטול SOS פעיל מחייב את הקוד האישי שלך - לעולם לא טביעת אצבע.':ar?'إلغاء SOS نشط يتطلب رمزك الشخصي - ليس بصمة إصبع أبدًا.':'Cancelling an active SOS requires your personal code - never a fingerprint.')); }
-function reflectPinSetState(){ var el=document.getElementById('pin-set-state'); if(el){var he=currentLang==='he', has=SS.security&&/^\d{4,6}$/.test(SS.security.pin||''); el.textContent=has?(he?'מוגדר ✓':'Set ✓'):(he?'לא הוגדר':'Not set'); el.style.color=has?'var(--grn)':'var(--amb)';} }
-function closeSosPin(){ var ov=document.getElementById('sos-pin'); if(ov){ov.classList.remove('on');ov.setAttribute('aria-hidden','true');} _pinBuf='';_pinCb=null; }
+function _pinOpen(){ var e=document.getElementById('pin-err'); if(e)e.textContent=''; _pinShow=false; buildPinPad(); _pinSetTexts(); reflectPinDots(); var ov=document.getElementById('sos-pin'); if(ov){ov.classList.add('on');ov.setAttribute('aria-hidden','false');} }
+/* opts: {ttl, sub, forgot} - custom texts (e.g. a guardian alert) */
+function openSosPin(cb,opts){ _pinMode='verify';_pinBuf='';_pinFails=0;_pinCb=cb;_pinOpts=opts||{}; _pinOpen(); }
+/* Settings → cancel code: set a new one, or (if one exists) change / remove it after entering the current code */
+function openSetPin(cb){ _pinBuf='';_pinTmp='';_pinFails=0;_pinCb=cb||null;_pinOpts={}; _pinMode=_pinHas()?'old':'set1'; _pinOpen(); }
+function pinRemove(){ var he=currentLang==='he', ar=currentLang==='ar';
+ if(!confirm(he?'להסיר את קוד הביטול? בלי קוד, SOS פעיל ייעצר בלחיצה אחת.':ar?'إزالة رمز الإلغاء؟ بدون رمز يمكن إيقاف SOS النشط بلمسة واحدة.':'Remove the cancel code? Without it, an active SOS stops with one tap.')) return;
+ try{ delete SS.security.pin; saveStore(); }catch(e){} closeSosPin(); reflectPinSetState(); toast(he?'קוד הביטול הוסר':ar?'تمت إزالة رمز الإلغاء':'Cancel code removed','amb'); }
+function pinToggleShow(){ _pinShow=!_pinShow; reflectPinDots(); _pinSetTexts(); }
+function pinForgot(){ var he=currentLang==='he', ar=currentLang==='ar';
+ var t=_pinOpts.forgot||(he?'מטעמי בטיחות אין עקיפה לקוד. אם זו התראה מהשומר/ת שלך - בקש/י ממנו/ה לעצור אותה מרחוק. אחרי זה אפשר להגדיר קוד חדש בהגדרות ← בטיחות.':ar?'لأسباب أمان لا يمكن تجاوز الرمز. إن كان هذا تنبيهًا من حارسك - اطلب منه إيقافه عن بُعد. بعدها يمكنك ضبط رمز جديد من الإعدادات ← الأمان.':'For safety the code cannot be bypassed. If this is an alert from your SHOMER, ask them to stop it remotely. Then set a new code in Settings → Safety.');
+ toast(t,'amb'); }
+function _pinSetTexts(){ var he=currentLang==='he', ar=currentLang==='ar', m=_pinMode;
+ var T={
+  set1:[he?'בחר/י קוד ביטול':ar?'اختر رمز الإلغاء':'Choose a cancel code', he?'4 עד 6 ספרות, ואז ✓. הקוד עוצר SOS או התראה - כך אף אחד אחר לא יכול לבטל במקומך. בחר/י משהו שתזכור/י ואחרים לא ינחשו.':ar?'من 4 إلى 6 أرقام ثم ✓. يوقف الرمز SOS أو التنبيه - فلا يستطيع غيرك الإلغاء بدلًا منك. اختر رمزًا تتذكّره ولا يخمّنه الآخرون.':'4 to 6 digits, then ✓. The code stops an SOS or an alert - so nobody else can cancel it for you. Pick something you will remember and others will not guess.'],
+  set2:[he?'הקלד/י שוב לאישור':ar?'اكتبه مرة أخرى للتأكيد':'Type it again to confirm', he?'כדי לוודא שאין טעות הקלדה.':ar?'للتأكد من عدم وجود خطأ.':'To make sure there is no typo.'],
+  old:[he?'הזן/י את הקוד הנוכחי':ar?'أدخل الرمز الحالي':'Enter your current code', he?'כדי לשנות או להסיר את קוד הביטול.':ar?'لتغيير رمز الإلغاء أو إزالته.':'To change or remove your cancel code.'],
+  verify:[_pinOpts.ttl||(he?'קוד לביטול SOS':ar?'رمز إلغاء SOS':'SOS cancel code'), _pinOpts.sub||(he?'הזן/י את הקוד האישי שלך כדי לעצור. לעולם לא טביעת אצבע.':ar?'أدخل رمزك الشخصي للإيقاف. ليس بصمة إصبع أبدًا.':'Enter your personal code to stop it. Never a fingerprint.')]
+ }[m]||['',''];
+ setText('pin-ttl',T[0]); setText('pin-sub',T[1]);
+ var L=document.getElementById('pin-links'); if(!L) return;
+ var h='<button type="button" class="pin-lnk" onclick="pinToggleShow()">'+(_pinShow?(he?'הסתר/י ספרות':ar?'إخفاء الأرقام':'Hide digits'):(he?'הצג/י ספרות':ar?'إظهار الأرقام':'Show digits'))+'</button>';
+ if(m==='verify') h+='<button type="button" class="pin-lnk" onclick="pinForgot()">'+(he?'שכחתי את הקוד':ar?'نسيت الرمز':'Forgot the code?')+'</button>';
+ if(m==='set1'&&_pinOpts.canRemove) h+='<button type="button" class="pin-lnk danger" onclick="pinRemove()">'+(he?'הסר/י את הקוד':ar?'إزالة الرمز':'Remove the code')+'</button>';
+ L.innerHTML=h;
+}
+function reflectPinSetState(){ var el=document.getElementById('pin-set-state'); if(el){var he=currentLang==='he', has=SS.security&&/^\d{4,6}$/.test(SS.security.pin||''); el.textContent=has?(he?'מוגדר ✓ · שינוי':currentLang==='ar'?'مضبوط ✓ · تغيير':'Set ✓ · change'):(he?'לא הוגדר · להגדרה':currentLang==='ar'?'غير مضبوط · ضبط':'Not set · set up'); el.style.color=has?'var(--grn)':'var(--amb)';} }
+function closeSosPin(){ var ov=document.getElementById('sos-pin'); if(ov){ov.classList.remove('on');ov.setAttribute('aria-hidden','true');} _pinBuf='';_pinTmp='';_pinCb=null;_pinOpts={};_pinShow=false; }
 
 /* ═══════════════ THEFT-SELFIE PROTECTION (opt-in) ═══════════════
    On 3 wrong security-code attempts, capture a FRONT-CAMERA selfie of whoever's holding
@@ -6906,7 +6958,7 @@ var EMERGENCY_GUIDE=[
  {"id":"cpr","e":"❤️","t":{"he":"החייאה (CPR)","en":"CPR","ar":"الإنعاش القلبي (CPR)"},"s":{"he":"אדם לא מגיב ואינו נושם","en":"Unresponsive, not breathing","ar":"لا يستجيب ولا يتنفّس"},"steps":{"he":["ודא/י שהאדם אינו מגיב ואינו נושם תקין (או רק נושף נשיפות בודדות).","חייג/י 101 מיד והפעל/י רמקול. שלח/י מישהו להביא דפיברילטור - אל תחכה/י לו, התחל/י לחיצות עכשיו.","הנח/י כף יד במרכז בית החזה (חצי תחתון של עצם החזה), יד שנייה מעליה.","לחץ/י חזק ומהר: קצב 100–120 לדקה, עומק 5–6 ס״מ.","תן/י לחזה לחזור למצב מלא בין הלחיצות - אל תישען/י עליו.","אם הוכשרת: 30 לחיצות ל-2 הנשמות (הטיית ראש, הרמת סנטר, סתימת אף, נשיפה עד שהחזה עולה).","לא הוכשרת? בצע/י לחיצות חזה רצופות בלבד, ללא הפסקה.","כשמגיע AED - הפעל/י ועקוב/י אחר ההוראות הקוליות.","המשך/י עד שמגיע צוות רפואי או שהאדם מתעורר."],"en":["Confirm the person is unresponsive and not breathing normally (or only gasping).","Call 101 now and put the phone on speaker. Send someone to bring an AED - do not wait for it, start compressions now.","Place the heel of your hand on the center of the chest (lower half of the breastbone), other hand on top.","Push hard and fast: 100–120 per minute, depth 5–6 cm.","Let the chest fully recoil between compressions - do not lean on it.","If trained: 30 chest compressions to 2 rescue breaths (tilt head, lift chin, pinch nose, breathe until the chest rises).","Not trained? Do continuous chest compressions only, without stopping.","When an AED arrives, turn it on and follow the voice prompts.","Continue until EMS arrives or the person wakes up."],"ar":["تأكّد أن الشخص لا يستجيب ولا يتنفّس بشكل طبيعي (أو يلهث فقط).","اتصل بـ101 فورًا وشغّل مكبّر الصوت. أرسل شخصًا لإحضار جهاز الصدمات - لا تنتظره، ابدأ الضغطات الآن.","ضع كعب يدك في منتصف الصدر (النصف السفلي من عظم القص)، واليد الأخرى فوقها.","اضغط بقوة وسرعة: 100–120 ضغطة في الدقيقة، بعمق 5–6 سم.","اترك الصدر يعود كاملًا بين الضغطات - لا تتّكئ عليه.","إذا كنت مدرَّبًا: 30 ضغطة مقابل نفَسين (إمالة الرأس، رفع الذقن، إغلاق الأنف، نفخ حتى يرتفع الصدر).","غير مدرَّب؟ اكتفِ بالضغطات المتواصلة دون توقف.","عند وصول جهاز AED، شغّله واتبع التعليمات الصوتية.","استمر حتى وصول الإسعاف أو استيقاظ الشخص."]},"dont":{"he":"אל תפסיק/י לחיצות שלא לצורך · אל תבדק/י דופק לפני התחלה · עומק לא יותר מ-6 ס״מ.","en":"Do not interrupt compressions unnecessarily · do not delay to check a pulse · depth no more than 6 cm.","ar":"لا توقف الضغطات دون داعٍ · لا تتأخر لفحص النبض · العمق لا يزيد عن 6 سم."},"src":"מד״א (MDA) · AHA cpr.heart.org · ERC/Resus Council UK · ILCOR"},
  {"id":"choke","e":"😮","t":{"he":"חנק","en":"Choking","ar":"الاختناق"},"s":{"he":"לא יכול לדבר / לנשום","en":"Cannot speak or breathe","ar":"لا يستطيع الكلام أو التنفّس"},"steps":{"he":["שאל/י „את/ה נחנק/ת?”. אם הוא משתעל/מדבר - עודד/י שיעול חזק, אל תתערב/י.","אינו יכול להשתעל, לדבר או לנשום? בקש/י ממישהו לחייג 101, הטה/י אותו קדימה ותן/י עד 5 מכות גב חזקות בין השכמות.","עדיין חסום? בצע/י עד 5 לחיצות בטן (היימליך): אגרוף מעל הטבור, אחיזה ביד שנייה, משיכה חדה פנימה ולמעלה.","החלף/י 5 מכות גב ו-5 לחיצות בטן עד שהחפץ יוצא.","תינוק (מתחת לשנה): 5 מכות גב כשהוא פנים-למטה על האמה, ואז 5 לחיצות חזה ב-2 אצבעות - בלי לחיצות בטן!","איבד הכרה? חייג/י 101 והתחל/י החייאה (לחיצות חזה)."],"en":["Ask \"Are you choking?\" If they cough or speak - encourage strong coughing, do not intervene.","Cannot cough, speak or breathe? Have someone call 101, lean them forward and give up to 5 firm back blows between the shoulder blades.","Still blocked? Give up to 5 abdominal thrusts (Heimlich): fist above the navel, grasp with the other hand, pull sharply in and up.","Alternate 5 back blows and 5 abdominal thrusts until the object comes out.","Infant (under 1 yr): 5 back blows face-down along your forearm, then 5 chest thrusts with 2 fingers - NO abdominal thrusts!","If they go unconscious: call 101 and start CPR (chest compressions)."],"ar":["اسأل: «هل تختنق؟» إن كان يسعل أو يتكلّم - شجّعه على السعال بقوة، ولا تتدخّل.","لا يستطيع السعال أو الكلام أو التنفّس؟ اطلب من أحد الاتصال بـ101، أملْه للأمام واضرب حتى 5 ضربات قوية بين لوحي الكتف.","ما زال مسدودًا؟ نفّذ حتى 5 ضغطات بطنية (هايمليك): قبضة فوق السرّة، أمسكها باليد الأخرى، واسحب بقوة للداخل وللأعلى.","بادل بين 5 ضربات على الظهر و5 ضغطات بطنية حتى يخرج الجسم.","الرضيع (أقل من سنة): 5 ضربات على الظهر ووجهه للأسفل على ساعدك، ثم 5 ضغطات صدرية بإصبعين - دون ضغطات بطنية!","إذا فقد الوعي: اتصل بـ101 وابدأ الإنعاش (ضغطات الصدر)."]},"dont":{"he":"אל תתערב/י כל עוד הוא משתעל · אסור לחיצות בטן לתינוק · בהריון או אדם גדול-מידות - לחיצות חזה במקום לחיצות בטן · אל תחפש/י באצבע בעיוורון בפה.","en":"Do not intervene while they can still cough · never use abdominal thrusts on an infant · in pregnancy or a large person use chest thrusts instead of abdominal · no blind finger sweeps.","ar":"لا تتدخّل ما دام يسعل · ممنوع الضغطات البطنية للرضيع · في الحمل أو الشخص كبير الحجم استخدم ضغطات الصدر بدل البطن · لا تُدخل أصابعك في الفم عشوائيًا."},"src":"מד״א (MDA) · British Red Cross · NHS"},
  {"id":"bleed","e":"🩸","t":{"he":"דימום חמור","en":"Severe bleeding","ar":"نزيف شديد"},"s":{"he":"דם זורם בכמות גדולה","en":"Heavy, flowing blood","ar":"نزيف غزير"},"steps":{"he":["חייג/י 101 או בקש/י ממישהו לחייג, על רמקול.","לחץ/י חזק וישירות על הפצע עם בד נקי או תחבושת, בלי להרפות.","קשור/י תחבושת הדוקה כדי לשמור על הלחץ; ספוג? הוסף/י מעליה.","דימום חמור ביד או ברגל שלא נעצר בלחץ, או קטיעה: הנח/י חוסם עורקים כמה סנטימטרים מעל הפצע, לא על מפרק, והדק/י עד שהדימום נפסק.","רשום/י את שעת הנחת החוסם.","השכב/י, שמור/י חם והשגח/י עד שהצוות מגיע."],"en":["Call 101 or have someone call, on speaker.","Press hard and directly on the wound with a clean cloth or bandage, without letting go.","Tie a tight bandage to keep the pressure; if it soaks through, add more on top.","Severe arm or leg bleeding that pressure does not stop, or an amputation: apply a tourniquet a few centimeters above the wound, not on a joint, and tighten until the bleeding stops.","Note the time the tourniquet went on.","Lay them down, keep them warm and watch them until help arrives."],"ar":["اتصل بـ101 أو اطلب من أحد الاتصال، على مكبّر الصوت.","اضغط بقوة ومباشرة على الجرح بقماش نظيف أو ضمادة دون أن ترخي.","اربط ضمادة محكمة للحفاظ على الضغط؛ إن تشبّعت أضف فوقها.","نزيف شديد في الذراع أو الساق لا يتوقف بالضغط، أو بتر: ضع عاصبة فوق الجرح ببضعة سنتيمترات، ليس على مفصل، وأحكمها حتى يتوقف النزيف.","سجّل وقت وضع العاصبة.","أضجعه وأبقه دافئًا وراقبه حتى وصول المساعدة."]},"dont":{"he":"אל תסיר/י תחבושת ספוגה בדם - הוסף/י עוד מעליה · אל תוציא/י חפץ נעוץ · אל תשחרר/י חוסם עורקים שהונח.","en":"Do not remove a blood-soaked dressing - add more on top · do not pull out an embedded object · do not loosen a tourniquet once applied.","ar":"لا تنزع ضمادة مشبعة بالدم - أضف فوقها · لا تنزع جسمًا مغروزًا · لا تُرخِ العاصبة بعد وضعها."},"src":"מד״א Magen David Adom · British Red Cross · Resus Council UK 2025"},
- {"id":"burn","e":"🔥","t":{"he":"כוויות","en":"Burns","ar":"الحروق"},"s":{"he":"כוויה מחום, נוזל או כימיקל","en":"Heat, scald or chemical burn","ar":"حرق بالحرارة أو السوائل أو الكيماويات"},"steps":{"he":["כוויה כימית: הברש/י אבקה יבשה ואז שטוף/י ברצף במים. כוויה חשמלית: ודא/י שהזרם כובה לפני הנגיעה.","קרר/י במים זורמים קרירים לפחות 20 דקות (יעיל אם מתחילים תוך 3 שעות מהכוויה).","הסר/י תכשיטים/בגדים מהאזור מוקדם ככל האפשר - אלא אם הם דבוקים לעור.","כסה/י ביריעת ניילון נצמד (הנח/י ברפיון, לא הדוק סביב האיבר) או שקית ניילון נקייה - לא בד רטוב.","תוך כדי הקירור: בכוויה רצינית - שטח גדול, פנים, צוואר, ידיים או מפרק - או כל כוויה חשמלית, חייג/י 101."],"en":["Chemical burn: brush off dry powder then flush continuously with water. Electrical burn: make sure the power is OFF before touching.","Cool under cool running water for at least 20 minutes (effective if started within 3 hours of the burn).","Remove jewelry/clothing from the area as soon as possible - unless stuck to the skin.","Cover with cling film laid loosely over it (not wrapped tight) or a clean plastic bag - not a wet cloth.","While cooling: for a serious burn - large area, face, neck, hands or a joint - or any electrical burn, call 101."],"ar":["حرق كيميائي: انفض المسحوق الجاف ثم اغسل بالماء باستمرار. حرق كهربائي: تأكّد أن التيار مقطوع قبل اللمس.","برّد تحت ماء جارٍ بارد (غير مثلّج) لمدة 20 دقيقة على الأقل (فعّال إذا بدأت خلال 3 ساعات من الحرق).","انزع الحلي/الملابس عن المنطقة بأسرع وقت - إلا إن كانت ملتصقة بالجلد.","غطِّ برفق بغلاف بلاستيكي (سيلوفان) موضوع فوق الحرق أو كيس بلاستيكي نظيف - وليس قماشًا مبللًا.","أثناء التبريد: في الحرق الخطير - مساحة كبيرة أو الوجه أو الرقبة أو اليدين أو مفصل - أو أي حرق كهربائي، اتصل بـ101."]},"dont":{"he":"אל תניח/י קרח על העור · אל תפוצץ/י שלפוחיות · בלי משחות בית (יוגורט/חמאה) · אל תקרע/י בגד דבוק.","en":"Do not put ice on the skin · do not pop blisters · no home remedies (yogurt/butter) · do not tear off stuck clothing.","ar":"لا تضع الثلج على الجلد · لا تفقأ البثور · لا علاجات منزلية (لبن/زبدة) · لا تنزع الملابس الملتصقة."},"src":"מד״א (MDA) · NHS · British Red Cross · ILCOR (cool 20 min)"},
+ {"id":"burn","e":"🔥","t":{"he":"כוויות","en":"Burns","ar":"الحروق"},"s":{"he":"כוויה מחום, נוזל או כימיקל","en":"Heat, scald or chemical burn","ar":"حرق بالحرارة أو السوائل أو الكيماويات"},"steps":{"he":["עצור/י את הכוויה: הרחק/י ממקור החום; בגד בוער - עצור/י, שכב/י והתגלגל/י. כוויה כימית: הברש/י אבקה יבשה ואז שטוף/י ברצף במים. כוויה חשמלית: ודא/י שהזרם כובה לפני הנגיעה.","קרר/י במים זורמים קרירים לפחות 20 דקות (יעיל אם מתחילים תוך 3 שעות מהכוויה).","הסר/י תכשיטים/בגדים מהאזור מוקדם ככל האפשר - אלא אם הם דבוקים לעור.","כסה/י ביריעת ניילון נצמד (הנח/י ברפיון, לא הדוק סביב האיבר) או שקית ניילון נקייה - לא בד רטוב.","תוך כדי הקירור: בכוויה רצינית - שטח גדול, פנים, צוואר, ידיים או מפרק - או כל כוויה חשמלית, חייג/י 101."],"en":["Stop the burning: move away from the heat; clothes on fire - stop, drop and roll. Chemical burn: brush off dry powder then flush continuously with water. Electrical burn: make sure the power is OFF before touching.","Cool under cool running water for at least 20 minutes (effective if started within 3 hours of the burn).","Remove jewelry/clothing from the area as soon as possible - unless stuck to the skin.","Cover with cling film laid loosely over it (not wrapped tight) or a clean plastic bag - not a wet cloth.","While cooling: for a serious burn - large area, face, neck, hands or a joint - or any electrical burn, call 101."],"ar":["أوقف الحرق: ابتعد عن مصدر الحرارة؛ ملابس مشتعلة - توقّف، انبطح وتدحرج. حرق كيميائي: انفض المسحوق الجاف ثم اغسل بالماء باستمرار. حرق كهربائي: تأكّد أن التيار مقطوع قبل اللمس.","برّد تحت ماء جارٍ بارد (غير مثلّج) لمدة 20 دقيقة على الأقل (فعّال إذا بدأت خلال 3 ساعات من الحرق).","انزع الحلي/الملابس عن المنطقة بأسرع وقت - إلا إن كانت ملتصقة بالجلد.","غطِّ برفق بغلاف بلاستيكي (سيلوفان) موضوع فوق الحرق أو كيس بلاستيكي نظيف - وليس قماشًا مبللًا.","أثناء التبريد: في الحرق الخطير - مساحة كبيرة أو الوجه أو الرقبة أو اليدين أو مفصل - أو أي حرق كهربائي، اتصل بـ101."]},"dont":{"he":"אל תניח/י קרח על העור · אל תפוצץ/י שלפוחיות · בלי משחות בית (יוגורט/חמאה) · אל תקרע/י בגד דבוק.","en":"Do not put ice on the skin · do not pop blisters · no home remedies (yogurt/butter) · do not tear off stuck clothing.","ar":"لا تضع الثلج على الجلد · لا تفقأ البثور · لا علاجات منزلية (لبن/زبدة) · لا تنزع الملابس الملتصقة."},"src":"מד״א (MDA) · NHS · British Red Cross · ILCOR (cool 20 min)"},
  {"id":"stroke","e":"🧠","t":{"he":"שבץ מוחי (FAST)","en":"Stroke (FAST)","ar":"السكتة الدماغية (FAST)"},"s":{"he":"חולשה פתאומית בצד אחד","en":"Sudden one-sided weakness","ar":"ضعف مفاجئ في جانب واحد"},"steps":{"he":["פנים (F): בקש/י חיוך - צד אחד צונח?","זרועות (A): בקש/י להרים שתי ידיים - אחת צונחת או חלשה?","דיבור (S): הדיבור מעורפל או מבולבל? בקש/י לחזור על משפט פשוט.","זמן (T): חייג/י 101 מיד - גם אם הסימנים חולפים. רשום/י את שעת תחילת הסימנים - קריטי לטיפול.","הישאר/י לידו, אל תיתן/י לאכול או לשתות.","איבד הכרה ונושם - השכב/י על הצד. אינו נושם - התחל/י החייאה."],"en":["Face (F): ask them to smile - does one side droop?","Arms (A): ask them to raise both arms - does one drift down or feel weak?","Speech (S): is speech slurred or confused? Ask them to repeat a simple sentence.","Time (T): call 101 immediately - even if signs fade. Note the time symptoms started - critical for treatment.","Stay with them; give nothing to eat or drink.","If they become unresponsive but breathe, turn them on their side; if not breathing, start CPR."],"ar":["الوجه (F): اطلب منه أن يبتسم - هل يتدلّى جانب واحد؟","الذراعان (A): اطلب رفع الذراعين - هل تنخفض إحداهما أو تضعف؟","الكلام (S): هل الكلام متداخل أو مشوّش؟ اطلب تكرار جملة بسيطة.","الوقت (T): اتصل بـ101 فورًا - حتى لو زالت العلامات. سجّل وقت بدء الأعراض - مهم للعلاج.","ابقَ معه؛ لا تعطه طعامًا أو شرابًا.","إن فقد الوعي ويتنفّس أدِره على جنبه؛ وإن لم يتنفّس ابدأ الإنعاش."]},"dont":{"he":"אל תחכה/י שזה יעבור · אל תיתן/י אספירין (חלק מהשבצים הם דימום).","en":"Do not wait for it to pass · do not give aspirin (some strokes are bleeds).","ar":"لا تنتظر أن تزول · لا تعطِ أسبرين (بعض السكتات نزيفية)."},"src":"AHA/ASA stroke.org · NHS · מד״א (MDA)"},
  {"id":"heart","e":"❤️‍🩹","t":{"he":"התקף לב","en":"Heart attack","ar":"النوبة القلبية"},"s":{"he":"לחץ/כאב בחזה, קוצר נשימה","en":"Chest pressure, shortness of breath","ar":"ضغط بالصدر وضيق نفس"},"steps":{"he":["זהה/י סימנים: לחץ/כאב במרכז החזה, אולי מתפשט לזרוע/לסת/גב, קוצר נשימה, זיעה קרה, בחילה.","אצל נשים - לעיתים בעיקר קוצר נשימה, בחילה ועייפות, בלי כאב חזה בולט.","חייג/י 101 מיד - כל דקה חשובה.","עזור/י לו לנוח בישיבה נוחה, חצי-שכיבה, ברכיים כפופות.","אם אינו רגיש לאספירין - אפשר ללעוס כדור אספירין אחד, כ-300 מיליגרם.","איבד הכרה ואינו נושם? התחל/י החייאה."],"en":["Recognize signs: pressure/pain in the center of the chest, maybe spreading to arm/jaw/back, shortness of breath, cold sweat, nausea.","In women - sometimes mainly shortness of breath, nausea and fatigue, without prominent chest pain.","Call 101 immediately - every minute matters.","Help them rest in a comfortable seated, semi-reclined position, knees bent.","If not allergic to aspirin, they may chew one aspirin, about 300 milligrams.","If they become unresponsive and not breathing, start CPR."],"ar":["تعرّف على العلامات: ضغط/ألم في منتصف الصدر، قد يمتد للذراع/الفك/الظهر، ضيق نفس، عرق بارد، غثيان.","عند النساء - أحيانًا ضيق نفس وغثيان وتعب أساسًا، دون ألم صدر واضح.","اتصل بـ101 فورًا - كل دقيقة مهمة.","ساعده على الراحة جالسًا بوضعية شبه مستلقية والركبتان مثنيتان.","إن لم يكن لديه حساسية من الأسبرين، يمكنه مضغ حبة أسبرين واحدة، حوالي 300 ملليغرام.","إذا فقد الوعي وتوقّف التنفّس، ابدأ الإنعاش."]},"dont":{"he":"אל תיתן/י אספירין באלרגיה לאספירין · אל תעכב/י חיוג כדי לחפש אספירין · בספק - חכה/י לצוות.","en":"Do not give aspirin if allergic · do not delay calling to find aspirin · if unsure, wait for EMS.","ar":"لا تعطِ الأسبرين عند الحساسية · لا تؤخّر الاتصال للبحث عن أسبرين · عند الشك انتظر الإسعاف."},"src":"AHA 2024 First Aid (cpr.heart.org) · מד״א (MDA)"},
  {"id":"allergy","e":"💉","t":{"he":"תגובה אלרגית חמורה","en":"Anaphylaxis","ar":"الحساسية المفرطة"},"s":{"he":"נפיחות, קושי בנשימה, פריחה","en":"Swelling, breathing difficulty, rash","ar":"تورّم وصعوبة تنفّس وطفح"},"steps":{"he":["השתמש/י מיד במזרק אדרנלין (אפיפן) - ההוראות על המכשיר.","הזרק/י לאמצע הירך החיצונית - עובד דרך הבגד. החזק/י 10 שניות.","חייג/י 101 מיד ואמר/י „תגובה אנפילקטית” - גם אם משתפר.","השכב/י אותו עם רגליים מורמות; אם קשה לנשום - אפשר/י ישיבה. שמור/י על שקט ומנוחה.","אין שיפור תוך 5 דקות? הזרק/י מנה שנייה.","שים/י לב - הסימנים יכולים לחזור שעות אחר כך; נדרשת השגחה רפואית.","איבד הכרה ואינו נושם? התחל/י החייאה."],"en":["Use the adrenaline auto-injector (EpiPen) immediately - instructions are on the device.","Inject into the middle of the outer thigh - it works through clothing. Hold for 10 seconds.","Call 101 immediately and say \"anaphylaxis\" - even if they improve.","Lay them down with legs raised; if breathing is hard, let them sit up. Keep them calm and still.","No improvement within 5 minutes? Give a second dose.","Note - symptoms can return hours later; medical observation is needed.","If they become unresponsive and stop breathing, start CPR."],"ar":["استخدم حاقن الأدرينالين (إيبي-بِن) فورًا - التعليمات على الجهاز.","احقن في منتصف الفخذ الخارجي - يعمل عبر الملابس. ثبّته 10 ثوانٍ.","اتصل بـ101 فورًا وقل «حساسية مفرطة» - حتى لو تحسّن.","أضجعه ورجلاه مرفوعتان؛ وإن صعب التنفّس فدعه يجلس. أبقه هادئًا وساكنًا.","لا تحسّن خلال 5 دقائق؟ احقن جرعة ثانية.","انتبه - قد تعود الأعراض بعد ساعات؛ تلزم مراقبة طبية.","إن فقد الوعي ولم يتنفّس، ابدأ الإنعاش."]},"dont":{"he":"אל תיתן/י לו לעמוד או ללכת, גם אם משתפר · אל תעכב/י את האדרנלין · אל תזריק/י לישבן.","en":"Do not let them stand or walk, even if better · do not delay the adrenaline · do not inject into the buttock.","ar":"لا تدعه يقف أو يمشي ولو تحسّن · لا تؤخّر الأدرينالين · لا تحقن في الأرداف."},"src":"Resus Council UK · EpiPen (epipen.co.uk) · NHS · מד״א (MDA)"},
@@ -7070,9 +7122,10 @@ function gReadIcon(k){ var P={play:'<path d="M8 5v14l11-7z" fill="currentColor"/
 function gSpeakable(t,L){
   t=String(t||'');
   try{ t=emLocalize(t); }catch(e){}
+  t=t.replace(/(^|[^\d–\-\s]\s?|\s)(100|101|102|112|911|999|1201)(?![\d])(?!\s*(?:[–\-]|עד|to|إلى)\s*\d)/g,function(m0,pre,x){ return /[–\-]\s?$/.test(pre)?m0:pre+x.split('').join(' ');  });   /* emergency numbers digit by digit - never part of a range (100–120) */
   if(L==='he'){
     t=t.replace(/את\/ה/g,'אתה').replace(/הוא\/היא/g,'הוא').replace(/לו\/לה/g,'לו').replace(/אותו\/ה/g,'אותו')
-       .replace(/([\u0590-\u05FF]+)\/[\u0590-\u05FF]{1,2}(?=[\s,.;:!?)"״]|$)/g,'$1')   /* gender slash forms → one form */
+       .replace(/([\u0590-\u05FF]+)\/(?:ית|י|ה|ת)(?=[\s,.;:!?)"״]|$)/g,'$1')   /* gender suffixes only (חייג/י, רגוע/ה, נחנק/ת) - never a list word like ראש/גב */
        .replace(/ס[״"]מ/g,'סנטימטר').replace(/מ[״"]ג/g,'מיליגרם').replace(/מד[״"]א/g,'מגן דוד אדום').replace(/ער[״"]ן/g,'ערן')
        .replace(/\bAED\b/g,'דפיברילטור').replace(/\((?:CPR|FAST|RICE|[FAST])\)/g,'').replace(/\b(CPR|RICE)\b/g,'')
        .replace(/5-4-3-2-1/g,'חמש, ארבע, שלוש, שתיים, אחת').replace(/~\s*/g,'בערך ').replace(/(\d)\s*[–-]\s*(\d)/g,'$1 עד $2');
@@ -7081,11 +7134,10 @@ function gSpeakable(t,L){
        .replace(/5-4-3-2-1/g,'خمسة، أربعة، ثلاثة، اثنان، واحد').replace(/~\s*/g,'حوالي ').replace(/بـ\s*(\d)/g,'بالرقم $1')
        .replace(/(\d)\s*[–-]\s*(\d)/g,'$1 إلى $2').replace(/(\d)\s*سم/g,'$1 سنتيمتر').replace(/(\d)\s*ملغ/g,'$1 ملليغرام');
   } else {
-    t=t.replace(/\bAED\b/g,'defibrillator').replace(/\bEMS\b/g,'the ambulance team').replace(/\((?:FAST|RICE|[FAST])\)/g,'').replace(/\bRICE\b/g,'')
+    t=t.replace(/\bAED\b/g,'defibrillator').replace(/\bEMS\b/g,'the ambulance team').replace(/\((?:FAST|RICE|[FAST])\)/g,'').replace(/\bRICE\b/g,'').replace(/\byr\b/g,'year').replace(/\bMDA\b/g,'Magen David Adom').replace(/\bERAN\b/g,'Eran')
        .replace(/5-4-3-2-1/g,'five, four, three, two, one').replace(/~\s*/g,'about ').replace(/(\d)\s*[–-]\s*(\d)/g,'$1 to $2').replace(/(\d)\s*cm\b/g,'$1 centimetres').replace(/(\d)\s*mg\b/g,'$1 milligrams');
   }
-  t=t.replace(/\b(100|101|102|112|911|999|1201|000)\b/g,function(x){ return x.split('').join(' '); })   /* phone numbers digit by digit */
-     .replace(/\s*·\s*/g,'. ').replace(/[⇄⛔📞📍•→]/g,' ').replace(/[„”“"״]/g,'').replace(/\s*\/\s*/g,', ').replace(/\s{2,}/g,' ').trim();
+  t=t.replace(/\s*·\s*/g,'. ').replace(/[⇄⛔📞📍•→]/g,' ').replace(/[„”“"״]/g,'').replace(/\s*\/\s*/g,', ').replace(/\s{2,}/g,' ').trim();
   return t;
 }
 function gReadBuild(){
@@ -7103,7 +7155,7 @@ function gReadSay(text){
   var rate=gRead.slow?0.72:0.9, lang=gReadLang();
   return new Promise(function(res){
     var done=false, end=function(){ if(!done){ done=true; res(); } };
-    setTimeout(end, 4000+text.length*(gRead.slow?120:95));   /* never hang on a silent engine */
+    setTimeout(end, 6000+text.length*(gRead.slow?170:140));   /* never hang on a silent engine (generous: never cut a slow voice off) */
     try{ var T=window.Capacitor&&window.Capacitor.Plugins&&window.Capacitor.Plugins.TextToSpeech;
       if(T&&T.speak){ T.speak({text:text,lang:lang,rate:rate,pitch:1.0,volume:1.0,category:'playback'}).then(end,end); return; } }catch(e){}
     try{ if(window.speechSynthesis&&window.SpeechSynthesisUtterance){ var u=new SpeechSynthesisUtterance(text); u.lang=lang; u.rate=rate;
@@ -7130,7 +7182,7 @@ function gReadUi(){
 }
 async function gReadRun(){
   var tok=++gRead.tok;
-  try{ acquireWake(); }catch(e){}
+  try{ if(typeof _wakeLock==='undefined'||!_wakeLock) acquireWake(); }catch(e){}
   while(gRead.playing && tok===gRead.tok && gRead.i<gRead.items.length){
     gReadMark(); gReadUi();
     await gReadSay(gRead.items[gRead.i].say);
@@ -10351,7 +10403,7 @@ try{ hydrateIcons(document); }catch(e){}
 /* Loaded-build version - shown in the diagnostic panel so a phone can prove
    whether it's on the latest build or a STALE cached one. Keep in lock-step
    with sw.js SW_VERSION on every deploy. */
-var APP_VER='v306';
+var APP_VER='v307';
 var FB={ready:false,uid:null,db:null,_presTimer:null,connected:false,listening:false,pushState:'default',near:0,swVer:'?',
   authState:'connecting',sdkLoaded:false,persist:'',permErr:null,err:null,wsProbe:'',csp:''};
 /* Always log connection diagnostics to the console so the real failure can be SEEN in Chrome. */
