@@ -769,6 +769,7 @@ async function boot(){
   if(!u){ liveBoot(); return; }
   var md=u.user_metadata||{};
   CLIENT={org:md.org||'',territory:md.territory||'',email:u.email};
+  try{ if(teamLS('on')) setTimeout(function(){ teamInit().catch(function(){}); },1500); }catch(e){}   /* v310: a manager with a team hears leaders' alerts as soon as they log in */
   if(!CLIENT.territory){ // shouldn't happen, but guard
     CLIENT.territory=DATA._sorted[0].city;
   }
@@ -1580,18 +1581,20 @@ function teamWatchInvite(it){
     if(TEAM.leaders[v.acceptedBy]){ teamDropInvite(it.tok); return; }
     var ok=false; try{ ok=!!v.acceptedCode && v.acceptedCode===await teamSha(it.tok+':'+it.code); }catch(e){}
     if(ok){ await teamLink(v,it.tok); }
-    else { it.ask={uid:v.acceptedBy,name:v.acceptedName||'',phone:v.acceptedPhone||''}; teamRender(); }   /* no code proof: the manager confirms the person */
+    else if(v.acceptedCode){ await teamReject(it.tok,v); }   /* v310: WRONG code = refused outright (same as the app) */
+    else { it.ask={uid:v.acceptedBy,name:v.acceptedName||'',phone:v.acceptedPhone||''}; var _l=teamLS('inv')||[]; _l.forEach(function(x){ if(x.tok===it.tok) x.ask=it.ask; }); teamLS('inv',_l); teamRender(); }   /* no code proof: the manager confirms the person */
   });
 }
 async function teamLink(v,tok){
   await TEAM.db.ref('pairs/'+TEAM.uid+'/'+v.acceptedBy).set({name:(v.acceptedName||'ראש צוות').slice(0,40),token:tok,ts:Date.now(),via:'dashboard'});
   teamDropInvite(tok);
 }
+async function teamReject(tok,v){ try{ await TEAM.db.ref('invites/'+tok).update({rejected:(v&&v.acceptedBy)||true,rejectedTs:Date.now()}); }catch(e){} teamDropInvite(tok); }   /* the joiner's app sees "rejected" and undoes its side */
 function teamDropInvite(tok){ try{ TEAM.db.ref('invites/'+tok).off(); }catch(e){} var inv=(teamLS('inv')||[]).filter(function(x){return x.tok!==tok;}); teamLS('inv',inv); teamRender(); }
 async function teamConfirm(tok,yes){
   var it=(teamLS('inv')||[]).find(function(x){return x.tok===tok;}); var v=null;
   try{ v=(await TEAM.db.ref('invites/'+tok).once('value')).val(); }catch(e){}
-  if(yes&&v&&v.acceptedBy) await teamLink(v,tok); else teamDropInvite(tok);
+  if(yes&&v&&v.acceptedBy) await teamLink(v,tok); else if(v&&v.acceptedBy) await teamReject(tok,v); else teamDropInvite(tok);
 }
 /* ── check-in / alert / alarm ── */
 async function teamSend(uid,level){
@@ -1658,10 +1661,10 @@ async function openTeam(){
    +'<div class="acct-sub">ראשי הצוות שלך באפליקציה. „הכל טוב?” שואל בשקט; התראה ואזעקה מצלצלות בטלפון שלהם עד שהם מזינים את קוד הביטול שלהם (או עד שעוצרים מכאן).</div>'
    +'<div id="team-list"><div class="tm-empty">מתחבר…</div></div><div id="team-newinv"></div>'
    +'<button class="tm-add" onclick="teamInvite()">+ הזמנת ראש צוות</button>'
-   +'<div class="acct-note">החיבור נעשה רק באישור ראש הצוות באפליקציה. הוא יכול לנתק אותו בכל רגע. הלוח לא אוסף מיקום או פרטים נוספים מעבר לשם שאישר.</div></div>';
+   +'<div class="acct-note">החיבור נעשה רק באישור ראש הצוות באפליקציה. הוא יכול לנתק אותו בכל רגע. הלוח לא אוסף מיקום. נשמרים רק השם שראש הצוות אישר באפליקציה (ואם הצטרף בלי הקוד - גם המספר, כדי שתוכלו לוודא שזה הוא). הצוות שמור בדפדפן הזה.</div></div>';
   ov.addEventListener('click',function(e){ if(e.target===ov) ov.remove(); });
   document.body.appendChild(ov);
-  try{ await teamInit(); teamRender(); }catch(e){ var b=document.getElementById('team-list'); if(b) b.innerHTML='<div class="tm-empty">אין חיבור כרגע - נסו שוב בעוד רגע.</div>'; }
+  try{ await teamInit(); teamLS('on',1); teamRender(); }catch(e){ var b=document.getElementById('team-list'); if(b) b.innerHTML='<div class="tm-empty">אין חיבור כרגע - נסו שוב בעוד רגע.</div>'; }
 }
 function closeSettings(){ var o=document.getElementById('set-ov'); if(o)o.remove(); }
 /* v293: each click flips the CURRENT value (it used to reuse the value baked in when the window opened), the switch shows the
