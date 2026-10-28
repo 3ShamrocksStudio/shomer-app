@@ -10317,7 +10317,7 @@ try{ hydrateIcons(document); }catch(e){}
 /* Loaded-build version - shown in the diagnostic panel so a phone can prove
    whether it's on the latest build or a STALE cached one. Keep in lock-step
    with sw.js SW_VERSION on every deploy. */
-var APP_VER='v299';
+var APP_VER='v300';
 var FB={ready:false,uid:null,db:null,_presTimer:null,connected:false,listening:false,pushState:'default',near:0,swVer:'?',
   authState:'connecting',sdkLoaded:false,persist:'',permErr:null,err:null,wsProbe:'',csp:''};
 /* Always log connection diagnostics to the console so the real failure can be SEEN in Chrome. */
@@ -10690,7 +10690,10 @@ function fbRestWrite(method,path,val){
 /* ── Sanitized PII-free municipal dashboard feed (coarse coords, no name/photo) ── */
 function dashFeedPush(id,type,lat,lng){
   try{ if(typeof FB==='undefined'||!FB.ready||!FB.uid||lat==null||lng==null) return;
-    fbRestWrite('PUT','dashfeed/'+id,{type:String(type||'event'),lat:+(+lat).toFixed(2),lng:+(+lng).toFixed(2),ts:Date.now(),status:'active',by:FB.uid}); }catch(e){}
+    var _row={type:String(type||'event'),lat:+(+lat).toFixed(2),lng:+(+lng).toFixed(2),ts:Date.now(),status:'active'};
+    /* v300: the public feed carries no account id (the database checks ownership on the source record).
+       Until the new rules are published the server still requires it - then, and only then, add it. */
+    fbRestWrite('PUT','dashfeed/'+id,_row).catch(function(e){ if(e&&e.code==='PERMISSION_DENIED'){ _row.by=FB.uid; return fbRestWrite('PUT','dashfeed/'+id,_row); } }).catch(function(){}); }catch(e){}
 }
 /* ── SSE live stream (mimics ref.on('value')) ── */
 /* ── CONNECTION BUDGET ──
@@ -11169,10 +11172,24 @@ function fbNativeBeat(o){
     np.beat(cfg).catch(function(){});
   }catch(e){}
 }
+/* v300: RETENTION - the public dashboard feed keeps nothing longer than needed: session rows 2 days, daily
+   markers / reports 90 days (privacy policy). Once a day, any signed-in app removes up to 60 expired rows
+   (the database rules only allow deleting rows that have actually expired). */
+function fbDashPurge(){
+  try{ var dk=fbDayKey(); if(localStorage.getItem('shomerPurgeDay')===dk) return; localStorage.setItem('shomerPurgeDay',dk); }catch(e){ return; }
+  fetch(FB_REST+'/dashfeed.json',{cache:'no-store'}).then(function(r){ return r.ok?r.json():null; }).then(function(all){
+    if(!all) return; var now=Date.now(), n=0;
+    Object.keys(all).forEach(function(k){ var v=all[k]; if(!v||typeof v!=='object'||typeof v.ts!=='number'||n>=60) return;
+      var marker=(typeof v.status==='string'&&v.status.indexOf('d1:')===0);
+      var exp=(now-v.ts>90*864e5+36e5) || (v.type==='presence' && !marker && now-v.ts>2*864e5+36e5);
+      if(exp){ n++; fbRestWrite('DELETE','dashfeed/'+k).catch(function(){}); } });
+  }).catch(function(){});
+}
 function fbDashBeat(hide, lat, lng){
   if(!FB._authReady||!FB.uid) return;
   /* v279: automated/test browsers (navigator.webdriver) never count toward the public dashboard */
   try{ if(navigator.webdriver || isReviewAccount()) return; }catch(e){}
+  try{ setTimeout(fbDashPurge, 20000); }catch(e){}
   fbDashInit().then(function(){
     var st=FB._hb, dk=fbDayKey();
     if(st.mode==='new' && st.day && st.day!==dk){ st.day=dk; st.ready=null; return fbDashInit(); }   /* v280: midnight = fresh row (old one deleted) */
@@ -11184,7 +11201,7 @@ function fbDashBeat(hide, lat, lng){
     var _hb={type:'presence',lat:lat,lng:lng,ts:Date.now(),status:((st.mode==='new'&&fbDayTag())?'v2:'+fbDayTag():'v2')};   /* 'v2' = real (non-automated) app; v280 adds today's anonymous tag */
     if(st.mode!=='new') _hb.by=FB.uid;
     var _fd=false; try{ _fd=isFounder(); }catch(_f){}
-    fbRestWrite('PUT','dashfeed/'+key,_hb).then(function(){ if(_fd) return fbRestWrite('PATCH','dashfeed/'+key,{founder:true}); }).catch(function(){});
+    fbRestWrite('PUT','dashfeed/'+key,_hb).catch(function(){});   /* v300: no founder flag in the public feed - it pinpointed the founder's live area */
     if(st.mode==='new') fbNativeBeat({on:true,key:key,lat:lat,lng:lng});   /* v299: the background service keeps this row alive while the app is off-screen */
     try{ fbDayMark(lat,lng); }catch(e){}
   });
@@ -12303,7 +12320,7 @@ async function evtCreate(type, note){
   var spec=EVT.TYPES[type]||EVT.TYPES.suspicious;
   var id='e_'+FB.uid.slice(0,10)+'_'+Date.now().toString(36);
   var ev={
-    by:FB.uid, byName:(SS.user&&SS.user.name)||'', ts:Date.now(),
+    by:FB.uid, byName:((SS.settings&&SS.settings.toggles&&SS.settings.toggles.p_showname)?((SS.user&&SS.user.name)||''):''), ts:Date.now(),   /* v300: reports are anonymous unless the user turned on "show name on reports" */
     type:type, sev:spec.sev, lat:+p.lat.toFixed(4), lng:+p.lng.toFixed(4),
     note:String(note||'').slice(0,140),
     need:spec.need,            /* confirmations required to go community-wide */
