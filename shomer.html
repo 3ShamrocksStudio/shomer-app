@@ -4517,7 +4517,7 @@ function fireUpdateNotice(){
  try{
   var he=currentLang==='he',ar=currentLang==='ar';
   var title=he?'SH\u2721MER \u05e2\u05d5\u05d3\u05db\u05df':ar?'\u062a\u0645 \u062a\u062d\u062f\u064a\u062b SH\u2721MER':'SH\u2721MER updated';
-  var body=(he?'\u05d4\u05d0\u05e4\u05dc\u05d9\u05e7\u05e6\u05d9\u05d4 \u05e2\u05d5\u05d3\u05db\u05e0\u05d4 \u05dc\u05d2\u05e8\u05e1\u05d4 ':ar?'\u062a\u0645 \u0627\u0644\u062a\u062d\u062f\u064a\u062b \u0625\u0644\u0649 ':'Updated to ')+APP_VER;
+  var body=he?'\u05d4\u05d0\u05e4\u05dc\u05d9\u05e7\u05e6\u05d9\u05d4 \u05e2\u05d5\u05d3\u05db\u05e0\u05d4 \u05dc\u05d2\u05e8\u05e1\u05d4 \u05d4\u05d0\u05d7\u05e8\u05d5\u05e0\u05d4':ar?'\u062a\u0645 \u0627\u0644\u062a\u062d\u062f\u064a\u062b \u0625\u0644\u0649 \u0623\u062d\u062f\u062b \u0625\u0635\u062f\u0627\u0631':'Updated to the latest version';   /* v304: no internal build number in user-facing text */
   try{ if(_ln){ _ln.schedule({notifications:[{id:(_lnId=(_lnId%2000000)+1),title:title,body:body,channelId:'shomer-updates',autoCancel:true,extra:{tag:'update'}}]}); } }catch(e){}
   if(!_emergencyBusy()){ try{ toast(title+' \u00b7 '+body,'grn'); }catch(e){} }
  }catch(e){}
@@ -10331,7 +10331,7 @@ try{ hydrateIcons(document); }catch(e){}
 /* Loaded-build version - shown in the diagnostic panel so a phone can prove
    whether it's on the latest build or a STALE cached one. Keep in lock-step
    with sw.js SW_VERSION on every deploy. */
-var APP_VER='v303';
+var APP_VER='v304';
 var FB={ready:false,uid:null,db:null,_presTimer:null,connected:false,listening:false,pushState:'default',near:0,swVer:'?',
   authState:'connecting',sdkLoaded:false,persist:'',permErr:null,err:null,wsProbe:'',csp:''};
 /* Always log connection diagnostics to the console so the real failure can be SEEN in Chrome. */
@@ -13736,9 +13736,14 @@ async function showA2HS(){
         it force-checks for an update. ═══════════════════════════════════════════════════ */
 var UPD_POLL_MS=60000;
 function updNum(v){ try{ return parseInt(String(v).replace(/\D/g,''),10)||0; }catch(e){ return 0; } }
+/* v304: users see a short public version (changes only on meaningful releases); the exact internal build
+   (v### + Play build) stays one tap away - version badge tap, and Settings → About. */
+var PUBLIC_VER='1.0';
+function pubVerLabel(){ var he=currentLang==='he',ar=currentLang==='ar'; return PUBLIC_VER+' \u00b7 '+(he?'\u05d1\u05d8\u05d0':ar?'\u062a\u062c\u0631\u064a\u0628\u064a':'Beta'); }
+function fullVerLabel(cb){ var t=APP_VER; try{ var A=window.Capacitor&&window.Capacitor.Plugins&&window.Capacitor.Plugins.App; if(A&&A.getInfo){ A.getInfo().then(function(i){ cb(t+(i&&i.build?' \u00b7 build '+i.build:'')); }).catch(function(){ cb(t); }); return; } }catch(e){} cb(t); }
 function updSetBadge(txt,stale){
  var b=document.getElementById('ver-badge'); if(b){ b.textContent=txt; b.style.color=stale?'#F5C840':'#6b7a9c'; }
- var s=document.getElementById('set-ver'); if(s){ s.textContent=txt; s.style.color=stale?'#F5C840':''; }   // Settings → About build row
+ var s=document.getElementById('set-ver'); if(s){ fullVerLabel(function(f){ s.textContent=txt+' ('+f+')'; }); s.style.color=stale?'#F5C840':''; }   // Settings → About build row
 }
 function updShowBanner(pubV,done,notes){
   if(document.getElementById('upd-modal')) return;
@@ -13784,7 +13789,7 @@ function updCheck(manual){
       .then(function(d){
         if(!d||!d.v||typeof APP_VER==='undefined') return;
         var pub=updNum(d.v), cur=updNum(APP_VER), stale=pub>cur;
-        updSetBadge(APP_VER+' · beta', stale);
+        updSetBadge(pubVerLabel(), stale);
         if(stale){ try{fbLog('UPDATE available: '+APP_VER+' → '+d.v);}catch(e){}
           try{ if(_ln && window._updNotified!==d.v){ window._updNotified=d.v; var _he=currentLang==='he',_ar=currentLang==='ar';
             _ln.schedule({notifications:[{id:(_lnId=(_lnId%2000000)+1),title:(_he?'עדכון זמין · SH✡MER':_ar?'تحديث متاح · SH✡MER':'Update available · SH✡MER'),body:(_he?'גרסה חדשה מוכנה — פתח/י את SH✡MER כדי לעדכן.':_ar?'نسخة جديدة جاهزة — افتح SH✡MER للتحديث.':'A new version is ready — open SH✡MER to update.'),channelId:'shomer-updates',autoCancel:true,extra:{tag:'update-available'}}]}); } }catch(e){}
@@ -13800,7 +13805,7 @@ function updCheck(manual){
             updShowBanner(d.v,false,d.notes);
           }
         }
-        else if(manual){ try{ toast((currentLang==='he'?'✓ מעודכן - ':'✓ Up to date - ')+APP_VER,'grn'); }catch(e){} }
+        else if(manual){ try{ toast((currentLang==='he'?'✓ מעודכן - ':currentLang==='ar'?'✓ محدّث - ':'✓ Up to date - ')+pubVerLabel(),'grn'); }catch(e){} }
       }).catch(function(){ if(manual){ try{ toast(currentLang==='he'?'בדיקת עדכון נכשלה':'Update check failed','amb'); }catch(e){} } });
   }catch(e){}
 }
@@ -13808,11 +13813,11 @@ function updMountBadge(){
   if(document.getElementById('ver-badge')) return;
   var el=document.createElement('div'); el.id='ver-badge';
   el.setAttribute('style','position:fixed;left:6px;bottom:calc(3px + env(safe-area-inset-bottom));z-index:90000;font:600 10px/1 system-ui,-apple-system,sans-serif;color:#6b7a9c;background:rgba(9,18,36,.55);padding:3px 6px;border-radius:7px;letter-spacing:.3px;cursor:pointer');
-  el.textContent=(typeof APP_VER!=='undefined'?APP_VER:'?')+' · beta';
+  el.textContent=pubVerLabel();
   el.title='SHOMER build - tap to check for updates';
-  el.onclick=function(){ try{ toast(currentLang==='he'?'בודק עדכונים…':currentLang==='ar'?'جارٍ البحث عن تحديثات…':'Checking for updates…',''); }catch(e){} updCheck(true); };
+  el.onclick=function(){ fullVerLabel(function(f){ try{ toast((currentLang==='he'?'גרסה ':currentLang==='ar'?'الإصدار ':'Version ')+pubVerLabel()+' ('+f+') \u00b7 '+(currentLang==='he'?'בודק עדכונים…':currentLang==='ar'?'جارٍ البحث عن تحديثات…':'checking for updates…'),''); }catch(e){} }); updCheck(true); };
   document.body.appendChild(el);
-  var sv=document.getElementById('set-ver'); if(sv) sv.textContent=APP_VER+' · beta';   // Settings version row (user-facing)
+  var sv=document.getElementById('set-ver'); if(sv) fullVerLabel(function(f){ sv.textContent=pubVerLabel()+' ('+f+')'; });   // Settings version row (user-facing)
 }
 try{
   if(document.readyState!=='loading'){ updMountBadge(); } else document.addEventListener('DOMContentLoaded',updMountBadge);
@@ -15010,7 +15015,7 @@ html[dir="rtl"] .sh-back svg{transform:scaleX(-1)}
 .agf-code-row{display:flex;gap:8px}
 .agf-code-in{flex:1;min-width:0;margin:0!important}
 .agf-code-go{flex:0 0 auto;padding:0 16px;border:0;border-radius:10px;background:#7c5cff;color:#fff;font-family:inherit;font-weight:800;font-size:13.5px;cursor:pointer}
-.agf-share{width:100%;display:flex;align-items:center;justify-content:center;gap:9px;margin-top:12px;padding:12px;border-radius:999px;background:transparent;border:1.5px solid var(--g3,#E0A828);color:var(--g3,#E0A828);font-family:inherit;font-weight:800;font-size:13.5px;cursor:pointer}
+.agf-share{width:100%;display:flex;align-items:center;justify-content:center;gap:9px;margin-top:12px;padding:12px;border-radius:999px;background:transparent;border:0;color:var(--g3,#E0A828);font-family:inherit;font-weight:800;font-size:13.5px;cursor:pointer}
 .agf-share svg{width:17px;height:17px;flex:0 0 auto}
 .agf-links{display:flex;align-items:center;justify-content:center;gap:10px;flex-wrap:wrap;margin-top:14px;padding-top:12px;border-top:1px solid var(--b2)}
 .agf-lnk{background:none;border:0;padding:4px 2px;color:var(--g3);font-family:inherit;font-size:12.5px;font-weight:700;cursor:pointer;text-decoration:underline;text-underline-offset:3px}
