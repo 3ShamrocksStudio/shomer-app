@@ -153,6 +153,17 @@ final class BeatTask {
       nm.notify(11, n);
     } catch (Throwable e) {}
   }
+  /** The app handled this alert (answered, stopped with the code, stopped remotely, or already seen):
+   *  never ring it again from the background, and silence it if it is ringing right now. */
+  static void markHandled(Context c, String id) {
+    if (id == null || id.length() == 0) return;
+    try {
+      SharedPreferences sp = c.getSharedPreferences(P, Context.MODE_PRIVATE);
+      String seen = sp.getString("ga_seen", "");
+      if (!seen.contains("|" + id + "|")) { seen = "|" + id + "|" + seen; if (seen.length() > 1200) seen = seen.substring(0, 1200); sp.edit().putString("ga_seen", seen).commit(); }
+    } catch (Throwable e) {}
+    if (id.equals(ringingId)) clearGuardAlert(c);
+  }
   static void clearGuardAlert(Context c) {
     try { AlarmPlayer.stop(c); } catch (Throwable e) {}
     ringingId = null;

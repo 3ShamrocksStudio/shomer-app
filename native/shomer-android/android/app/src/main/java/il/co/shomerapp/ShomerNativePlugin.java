@@ -80,6 +80,11 @@ public class ShomerNativePlugin extends Plugin {
     call.resolve();
   }
   @PluginMethod
+  public void gaHandled(PluginCall call) {
+    try { BeatTask.markHandled(getContext(), call.getString("id", "")); } catch (Throwable e) {}
+    call.resolve();
+  }
+  @PluginMethod
   public void stopGuardAlarm(PluginCall call) {
     try { BeatTask.clearGuardAlert(getContext()); } catch (Throwable e) {}
     call.resolve();
