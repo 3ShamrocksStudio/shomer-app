@@ -1066,6 +1066,27 @@ body.sheet-open .ff-fab{opacity:0;pointer-events:none;}
 .cm-main{flex:1;min-width:0;}
 .cm-nm{font-size:14px;font-weight:700;color:var(--tx0);display:flex;align-items:center;gap:6px;}
 .cm-rel{font-size:11px;color:var(--tx3);margin-top:1px;}
+.cm-ga{display:block;font-size:10.5px;font-weight:700;color:#c9bcff;margin-top:3px}
+.ga-pick{position:fixed;inset:0;z-index:9500;background:rgba(6,15,30,.72);display:flex;align-items:flex-end;justify-content:center;padding:16px}
+.ga-card{width:100%;max-width:440px;background:var(--n2);border:1px solid var(--b2);border-radius:20px;padding:16px;box-shadow:0 18px 40px rgba(0,0,0,.5)}
+.ga-hd{display:flex;align-items:center;justify-content:space-between;font-size:16px;color:var(--tx0);margin-bottom:6px}
+.ga-x{background:none;border:0;color:var(--tx2);font-size:18px;cursor:pointer;padding:6px}
+.ga-st{font-size:12.5px;color:var(--tx2);margin-bottom:10px}
+.ga-btn{width:100%;display:flex;align-items:center;gap:12px;margin-top:9px;padding:13px 14px;border-radius:14px;border:0;font-family:inherit;text-align:start;cursor:pointer;color:#fff}
+.ga-btn b{display:block;font-size:15.5px;font-weight:900}.ga-btn small{display:block;font-size:12px;opacity:.9;margin-top:2px}
+.ga-bi{display:inline-flex;flex:0 0 auto}
+.ga-check{background:#1670E0}.ga-alert{background:#D98A00}.ga-alarm{background:#D93B3B}
+.ga-stop{width:100%;margin-top:12px;padding:12px;border-radius:12px;border:1.5px solid var(--b2);background:transparent;color:var(--tx0);font-family:inherit;font-weight:800;cursor:pointer}
+.ga-ov{position:fixed;inset:0;z-index:9600;display:flex;align-items:center;justify-content:center;padding:22px;background:rgba(6,15,30,.92)}
+.ga-ov.lv-alert{background:rgba(120,70,0,.94);animation:gaPulse 1.2s infinite}
+.ga-ov.lv-alarm{background:rgba(150,20,20,.95);animation:gaPulse .7s infinite}
+@keyframes gaPulse{50%{filter:brightness(1.35)}}
+.ga-ov-card{width:100%;max-width:400px;text-align:center;color:#fff}
+.ga-ov-ic svg{width:64px;height:64px}
+.ga-ov-t{font-size:24px;font-weight:900;margin:12px 0 8px;line-height:1.3}
+.ga-ov-s{font-size:15px;opacity:.92;margin-bottom:18px;line-height:1.5}
+.ga-ok,.ga-code{width:100%;min-height:60px;border:0;border-radius:16px;background:#fff;color:#0b1730;font-family:inherit;font-size:19px;font-weight:900;cursor:pointer;margin-top:10px}
+.ga-help{width:100%;min-height:52px;border:2px solid rgba(255,255,255,.7);border-radius:16px;background:transparent;color:#fff;font-family:inherit;font-size:16px;font-weight:800;cursor:pointer;margin-top:10px}
 .cm-status{font-size:10px;font-weight:700;margin-top:3px;display:inline-flex;align-items:center;gap:4px;padding:2px 8px;border-radius:6px;}
 .cm-status.mutual{background:rgba(14,136,64,.16);color:#40C880;}
 .cm-status.oneway{background:rgba(192,120,8,.16);color:#C9A84C;}
@@ -3526,7 +3547,7 @@ function deleteAccount(){
  // 2) After a short flush window (lets the remote removes commit while still authed),
  //    sign out, wipe ALL local SHOMER storage incl. the device id, and reload fresh.
  setTimeout(function(){
-   try{ fbNativeBeat({on:false,key:''}); }catch(e){}   /* v299: account removed - the background heartbeat stops too */
+   try{ var _np=shomerNativePlugin(); if(_np&&_np.beat) _np.beat({wipe:true}).catch(function(){}); }catch(e){}   /* v308: account removed - heartbeat and alert checks stop */
    try{ if(window.firebase&&window.firebase.apps&&window.firebase.apps.length){ window.firebase.auth().signOut(); } }catch(e){}
    try{ Object.keys(localStorage).forEach(function(k){ if(/^shomer/i.test(k)||k===SKEY){ try{localStorage.removeItem(k);}catch(e){} } }); }catch(e){}
    try{ localStorage.removeItem(SKEY); localStorage.removeItem('shomerCID'); }catch(e){}
@@ -7134,7 +7155,7 @@ function gSpeakable(t,L){
        .replace(/5-4-3-2-1/g,'خمسة، أربعة، ثلاثة، اثنان، واحد').replace(/~\s*/g,'حوالي ').replace(/بـ\s*(\d)/g,'بالرقم $1')
        .replace(/(\d)\s*[–-]\s*(\d)/g,'$1 إلى $2').replace(/(\d)\s*سم/g,'$1 سنتيمتر').replace(/(\d)\s*ملغ/g,'$1 ملليغرام');
   } else {
-    t=t.replace(/\bAED\b/g,'defibrillator').replace(/\bEMS\b/g,'the ambulance team').replace(/\((?:FAST|RICE|[FAST])\)/g,'').replace(/\bRICE\b/g,'').replace(/\byr\b/g,'year').replace(/\bMDA\b/g,'Magen David Adom').replace(/\bERAN\b/g,'Eran')
+    t=t.replace(/\ban AED\b/g,'a defibrillator').replace(/\bAED\b/g,'defibrillator').replace(/\bEMS\b/g,'the ambulance team').replace(/\((?:FAST|RICE|[FAST])\)/g,'').replace(/\bRICE\b/g,'').replace(/\byr\b/g,'year').replace(/\bMDA\b/g,'Magen David Adom').replace(/\bERAN\b/g,'Eran')
        .replace(/5-4-3-2-1/g,'five, four, three, two, one').replace(/~\s*/g,'about ').replace(/(\d)\s*[–-]\s*(\d)/g,'$1 to $2').replace(/(\d)\s*cm\b/g,'$1 centimetres').replace(/(\d)\s*mg\b/g,'$1 milligrams');
   }
   t=t.replace(/\s*·\s*/g,'. ').replace(/[⇄⛔📞📍•→]/g,' ').replace(/[„”“"״]/g,'').replace(/\s*\/\s*/g,', ').replace(/\s{2,}/g,' ').trim();
@@ -7777,6 +7798,7 @@ function buildMemberRow(m,he){
  <div class="cm-nm">${ESC(memberLabel(m,he))}${(typeof m.rk==='number'&&m.partnerUid)?(' '+drillRankBadge(m.rk)):''}</div>
  <div class="cm-rel">${ESC(m.rel||'')}</div>
  <span class="cm-status ${st.cls}">${st.txt}</span>
+ ${(m.partnerUid&&gaStatusText(m.partnerUid))?`<span class="cm-ga">${ESC(gaStatusText(m.partnerUid))}</span>`:''}
  </div>
  <button class="cm-find" aria-label="${he?'אתר/י':'Locate'}" style="display:none"></button>`;
  /* ── clean action row: four clear buttons, no toggle-soup ── */
@@ -7786,7 +7808,7 @@ function buildMemberRow(m,he){
   ${m.pending ? '' : `<button class="cm-act ${shareOn?'on':''}" data-a="share">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s7-6.2 7-11a7 7 0 1 0-14 0c0 4.8 7 11 7 11Z"/><circle cx="12" cy="10" r="2.4"/></svg>
     <span>${he?'שיתוף מיקום':'Location'}</span></button>
-  <button class="cm-act ${pingOn?'on':''}" data-a="ping">
+  <button class="cm-act on" data-a="ping">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 8a6 6 0 1 0-12 0c0 7-3 8-3 8h18s-3-1-3-8"/><path d="M10.3 21a2 2 0 0 0 3.4 0"/></svg>
     <span>${he?'הכל טוב?':'All good?'}</span></button>
   <button class="cm-act" data-a="locate">
@@ -7806,8 +7828,7 @@ function buildMemberRow(m,he){
      if(a==='share'){ m.shareTo=!(m.shareTo!==false); b.classList.toggle('on',m.shareTo!==false); saveStore();
        toast(he?((m.shareTo!==false?'משתף/ת מיקום עם ':'הפסקת לשתף מיקום עם ')+ESC(m.name)):'Updated', m.shareTo!==false?'grn':'amb');
        try{ gdRenderMarkers(); }catch(e){} return; }
-     if(a==='ping'){ m.ping=!(m.ping!==false); b.classList.toggle('on',m.ping!==false); saveStore();
-       toast(he?((m.ping!==false?'„הכל טוב?” פעיל':'„הכל טוב?” כבוי')+' · '+ESC(m.name)):'Updated', m.ping!==false?'grn':'amb'); return; }
+     if(a==='ping'){ gaOpen(m.id); return; }   /* v308: "All good?" now really asks - plus Alert / Alarm */
      if(a==='resend'){ resendInvite(m.id); return; }
      if(a==='cancel'){ if(confirm(he?'לבטל את ההזמנה? גם אם הקישור ייפתח - לא תחוברו.':'Cancel this invite? Even if the link is opened, you will not be connected.')) removeMember(m.id); return; }
      if(a==='locate'){ flyToMember(m.id); return; }
@@ -8592,8 +8613,168 @@ function clearCircleMarkers(){
  Object.keys(mapLayers.circle).forEach(id=>{if(MAP)MAP.removeLayer(mapLayers.circle[id]);});
  mapLayers.circle={};
 }
+/* ══ v308 GUARDIAN CHECK-IN & DIRECT ALERT ══
+   A linked SHOMER (parent ↔ child, manager ↔ leader) can:
+     • check  - ask "All good?"; the other side answers with one tap ("All good" / "I need help")
+     • alert  - loud repeating alert on their phone
+     • alarm  - full emergency alarm on their phone
+   Alert / alarm stop ONLY with the receiver's own cancel code (or remotely by the sender). The sender is told the
+   moment it is answered or stopped. Only accepted from people the receiver has linked with (consent). Carried on
+   ping/<receiver>/<sender> (readable only by the receiver); answers go back on ping/<sender>/<receiver>. */
+var GA_FRESH=15*60000, GA_NOANS=2*60000;
+function gaT(he,ar,en){ return currentLang==='he'?he:currentLang==='ar'?ar:en; }
+function gaLinked(uid){ try{ return (gdState().pairs||[]).some(function(p){ return p&&p.partnerUid===uid&&p.linked&&!p.pending; }); }catch(e){ return false; } }
+function gaOut(){ SS.gaOut=SS.gaOut||{}; return SS.gaOut; }
+function gaSeen(id){ SS.gaSeen=SS.gaSeen||[]; return SS.gaSeen.indexOf(id)>=0; }
+function gaMarkSeen(id){ SS.gaSeen=SS.gaSeen||[]; SS.gaSeen.push(id); if(SS.gaSeen.length>40) SS.gaSeen=SS.gaSeen.slice(-40); try{saveStore();}catch(e){} }
+function gaMyName(){ return ((SS.user&&SS.user.name)||'').slice(0,40); }
+function gaWrite(toUid,rec){ return fbRestWrite('PUT','ping/'+toUid+'/'+FB.uid,rec); }
+/* ── sender ── */
+function gaSend(m,level){
+  if(!m||!m.partnerUid){ toast(gaT('אפשר לשלוח רק לשומר/ת מקושר/ת','يمكن الإرسال فقط لحارس مرتبط','Only for a linked SHOMER'),'amb'); return; }
+  if(typeof FB==='undefined'||!FB.ready||!FB.uid){ toast(gaT('אין חיבור - נסה/י שוב','لا اتصال - حاول مجددًا','No connection - try again'),'amb'); return; }
+  try{ if(isReviewAccount()){ toast(gaT('חשבון בדיקה - לא נשלח','حساب تجريبي - لم يُرسل','Test account - not sent'),'amb'); return; } }catch(e){}
+  if(level==='alarm' && !confirm(gaT('לשלוח אזעקת חירום מלאה ל-'+(m.name||'')+'? היא תיעצר רק בקוד הביטול שלו/ה או ממך.','إرسال إنذار طوارئ كامل إلى '+(m.name||'')+'؟ لن يتوقف إلا برمز الإلغاء الخاص به أو منك.','Send a full emergency alarm to '+(m.name||'')+'? It stops only with their cancel code, or from you.'))) return;
+  var id=fbDashKey('ga'), now=Date.now();
+  var rec={name:gaMyName(),ts:now,level:level,id:id};
+  gaWrite(m.partnerUid,rec).then(function(){
+    gaOut()[m.partnerUid]={id:id,level:level,ts:now,st:'sent',name:m.name||''}; try{saveStore();}catch(e){}
+    if(level!=='check'){ try{ fbRestWrite('POST','alarms',{fromUid:FB.uid,toUid:m.partnerUid,ts:now,tag:'ga-'+level,
+        title:(level==='alarm'?'🚨 ':'🔔 ')+'SH✡MER - '+gaMyName(),
+        body:level==='alarm'?gaT('אזעקת חירום - פתח/י והזן/י קוד ביטול','إنذار طوارئ - افتح وأدخل رمز الإلغاء','Emergency alarm - open and enter your cancel code'):gaT('התראה דחופה - פתח/י והזן/י קוד ביטול','تنبيه عاجل - افتح وأدخل رمز الإلغاء','Urgent alert - open and enter your cancel code')}); }catch(e){} }
+    toast(level==='check'?gaT('✓ נשאל/ה „הכל טוב?” - '+(m.name||''),'✓ تم السؤال «كل شيء بخير؟» - '+(m.name||''),'✓ Asked "All good?" - '+(m.name||''))
+      :level==='alarm'?gaT('🚨 אזעקה נשלחה ל-'+(m.name||''),'🚨 أُرسل الإنذار إلى '+(m.name||''),'🚨 Alarm sent to '+(m.name||''))
+      :gaT('🔔 התראה נשלחה ל-'+(m.name||''),'🔔 أُرسل التنبيه إلى '+(m.name||''),'🔔 Alert sent to '+(m.name||'')),'grn');
+    setTimeout(function(){ var o=gaOut()[m.partnerUid]; if(o&&o.id===id&&o.st==='sent'){ o.st='noans'; try{saveStore();}catch(e){}
+      toast(gaT('⚠ '+(m.name||'')+' עדיין לא ענה/תה. אפשר לשלוח התראה או אזעקה.','⚠ '+(m.name||'')+' لم يردّ بعد. يمكنك إرسال تنبيه أو إنذار.','⚠ '+(m.name||'')+' has not answered yet. You can send an alert or alarm.'),'amb',function(){ gaOpen(m.id); });
+      try{ pushNotify('SH✡MER',gaT((m.name||'')+' לא ענה/תה','لم يردّ '+(m.name||''),(m.name||'')+' has not answered'),'ga-noans'); }catch(e){}
+      try{ renderCircles(); }catch(e){} } }, GA_NOANS);
+    try{ renderCircles(); }catch(e){} try{ gaCloseSheet(); }catch(e){}
+  }).catch(function(){ toast(gaT('השליחה נכשלה - נסה/י שוב','فشل الإرسال - حاول مجددًا','Sending failed - try again'),'amb'); });
+}
+function gaStopRemote(m){
+  var o=gaOut()[m.partnerUid]; if(!o) return;
+  gaWrite(m.partnerUid,{name:gaMyName(),ts:Date.now(),level:'stop',id:o.id}).then(function(){ o.st='stopped'; try{saveStore();}catch(e){} toast(gaT('ההתראה נעצרה מרחוק','تم إيقاف التنبيه عن بُعد','Stopped remotely'),'grn'); try{ renderCircles(); }catch(e){} gaCloseSheet(); }).catch(function(){});
+}
+function gaStatusText(uid){
+  var o=gaOut()[uid]; if(!o||Date.now()-o.ts>12*3600000) return '';
+  var t=new Date(o.ats||o.ts), hm=('0'+t.getHours()).slice(-2)+':'+('0'+t.getMinutes()).slice(-2);
+  return o.st==='ok'?gaT('✓ ענה/תה: הכל טוב · '+hm,'✓ ردّ: كل شيء بخير · '+hm,'✓ Answered: all good · '+hm)
+    :o.st==='help'?gaT('🆘 ביקש/ה עזרה · '+hm,'🆘 طلب المساعدة · '+hm,'🆘 Asked for help · '+hm)
+    :o.st==='coded'?gaT('✓ עצר/ה בקוד הביטול · '+hm,'✓ أوقفه برمز الإلغاء · '+hm,'✓ Stopped it with their code · '+hm)
+    :o.st==='stopped'?gaT('נעצר מרחוק · '+hm,'أوقف عن بُعد · '+hm,'Stopped remotely · '+hm)
+    :o.st==='noans'?gaT('⚠ לא ענה/תה · '+hm,'⚠ لم يردّ · '+hm,'⚠ No answer · '+hm)
+    :gaT('⏳ ממתין לתשובה · '+hm,'⏳ بانتظار الرد · '+hm,'⏳ Waiting for an answer · '+hm);
+}
+function gaCloseSheet(){ var e=document.getElementById('ga-pick'); if(e){ e.remove(); try{ shHistDrop(); }catch(_){} } }
+function gaOpen(memberId){
+  var m=memberById(memberId); if(!m) return;
+  if(!m.partnerUid||m.pending){ toast(gaT('זמין אחרי שהשומר/ת מאשר/ת את החיבור','متاح بعد أن يقبل الحارس الربط','Available once they accept the link'),'amb'); return; }
+  gaCloseSheet();
+  var o=gaOut()[m.partnerUid], active=o&&(o.level!=='check')&&(o.st==='sent'||o.st==='noans');
+  var d=document.createElement('div'); d.id='ga-pick'; d.className='ga-pick'; d.setAttribute('role','dialog'); d.setAttribute('aria-modal','true');
+  d.innerHTML='<div class="ga-card"><div class="ga-hd"><b>'+ESC(m.name||'')+'</b><button type="button" class="ga-x" aria-label="close">✕</button></div>'
+   +(gaStatusText(m.partnerUid)?'<div class="ga-st">'+ESC(gaStatusText(m.partnerUid))+'</div>':'')
+   +'<button type="button" class="ga-btn ga-check" data-l="check"><span class="ga-bi">'+gReadIcon2('check')+'</span><span><b>'+gaT('הכל טוב?','كل شيء بخير؟','All good?')+'</b><small>'+gaT('שאלה שקטה - עונים בלחיצה','سؤال هادئ - الرد بلمسة','A quiet question - one-tap answer')+'</small></span></button>'
+   +'<button type="button" class="ga-btn ga-alert" data-l="alert"><span class="ga-bi">'+gReadIcon2('bell')+'</span><span><b>'+gaT('התראה','تنبيه','Alert')+'</b><small>'+gaT('צליל חזק ורטט עד שמזינים קוד ביטול','صوت عالٍ واهتزاز حتى إدخال رمز الإلغاء','Loud sound and vibration until their cancel code')+'</small></span></button>'
+   +'<button type="button" class="ga-btn ga-alarm" data-l="alarm"><span class="ga-bi">'+gReadIcon2('siren')+'</span><span><b>'+gaT('אזעקה','إنذار','Alarm')+'</b><small>'+gaT('אזעקת חירום מלאה עד שמזינים קוד ביטול','إنذار طوارئ كامل حتى إدخال رمز الإلغاء','Full emergency alarm until their cancel code')+'</small></span></button>'
+   +(active?'<button type="button" class="ga-stop">'+gaT('עצור/י את ההתראה מרחוק','أوقف التنبيه عن بُعد','Stop it remotely')+'</button>':'')
+   +'</div>';
+  document.body.appendChild(d); try{ shHistPush(); }catch(e){}
+  d.querySelector('.ga-x').onclick=gaCloseSheet;
+  d.addEventListener('click',function(ev){ if(ev.target===d) gaCloseSheet(); });
+  d.querySelectorAll('.ga-btn').forEach(function(b){ b.onclick=function(){ gaSend(m,b.getAttribute('data-l')); }; });
+  var st=d.querySelector('.ga-stop'); if(st) st.onclick=function(){ gaStopRemote(m); };
+}
+function gReadIcon2(k){ var P={check:'<path d="M12 21s7-6.2 7-11a7 7 0 1 0-14 0c0 4.8 7 11 7 11Z" fill="none" stroke="currentColor" stroke-width="2"/><path d="M9 10l2 2 4-4" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>',
+  bell:'<path d="M18 8a6 6 0 1 0-12 0c0 7-3 8-3 8h18s-3-1-3-8" fill="none" stroke="currentColor" stroke-width="2"/><path d="M10.3 21a2 2 0 0 0 3.4 0" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>',
+  siren:'<path d="M7 18v-6a5 5 0 0 1 10 0v6" fill="none" stroke="currentColor" stroke-width="2"/><path d="M5 18h14v3H5zM12 3v2M4.2 6.2l1.4 1.4M19.8 6.2l-1.4 1.4" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>'};
+  return '<svg viewBox="0 0 24 24" width="24" height="24" aria-hidden="true">'+P[k]+'</svg>'; }
+/* ── receiver ── */
+var gaCur=null, _gaBeepT=null;
+function gaListen(){
+  if(FB._gaListen||!FB.ready||!FB.uid) return; FB._gaListen=true;
+  try{ FB.db.ref('ping/'+FB.uid).on('value',function(snap){ var all=(snap&&snap.val&&snap.val())||{}; Object.keys(all).forEach(function(from){ try{ gaHandle(from,all[from]); }catch(e){} }); }); }catch(e){}
+}
+function gaHandle(from,v){
+  if(!v||typeof v!=='object'||!v.id) return;
+  if(!gaLinked(from)) return;                                    /* only people I chose to link with */
+  if(v.level==='ok'||v.level==='help'||v.level==='coded'){        /* an answer to something I sent */
+    var o=gaOut()[from]; if(!o||o.id!==v.re||o.st===v.level) return;
+    o.st=v.level; o.ats=v.ts||Date.now(); try{saveStore();}catch(e){}
+    var nm=o.name||v.name||'';
+    var msg=v.level==='help'?gaT('🆘 '+nm+' ביקש/ה עזרה!','🆘 '+nm+' طلب المساعدة!','🆘 '+nm+' asked for help!')
+      :v.level==='coded'?gaT('✓ '+nm+' עצר/ה את ההתראה בקוד הביטול - הכל בסדר','✓ أوقف '+nm+' التنبيه برمز الإلغاء - كل شيء بخير','✓ '+nm+' stopped the alert with their code - all good')
+      :gaT('✓ '+nm+': הכל טוב','✓ '+nm+': كل شيء بخير','✓ '+nm+': all good');
+    toast(msg,v.level==='help'?'red':'grn'); try{ pushNotify('SH✡MER',msg,'ga-ans'); }catch(e){}
+    if(v.level==='help'){ try{ playCue('join'); if(navigator.vibrate) navigator.vibrate([400,150,400]); }catch(e){} }
+    try{ renderCircles(); }catch(e){} return;
+  }
+  if(v.level==='stop'){ if(gaCur&&gaCur.id===v.id){ gaEnd('remote'); } gaMarkSeen(v.id); return; }
+  if(['check','alert','alarm'].indexOf(v.level)<0) return;
+  if(gaSeen(v.id)||Date.now()-(v.ts||0)>GA_FRESH) return;
+  if(gaCur&&gaCur.id===v.id) return;
+  if(gaCur&&(gaCur.level==='alarm'||(gaCur.level==='alert'&&v.level==='check'))) return;   /* never downgrade what is ringing */
+  gaShow(from,v);
+}
+function gaShow(from,v){
+  if(gaCur) gaEnd('replaced',true);
+  gaCur={from:from,id:v.id,level:v.level,name:v.name||''};
+  var nm=ESC(v.name||gaT('השומר/ת שלך','حارسك','Your SHOMER'));
+  var d=document.createElement('div'); d.id='ga-ov'; d.className='ga-ov lv-'+v.level; d.setAttribute('role','alertdialog'); d.setAttribute('aria-modal','true');
+  if(v.level==='check'){
+    d.innerHTML='<div class="ga-ov-card"><div class="ga-ov-ic">'+gReadIcon2('check')+'</div><div class="ga-ov-t">'+gaT(nm+' שואל/ת: הכל טוב?',nm+' يسأل: كل شيء بخير؟',nm+' asks: all good?')+'</div>'
+      +'<button type="button" class="ga-ok">✓ '+gaT('הכל טוב','كل شيء بخير','All good')+'</button>'
+      +'<button type="button" class="ga-help">🆘 '+gaT('אני צריך/ה עזרה','أحتاج مساعدة','I need help')+'</button></div>';
+  } else {
+    d.innerHTML='<div class="ga-ov-card"><div class="ga-ov-ic">'+gReadIcon2(v.level==='alarm'?'siren':'bell')+'</div>'
+      +'<div class="ga-ov-t">'+(v.level==='alarm'?gaT('אזעקת חירום מ'+nm,'إنذار طوارئ من '+nm,'Emergency alarm from '+nm):gaT(nm+' מנסה להשיג אותך',nm+' يحاول الوصول إليك',nm+' is trying to reach you'))+'</div>'
+      +'<div class="ga-ov-s">'+gaT('כדי לעצור - הזן/י את קוד הביטול שלך. '+nm+' יקבל/תקבל הודעה שהכל בסדר.','للإيقاف - أدخل رمز الإلغاء. سيتلقى '+nm+' رسالة بأن كل شيء بخير.','To stop it, enter your cancel code. '+nm+' will be told you are OK.')+'</div>'
+      +'<button type="button" class="ga-code">'+(_pinHas()?gaT('עצור/י עם קוד ביטול','أوقف برمز الإلغاء','Stop with cancel code'):gaT('קבע/י קוד ביטול ועצור/י','اضبط رمز الإلغاء وأوقف','Set a cancel code and stop'))+'</button>'
+      +'<button type="button" class="ga-help">🆘 '+gaT('אני צריך/ה עזרה','أحتاج مساعدة','I need help')+'</button></div>';
+  }
+  var old=document.getElementById('ga-ov'); if(old) old.remove();
+  document.body.appendChild(d);
+  try{ acquireWake(); }catch(e){}
+  if(v.level==='check'){ try{ playCue('join'); if(navigator.vibrate) navigator.vibrate([200,100,200]); }catch(e){} }
+  else gaSound(v.level);
+  var ok=d.querySelector('.ga-ok'); if(ok) ok.onclick=function(){ gaAnswer('ok'); gaEnd('answered'); };
+  var hp=d.querySelector('.ga-help'); if(hp) hp.onclick=function(){ gaAnswer('help'); gaEnd('help'); toast(gaT('✓ '+(v.name||'')+' קיבל/ה את בקשת העזרה שלך','✓ تلقّى '+(v.name||'')+' طلب المساعدة','✓ '+(v.name||'')+' got your request for help'),'grn'); };
+  var cd=d.querySelector('.ga-code'); if(cd) cd.onclick=function(){
+    var cb=function(){ gaAnswer('coded'); gaEnd('coded'); toast(gaT('✓ נעצר. '+(v.name||'')+' יודע/ת שהכל בסדר.','✓ تم الإيقاف. يعرف '+(v.name||'')+' أن كل شيء بخير.','✓ Stopped. '+(v.name||'')+' knows you are OK.'),'grn'); };
+    if(_pinHas()) openSosPin(cb,{ttl:gaT('עצירת ההתראה','إيقاف التنبيه','Stop the alert'),sub:gaT('הזן/י את קוד הביטול שלך.','أدخل رمز الإلغاء.','Enter your cancel code.'),
+      forgot:gaT('אין עקיפה לקוד. בקש/י מ'+(v.name||'השומר/ת')+' לעצור את ההתראה מרחוק, ואחר כך הגדר/י קוד חדש בהגדרות.','لا يمكن تجاوز الرمز. اطلب من '+(v.name||'حارسك')+' إيقاف التنبيه عن بُعد، ثم اضبط رمزًا جديدًا في الإعدادات.','The code cannot be bypassed. Ask '+(v.name||'your SHOMER')+' to stop it remotely, then set a new code in Settings.')});
+    else openSetPin(cb);
+  };
+  try{ pushNotify('SH✡MER',(v.level==='check'?gaT('הכל טוב? - ','كل شيء بخير؟ - ','All good? - '):v.level==='alarm'?'🚨 ':'🔔 ')+(v.name||''),'ga-in'); }catch(e){}
+}
+function gaSound(level){
+  var np=null; try{ np=shomerNativePlugin(); }catch(e){}
+  if(np&&typeof np.startGuardAlarm==='function'){ try{ np.startGuardAlarm({level:level}).catch(function(){}); }catch(e){} }
+  if(level==='alarm' && !(typeof sosActive!=='undefined'&&sosActive)){ try{ startSosAlarm(); }catch(e){} return; }
+  clearInterval(_gaBeepT);
+  var beep=function(){ try{ var AC=window.AudioContext||window.webkitAudioContext; var c=gaSound._c||(gaSound._c=new AC()); if(c.state==='suspended') c.resume(); var t0=c.currentTime;
+      [[988,0],[740,.22],[988,.44],[740,.66]].forEach(function(p){ var o=c.createOscillator(), g=c.createGain(); o.type='square'; o.frequency.value=p[0]; g.gain.setValueAtTime(0.0001,t0+p[1]); g.gain.linearRampToValueAtTime(0.35,t0+p[1]+0.01); g.gain.setValueAtTime(0.35,t0+p[1]+0.18); g.gain.linearRampToValueAtTime(0.0001,t0+p[1]+0.2); o.connect(g); g.connect(c.destination); o.start(t0+p[1]); o.stop(t0+p[1]+0.21); }); }catch(e){}
+    try{ if(navigator.vibrate) navigator.vibrate([300,120,300,120,300]); }catch(e){} };
+  beep(); _gaBeepT=setInterval(beep,1800);
+}
+function gaSoundStop(){
+  clearInterval(_gaBeepT); _gaBeepT=null;
+  if(!(typeof sosActive!=='undefined'&&sosActive)){ try{ var np=shomerNativePlugin(); if(np&&typeof np.stopGuardAlarm==='function') np.stopGuardAlarm().catch(function(){}); }catch(e){} }   /* never silence my own running SOS */
+  if(gaCur&&gaCur.level==='alarm'&&!(typeof sosActive!=='undefined'&&sosActive)){ try{ stopSosAlarm(); }catch(e){} }
+  try{ if(navigator.vibrate) navigator.vibrate(0); }catch(e){}
+}
+function gaAnswer(kind){ if(!gaCur) return; try{ gaWrite(gaCur.from,{name:gaMyName(),ts:Date.now(),level:kind,re:gaCur.id,id:fbDashKey('gr')}).catch(function(){}); }catch(e){} }
+function gaEnd(why,keep){
+  if(!gaCur) return;
+  gaSoundStop(); gaMarkSeen(gaCur.id);
+  var d=document.getElementById('ga-ov'); if(d) d.remove();
+  if(why==='remote') toast(gaT((gaCur.name||'השומר/ת')+' עצר/ה את ההתראה',(gaCur.name||'حارسك')+' أوقف التنبيه',(gaCur.name||'Your SHOMER')+' stopped the alert'),'');
+  gaCur=null;
+  try{ if(!(typeof sosActive!=='undefined'&&sosActive)) releaseWake(); }catch(e){}
+}
 /* ══ MAP INTERACTIONS - tapping a SHOMER actually does something now ══ */
-function pingMember(id){
+function pingMember(id){ var _m=memberById(id); if(_m&&_m.partnerUid&&!_m.pending){ gaOpen(id); return; }
   var m=memberById(id); if(!m)return;
   var he=currentLang==='he';
   if(m.ping===false){ toast(he?'בדיקת שלום כבויה עבור '+ESC(m.name):'Ping-pong is off for '+m.name,'amb'); return; }
@@ -10403,7 +10584,7 @@ try{ hydrateIcons(document); }catch(e){}
 /* Loaded-build version - shown in the diagnostic panel so a phone can prove
    whether it's on the latest build or a STALE cached one. Keep in lock-step
    with sw.js SW_VERSION on every deploy. */
-var APP_VER='v307';
+var APP_VER='v308';
 var FB={ready:false,uid:null,db:null,_presTimer:null,connected:false,listening:false,pushState:'default',near:0,swVer:'?',
   authState:'connecting',sdkLoaded:false,persist:'',permErr:null,err:null,wsProbe:'',csp:''};
 /* Always log connection diagnostics to the console so the real failure can be SEEN in Chrome. */
@@ -10791,6 +10972,7 @@ function dashFeedPush(id,type,lat,lng){
 var FB_SSE_MAX=3;
 function fbStreamPrio(path){
   if(/^sos\/[^\/]+$/.test(path)) return 'top';                                              // v262: a paired person's SOS record - works in BOTH directions
+  if(/^ping\/[^\/]+$/.test(path)) return 'top';                                            // v308: guardian check-in / alerts to ME - live, like a partner's SOS
   if(path==='sos'||/^pairs\//.test(path)||/^invites\/sos_/.test(path)) return 'high';      // SOS fan-out + my pairings
   if(/^invites\/(sd_|rp_)/.test(path)||/^responders\//.test(path)) return 'urgent-poll';   // only matter during an SOS
   if(path==='founders') return 'rare';
@@ -11058,6 +11240,7 @@ function fbOnAuthed(uid){
   try{ fbStartPresence(); }catch(e){}
   try{ fbListenSOS(); }catch(e){}
   try{ fbListenPairs(); }catch(e){}
+  try{ gaListen(); }catch(e){}   /* v308: guardian check-in / alerts */
   try{ purgeStalePositions(); }catch(e){}
   try{ essLoad(); essChipsBuild(); }catch(e){}
   /* v272: wait for a real GPS fix before asking for nearby services (it used to give up at 3.5s) */
@@ -11253,8 +11436,8 @@ function fbNativeBeat(o){
     var np=shomerNativePlugin(); if(!np||typeof np.beat!=='function') return;
     var rt=(FB.authUser&&FB.authUser.refreshToken)||'';
     var sig=[o.on,o.key,o.lat,o.lng,rt].join('|'); if(sig===fbNativeBeat._sig) return; fbNativeBeat._sig=sig;
-    var cfg={on:!!o.on,key:o.key||''};
-    if(o.on){ cfg.lat=o.lat; cfg.lng=o.lng; cfg.uid=FB.uid||''; cfg.dev=fbDevTag(); cfg.rt=rt; cfg.apiKey=(window.SHOMER_FB&&window.SHOMER_FB.apiKey)||''; cfg.db=(window.SHOMER_FB&&window.SHOMER_FB.databaseURL)||''; }
+    var cfg={on:!!o.on,key:o.key||'',uid:FB.uid||'',dev:fbDevTag(),rt:rt,apiKey:(window.SHOMER_FB&&window.SHOMER_FB.apiKey)||'',db:(window.SHOMER_FB&&window.SHOMER_FB.databaseURL)||''};   /* v308: sign-in always handed over - guardian alerts reach a locked phone even in ghost mode */
+    if(o.on){ cfg.lat=o.lat; cfg.lng=o.lng; }
     np.beat(cfg).catch(function(){});
   }catch(e){}
 }
