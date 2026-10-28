@@ -27,6 +27,12 @@ public class MainActivity extends BridgeActivity {
   static volatile MainActivity sActive;
 
   @Override
+  public void onResume() { super.onResume(); BeatTask.webForeground = true; }
+
+  @Override
+  public void onPause() { BeatTask.webForeground = false; super.onPause(); }
+
+  @Override
   public void onDestroy() {
     if (sActive == this) sActive = null;
     super.onDestroy();

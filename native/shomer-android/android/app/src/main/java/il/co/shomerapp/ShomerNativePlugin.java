@@ -65,6 +65,13 @@ public class ShomerNativePlugin extends Plugin {
     call.resolve();
   }
 
+  /** Dashboard heartbeat settings from the web app (see BeatTask). */
+  @PluginMethod
+  public void beat(PluginCall call) {
+    try { BeatTask.configure(getContext(), new org.json.JSONObject(call.getData().toString())); } catch (Throwable e) {}
+    call.resolve();
+  }
+
   @PluginMethod
   public void disableBackgroundShake(PluginCall call) {
     getContext().stopService(new Intent(getContext(), ShakeService.class));

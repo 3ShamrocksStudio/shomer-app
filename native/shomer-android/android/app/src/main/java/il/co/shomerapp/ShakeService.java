@@ -67,6 +67,7 @@ public class ShakeService extends Service implements SensorEventListener {
         if (acc != null) sm.registerListener(this, acc, SensorManager.SENSOR_DELAY_GAME);
       }
     }
+    try { BeatTask.start(this); } catch (Throwable e) {}   // keep this phone visible on the dashboard while the app is off-screen
     return START_STICKY;
   }
 
@@ -180,6 +181,7 @@ public class ShakeService extends Service implements SensorEventListener {
     try { if (sm != null) sm.unregisterListener(this); } catch (Exception e) {}
     try { if (wl != null && wl.isHeld()) wl.release(); } catch (Exception e) {}
     try { AlarmPlayer.stop(this); } catch (Exception e) {}
+    try { BeatTask.stop(); } catch (Throwable e) {}
     super.onDestroy();
   }
 
