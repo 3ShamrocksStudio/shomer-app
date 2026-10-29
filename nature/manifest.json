@@ -1,22 +1,14 @@
 {
   "name": "SH✡MER Nature",
   "short_name": "SH✡MER Nature",
-  "description": "רשת שמירה לטבע, חוף ים, בעלי חיים וסביבה",
-  "start_url": "/nature/nature.html",
-  "scope": "/nature/",
+  "description": "עזרה לבעלי חיים ולטבע: דיווח על חיה פצועה, שריפה או פסולת, SOS לטיול ומדריכי עזרה ראשונה",
+  "start_url": "nature.html",
+  "scope": "./",
   "display": "standalone",
-  "background_color": "#0A2010",
-  "theme_color": "#0A2010",
+  "background_color": "#FAF6EC",
+  "theme_color": "#FAF6EC",
   "icons": [
-    {
-      "src": "/nature/icon-192.png",
-      "sizes": "192x192",
-      "type": "image/png"
-    },
-    {
-      "src": "/nature/icon-512.png",
-      "sizes": "512x512",
-      "type": "image/png"
-    }
+    { "src": "icon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png" }
   ]
 }
