@@ -4,355 +4,561 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>SH✡MER Nature — שומרים על מי שאין לו קול</title>
-<meta name="description" content="אותה רשת שמירה — הפעם ליער, לחוף, לחי ולסביבה.">
-<link rel="icon" href="badge-192.png">
+<meta name="description" content="SH✡MER Nature: עזרה לבעלי חיים, לטבע ולאנשים בשטח. מדווחים על חיה פצועה, שריפה או פסולת, SOS לטיול ומדריכי עזרה ראשונה. חינם.">
+<meta name="theme-color" content="#F7F3E8">
+<meta property="og:title" content="SH✡MER Nature — שומרים על מי שאין לו קול">
+<meta property="og:description" content="עזרה לבעלי חיים, לטבע ולאנשים בשטח.">
+<meta property="og:image" content="https://www.shomer-app.co.il/nature-v2/img/hero-wide.jpg">
+<link rel="icon" href="nature-v2/img/badge.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;500;700;800;900&display=swap" rel="stylesheet">
 <style>
 :root{
-  /* NAVY IS THE BASE. Light bands break it, they do not replace it. */
-  --n0:#08120C; --n1:#0F1712; --n2:#16241A; --n3:#1E3324; --n5:#2A4A33;
-  --tx0:#F1F7F0; --tx1:#C2D6C2; --tx2:#7E947F;
-  --au1:#3A9E18; --au2:#50DB0F; --au3:#8EF25A;
-  --au-grad:linear-gradient(135deg,#2F8A10,#50DB0F,#8EF25A);
-  /* light break bands */
-  --stone:#E9F0E6; --stone2:#DCE6D8; --ink-on-light:#12200F; --ink2-on-light:#46543F;
-  --sos:#D93B3B;
-  --s1:8px;--s2:16px;--s3:24px;--s4:40px;--s5:64px;--s6:96px;--s7:128px;
+  /* SH✡MER Nature: light, natural, calm. Sand base, fresh leaf greens, sky, earth. Gold star = SH✡MER family. */
+  --sand:#FAF6EC; --sand2:#F2EBDB; --paper:#FFFFFF;
+  --leaf:#2F8540; --leaf2:#4FA85C; --leaf-t:#E6F2DF; --leaf-tx:#276E36;
+  --sky:#E2F0F8; --sky-d:#2A78A8; --earth:#8A6A44; --earth-t:#F3E9DA;
+  --gold:#E0A828;
+  --ink:#1F2B24; --ink2:#4D5B52; --ink3:#6E7A71; --line:#E4DCCB;
+  --sos:#C93636;
+  --r:22px; --sh:0 18px 40px -26px rgba(48,60,40,.45);
 }
 *{margin:0;padding:0;box-sizing:border-box}
 html{scroll-behavior:smooth;-webkit-text-size-adjust:100%;overflow-x:hidden}
-body{background:var(--n0);color:var(--tx0);font-family:'Heebo',sans-serif;font-weight:400;
-  font-size:17px;line-height:1.65;-webkit-font-smoothing:antialiased}
+body{background:var(--sand);color:var(--ink);font-family:'Heebo',system-ui,sans-serif;font-size:17px;
+  line-height:1.65;-webkit-font-smoothing:antialiased;overflow-x:hidden}
 a{color:inherit;text-decoration:none} img{display:block;max-width:100%}
-.w{width:min(1100px,90vw);margin-inline:auto}
-.wn{width:min(820px,90vw);margin-inline:auto}
-a:focus-visible,button:focus-visible{outline:2px solid var(--au2);outline-offset:3px}
+button{font:inherit;color:inherit}
+.w{width:min(1120px,100% - 32px);margin-inline:auto}
+:focus-visible{outline:3px solid var(--sky-d);outline-offset:3px;border-radius:6px}
+.wm{font-weight:900;letter-spacing:.02em;white-space:nowrap;unicode-bidi:isolate}
+.wm .st{color:var(--gold)} .wm em{font-style:italic;font-weight:800;color:var(--leaf2);margin-inline-start:.22em}
+.eyebrow{display:inline-flex;align-items:center;gap:8px;font-size:13px;font-weight:700;letter-spacing:.06em;
+  color:var(--leaf-tx);background:var(--leaf-t);border-radius:999px;padding:5px 14px}
+.h1{font-size:clamp(36px,6.2vw,64px);font-weight:900;line-height:1.08;letter-spacing:-.03em}
+.h2{font-size:clamp(28px,4vw,42px);font-weight:800;line-height:1.15;letter-spacing:-.02em}
+.lead{font-size:clamp(18px,2vw,20px);color:var(--ink2);line-height:1.6}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:10px;min-height:52px;padding:0 28px;
+  border:0;border-radius:999px;background:var(--leaf);color:#fff;font-weight:700;font-size:16px;cursor:pointer;
+  transition:transform .18s ease,box-shadow .18s ease,background .18s}
+.btn:hover{background:#28763A;transform:translateY(-1px);box-shadow:0 12px 26px -14px rgba(47,133,64,.8)}
+.btn svg{width:20px;height:20px;flex:none}
+.btn-ghost{background:transparent;color:var(--leaf-tx);border:1.5px solid #BFD8B8}
+.btn-ghost:hover{background:var(--leaf-t);box-shadow:none}
+.btn-sm{min-height:44px;padding:0 18px;font-size:15px}
+.ic{width:26px;height:26px;fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
 
-.eyebrow{font-size:12px;font-weight:800;letter-spacing:.2em;color:var(--au3)}
-.h1{font-size:clamp(38px,7.4vw,72px);font-weight:900;line-height:1.06;letter-spacing:-.035em}
-.h2{font-size:clamp(27px,4.4vw,44px);font-weight:800;line-height:1.15;letter-spacing:-.028em}
-.h3{font-size:20px;font-weight:700;letter-spacing:-.015em}
-.lead{font-size:clamp(18px,2.2vw,21px);color:var(--tx1);line-height:1.6;font-weight:300}
-.body{color:var(--tx1);line-height:1.7}
+/* NAV */
+nav{position:sticky;top:0;z-index:40;background:rgba(250,246,236,.92);backdrop-filter:blur(12px);
+  border-bottom:1px solid var(--line)}
+.nav-in{display:flex;align-items:center;justify-content:space-between;gap:12px;height:64px}
+.brand{display:flex;align-items:center;gap:10px;font-size:18px;min-width:0}
+.brand img{width:36px;height:36px}
+.nav-r{display:flex;align-items:center;gap:6px}
+.lang{display:flex}
+.lang button{min-width:40px;height:44px;border:0;background:none;color:var(--ink3);font-size:13px;font-weight:500;cursor:pointer}
+.lang button.on{color:var(--leaf-tx);font-weight:800}
 
-nav{position:fixed;inset-inline:0;top:0;z-index:60;background:rgba(8,18,12,.92);
-  backdrop-filter:blur(14px);border-bottom:1px solid rgba(80,219,15,.18)}
-.nav-in{display:flex;align-items:center;justify-content:space-between;height:62px}
-.brand{display:flex;align-items:center;gap:9px;font-weight:900;font-size:17px;letter-spacing:.03em}
-.brand img{width:32px;height:32px} .brand i{font-style:normal;color:var(--au3)}
-.nav-r{display:flex;align-items:center;gap:var(--s1)}
-.lang button{width:44px;height:44px;border:0;background:none;color:var(--tx2);
-  font:500 12px/1 'Heebo',sans-serif;cursor:pointer}
-.lang button.on{color:var(--au3);font-weight:800}
-.btn{display:inline-flex;align-items:center;justify-content:center;gap:9px;min-height:52px;
-  padding:0 var(--s4);background:var(--au-grad);color:var(--n0);border-radius:999px;
-  font-weight:700;font-size:16px;transition:transform .18s ease,box-shadow .18s ease}
-.btn:hover{transform:translateY(-2px);box-shadow:0 14px 34px -12px rgba(80,219,15,.55)}
-.btn svg{width:17px;height:17px;stroke-width:2.3}
-.btn-sm{min-height:44px;padding:0 var(--s3);font-size:14px}
+/* HERO */
+.hero{padding:48px 0 64px;background:linear-gradient(180deg,var(--sky) 0%,var(--sand) 70%)}
+.hero-in{display:grid;grid-template-columns:1.05fr .95fr;gap:48px;align-items:center}
+.hero .h1{margin:18px 0 18px}
+.hero .lead{max-width:34ch}
+.hero-cta{display:flex;flex-wrap:wrap;gap:12px;margin-top:30px}
+.hero-meta{margin-top:18px;font-size:14px;color:var(--ink3)}
+.hero-pic{position:relative;border-radius:28px;overflow:hidden;box-shadow:var(--sh);aspect-ratio:800/724;background:var(--sand2)}
+.hero-pic img{width:100%;height:100%;object-fit:cover}
+.hero-pic picture{display:block;height:100%}
+.hero-pic .tag{position:absolute;inset-inline-start:16px;bottom:16px;background:rgba(255,255,255,.94);
+  border-radius:16px;padding:10px 14px;display:flex;align-items:center;gap:10px;font-size:14px;font-weight:600;
+  box-shadow:0 10px 24px -16px rgba(0,0,0,.4);max-width:calc(100% - 32px)}
+.hero-pic .tag .dot{width:34px;height:34px;border-radius:50%;background:var(--earth-t);color:var(--earth);
+  display:flex;align-items:center;justify-content:center;flex:none}
+.hero-pic .tag .ic{width:20px;height:20px}
 
-/* HERO — photo, slogan, one action. Trust before features. */
-.hero{position:relative;min-height:92svh;display:flex;align-items:flex-end;
-  padding:var(--s6) 0 var(--s5);overflow:hidden}
-.hero-bg{position:absolute;inset:0}
-.hero-bg img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;
-  object-position:50% 30%;opacity:0;transition:opacity 1.8s ease}
-.hero-bg img.on{opacity:1}
-.hero-bg::after{content:"";position:absolute;inset:0;
-  background:linear-gradient(180deg,rgba(8,18,12,.62),rgba(8,18,12,.42) 38%,rgba(8,18,12,.97))}
-.hero-in{position:relative;z-index:2}
-/* the badge is the brand mark — displayed large on navy, never small */
-.hero-badge{width:clamp(112px,20vw,168px);height:auto;margin-bottom:var(--s3);
-  filter:drop-shadow(0 6px 28px rgba(0,0,0,.65))}
-.close-badge{width:clamp(104px,18vw,148px);margin:0 auto var(--s3);
-  filter:drop-shadow(0 6px 28px rgba(0,0,0,.5))}
+/* SECTIONS */
+.sec{padding:84px 0}
+.sec-head{text-align:center;max-width:640px;margin:0 auto 44px}
+.sec-head .h2{margin-top:14px}
+.sec-head p{margin-top:12px;color:var(--ink2)}
 
-.hero .eyebrow{color:var(--au3)}
-.hero .h1{margin:var(--s2) 0 var(--s3);max-width:13ch}
-.hero .lead{color:var(--tx1);max-width:36ch}
-.hero-cta{margin-top:var(--s4);display:flex;flex-wrap:wrap;align-items:center;gap:var(--s3)}
+/* REPORT TILES */
+.tiles{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.tile{background:var(--paper);border:1px solid var(--line);border-radius:var(--r);transition:box-shadow .2s}
+.tile[open]{box-shadow:var(--sh)}
+.tile summary{list-style:none;cursor:pointer;display:flex;align-items:center;gap:14px;padding:18px 18px;min-height:76px}
+.tile summary::-webkit-details-marker{display:none}
+.tile .ib{width:48px;height:48px;border-radius:15px;display:flex;align-items:center;justify-content:center;flex:none}
+.tile h3{font-size:17px;font-weight:700;line-height:1.3}
+.tile .sub{font-size:14px;color:var(--ink3);line-height:1.35}
+.tile .chev{margin-inline-start:auto;width:18px;height:18px;color:var(--ink3);transition:transform .2s;flex:none}
+.tile[open] .chev{transform:rotate(180deg)}
+.tile p{padding:0 18px 18px 18px;font-size:15px;color:var(--ink2);line-height:1.6}
+.c-fire{background:#FCE9DF;color:#B4502A} .c-paw{background:var(--earth-t);color:var(--earth)}
+.c-dump{background:#EEF0DA;color:#6C7330} .c-water{background:var(--sky);color:var(--sky-d)}
+.c-lost{background:#ECE7F6;color:#6A55A8} .c-trail{background:var(--leaf-t);color:var(--leaf-tx)}
 
-.hero-alt{color:var(--tx2);font-size:15px;min-height:44px;display:inline-flex;align-items:center}
-.hero-alt a{color:var(--au3);border-bottom:1px solid rgba(80,219,15,.5);display:inline-flex;align-items:center;min-height:44px;padding:0 2px}
+/* PLACES */
+.places{background:var(--paper);border-block:1px solid var(--line)}
+.cards{display:grid;grid-template-columns:repeat(3,1fr);gap:20px}
+.card{border-radius:var(--r);overflow:hidden;background:var(--sand);border:1px solid var(--line)}
+.card img{width:100%;height:auto;aspect-ratio:4/3;object-fit:cover}
+.card div{padding:18px 20px 22px}
+.card h3{font-size:19px;font-weight:800}
+.card p{font-size:15px;color:var(--ink2);margin-top:4px}
 
-/* TRUST BAND — takes the place of testimonials we do not yet have */
-.trust{background:var(--n1);border-block:1px solid rgba(80,219,15,.16);padding:var(--s5) 0}
-.trust-q{font-size:clamp(20px,3vw,29px);font-weight:300;line-height:1.45;
-  color:var(--tx0);max-width:22ch;margin-inline:auto;text-align:center}
-.trust-q b{font-weight:800}
-.trust-src{margin-top:var(--s3);text-align:center;font-size:13px;font-weight:700;
-  letter-spacing:.14em;color:var(--au1)}
+/* OUTDOORS */
+.out-in{display:grid;grid-template-columns:.9fr 1.1fr;gap:56px;align-items:center}
+.out-pic{border-radius:28px;overflow:hidden;aspect-ratio:686/760;box-shadow:var(--sh)}
+.out-pic img{width:100%;height:100%;object-fit:cover;object-position:50% 70%}
+.feats{list-style:none;margin-top:28px;display:grid;gap:14px}
+.feats li{display:flex;gap:14px;align-items:flex-start;background:var(--paper);border:1px solid var(--line);
+  border-radius:18px;padding:16px 18px}
+.feats .ib{width:44px;height:44px;border-radius:14px;display:flex;align-items:center;justify-content:center;flex:none}
+.feats b{display:block;font-size:17px}
+.feats span{font-size:15px;color:var(--ink2);line-height:1.5}
 
-/* HOW — numbered, with real screens */
-.sec{padding:var(--s7) 0}
-.sec-light{background:linear-gradient(180deg,var(--stone),var(--stone2));color:var(--ink2-on-light)}
-.sec-light .eyebrow{color:#2F8A10}
-.sec-light .h2{color:var(--ink-on-light)}
-.sec-light .step h3{color:var(--ink-on-light)}
-.sec-light .step p{color:var(--ink2-on-light)}
-.sec-light .step .n{background:var(--ink-on-light)}
-.sec-head{text-align:center;max-width:24ch;margin:0 auto var(--s5)}
-.sec-head .eyebrow{display:block;margin-bottom:var(--s2)}
-.steps{display:grid;grid-template-columns:repeat(3,1fr);gap:var(--s4)}
-.step{text-align:center}
-.step .shot{border-radius:26px;overflow:hidden;background:#000;aspect-ratio:1080/2146;
-  margin:0 auto var(--s3);width:min(210px,100%);border:7px solid var(--n2);
-  box-shadow:0 24px 50px -28px rgba(19,24,32,.55)}
-.step .shot img{width:100%;height:100%;object-fit:cover}
-.step .n{width:30px;height:30px;border-radius:50%;background:var(--ink);color:#fff;
-  font-weight:800;font-size:14px;display:flex;align-items:center;justify-content:center;
-  margin:0 auto var(--s2)}
-.step h3{margin-bottom:6px}
-.step p{font-size:15.5px;color:var(--ink2);line-height:1.6;max-width:30ch;margin-inline:auto}
-@media(max-width:760px){
-  .steps{grid-template-columns:1fr;gap:var(--s4)}
-  .step .shot{width:min(150px,52%)}
-  .sec-light{padding:var(--s5) 0}
-  .sec-light .sec-head{margin-bottom:var(--s4)}
-}
+/* INSTALL */
+.install{background:linear-gradient(180deg,var(--leaf-t),var(--sand))}
+.inst-grid{display:grid;grid-template-columns:1.3fr .7fr;gap:28px;align-items:stretch}
+.steps{list-style:none;display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+.steps li{background:var(--paper);border:1px solid var(--line);border-radius:var(--r);padding:22px 20px}
+.steps .n{width:32px;height:32px;border-radius:50%;background:var(--leaf);color:#fff;font-weight:800;
+  display:flex;align-items:center;justify-content:center;font-size:15px;margin-bottom:12px}
+.steps b{display:block;font-size:17px}
+.steps span{font-size:15px;color:var(--ink2)}
+.inst-cta{grid-column:1/-1;display:flex;flex-wrap:wrap;gap:12px;justify-content:center;margin-top:8px}
+.qr{background:var(--paper);border:1px solid var(--line);border-radius:var(--r);padding:22px;text-align:center;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px}
+.qr img{width:150px;height:150px}
+.qr b{font-size:16px} .qr span{font-size:14px;color:var(--ink3)}
 
-/* VALUES — the covenant. This is what Noonlight cannot say. */
-
-.vals .eyebrow{color:var(--au3)}
-.vals .h2{color:var(--tx0)}
-.vals-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:var(--s4);margin-top:var(--s5)}
-.val h3{color:var(--tx0);margin-bottom:6px}
-.val p{color:var(--tx1);font-size:15.5px;line-height:1.65}
-.val .bar{width:32px;height:2px;background:var(--au-grad);margin-bottom:var(--s2)}
-@media(max-width:760px){.vals-grid{grid-template-columns:1fr;gap:var(--s4)}}
-
-/* FEATURES — small, last, like Noonlight */
-.feats{display:grid;grid-template-columns:repeat(2,1fr);gap:var(--s2) var(--s5);
-  max-width:760px;margin:var(--s5) auto 0}
-.feat{padding:var(--s3) 0;border-top:1px solid rgba(80,219,15,.16)}
-.feat h3{font-size:17px;margin-bottom:2px}
-.feat p{font-size:15px;color:var(--tx1)}
-@media(max-width:620px){.feats{grid-template-columns:1fr}}
-
-/* STATS */
-.stats{background:var(--n1);border-block:1px solid rgba(80,219,15,.16);padding:var(--s5) 0}
-.stats-in{display:grid;grid-template-columns:repeat(3,1fr);text-align:center;gap:var(--s2)}
-.stat b{display:block;font-size:clamp(28px,5vw,42px);font-weight:900;letter-spacing:-.03em;
-  background:var(--au-grad);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
-.stat span{font-size:14px;color:var(--tx1)}
+/* FAQ */
+.faq{max-width:780px;margin:0 auto}
+.faq details{border-bottom:1px solid var(--line)}
+.faq summary{list-style:none;cursor:pointer;display:flex;justify-content:space-between;gap:16px;align-items:center;
+  padding:20px 4px;font-weight:700;font-size:17px;min-height:64px}
+.faq summary::-webkit-details-marker{display:none}
+.faq summary::after{content:"+";font-size:24px;font-weight:400;color:var(--leaf-tx);flex:none}
+.faq details[open] summary::after{content:"−"}
+.faq p{padding:0 4px 20px;color:var(--ink2);font-size:16px}
+.faq a{color:var(--leaf-tx);text-decoration:underline}
 
 /* CLOSE */
-.close{padding:var(--s7) 0;text-align:center}
-.close .h2{max-width:17ch;margin:0 auto var(--s3)}
-.close .lead{max-width:38ch;margin:0 auto var(--s4)}
-.note{margin-top:var(--s5);font-size:14px;color:var(--tx2);max-width:50ch;
-  margin-inline:auto;line-height:1.6}
-.note b{color:var(--sos);font-weight:700}
-.num{font-variant-numeric:tabular-nums;white-space:nowrap}
-footer{border-top:1px solid rgba(80,219,15,.16);padding:var(--s4) 0;text-align:center}
-footer p{font-size:13px;color:var(--tx2)}
-@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+.close{position:relative;overflow:hidden;border-radius:30px;margin:0 auto 84px;min-height:380px;display:flex;align-items:center}
+.close img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:100% 50%}
+.close{justify-content:flex-end}
+[dir=ltr] .close{justify-content:flex-start}
+.close-in{position:relative;z-index:2;padding:44px;max-width:520px}
+.close-in .h2{margin:14px 0 22px}
+
+footer{border-top:1px solid var(--line);padding:36px 0 44px;text-align:center;background:var(--sand2)}
+.note{font-size:15px;color:var(--ink2);max-width:58ch;margin:0 auto 16px}
+.note b{color:var(--sos)}
+.num{font-variant-numeric:tabular-nums;white-space:nowrap;font-weight:700}
+.flinks{display:flex;flex-wrap:wrap;justify-content:center;gap:6px 18px;font-size:14px;color:var(--ink2)}
+.flinks a{text-decoration:underline;min-height:32px;display:inline-flex;align-items:center}
+.copy{margin-top:12px;font-size:13px;color:var(--ink3)}
+
+/* INSTALL SHEET */
+dialog{border:0;padding:0;background:transparent;max-width:none;max-height:none;width:100%;height:100%;margin:0}
+dialog::backdrop{background:rgba(31,43,36,.42)}
+.sheet{position:absolute;inset-inline:0;bottom:0;margin:0 auto;width:min(560px,100%);max-height:92vh;overflow:auto;
+  background:var(--paper);border-radius:26px 26px 0 0;padding:22px 20px 28px;box-shadow:0 -20px 50px -20px rgba(0,0,0,.35)}
+@media(min-width:700px){.sheet{top:50%;bottom:auto;transform:translateY(-50%);border-radius:26px}}
+.sh-top{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:14px}
+.sh-top h2{font-size:22px;font-weight:800}
+.x{width:44px;height:44px;border:0;border-radius:50%;background:var(--sand);cursor:pointer;font-size:22px;line-height:1}
+.seg{display:grid;grid-template-columns:repeat(3,1fr);background:var(--sand);border-radius:14px;padding:4px;gap:4px;margin-bottom:18px}
+.seg button{border:0;background:none;border-radius:11px;min-height:44px;font-weight:600;font-size:15px;cursor:pointer;color:var(--ink2)}
+.seg button[aria-selected=true]{background:var(--paper);color:var(--leaf-tx);box-shadow:0 2px 8px -4px rgba(0,0,0,.25)}
+.pane[hidden]{display:none}
+.pane ol{padding-inline-start:22px;display:grid;gap:8px;color:var(--ink2);font-size:16px;margin:14px 0 4px}
+.pane .row{display:flex;flex-direction:column;gap:10px}
+.pane .btn{width:100%}
+.pane .hint{font-size:14px;color:var(--ink3);margin-top:10px}
+.pane .or{display:flex;align-items:center;gap:12px;color:var(--ink3);font-size:14px;margin:16px 0 4px}
+.pane .or::before,.pane .or::after{content:"";flex:1;height:1px;background:var(--line)}
+.pane .qrbox{display:flex;gap:18px;align-items:center}
+.pane .qrbox img{width:140px;height:140px;flex:none;border:1px solid var(--line);border-radius:14px;padding:6px}
+.pane .url{font-size:13px;direction:ltr;word-break:break-all;color:var(--ink3)}
+.pane .kbd{display:inline-flex;align-items:center;justify-content:center;vertical-align:-4px;width:22px;height:22px;
+  border:1px solid var(--line);border-radius:6px;background:var(--sand)}
+.pane .kbd svg{width:14px;height:14px}
+
+@media(max-width:900px){
+  .hero-in,.out-in,.inst-grid{grid-template-columns:1fr;gap:32px}
+  .tiles,.cards{grid-template-columns:1fr 1fr}
+  .steps{grid-template-columns:1fr}
+  .out-pic{aspect-ratio:4/3}
+  .qr{display:none}
+}
+@media(max-width:620px){
+  .hero{padding:28px 0 48px}
+  .hero-pic{aspect-ratio:4/3.4}
+  .tiles,.cards{grid-template-columns:1fr}
+  .sec{padding:60px 0}
+  .card img{aspect-ratio:16/9}
+  .close{border-radius:0;min-height:0;flex-direction:column;margin-bottom:0;width:100%}
+  .close img{position:relative;height:220px}
+  .close-in{padding:28px 16px 48px;text-align:center;max-width:none}
+  .nav-r .btn-sm{padding:0 14px}
+  .brand{font-size:16px} .brand img{width:30px;height:30px}
+  .lang button{min-width:34px}
+  .pane .qrbox{flex-direction:column;align-items:flex-start}
+}
+@media(max-width:440px){.brand img{display:none}.lang button{min-width:32px}.nav-r{gap:2px}.nav-r .btn-sm{padding:0 12px;gap:6px}.hero-pic img{object-position:35% 100%}.hero-pic .tag{display:none}}
+@media(max-width:350px){.nav-r .btn-sm span{display:none}}
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}html{scroll-behavior:auto}}
 </style>
 </head>
 <body>
 
+<!-- custom line icons -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="i-fire" viewBox="0 0 24 24"><path d="M12 3c.6 3.2 4.8 5 4.8 9.6A4.8 4.8 0 0 1 7.2 12.6c0-1.9.9-3.2 2-4.1.1 1.6.9 2.6 2 2.8-.3-3 .1-5.8.8-8.3z"/><path d="M10.3 15.6c0-1 .8-1.7 1.7-2.6.9.9 1.7 1.6 1.7 2.6a1.7 1.7 0 0 1-3.4 0z"/><path d="M4 21h16"/></symbol>
+  <symbol id="i-paw" viewBox="0 0 24 24"><ellipse cx="7" cy="9" rx="1.7" ry="2.2"/><ellipse cx="11" cy="6.3" rx="1.7" ry="2.2"/><ellipse cx="15.4" cy="7.4" rx="1.7" ry="2.2"/><path d="M6.8 17.6c0-3 2.4-5.6 4.8-5.6s4 1.9 4 4.2c0 1.6-1.2 2.6-2.6 2.6-.9 0-1.4-.4-2-.4s-1.1.5-2 .5c-1.3 0-2.2-.5-2.2-1.3z"/><path d="M19 13.5v5M16.5 16h5"/></symbol>
+  <symbol id="i-dump" viewBox="0 0 24 24"><path d="M9.5 3h3M10 3v2.6L8.4 8v9.4c0 .9.7 1.6 1.6 1.6h2c.9 0 1.6-.7 1.6-1.6V8L12 5.6V3"/><path d="M8.4 11.5h5.2"/><path d="M3 21h18"/><path d="M16.5 19c.4-2.6 1.9-4.4 4.3-5-.2 2.6-1.8 4.4-4.3 5zM16.5 19c.6-1.4 1.5-2.4 2.7-3.1"/></symbol>
+  <symbol id="i-water" viewBox="0 0 24 24"><path d="M3 15c1.5 0 1.5-1.3 3-1.3s1.5 1.3 3 1.3 1.5-1.3 3-1.3 1.5 1.3 3 1.3 1.5-1.3 3-1.3 1.5 1.3 3 1.3"/><path d="M3 19.5c1.5 0 1.5-1.3 3-1.3s1.5 1.3 3 1.3 1.5-1.3 3-1.3 1.5 1.3 3 1.3 1.5-1.3 3-1.3 1.5 1.3 3 1.3"/><circle cx="12" cy="6.5" r="2"/><path d="M8 11.4l4-1.6 4 1.6"/></symbol>
+  <symbol id="i-lost" viewBox="0 0 24 24"><circle cx="9" cy="4.6" r="1.8"/><path d="M8.4 8.2 7 13.6l2.6 2.2.8 5.2M7 13.6 5.6 21M8.4 8.2l2.8 1.6 1.6 3"/><path d="M8.6 8.4 5.8 7.6 4.7 11.8l2.5.6"/><path d="M15.6 7.6a2.4 2.4 0 1 1 3.4 2.2c-.7.3-1.1.8-1.1 1.6v.5"/><path d="M17.9 14.6v.1"/><path d="M14.5 21h6"/></symbol>
+  <symbol id="i-trail" viewBox="0 0 24 24"><path d="M2.5 20 8.5 10l3.4 5.4L14.6 12l6.9 8z"/><path d="M8.5 10l1.6-2.6"/><path d="M17.5 3.2l3.6 6.2h-7.2z"/><path d="M17.5 5.6v1.6M17.5 8.3v.1"/></symbol>
+  <symbol id="i-sos" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5"/><path d="M12 7.5v5"/><path d="M12 15.8v.1"/></symbol>
+  <symbol id="i-timer" viewBox="0 0 24 24"><circle cx="12" cy="13.5" r="7"/><path d="M12 9.5v4l2.6 1.6M10 2.8h4M18.4 6.4l1.4-1.4"/></symbol>
+  <symbol id="i-book" viewBox="0 0 24 24"><path d="M4 5.5c2.7-1 5.3-1 8 .7 2.7-1.7 5.3-1.7 8-.7v13c-2.7-1-5.3-1-8 .7-2.7-1.7-5.3-1.7-8-.7z"/><path d="M12 6.2v13"/><path d="M7 10.5h2M8 9.5v2"/></symbol>
+  <symbol id="i-down" viewBox="0 0 24 24"><path d="M12 4v11M7.5 10.5 12 15l4.5-4.5M5 19.5h14"/></symbol>
+  <symbol id="i-chev" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></symbol>
+  <symbol id="i-share" viewBox="0 0 24 24"><path d="M12 3.5v11M8.2 7.2 12 3.5l3.8 3.7"/><path d="M8 10.5H6.5v9.5h11v-9.5H16"/></symbol>
+  <symbol id="i-dots" viewBox="0 0 24 24"><circle cx="12" cy="5.5" r=".9"/><circle cx="12" cy="12" r=".9"/><circle cx="12" cy="18.5" r=".9"/></symbol>
+  <symbol id="i-leaf" viewBox="0 0 24 24"><path d="M5 19c0-8 5-13 15-14-.5 9.5-6 14.5-14 14z"/><path d="M5 19c3-4 6-6.5 9.5-8.5"/></symbol>
+</svg>
+
 <nav><div class="w nav-in">
-  <span class="brand"><img src="nature-badge.png" alt="">SH<i>✡</i>MER <span style="color:#2F8A10">Nature</span></span>
-  <span class="nav-r">
-    <span class="lang">
-      <button class="on" id="L-he" onclick="setLang('he')">עב</button>
-      <button id="L-en" onclick="setLang('en')">EN</button>
-      <button id="L-ar" onclick="setLang('ar')">عر</button>
-    </span>
-    <a href="index.html" class="btn btn-sm" data-t="nav">SH✡MER העירוני</a>
-  </span>
+  <a class="brand" href="#top" aria-label="SH✡MER Nature"><img src="nature-v2/img/badge.png" alt="" width="36" height="36"><span class="wm" dir="ltr">SH<span class="st">✡</span>MER<em>Nature</em></span></a>
+  <div class="nav-r">
+    <div class="lang" role="group" aria-label="Language">
+      <button class="on" id="L-he" type="button" onclick="setLang('he')">עב</button>
+      <button id="L-en" type="button" onclick="setLang('en')">EN</button>
+      <button id="L-ar" type="button" onclick="setLang('ar')">عر</button>
+    </div>
+    <button class="btn btn-sm" type="button" data-install><svg class="ic"><use href="#i-down"/></svg><span data-t="navi">התקנה</span></button>
+  </div>
 </div></nav>
 
-<header class="hero">
-  <div class="hero-bg"><img class="on" id="s1" src="nature-hero.jpg" alt=""></div>
+<header class="hero" id="top">
   <div class="w hero-in">
-    <img class="hero-badge" src="nature-badge.png" alt="SH✡MER Nature">
-    <span class="eyebrow" data-t="eb">בקרוב · COMING SOON</span>
-    <h1 class="h1" data-t="h1">שומרים על מי שאין לו קול.</h1>
-    <p class="lead" data-t="sub">אותה רשת שמירה — הפעם ליער, לחוף, לחי ולסביבה.</p>
-    <div class="hero-cta">
-      <a href="#wait" class="btn"><span data-t="cta">הצטרפ/י לרשימת ההמתנה</span></a>
-      <span class="hero-alt" data-t="alt">כבר מוגן/ת בעיר? <a href="index.html">ל-SH✡MER העירוני</a></span>
+    <div>
+      <span class="eyebrow"><svg class="ic" style="width:16px;height:16px"><use href="#i-leaf"/></svg><span data-t="eb">גרסת בטא · חינם</span></span>
+      <h1 class="h1" data-t="h1">שומרים על מי שאין לו קול.</h1>
+      <p class="lead" data-t="sub">חיה פצועה, שריפה קטנה, פסולת בשמורה. רואים, מדווחים, והשומרים הקרובים מקבלים את זה מיד. ובטיול: SOS ומדריכי עזרה ראשונה בכיס.</p>
+      <div class="hero-cta">
+        <button class="btn" type="button" data-install><svg class="ic"><use href="#i-down"/></svg><span data-t="cta">התקנה חינם</span></button>
+        <a class="btn btn-ghost" href="#what" data-t="cta2">מה אפשר לעשות</a>
+      </div>
+      <p class="hero-meta" data-t="meta">אנדרואיד ואייפון · בלי חנות אפליקציות · 20 שניות</p>
+    </div>
+    <div class="hero-pic">
+      <picture>
+        <source media="(max-width:620px)" srcset="nature-v2/img/hero-tall.jpg">
+        <img src="nature-v2/img/hero-tall.jpg" alt="" data-ta="alt1" width="800" height="724">
+      </picture>
+      <div class="tag"><span class="dot"><svg class="ic"><use href="#i-paw"/></svg></span><span data-t="tag">כלב פצוע ברחוב? דיווח אחד, ומי שקרוב יודע.</span></div>
     </div>
   </div>
 </header>
 
-<section class="trust">
-  <div class="wn">
-    <p class="trust-q" data-t="tq">חיה פצועה, שריפה מתחילה, מפגע בשמורה — <b>מישהו קרוב תמיד רואה ראשון.</b></p>
-    <div class="trust-src" data-t="ts">העיקרון שעליו נבנה SH✡MER Nature</div>
+<section class="sec" id="what">
+  <div class="w">
+    <div class="sec-head">
+      <span class="eyebrow" data-t="eb2">על מה מדווחים</span>
+      <h2 class="h2" data-t="h2a">שש דרכים לעזור, בלחיצה אחת.</h2>
+      <p data-t="h2as">לחצו על כל אחת לפרטים.</p>
+    </div>
+    <div class="tiles">
+      <details class="tile"><summary><span class="ib c-paw"><svg class="ic"><use href="#i-paw"/></svg></span><span><h3 data-t="t1">חיה פצועה</h3><span class="sub" data-t="t1s">כלב, חתול, ציפור או צב</span></span><svg class="ic chev"><use href="#i-chev"/></svg></summary>
+        <p data-t="t1d">מצאתם חיה פצועה או לכודה? מצלמים, מסמנים "חיה פצועה", והמיקום נלכד לבד. מי שקרוב ויכול לעזור רואה את זה על המפה.</p></details>
+      <details class="tile"><summary><span class="ib c-fire"><svg class="ic"><use href="#i-fire"/></svg></span><span><h3 data-t="t2">שריפה או עשן</h3><span class="sub" data-t="t2s">לתפוס אותה כשהיא קטנה</span></span><svg class="ic chev"><use href="#i-chev"/></svg></summary>
+        <p data-t="t2d">שריפת חורש מתחילה קטנה. דיווח מוקדם עם מיקום עוזר לכל מי שבאזור להתרחק ולהזעיק עזרה. במקרה של שריפה, חייגו 102.</p></details>
+      <details class="tile"><summary><span class="ib c-dump"><svg class="ic"><use href="#i-dump"/></svg></span><span><h3 data-t="t3">פסולת וזיהום</h3><span class="sub" data-t="t3s">בשמורה, ביער או בחוף</span></span><svg class="ic chev"><use href="#i-chev"/></svg></summary>
+        <p data-t="t3d">שקיות, פסולת בניין, נפט בחוף. תיעוד עם תמונה ומיקום, כדי שאפשר יהיה לטפל ולנקות.</p></details>
+      <details class="tile"><summary><span class="ib c-water"><svg class="ic"><use href="#i-water"/></svg></span><span><h3 data-t="t4">סכנה במים</h3><span class="sub" data-t="t4s">זרם, גלים, מישהו בקושי</span></span><svg class="ic chev"><use href="#i-chev"/></svg></summary>
+        <p data-t="t4d">זרם חזק או מתרחץ בקושי? דיווח מהיר מסמן את המקום למי שעל החוף עכשיו. במצב חירום, חייגו 101 או 100.</p></details>
+      <details class="tile"><summary><span class="ib c-lost"><svg class="ic"><use href="#i-lost"/></svg></span><span><h3 data-t="t5">מטייל נעדר</h3><span class="sub" data-t="t5s">מישהו לא חזר מהשביל</span></span><svg class="ic chev"><use href="#i-chev"/></svg></summary>
+        <p data-t="t5d">מישהו מהקבוצה לא חזר? מסמנים את המקום האחרון שבו נראה, כדי שמי שבאזור ישים לב. וחייגו 100.</p></details>
+      <details class="tile"><summary><span class="ib c-trail"><svg class="ic"><use href="#i-trail"/></svg></span><span><h3 data-t="t6">מפגע בשביל</h3><span class="sub" data-t="t6s">עץ שנפל, סלע, בור</span></span><svg class="ic chev"><use href="#i-chev"/></svg></summary>
+        <p data-t="t6d">עץ שחוסם את השביל, סלע שהתדרדר, גשר שבור. מטיילים אחרים יראו לפני שהם יוצאים לדרך.</p></details>
+    </div>
+  </div>
+</section>
+
+<section class="sec places">
+  <div class="w">
+    <div class="sec-head">
+      <span class="eyebrow" data-t="eb3">בשביל מי</span>
+      <h2 class="h2" data-t="h2b">לחיות, לים, לשביל.</h2>
+    </div>
+    <div class="cards">
+      <div class="card"><img src="nature-v2/img/pets.jpg" alt="" data-ta="alt2" loading="lazy" width="750" height="399"><div><h3 data-t="c1">בעלי חיים</h3><p data-t="c1d">כלבים, חתולים וחיות בר שצריכים יד.</p></div></div>
+      <div class="card"><img src="nature-v2/img/turtle.jpg" alt="" data-ta="alt3" loading="lazy" width="690" height="399"><div><h3 data-t="c2">ים וחוף</h3><p data-t="c2d">צבי ים, דגים ועופות שנלכדו בפסולת.</p></div></div>
+      <div class="card"><img src="nature-v2/img/trail.jpg" alt="" data-ta="alt4" loading="lazy" width="500" height="720"><div><h3 data-t="c3">יער ושבילים</h3><p data-t="c3d">והאנשים שיוצאים ליהנות מהם.</p></div></div>
+    </div>
   </div>
 </section>
 
 <section class="sec">
+  <div class="w out-in">
+    <div class="out-pic"><img src="nature-v2/img/dog.jpg" alt="" data-ta="alt5" loading="lazy" width="686" height="858"></div>
+    <div>
+      <span class="eyebrow" data-t="eb4">יוצאים לשטח</span>
+      <h2 class="h2" style="margin-top:14px" data-t="h2c">רגועים יותר בכל טיול.</h2>
+      <ul class="feats">
+        <li><span class="ib c-fire"><svg class="ic"><use href="#i-sos"/></svg></span><span><b data-t="f1">SOS לטיול</b><span data-t="f1d">לחיצה אחת, והשומרים שלי מקבלים את המיקום שלך.</span></span></li>
+        <li><span class="ib c-water"><svg class="ic"><use href="#i-timer"/></svg></span><span><b data-t="f2">טיימר בטיחות</b><span data-t="f2d">יוצאים לבד? אם לא תאשרו שהכול בסדר בזמן, השומרים שלי יקבלו התרעה.</span></span></li>
+        <li><span class="ib c-trail"><svg class="ic"><use href="#i-book"/></svg></span><span><b data-t="f3">מדריכי עזרה ראשונה</b><span data-t="f3d">כוויה, דימום, הכשה, טביעה. צעד אחר צעד, בעברית פשוטה.</span></span></li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<section class="sec install" id="install">
   <div class="w">
     <div class="sec-head">
-      <span class="eyebrow" data-t="eb2">איך זה יעבוד</span>
-      <h2 class="h2" data-t="h2a">שלושה צעדים.</h2>
+      <span class="eyebrow" data-t="eb5">איך מתקינים</span>
+      <h2 class="h2" data-t="h2d">שלושה צעדים, 20 שניות.</h2>
     </div>
-    <div class="steps">
-      <div class="step"><div class="n">1</div><h3 class="h3" data-t="s1t">רואה — מדווח/ת</h3>
-        <p data-t="s1d">צילום, סוג המפגע, והמיקום נלכד אוטומטית. עשר שניות.</p></div>
-      <div class="step"><div class="n">2</div><h3 class="h3" data-t="s2t">מי שקרוב מקבל התרעה</h3>
-        <p data-t="s2d">המתנדבים והגורמים באזור מקבלים את הדיווח מיד.</p></div>
-      <div class="step"><div class="n">3</div><h3 class="h3" data-t="s3t">מישהו מגיע — ואת/ה יודע/ת</h3>
-        <p data-t="s3d">רואים מי בדרך ומה קרה בסוף.</p></div>
+    <div class="inst-grid">
+      <ol class="steps">
+        <li><span class="n">1</span><b data-t="s1">לוחצים "התקנה"</b><span data-t="s1d">בטלפון. או סורקים את הקוד מהמחשב.</span></li>
+        <li><span class="n">2</span><b data-t="s2">בוחרים טלפון</b><span data-t="s2d">אנדרואיד: קובץ התקנה. אייפון: הוספה למסך הבית.</span></li>
+        <li><span class="n">3</span><b data-t="s3">פותחים ונרשמים</b><span data-t="s3d">מספר טלפון ושם, וזהו.</span></li>
+      </ol>
+      <div class="qr"><img src="nature-v2/img/qr-nature.svg" alt="QR" width="150" height="150"><b data-t="qrt">במחשב? סרקו עם הטלפון</b><span data-t="qrs">פותח את SH✡MER Nature בטלפון</span></div>
+      <div class="inst-cta">
+        <button class="btn" type="button" data-install><svg class="ic"><use href="#i-down"/></svg><span data-t="cta">התקנה חינם</span></button>
+      </div>
     </div>
   </div>
 </section>
 
-<section class="sec sec-light">
+<section class="sec" style="padding-top:20px">
   <div class="w">
-    <div class="sec-head">
-      <span class="eyebrow" data-t="eb3">מה זה יכסה</span>
-      <h2 class="h2" data-t="h2b">כל מה שאין לו קול.</h2>
-    </div>
-    <div class="vals-grid">
-      <div class="val"><div class="bar"></div><h3 class="h3" data-t="v1t">חילוץ בעלי חיים</h3><p data-t="v1d">חיה פצועה או לכודה — המתנדב הקרוב שיודע לטפל מקבל התרעה עם מיקום מדויק.</p></div>
-      <div class="val"><div class="bar"></div><h3 class="h3" data-t="v2t">שריפות בהתחלה</h3><p data-t="v2d">שריפת חורש מתחילה קטנה. דקות קובעות. דיווח מוקדם מגיע מיד לכל מי שבטווח.</p></div>
-      <div class="val"><div class="bar"></div><h3 class="h3" data-t="v3t">חופים וים</h3><p data-t="v3d">זיהום, דגה פגועה, זרם מסוכן, מדוזות — מפה חיה מאנשים שנמצאים שם עכשיו.</p></div>
-      <div class="val"><div class="bar"></div><h3 class="h3" data-t="v4t">מפגעים בשמורות</h3><p data-t="v4d">פסולת, פגיעה בצמחייה, רכב במקום אסור — תיעוד עם מיקום.</p></div>
-      <div class="val"><div class="bar"></div><h3 class="h3" data-t="v5t">מפת סכנות חיה</h3><p data-t="v5d">לפני שיוצאים לטיול — מה מסוכן היום באזור. לא ארכיון.</p></div>
-      <div class="val"><div class="bar"></div><h3 class="h3" data-t="v6t">אותה רשת שומרים</h3><p data-t="v6d">אותם מעגלי אמון — הפעם עבור הטבע.</p></div>
+    <div class="sec-head"><h2 class="h2" data-t="h2e">שאלות נפוצות</h2></div>
+    <div class="faq">
+      <details><summary data-t="q1">זה עולה כסף?</summary><p data-t="a1">לא. SH✡MER Nature חינם.</p></details>
+      <details><summary data-t="q2">זו אפליקציה נפרדת מ-SH✡MER?</summary><p data-t="a2">כן. SH✡MER Nature היא אפליקציה נפרדת לטבע, לבעלי חיים ולטיולים, מאותה משפחה. כבר יש לך חשבון SH✡MER? אפשר להתחבר איתו.</p></details>
+      <details><summary data-t="q3">למה לא מחנות האפליקציות?</summary><p data-t="a3">אנחנו בגרסת בטא. באנדרואיד מורידים קובץ התקנה ישירות מכאן. באייפון מוסיפים למסך הבית מ-Safari, והאפליקציה מתעדכנת לבד.</p></details>
+      <details><summary data-t="q4">מה קורה למידע שלי?</summary><p data-t="a4">דיווחים הם אנונימיים, אלא אם בחרת אחרת. המספר שלך משמש לאימות ולשליחת עזרה, אף פעם לא לשיווק. <a href="https://www.shomer-app.co.il/privacy.html">מדיניות הפרטיות</a></p></details>
+      <details><summary data-t="q5">זה מחליף את שירותי החירום?</summary><p data-t="a5">לא. SH✡MER Nature עוזר לאנשים קרובים לדעת ולעזור, אבל לא מזעיק רשויות בשבילך. במצב חירום חייגו 100, 101 או 102.</p></details>
     </div>
   </div>
 </section>
 
-<section class="close" id="wait">
-  <div class="w">
-    <h2 class="h2" data-t="cl1">רוצה להיות הראשון?</h2>
-    <p class="lead" data-t="cl2">נעדכן אותך ברגע ש-SH✡MER Nature עולה לאוויר.</p>
-    <div style="display:flex;gap:10px;max-width:420px;margin:0 auto;flex-wrap:wrap;justify-content:center">
-      <input type="email" id="wl" placeholder="you@email.com" inputmode="email" autocomplete="email"
-        style="flex:1;min-width:190px;min-height:52px;border:1px solid var(--line);border-radius:999px;
-               padding:0 20px;font:400 16px 'Heebo',sans-serif;color:var(--ink)">
-      <button class="btn" onclick="joinWL()"><span data-t="wlb">עדכנו אותי</span></button>
-    </div>
-    <div id="wlm" style="margin-top:16px;font-size:14px;min-height:20px;font-weight:500"></div>
-    <p class="note" data-t="note"><b>SH✡MER Nature אינו תחליף לשירותי חירום.</b> במצב חירום חייג/י <span class="num">100</span> · <span class="num">101</span> · <span class="num">102</span>.</p>
+<section class="w close">
+  <img src="nature-v2/img/hero-wide.jpg" alt="" width="1920" height="724">
+  <div class="close-in">
+    <span class="wm" dir="ltr" style="font-size:22px">SH<span class="st">✡</span>MER<em>Nature</em></span>
+    <h2 class="h2" data-t="cl1">שומרים על מי שאין לו קול.</h2>
+    <button class="btn" type="button" data-install><svg class="ic"><use href="#i-down"/></svg><span data-t="cta">התקנה חינם</span></button>
   </div>
 </section>
 
-<footer><div class="w"><p>SH✡MER Nature · © 2026 3Shamrocks Studio</p></div></footer>
+<footer><div class="w">
+  <p class="note" data-t="note"><b>SH✡MER Nature אינו תחליף לשירותי חירום.</b> במצב חירום חייגו <span class="num">100</span> משטרה · <span class="num">101</span> מד"א · <span class="num">102</span> כבאות.</p>
+  <div class="flinks">
+    <a href="https://www.shomer-app.co.il/" data-t="fl1">SH✡MER לעיר</a>
+    <a href="https://www.shomer-app.co.il/privacy.html" data-t="fl2">פרטיות</a>
+    <a href="https://www.shomer-app.co.il/terms.html" data-t="fl3">תנאי שימוש</a>
+    <a href="https://www.shomer-app.co.il/accessibility.html" data-t="fl4">נגישות</a>
+  </div>
+  <p class="copy">SH✡MER Nature · © 2026 3Shamrocks Studio</p>
+</div></footer>
+
+<dialog id="inst" aria-labelledby="inst-t">
+  <div class="sheet">
+    <div class="sh-top"><h2 id="inst-t" data-t="it">התקנת SH✡MER Nature</h2><button class="x" type="button" data-close aria-label="סגירה">×</button></div>
+    <div class="seg" role="tablist">
+      <button type="button" role="tab" id="tb-and" aria-controls="p-and" data-tab="and">Android</button>
+      <button type="button" role="tab" id="tb-ios" aria-controls="p-ios" data-tab="ios">iPhone</button>
+      <button type="button" role="tab" id="tb-pc" aria-controls="p-pc" data-tab="pc" data-t="tpc">מחשב</button>
+    </div>
+
+    <div class="pane" id="p-and" role="tabpanel" aria-labelledby="tb-and">
+      <div class="row">
+        <a class="btn" id="apk-link" href="nature-v2/SHOMER-Nature.apk" download="SHOMER-Nature.apk"><svg class="ic"><use href="#i-down"/></svg><span data-t="apk">הורדת קובץ ההתקנה (APK)</span></a>
+      </div>
+      <ol>
+        <li data-t="a_1">לוחצים על הכפתור. הקובץ יורד לטלפון.</li>
+        <li data-t="a_2">פותחים את הקובץ מההתראה או מתיקיית ההורדות.</li>
+        <li data-t="a_3">אם הטלפון שואל, מאשרים "התקנה ממקור זה", ולוחצים "התקנה".</li>
+      </ol>
+      <div class="or" data-t="or">או בלי קובץ</div>
+      <a class="btn btn-ghost" data-app href="https://www.shomer-app.co.il/nature/nature.html" target="_blank" rel="noopener" data-t="openapp">פתיחה בדפדפן Chrome</a>
+      <p class="hint" data-t="a_h">ב-Chrome לוחצים על <span class="kbd"><svg class="ic"><use href="#i-dots"/></svg></span> ואז "הוספה למסך הבית".</p>
+    </div>
+
+    <div class="pane" id="p-ios" role="tabpanel" aria-labelledby="tb-ios" hidden>
+      <div class="row"><a class="btn" data-app href="https://www.shomer-app.co.il/nature/nature.html" target="_blank" rel="noopener" data-t="openios">פתיחה ב-Safari</a></div>
+      <ol>
+        <li data-t="i_1">פותחים את הקישור ב-Safari.</li>
+        <li><span data-t="i_2">לוחצים על כפתור השיתוף</span> <span class="kbd"><svg class="ic"><use href="#i-share"/></svg></span></li>
+        <li data-t="i_3">בוחרים "הוספה למסך הבית", ואז "הוספה".</li>
+      </ol>
+      <p class="hint" data-t="i_h">האייקון מופיע במסך הבית ונפתח כמו אפליקציה.</p>
+    </div>
+
+    <div class="pane" id="p-pc" role="tabpanel" aria-labelledby="tb-pc" hidden>
+      <div class="qrbox">
+        <img src="nature-v2/img/qr-nature.svg" alt="QR" width="140" height="140">
+        <div>
+          <p data-t="pc1" style="font-weight:700">סורקים עם מצלמת הטלפון</p>
+          <p data-t="pc2" style="color:var(--ink2);font-size:15px">האפליקציה תיפתח בטלפון. משם מוסיפים אותה למסך הבית.</p>
+          <p class="url">www.shomer-app.co.il/nature/nature.html</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</dialog>
 
 <script>
 var T={
- he:{nav:"SH✡MER העירוני",eb:"בקרוב · COMING SOON",h1:"שומרים על מי שאין לו קול.",
-  sub:"אותה רשת שמירה — הפעם ליער, לחוף, לחי ולסביבה.",cta:"הצטרפ/י לרשימת ההמתנה",
-  alt:"כבר מוגן/ת בעיר? <a href='index.html'>ל-SH✡MER העירוני</a>",
-  tq:"חיה פצועה, שריפה מתחילה, מפגע בשמורה — <b>מישהו קרוב תמיד רואה ראשון.</b>",
-  ts:"העיקרון שעליו נבנה SH✡MER Nature",eb2:"איך זה יעבוד",h2a:"שלושה צעדים.",
-  s1t:"רואה — מדווח/ת",s1d:"צילום, סוג המפגע, והמיקום נלכד אוטומטית. עשר שניות.",
-  s2t:"מי שקרוב מקבל התרעה",s2d:"המתנדבים והגורמים באזור מקבלים את הדיווח מיד.",
-  s3t:"מישהו מגיע — ואת/ה יודע/ת",s3d:"רואים מי בדרך ומה קרה בסוף.",
-  eb3:"מה זה יכסה",h2b:"כל מה שאין לו קול.",
-  v1t:"חילוץ בעלי חיים",v1d:"חיה פצועה או לכודה — המתנדב הקרוב שיודע לטפל מקבל התרעה עם מיקום מדויק.",
-  v2t:"שריפות בהתחלה",v2d:"שריפת חורש מתחילה קטנה. דקות קובעות. דיווח מוקדם מגיע מיד לכל מי שבטווח.",
-  v3t:"חופים וים",v3d:"זיהום, דגה פגועה, זרם מסוכן, מדוזות — מפה חיה מאנשים שנמצאים שם עכשיו.",
-  v4t:"מפגעים בשמורות",v4d:"פסולת, פגיעה בצמחייה, רכב במקום אסור — תיעוד עם מיקום.",
-  v5t:"מפת סכנות חיה",v5d:"לפני שיוצאים לטיול — מה מסוכן היום באזור. לא ארכיון.",
-  v6t:"אותה רשת שומרים",v6d:"אותם מעגלי אמון — הפעם עבור הטבע.",
-  cl1:"רוצה להיות הראשון?",cl2:"נעדכן אותך ברגע ש-SH✡MER Nature עולה לאוויר.",wlb:"עדכנו אותי",
-  note:"<b>SH✡MER Nature אינו תחליף לשירותי חירום.</b> במצב חירום חייג/י <span class='num'>100</span> · <span class='num'>101</span> · <span class='num'>102</span>."},
- en:{nav:"Urban SH✡MER",eb:"COMING SOON",h1:"Guarding what has no voice.",
-  sub:"The same guardian network — this time for the forest, the coast, wildlife and the environment.",
-  cta:"Join the waitlist",alt:"Already protected in the city? <a href='index.html'>Urban SH✡MER</a>",
-  tq:"An injured animal, a fire starting, damage in a reserve — <b>someone nearby always sees it first.</b>",
-  ts:"The principle SH✡MER Nature is built on",eb2:"How it will work",h2a:"Three steps.",
-  s1t:"See it, report it",s1d:"A photo, the type, and location captured automatically. Ten seconds.",
-  s2t:"Whoever is near is alerted",s2d:"Volunteers and authorities in the area get it immediately.",
-  s3t:"Someone comes — and you know",s3d:"See who is on the way and how it ended.",
-  eb3:"What it will cover",h2b:"Everything without a voice.",
-  v1t:"Animal rescue",v1d:"An injured or trapped animal — the nearest capable volunteer is alerted with a precise location.",
-  v2t:"Fires at the start",v2d:"A brush fire starts small. Minutes decide. Early reports reach everyone in range.",
-  v3t:"Coast and sea",v3d:"Pollution, harmed marine life, dangerous currents, jellyfish — a live map from people who are there now.",
-  v4t:"Damage in reserves",v4d:"Dumping, damage to vegetation, vehicles where they should not be — documented with location.",
-  v5t:"Live hazard map",v5d:"Before you set out — what is dangerous today. Not an archive.",
-  v6t:"The same guardian network",v6d:"The same circles of trust — this time for nature.",
-  cl1:"Want to be first?",cl2:"We will tell you the moment SH✡MER Nature goes live.",wlb:"Notify me",
-  note:"<b>SH✡MER Nature is not a substitute for emergency services.</b> In an emergency call <span class='num'>100</span> · <span class='num'>101</span> · <span class='num'>102</span>."},
- ar:{nav:"شومير الحضري",eb:"قريبًا · COMING SOON",h1:"نحرس من لا صوت له.",
-  sub:"نفس شبكة الحماية — هذه المرة للغابة والشاطئ والحياة البرية والبيئة.",
-  cta:"انضم لقائمة الانتظار",alt:"محميّ في المدينة؟ <a href='index.html'>شومير الحضري</a>",
-  tq:"حيوان مصاب، حريق يبدأ، ضرر في محمية — <b>من يكون قريبًا يراه أولاً دائمًا.</b>",
-  ts:"المبدأ الذي بُني عليه شومير الطبيعة",eb2:"كيف سيعمل",h2a:"ثلاث خطوات.",
-  s1t:"ترى — تُبلّغ",s1d:"صورة، نوع الضرر، والموقع يُلتقط تلقائيًا. عشر ثوانٍ.",
-  s2t:"من هو قريب يُنبَّه",s2d:"المتطوعون والجهات في المنطقة يستلمون البلاغ فورًا.",
-  s3t:"أحدهم يصل — وأنت تعلم",s3d:"ترى من في الطريق وماذا حدث في النهاية.",
-  eb3:"ما الذي سيغطيه",h2b:"كل ما لا صوت له.",
-  v1t:"إنقاذ الحيوانات",v1d:"حيوان مصاب أو محاصر — أقرب متطوع مؤهل يُنبَّه بموقع دقيق.",
-  v2t:"الحرائق في بدايتها",v2d:"حريق الأحراش يبدأ صغيرًا. الدقائق تحسم. البلاغ المبكر يصل لكل من في النطاق.",
-  v3t:"الشواطئ والبحر",v3d:"تلوث، أحياء بحرية متضررة، تيارات خطرة، قناديل — خريطة حية ممن هم هناك الآن.",
-  v4t:"أضرار في المحميات",v4d:"نفايات، ضرر بالنباتات، مركبات في أماكن ممنوعة — موثّق بالموقع.",
-  v5t:"خريطة مخاطر حية",v5d:"قبل الخروج — ما هو خطر اليوم. ليس أرشيفًا.",
-  v6t:"نفس شبكة الحُرّاس",v6d:"نفس دوائر الثقة — هذه المرة للطبيعة.",
-  cl1:"تريد أن تكون الأول؟",cl2:"سنخبرك فور إطلاق شومير الطبيعة.",wlb:"أبلغوني",
-  note:"<b>شومير الطبيعة ليس بديلاً عن خدمات الطوارئ.</b> في الطوارئ اتصل بـ <span class='num'>100</span> · <span class='num'>101</span> · <span class='num'>102</span>."}
+ he:{navi:"התקנה",eb:"גרסת בטא · חינם",h1:"שומרים על מי שאין לו קול.",
+  sub:"חיה פצועה, שריפה קטנה, פסולת בשמורה. רואים, מדווחים, והשומרים הקרובים מקבלים את זה מיד. ובטיול: SOS ומדריכי עזרה ראשונה בכיס.",
+  cta:"התקנה חינם",cta2:"מה אפשר לעשות",meta:"אנדרואיד ואייפון · בלי חנות אפליקציות · 20 שניות",
+  tag:"כלב פצוע ברחוב? דיווח אחד, ומי שקרוב יודע.",
+  eb2:"על מה מדווחים",h2a:"שש דרכים לעזור, בלחיצה אחת.",h2as:"לחצו על כל אחת לפרטים.",
+  t1:"חיה פצועה",t1s:"כלב, חתול, ציפור או צב",t1d:"מצאתם חיה פצועה או לכודה? מצלמים, מסמנים \"חיה פצועה\", והמיקום נלכד לבד. מי שקרוב ויכול לעזור רואה את זה על המפה.",
+  t2:"שריפה או עשן",t2s:"לתפוס אותה כשהיא קטנה",t2d:"שריפת חורש מתחילה קטנה. דיווח מוקדם עם מיקום עוזר לכל מי שבאזור להתרחק ולהזעיק עזרה. במקרה של שריפה, חייגו 102.",
+  t3:"פסולת וזיהום",t3s:"בשמורה, ביער או בחוף",t3d:"שקיות, פסולת בניין, נפט בחוף. תיעוד עם תמונה ומיקום, כדי שאפשר יהיה לטפל ולנקות.",
+  t4:"סכנה במים",t4s:"זרם, גלים, מישהו בקושי",t4d:"זרם חזק או מתרחץ בקושי? דיווח מהיר מסמן את המקום למי שעל החוף עכשיו. במצב חירום, חייגו 101 או 100.",
+  t5:"מטייל נעדר",t5s:"מישהו לא חזר מהשביל",t5d:"מישהו מהקבוצה לא חזר? מסמנים את המקום האחרון שבו נראה, כדי שמי שבאזור ישים לב. וחייגו 100.",
+  t6:"מפגע בשביל",t6s:"עץ שנפל, סלע, בור",t6d:"עץ שחוסם את השביל, סלע שהתדרדר, גשר שבור. מטיילים אחרים יראו לפני שהם יוצאים לדרך.",
+  eb3:"בשביל מי",h2b:"לחיות, לים, לשביל.",
+  c1:"בעלי חיים",c1d:"כלבים, חתולים וחיות בר שצריכים יד.",c2:"ים וחוף",c2d:"צבי ים, דגים ועופות שנלכדו בפסולת.",c3:"יער ושבילים",c3d:"והאנשים שיוצאים ליהנות מהם.",
+  eb4:"יוצאים לשטח",h2c:"רגועים יותר בכל טיול.",
+  f1:"SOS לטיול",f1d:"לחיצה אחת, והשומרים שלי מקבלים את המיקום שלך.",
+  f2:"טיימר בטיחות",f2d:"יוצאים לבד? אם לא תאשרו שהכול בסדר בזמן, השומרים שלי יקבלו התרעה.",
+  f3:"מדריכי עזרה ראשונה",f3d:"כוויה, דימום, הכשה, טביעה. צעד אחר צעד, בעברית פשוטה.",
+  eb5:"איך מתקינים",h2d:"שלושה צעדים, 20 שניות.",
+  s1:"לוחצים \"התקנה\"",s1d:"בטלפון. או סורקים את הקוד מהמחשב.",s2:"בוחרים טלפון",s2d:"אנדרואיד: קובץ התקנה. אייפון: הוספה למסך הבית.",s3:"פותחים ונרשמים",s3d:"מספר טלפון ושם, וזהו.",
+  qrt:"במחשב? סרקו עם הטלפון",qrs:"פותח את SH✡MER Nature בטלפון",
+  h2e:"שאלות נפוצות",
+  q1:"זה עולה כסף?",a1:"לא. SH✡MER Nature חינם.",
+  q2:"זו אפליקציה נפרדת מ-SH✡MER?",a2:"כן. SH✡MER Nature היא אפליקציה נפרדת לטבע, לבעלי חיים ולטיולים, מאותה משפחה. כבר יש לך חשבון SH✡MER? אפשר להתחבר איתו.",
+  q3:"למה לא מחנות האפליקציות?",a3:"אנחנו בגרסת בטא. באנדרואיד מורידים קובץ התקנה ישירות מכאן. באייפון מוסיפים למסך הבית מ-Safari, והאפליקציה מתעדכנת לבד.",
+  q4:"מה קורה למידע שלי?",a4:"דיווחים הם אנונימיים, אלא אם בחרת אחרת. המספר שלך משמש לאימות ולשליחת עזרה, אף פעם לא לשיווק. <a href='https://www.shomer-app.co.il/privacy.html'>מדיניות הפרטיות</a>",
+  q5:"זה מחליף את שירותי החירום?",a5:"לא. SH✡MER Nature עוזר לאנשים קרובים לדעת ולעזור, אבל לא מזעיק רשויות בשבילך. במצב חירום חייגו 100, 101 או 102.",
+  cl1:"שומרים על מי שאין לו קול.",
+  note:"<b>SH✡MER Nature אינו תחליף לשירותי חירום.</b> במצב חירום חייגו <span class='num'>100</span> משטרה · <span class='num'>101</span> מד\"א · <span class='num'>102</span> כבאות.",
+  fl1:"SH✡MER לעיר",fl2:"פרטיות",fl3:"תנאי שימוש",fl4:"נגישות",
+  it:"התקנת SH✡MER Nature",tpc:"מחשב",apk:"הורדת קובץ ההתקנה (APK)",
+  a_1:"לוחצים על הכפתור. הקובץ יורד לטלפון.",a_2:"פותחים את הקובץ מההתראה או מתיקיית ההורדות.",a_3:"אם הטלפון שואל, מאשרים \"התקנה ממקור זה\", ולוחצים \"התקנה\".",
+  or:"או בלי קובץ",openapp:"פתיחה בדפדפן Chrome",a_h:"ב-Chrome לוחצים על <span class='kbd'><svg class='ic'><use href='#i-dots'/></svg></span> ואז \"הוספה למסך הבית\".",
+  openios:"פתיחה ב-Safari",i_1:"פותחים את הקישור ב-Safari.",i_2:"לוחצים על כפתור השיתוף",i_3:"בוחרים \"הוספה למסך הבית\", ואז \"הוספה\".",i_h:"האייקון מופיע במסך הבית ונפתח כמו אפליקציה.",
+  pc1:"סורקים עם מצלמת הטלפון",pc2:"האפליקציה תיפתח בטלפון. משם מוסיפים אותה למסך הבית.",
+  alt1:"אישה כורעת ליד כלב פצוע ומחזיקה טלפון",alt2:"גור כלבים וחתלתול ישנים על הדשא",alt3:"צב ים לכוד ברשת על החוף",alt4:"שביל הליכה ביער",alt5:"אישה עם כלב פצוע ברחוב, בשעת שקיעה",close:"סגירה"},
+ en:{navi:"Install",eb:"Beta · Free",h1:"Caring for those who have no voice.",
+  sub:"An injured animal, a small fire, litter in a reserve. See it, report it, and the people nearby know right away. On the trail: SOS and first-aid guides in your pocket.",
+  cta:"Install free",cta2:"What you can do",meta:"Android & iPhone · no app store · 20 seconds",
+  tag:"An injured dog on the street? One report, and people nearby know.",
+  eb2:"What you can report",h2a:"Six ways to help, in one tap.",h2as:"Tap any of them for details.",
+  t1:"Injured animal",t1s:"A dog, cat, bird or turtle",t1d:"Found an injured or trapped animal? Take a photo, choose \"Injured wildlife\", and the location is added for you. People nearby who can help see it on the map.",
+  t2:"Fire or smoke",t2s:"Catch it while it is small",t2d:"A brush fire starts small. An early report with a location helps everyone around keep clear and get help. For a fire, call 102.",
+  t3:"Litter and pollution",t3s:"In a reserve, forest or beach",t3d:"Bags, building waste, oil on the beach. A photo and a location, so it can be handled and cleaned up.",
+  t4:"Danger in the water",t4s:"Currents, waves, a swimmer in trouble",t4d:"A strong current or a swimmer in trouble? A quick report marks the spot for people on the beach right now. In an emergency, call 101 or 100.",
+  t5:"Lost hiker",t5s:"Someone did not come back",t5d:"Someone in your group did not come back? Mark where they were last seen so people in the area keep an eye out. And call 100.",
+  t6:"Trail hazard",t6s:"A fallen tree, a rock, a hole",t6d:"A tree blocking the path, a fallen rock, a broken bridge. Other hikers see it before they set out.",
+  eb3:"Who it is for",h2b:"For animals, the sea and the trail.",
+  c1:"Animals",c1d:"Dogs, cats and wildlife that need a hand.",c2:"Sea and coast",c2d:"Sea turtles, fish and birds caught in litter.",c3:"Forests and trails",c3d:"And the people who go out to enjoy them.",
+  eb4:"Heading outdoors",h2c:"Calmer on every trip.",
+  f1:"Trip SOS",f1d:"One tap, and My Shomers get your location.",
+  f2:"Safety timer",f2d:"Going alone? If you do not check in on time, My Shomers get an alert.",
+  f3:"First-aid guides",f3d:"Burns, bleeding, bites, drowning. Step by step, in plain words.",
+  eb5:"How to install",h2d:"Three steps, 20 seconds.",
+  s1:"Tap \"Install\"",s1d:"On your phone. Or scan the code from your computer.",s2:"Pick your phone",s2d:"Android: an install file. iPhone: add to Home Screen.",s3:"Open and sign up",s3d:"A phone number and a name. That is it.",
+  qrt:"On a computer? Scan with your phone",qrs:"Opens SH✡MER Nature on your phone",
+  h2e:"Questions",
+  q1:"Does it cost money?",a1:"No. SH✡MER Nature is free.",
+  q2:"Is it separate from SH✡MER?",a2:"Yes. SH✡MER Nature is its own app for nature, animals and trips, from the same family. Already have a SH✡MER account? You can sign in with it.",
+  q3:"Why not from the app store?",a3:"We are in beta. On Android you download the install file right here. On iPhone you add it to your Home Screen from Safari, and it updates by itself.",
+  q4:"What happens to my data?",a4:"Reports are anonymous unless you choose otherwise. Your number is used for verification and for sending help, never for marketing. <a href='https://www.shomer-app.co.il/privacy.html'>Privacy policy</a>",
+  q5:"Does it replace emergency services?",a5:"No. SH✡MER Nature helps people nearby know and help, but it does not call the authorities for you. In an emergency call 100, 101 or 102.",
+  cl1:"Caring for those who have no voice.",
+  note:"<b>SH✡MER Nature is not a substitute for emergency services.</b> In an emergency call <span class='num'>100</span> Police · <span class='num'>101</span> MDA · <span class='num'>102</span> Fire.",
+  fl1:"SH✡MER for the city",fl2:"Privacy",fl3:"Terms",fl4:"Accessibility",
+  it:"Install SH✡MER Nature",tpc:"Computer",apk:"Download the install file (APK)",
+  a_1:"Tap the button. The file downloads to your phone.",a_2:"Open it from the notification or your Downloads folder.",a_3:"If your phone asks, allow \"Install from this source\", then tap \"Install\".",
+  or:"or without a file",openapp:"Open in Chrome",a_h:"In Chrome tap <span class='kbd'><svg class='ic'><use href='#i-dots'/></svg></span> and then \"Add to Home screen\".",
+  openios:"Open in Safari",i_1:"Open the link in Safari.",i_2:"Tap the Share button",i_3:"Choose \"Add to Home Screen\", then \"Add\".",i_h:"The icon appears on your Home Screen and opens like an app.",
+  pc1:"Scan with your phone camera",pc2:"The app opens on your phone. Add it to your Home Screen from there.",
+  alt1:"A woman kneels by an injured dog holding a phone",alt2:"A puppy and a kitten asleep on the grass",alt3:"A sea turtle caught in a net on the beach",alt4:"A forest hiking trail",alt5:"A woman with an injured dog on the street at sunset",close:"Close"},
+ ar:{navi:"تثبيت",eb:"نسخة تجريبية · مجانًا",h1:"نحمي من لا صوت له.",
+  sub:"حيوان مصاب، حريق صغير، نفايات في محمية. ترى، تبلّغ، ويعرف القريبون فورًا. وفي الرحلة: SOS وأدلة إسعاف أولي في جيبك.",
+  cta:"تثبيت مجاني",cta2:"ماذا يمكنك أن تفعل",meta:"أندرويد وآيفون · بدون متجر تطبيقات · 20 ثانية",
+  tag:"كلب مصاب في الشارع؟ بلاغ واحد، والقريبون يعرفون.",
+  eb2:"عمّا تبلّغ",h2a:"ست طرق للمساعدة، بلمسة واحدة.",h2as:"اضغط على أي منها للتفاصيل.",
+  t1:"حيوان مصاب",t1s:"كلب، قطة، طائر أو سلحفاة",t1d:"وجدت حيوانًا مصابًا أو عالقًا؟ صوّر، اختر \"حيوان مصاب\"، ويُضاف الموقع تلقائيًا. من هو قريب ويستطيع المساعدة يراه على الخريطة.",
+  t2:"حريق أو دخان",t2s:"التقطه وهو صغير",t2d:"حريق الأحراش يبدأ صغيرًا. البلاغ المبكر مع الموقع يساعد الجميع على الابتعاد وطلب المساعدة. في حالة حريق، اتصل بـ 102.",
+  t3:"نفايات وتلوث",t3s:"في محمية أو غابة أو شاطئ",t3d:"أكياس، مخلفات بناء، نفط على الشاطئ. صورة وموقع، كي يمكن المعالجة والتنظيف.",
+  t4:"خطر في الماء",t4s:"تيار، أمواج، سبّاح في ضيق",t4d:"تيار قوي أو سبّاح في ضيق؟ بلاغ سريع يحدد المكان لمن على الشاطئ الآن. في الطوارئ، اتصل بـ 101 أو 100.",
+  t5:"متنزّه مفقود",t5s:"شخص لم يعد من المسار",t5d:"شخص من المجموعة لم يعد؟ حدّد آخر مكان شوهد فيه كي ينتبه من في المنطقة. واتصل بـ 100.",
+  t6:"خطر على المسار",t6s:"شجرة سقطت، صخرة، حفرة",t6d:"شجرة تسد المسار، صخرة انهارت، جسر مكسور. يراه المتنزهون الآخرون قبل الانطلاق.",
+  eb3:"لمن",h2b:"للحيوانات، للبحر، للمسار.",
+  c1:"الحيوانات",c1d:"كلاب وقطط وحيوانات برية تحتاج يدًا.",c2:"البحر والشاطئ",c2d:"سلاحف بحرية وأسماك وطيور عالقة في النفايات.",c3:"الغابات والمسارات",c3d:"والناس الذين يخرجون للاستمتاع بها.",
+  eb4:"الخروج إلى الطبيعة",h2c:"أكثر هدوءًا في كل رحلة.",
+  f1:"SOS للرحلة",f1d:"لمسة واحدة، ويحصل حُرّاسي على موقعك.",
+  f2:"مؤقّت الأمان",f2d:"تخرج وحدك؟ إذا لم تؤكد أنك بخير في الوقت المحدد، يتلقى حُرّاسي تنبيهًا.",
+  f3:"أدلة الإسعاف الأولي",f3d:"حروق، نزيف، لدغات، غرق. خطوة بخطوة، بكلمات بسيطة.",
+  eb5:"كيف تثبّت",h2d:"ثلاث خطوات، 20 ثانية.",
+  s1:"اضغط \"تثبيت\"",s1d:"على هاتفك. أو امسح الرمز من الحاسوب.",s2:"اختر هاتفك",s2d:"أندرويد: ملف تثبيت. آيفون: إضافة إلى الشاشة الرئيسية.",s3:"افتح وسجّل",s3d:"رقم هاتف واسم، وهذا كل شيء.",
+  qrt:"على الحاسوب؟ امسح بهاتفك",qrs:"يفتح SH✡MER Nature على هاتفك",
+  h2e:"أسئلة شائعة",
+  q1:"هل هو مدفوع؟",a1:"لا. SH✡MER Nature مجاني.",
+  q2:"هل هو منفصل عن SH✡MER؟",a2:"نعم. SH✡MER Nature تطبيق مستقل للطبيعة والحيوانات والرحلات، من نفس العائلة. لديك حساب SH✡MER؟ يمكنك الدخول به.",
+  q3:"لماذا ليس من متجر التطبيقات؟",a3:"نحن في نسخة تجريبية. على أندرويد تنزّل ملف التثبيت من هنا مباشرة. على آيفون تضيفه إلى الشاشة الرئيسية من Safari، ويتحدّث تلقائيًا.",
+  q4:"ماذا يحدث لمعلوماتي؟",a4:"البلاغات مجهولة الهوية إلا إذا اخترت غير ذلك. رقمك يُستخدم للتحقق ولإرسال المساعدة، وليس للتسويق أبدًا. <a href='https://www.shomer-app.co.il/privacy.html'>سياسة الخصوصية</a>",
+  q5:"هل يحل محل خدمات الطوارئ؟",a5:"لا. SH✡MER Nature يساعد القريبين على المعرفة والمساعدة، لكنه لا يتصل بالسلطات نيابة عنك. في الطوارئ اتصل بـ 100 أو 101 أو 102.",
+  cl1:"نحمي من لا صوت له.",
+  note:"<b>SH✡MER Nature ليس بديلاً عن خدمات الطوارئ.</b> في الطوارئ اتصل بـ <span class='num'>100</span> الشرطة · <span class='num'>101</span> نجمة داود الحمراء · <span class='num'>102</span> الإطفاء.",
+  fl1:"SH✡MER للمدينة",fl2:"الخصوصية",fl3:"شروط الاستخدام",fl4:"إمكانية الوصول",
+  it:"تثبيت SH✡MER Nature",tpc:"حاسوب",apk:"تنزيل ملف التثبيت (APK)",
+  a_1:"اضغط الزر. يُنزَّل الملف إلى هاتفك.",a_2:"افتحه من الإشعار أو من مجلد التنزيلات.",a_3:"إذا سألك الهاتف، اسمح بـ \"التثبيت من هذا المصدر\"، ثم اضغط \"تثبيت\".",
+  or:"أو بدون ملف",openapp:"فتح في Chrome",a_h:"في Chrome اضغط <span class='kbd'><svg class='ic'><use href='#i-dots'/></svg></span> ثم \"إضافة إلى الشاشة الرئيسية\".",
+  openios:"فتح في Safari",i_1:"افتح الرابط في Safari.",i_2:"اضغط زر المشاركة",i_3:"اختر \"إضافة إلى الشاشة الرئيسية\"، ثم \"إضافة\".",i_h:"تظهر الأيقونة على الشاشة الرئيسية وتفتح كتطبيق.",
+  pc1:"امسح بكاميرا الهاتف",pc2:"يفتح التطبيق على هاتفك. أضفه إلى الشاشة الرئيسية من هناك.",
+  alt1:"امرأة تجثو بجانب كلب مصاب وتحمل هاتفًا",alt2:"جرو وقطة صغيرة نائمان على العشب",alt3:"سلحفاة بحرية عالقة في شبكة على الشاطئ",alt4:"مسار مشي في الغابة",alt5:"امرأة مع كلب مصاب في الشارع وقت الغروب",close:"إغلاق"}
 };
+var LANG='he';
 function setLang(l){
-  document.documentElement.lang=l;
-  document.documentElement.dir=(l==='en')?'ltr':'rtl';
-  document.querySelectorAll('[data-t]').forEach(function(el){
-    var k=el.getAttribute('data-t'); if(T[l]&&T[l][k]!=null) el.innerHTML=T[l][k];
-  });
-  ['he','en','ar'].forEach(function(x){var b=document.getElementById('L-'+x); if(b)b.classList.toggle('on',x===l);});
+  if(!T[l])return; LANG=l;
+  var d=document.documentElement; d.lang=l; d.dir=(l==='en')?'ltr':'rtl';
+  document.querySelectorAll('[data-t]').forEach(function(el){var k=el.getAttribute('data-t');if(T[l][k]!=null)el.innerHTML=T[l][k];});
+  document.querySelectorAll('[data-ta]').forEach(function(el){var k=el.getAttribute('data-ta');if(T[l][k]!=null)el.alt=T[l][k];});
+  var x=document.querySelector('[data-close]'); if(x)x.setAttribute('aria-label',T[l].close);
+  ['he','en','ar'].forEach(function(c){var b=document.getElementById('L-'+c);if(b)b.classList.toggle('on',c===l);});
   try{localStorage.setItem('shomerLang',l);}catch(e){}
 }
-try{var sl=localStorage.getItem('shomerLang'); if(sl&&sl!=='he')setLang(sl);}catch(e){}
-function joinWL(){
-  var i=document.getElementById('wl'), m=document.getElementById('wlm');
-  var btn=document.querySelector('[onclick="joinWL()"]');
-  var v=(i.value||'').trim();
-  if(!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(v)){m.style.color='#D93B3B';
-    m.textContent=(currentLangIs('he')?'נא להזין כתובת אימייל תקינה':'Please enter a valid email');return;}
-  /* local fallback — always save before attempting network */
-  try{var k='shomerNatureWL',L=JSON.parse(localStorage.getItem(k)||'[]');
-    if(L.indexOf(v)===-1)L.push(v);localStorage.setItem(k,JSON.stringify(L));}catch(e){}
-  m.style.color='var(--tx2)';
-  m.textContent=(currentLangIs('he')?'שומר...':'Saving...');
-  if(btn)btn.disabled=true;
-  var email=v,lang=document.documentElement.lang||'he';
-  var FB_CFG={apiKey:'AIzaSyAfevYysNLWMtXluY5lZSM_VY0eyDwZ6KQ',authDomain:'shomergency.firebaseapp.com',
-    databaseURL:'https://shomergency-default-rtdb.firebaseio.com',projectId:'shomergency',
-    storageBucket:'shomergency.firebasestorage.app',messagingSenderId:'745767303099',
-    appId:'1:745767303099:web:6c9605fbba940430b7769e'};
-  function fbLoad(src){return new Promise(function(res,rej){
-    if(document.querySelector('script[src="'+src+'"]')){res();return;}
-    var s=document.createElement('script');s.src=src;s.onload=res;s.onerror=rej;document.head.appendChild(s);});}
-  function finish(){
-    m.style.color='#2F8A10';
-    m.textContent=(currentLangIs('he')?'נרשמת! נעדכן אותך ברגע שנעלה לאוויר.':'You\'re on the list!');
-    i.value='';if(btn)btn.disabled=false;}
-  Promise.all([
-    fbLoad('https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js'),
-    fbLoad('https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js'),
-    fbLoad('https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js')
-  ]).then(function(){
-    if(!firebase.apps.length)firebase.initializeApp(FB_CFG);
-    var auth=firebase.auth(),db=firebase.database();
-    return auth.signInAnonymously().then(function(){
-      return db.ref('nature-waitlist').push({email:email,ts:Date.now(),lang:lang});
-    });
-  }).then(finish).catch(function(){   /* v293: never claim success when the sign-up did not reach us */
-    m.style.color='#D93B3B';
-    m.textContent=(currentLangIs('he')?'לא הצלחנו לשמור - בדקו חיבור ונסו שוב':currentLangIs('ar')?'تعذّر الحفظ - تحقّق من الاتصال وحاول مجددًا':'Could not save - check your connection and try again');
-    if(btn)btn.disabled=false;
-  });
+setLang('he');
+try{var sl=localStorage.getItem('shomerLang');if(sl&&sl!=='he'&&T[sl])setLang(sl);}catch(e){}
+
+/* Install sheet: picks the right tab for the visitor's device. */
+var ua=navigator.userAgent||'';
+var isIOS=/iPhone|iPad|iPod/i.test(ua)||(navigator.platform==='MacIntel'&&navigator.maxTouchPoints>1);
+var isAnd=/Android/i.test(ua);
+function pick(tab){
+  document.querySelectorAll('[data-tab]').forEach(function(b){b.setAttribute('aria-selected',b.getAttribute('data-tab')===tab?'true':'false');});
+  ['and','ios','pc'].forEach(function(p){document.getElementById('p-'+p).hidden=(p!==tab);});
 }
-function currentLangIs(l){ return document.documentElement.lang===l; }
-document.addEventListener('keydown',function(e){
-  if(e.key==='Enter'&&document.activeElement&&document.activeElement.id==='wl') joinWL();
-});
-(function(){
-  var io=new IntersectionObserver(function(es){es.forEach(function(e){
-    if(e.isIntersecting){e.target.style.opacity='1';e.target.style.transform='none';io.unobserve(e.target);}})},{threshold:.14});
-  document.querySelectorAll('.step,.val,.sec-head').forEach(function(e,n){
-    e.style.opacity='0';e.style.transform='translateY(16px)';
-    e.style.transition='opacity .65s ease '+(n%3*.08)+'s, transform .65s ease '+(n%3*.08)+'s';
-    io.observe(e);});
-})();
+var dlg=document.getElementById('inst');
+function openInstall(){
+  pick(isIOS?'ios':isAnd?'and':'pc');
+  if(dlg.showModal){try{dlg.showModal();}catch(e){dlg.setAttribute('open','');}}else{dlg.setAttribute('open','');}
+}
+function closeInstall(){if(dlg.close)dlg.close();else dlg.removeAttribute('open');}
+document.querySelectorAll('[data-install]').forEach(function(b){b.addEventListener('click',openInstall);});
+document.querySelectorAll('[data-tab]').forEach(function(b){b.addEventListener('click',function(){pick(b.getAttribute('data-tab'));});});
+document.querySelector('[data-close]').addEventListener('click',closeInstall);
+dlg.addEventListener('click',function(e){if(e.target===dlg)closeInstall();});
+if(location.hash==='#get')openInstall();
 </script>
 </body>
 </html>
