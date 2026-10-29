@@ -9,7 +9,7 @@
 <meta name="apple-mobile-web-app-title" content="SH✡MER Nature">
 <meta http-equiv="X-Content-Type-Options" content="nosniff"><meta http-equiv="Referrer-Policy" content="no-referrer">
 <!-- CSP: no eval. Allows Leaflet (cdnjs) + OpenStreetMap tiles at runtime; everything else self-hosted. -->
-<meta http-equiv="Content-Security-Policy" content="default-src 'self' capacitor://localhost https://localhost http://localhost; base-uri 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdnjs.cloudflare.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: blob: https://cdnjs.cloudflare.com https://*.tile.openstreetmap.org https://*.basemaps.cartocdn.com https://server.arcgisonline.com https://*.arcgisonline.com https://*.google-analytics.com https://*.googletagmanager.com; connect-src 'self' capacitor://localhost https://localhost http://localhost https://shomer-app.co.il https://www.shomer-app.co.il https://server.arcgisonline.com https://*.arcgisonline.com https://overpass-api.de https://overpass.kumi.systems https://photon.komoot.io https://nominatim.openstreetmap.org https://shomer-otp.shomer3s.workers.dev https://*.twil.io https://*.tile.openstreetmap.org https://*.basemaps.cartocdn.com https://*.googleapis.com https://fcmregistrations.googleapis.com https://firebaseinstallations.googleapis.com https://router.project-osrm.org https://*.firebaseio.com wss://*.firebaseio.com https://shomergency-default-rtdb.firebaseio.com wss://shomergency-default-rtdb.firebaseio.com https://*.firebasedatabase.app wss://*.firebasedatabase.app https://*.firebaseapp.com https://*.google-analytics.com https://*.analytics.google.com https://www.googletagmanager.com; script-src 'self' 'unsafe-inline' capacitor://localhost https://localhost http://localhost https://cdnjs.cloudflare.com https://www.gstatic.com https://apis.google.com https://www.googletagmanager.com; frame-src 'self' https://shomergency.firebaseapp.com https://www.google.com https://recaptcha.google.com https://accounts.google.com; manifest-src 'self'; worker-src 'self';">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self' capacitor://localhost https://localhost http://localhost; base-uri 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdnjs.cloudflare.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: blob: https://cdnjs.cloudflare.com https://tile.openstreetmap.org https://*.tile.openstreetmap.org https://*.basemaps.cartocdn.com https://server.arcgisonline.com https://*.arcgisonline.com https://*.google-analytics.com https://*.googletagmanager.com; connect-src 'self' capacitor://localhost https://localhost http://localhost https://shomer-app.co.il https://www.shomer-app.co.il https://server.arcgisonline.com https://*.arcgisonline.com https://overpass-api.de https://overpass.kumi.systems https://photon.komoot.io https://nominatim.openstreetmap.org https://shomer-otp.shomer3s.workers.dev https://*.twil.io https://*.tile.openstreetmap.org https://*.basemaps.cartocdn.com https://*.googleapis.com https://fcmregistrations.googleapis.com https://firebaseinstallations.googleapis.com https://router.project-osrm.org https://*.firebaseio.com wss://*.firebaseio.com https://shomergency-default-rtdb.firebaseio.com wss://shomergency-default-rtdb.firebaseio.com https://*.firebasedatabase.app wss://*.firebasedatabase.app https://*.firebaseapp.com https://*.google-analytics.com https://*.analytics.google.com https://www.googletagmanager.com; script-src 'self' 'unsafe-inline' capacitor://localhost https://localhost http://localhost https://cdnjs.cloudflare.com https://www.gstatic.com https://apis.google.com https://www.googletagmanager.com; frame-src 'self' https://shomergency.firebaseapp.com https://www.google.com https://recaptcha.google.com https://accounts.google.com; manifest-src 'self'; worker-src 'self';">
 <title>SH✡MER Nature · עזרה לבעלי חיים ולטבע</title>
 <link rel="manifest" href="manifest.json">
 <link rel="icon" type="image/png" href="icon-192.png">
@@ -1440,6 +1440,7 @@ body.otp-active .ob-steps{display:none!important;}
  <symbol id="i-paw" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="7" cy="9" rx="1.7" ry="2.2"/><ellipse cx="11" cy="6.3" rx="1.7" ry="2.2"/><ellipse cx="15.4" cy="7.4" rx="1.7" ry="2.2"/><path d="M6.8 17.6c0-3 2.4-5.6 4.8-5.6s4 1.9 4 4.2c0 1.6-1.2 2.6-2.6 2.6-.9 0-1.4-.4-2-.4s-1.1.5-2 .5c-1.3 0-2.2-.5-2.2-1.3z"/><path d="M19 13.5v5M16.5 16h5"/></g></symbol>
  <symbol id="i-trash" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9.5 3h3M10 3v2.6L8.4 8v9.4c0 .9.7 1.6 1.6 1.6h2c.9 0 1.6-.7 1.6-1.6V8L12 5.6V3"/><path d="M8.4 11.5h5.2"/><path d="M3 21h18"/><path d="M16.5 19c.4-2.6 1.9-4.4 4.3-5-.2 2.6-1.8 4.4-4.3 5zM16.5 19c.6-1.4 1.5-2.4 2.7-3.1"/></g></symbol>
  <symbol id="i-wave" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 15c1.5 0 1.5-1.3 3-1.3s1.5 1.3 3 1.3 1.5-1.3 3-1.3 1.5 1.3 3 1.3 1.5-1.3 3-1.3 1.5 1.3 3 1.3"/><path d="M3 19.5c1.5 0 1.5-1.3 3-1.3s1.5 1.3 3 1.3 1.5-1.3 3-1.3 1.5 1.3 3 1.3 1.5-1.3 3-1.3 1.5 1.3 3 1.3"/><circle cx="12" cy="6.5" r="2"/><path d="M8 11.4l4-1.6 4 1.6"/></g></symbol>
+ <symbol id="i-debris" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6.4 18.6Q8.7 19.2 10.4 17.5L16.4 11.6 13.4 8.6 7.5 14.6Q5.8 16.3 6.4 18.6Z M14 14 18.6 13 16.6 11 M11 11 12 6.4 14 8.4 M11.7 16.3 8.7 13.3"/><path d="M2.5 21h11"/><path d="M3.6 17.8l-1.2-.8M5 16.2l-.6-1.4"/></g></symbol>
  <symbol id="i-fire" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3c.6 3.2 4.8 5 4.8 9.6A4.8 4.8 0 0 1 7.2 12.6c0-1.9.9-3.2 2-4.1.1 1.6.9 2.6 2 2.8-.3-3 .1-5.8.8-8.3z"/><path d="M10.3 15.6c0-1 .8-1.7 1.7-2.6.9.9 1.7 1.6 1.7 2.6a1.7 1.7 0 0 1-3.4 0z"/><path d="M4 21h16"/></g></symbol>
  <symbol id="i-medic" viewBox="0 0 24 24"><path d="M4 17V9a2 2 0 0 1 2-2h7l4 3.5V17" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><circle cx="8" cy="18" r="2" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="16" cy="18" r="2" fill="none" stroke="currentColor" stroke-width="2"/><path d="M10.5 11v3M9 12.5h3" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></symbol>
  <symbol id="i-stethoscope" viewBox="0 0 24 24"><path d="M5 4v4a4 4 0 0 0 8 0V4" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M9 12v2a5 5 0 0 0 10 0v-1" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><circle cx="19" cy="11" r="2" fill="none" stroke="currentColor" stroke-width="2"/></symbol>
@@ -1608,6 +1609,7 @@ body.otp-active .ob-steps{display:none!important;}
  <div class="leg"><div class="ldc" style="background:#2962FF" aria-hidden="true"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="11" width="14" height="9" rx="2" fill="none" stroke="currentColor" stroke-width="2"/><path d="M8 11V8a4 4 0 0 1 7.5-2" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></div><span id="l4">גנבה / רכוש</span></div>
  <div class="leg"><div class="ldc" style="background:#18C29C" aria-hidden="true"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="8" width="18" height="8" rx="4" fill="none" stroke="currentColor" stroke-width="2"/><path d="M12 8v8" fill="none" stroke="currentColor" stroke-width="2"/></svg></div><span id="l5">סמים</span></div>
  <div class="leg"><div class="ldc" style="background:#16A06A" aria-hidden="true"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="4" width="16" height="16" rx="4" fill="none" stroke="currentColor" stroke-width="2"/><path d="M12 8v8M8 12h8" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg></div><span id="l6">רפואי</span></div>
+ <div class="leg"><div class="ldc" style="background:#F25C05" aria-hidden="true"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><g fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6.4 18.6Q8.7 19.2 10.4 17.5L16.4 11.6 13.4 8.6 7.5 14.6Q5.8 16.3 6.4 18.6Z M14 14 18.6 13 16.6 11 M11 11 12 6.4 14 8.4 M11.7 16.3 8.7 13.3"/><path d="M2.5 21h11"/><path d="M3.6 17.8l-1.2-.8M5 16.2l-.6-1.4"/></g></svg></div><span id="l_uxo">נפל / שרידי רקטה</span></div>
  <div class="leg"><div class="ldc" style="background:#19A8FF;border-color:#fff" aria-hidden="true"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 4 L17 18.5 L12 15.2 L7 18.5 Z" fill="#fff"/></svg></div><span id="l8">המיקום שלי</span></div>
  <div class="legend-foot" id="legend-foot">צבעים = קטגוריה. סמני ערים = סקירה סטטיסטית מצרפית, לא אירוע ספציפי.</div></div></div>
      <div class="leg-sec" id="leg-past-sec"><div class="leg-past-row"><span data-he="אירועי עבר" data-en="Past events" data-ar="أحداث سابقة">אירועי עבר</span><div class="tog" id="leg-past-tog" role="switch" aria-checked="false" onclick="togglePastEvents();this.classList.toggle('on');this.setAttribute('aria-checked',this.classList.contains('on'))"></div></div></div>
@@ -1981,6 +1983,7 @@ body.otp-active .ob-steps{display:none!important;}
  <div class="ropt" onclick="rt(this)" role="radio" aria-checked="false"><div class="ropt-ic"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><g fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9.5 3h3M10 3v2.6L8.4 8v9.4c0 .9.7 1.6 1.6 1.6h2c.9 0 1.6-.7 1.6-1.6V8L12 5.6V3"/><path d="M8.4 11.5h5.2"/><path d="M3 21h18"/><path d="M16.5 19c.4-2.6 1.9-4.4 4.3-5-.2 2.6-1.8 4.4-4.3 5zM16.5 19c.6-1.4 1.5-2.4 2.7-3.1"/></g></svg></div><span id="rt4" data-he="זיהום / פסולת" data-en="Pollution / dumping" data-ar="تلوث / نفايات">זיהום / פסולת</span></div>
  <div class="ropt" onclick="rt(this)" role="radio" aria-checked="false"><div class="ropt-ic"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><g fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20.5s-7.5-4.4-7.5-10A4.2 4.2 0 0 1 12 8a4.2 4.2 0 0 1 7.5 2.5c0 5.6-7.5 10-7.5 10z"/><path d="M12 11v5M9.5 13.5h5"/></g></svg></div><span id="rt5" data-he="עזרה רפואית" data-en="Medical help" data-ar="مساعدة طبية">עזרה רפואית</span></div>
  <div class="ropt" onclick="rt(this)" role="radio" aria-checked="false"><div class="ropt-ic"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><g fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 19c0-8 5-13 15-14-.5 9.5-6 14.5-14 14z"/><path d="M5 19c3-4 6-6.5 9.5-8.5"/></g></svg></div><span id="rt6" data-he="אחר" data-en="Other" data-ar="أخرى">אחר</span></div>
+ <div class="ropt ropt-uxo" onclick="rt(this)" role="radio" aria-checked="false"><div class="ropt-ic"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><g fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6.4 18.6Q8.7 19.2 10.4 17.5L16.4 11.6 13.4 8.6 7.5 14.6Q5.8 16.3 6.4 18.6Z M14 14 18.6 13 16.6 11 M11 11 12 6.4 14 8.4 M11.7 16.3 8.7 13.3"/><path d="M2.5 21h11"/><path d="M3.6 17.8l-1.2-.8M5 16.2l-.6-1.4"/></g></svg></div><span id="rt7" data-he="נפל / שרידי רקטה" data-en="Fallen rocket / debris" data-ar="بقايا صاروخ / شظايا">נפל / שרידי רקטה</span></div>
  </div>
  </div>
  <div class="mb16">
@@ -1994,6 +1997,7 @@ body.otp-active .ob-steps{display:none!important;}
  <div class="cam-bar">
  <svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 8a2 2 0 0 1 2-2h2l1.5-2h7L17 6h2a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2Z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><circle cx="12" cy="13" r="3.4" fill="none" stroke="currentColor" stroke-width="2"/></svg>
  <span class="cam-lbl" id="cam-lbl" data-he="צרף תמונות" data-en="Attach photos">צרף תמונות</span>
+ <span class="cam-uxo" id="cam-uxo" data-he="רק ממרחק בטוח · לא חובה" data-en="Only from a safe distance · optional" data-ar="فقط من مسافة آمنة · اختياري">רק ממרחק בטוח · לא חובה</span>
  <span class="cam-cnt" id="cam-cnt" style="display:none" aria-live="polite">0</span>
  <button class="cam-btn d" onclick="openCam()" id="cam-cam-btn"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 8a2 2 0 0 1 2-2h2l1.5-2h7L17 6h2a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2Z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><circle cx="12" cy="13" r="3.4" fill="none" stroke="currentColor" stroke-width="2"/></svg></button>
  <button class="cam-btn l" onclick="document.getElementById('file-in').click()" id="cam-gal-btn"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="2.5" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="8.5" cy="9.5" r="1.8" fill="currentColor"/><path d="M5 18l5-5 3.5 3.5L17 13l3 3.5" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></svg></button>
@@ -2771,7 +2775,7 @@ const LANGS={
  cancel:'בטל SOS',ok_all:'✓ הכל טוב?',
  upd_ttl:'עדכונים',rep_ttl:'דיווח אירוע',dms_ttl:" שומר אוטומטי",
  set_ttl:'הגדרות',prof_ttl:'הפרופיל שלי',em_ttl:'מספרי חירום',alarm_ttl:'הגדרות אזעקה',
- l1:'שריפה / עשן',l2:'זיהום / פסולת',l3:'חיה פצועה',l4:'זרם קורע / טביעה',l5:'מפגע בשטח',l6:'רפואי',l7:'SOS חי',
+ l_uxo:'נפל / שרידי רקטה',l1:'שריפה / עשן',l2:'זיהום / פסולת',l3:'חיה פצועה',l4:'זרם קורע / טביעה',l5:'מפגע בשטח',l6:'רפואי',l7:'SOS חי',
  saved:'✓ הגדרות נשמרו',sent:' דיווח נשלח!',dms_on:'DMS פעיל',dms_off:'DMS כבוי',
  rep_desc:'מה ראית? למשל: כלב פצוע ליד השביל, עשן מעל החורש, פסולת בחוף...',
  share_loc:'שתף מיקום נוכחי',loc_ok:' מיקום נקלט ✓',
@@ -2804,7 +2808,7 @@ const LANGS={
  cancel:'Cancel SOS',ok_all:'✓ I\'m OK',
  upd_ttl:'Updates',rep_ttl:'Report incident',dms_ttl:" שומר אוטומטי",
  set_ttl:'Settings',prof_ttl:'My profile',em_ttl:'Emergency numbers',alarm_ttl:' Alarm settings',
- l1:'Wildfire / smoke',l2:'Pollution / dumping',l3:'Injured wildlife',l4:'Rip current / drowning',l5:'Trail / beach hazard',l6:'Medical',l7:'Live SOS',
+ l_uxo:'Fallen rocket / debris',l1:'Wildfire / smoke',l2:'Pollution / dumping',l3:'Injured wildlife',l4:'Rip current / drowning',l5:'Trail / beach hazard',l6:'Medical',l7:'Live SOS',
  saved:'✓ Settings saved',sent:' Report sent!',dms_on:'DMS active',dms_off:'DMS off',
  rep_desc:'What did you see? For example: an injured dog by the trail, smoke over the woods, litter on the beach...',
  share_loc:'Share current location',loc_ok:' Location captured ✓',
@@ -2837,7 +2841,7 @@ const LANGS={
  cancel:'إلغاء SOS',ok_all:'✓ كل شيء بخير',
  upd_ttl:'التحديثات',rep_ttl:'الإبلاغ عن حادثة',dms_ttl:' مفتاح الأمان الميت',
  set_ttl:'الإعدادات',prof_ttl:'ملفي الشخصي',em_ttl:'أرقام الطوارئ',alarm_ttl:' إعدادات الإنذار',
- l1:'حريق / دخان',l2:'تلوث / نفايات',l3:'حيوان مصاب',l4:'تيار ساحب / غرق',l5:'خطر في المسار',l6:'طبي',l7:'SOS مباشر',
+ l_uxo:'بقايا صاروخ / شظايا',l1:'حريق / دخان',l2:'تلوث / نفايات',l3:'حيوان مصاب',l4:'تيار ساحب / غرق',l5:'خطر في المسار',l6:'طبي',l7:'SOS مباشر',
  saved:'✓ تم حفظ الإعدادات',sent:' تم إرسال البلاغ!',dms_on:'مفتاح الأمان نشط',dms_off:'مفتاح الأمان متوقف',
  rep_desc:'ماذا رأيت؟ صف: الحادثة، الأشخاص المتورطين، الموقع الدقيق...',
  share_loc:'مشاركة الموقع الحالي',loc_ok:' تم تسجيل الموقع ✓',
@@ -2870,7 +2874,7 @@ const LANGS={
  cancel:'Отмена SOS',ok_all:'✓ Всё в порядке',
  upd_ttl:'Обновления',rep_ttl:'Сообщить об инциденте',dms_ttl:' Мёртвая рука',
  set_ttl:'Настройки',prof_ttl:'Мой профиль',em_ttl:'Экстренные номера',alarm_ttl:' Настройки сигнала',
- l1:'Сексуальное насилие',l2:'Насилие',l3:'Слежка',l4:'Кража',l5:'Наркотики',l6:'Медицина',l7:'SOS онлайн',
+ l_uxo:'Fallen rocket / debris',l1:'Сексуальное насилие',l2:'Насилие',l3:'Слежка',l4:'Кража',l5:'Наркотики',l6:'Медицина',l7:'SOS онлайн',
  saved:'✓ Настройки сохранены',sent:' Отчёт отправлен!',dms_on:'Мёртвая рука активна',dms_off:'Мёртвая рука выкл.',
  rep_desc:'Что вы видели? Опишите: инцидент, участников, точное место...',
  share_loc:'Поделиться местоположением',loc_ok:' Местоположение зафиксировано ✓',
@@ -2903,7 +2907,7 @@ const LANGS={
  cancel:'SOS ሰርዝ',ok_all:'✓ ሁሉም ደህና ነው',
  upd_ttl:'ዜናዎች',rep_ttl:'ክስተት ሪፖርት',dms_ttl:' שומר אוטומטי',
  set_ttl:'ቅንጅቶች',prof_ttl:'መገለጫዬ',em_ttl:'አደጋ ጊዜ ቁጥሮች',alarm_ttl:' የማንቂያ ቅንጅቶች',
- l1:'ወሲባዊ ጥቃት',l2:'ኃይል',l3:'መከታተል',l4:'ስርቆት',l5:'አደንዛዥ',l6:'ህክምና',l7:'ቀጥታ SOS',
+ l_uxo:'Fallen rocket / debris',l1:'ወሲባዊ ጥቃት',l2:'ኃይል',l3:'መከታተል',l4:'ስርቆት',l5:'አደንዛዥ',l6:'ህክምና',l7:'ቀጥታ SOS',
  saved:'✓ ቅንጅቶች ተቀምጠዋል',sent:' ሪፖርት ተልኳል!',dms_on:'DMS ንቁ',dms_off:'DMS ዝግ',
  rep_desc:'ምን አያችሁ? ክስተቱን፣ ሰዎቹን፣ ቦታውን ይግለጹ...',
  share_loc:'የአሁኑ ቦታ አካፍሉ',loc_ok:' ቦታ ተዘግቧል ✓',
@@ -2936,7 +2940,7 @@ const LANGS={
  cancel:'Annuler SOS',ok_all:"✓ Tout va bien",
  upd_ttl:'Mises à jour',rep_ttl:'Signaler un incident',dms_ttl:" שומר אוטומטי",
  set_ttl:'Paramètres',prof_ttl:'Mon profil',em_ttl:"Numéros d'urgence",alarm_ttl:" Paramètres d'alarme",
- l1:'Agression sexuelle',l2:'Violence',l3:'Filature',l4:'Vol',l5:'Drogues',l6:'Médical',l7:'SOS en direct',
+ l_uxo:'Fallen rocket / debris',l1:'Agression sexuelle',l2:'Violence',l3:'Filature',l4:'Vol',l5:'Drogues',l6:'Médical',l7:'SOS en direct',
  saved:'✓ Paramètres sauvegardés',sent:' Signalement envoyé!',dms_on:'DMS actif',dms_off:'DMS inactif',
  rep_desc:'Que avez-vous vu? Décrivez: l\'incident, les personnes, l\'emplacement exact...',
  share_loc:'Partager ma position',loc_ok:' Position capturée ✓',
@@ -3743,6 +3747,7 @@ const TYPES={
  theft:{label:()=>T('l4'),color:'#1E9BD6',cls:'t-theft',icon:'wave'},   /* Rip current / drowning */
  drug: {label:()=>T('l5'),color:'#C9A81E',cls:'t-drug', icon:'warning'},/* Trail / beach hazard */
  med: {label:()=>T('l6'),color:'#16A06A',cls:'t-med', icon:'medcross'},/* Medical / injured person */
+ uxo: {label:()=>T('l_uxo'),color:'#F25C05',cls:'t-uxo', icon:'debris'},/* Fallen rocket / debris (נפל) - alert red-orange */
  sos: {label:()=>T('l7'),color:'#FF1A40',cls:'t-sos', icon:'sos'},
  abduct:{label:()=>currentLang==='he'?'ציד לא חוקי':currentLang==='ar'?'صيد غير قانوني':'Poaching', color:'#A0431E',cls:'t-abduct', icon:'ban'},
  missing:{label:()=>currentLang==='he'?'מטייל נעדר':currentLang==='ar'?'متنزه مفقود':'Lost hiker', color:'#6D4AFF',cls:'t-missing', icon:'missing'},
@@ -3885,7 +3890,7 @@ function applyTranslations(){
  setText('alarm-ttl',T('alarm_ttl'));
  // Map legend
  setText('l1',T('l1'));setText('l2',T('l2'));setText('l3',T('l3'));
- setText('l4',T('l4'));setText('l5',T('l5'));setText('l6',T('l6'));setText('l7',T('l7'));
+ setText('l4',T('l4'));setText('l5',T('l5'));setText('l6',T('l6'));setText('l7',T('l7'));setText('l_uxo',T('l_uxo'));
  {const he=currentLang==='he';
  setText('l8',he?'המיקום שלי':currentLang==='ar'?'موقعي':currentLang==='ru'?'Моё местоположение':currentLang==='fr'?'Ma position':currentLang==='am'?'የእኔ ቦታ':'My location');
  setText('legend-ttl-txt',he?'מקרא מפה':'Legend');
@@ -5700,9 +5705,10 @@ function removeSOSPin(){if(mapLayers.sosMarker){MAP.removeLayer(mapLayers.sosMar
 ═══════════════════════════════════ */
 let MAP=null;
 const mapLayers={stats:[],reports:{},sosMarker:null,meMarker:null,circle:{},SHOMER:{},radar:null};
-/* BRANDED basemap - CARTO dark base recoloured to the Shomer navy world via a
- class-scoped CSS filter, with crisp labels layered on top (untinted). */
-const TILE_BASE='https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Light_Gray_Base/MapServer/tile/{z}/{y}/{x}';
+/* BRANDED basemap - OpenStreetMap standard tiles (free, no account or key, OSMF tile policy:
+ attribution kept). Local Hebrew names, green parks/forests, blue water; a light class-scoped
+ CSS tint (.tiles-base) warms land to sand and leans greens toward the brand leaf green. */
+const TILE_BASE='https://tile.openstreetmap.org/{z}/{x}/{y}.png';
 const TILE_REF='https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Light_Gray_Reference/MapServer/tile/{z}/{y}/{x}';
 const TILE_LABELS='https://{s}.basemaps.cartocdn.com/dark_only_labels/{z}/{x}/{y}{r}.png';
 
@@ -5954,9 +5960,8 @@ function initMap(){
  MAP=window.L.map('map',{preferCanvas:true,zoomControl:false,attributionControl:true,
  center:_c0,zoom:_z0,minZoom:3,maxZoom:19,
  zoomSnap:.5,worldCopyJump:true});
- window.L.tileLayer(TILE_BASE,{maxZoom:16,className:'tiles-base',
- attribution:'Esri · HERE · Garmin · OpenStreetMap contributors'}).addTo(MAP);
- window.L.tileLayer(TILE_REF,{maxZoom:16,className:'tiles-ref',pane:'shadowPane'}).addTo(MAP);
+ window.L.tileLayer(TILE_BASE,{maxZoom:19,className:'tiles-base',
+ attribution:'&copy; <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap</a> contributors'}).addTo(MAP);
  /* labels baked into OSM base */
  buildStatMarkers(); try{ checkInbox(); }catch(e){} try{ communityNudge(); }catch(e){} try{ setTimeout(communityNudge, 8000); }catch(e){} try{ renderPastEvents(); }catch(e){}
  // The container may have been laid out while hidden - recalc once visible.
@@ -6075,7 +6080,11 @@ function openDetail(idx){
  const _isPast=isPastEvent(d);
   const canNav=(d.lat!=null&&d.lng!=null&&d.status!=='טופל'&&!_isPast);
  const navBtn=canNav?`<button class="dcta pr" style="width:100%;margin-bottom:8px;background:linear-gradient(135deg,#0E8840,#14A857)" onclick="navigateToEvent()"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true" style="width:18px;height:18px;vertical-align:-3px;margin-inline-end:6px"><path d="M3 11l18-8-8 18-2-8-8-2z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></svg>${currentLang==='he'?'נווט לאירוע · מסלול חי':'Navigate to event · live route'}</button>`:'';
- if(['sos','viol','stalk','med'].includes(d.type)){
+ if(d.type==='uxo'){
+ const _t=uxoTx();
+ ctas=`<div class="uxo-det">${ESC(_t.p[0])} ${ESC(_t.p[1])}</div>
+   <div class="det-ctas"><button class="dcta gd" onclick="callNum(policeNum())">${call100Lbl()}</button><button class="dcta sc" onclick="cl('det-sheet')">${T('close')}</button></div>`;
+ } else if(['sos','viol','stalk','med'].includes(d.type)){
  /* ONE primary action. "Navigate" and "I'm on my way" were two buttons for what the
     user experiences as a single decision - so responding now also starts the route. */
  const he2=currentLang==='he';
@@ -6371,7 +6380,40 @@ function updCamCnt(){
 function rt(el){
  document.querySelectorAll('.ropt').forEach(b=>{b.classList.remove('sel');b.setAttribute('aria-checked','false');});
  el.classList.add('sel'); el.setAttribute('aria-checked','true');
+ const uxo=!!el.querySelector('#rt7'); const sh=document.getElementById('sh-rep'); if(sh) sh.classList.toggle('is-uxo',uxo);
+ if(uxo) uxoNotice();
 }
+/* ═══ נפל / FALLEN ROCKET - safety first ═══
+   Shown BEFORE the user continues a "נפל" report (and from the quick-report sheet).
+   Do not approach/touch/move/photograph up close · keep people and animals away · call 100 now. */
+var UXO_TX={
+ he:{h:'נפל או שרידי רקטה: קודם כל בטיחות',p:['לא מתקרבים, לא נוגעים, לא מזיזים ולא מצלמים מקרוב.','מרחיקים אנשים ובעלי חיים מהמקום.','מתקשרים מיד למשטרה ב-100. חבלן משטרה יטפל בזה.'],
+   ph:'תמונה רק ממרחק בטוח, ואפשר לדלג עליה.',call:'חיוג ל-100',go:'הבנתי, המשך לדיווח'},
+ en:{h:'Fallen rocket or debris: safety first',p:['Do not approach, touch, move or photograph it up close.','Keep people and animals away.','Call the police on 100 right away. A police bomb technician will handle it.'],
+   ph:'Photo only from a safe distance, or skip it.',call:'Call 100',go:'Understood, continue'},
+ ar:{h:'بقايا صاروخ أو شظايا: السلامة أولًا',p:['لا تقترب منها، لا تلمسها، لا تحرّكها ولا تصوّرها عن قرب.','أبعِد الناس والحيوانات عن المكان.','اتصل بالشرطة على 100 فورًا. خبير المتفجرات في الشرطة سيتولّى الأمر.'],
+   ph:'صورة فقط من مسافة آمنة، ويمكنك تخطّيها.',call:'اتصل بـ 100',go:'فهمت، متابعة البلاغ'}
+};
+function uxoTx(){ return UXO_TX[currentLang==='ar'?'ar':currentLang==='he'?'he':'en']; }
+var _uxoNext=null;
+function uxoNotice(next){
+ _uxoNext=(typeof next==='function')?next:null;
+ var t=uxoTx(), ov=document.getElementById('uxo-ov');
+ if(!ov){ ov=document.createElement('div'); ov.id='uxo-ov'; ov.setAttribute('role','alertdialog'); ov.setAttribute('aria-modal','true'); ov.setAttribute('aria-labelledby','uxo-h'); document.body.appendChild(ov); }
+ var num=(typeof policeNum==='function')?policeNum():'100';
+ ov.setAttribute('dir',currentLang==='en'?'ltr':'rtl');
+ ov.innerHTML='<div class="uxo-card"><div class="uxo-hd"><span class="uxo-ic">'+ic('debris')+'</span><span id="uxo-h">'+ESC(t.h)+'</span></div>'
+  +'<ul class="uxo-list">'+t.p.map(function(x){return '<li>'+ESC(x)+'</li>';}).join('')+'</ul>'
+  +'<div class="uxo-ph">'+ESC(t.ph)+'</div>'
+  +'<button class="uxo-call" onclick="uxoCall()">'+ic('phone')+'<span>'+ESC(t.call.replace('100',num))+'</span></button>'
+  +'<button class="uxo-go" onclick="uxoAck()">'+ESC(t.go)+'</button></div>';
+ ov.classList.add('on');
+ try{ if(navigator.vibrate) navigator.vibrate([90,60,90]); }catch(e){}
+ setTimeout(function(){ var b=ov.querySelector('.uxo-call'); if(b) b.focus(); },60);
+}
+function uxoClose(){ var ov=document.getElementById('uxo-ov'); if(ov) ov.classList.remove('on'); }
+function uxoAck(){ uxoClose(); var n=_uxoNext; _uxoNext=null; if(n){ try{ n(); }catch(e){} } }
+function uxoCall(){ uxoClose(); _uxoNext=null; var n=(typeof policeNum==='function')?policeNum():'100'; try{ toast((currentLang==='he'?'מחייג ':currentLang==='ar'?'جارٍ الاتصال بـ ':'Calling ')+n+'...','amb'); }catch(e){} setTimeout(function(){ window.location.href='tel:'+n; },300); }
 function getRepLoc(){
  if(!navigator.geolocation){document.getElementById('rep-loc-txt').textContent=(user.city||'ישראל')+' ✓';return;}
  navigator.geolocation.getCurrentPosition(
@@ -6396,7 +6438,7 @@ function sendReport(){
  // Map the selected report option to a type key.
  const opts=[...document.querySelectorAll('.ropt')];
  const selIdx=opts.findIndex(o=>o.classList.contains('sel'));
- const typeKeys=['sex','stalk','theft','viol','med','new'];
+ const typeKeys=['sex','stalk','theft','viol','med','new','uxo'];
  const typeKey=typeKeys[selIdx>=0?selIdx:0];
  toast(`${T('sent')}${n>0?' +'+n+'':''}`, 'grn');
  // Build + persist the report.
@@ -6715,6 +6757,14 @@ var EMERGENCY_GUIDE=[
   dont:{he:'לא מתפצלים כדי "לחפש עזרה" · לא יורדים לערוץ או לנחל כדי לקצר.',en:'Do not split up to "go for help" · Do not drop into a gully or stream bed to take a shortcut.',ar:'لا تتفرقوا "لطلب المساعدة" · لا تنزلوا إلى وادٍ أو مجرى لاختصار الطريق.'},
   src:'משטרת ישראל - יחידות החילוץ · רשות הטבע והגנים (INPA)'},
 
+ {id:'uxo',e:'',t:{he:'נפל / שרידי רקטה',en:'Fallen rocket / debris',ar:'بقايا صاروخ / شظايا'},
+  s:{he:'לא מתקרבים, מרחיקים, מחייגים 100',en:'Keep away, clear the area, call 100',ar:'لا تقترب، أبعِد الناس، اتصل بـ100'},
+  steps:{he:['מצאת רקטה, טיל, שבר של מיירט או חפץ חשוד שלא התפוצץ? עצור/י. לא מתקרבים.','לא נוגעים, לא מזיזים, לא מרימים ולא מצלמים מקרוב. גם חלק קטן עלול להתפוצץ.','מתרחקים לאט באותה הדרך שבה הגעת. מרחיקים אנשים, ילדים ובעלי חיים.','מתקשרים מיד למשטרה ב-100. חבלן משטרה יטפל בזה.','אומרים למוקד איפה בדיוק זה נמצא. אפשר להקריא את קואורדינטות רשת ישראל מפס ה-SOS.','אם אפשר לעשות זאת בבטחה, נשארים במרחק ומזהירים אחרים עד שהמשטרה מגיעה.'],
+   en:['Found a rocket, missile, interceptor fragment or a suspicious object that did not explode? Stop. Do not go closer.','Do not touch, move, pick up or photograph it up close. Even a small piece can explode.','Back away slowly the same way you came. Keep people, children and animals away.','Call the police on 100 right away. A police bomb technician will handle it.','Tell the call centre exactly where it is. You can read out the Israel grid numbers from the SOS bar.','If it is safe to do so, stay at a distance and warn others until the police arrive.'],
+   ar:['وجدت صاروخًا أو قذيفة أو شظية صاروخ اعتراضي أو جسمًا مشبوهًا لم ينفجر؟ توقّف. لا تقترب.','لا تلمسه، لا تحرّكه، لا ترفعه ولا تصوّره عن قرب. حتى القطعة الصغيرة قد تنفجر.','ابتعد ببطء من نفس الطريق الذي جئت منه. أبعِد الناس والأطفال والحيوانات.','اتصل بالشرطة على 100 فورًا. خبير المتفجرات في الشرطة سيتولّى الأمر.','أخبر مركز الاتصال بالمكان الدقيق. يمكنك قراءة أرقام شبكة إسرائيل من شريط الطوارئ.','إن كان ذلك آمنًا، ابقَ على مسافة وحذّر الآخرين حتى وصول الشرطة.']},
+  dont:{he:'לא נוגעים ולא מזיזים · לא לוקחים "מזכרת" · לא מצלמים מקרוב · לא מטפלים בזה לבד.',en:'Do not touch or move it · never take a "souvenir" · no close-up photos · do not deal with it yourself.',ar:'لا تلمسه ولا تحرّكه · لا تأخذ "تذكارًا" · لا تصوير عن قرب · لا تتعامل معه بنفسك.'},
+  src:'משטרת ישראל - מערך החבלה · פיקוד העורף'},
+
  {id:'shock',e:'🆘',t:{he:'הלם',en:'Shock',ar:'الصدمة'},
   s:{he:'חיוורון, עור קר, חולשה',en:'Pale, cold skin, weakness',ar:'شحوب وبرودة وضعف'},
   steps:{he:['חייג/י 101 - הלם מסכן חיים.','השכב/י את האדם.','הרם/י את הרגליים מעל גובה הלב - אלא אם יש כאב, חשד לפציעת ראש/צוואר/גב/רגל, או קושי בנשימה.','שמור/י עליו חם - כסה/י במעיל או שמיכה.','שחרר/י בגד צמוד, עצור/י דימום בולט בלחץ. הרגע/י והשגח/י.'],
@@ -6888,7 +6938,7 @@ function guidePicto(id,cls){ var p=GUIDE_PICTO[id]; if(!p)return '<span class="'
 /* Per-CATEGORY distinct colour - each emergency is instantly separated at a glance.
    Paired with a unique SHOMER-branded Grok illustration per topic (img/guide/<id>.jpg,
    navy outline + the category accent, airplane-safety-card style). Offline-cached. */
-var GUIDE_CAT={ aed:'#F2E9D1', ptsd:'#3217A1', selfdef:'#F2E9D1', cpr:'#E5484D', choke:'#12A594', bleed:'#B21D2B', burn:'#E8811C', stroke:'#8E4EC6', heart:'#D6409F', allergy:'#30A46C', seizure:'#2E843E', drown:'#2E7DD1', flood:'#3BA3C7', heat:'#E8811C', lost:'#6D4AFF', shock:'#5B6AD0', faint:'#3B17A1', bone:'#E7E1D0', call:'#0EA5E9' };
+var GUIDE_CAT={ aed:'#F2E9D1', ptsd:'#3217A1', selfdef:'#F2E9D1', cpr:'#E5484D', choke:'#12A594', bleed:'#B21D2B', burn:'#E8811C', stroke:'#8E4EC6', heart:'#D6409F', allergy:'#30A46C', seizure:'#2E843E', drown:'#2E7DD1', flood:'#3BA3C7', heat:'#E8811C', lost:'#6D4AFF', uxo:'#C2410C', shock:'#5B6AD0', faint:'#3B17A1', bone:'#E7E1D0', call:'#0EA5E9' };
 function guideCatColor(id){ return GUIDE_CAT[id]||'var(--g3)'; }
 function guideImg(id,cls){ return '<img class="'+(cls||'gd-pic')+'" src="img/guide/'+id+'.jpg" alt="" loading="lazy" decoding="async" onerror="this.style.display=&quot;none&quot;">'; }
 function guideRenderList(q){
@@ -6936,6 +6986,7 @@ var GUIDE_SYN = {
   drown:   ['טביעה','טבע','מים','ים','בריכה','לא נושם','שאב מים'],
   flood:   ['שיטפון','שטפון','שיטפונות','נחל','ואדי','זרימה','גשם','נלכד','מים','flood','wadi','سيل'],
   heat:    ['חום','מכת חום','שמש','התייבשות','צמא','סחרחורת','בחילה','heat','dehydration','حر'],
+  uxo:     ['נפל','רקטה','טיל','שרידים','שבר','רסיס','רסיסים','מיירט','חבלן','חפץ חשוד','לא התפוצץ','rocket','missile','debris','shrapnel','unexploded','صاروخ','شظايا'],
   lost:    ['איבוד','אבוד','הלכתי לאיבוד','תעיתי','שביל','מסלול','לילה','חושך','lost','trail','تائه'],
   child:   ['ילד','תינוק','פעוט','ילדים','חנק בילד','החייאת ילדים']
 };
@@ -6971,6 +7022,7 @@ function openGuideTopic(id){ var L=currentLang==='ar'?'ar':currentLang==='en'?'e
  g.steps[L].forEach(function(st,i){ html+='<div class="gd-step"><span class="gd-num" style="background:'+col+'">'+(i+1)+'</span><span class="gd-step-tx">'+ESC(emLocalize(st))+'</span></div>'; });
  if(g.call){ html+='<div class="gd-dont" style="background:rgba(46,132,62,0.12);border-color:var(--amb)"><div class="gd-dont-h" style="color:var(--amb)">📞 '+(he?'מתי לחייג ':L==='ar'?'متى تتصل بـ':'When to call ')+ambulanceNum()+'</div><div class="gd-dont-tx" style="color:var(--tx1)">'+ESC(emLocalize(g.call[L]))+'</div></div>'; }
  if(g.dont){ html+='<div class="gd-dont"><div class="gd-dont-h">⛔ '+(he?'אסור':L==='ar'?'ممنوع':'Do NOT')+'</div><div class="gd-dont-tx">'+ESC(g.dont[L])+'</div></div>'; }
+ if(g.id==='uxo'){ html+='<button class="uxo-call" style="margin:4px 0 12px" onclick="callNum(policeNum())">'+ic('phone')+'<span>'+ESC(uxoTx().call.replace('100',policeNum()))+'</span></button>'; }
  if(g.id==='cpr'||g.id==='aed'||g.id==='choke'){
    html+='<button onclick="aedFindNearest()" style="width:100%;margin:4px 0 12px;padding:14px;border-radius:14px;border:0;background:linear-gradient(150deg,#3DDC97,#F2E9D1);color:#fff;font-weight:800;font-size:15px;cursor:pointer;font-family:inherit;display:flex;align-items:center;justify-content:center;gap:8px;box-shadow:0 8px 22px rgba(242,233,209,0.35)">'
      +'<span style="display:inline-flex;width:22px;height:22px;background:#fff;border-radius:4px;align-items:center;justify-content:center"><svg viewBox="0 0 24 24" width="16" height="16"><path d="M12 21.2s-7.6-4.9-7.6-10.4A4.6 4.6 0 0 1 12 7.6a4.6 4.6 0 0 1 7.6 3.2c0 5.5-7.6 10.4-7.6 10.4Z" fill="#F2E9D1"/><path d="M12.9 9.3l-3.3 4.5h2.2l-.6 3.6 3.4-4.7h-2.3l.6-3.4Z" fill="#fff"/></svg></span>'
@@ -9919,7 +9971,7 @@ try{ hydrateIcons(document); }catch(e){}
 /* Loaded-build version - shown in the diagnostic panel so a phone can prove
    whether it's on the latest build or a STALE cached one. Keep in lock-step
    with sw.js SW_VERSION on every deploy. */
-var APP_VER='v277';
+var APP_VER='v278';
 var FB={ready:false,uid:null,db:null,_presTimer:null,connected:false,listening:false,pushState:'default',near:0,swVer:'?',
   authState:'connecting',sdkLoaded:false,persist:'',permErr:null,err:null,wsProbe:'',csp:''};
 /* Always log connection diagnostics to the console so the real failure can be SEEN in Chrome. */
@@ -11399,7 +11451,8 @@ function openReport(){
     b.onclick=function(){
       chosen=b.getAttribute('data-t');
       var note=(document.getElementById('rep-note')||{}).value||'';
-      evtCreate(chosen, note).then(function(ok){ if(ok) d.remove(); });
+      var go=function(){ evtCreate(chosen, note).then(function(ok){ if(ok) d.remove(); }); };
+      if(chosen==='uxo') uxoNotice(go); else go();
     };
   });
   d.querySelector('.rep-close').onclick=function(){ d.remove(); };
@@ -11508,7 +11561,8 @@ var EVT = {
     weapon:     {he:'נשק / איום',    sev:4, ic:'🔴', need:4},
     hazard:     {he:'מפגע / סכנה',   sev:1, ic:'△', need:2},
     fire:       {he:'שריפה',         sev:3, ic:'🔥', need:2},
-    medical:    {he:'מצוקה רפואית',  sev:3, ic:'✚', need:1}
+    medical:    {he:'מצוקה רפואית',  sev:3, ic:'✚', need:1},
+    uxo:        {he:'נפל / שרידי רקטה', sev:4, ic:'⚠', need:1}
   },
   NEIGH_M: 1500          /* a confirmation only counts if the confirmer is within 1.5 km */
 };
@@ -15251,8 +15305,10 @@ html,body{background:var(--sand);color:var(--ink);}
 .ob-sub{letter-spacing:0!important;text-transform:none!important;font-size:16px!important;font-weight:500!important;color:var(--ink2,#4D5B52)!important;text-shadow:none!important}
 .ob-cta,.cta-gold{background:var(--leaf)!important;color:#fff!important;box-shadow:0 12px 26px -14px rgba(47,133,64,.8)!important}
 /* Map: light, warm basemap */
-.tiles-base{filter:sepia(.18) saturate(1.1) brightness(1.02)!important}
-.leaflet-container{background:#EFEADC!important}
+.tiles-base{filter:saturate(.9) sepia(.06) hue-rotate(4deg)!important}
+.leaflet-container{background:#F4F0E4!important}
+.leaflet-control-attribution{background:rgba(250,246,236,.86)!important;color:#4D5B52!important}
+.leaflet-control-attribution a{color:#276E36!important}
 /* The 6 report icons: tinted rounded chips, same as the landing page tiles */
 .type-grid .ropt-ic{width:48px;height:48px;border-radius:15px;display:flex;align-items:center;justify-content:center;margin:0 auto 6px}
 .type-grid .ropt-ic .ic{width:26px!important;height:26px!important}
@@ -15264,6 +15320,26 @@ html,body{background:var(--sand);color:var(--ink);}
 .ropt:has(#rt6) .ropt-ic{background:var(--leaf-t)}.ropt:has(#rt6) .ropt-ic .ic{color:var(--leaf-tx)!important}
 .type-grid .ropt{background:var(--paper)!important;border:1px solid var(--line)!important;color:var(--ink)!important}
 .type-grid .ropt.sel{border-color:var(--leaf)!important;background:var(--leaf-t)!important;box-shadow:0 0 0 1px var(--leaf) inset}
+/* נפל / fallen rocket: 7th type, full-width row in alert red-orange */
+.type-grid .ropt-uxo{grid-column:1/-1;flex-direction:row;justify-content:center;gap:12px;padding:10px 12px}
+.type-grid .ropt-uxo .ropt-ic{margin:0}
+.ropt:has(#rt7) .ropt-ic{background:#FDE4D3}.ropt:has(#rt7) .ropt-ic .ic{color:#C2410C!important}
+.type-grid .ropt-uxo.sel{border-color:#C2410C!important;background:#FFF1E7!important;box-shadow:0 0 0 1px #C2410C inset}
+.cam-uxo{display:none;font-size:12px;font-weight:700;color:#9A3412}
+#sh-rep.is-uxo .cam-uxo{display:inline}#sh-rep.is-uxo #cam-lbl{display:none}
+#uxo-ov{position:fixed;inset:0;z-index:9800;display:none;align-items:center;justify-content:center;padding:16px;background:rgba(31,43,36,.45)}
+#uxo-ov.on{display:flex}
+.uxo-card{width:min(420px,100%);max-height:calc(100vh - 32px);overflow:auto;background:#FFFDF8;border-radius:22px;border-top:6px solid #C2410C;padding:18px 18px 16px;box-shadow:0 24px 60px -20px rgba(31,43,36,.55);color:#1F2B24;font-family:var(--font-main)}
+.uxo-hd{display:flex;align-items:center;gap:12px;font-size:18px;font-weight:800;line-height:1.3;color:#9A3412}
+.uxo-ic{width:44px;height:44px;flex:none;border-radius:14px;background:#FDE4D3;color:#C2410C;display:flex;align-items:center;justify-content:center}
+.uxo-ic .ic{width:26px;height:26px}
+.uxo-list{margin:14px 0 10px;padding-inline-start:20px;font-size:15.5px;line-height:1.55;font-weight:600}
+.uxo-list li{margin-bottom:6px}
+.uxo-ph{font-size:13.5px;color:#4D5B52;background:#F2EBDB;border-radius:10px;padding:8px 12px;margin-bottom:14px}
+.uxo-call{width:100%;min-height:52px;border:0;border-radius:999px;background:#C2410C;color:#fff;font:800 17px var(--font-main);display:flex;align-items:center;justify-content:center;gap:10px;cursor:pointer}
+.uxo-call .ic{width:22px;height:22px}
+.uxo-go{width:100%;min-height:48px;margin-top:10px;border:1.5px solid #E4DCCB;border-radius:999px;background:#fff;color:#1F2B24;font:700 15px var(--font-main);cursor:pointer}
+.uxo-det{font-size:14px;font-weight:600;color:#9A3412;background:#FFF1E7;border:1px solid #F5C9AB;border-radius:12px;padding:10px 12px;margin-bottom:10px;line-height:1.5}
 /* SOS countdown: readable on the light card */
 .sos-cd-num{color:#C93636!important;text-shadow:none!important}
 #ver-badge{background:rgba(255,255,255,.88)!important;color:var(--tx3)!important;border:1px solid var(--line)!important}
