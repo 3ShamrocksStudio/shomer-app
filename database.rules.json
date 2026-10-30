@@ -153,10 +153,13 @@
     "palerts": {
       ".read": "auth != null",
       "$id": {
-        ".write": "auth != null && ( !data.exists() ? (newData.child('by').val() === auth.uid && !root.child('dashfeed').child($id).exists()) : ( data.child('by').val() === auth.uid || data.child('subjUid').val() === auth.uid ) )",
-        ".validate": "!newData.exists() || newData.hasChildren(['by','ts','kind'])",
+        ".write": "auth != null && ( !data.exists() ? (root.child('dashown').child($id).val() === auth.uid && !root.child('dashfeed').child($id).exists()) : ( data.child('by').val() === auth.uid || root.child('dashown').child($id).val() === auth.uid || data.child('subjUid').val() === auth.uid ) )",
+        ".validate": "!newData.exists() || newData.hasChildren(['ts','kind'])",
         "by": {
-          ".validate": "!data.exists() || newData.val() === data.val()"
+          ".validate": false
+        },
+        "resolvedBy": {
+          ".validate": false
         }
       }
     },
@@ -182,8 +185,8 @@
     "dashfeed": {
       ".read": true,
       "$id": {
-        ".write": "auth != null && ((!newData.exists() && data.exists() && data.child('ts').isNumber() && (data.child('ts').val() < now - 7776000000 || (data.child('type').val() === 'presence' && !(data.child('status').isString() && data.child('status').val().beginsWith('d1:')) && data.child('ts').val() < now - 172800000))) || (($id.beginsWith('hb_') || $id.beginsWith('sf_')) ? (root.child('dashown').child($id).val() === auth.uid || ($id === 'hb_' + auth.uid && !newData.exists())) : (!data.exists() || data.child('by').val() === auth.uid || (root.child('events').child($id).child('by').val() === auth.uid || root.child('sos').child($id).child('uid').val() === auth.uid || root.child('palerts').child($id).child('by').val() === auth.uid))))",
-        ".validate": "newData.hasChildren(['type','lat','lng','ts']) && ($id.beginsWith('hb_') ? newData.child('type').val() === 'presence' : ($id.beginsWith('sf_') ? (newData.child('type').val() !== 'presence' && root.child('sos').child(auth.uid).child('uid').val() === auth.uid) : (newData.child('type').val() !== 'presence' && (root.child('events').child($id).child('by').val() === auth.uid || root.child('sos').child($id).child('uid').val() === auth.uid || root.child('palerts').child($id).child('by').val() === auth.uid))))",
+        ".write": "auth != null && ((!newData.exists() && data.exists() && data.child('ts').isNumber() && (data.child('ts').val() < now - 7776000000 || (data.child('type').val() === 'presence' && !(data.child('status').isString() && data.child('status').val().beginsWith('d1:')) && data.child('ts').val() < now - 172800000))) || (($id.beginsWith('hb_') || $id.beginsWith('sf_')) ? (root.child('dashown').child($id).val() === auth.uid || ($id === 'hb_' + auth.uid && !newData.exists())) : (!data.exists() || data.child('by').val() === auth.uid || (root.child('events').child($id).child('by').val() === auth.uid || root.child('sos').child($id).child('uid').val() === auth.uid || root.child('palerts').child($id).child('by').val() === auth.uid || ($id.beginsWith('pa_') && root.child('dashown').child($id).val() === auth.uid)))))",
+        ".validate": "newData.hasChildren(['type','lat','lng','ts']) && ($id.beginsWith('hb_') ? newData.child('type').val() === 'presence' : ($id.beginsWith('sf_') ? (newData.child('type').val() !== 'presence' && root.child('sos').child(auth.uid).child('uid').val() === auth.uid) : (newData.child('type').val() !== 'presence' && (root.child('events').child($id).child('by').val() === auth.uid || root.child('sos').child($id).child('uid').val() === auth.uid || root.child('palerts').child($id).child('by').val() === auth.uid || ($id.beginsWith('pa_') && root.child('dashown').child($id).val() === auth.uid)))))",
         "type": {
           ".validate": "newData.isString()"
         },
@@ -231,7 +234,7 @@
     "dashown": {
       "$id": {
         ".read": false,
-        ".write": "auth != null && ($id.beginsWith('hb_') || $id.beginsWith('sf_')) && (!data.exists() || data.val() === auth.uid) && (!newData.exists() || newData.val() === auth.uid)",
+        ".write": "auth != null && ($id.beginsWith('hb_') || $id.beginsWith('sf_') || $id.beginsWith('pa_')) && (!data.exists() || data.val() === auth.uid) && (!newData.exists() || newData.val() === auth.uid)",
         ".validate": "newData.isString()"
       }
     }
