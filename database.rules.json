@@ -161,8 +161,8 @@
       }
     },
     "events": {
-      ".read": "auth != null",
       "$id": {
+        ".read": "auth != null && data.child('by').val() === auth.uid",
         ".write": "auth != null && ( (!data.exists() && newData.child('by').val() === auth.uid && !root.child('dashfeed').child($id).exists()) || (data.exists() && data.child('by').val() === auth.uid) )",
         ".validate": "!newData.exists() || newData.hasChildren(['by','ts','type'])",
         "confirms": {
@@ -200,13 +200,13 @@
           ".validate": "newData.isString()"
         },
         "by": {
-          ".validate": "newData.isString() && newData.val() === auth.uid && !$id.beginsWith('hb_') && !$id.beginsWith('sf_')"
+          ".validate": false
         },
         "$other": {
           ".validate": false
         },
         "founder": {
-          ".validate": "newData.isBoolean() && root.child('founders').child(auth.uid).exists()"
+          ".validate": false
         }
       }
     },
