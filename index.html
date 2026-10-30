@@ -462,6 +462,8 @@ header.bar{border-bottom:1px solid rgba(250,172,34,.14)}
 .btn-orange svg{stroke:#0C1B3A}
 .arrive-kicker,.arrive-big{color:var(--gold-ink)!important}
 .disc-card{border-color:#1F315F}
+.comm{margin-top:22px;font-size:17px}
+.comm a{display:inline-flex;align-items:center;min-height:44px;color:#1F315F;font-weight:700;text-decoration:underline;text-underline-offset:4px;text-decoration-color:#E0A828}
 .disc-txt,.disc-txt strong,.disc-txt .foot-nums{color:#1F315F}
 </style>
 </head>
@@ -562,6 +564,8 @@ header.bar{border-bottom:1px solid rgba(250,172,34,.14)}
       <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v12m0 0l-4-4m4 4l4-4M4 21h16"/></svg>
       <span data-i="cta2">להורדה - חינם!</span>
     </a>
+    <!-- COMMUNITIES PATH: staging URL until Dave approves the merge; then point it at the production Command page -->
+    <p class="comm"><a href="https://3shamrocksstudio.github.io/shomer-command/" data-i="comm">קהילה, יישוב או מועצה? לוח בקרה לרבש"צים ולמזכירויות ←</a></p>
   </div>
 </section>
 
@@ -578,6 +582,7 @@ header.bar{border-bottom:1px solid rgba(250,172,34,.14)}
       <a href="privacy.html" data-i="fl1">פרטיות</a>
       <a href="terms.html" data-i="fl2">תנאים</a>
       <a href="accessibility.html" data-i="fl3">הצהרת נגישות</a>
+      <a href="https://3shamrocksstudio.github.io/shomer-command/" data-i="fl5">לקהילות ולרשויות</a>
       <a href="mailto:support@shomer-app.co.il" data-i="fl4">כתבו לנו</a>
       </div>
       <div class="foot-social">
@@ -616,6 +621,8 @@ var I18N={nsoon:{he:"בקרוב · COMING SOON",en:"COMING SOON",ar:"قريبً�
  fl2:{he:"תנאים",en:"Terms",ar:"الشروط"},
  fl3:{he:"הצהרת נגישות",en:"Accessibility",ar:"إمكانية الوصول"},
  fl4:{he:"כתבו לנו",en:"Contact us",ar:"راسلنا"},
+ fl5:{he:"לקהילות ולרשויות",en:"For communities and councils",ar:"للمجتمعات والسلطات"},
+ comm:{he:"קהילה, יישוב או מועצה? לוח בקרה לרבש\"צים ולמזכירויות ←",en:"A community, town or council? A dashboard for security coordinators →",ar:"مجتمع أو بلدة أو مجلس؟ لوحة تحكم لمنسقي الأمن ←"},
  copy:{he:"© 2026 3Shamrocks Studio · SH✡MER",en:"© 2026 3Shamrocks Studio · SH✡MER",ar:"© 2026 3Shamrocks Studio · SH✡MER"}
 };
 function setLang(l){
