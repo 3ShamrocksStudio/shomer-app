@@ -10138,7 +10138,7 @@ function privacyHTML(){ const he=currentLang==='he';
  <h4>أين تُخزَّن البيانات</h4>
  <p><strong>معظم البيانات تُخزَّن على جهازك</strong> (تخزين محلي في المتصفّح). لإظهار الحُرّاس القريبين وبثّ نداء استغاثة، يُزامَن موقع تقريبي فقط عبر خدمة آنية مؤمَّنة. ولا تغادر بقية البيانات جهازك، باستثناء رابط دعوة تختار مشاركته.</p>
  <h4>المشاركة والبيع</h4>
- <p><strong>لا نبيع بياناتك ولا نشاركها مع أطراف ثالثة.</strong> لا توجد إعلانات ولا أدوات تتبّع/تحليلات.</p>
+ <p><strong>لا نبيع بياناتك ولا نشاركها مع أطراف ثالثة.</strong> لا توجد إعلانات. لعدّ الاستخدام نستخدم Google Analytics 4، مع إيقاف Google Signals وتخصيص الإعلانات.</p>
  <h4>أدوات تحكّمك</h4>
  <ul>
  <li><strong>إيقاف المشاركة</strong> - وضع التخفّي، أو إيقاف „شارك موقعي"، أو فصل حارس.</li>
@@ -10164,7 +10164,7 @@ function privacyHTML(){ const he=currentLang==='he';
  <h4>היכן המידע נשמר</h4>
  <p><strong>רוב המידע נשמר במכשירך</strong> (אחסון מקומי בדפדפן). כדי להציג אותך לשומרים שחיברת ולשדר SOS, המיקום מסונכרן דרך שירות זמן-אמת מאובטח: מיקום מדויק רק לשומרים שחיברת בהסכמה, ומיקום מקורב (כ-1 ק"מ) בלבד לכל השאר. צוות SH✡MER רשאי לגשת לנתוני מיקום רק לצורכי בטיחות ומניעת שימוש לרעה. שאר המידע אינו עוזב את מכשירך, למעט קישור הזמנה שאת/ה בוחר/ת לשתף.</p>
  <h4>שיתוף ומכירה</h4>
- <p><strong>איננו מוכרים את המידע שלך ואיננו משתפים אותו עם צדדים שלישיים.</strong> אין פרסומות ואין כלי מעקב/אנליטיקה.</p>
+ <p><strong>איננו מוכרים את המידע שלך ואיננו משתפים אותו עם צדדים שלישיים.</strong> אין פרסומות. לספירת שימוש אנחנו משתמשים ב-Google Analytics 4, בלי Google Signals ובלי התאמת פרסום.</p>
  <h4>השליטה שלך</h4>
  <ul>
  <li><strong>להפסיק שיתוף</strong> - מצב רפאים, כיבוי „שתף מיקום", או ניתוק שומר.</li>
@@ -10190,7 +10190,7 @@ function privacyHTML(){ const he=currentLang==='he';
  <h4>Where data is stored</h4>
  <p><strong>Most data is stored on your device</strong> (browser local storage). To show you to the SHOMERs you connected and to broadcast an SOS, your location is synced through a secure realtime service: precise only for SHOMERs you connected by consent, coarse (~1 km) for everyone else. The SH✡MER team may access location data only for safety operations and abuse prevention. The rest never leaves your device, except an invite link you choose to share.</p>
  <h4>Sharing & selling</h4>
- <p><strong>We do not sell your data and do not share it with third parties.</strong> There are no ads and no tracking/analytics tools.</p>
+ <p><strong>We do not sell your data and do not share it with third parties.</strong> There are no ads. To count usage we use Google Analytics 4, with Google Signals and ad personalisation turned off.</p>
  <h4>Your controls</h4>
  <ul>
  <li><strong>Stop sharing</strong> - ghost mode, turn off "Share my location", or disconnect a SHOMER.</li>
@@ -14143,6 +14143,8 @@ function statsInitAnalytics(){
     try{ if(navigator.webdriver || isReviewAccount()) return; }catch(e){}   /* v279: no analytics from automated browsers or the store-review account */
     if(FB._analytics||FB._analyticsIniting) return; if(!(window.firebase&&window.firebase.initializeApp)) return;
     FB._analyticsIniting=true;
+    /* privacy: no Google Signals and no ad personalisation (GA4 itself does not store IP addresses) */
+    try{ window.dataLayer=window.dataLayer||[]; if(typeof window.gtag!=='function'){ window.gtag=function(){ window.dataLayer.push(arguments); }; } window.gtag('set',{allow_google_signals:false,allow_ad_personalization_signals:false}); }catch(e){}
     fbLoad('https://www.gstatic.com/firebasejs/10.12.2/firebase-analytics-compat.js').then(function(){
       try{ FB._analytics=window.firebase.analytics(); fbLog('analytics (GA4) ready'); statsLogEvent('app_open'); }
       catch(e){ fbLog('analytics init failed (non-fatal):',(e&&e.message)||e); }
