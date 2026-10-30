@@ -10966,7 +10966,7 @@ function dashFeedPush(id,type,lat,lng){
     var _row={type:String(type||'event'),lat:+(+lat).toFixed(2),lng:+(+lng).toFixed(2),ts:Date.now(),status:'active'};
     /* v300: the public feed carries no account id (the database checks ownership on the source record).
        Until the new rules are published the server still requires it - then, and only then, add it. */
-    fbRestWrite('PUT','dashfeed/'+id,_row).catch(function(e){ if(e&&e.code==='PERMISSION_DENIED'){ _row.by=FB.uid; return fbRestWrite('PUT','dashfeed/'+id,_row); } }).catch(function(){}); }catch(e){}
+    fbRestWrite('PUT','dashfeed/'+id,_row).catch(function(){}); }catch(e){}   /* never retry with the account id: no row beats a row that names me */
 }
 /* ── SSE live stream (mimics ref.on('value')) ── */
 /* ── CONNECTION BUDGET ──
@@ -11474,7 +11474,7 @@ function fbDashBeat(hide, lat, lng){
     if(hide){ fbNativeBeat({on:false,key:key}); if(!st.gone){ st.gone=true; fbRestWrite('DELETE','dashfeed/'+key).catch(function(){}); } return; }
     st.gone=false;
     var _hb={type:'presence',lat:lat,lng:lng,ts:Date.now(),status:((st.mode==='new'&&fbDayTag())?'v2:'+fbDayTag():'v2')};   /* 'v2' = real (non-automated) app; v280 adds today's anonymous tag */
-    if(st.mode!=='new') _hb.by=FB.uid;
+    if(st.mode!=='new') return;   /* without an anonymous key, skip the public feed rather than name my account */
     var _fd=false; try{ _fd=isFounder(); }catch(_f){}
     fbRestWrite('PUT','dashfeed/'+key,_hb).catch(function(){});   /* v300: no founder flag in the public feed - it pinpointed the founder's live area */
     if(st.mode==='new') fbNativeBeat({on:true,key:key,lat:lat,lng:lng});   /* v299: the background service keeps this row alive while the app is off-screen */
@@ -12160,7 +12160,7 @@ function openReport(){
   }).join('');
   d.innerHTML='<div class="rep-card">'
     +'<div class="rep-h">'+(he?'דיווח על אירוע':'Report an event')+'</div>'
-    +'<div class="rep-sub">'+(he?'הדיווח נשלח קודם לשומרים שלך. יתפרסם לאזור רק אחרי שכנים שיאשרו.':'Goes to your SHOMERs first. Area-wide only after neighbours confirm.')+'</div>'
+    +'<div class="rep-sub">'+(he?'הדיווח נשמר במערכת בלבד ואף אחד לא מקבל עליו התראה. במצב חירום חייגו 100 / 101 / 102.':'The report is only saved in the system and nobody is alerted. In an emergency call 100 / 101 / 102.')+'</div>'
     +'<div class="rep-grid">'+btns+'</div>'
     +'<textarea class="rep-note" id="rep-note" maxlength="140" placeholder="'+(he?'פרטים (לא חובה)':'Details (optional)')+'"></textarea>'
     +'<button class="btn-ghost rep-close">'+(he?'ביטול':'Cancel')+'</button>'
@@ -12607,7 +12607,7 @@ async function evtCreate(type, note){
   if(ok){
     try{ dashFeedPush(id,ev.type,ev.lat,ev.lng); }catch(e){}
     var r=repState(); r.made=(r.made||0)+1; r._posts=(r._posts||[]); r._posts.push(Date.now()); saveStore();
-    toast(he?'הדיווח נשלח לשומרים שלך. יתפרסם לאזור רק לאחר אישור של שכנים.':'Sent to your SHOMERs. Goes area-wide only after neighbours confirm.','grn');
+    toast((he?'הדיווח נשמר. אף אחד לא מקבל עליו התראה.':'Report saved. Nobody is alerted about it.')+(ev.byName?(he?' שמך מצורף לדיווח.':' Your name is attached.'):(he?' שמך לא נשלח.':' Your name was not sent.')),'grn');   /* honest: no app reads reports back yet, so nobody is notified */
     try{ evtRenderMine(); }catch(e){}
   } else {
     toast(he?'הדיווח לא נשלח':'Report not sent','amb');
