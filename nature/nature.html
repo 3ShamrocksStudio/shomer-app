@@ -9688,9 +9688,9 @@ function legalApplyI18n(){
  /* v274 GLOBAL: same sentence, local numbers when the user is outside Israel */
  try{ if(obd && !emIsIL()){ const _n=emergencyNums(), _a=emLabels().a; obd.innerHTML=obd.innerHTML.replace('<b>100</b>','<b>'+ESC(_n.p)+'</b>').replace('<b>101</b>','<b>'+ESC(_n.a)+'</b>').replace('<b>102</b>','<b>'+ESC(_n.f)+'</b>').replace(/\((MDA|מד״א|نجمة داوود الحمراء)\)/,'('+_a+')'); } }catch(_e){}
  const oba=document.getElementById('ob-agree-txt'); if(oba)oba.innerHTML=he
- ?'בכניסה את/ה מסכים/ה ל<button type="button" class="lnk-inline" onclick="openLegal(\'tos\')">תנאי השימוש</button> ול<button type="button" class="lnk-inline" onclick="openLegal(\'privacy\')">מדיניות הפרטיות</button>. שיתוף מיקום הוא בהסכמה בלבד.'
- :ar?'بالدخول فإنك توافق على <button type="button" class="lnk-inline" onclick="openLegal(\'tos\')">شروط الاستخدام</button> و<button type="button" class="lnk-inline" onclick="openLegal(\'privacy\')">سياسة الخصوصية</button>. مشاركة الموقع تتم بالموافقة فقط.'
- :'By entering you agree to the <button type="button" class="lnk-inline" onclick="openLegal(\'tos\')">Terms of Service</button> andbutton type="button" class="lnk-inline" onclick="openLegal(\'privacy\')">Privacy Policy</button>. Location sharing is consent-only.';
+ ?'בכניסה את/ה מסכים/ה ל<button type="button" class="lnk-inline" onclick="openLegal(\'tos\')">תנאי השימוש</button> ול<a href="privacy.html" target="_blank" rel="noopener">מדיניות הפרטיות</a>. שיתוף מיקום הוא בהסכמה בלבד.'
+ :ar?'بالدخول فإنك توافق على <button type="button" class="lnk-inline" onclick="openLegal(\'tos\')">شروط الاستخدام</button> و<a href="privacy.html?lang=ar" target="_blank" rel="noopener">سياسة الخصوصية</a>. مشاركة الموقع تتم بالموافقة فقط.'
+ :'By entering you agree to the <button type="button" class="lnk-inline" onclick="openLegal(\'tos\')">Terms of Service</button> and the <a href="privacy.html?lang=en" target="_blank" rel="noopener">Privacy Policy</a>. Location sharing is consent-only.';
  /* SAFETY-CRITICAL - emergency dialing instruction; native-Arabic review required */
  setText('sos-cd-legal-txt',he?'SH✡MER Nature אינו מתקשר לרשויות. במצב חירום חייגו 100 / 101 / 102 בעצמכם.':ar?'شومير لا يتصل بالسلطات. في حالة الطوارئ اتصل بـ 100 / 101 / 102 بنفسك.':'SH✡MER Nature does not call authorities. In an emergency, dial 100 / 101 / 102 yourself.');
  setText('disc-ttl',he?' כתב ויתור חירום':' Emergency disclaimer');
