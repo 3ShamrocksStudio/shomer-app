@@ -2137,7 +2137,7 @@ body.otp-active .ob-steps{display:none!important;}
  <div class="sec-cap mb12" id="set-priv-lbl">פרטיות</div>
  <div class="set-grp">
  <div class="set-row"><div class="sr-l"><div class="sr-ic"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 22s7-6.4 7-12a7 7 0 1 0-14 0c0 5.6 7 12 7 12Z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><circle cx="12" cy="10" r="2.6" fill="currentColor"/></svg></div><div><div class="sr-nm" id="p-bgloc-nm">שיתוף מיקום ברקע</div><div class="sr-sb" id="p-bgloc-sb">נדרש ל-SOS ו-DMS - בלעדיו אי אפשר לשלוח את מיקומך בחירום</div></div></div><div class="tog on" data-skey="p_bgloc" onclick="this.classList.toggle('on');saveToggle(this)" role="switch"></div></div>
- <div class="set-row"><div class="sr-l"><div class="sr-ic"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="3.7" fill="none" stroke="currentColor" stroke-width="2"/><path d="M5.5 20a6.5 6.5 0 0 1 13 0" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></div><div><div class="sr-nm" id="p-showname-nm">הצג שם בעדכונים</div><div class="sr-sb" id="p-showname-sb">כבוי = הדיווחים שלך מופיעים בעילום שם</div></div></div><div class="tog on" data-skey="p_showname" onclick="this.classList.toggle('on');saveToggle(this)" role="switch"></div></div>
+ <div class="set-row"><div class="sr-l"><div class="sr-ic"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="3.7" fill="none" stroke="currentColor" stroke-width="2"/><path d="M5.5 20a6.5 6.5 0 0 1 13 0" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></div><div><div class="sr-nm" id="p-showname-nm">הצג שם בעדכונים</div><div class="sr-sb" id="p-showname-sb">כבוי = הדיווחים שלך מופיעים בעילום שם</div></div></div><div class="tog" data-skey="p_showname" onclick="this.classList.toggle('on');saveToggle(this)" role="switch"></div></div>
  </div>
  <div class="sec-cap mb12" id="units-lbl" data-he="יחידות מרחק" data-en="Distance units">יחידות מרחק</div>
  <div class="set-grp" style="padding:10px 14px;margin-bottom:18px;">
@@ -10345,7 +10345,7 @@ function fbRestWrite(method,path,val){
 /* ── Sanitized PII-free municipal dashboard feed (coarse coords, no name/photo) ── */
 function dashFeedPush(id,type,lat,lng){
   try{ if(typeof FB==='undefined'||!FB.ready||!FB.uid||lat==null||lng==null) return;
-    fbRestWrite('PUT','dashfeed/'+id,{type:String(type||'event'),lat:+(+lat).toFixed(2),lng:+(+lng).toFixed(2),ts:Date.now(),status:'active',by:FB.uid}); }catch(e){}
+    fbRestWrite('PUT','dashfeed/'+id,{type:String(type||'event'),lat:+(+lat).toFixed(2),lng:+(+lng).toFixed(2),ts:Date.now(),status:'active'}); }catch(e){}   /* no account id in the public feed */
 }
 /* ── SSE live stream (mimics ref.on('value')) ── */
 /* ── CONNECTION BUDGET ──
@@ -10793,9 +10793,9 @@ function fbDashBeat(hide, lat, lng){
     if(hide){ if(!st.gone){ st.gone=true; fbRestWrite('DELETE','dashfeed/'+key).catch(function(){}); } return; }
     st.gone=false;
     var _hb={type:'presence',lat:lat,lng:lng,ts:Date.now(),status:'online'};
-    if(st.mode!=='new') _hb.by=FB.uid;
+    if(st.mode!=='new') return;   /* without an anonymous key, skip the public feed rather than name my account */
     var _fd=false; try{ _fd=isFounder(); }catch(_f){}
-    fbRestWrite('PUT','dashfeed/'+key,_hb).then(function(){ if(_fd) return fbRestWrite('PATCH','dashfeed/'+key,{founder:true}); }).catch(function(){});
+    fbRestWrite('PUT','dashfeed/'+key,_hb).catch(function(){});   /* no founder flag in the public feed */
   });
 }
 function updateGuardiansNearby(n){
@@ -10832,7 +10832,7 @@ function fbResolveSOS(id){ if(FB.ready&&id&&FB._authReady&&!window._sosPractice)
 function fbDashSos(type, lat, lng){
   if(lat==null||lng==null) return;
   fbDashInit().then(function(){
-    if(FB._hb.mode!=='new'){ FB._sosFeedKey=FB.uid; dashFeedPush(FB.uid,type,lat,lng); return; }
+    if(FB._hb.mode!=='new'){ return; }   /* without an anonymous key, skip the public feed rather than key it by my account id */
     var k=fbDashKey('sf_'); FB._sosFeedKey=k;
     try{ if(SS.sosLive&&SS.sosLive.id===curSosId){ SS.sosLive.fk=k; saveStore(); } }catch(e){}   /* v268: a reload must still resolve THIS dashboard row */
     fbRestWrite('PUT','dashown/'+k, FB.uid).then(function(){
@@ -11437,7 +11437,7 @@ function openReport(){
   }).join('');
   d.innerHTML='<div class="rep-card">'
     +'<div class="rep-h">'+(he?'דיווח על אירוע':'Report an event')+'</div>'
-    +'<div class="rep-sub">'+(he?'הדיווח נשלח קודם לשומרים שלך. יתפרסם לאזור רק אחרי שכנים שיאשרו.':'Goes to your Shomers first. Area-wide only after neighbours confirm.')+'</div>'
+    +'<div class="rep-sub">'+(he?'הדיווח נשמר במערכת בלבד ואף אחד לא מקבל עליו התראה. במצב חירום חייגו 100 / 101 / 102.':'The report is only saved in the system and nobody is alerted. In an emergency call 100 / 101 / 102.')+'</div>'
     +'<div class="rep-grid">'+btns+'</div>'
     +'<textarea class="rep-note" id="rep-note" maxlength="140" placeholder="'+(he?'פרטים (לא חובה)':'Details (optional)')+'"></textarea>'
     +'<button class="btn-ghost rep-close">'+(he?'ביטול':'Cancel')+'</button>'
@@ -11673,7 +11673,7 @@ async function paCreate(m, kind, desc, lastSeen, photo){
   if(!confirm(warn+(he?' דיווח כוזב עלול להוביל לחסימת החשבון.':' A false report may get your account blocked.'))) return false;
   var _go=await paCountdown(6);
   if(!_go){ toast(he?'בוטל - לא שודר':'Cancelled - not broadcast',''); return false; }
-  var id='pa_'+FB.uid.slice(0,8)+'_'+now.toString(36);
+  var id=fbDashKey('pa_');   /* random id - the public feed key must not reveal who reported */
   var rec={ kind:kind, subjUid:m.partnerUid||'', subjName:(m.name||'').slice(0,60),
     desc:String(desc||'').slice(0,200), lastSeen:String(lastSeen||'').slice(0,120),
     lat:(m.lat!=null?+(+m.lat).toFixed(4):null), lng:(m.lng!=null?+(+m.lng).toFixed(4):null), locTs:m.ts||0,
@@ -11870,9 +11870,9 @@ async function evtCreate(type, note){
   var p=_myPos();
   if(!p){ toast(he?'צריך מיקום כדי לדווח':'Location needed to report','amb'); return; }
   var spec=EVT.TYPES[type]||EVT.TYPES.suspicious;
-  var id='e_'+FB.uid.slice(0,10)+'_'+Date.now().toString(36);
+  var id=fbDashKey('e_');   /* random id - the public feed key must not reveal who reported */
   var ev={
-    by:FB.uid, byName:(SS.user&&SS.user.name)||'', ts:Date.now(),
+    by:FB.uid, byName:((SS.settings&&SS.settings.toggles&&SS.settings.toggles.p_showname===true)?((SS.user&&SS.user.name)||''):''), ts:Date.now(),   /* anonymous unless the user turned on "show name" */
     type:type, sev:spec.sev, lat:+p.lat.toFixed(4), lng:+p.lng.toFixed(4),
     note:String(note||'').slice(0,140),
     need:spec.need,            /* confirmations required to go community-wide */
@@ -11884,7 +11884,7 @@ async function evtCreate(type, note){
   if(ok){
     try{ dashFeedPush(id,ev.type,ev.lat,ev.lng); }catch(e){}
     var r=repState(); r.made=(r.made||0)+1; r._posts=(r._posts||[]); r._posts.push(Date.now()); saveStore();
-    toast(he?'הדיווח נשלח לשומרים שלך. יתפרסם לאזור רק לאחר אישור של שכנים.':'Sent to your Shomers. Goes area-wide only after neighbours confirm.','grn');
+    toast((he?'הדיווח נשמר. אף אחד לא מקבל עליו התראה.':'Report saved. Nobody is alerted about it.')+(ev.byName?(he?' שמך מצורף לדיווח.':' Your name is attached.'):(he?' שמך לא נשלח.':' Your name was not sent.')),'grn');   /* honest: no app reads reports back yet, so nobody is notified */
     try{ evtRenderMine(); }catch(e){}
   } else {
     toast(he?'הדיווח לא נשלח':'Report not sent','amb');
