@@ -11676,11 +11676,17 @@ async function paCreate(m, kind, desc, lastSeen, photo){
   var id=fbDashKey('pa_');   /* random id - the public feed key must not reveal who reported */
   var rec={ kind:kind, subjUid:m.partnerUid||'', subjName:(m.name||'').slice(0,60),
     desc:String(desc||'').slice(0,200), lastSeen:String(lastSeen||'').slice(0,120),
-    lat:(m.lat!=null?+(+m.lat).toFixed(4):null), lng:(m.lng!=null?+(+m.lng).toFixed(4):null), locTs:m.ts||0,
-    by:FB.uid, byName:((SS.user&&SS.user.name)||'').slice(0,60), ts:now, status:'active' };
+    lat:(m.lat!=null?+(+m.lat).toFixed(3):null), lng:(m.lng!=null?+(+m.lng).toFixed(3):null), locTs:m.ts||0,   /* privacy: ~110 m, enough to search an area */
+    byName:((SS.settings&&SS.settings.toggles&&SS.settings.toggles.p_showname===true)?((SS.user&&SS.user.name)||''):'').slice(0,60), ts:now, status:'active' };   /* privacy: reporter's name only if "show name" is on; no account id in the public alert */
   if(photo && typeof photo==='string' && photo.length<60000) rec.subjPhoto=photo;
   var ok=false;
-  try{ var w=await fbRestWrite('PUT','palerts/'+id, rec); ok=(w!==false); }catch(e){ ok=false; }
+  try{ await fbRestWrite('PUT','dashown/'+id, FB.uid); }catch(e){}   /* private owner record (no user can read it): lets the rules know the alert is mine */
+  try{ var w=await fbRestWrite('PUT','palerts/'+id, rec); ok=(w!==false); }
+  catch(e){ ok=false;
+    /* until the new rules are published the server still requires the account id on a person alert;
+       an abduction alert must never fail, so only on that refusal does it go out with it */
+    if(e && (e.code==='PERMISSION_DENIED' || e.code==='unauthenticated')){ try{ rec.by=FB.uid; var w2=await fbRestWrite('PUT','palerts/'+id, rec); ok=(w2!==false); }catch(e2){ ok=false; } } }
+  if(ok){ try{ SS.paMine=SS.paMine||{}; SS.paMine[id]=1; }catch(e){} }
   if(ok){
     try{ dashFeedPush(id,(kind==='abduct'?'abduct':'missing'),rec.lat,rec.lng); }catch(e){}
     SS.paLast=now; try{ saveStore(); }catch(e){}
@@ -11711,7 +11717,7 @@ function fbListenPersonAlerts(){
           (function(mid){ paMarkers[mid].on('click',function(){ openPersonAlertDetail(mid); }); })(id); }
       }
       if(firstSync){ FB._paAlerted[id]=true; }
-      else if(!FB._paAlerted[id]){ FB._paAlerted[id]=true; if(a.by!==FB.uid) fresh.push(Object.assign({id:id},a)); }
+      else if(!FB._paAlerted[id]){ FB._paAlerted[id]=true; if(a.by!==FB.uid && !(SS.paMine&&SS.paMine[id])) fresh.push(Object.assign({id:id},a)); }
     });
     FB._paInit=true;
     if(fresh.length) paIncomingAlert(fresh[0]);
@@ -11729,14 +11735,14 @@ function paIncomingAlert(a){
 }
 
 /* ── Detail card: who can stand it down = subject, reporter, or a linked Shomer ── */
-function paCanResolve(a){ try{ return a && (FB.uid===a.subjUid || FB.uid===a.by || (typeof isGuardianOf==='function' && isGuardianOf(a.subjUid))); }catch(e){ return false; } }
+function paCanResolve(a){ try{ return a && (FB.uid===a.subjUid || FB.uid===a.by || (SS.paMine&&a.id&&SS.paMine[a.id]) || (typeof isGuardianOf==='function' && isGuardianOf(a.subjUid))); }catch(e){ return false; } }
 function openPersonAlertDetail(id){
   var he=currentLang==='he', ar=currentLang==='ar';
   var a=(FB._paCache||{})[id]; if(!a) return;
   var old=document.getElementById('pa-detail'); if(old) old.remove();
   var kindL=paKindLabel(a.kind), col=(a.kind==='abduct'?'#D10029':'#6D4AFF');
   var when=a.ts?agoTxt(a.ts,he):'';
-  var locTxt=(a.lat!=null&&a.lng!=null)?((+a.lat).toFixed(4)+', '+(+a.lng).toFixed(4)):(he?'מיקום אחרון לא ידוע':ar?'الموقع الأخير غير معروف':'Last location unknown');
+  var locTxt=(a.lat!=null&&a.lng!=null)?((+a.lat).toFixed(3)+', '+(+a.lng).toFixed(3)):(he?'מיקום אחרון לא ידוע':ar?'الموقع الأخير غير معروف':'Last location unknown');
   var d=document.createElement('div'); d.id='pa-detail'; d.className='rep-sheet';
   d.innerHTML='<div class="rep-card">'
     +'<div style="display:inline-block;background:'+col+';color:#fff;font-size:11px;font-weight:800;padding:3px 10px;border-radius:7px;margin-bottom:8px">'+(a.kind==='abduct'?'🚨 ':'🔎 ')+kindL+'</div>'
@@ -11761,7 +11767,7 @@ function paResolve(id){
   if(!paCanResolve(a)){ toast(he?'רק אדם מקושר או הנושא יכול לסגור':'Only a linked person or the subject can close this','amb'); return; }
   if(!confirm(he?'לסמן שהאדם נמצא / בטוח? פעולה זו תסגור את ההתראה לכולם.':'Mark this person found / safe? This stands the alert down for everyone.')) return;
   fbRestWrite('PUT','palerts/'+id+'/status','resolved').then(function(){
-    try{ fbRestWrite('PUT','palerts/'+id+'/resolvedBy',FB.uid); fbRestWrite('PUT','palerts/'+id+'/resolvedTs',Date.now()); }catch(e){}
+    try{ fbRestWrite('PUT','palerts/'+id+'/resolvedTs',Date.now()); }catch(e){}   /* no account id on the public alert */
   });
   try{ if(paMarkers[id]&&MAP){ MAP.removeLayer(paMarkers[id]); delete paMarkers[id]; } }catch(e){}
   toast(he?'✓ ההתראה נסגרה · נמצא/בטוח':'✓ Alert stood down · found/safe','grn');
