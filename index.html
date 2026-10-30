@@ -464,6 +464,8 @@ header.bar{border-bottom:1px solid rgba(250,172,34,.14)}
 .disc-card{border-color:#1F315F}
 .langs button{min-height:44px;min-width:40px;padding:0 4px}
 @media(max-width:620px){.langs{gap:2px!important}}
+.car-hint{display:none}
+@media(max-width:860px){.car-hint{display:block;text-align:center;font-size:14px;color:#5B6273;margin-top:2px}}
 .comm{margin-top:22px;font-size:17px}
 .comm a{display:inline-flex;align-items:center;min-height:44px;color:#1F315F;font-weight:700;text-decoration:underline;text-underline-offset:4px;text-decoration-color:#E0A828}
 .disc-txt,.disc-txt strong,.disc-txt .foot-nums{color:#1F315F}
@@ -556,7 +558,7 @@ header.bar{border-bottom:1px solid rgba(250,172,34,.14)}
 <section class="screens">
   <div class="wrap">
     <h2 data-i="screens">”שומר אחי אנוכי“</h2>
-    <div class="car"><div class="car-track" id="cartrack"><div class="shot"><img src="app-shots-map-v2.jpg" alt="מפה חיה עם כפתור SOS" loading="lazy"></div><div class="shot"><img src="app-shots-circles-v2.jpg" alt="מעגלי השומרים שלי" loading="lazy"></div><div class="shot"><img src="app-shots-guide-v2.jpg" alt="מדריך חירום" loading="lazy"></div><div class="shot"><img src="app-shots-profile-v2.jpg" alt="הפרופיל שלי" loading="lazy"></div></div><div class="car-dots" id="cardots"></div></div></div></section>
+    <div class="car"><div class="car-track" id="cartrack"><div class="shot"><img src="app-shots-map-v2.jpg" alt="מפה חיה עם כפתור SOS" loading="lazy"></div><div class="shot"><img src="app-shots-circles-v2.jpg" alt="מעגלי השומרים שלי" loading="lazy"></div><div class="shot"><img src="app-shots-guide-v2.jpg" alt="מדריך חירום" loading="lazy"></div><div class="shot"><img src="app-shots-profile-v2.jpg" alt="הפרופיל שלי" loading="lazy"></div></div><div class="car-dots" id="cardots"></div><p class="car-hint" data-i="swipe">החליקו לצפייה במסכים נוספים</p></div></div></section>
 
 <!-- ══ CLOSING CTA ══ -->
 <section class="close-cta">
@@ -623,6 +625,7 @@ var I18N={nsoon:{he:"בקרוב · COMING SOON",en:"COMING SOON",ar:"قريبً�
  fl2:{he:"תנאים",en:"Terms",ar:"الشروط"},
  fl3:{he:"הצהרת נגישות",en:"Accessibility",ar:"إمكانية الوصول"},
  fl4:{he:"כתבו לנו",en:"Contact us",ar:"راسلنا"},
+ swipe:{he:"החליקו לצפייה במסכים נוספים",en:"Swipe to see more screens",ar:"اسحب لرؤية المزيد من الشاشات"},
  fl5:{he:"לקהילות ולרשויות",en:"For communities and councils",ar:"للمجتمعات والسلطات"},
  comm:{he:"קהילה, יישוב או מועצה? לוח בקרה לרבש\"צים ולמזכירויות ←",en:"A community, town or council? A dashboard for security coordinators →",ar:"مجتمع أو بلدة أو مجلس؟ لوحة تحكم لمنسقي الأمن ←"},
  copy:{he:"© 2026 3Shamrocks Studio · SH✡MER",en:"© 2026 3Shamrocks Studio · SH✡MER",ar:"© 2026 3Shamrocks Studio · SH✡MER"}
