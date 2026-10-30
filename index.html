@@ -455,6 +455,14 @@ header.bar{border-bottom:1px solid rgba(250,172,34,.14)}
   .hero-phone{order:2!important;position:relative!important;left:auto!important;bottom:auto!important;margin:30px auto -56px!important;width:min(56vw,224px)!important;z-index:6}
 }
 
+/* ═══ site-fixes 2026-10-30 (audit 2026-10-28): brand gold instead of orange; red stays for SOS only ═══ */
+:root{--orange:#E0A828;--orange-d:#C09020;--gold-ink:#8A5F12}
+.btn-orange{background:linear-gradient(135deg,#C09020 0%,#E0A828 60%,#F5C840 100%);color:#0C1B3A;box-shadow:0 6px 18px rgba(192,144,32,.28)}
+.btn-orange:hover{background:linear-gradient(135deg,#B3851B 0%,#D69F24 60%,#F0C238 100%)}
+.btn-orange svg{stroke:#0C1B3A}
+.arrive-kicker,.arrive-big{color:var(--gold-ink)!important}
+.disc-card{border-color:#1F315F}
+.disc-txt,.disc-txt strong,.disc-txt .foot-nums{color:#1F315F}
 </style>
 </head>
 <body>
