@@ -12,7 +12,7 @@ create table if not exists public.command_accounts (
   org          text not null default '',
   territory    text not null default '',
   status       text not null default 'pending' check (status in ('pending','active','suspended')),
-  plan         text not null default 'none'    check (plan in ('none','pilot','annual','council')),
+  plan         text not null default 'none'    check (plan in ('none','pilot','s','m','l','council')),  -- same keys as the Command checkout
   requested_at timestamptz not null default now(),
   activated_at timestamptz,
   note         text not null default ''

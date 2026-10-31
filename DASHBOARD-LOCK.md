@@ -23,7 +23,7 @@ Staging preview (no backend, noindex): https://3shamrocksstudio.github.io/shomer
 
 ## Backend: `supabase/migrations/20261031120000_command_accounts.sql`
 - Table `command_accounts` (user, email, org, territory, `status` pending/active/suspended,
-  `plan` none/pilot/annual/council, dates, note). RLS on: a signed-in user can read **only their own
+  `plan` none/pilot/s/m/l/council, the same keys as the Command checkout, dates, note). RLS on: a signed-in user can read **only their own
   row**; nobody can insert, update or delete from the browser.
 - A trigger creates a `pending` row for every dashboard sign-up (metadata `role = 'client'`). Status and
   plan are never taken from what the user sends.
