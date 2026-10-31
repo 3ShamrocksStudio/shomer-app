@@ -77,3 +77,13 @@ exports.alarmFanout = onValueCreated('/alarms/{id}', async (event) => {
     await event.data.ref.remove(); // one-shot: clean up the queue item
   }
 });
+
+/* Privacy retention, once a day (NOT DEPLOYED). Deletes closed person alerts older than 90 days and
+   moves old AED creator ids into the private owner records. Logic: ./retention.js.
+   Deploy only this one:  firebase deploy --only functions:privacyRetention --project shomergency */
+const {onSchedule} = require('firebase-functions/v2/scheduler');
+const {runRetention} = require('./retention');
+exports.privacyRetention = onSchedule({schedule: 'every day 03:17', timeZone: 'Asia/Jerusalem'}, async () => {
+  const r = await runRetention(db);
+  console.log('privacyRetention', JSON.stringify(r));
+});

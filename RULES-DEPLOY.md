@@ -75,3 +75,23 @@ Client scaffold is in place but **dormant**. To enable:
 Pre-v64 data was keyed by device-id; v64 keys by `auth.uid`. Old presence/SOS expire on their own
 (90 s / 25 min). `registry` re-publishes under the new uid automatically on launch. Any pairings made
 on v63 (device-id) won't carry over — re-pair once on v64. Acceptable for pre-launch testing.
+
+## Retention function `privacyRetention` (2026-10-31, NOT DEPLOYED, needs Dave's OK)
+
+`functions/retention.js`, scheduled daily 03:17 Israel time. It **deletes** closed person alerts
+whose close time (`resolvedTs`, else `ts`) is older than 90 days, plus their `dashown/<id>` owner
+record, and moves the old creator id on AEDs from `aeds/<id>/by` into the private `dashown/aed_<id>`.
+Tested on the local emulator only (`/home/claude/weekend/qa/fn/retention_test.js`, 6/6).
+
+What deploying it needs:
+1. The Firebase project `shomergency` on the **Blaze** plan (scheduled functions need Cloud Scheduler;
+   the first 3 jobs per billing account are free, then about $0.10 per job per month).
+2. `cd functions && npm install && cd ..`
+3. `firebase deploy --only functions:privacyRetention --project shomergency` (only this function).
+   Note: a plain `firebase deploy --only functions` (or `database,functions`) now deploys it too.
+4. Afterwards remove the "automatic deletion starts with a server update" clause from privacy.html
+   and the Nature privacy page.
+
+Without the function, the rules already let any signed-in account delete a closed alert whose
+`resolvedTs` is older than 90 days (and nobody can edit or reopen it), so a manual cleanup can be run
+with an ordinary account once Dave OKs it. The app hides closed alerts older than 90 days.
