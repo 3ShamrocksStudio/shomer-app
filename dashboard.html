@@ -47,6 +47,13 @@
   .lnk{display:block;text-align:center;margin-top:14px;color:var(--tx2);font-size:13px;cursor:pointer;background:none;border:0;width:100%;font-family:inherit}
   .lnk b{color:var(--gold)}
   .err{color:#ff6b7d;font-size:13px;margin-top:12px;min-height:16px;text-align:center}
+  a.lnk{text-decoration:none}
+  .pend-ic{text-align:center;font-size:34px;line-height:1;margin-bottom:10px}
+  .pend-h{text-align:center;font-size:19px;font-weight:800;color:var(--tx);margin-bottom:8px}
+  .pend-p{text-align:center;font-size:14.5px;line-height:1.65;color:var(--tx2)}
+  .pend-en{font-size:13px;color:var(--tx3);margin-top:6px}
+  .pend-who{text-align:center;font-size:12px;color:var(--tx3);margin-top:10px;min-height:14px}
+  a.btn.pend-plans{display:block;text-align:center;text-decoration:none;margin-top:18px;box-sizing:border-box}
   /* ---------- APP SHELL ---------- */
   #app{height:100vh;display:flex;flex-direction:column;overflow:hidden;background:radial-gradient(1400px 700px at 85% -10%,rgba(30,49,95,.55),transparent 60%),var(--navy-0)}
   .topbar{display:flex;align-items:center;gap:12px;padding:0 16px;height:54px;flex:0 0 54px;background:var(--navy);border-bottom:1px solid var(--line-2);box-shadow:0 1px 0 rgba(250,172,34,.18)}
@@ -577,9 +584,19 @@
       <label>אימייל ארגוני</label><input id="email" type="email" dir="ltr" placeholder="you@municipality.gov.il">
       <label>סיסמה</label><input id="pass" type="password" dir="ltr" placeholder="••••••••">
       <button class="btn" id="login-btn">כניסה</button>
-      <button class="btn" id="live-btn" style="background:linear-gradient(135deg,#0f7a4a,#16a06a 60%,#2ecc71);color:#042016;margin-top:10px;font-weight:800">🟢  תצוגה חיה · נתוני רשת אמת (PoC)</button>
-      <button class="btn" id="demo-btn" style="background:transparent;border:1px solid var(--gold);color:var(--gold);margin-top:8px">👁  כניסה לדמו · See a live demo</button>
+      <button class="btn" id="demo-btn" style="background:transparent;border:1px solid var(--gold);color:var(--gold);margin-top:10px">👁  כניסה לדמו · נתוני דוגמה</button>
       <button class="lnk" id="to-signup">אין לך גישה עדיין? <b>בקשת גישת לקוח</b></button>
+      <a class="lnk plans-lnk" href="https://3shamrocksstudio.github.io/shomer-command/#plans">נתונים חיים לרשות שלכם? <b>תוכניות SH✡MER Command</b></a>
+    </div>
+    <div id="view-pending" class="hidden">
+      <div class="pend-ic" aria-hidden="true">⏳</div>
+      <h2 class="pend-h" id="pend-h">החשבון ממתין להפעלה</h2>
+      <p class="pend-p" id="pend-p">החשבון שלך ממתין להפעלה. נחזור אליך תוך יום עסקים אחד.</p>
+      <p class="pend-p pend-en" dir="ltr" id="pend-en">Your account is waiting for activation. We'll be in touch within one business day.</p>
+      <p class="pend-who" id="pend-who" dir="ltr"></p>
+      <a class="btn pend-plans" href="https://3shamrocksstudio.github.io/shomer-command/#plans">לתוכניות SH✡MER Command</a>
+      <button class="btn" id="pend-demo" style="background:transparent;border:1px solid var(--gold);color:var(--gold);margin-top:10px">👁  בינתיים: דמו עם נתוני דוגמה</button>
+      <button class="lnk" id="pend-out">יציאה מהחשבון</button>
     </div>
     <div id="view-signup" class="hidden">
       <label>שם הארגון / רשות</label><input id="su-org" type="text" placeholder="עיריית ...">
@@ -703,10 +720,12 @@ document.getElementById('signup-btn').onclick=async function(){
   var r=await sb.auth.signUp({email:e,password:p,options:{data:{org:org,territory:terr,role:'client'}}});
   if(r.error){gerr('יצירה נכשלה: '+r.error.message);return;}
   if(r.data && r.data.session){ boot(); }
-  else { gerr('✓ נוצרה גישה. בדוק/י את האימייל לאישור, ואז היכנס/י.'); document.getElementById('to-login').click(); }
+  else { document.getElementById('to-login').click(); gerr('✓ הבקשה נקלטה. אשר/י את האימייל ואז היכנס/י. החשבון יופעל אחרי שנחזור אליך (עד יום עסקים אחד).'); }
 };
 document.getElementById('signout').onclick=async function(){ try{ if(!(CLIENT&&CLIENT.demo)) await sb.auth.signOut(); }catch(e){} location.reload(); };
 document.getElementById('demo-btn').onclick=function(){ demoBoot(); };
+document.getElementById('pend-demo').onclick=function(){ demoBoot(); };
+document.getElementById('pend-out').onclick=async function(){ try{ await sb.auth.signOut(); }catch(e){} location.reload(); };
 (function(){ var lb=document.getElementById('live-btn'); if(lb) lb.onclick=function(){ liveBoot(); }; })();
 (function(){var ex=document.getElementById('export-btn'); if(ex) ex.onclick=function(){ try{exportReport();}catch(e){window.print();} };
  var ac=document.getElementById('acct-btn'); if(ac) ac.onclick=function(){ try{openSettings();}catch(e){} };})();
@@ -722,7 +741,7 @@ var DEMO_INC=[
 async function demoBoot(){
   await loadData();
   CLIENT={org:'עיריית תל אביב-יפו · דמו', territory:'תל אביב יפו', email:'demo', demo:true};
-  try{ if(!document.getElementById('demo-banner')){ var _db=document.createElement('div'); _db.id='demo-banner'; _db.textContent='מצב הדגמה — נתונים לא אמיתיים'; _db.style.cssText='position:fixed;top:0;left:50%;transform:translateX(-50%);z-index:3000;background:#b3202d;color:#fff;font:800 13px Alef,system-ui,sans-serif;padding:5px 18px;border-radius:0 0 10px 10px;box-shadow:0 4px 14px rgba(0,0,0,.45);pointer-events:none'; document.body.appendChild(_db); } }catch(_e){}
+  try{ if(!document.getElementById('demo-banner')){ var _db=document.createElement('div'); _db.id='demo-banner'; _db.textContent='מצב הדגמה · נתוני דוגמה, לא נתונים חיים'; _db.style.cssText='position:fixed;top:0;left:50%;transform:translateX(-50%);z-index:3000;background:#b3202d;color:#fff;font:800 13px Alef,system-ui,sans-serif;padding:5px 18px;border-radius:0 0 10px 10px;box-shadow:0 4px 14px rgba(0,0,0,.45);pointer-events:none'; document.body.appendChild(_db); } }catch(_e){}
   document.getElementById('gate').classList.add('hidden');
   document.getElementById('app').classList.remove('hidden');
   document.getElementById('terr-name').textContent=CLIENT.territory;
@@ -734,6 +753,17 @@ async function demoBoot(){
   _applyTerrParam();
   setTimeout(function(){ try{ var k=Object.keys(_liveEvents||{}).filter(function(id){return _liveEvents[id].m&&_liveEvents[id].m.sos;})[0]; if(k){ _playAlertTone(); openResponse(k); } }catch(e){} }, 2000);
   /* note removed in console layout */
+}
+/* sample network feed for the demo (same shape as /dashfeed): devices online now plus daily activity
+   markers for the last 14 days, all around the demo territory. Nothing here comes from the real network. */
+function demoFeed(c){
+  var o={}, now=Date.now(), DAY=864e5, seed=7;
+  function rnd(){ seed=(seed*9301+49297)%233280; return seed/233280; }
+  function hex(i){ return ('00000000'+(0x5a3c00+i*2654435761>>>0).toString(16)).slice(-8); }
+  for(var i=0;i<42;i++){ var dev=hex(i);
+    o['demo_hb_'+i]={type:'presence',lat:+(c.lat+(rnd()-.5)*.06).toFixed(2),lng:+(c.lng+(rnd()-.5)*.06).toFixed(2),ts:now-Math.floor(rnd()*80000),status:'v2:'+dev};
+    for(var d=0;d<14;d++){ if(rnd()<.62){ var t=now-d*DAY; o['demo_d1_'+i+'_'+d]={type:'presence',lat:+c.lat.toFixed(2),lng:+c.lng.toFixed(2),ts:t,status:'d1:'+dev+':'+_ilDay(t)}; } } }
+  return o;
 }
 function demoLive(c){
   var now=Date.now();
@@ -762,13 +792,32 @@ async function liveBoot(){
 /* ---- boot: load data + client, route ---- */
 async function loadData(){ if(DATA)return DATA; var r=await fetch('crime-stats.json?v=3'); DATA=await r.json(); DATA._sorted=DATA.cities.slice().sort(function(a,b){return b.total-a.total;}); return DATA; }
 function fillTerr(sel){ DATA._sorted.forEach(function(c){var o=document.createElement('option');o.value=c.city;o.textContent=c.city;sel.appendChild(o);}); }
+/* ── Command plan lock: the account row (public.command_accounts) is set by an admin only.
+   Anything other than status 'active' - pending, suspended, no row, or a failed check - shows the
+   waiting screen. Fails closed. ── */
+async function cmdAccess(u){
+  try{ var r=await sb.from('command_accounts').select('status,plan,org,territory').eq('user_id',u.id).maybeSingle();
+    if(r.error) return {status:'error'}; return r.data||null; }catch(e){ return {status:'error'}; }
+}
+function showPending(u,acc){
+  ['view-login','view-signup'].forEach(function(id){ document.getElementById(id).classList.add('hidden'); });
+  document.getElementById('view-pending').classList.remove('hidden');
+  var sus=acc&&acc.status==='suspended';
+  if(sus){ document.getElementById('pend-h').textContent='הגישה לנתונים החיים מושהית';
+    document.getElementById('pend-p').textContent='הגישה של החשבון לנתונים החיים מושהית. לפרטים: support@shomer-app.co.il';
+    document.getElementById('pend-en').textContent='Live data access for this account is paused. Contact support@shomer-app.co.il'; }
+  document.getElementById('pend-who').textContent=(u&&u.email)||'';
+  gerr('');
+}
 async function boot(){
   await loadData();
   if(!document.getElementById('su-terr').options.length) fillTerr(document.getElementById('su-terr'));
-  var u=(await sb.auth.getUser()).data.user;
-  if(!u){ liveBoot(); return; }
+  var u=null; try{ u=(await sb.auth.getUser()).data.user; }catch(e){ u=null; }
+  if(!u){ return; }   /* not signed in: the gate stays (login, request access, demo) - no open live view */
+  var acc=await cmdAccess(u);
+  if(!acc || acc.status!=='active'){ showPending(u,acc); return; }   /* live data only for an activated Command plan */
   var md=u.user_metadata||{};
-  CLIENT={org:md.org||'',territory:md.territory||'',email:u.email};
+  CLIENT={org:acc.org||md.org||'',territory:acc.territory||md.territory||'',email:u.email,plan:acc.plan||''};
   try{ if(teamLS('on')) setTimeout(function(){ teamInit().catch(function(){}); },1500); }catch(e){}   /* v310: a manager with a team hears leaders' alerts as soon as they log in */
   if(!CLIENT.territory){ // shouldn't happen, but guard
     CLIENT.territory=DATA._sorted[0].city;
@@ -1444,11 +1493,11 @@ function _ilDay(ts){ try{ return new Intl.DateTimeFormat('en-CA',{timeZone:'Asia
 function loadLive(c){
   _curCityObj=c;
   var demo=!!(CLIENT&&CLIENT.demo);
-  /* demo: incidents are simulated (clearly labelled); the network counts below still come from the real feed */
+  /* demo: incidents AND network counts are sample data (clearly labelled); the real feed is read only for an activated account */
   if(demo){ window._revReal=[]; demoLive(c); }
   var DB='https://shomergency-default-rtdb.firebaseio.com';
   var initial=!_liveInitDone, reqC=c;
-  fetch(DB+'/dashfeed.json',{cache:'no-store'}).then(function(r){return r.ok?r.json():null;}).catch(function(){return null;}).then(function(obj){
+  (demo?Promise.resolve(demoFeed(c)):fetch(DB+'/dashfeed.json',{cache:'no-store'}).then(function(r){return r.ok?r.json():null;}).catch(function(){return null;})).then(function(obj){
     if(_curCityObj!==reqC) return; /* territory changed while loading */
     var now=Date.now(), DAY=864e5, ONLINE=15e4; /* 150s = "online": the app beats every 30-40s on screen and its background service every 60s */
     var evList=[], revReal=[], presTerr=[], presAll=[], active24={}, onlineUsers={}, onlineTerrUsers={}, active24Terr={}, reps={};
@@ -1808,7 +1857,7 @@ function buildReportHtml(){
   +'<div class="meta">'+ESC(org)+'<br>הופק: '+gen+(tz?' ('+ESC(tz)+')':'')+'<br>מצב: '+(demo?'דמו':live?'תצוגה חיה':'חשבון לקוח')+'</div></div>'
   +'<h1>דוח ביטחון קהילתי · תמונת מצב</h1>'
   +'<div class="terr">טריטוריה: <b>'+ESC(c.city)+'</b>'+(c.country?' · '+ESC(c.country):'')+(has?'':' · ללא נתוני פשיעה רשמיים')+'</div>'
-  +(demo?'<div class="badge">דוח הדגמה — אירועים המסומנים "הדגמה" הם מדומים. נתוני המשטרה ונתוני הרשת אמיתיים.</div>':'')
+  +(demo?'<div class="badge">דוח הדגמה — אירועים המסומנים "הדגמה" הם מדומים. נתוני הרשת בדוח זה הם נתוני דוגמה; נתוני המשטרה הם הנתונים הציבוריים הרשמיים.</div>':'')
   +'<section><h2>1. תקציר</h2><ul class="sum">'+sum.map(function(s){return '<li>• '+s+'</li>';}).join('')+'</ul></section>'
   +'<section><h2>2. אירועים חיים ואחרונים · מצב וטיפול</h2>'+evTable+(exCount?'<p class="note">'+exCount+' אירועי דוגמה מלוח האירועים לא נכללו בדוח.</p>':'')+'</section>'
   +'<section><h2>3. אזורים חמים</h2>'+hot+'</section>'
@@ -1900,7 +1949,7 @@ function openImprove(){
  var covSub=I.covChg!=null?('לעומת '+(Math.round(I.covPrev*10)/10)+' בשבוע הקודם ('+(I.covChg>0?'+':'')+I.covChg+'%)'):('השוואה שבועית תתחיל אחרי 14 ימי נתונים · עכשיו יום '+Math.min(I.days,14));
  var ov=document.createElement('div'); ov.id='imp-ov'; ov.className='acct-ov';
  ov.innerHTML='<div class="acct-card" style="max-width:480px"><div class="acct-head"><h3>מדד שיפור · '+ESC(c.city)+'</h3><button class="acct-x" onclick="document.getElementById(\'imp-ov\').remove()">✕</button></div>'
-  +'<div class="acct-sub">מה משתנה עכשיו בטריטוריה בזכות הרשת והלוח. נתוני הפשיעה הרשמיים מתפרסמים פעם בשנה, ולכן אינם חלק מהמדד.'+((CLIENT&&CLIENT.demo)?'<br><b style="color:var(--gold)">במצב דמו: המדד מחושב מנתוני הרשת האמיתיים בלבד · אירועי ההדגמה לא נספרים.</b>':'')+'</div>'
+  +'<div class="acct-sub">מה משתנה עכשיו בטריטוריה בזכות הרשת והלוח. נתוני הפשיעה הרשמיים מתפרסמים פעם בשנה, ולכן אינם חלק מהמדד.'+((CLIENT&&CLIENT.demo)?'<br><b style="color:var(--gold)">במצב דמו: המדד מחושב מנתוני דוגמה של הרשת, לא מנתונים חיים.</b>':'')+'</div>'
   +impChart(I)
   +row('כיסוי רשת',cov,'מכשירים פעילים ביום (ממוצע 7 ימים, עד 18 ק״מ ממרכז העיר) · '+covSub)
   +row('אירועים שטופלו',I.rate!=null?I.rate+'%':'—',I.ev?(I.handled+' מתוך '+I.ev+' אירועים ב-30 הימים האחרונים סומנו "טופל" או "נסגר"'):'אין עדיין אירועי רשת בטריטוריה')
@@ -2143,7 +2192,7 @@ function renderUserPanel(){
   +'<div class="up-head"><span class="up-emblem">'+crest+'</span>'
    +'<div class="up-htx"><div class="up-org">'+ESC(org.replace(' · דמו','').replace(' · דמו',''))+'</div>'
    +'<div class="up-terr">'+ESC(terr)+' · <span class="up-plan">גרסת בטא</span>'+'</div></div>'
-   +(_feedLive()?'<div class="up-status"><span class="up-dot"></span>מערכת מקוונת · מתעדכן בזמן אמת</div>':'<div class="up-status" style="color:#a3b1cc"><span class="up-dot" style="background:#7c869c;box-shadow:none;animation:none"></span>אין חיבור לנתונים חיים</div>')
+   +((CLIENT&&CLIENT.demo)?'<div class="up-status" style="color:#F5C840"><span class="up-dot" style="background:#F5C840;box-shadow:none;animation:none"></span>מצב הדגמה · נתוני דוגמה</div>':_feedLive()?'<div class="up-status"><span class="up-dot"></span>מערכת מקוונת · מתעדכן בזמן אמת</div>':'<div class="up-status" style="color:#a3b1cc"><span class="up-dot" style="background:#7c869c;box-shadow:none;animation:none"></span>אין חיבור לנתונים חיים</div>')
    +'<button class="up-set" onclick="openSettings()" title="הגדרות" aria-label="הגדרות">⚙</button></div>'
   +'<div class="up-stats">'
    +st(pop?fmt(pop):'—','תושבים (למ״ס)')
