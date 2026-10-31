@@ -1,0 +1,51 @@
+name: Deploy Firebase database rules
+
+# Rules-only. Never deploys functions, hosting or anything else.
+# Uses whichever credential already exists in the repo's secrets:
+#   FIREBASE_TOKEN          — from `firebase login:ci`
+#   FIREBASE_SERVICE_ACCOUNT — service-account JSON
+# If neither is set, the job says so plainly and stops.
+
+on:
+  workflow_dispatch:
+
+jobs:
+  deploy-rules:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Which credential is available?
+        id: cred
+        env:
+          TOK: ${{ secrets.FIREBASE_TOKEN }}
+          SA: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+        run: |
+          if [ -n "$TOK" ]; then echo "mode=token" >> $GITHUB_OUTPUT; echo "Found FIREBASE_TOKEN";
+          elif [ -n "$SA" ]; then echo "mode=sa" >> $GITHUB_OUTPUT; echo "Found FIREBASE_SERVICE_ACCOUNT";
+          else echo "mode=none" >> $GITHUB_OUTPUT; echo "NO CREDENTIAL IN REPO SECRETS"; fi
+
+      - name: Validate rules file
+        run: node -e "JSON.parse(require('fs').readFileSync('database.rules.json','utf8'));console.log('database.rules.json parses OK')"
+
+      - name: Deploy with CI token
+        if: steps.cred.outputs.mode == 'token'
+        run: npx -y firebase-tools@13 deploy --only database --project shomergency --non-interactive --token "${{ secrets.FIREBASE_TOKEN }}"
+
+      - name: Deploy with service account
+        if: steps.cred.outputs.mode == 'sa'
+        run: |
+          printf '%s' '${{ secrets.FIREBASE_SERVICE_ACCOUNT }}' > /tmp/sa.json
+          GOOGLE_APPLICATION_CREDENTIALS=/tmp/sa.json npx -y firebase-tools@13 deploy --only database --project shomergency --non-interactive
+          rm -f /tmp/sa.json
+
+      - name: No credential
+        if: steps.cred.outputs.mode == 'none'
+        run: |
+          echo "::error::No FIREBASE_TOKEN or FIREBASE_SERVICE_ACCOUNT secret in this repo."
+          echo "Add one at Settings -> Secrets and variables -> Actions, then re-run."
+          exit 1
