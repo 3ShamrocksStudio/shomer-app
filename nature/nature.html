@@ -11708,6 +11708,7 @@ function fbListenPersonAlerts(){
     var fresh=[], firstSync=!FB._paInit, now=Date.now(), STALE=24*60*60*1000;
     FB._paCache={};
     Object.keys(all).forEach(function(id){ var a=all[id]; if(!a) return;
+      if(a.status==='resolved' && (now-(+a.resolvedTs||+a.ts||0))>7776000000) return;   /* privacy: closed alerts are kept 90 days at most */
       FB._paCache[id]=Object.assign({id:id},a);
       if(a.status==='resolved') return;
       if(a.ts && (now-a.ts)>STALE) return;
@@ -12630,12 +12631,23 @@ var ESS_TTL=24*60*60*1000;
    near it. These two functions push your contributions up and pull everyone else's down.
    They silently no-op until the DB rules allow `aeds/` (pending the rules deploy). */
 function myAeds(){ SS.myAeds = SS.myAeds || []; return SS.myAeds; }
+/* privacy: the shared AED record carries no account id. Ownership sits in a private
+   dashown/aed_<id> record that nobody can read. Until the new rules are published the server
+   still requires `by`, so only on that refusal does it go out with it. */
+function aedPublish(id, rec){
+  return fbRestWrite('PUT','dashown/aed_'+id, FB.uid).catch(function(){}).then(function(){
+    return fbRestWrite('PUT','aeds/'+id, rec);
+  }).catch(function(e){
+    if(e && (e.code==='PERMISSION_DENIED' || e.code==='unauthenticated')) return fbRestWrite('PUT','aeds/'+id, Object.assign({}, rec, {by:FB.uid}));
+    throw e;
+  });
+}
 function aedSyncUp(){
   if(!FB.ready||!FB.uid) return;
   myAeds().forEach(function(a){
     if(a.synced) return;
     try{
-      var p=fbRestWrite('PUT','aeds/'+a.id,{lat:a.lat,lng:a.lng,name:a.name||'',by:FB.uid,ts:a.ts});
+      var p=aedPublish(a.id,{lat:a.lat,lng:a.lng,name:a.name||'',ts:a.ts});
       if(p&&p.then) p.then(function(){ a.synced=true; try{saveStore();}catch(e){} }).catch(function(){});
     }catch(e){}
   });
@@ -12925,7 +12937,7 @@ function aedAddHere(){
   ESS.data.aed.push(rec);
   ESS.on.aed=true;
   essSave(); essRender(); essLegPaint();
-  try{ if(FB.ready && FB.uid) fbRestWrite('PUT','aeds/'+rec.id,{lat:rec.lat,lng:rec.lng,desc:rec.desc,by:FB.uid,ts:Date.now()}); }catch(e){}
+  try{ if(FB.ready && FB.uid) aedPublish(rec.id,{lat:rec.lat,lng:rec.lng,desc:rec.desc,ts:Date.now()}).catch(function(){}); }catch(e){}
   toast(he?'\u2713 תודה - הדפיברילטור נוסף למפה. אולי תציל/י חיים':'\u2713 Thank you - AED added to the map','grn');
   try{ myAeds().push(a); saveStore(); aedSyncUp(); }catch(e){}
 }
