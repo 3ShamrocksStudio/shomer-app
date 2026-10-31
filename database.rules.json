@@ -142,8 +142,11 @@
     "aeds": {
       ".read": "auth != null",
       "$id": {
-        ".write": "auth != null && (!data.exists() || data.child('by').val() == auth.uid)",
-        ".validate": "newData.hasChildren(['lat','lng','by','ts'])"
+        ".write": "auth != null && (!data.exists() ? root.child('dashown').child('aed_' + $id).val() === auth.uid : (data.child('by').val() === auth.uid || root.child('dashown').child('aed_' + $id).val() === auth.uid))",
+        ".validate": "newData.hasChildren(['lat','lng','ts'])",
+        "by": {
+          ".validate": false
+        }
       }
     },
     "inbox": {
@@ -153,13 +156,16 @@
     "palerts": {
       ".read": "auth != null",
       "$id": {
-        ".write": "auth != null && ( !data.exists() ? (root.child('dashown').child($id).val() === auth.uid && !root.child('dashfeed').child($id).exists()) : ( data.child('by').val() === auth.uid || root.child('dashown').child($id).val() === auth.uid || data.child('subjUid').val() === auth.uid ) )",
+        ".write": "auth != null && ((!newData.exists() && (data.child('status').val() === 'resolved' && data.child('resolvedTs').isNumber() && data.child('resolvedTs').val() < now - 7776000000)) || (!(data.child('status').val() === 'resolved' && data.child('resolvedTs').isNumber() && data.child('resolvedTs').val() < now - 7776000000) && ( !data.exists() ? (root.child('dashown').child($id).val() === auth.uid && !root.child('dashfeed').child($id).exists()) : ( data.child('by').val() === auth.uid || root.child('dashown').child($id).val() === auth.uid || data.child('subjUid').val() === auth.uid ) )))",
         ".validate": "!newData.exists() || newData.hasChildren(['ts','kind'])",
         "by": {
           ".validate": false
         },
         "resolvedBy": {
           ".validate": false
+        },
+        "resolvedTs": {
+          ".validate": "newData.isNumber() && newData.val() <= now + 600000"
         }
       }
     },
@@ -234,7 +240,7 @@
     "dashown": {
       "$id": {
         ".read": false,
-        ".write": "auth != null && ($id.beginsWith('hb_') || $id.beginsWith('sf_') || $id.beginsWith('pa_')) && (!data.exists() || data.val() === auth.uid) && (!newData.exists() || newData.val() === auth.uid)",
+        ".write": "auth != null && ($id.beginsWith('hb_') || $id.beginsWith('sf_') || $id.beginsWith('pa_') || $id.beginsWith('aed_')) && (!data.exists() || data.val() === auth.uid) && (!newData.exists() || newData.val() === auth.uid)",
         ".validate": "newData.isString()"
       }
     }
