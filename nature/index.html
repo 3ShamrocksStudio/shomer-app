@@ -1,342 +1,746 @@
 <!DOCTYPE html>
-<html lang="he" dir="rtl">
+<html lang="he" dir="rtl" data-brand="shomer-nature">
 <head>
 <meta charset="UTF-8">
-  <meta name="theme-color" content="#0A2010">
-  <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <meta name="apple-mobile-web-app-title" content="SH✡MER Nature">
-  <meta property="og:image" content="https://3shamrocksstudio.github.io/shomer-nature/">
-  <meta property="og:type" content="website">
-  <link rel="manifest" href="/shomer-nature/manifest.json">
-  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>SH✡MER Nature — שומרים על מי שאין לו קול</title>
-<meta name="description" content="אותה רשת שמירה — הפעם ליער, לחוף, לחי ולסביבה.">
-<link rel="icon" href="badge-192.png">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0C1B3A">
+<title>SH✡MER Nature · שומרים על מי שאין לו קול</title>
+<meta name="description" content="SH✡MER Nature: אפליקציה חינמית מבית SH✡MER לטבע, לבעלי חיים ולטיולים. תיעוד חיה פצועה, שריפה, פסולת או נפל, SOS לטיול ומדריכי עזרה ראשונה.">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="SH✡MER">
+<meta property="og:title" content="SH✡MER Nature · שומרים על מי שאין לו קול">
+<meta property="og:description" content="אפליקציה חינמית מבית SH✡MER לטבע, לבעלי חיים ולטיולים.">
+<meta property="og:url" content="https://www.shomer-app.co.il/nature/">
+<meta property="og:image" content="https://www.shomer-app.co.il/SHOMERNature_BannerBIG.jpg">
+<meta property="og:locale" content="he_IL">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="canonical" href="https://www.shomer-app.co.il/nature/">
+<link rel="manifest" href="manifest.json">
+<link rel="icon" href="nature-badge.png">
+<link rel="apple-touch-icon" href="icon-192.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;500;700;800;900&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Alef:wght@400;700&display=swap" rel="stylesheet">
 <style>
+/* ══════════════════════════════════════════════════════
+   SH✡MER Nature · Landing. Built on the SH✡MER landing system
+   (index.html): Alef, navy bar, orange pills, alternating
+   navy / white / light bands, badge on the footer line.
+   Nature accent: the green of the official SH✡MER Nature wordmark.
+   © 2026 3Shamrocks Studio.
+   ══════════════════════════════════════════════════════ */
 :root{
-  /* NAVY IS THE BASE. Light bands break it, they do not replace it. */
-  --n0:#08120C; --n1:#0F1712; --n2:#16241A; --n3:#1E3324; --n5:#2A4A33;
-  --tx0:#F1F7F0; --tx1:#C2D6C2; --tx2:#7E947F;
-  --au1:#3A9E18; --au2:#50DB0F; --au3:#8EF25A;
-  --au-grad:linear-gradient(135deg,#2F8A10,#50DB0F,#8EF25A);
-  /* light break bands */
-  --stone:#E9F0E6; --stone2:#DCE6D8; --ink-on-light:#12200F; --ink2-on-light:#46543F;
-  --sos:#D93B3B;
-  --s1:8px;--s2:16px;--s3:24px;--s4:40px;--s5:64px;--s6:96px;--s7:128px;
+  --bar:#0C1B3A; --navy:#1F315F; --navy-2:#0d1a30; --deep:#08152F;
+  --orange:#FC9918; --orange-d:#E8850F; --gold:#FAAC22;
+  --green:#50DB0F; --green-d:#2F8A10; --green-t:rgba(80,219,15,.14);
+  --light:#F3F4F8; --foot:#141C27; --ink:#16202E; --ink-soft:#44506A; --grey:#7C828F;
+  --navy-text:#B9C6E0; --white:#fff;
 }
-*{margin:0;padding:0;box-sizing:border-box}
-html{scroll-behavior:smooth;-webkit-text-size-adjust:100%;overflow-x:hidden}
-body{background:var(--n0);color:var(--tx0);font-family:'Heebo',sans-serif;font-weight:400;
-  font-size:17px;line-height:1.65;-webkit-font-smoothing:antialiased}
-a{color:inherit;text-decoration:none} img{display:block;max-width:100%}
-.w{width:min(1100px,90vw);margin-inline:auto}
-.wn{width:min(820px,90vw);margin-inline:auto}
-a:focus-visible,button:focus-visible{outline:2px solid var(--au2);outline-offset:3px}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth;overflow-x:hidden;-webkit-text-size-adjust:100%}
+body{font-family:'Alef',system-ui,-apple-system,sans-serif;color:var(--ink);background:var(--white);
+  line-height:1.55;overflow-x:hidden;-webkit-font-smoothing:antialiased}
+img{display:block;max-width:100%;height:auto}
+a{text-decoration:none;color:inherit}
+h1,h2,h3{line-height:1.2;font-weight:800}
+.wrap{max-width:1240px;margin:0 auto;padding:0 clamp(20px,4vw,44px)}
+:focus-visible{outline:none;box-shadow:0 0 0 3px rgba(252,153,24,.6);border-radius:8px}
+.ic{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round;flex:none}
+@font-face{font-family:'Marion';src:local('Marion Bold'),local('Marion-Bold'),local('Marion');font-weight:700;font-display:swap}
+.wordmark{font-family:'Marion','Alef',serif;font-weight:700;letter-spacing:.01em;white-space:nowrap;unicode-bidi:isolate;direction:ltr;display:inline-block}
+.wordmark .star{color:var(--green)}
+.wordmark em{font-style:normal;color:var(--green);margin-inline-start:.2em}
+.wm-svg{display:block;height:auto}
 
-.eyebrow{font-size:12px;font-weight:800;letter-spacing:.2em;color:var(--au3)}
-.h1{font-size:clamp(38px,7.4vw,72px);font-weight:900;line-height:1.06;letter-spacing:-.035em}
-.h2{font-size:clamp(27px,4.4vw,44px);font-weight:800;line-height:1.15;letter-spacing:-.028em}
-.h3{font-size:20px;font-weight:700;letter-spacing:-.015em}
-.lead{font-size:clamp(18px,2.2vw,21px);color:var(--tx1);line-height:1.6;font-weight:300}
-.body{color:var(--tx1);line-height:1.7}
+/* ── pills (same as SH✡MER) ── */
+.btn-orange{display:inline-flex;align-items:center;justify-content:center;gap:10px;background:var(--orange);color:#fff;border:0;cursor:pointer;
+  font:800 17px 'Alef',sans-serif;min-height:56px;padding:0 40px;border-radius:999px;white-space:nowrap;
+  transition:background .18s,transform .12s,box-shadow .18s;box-shadow:0 6px 18px rgba(252,153,24,.28)}
+.btn-orange:hover{background:var(--orange-d);transform:translateY(-1px)}
+.btn-orange:active{transform:scale(.98)}
+.btn-line{display:inline-flex;align-items:center;justify-content:center;gap:10px;background:transparent;color:#fff;cursor:pointer;
+  font:800 16px 'Alef',sans-serif;min-height:54px;padding:0 30px;border-radius:999px;white-space:nowrap;border:2px solid var(--green);transition:background .18s}
+.btn-line:hover{background:rgba(80,219,15,.12)}
+.btn-line.dark{color:var(--ink);border-color:var(--green-d)}
+.btn-line.dark:hover{background:rgba(47,138,16,.08)}
 
-nav{position:fixed;inset-inline:0;top:0;z-index:60;background:rgba(8,18,12,.92);
-  backdrop-filter:blur(14px);border-bottom:1px solid rgba(80,219,15,.18)}
-.nav-in{display:flex;align-items:center;justify-content:space-between;height:62px}
-.brand{display:flex;align-items:center;gap:9px;font-weight:900;font-size:17px;letter-spacing:.03em}
-.brand img{width:32px;height:32px} .brand i{font-style:normal;color:var(--au3)}
-.nav-r{display:flex;align-items:center;gap:var(--s1)}
-.lang button{width:44px;height:44px;border:0;background:none;color:var(--tx2);
-  font:500 12px/1 'Heebo',sans-serif;cursor:pointer}
-.lang button.on{color:var(--au3);font-weight:800}
-.btn{display:inline-flex;align-items:center;justify-content:center;gap:9px;min-height:52px;
-  padding:0 var(--s4);background:var(--au-grad);color:var(--n0);border-radius:999px;
-  font-weight:700;font-size:16px;transition:transform .18s ease,box-shadow .18s ease}
-.btn:hover{transform:translateY(-2px);box-shadow:0 14px 34px -12px rgba(80,219,15,.55)}
-.btn svg{width:17px;height:17px;stroke-width:2.3}
-.btn-sm{min-height:44px;padding:0 var(--s3);font-size:14px}
+/* ══ TOP BAR ══ */
+header.bar{position:relative;z-index:60;background:var(--bar);border-bottom:1px solid rgba(250,172,34,.14)}
+.bar-inner{position:relative;display:flex;align-items:center;justify-content:space-between;gap:18px;height:72px;direction:ltr}
+.bar-left{display:flex;align-items:center;gap:22px}
+.langs{display:flex;align-items:center;gap:16px;font-size:15px;color:#E7ECF7;font-weight:700}
+.langs button{background:none;border:0;font:inherit;color:inherit;cursor:pointer;opacity:.7;padding:10px 2px;transition:.15s}
+.langs button:hover{opacity:1}
+.langs button.on{opacity:1;color:var(--orange)}
+.bar-badge{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);height:clamp(66px,8vw,112px);width:auto;
+  filter:drop-shadow(0 10px 24px rgba(0,0,0,.6));pointer-events:none;z-index:2}
+.bar-right{display:flex;align-items:center;padding-inline-end:4px}
+.bar-right .wm-svg{width:clamp(130px,13vw,170px)}
+.bar-left .btn-orange{min-height:44px;padding:0 22px;font-size:15px}
 
-/* HERO — photo, slogan, one action. Trust before features. */
-.hero{position:relative;min-height:92svh;display:flex;align-items:flex-end;
-  padding:var(--s6) 0 var(--s5);overflow:hidden}
-.hero-bg{position:absolute;inset:0}
-.hero-bg img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;
-  object-position:50% 30%;opacity:0;transition:opacity 1.8s ease}
-.hero-bg img.on{opacity:1}
-.hero-bg::after{content:"";position:absolute;inset:0;
-  background:linear-gradient(180deg,rgba(8,18,12,.62),rgba(8,18,12,.42) 38%,rgba(8,18,12,.97))}
-.hero-in{position:relative;z-index:2}
-/* the badge is the brand mark — displayed large on navy, never small */
-.hero-badge{width:clamp(112px,20vw,168px);height:auto;margin-bottom:var(--s3);
-  filter:drop-shadow(0 6px 28px rgba(0,0,0,.65))}
-.close-badge{width:clamp(104px,18vw,148px);margin:0 auto var(--s3);
-  filter:drop-shadow(0 6px 28px rgba(0,0,0,.5))}
+/* ══ HERO ══ */
+.hero{position:relative;background:#0A1630;overflow:visible}
+.hero-bg{position:absolute;top:0;left:0;width:100%;height:clamp(460px,44vw,600px);object-fit:cover;object-position:50% 40%}
+.hero-shade{position:absolute;top:0;left:0;right:0;height:clamp(460px,44vw,600px);background:
+  linear-gradient(270deg,rgba(8,16,36,.80) 0%,rgba(9,18,40,.62) 40%,rgba(10,20,44,.30) 75%,rgba(10,20,44,.15) 100%),
+  linear-gradient(180deg,rgba(8,16,36,.35) 0%,rgba(8,16,36,0) 45%,rgba(8,16,36,.70) 100%)}
+.hero-inner{position:relative;display:grid;grid-template-columns:1fr;justify-items:end;align-items:center;
+  min-height:clamp(460px,44vw,600px);margin-bottom:60px;direction:ltr}
+.hero-text{direction:rtl;text-align:right;color:#fff;max-width:600px;padding:30px 0;z-index:3}
+html[dir=ltr] .hero-text{direction:ltr;text-align:left}
+.hero-text .wm-svg{width:clamp(220px,22vw,300px);margin:0 0 14px auto;filter:drop-shadow(0 3px 18px rgba(0,0,0,.6))}
+html[dir=ltr] .hero-text .wm-svg{margin:0 auto 14px 0}
+.hero-eb{display:inline-flex;align-items:center;gap:8px;font-size:13.5px;font-weight:700;letter-spacing:.06em;color:var(--green);
+  border:1px solid rgba(80,219,15,.5);border-radius:999px;padding:5px 14px;margin-bottom:14px;background:rgba(8,16,36,.45)}
+.hero-eb .ic{width:15px;height:15px}
+.hero-text h1{font-size:clamp(28px,3.2vw,46px);font-weight:800;line-height:1.25;text-shadow:0 3px 18px rgba(0,0,0,.7)}
+.hero-text p{margin-top:14px;font-size:clamp(16px,1.35vw,20px);color:#EAF0FB;text-shadow:0 2px 12px rgba(0,0,0,.6);max-width:46ch}
+html[dir=rtl] .hero-text p{margin-inline-start:auto}
+.hero-cta{display:flex;flex-wrap:wrap;gap:12px;margin-top:24px;justify-content:flex-start}
+.hero-meta{margin-top:12px!important;font-size:14px!important;color:#C9D4EA!important}
+.hero-phone{position:absolute;left:3.5%;bottom:-72px;width:clamp(230px,20vw,290px);z-index:6;border-radius:34px;padding:9px;
+  background:linear-gradient(160deg,#1a2438,#05080f);border:1px solid #3A465F;box-shadow:0 34px 66px -20px rgba(0,0,0,.72)}
+.hero-phone img{border-radius:26px;width:100%;aspect-ratio:9/19.5;object-fit:cover;object-position:top}
 
-.hero .eyebrow{color:var(--au3)}
-.hero .h1{margin:var(--s2) 0 var(--s3);max-width:13ch}
-.hero .lead{color:var(--tx1);max-width:36ch}
-.hero-cta{margin-top:var(--s4);display:flex;flex-wrap:wrap;align-items:center;gap:var(--s3)}
+/* ══ PRINCIPLE (white, image + orange/green blocks) ══ */
+.arrive{background:#fff;padding:clamp(66px,8.5vw,124px) 0}
+.arrive-inner{display:grid;grid-template-columns:1fr 1fr;gap:clamp(36px,5vw,80px);align-items:center;direction:rtl}
+html[dir=ltr] .arrive-inner{direction:ltr}
+.arrive-kicker{font-size:14px;color:var(--orange);font-weight:700;letter-spacing:.06em;margin-bottom:14px}
+.arrive-kicker .wordmark{color:var(--ink)}
+.arrive-lead{font-size:clamp(18px,1.7vw,23px);color:var(--ink);font-weight:800;margin-bottom:6px}
+.arrive-big{font-size:clamp(48px,6.6vw,118px);line-height:.98;font-weight:900;color:var(--orange);letter-spacing:-2px}
+.arrive-big em{font-style:normal;color:var(--green-d)}
+.arrive-figure{position:relative;display:flex;justify-content:center;align-items:center}
+.arrive-figure .blk{position:absolute;border-radius:28px;z-index:0}
+.arrive-figure .b1{left:-5%;top:9%;width:46%;height:82%;background:var(--orange)}
+.arrive-figure .b2{right:-4%;top:24%;width:20%;height:56%;background:var(--green)}
+.arrive-figure img{position:relative;z-index:1;border-radius:26px;width:100%;max-width:430px;aspect-ratio:1/1;object-fit:cover;
+  box-shadow:0 30px 64px -18px rgba(20,28,39,.4)}
 
-.hero-alt{color:var(--tx2);font-size:15px;min-height:44px;display:inline-flex;align-items:center}
-.hero-alt a{color:var(--au3);border-bottom:1px solid rgba(80,219,15,.5);display:inline-flex;align-items:center;min-height:44px;padding:0 2px}
+/* ══ REPORT TYPES (navy band, round outlined icons) ══ */
+.adv{background:var(--navy);color:#fff;padding:clamp(66px,8.5vw,120px) 0;background-image:linear-gradient(180deg,rgba(12,27,58,0) 55%,var(--deep) 100%)}
+.adv h2,.sec-h{text-align:center;font-size:clamp(25px,3.1vw,48px);font-weight:900;margin-bottom:10px}
+.adv .sub{text-align:center;color:var(--navy-text);font-size:clamp(16px,1.3vw,19px);margin-bottom:clamp(36px,4.5vw,64px)}
+.types{display:grid;grid-template-columns:repeat(4,1fr);gap:clamp(14px,1.8vw,24px)}
+.type{background:rgba(255,255,255,.04);border:1px solid rgba(185,198,224,.18);border-radius:22px;padding:22px 18px;text-align:center;transition:border-color .2s,background .2s}
+.type[open]{border-color:rgba(80,219,15,.55);background:rgba(80,219,15,.06)}
+.type summary{list-style:none;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:10px}
+.type summary::-webkit-details-marker{display:none}
+.t-ic{width:78px;height:78px;border:2px solid var(--green);border-radius:50%;display:flex;align-items:center;justify-content:center;color:var(--green)}
+.t-ic .ic{width:36px;height:36px;stroke-width:1.7}
+.type h3{font-size:clamp(17px,1.4vw,21px);color:#fff}
+.type .ts{font-size:14.5px;color:var(--navy-text)}
+.type .more{display:inline-flex;align-items:center;gap:4px;font-size:13px;color:var(--green);font-weight:700}
+.type .more .ic{width:15px;height:15px;transition:transform .2s}
+.type[open] .more .ic{transform:rotate(180deg)}
+.type p{margin-top:12px;font-size:15px;line-height:1.7;color:#DCE4F3;text-align:start}
+.type.uxo .t-ic{border-color:var(--orange);color:var(--orange)}
+.type.uxo[open]{border-color:rgba(252,153,24,.6);background:rgba(252,153,24,.07)}
+.types-note{margin:clamp(28px,3vw,40px) auto 0;max-width:720px;text-align:center;font-size:15px;color:var(--navy-text);
+  border:1px solid rgba(185,198,224,.22);border-radius:16px;padding:14px 20px}
+.types-note b{color:#fff}
 
-/* TRUST BAND — takes the place of testimonials we do not yet have */
-.trust{background:var(--n1);border-block:1px solid rgba(80,219,15,.16);padding:var(--s5) 0}
-.trust-q{font-size:clamp(20px,3vw,29px);font-weight:300;line-height:1.45;
-  color:var(--tx0);max-width:22ch;margin-inline:auto;text-align:center}
-.trust-q b{font-weight:800}
-.trust-src{margin-top:var(--s3);text-align:center;font-size:13px;font-weight:700;
-  letter-spacing:.14em;color:var(--au1)}
+/* ══ FOR WHOM (light band, photo cards) ══ */
+.whom{background:var(--light);padding:clamp(60px,8vw,110px) 0}
+.whom .sec-h{color:var(--ink);margin-bottom:clamp(30px,4vw,54px)}
+.cards{display:grid;grid-template-columns:repeat(3,1fr);gap:clamp(16px,2vw,28px)}
+.card{background:#fff;border-radius:22px;overflow:hidden;box-shadow:0 18px 38px -22px rgba(20,30,60,.35)}
+.card img{width:100%;aspect-ratio:4/3;object-fit:cover}
+.card div{padding:18px 20px 22px;border-top:4px solid var(--green)}
+.card h3{font-size:21px;color:var(--ink);margin-bottom:4px}
+.card p{color:var(--ink-soft);font-size:16px}
 
-/* HOW — numbered, with real screens */
-.sec{padding:var(--s7) 0}
-.sec-light{background:linear-gradient(180deg,var(--stone),var(--stone2));color:var(--ink2-on-light)}
-.sec-light .eyebrow{color:#2F8A10}
-.sec-light .h2{color:var(--ink-on-light)}
-.sec-light .step h3{color:var(--ink-on-light)}
-.sec-light .step p{color:var(--ink2-on-light)}
-.sec-light .step .n{background:var(--ink-on-light)}
-.sec-light .val h3{color:var(--ink-on-light)} .sec-light .val p{color:var(--ink2-on-light)}
-.brand .wm{white-space:nowrap}
-@media (max-width:640px){ .hero-bg img{object-position:82% 50%} }
-@media (max-width:440px){ .nav-r .btn-sm{display:none} .lang button{width:34px} .brand{font-size:15px} }
-.sec-head{text-align:center;max-width:24ch;margin:0 auto var(--s5)}
-.sec-head .eyebrow{display:block;margin-bottom:var(--s2)}
-.steps{display:grid;grid-template-columns:repeat(3,1fr);gap:var(--s4)}
-.step{text-align:center}
-.step .shot{border-radius:26px;overflow:hidden;background:#000;aspect-ratio:1080/2146;
-  margin:0 auto var(--s3);width:min(210px,100%);border:7px solid var(--n2);
-  box-shadow:0 24px 50px -28px rgba(19,24,32,.55)}
-.step .shot img{width:100%;height:100%;object-fit:cover}
-.step .n{width:30px;height:30px;border-radius:50%;background:var(--ink);color:#fff;
-  font-weight:800;font-size:14px;display:flex;align-items:center;justify-content:center;
-  margin:0 auto var(--s2)}
-.step h3{margin-bottom:6px}
-.step p{font-size:15.5px;color:var(--ink2);line-height:1.6;max-width:30ch;margin-inline:auto}
-@media(max-width:760px){
-  .steps{grid-template-columns:1fr;gap:var(--s4)}
-  .step .shot{width:min(150px,52%)}
-  .sec-light{padding:var(--s5) 0}
-  .sec-light .sec-head{margin-bottom:var(--s4)}
+/* ══ OUTDOORS (white, image + list) ══ */
+.out{background:#fff;padding:clamp(60px,8vw,110px) 0}
+.out-in{display:grid;grid-template-columns:1fr 1fr;gap:clamp(36px,5vw,80px);align-items:center;direction:rtl}
+html[dir=ltr] .out-in{direction:ltr}
+.out-pic{position:relative}
+.out-pic img{border-radius:26px;width:100%;max-width:440px;aspect-ratio:4/5;object-fit:cover;margin:0 auto;box-shadow:0 30px 64px -18px rgba(20,28,39,.4)}
+.out .kick{font-size:14px;color:var(--orange);font-weight:700;letter-spacing:.06em}
+.out h2{font-size:clamp(26px,3vw,44px);font-weight:900;color:var(--ink);margin:10px 0 24px}
+.feats{list-style:none;display:grid;gap:18px}
+.feats li{display:flex;gap:16px;align-items:flex-start}
+.f-ic{flex:none;width:58px;height:58px;border:2px solid var(--orange);border-radius:50%;display:flex;align-items:center;justify-content:center;color:var(--orange)}
+.f-ic .ic{width:26px;height:26px}
+.feats b{display:block;font-size:19px;color:var(--ink)}
+.feats span.d{display:block;color:var(--ink-soft);font-size:16px}
+
+/* ══ APP SCREENS (light band, carousel, real screenshots) ══ */
+.screens{background:var(--light);padding:clamp(60px,8vw,110px) 0}
+.screens .sec-h{color:var(--ink);margin-bottom:clamp(30px,4vw,54px)}
+.car-track{display:flex;gap:22px;justify-content:center;overflow-x:auto;scroll-snap-type:x mandatory;scrollbar-width:none;direction:ltr;padding-bottom:4px}
+.car-track::-webkit-scrollbar{display:none}
+.shot{flex:0 0 min(250px,70vw);scroll-snap-align:center;background:#0a1628;border-radius:22px;padding:7px;box-shadow:0 18px 38px -18px rgba(20,30,60,.5)}
+.shot img{border-radius:16px;width:100%;aspect-ratio:9/19.5;object-fit:cover;object-position:top}
+.shot figcaption{color:#C9D4EA;font-size:14px;text-align:center;padding:8px 4px 4px}
+
+/* ══ INSTALL (navy) ══ */
+.inst{background:var(--bar);color:#fff;padding:clamp(60px,8vw,110px) 0}
+.inst .sec-h{margin-bottom:8px}
+.inst .sub{text-align:center;color:var(--navy-text);margin-bottom:clamp(30px,4vw,50px);font-size:17px}
+.inst-grid{display:grid;grid-template-columns:1.2fr 1fr;gap:clamp(24px,4vw,56px);align-items:center;direction:rtl}
+html[dir=ltr] .inst-grid{direction:ltr}
+.steps{list-style:none;display:grid;gap:14px}
+.steps li{display:flex;gap:14px;align-items:flex-start;background:rgba(255,255,255,.05);border:1px solid rgba(185,198,224,.18);border-radius:18px;padding:16px 18px}
+.steps .n{flex:none;width:36px;height:36px;border-radius:50%;background:var(--orange);color:#fff;font-weight:800;display:flex;align-items:center;justify-content:center}
+.steps b{display:block;font-size:18px}
+.steps span.d{display:block;color:var(--navy-text);font-size:15.5px}
+.inst-side{display:flex;flex-direction:column;align-items:center;gap:14px;text-align:center}
+.inst-side .btn-orange,.inst-side .btn-line{width:100%;max-width:340px}
+.inst-side .open-web{color:var(--green);font-weight:700;font-size:15px;display:inline-flex;gap:6px;align-items:center;padding:8px}
+.qr{display:flex;align-items:center;gap:14px;background:#fff;color:var(--ink);border-radius:18px;padding:12px 16px;margin-top:6px;text-align:start}
+.qr img{width:96px;height:96px}
+.qr b{display:block;font-size:15px}
+.qr span{font-size:13.5px;color:var(--ink-soft)}
+
+/* ══ FAMILY (white): the main SH✡MER app ══ */
+.fam{background:#fff;padding:clamp(56px,7vw,96px) 0}
+.fam-card{display:grid;grid-template-columns:auto 1fr auto;gap:clamp(18px,3vw,40px);align-items:center;max-width:1000px;margin:0 auto;
+  background:var(--bar);color:#fff;border-radius:28px;padding:clamp(22px,3vw,36px);box-shadow:0 30px 64px -26px rgba(12,27,58,.6)}
+.fam-card img{width:clamp(84px,9vw,120px);height:auto;filter:drop-shadow(0 8px 20px rgba(0,0,0,.5))}
+.fam-card h2{font-size:clamp(22px,2.4vw,32px);font-weight:900}
+.fam-card h2 .wordmark .star{color:var(--gold)}
+.fam-card p{color:var(--navy-text);font-size:16.5px;margin-top:6px}
+.fam-cta{display:flex;flex-direction:column;gap:10px}
+.fam-cta .btn-line{border-color:var(--orange)}
+.fam-cta .btn-line:hover{background:rgba(252,153,24,.12)}
+
+/* ══ FAQ (light) ══ */
+.faq-sec{background:var(--light);padding:clamp(56px,7vw,96px) 0}
+.faq-sec .sec-h{color:var(--ink);margin-bottom:clamp(24px,3vw,40px)}
+.faq{max-width:820px;margin:0 auto;display:grid;gap:12px}
+.faq details{background:#fff;border-radius:16px;border:1px solid #E1E5EE;padding:0 20px}
+.faq summary{list-style:none;cursor:pointer;display:flex;justify-content:space-between;align-items:center;gap:12px;min-height:58px;font-weight:800;font-size:17px;color:var(--ink)}
+.faq summary::-webkit-details-marker{display:none}
+.faq summary .ic{color:var(--orange);transition:transform .2s}
+.faq details[open] summary .ic{transform:rotate(180deg)}
+.faq p{padding:0 0 18px;color:var(--ink-soft);font-size:16px;line-height:1.75}
+.faq a{color:var(--green-d);font-weight:700;text-decoration:underline}
+
+/* ══ CLOSING (photo band) ══ */
+.close-cta{position:relative;overflow:hidden;isolation:isolate;background:#0B140E;text-align:center;color:#fff}
+.close-cta .bg{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center;opacity:.5;z-index:-2}
+.close-cta::after{content:"";position:absolute;inset:0;z-index:-1;background:linear-gradient(180deg,rgba(12,27,58,.80),rgba(12,27,58,.55) 45%,rgba(12,27,58,.92))}
+.close-in{padding:clamp(70px,9vw,120px) 0}
+.close-in .wm-svg{width:clamp(220px,24vw,320px);margin:0 auto 14px}
+.close-in h2{font-size:clamp(26px,3.6vw,46px);font-weight:900;margin-bottom:26px;text-shadow:0 3px 18px rgba(0,0,0,.6)}
+
+/* ══ DISCLAIMER + FOOTER (same as SH✡MER) ══ */
+.disc-wrap{background:#fff;padding:clamp(40px,6vw,64px) 0 calc(clamp(150px,30vw,215px) / 2 + 22px)}
+.disc-card{max-width:660px;margin:0 auto;border:2px solid #D42B2B;border-radius:18px;padding:22px 24px;background:#fff;text-align:center}
+.disc-txt{font-size:14.5px;line-height:1.75;color:#D42B2B}
+.disc-txt b,.disc-txt .num{font-weight:800}
+.foot-badge-wrap{background:#fff;text-align:center;line-height:0;height:0;overflow:visible}
+.foot-badge{height:clamp(150px,30vw,215px);width:auto;margin:0 auto;transform:translateY(-50%);filter:drop-shadow(0 8px 20px rgba(0,0,0,.35));position:relative;z-index:3}
+footer.foot{background:var(--foot);color:#C3CCDF;padding:clamp(74px,8vw,104px) 0 34px;text-align:center}
+.foot-links{display:flex;gap:18px;justify-content:center;flex-wrap:wrap;margin:18px 0 12px}
+.foot-links a{font-size:14px;color:#AEB8CF;padding:6px 2px}
+.foot-links a:hover{color:#fff}
+.foot-social{display:flex;gap:14px;justify-content:center;margin:6px 0 16px}
+.foot-social a{width:44px;height:44px;border-radius:50%;border:1px solid rgba(250,172,34,.45);display:flex;align-items:center;justify-content:center;color:var(--gold)}
+.foot-social a:hover{background:rgba(250,172,34,.14)}
+.foot-meta{font-size:13px;color:#8B96B0;display:flex;align-items:center;justify-content:center;gap:9px;flex-wrap:wrap}
+.foot-meta img{height:13px;width:auto;opacity:.75}
+
+/* ══ INSTALL DIALOG ══ */
+dialog#inst{border:0;padding:0;margin:auto;width:min(520px,94vw);max-height:92vh;border-radius:24px;background:#fff;color:var(--ink);box-shadow:0 30px 80px -20px rgba(0,0,0,.6)}
+dialog#inst::backdrop{background:rgba(6,15,30,.72)}
+.dsheet{padding:22px 22px 24px;font-family:'Alef',sans-serif}
+.sh-top{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:14px}
+.sh-top h2{font-size:21px}
+.x{width:44px;height:44px;border-radius:50%;border:0;background:var(--light);font-size:24px;cursor:pointer;color:var(--ink)}
+.seg{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;background:var(--light);border-radius:999px;padding:5px;margin-bottom:16px}
+.seg button{border:0;background:none;border-radius:999px;min-height:42px;font:800 15px 'Alef',sans-serif;color:var(--ink-soft);cursor:pointer}
+.seg button[aria-selected=true]{background:var(--bar);color:#fff}
+.pane ol{margin:14px 0;padding-inline-start:22px;display:grid;gap:8px;font-size:16px}
+.pane .row{display:flex;justify-content:center}
+.pane .btn-orange{width:100%}
+.pane .btn-line.dark{width:100%}
+.or{text-align:center;color:var(--grey);font-size:14px;margin:14px 0 10px}
+.hint{font-size:14px;color:var(--ink-soft);margin-top:10px}
+.kbd{display:inline-flex;vertical-align:middle;border:1px solid #D4D9E4;border-radius:7px;padding:2px 4px}
+.kbd .ic{width:16px;height:16px}
+.qrbox{display:flex;gap:16px;align-items:center}
+.qrbox img{width:130px;height:130px;flex:none}
+.url{font-size:13px;color:var(--grey);direction:ltr;margin-top:6px}
+
+/* ══ RESPONSIVE ══ */
+@media (max-width:980px){
+  .types{grid-template-columns:repeat(2,1fr)}
+  .cards{grid-template-columns:1fr;max-width:520px;margin:0 auto}
+  .inst-grid{grid-template-columns:1fr}
+  .fam-card{grid-template-columns:1fr;text-align:center;justify-items:center}
+  .car-track{justify-content:flex-start}
 }
-
-/* VALUES — the covenant. This is what Noonlight cannot say. */
-
-.vals .eyebrow{color:var(--au3)}
-.vals .h2{color:var(--tx0)}
-.vals-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:var(--s4);margin-top:var(--s5)}
-.val h3{color:var(--tx0);margin-bottom:6px}
-.val p{color:var(--tx1);font-size:15.5px;line-height:1.65}
-.val .bar{width:32px;height:2px;background:var(--au-grad);margin-bottom:var(--s2)}
-@media(max-width:760px){.vals-grid{grid-template-columns:1fr;gap:var(--s4)}}
-
-/* FEATURES — small, last, like Noonlight */
-.feats{display:grid;grid-template-columns:repeat(2,1fr);gap:var(--s2) var(--s5);
-  max-width:760px;margin:var(--s5) auto 0}
-.feat{padding:var(--s3) 0;border-top:1px solid rgba(80,219,15,.16)}
-.feat h3{font-size:17px;margin-bottom:2px}
-.feat p{font-size:15px;color:var(--tx1)}
-@media(max-width:620px){.feats{grid-template-columns:1fr}}
-
-/* STATS */
-.stats{background:var(--n1);border-block:1px solid rgba(80,219,15,.16);padding:var(--s5) 0}
-.stats-in{display:grid;grid-template-columns:repeat(3,1fr);text-align:center;gap:var(--s2)}
-.stat b{display:block;font-size:clamp(28px,5vw,42px);font-weight:900;letter-spacing:-.03em;
-  background:var(--au-grad);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
-.stat span{font-size:14px;color:var(--tx1)}
-
-/* CLOSE */
-.close{padding:var(--s7) 0;text-align:center}
-.close .h2{max-width:17ch;margin:0 auto var(--s3)}
-.close .lead{max-width:38ch;margin:0 auto var(--s4)}
-.note{margin-top:var(--s5);font-size:14px;color:var(--tx2);max-width:50ch;
-  margin-inline:auto;line-height:1.6}
-.note b{color:var(--sos);font-weight:700}
-.num{font-variant-numeric:tabular-nums;white-space:nowrap}
-footer{border-top:1px solid rgba(80,219,15,.16);padding:var(--s4) 0;text-align:center}
-footer p{font-size:13px;color:var(--tx2)}
-@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+@media (max-width:860px){
+  .hero-bg,.hero-shade{height:clamp(560px,140vw,720px)}
+  .hero-shade{background:linear-gradient(180deg,rgba(8,16,36,.55) 0%,rgba(8,16,36,.35) 34%,rgba(8,16,36,.78) 78%,rgba(8,16,36,.95) 100%)}
+  .hero-inner{display:flex;flex-direction:column;align-items:center;min-height:auto;padding:clamp(26px,8vw,46px) 0 0;margin-bottom:30px}
+  .hero-text{order:1;text-align:center!important;max-width:94%;padding:0}
+  .hero-text .wm-svg{margin:0 auto 12px!important;width:clamp(200px,62vw,260px)}
+  .hero-text p{margin-inline:auto!important}
+  .hero-cta{justify-content:center}
+  .hero-phone{order:2;position:relative;left:auto;bottom:auto;margin:30px auto -56px;width:min(56vw,224px)}
+  .arrive{padding-top:96px}
+  .arrive-inner,.out-in{grid-template-columns:1fr;gap:36px}
+  .arrive-figure img{max-width:70%}
+  .arrive-figure .b1{left:6%;width:30%}
+  .arrive-figure .b2{right:6%;width:16%}
+}
+@media (max-width:620px){
+  .bar-inner{height:64px;gap:8px}
+  .bar-right{display:none}
+  .bar-badge{left:auto;right:12px;transform:translateY(-50%);height:50px}
+  .langs{gap:10px;font-size:13px}
+  .bar-left{gap:10px}
+  .bar-left .btn-orange{font-size:13px;min-height:44px;padding:0 14px}
+  .hero-cta .btn-orange,.hero-cta .btn-line{width:100%;max-width:340px}
+  .types{grid-template-columns:1fr 1fr;gap:12px}
+  .type{padding:16px 10px}
+  .t-ic{width:62px;height:62px}.t-ic .ic{width:30px;height:30px}
+  .type.uxo,.type.lost{grid-column:1/-1}
+  .type p{font-size:14.5px}
+  .qrbox{flex-direction:column;text-align:center}
+  .inst .qr{display:none}
+}
+@media (prefers-reduced-motion:reduce){*{scroll-behavior:auto!important;transition:none!important}}
 </style>
-  <meta name="keywords" content="שמירה טבע,SOS,חירום,ים,יער,בעלי חיים">
 </head>
 <body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="i-fire" viewBox="0 0 24 24"><path d="M12 3c.6 3.2 4.8 5 4.8 9.6A4.8 4.8 0 0 1 7.2 12.6c0-1.9.9-3.2 2-4.1.1 1.6.9 2.6 2 2.8-.3-3 .1-5.8.8-8.3z"/><path d="M10.3 15.6c0-1 .8-1.7 1.7-2.6.9.9 1.7 1.6 1.7 2.6a1.7 1.7 0 0 1-3.4 0z"/><path d="M4 21h16"/></symbol>
+  <symbol id="i-paw" viewBox="0 0 24 24"><ellipse cx="7" cy="9" rx="1.7" ry="2.2"/><ellipse cx="11" cy="6.3" rx="1.7" ry="2.2"/><ellipse cx="15.4" cy="7.4" rx="1.7" ry="2.2"/><path d="M6.8 17.6c0-3 2.4-5.6 4.8-5.6s4 1.9 4 4.2c0 1.6-1.2 2.6-2.6 2.6-.9 0-1.4-.4-2-.4s-1.1.5-2 .5c-1.3 0-2.2-.5-2.2-1.3z"/><path d="M19 13.5v5M16.5 16h5"/></symbol>
+  <symbol id="i-dump" viewBox="0 0 24 24"><path d="M9.5 3h3M10 3v2.6L8.4 8v9.4c0 .9.7 1.6 1.6 1.6h2c.9 0 1.6-.7 1.6-1.6V8L12 5.6V3"/><path d="M8.4 11.5h5.2"/><path d="M3 21h18"/><path d="M16.5 19c.4-2.6 1.9-4.4 4.3-5-.2 2.6-1.8 4.4-4.3 5zM16.5 19c.6-1.4 1.5-2.4 2.7-3.1"/></symbol>
+  <symbol id="i-water" viewBox="0 0 24 24"><path d="M3 15c1.5 0 1.5-1.3 3-1.3s1.5 1.3 3 1.3 1.5-1.3 3-1.3 1.5 1.3 3 1.3 1.5-1.3 3-1.3 1.5 1.3 3 1.3"/><path d="M3 19.5c1.5 0 1.5-1.3 3-1.3s1.5 1.3 3 1.3 1.5-1.3 3-1.3 1.5 1.3 3 1.3 1.5-1.3 3-1.3 1.5 1.3 3 1.3"/><circle cx="12" cy="6.5" r="2"/><path d="M8 11.4l4-1.6 4 1.6"/></symbol>
+  <symbol id="i-lost" viewBox="0 0 24 24"><circle cx="9" cy="4.6" r="1.8"/><path d="M8.4 8.2 7 13.6l2.6 2.2.8 5.2M7 13.6 5.6 21M8.4 8.2l2.8 1.6 1.6 3"/><path d="M8.6 8.4 5.8 7.6 4.7 11.8l2.5.6"/><path d="M15.6 7.6a2.4 2.4 0 1 1 3.4 2.2c-.7.3-1.1.8-1.1 1.6v.5"/><path d="M17.9 14.6v.1"/><path d="M14.5 21h6"/></symbol>
+  <symbol id="i-trail" viewBox="0 0 24 24"><path d="M2.5 20 8.5 10l3.4 5.4L14.6 12l6.9 8z"/><path d="M8.5 10l1.6-2.6"/><path d="M17.5 3.2l3.6 6.2h-7.2z"/><path d="M17.5 5.6v1.6M17.5 8.3v.1"/></symbol>
+  <symbol id="i-sos" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5"/><path d="M12 7.5v5"/><path d="M12 15.8v.1"/></symbol>
+  <symbol id="i-timer" viewBox="0 0 24 24"><circle cx="12" cy="13.5" r="7"/><path d="M12 9.5v4l2.6 1.6M10 2.8h4M18.4 6.4l1.4-1.4"/></symbol>
+  <symbol id="i-book" viewBox="0 0 24 24"><path d="M4 5.5c2.7-1 5.3-1 8 .7 2.7-1.7 5.3-1.7 8-.7v13c-2.7-1-5.3-1-8 .7-2.7-1.7-5.3-1.7-8-.7z"/><path d="M12 6.2v13"/><path d="M7 10.5h2M8 9.5v2"/></symbol>
+  <symbol id="i-down" viewBox="0 0 24 24"><path d="M12 4v11M7.5 10.5 12 15l4.5-4.5M5 19.5h14"/></symbol>
+  <symbol id="i-chev" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></symbol>
+  <symbol id="i-share" viewBox="0 0 24 24"><path d="M12 3.5v11M8.2 7.2 12 3.5l3.8 3.7"/><path d="M8 10.5H6.5v9.5h11v-9.5H16"/></symbol>
+  <symbol id="i-dots" viewBox="0 0 24 24"><circle cx="12" cy="5.5" r=".9"/><circle cx="12" cy="12" r=".9"/><circle cx="12" cy="18.5" r=".9"/></symbol>
+  <symbol id="i-leaf" viewBox="0 0 24 24"><path d="M5 19c0-8 5-13 15-14-.5 9.5-6 14.5-14 14z"/><path d="M5 19c3-4 6-6.5 9.5-8.5"/></symbol>
+  <symbol id="i-debris" viewBox="0 0 24 24"><path d="M6.4 18.6Q8.7 19.2 10.4 17.5L16.4 11.6 13.4 8.6 7.5 14.6Q5.8 16.3 6.4 18.6Z M14 14 18.6 13 16.6 11 M11 11 12 6.4 14 8.4 M11.7 16.3 8.7 13.3"/><path d="M2.5 21h11"/><path d="M3.6 17.8l-1.2-.8M5 16.2l-.6-1.4"/></symbol>
+  <symbol id="i-med" viewBox="0 0 24 24"><path d="M12 20.5s-7.5-4.4-7.5-10A4.2 4.2 0 0 1 12 8a4.2 4.2 0 0 1 7.5 2.5c0 5.6-7.5 10-7.5 10z"/><path d="M12 11v5M9.5 13.5h5"/></symbol>
+  <symbol id="i-app" viewBox="0 0 24 24"><rect x="6.5" y="2.5" width="11" height="19" rx="2.4"/><path d="M10.5 18.5h3"/></symbol>
+  <symbol id="i-ext" viewBox="0 0 24 24"><path d="M14 4h6v6M20 4l-9 9"/><path d="M18 14v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h5"/></symbol>
+</svg>
 
-<nav><div class="w nav-in">
-  <span class="brand"><img src="nature-badge.png" alt=""><span dir="ltr" class="wm">SH<i>✡</i>MER <span style="color:#50DB0F">Nature</span></span></span>
-  <span class="nav-r">
-    <span class="lang">
-      <button class="on" id="L-he" onclick="setLang('he')">עב</button>
-      <button id="L-en" onclick="setLang('en')">EN</button>
-      <button id="L-ar" onclick="setLang('ar')">عر</button>
-    </span>
-    <a href="https://www.shomer-app.co.il/" class="btn btn-sm" data-t="nav">SH✡MER העירוני</a>
-  </span>
-</div></nav>
-
-<header class="hero">
-  <div class="hero-bg"><img class="on" id="s1" src="nature-hero.jpg" alt=""></div>
-  <div class="w hero-in">
-    <img class="hero-badge" src="nature-badge.png" alt="SH✡MER Nature">
-    <span class="eyebrow" data-t="eb">בקרוב · COMING SOON</span>
-    <h1 class="h1" data-t="h1">שומרים על מי שאין לו קול.</h1>
-    <p class="lead" data-t="sub">אותה רשת שמירה — הפעם ליער, לחוף, לחי ולסביבה.</p>
-    <div class="hero-cta">
-      <a href="#wait" class="btn"><span data-t="cta">הצטרפ/י לרשימת ההמתנה</span></a>
-      <span class="hero-alt" data-t="alt">כבר מוגן/ת בעיר? <a href="https://www.shomer-app.co.il/">ל-SH✡MER העירוני</a> &nbsp;·&nbsp; <a href="nature.html" style="font-weight:800">נסו את הבטא ←</a></span>
+<!-- ══ TOP BAR ══ -->
+<header class="bar">
+  <div class="wrap bar-inner">
+    <div class="bar-left">
+      <nav class="langs" aria-label="Language">
+        <button type="button" data-lang="en">En</button>
+        <button type="button" data-lang="ar">عر</button>
+        <button type="button" data-lang="he" class="on">עב</button>
+      </nav>
+      <a class="btn-orange" href="../nature-v2/SHOMER-Nature.apk" download="SHOMER-Nature.apk" data-get>
+        <svg class="ic" aria-hidden="true"><use href="#i-down"/></svg><span data-t="ctas">להורדה - חינם!</span>
+      </a>
     </div>
+    <img class="bar-badge" src="nature-badge.png" alt="" aria-hidden="true">
+    <div class="bar-right"><svg class="wm-svg" role="img" aria-label="SH✡MER Nature" id="nwb-Layer_2" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 1006.47 279.8"> <defs> <style> .nwb-c-1 { fill: url(#nwb-linear-gradient-8); } .nwb-c-2 { fill: url(#nwb-linear-gradient-7); } .nwb-c-3 { fill: url(#nwb-linear-gradient-5); } .nwb-c-4 { fill: url(#nwb-linear-gradient-6); } .nwb-c-5 { fill: url(#nwb-linear-gradient-4); } .nwb-c-6 { fill: url(#nwb-linear-gradient-3); } .nwb-c-7 { fill: url(#nwb-linear-gradient-2); } .nwb-c-8 { fill: url(#nwb-linear-gradient); } .nwb-c-9 { fill: #fff; } .nwb-c-10 { fill: #50db0f; } </style> <linearGradient id="nwb-linear-gradient" x1="366.82" y1="10.85" x2="366.82" y2="73.9" gradientUnits="userSpaceOnUse"> <stop offset="0" stop-color="#faac22"/> <stop offset="1" stop-color="#50db0f"/> </linearGradient> <linearGradient id="nwb-linear-gradient-2" x1="397.07" y1="262.98" x2="397.07" y2="198.45" xlink:href="#nwb-linear-gradient"/> <linearGradient id="nwb-linear-gradient-3" x1="666.14" y1="232.55" x2="671.64" y2="279.3" gradientUnits="userSpaceOnUse"> <stop offset="0" stop-color="#50db0f"/> <stop offset="1" stop-color="#0b5a5f"/> </linearGradient> <linearGradient id="nwb-linear-gradient-4" x1="741.81" y1="223.65" x2="747.31" y2="270.4" xlink:href="#nwb-linear-gradient-3"/> <linearGradient id="nwb-linear-gradient-5" x1="800.15" y1="216.79" x2="805.65" y2="263.54" xlink:href="#nwb-linear-gradient-3"/> <linearGradient id="nwb-linear-gradient-6" x1="850.96" y1="210.81" x2="856.46" y2="257.56" xlink:href="#nwb-linear-gradient-3"/> <linearGradient id="nwb-linear-gradient-7" x1="918.1" y1="202.91" x2="923.6" y2="249.66" xlink:href="#nwb-linear-gradient-3"/> <linearGradient id="nwb-linear-gradient-8" x1="974.25" y1="196.31" x2="979.75" y2="243.05" xlink:href="#nwb-linear-gradient-3"/> </defs> <g id="nwb-Layer_1-2" data-name="Layer 1"> <g> <g> <g> <path class="nwb-c-9" d="M73.29,117.37c-1.04-4.74-2.35-9.06-3.91-12.97-1.56-3.91-3.49-7.29-5.77-10.13-2.28-2.84-4.89-5.03-7.82-6.57-2.93-1.54-6.22-2.31-9.87-2.31-7.56,0-13.42,1.4-17.59,4.18-4.17,2.79-6.25,6.44-6.25,10.94,0,3.2.71,5.82,2.15,7.83,1.43,2.02,3.52,3.83,6.25,5.43,2.74,1.6,6.09,3.08,10.07,4.45,3.97,1.37,8.44,2.94,13.39,4.71,5.6,2.02,10.75,4.04,15.44,6.05,4.69,2.02,8.7,4.45,12.02,7.3s5.89,6.29,7.72,10.32c1.82,4.03,2.74,9.13,2.74,15.3s-1.08,11.21-3.23,15.84c-2.15,4.63-5.21,8.57-9.19,11.84-3.98,3.26-8.73,5.75-14.27,7.47-5.54,1.72-11.63,2.58-18.27,2.58-4.82,0-9.48-.53-13.97-1.6s-8.44-2.96-11.82-5.69c-2.61,1.66-5.31,3.14-8.11,4.44-2.8,1.3-5.7,2.37-8.7,3.2-1.56-4.15-2.67-8.32-3.32-12.53-.65-4.2-.98-8.56-.98-13.06,0-3.08.1-6.1.29-9.06.2-2.96.55-5.98,1.08-9.06h12.7c0,3.91.55,7.88,1.66,11.9,1.11,4.03,2.9,7.73,5.37,11.11,2.47,3.38,5.7,6.13,9.68,8.26,3.97,2.13,8.76,3.2,14.37,3.2,5.08,0,9.35-.5,12.8-1.51,3.45-1.01,6.25-2.4,8.4-4.18,2.15-1.78,3.71-3.82,4.69-6.13.98-2.31,1.47-4.77,1.47-7.37,0-4.15-1.17-7.61-3.52-10.39-2.35-2.78-6.19-5-11.53-6.66-7.95-2.49-15.25-4.94-21.89-7.37-6.65-2.43-12.41-5.33-17.3-8.71-4.89-3.38-8.7-7.37-11.43-11.99-2.74-4.62-4.1-10.31-4.1-17.06,0-5.09,1.08-9.68,3.23-13.77,2.15-4.09,5.05-7.55,8.7-10.39,3.65-2.84,7.92-5,12.8-6.49,4.89-1.48,10.07-2.22,15.54-2.22,4.82,0,9.45.8,13.88,2.4,4.43,1.6,8.14,4.29,11.14,8.08,1.43-2.37,3.52-4.32,6.25-5.86,2.74-1.54,5.47-2.67,8.21-3.38,1.95,5.69,3.16,12.11,3.62,19.28.46,7.17.68,13.95.68,20.34h-13.49Z"/> <path class="nwb-c-9" d="M191.93,196.98v-7.46c12.77,0,19.16-3.61,19.16-10.84v-35.89c-1.3-.59-3.1-1.09-5.38-1.51-2.28-.41-4.98-.62-8.11-.62h-23.45c-4.82,0-9.06.71-12.7,2.13v35.89c0,7.23,5.86,10.84,17.59,10.84v7.46h-69.39v-7.46c13.16,0,19.74-3.61,19.74-10.84v-77.65c0-9.36-6.58-14.04-19.74-14.04v-7.82h69.39v7.82c-11.73,0-17.59,4.7-17.59,14.09v29.08c1.95.59,3.91,1.01,5.86,1.25,1.95.24,4.23.36,6.84.36h23.45c6.77,0,11.27-.47,13.49-1.43v-29.26c0-9.4-6.39-14.09-19.16-14.09v-7.82h62.68l6.31,7.82c-11.86,0-17.79,4.68-17.79,14.04v77.65c0,7.23,5.93,10.84,17.79,10.84l-5.03,7.46h-63.96Z"/> </g> <g id="nwb-tiLNYP"> <g> <polygon class="nwb-c-10" points="428.57 208.04 438.58 190.54 471.74 190.59 414.86 91.97 435.09 92.04 502.02 208.07 428.57 208.04"/> <polygon class="nwb-c-10" points="292.15 86.13 348.92 184.52 328.85 184.62 261.87 68.58 335.29 68.63 325.36 86.11 292.15 86.13"/> <polygon class="nwb-c-10" points="404.53 190.54 394.42 208.07 261.93 208.07 298.67 144.34 308.66 161.86 292.16 190.56 404.53 190.54"/> <path class="nwb-c-10" d="M455.16,114.87l16.8-28.7c-.59-.11-112.44-.06-112.44-.06l9.97-17.53h132.52s-36.77,63.65-36.77,63.65l-10.08-17.36Z"/> <polygon class="nwb-c-8" points="325.78 132.35 315.67 114.9 381.94 0 417.97 62.53 397.95 62.58 381.9 35.02 325.78 132.35"/> <polygon class="nwb-c-7" points="345.94 214.14 365.99 214 381.99 241.66 438.15 144.33 448.21 161.86 381.93 276.64 345.94 214.14"/> </g> </g> </g> <g> <path class="nwb-c-6" d="M698.38,198.34l4.85,47.13c.43,4.82-.21,9.88-1.91,15.17-2.28,6.69-5.64,10.28-10.08,10.79-6.6.76-13.72-3.51-21.36-12.82-5.53-6.89-11.45-16.61-17.75-29.16-3.74-8.2-7.53-16.39-11.39-24.58-.4,18.85-.23,31.44.49,37.77,1.6,13.97,3.45,21.89,5.55,23.75,2.1,1.86,3.21,3.28,3.32,4.27.24,2.08-.75,4.04-2.97,5.9-2.22,1.86-4.53,2.92-6.93,3.2-3.36.38-6.49-2.52-9.39-8.71-2.26-4.83-3.62-9.32-4.1-13.47-.21-1.85-.47-4.62-.77-8.29-.3-3.67-.55-6.43-.77-8.29-.51-4.48-.67-11.2-.48-20.18.18-8.98.03-15.71-.49-20.18l-2.29-19.98c-.03-.22-.15-.53-.38-.95-.23-.41-.36-.73-.38-.95-.25-2.18,1.17-4.17,4.25-5.96,2.5-1.5,5.08-2.41,7.72-2.71,6.12-.7,10.71.6,13.77,3.9.86,1.12,1.8,3.55,2.84,7.31.66,2.58,1.33,5.21,2,7.9,2.33,7.59,7.54,19.6,15.62,36.04,9.63,19.36,16.26,28.83,19.86,28.42,1.32-.15,1.81-1.76,1.45-4.82-.1-.88-5.2-53.42-5.2-53.42-.4-6.71.11-13.42,1.53-20.12,2.08-9.43,5.76-14.46,11.05-15.06.02,0,.03,0,.05,0,3.17-.33,5.45,3.2,3.91,6-4.96,9.01-2.22,26.73-1.6,32.12Z"/> <path class="nwb-c-5" d="M775.5,231.7c-.95,14.14-2.1,24.09-3.45,29.83-.83,3.36-3.48,4.89-7.94,4.59-6.76-.45-9.56-3.72-8.43-9.81-6.21,2.23-12.56,3.12-19.08,2.69-6.27-.42-12.15-2.25-17.62-5.48-6.53-3.85-9.61-8.41-9.26-13.67.35-5.15,4.53-9.72,12.55-13.7,7.26-3.59,13.97-5.17,20.12-4.76l15.38,1.03.26-3.92c.88-11.41-2.47-17.38-10.07-17.89-9.53-.64-14.56,3.06-15.1,11.09-.18,2.71-1.96,3.96-5.34,3.73-2.05-.14-4.13-1.13-6.25-2.98-2.12-1.85-3.11-3.7-2.99-5.57.41-6.14,3.16-11.02,8.25-14.64,5.09-3.62,11.01-5.21,17.76-4.76,22.67,1.52,33.07,16.26,31.2,44.21ZM756.84,236.39c.15-2.19-1.59-3.41-5.21-3.65-15.08-1.01-22.83,1.72-23.26,8.19-.24,3.51,2.96,5.48,9.59,5.93,4.1.28,8.03-.51,11.79-2.35,4.5-2.01,6.86-4.72,7.09-8.11Z"/> <path class="nwb-c-3" d="M820.75,194.82c.34,2.95-4.35,5.59-14.06,7.91.04,2.43.55,7.9,1.52,16.42l1.24,10.81c.25,2.18.98,5.36,2.19,9.54,1.21,4.18,1.93,7.3,2.17,9.37.2,1.75-.58,3.41-2.35,5-1.76,1.59-3.61,2.49-5.53,2.71-3,.34-5.79-1.71-8.37-6.17-1.97-3.42-3.15-6.83-3.54-10.21l-3.97-34.71c-5.61-.13-8.85-.26-9.72-.38-3.22-.51-4.93-1.59-5.12-3.23-.05-.43.01-.94.19-1.51,2.66-4.39,5.91-6.81,9.75-7.25.24-.03.6-.07,1.08-.12.49.06.86.07,1.1.04,2.52-.29,3.41-3.1,2.68-8.44l-1.37-11.95c-.74-1.13-1.16-2.13-1.26-3.01-.16-1.42.61-2.81,2.32-4.16,1.71-1.36,3.4-2.13,5.07-2.32,2.5-.29,5,.51,7.5,2.38,2.5,1.87,3.9,4.01,4.17,6.41.3,2.62.15,5.27-.46,7.93-.61,2.67-.7,5.36-.26,8.08l.08.66c9.47-.2,14.45,1.89,14.95,6.25Z"/> <path class="nwb-c-4" d="M877.37,185.88c.39,3.38.52,8.52.4,15.43-.12,6.91.02,12.11.42,15.59.35,3.05,1.02,7.58,2.01,13.59.99,6.01,1.66,10.48,1.99,13.42.29,2.5-1.91,4.03-6.59,4.56-4.8.55-8.1-1.17-9.9-5.17-4.25,3.25-8.54,5.12-12.86,5.62-3.48.4-7.55,0-12.18-1.18-4.64-1.18-7.99-2.87-10.07-5.07-4.01-4.19-6.59-11.35-7.75-21.51-.41-3.57-.55-4.04-.56-13.88,0-1.48.6-3.03,1.89-3.77,6.55-3.72,16.1-4.78,15.51,12.45-.12,3.57.64,9.67.64,9.67.3,2.62,1.39,5.26,3.28,7.92,2.29,3.06,4.76,4.43,7.41,4.13,5.16-.59,8.66-4.03,10.5-10.33,1.21-4.34,1.47-9.46.8-15.35l-2.25-19.65c-.18-1.57-1.58-11,.86-12.42,1.37-.79,2.74-1.27,4.13-1.43,2.88-.33,5.59.19,8.12,1.55,2.53,1.37,3.94,3.3,4.22,5.8Z"/> <path class="nwb-c-2" d="M939.07,178.01s0,.02,0,.02c.27,2.41-.52,4.86-2.18,6.62-1.57,1.67-3.28,2.61-5.13,2.82-.91.1-1.81.01-2.69-.28-2.11-.69-3.67-2.5-4.3-4.63-1.04-3.49-3.09-5.06-6.16-4.71-2.16.25-4.21,5.74-6.14,16.46-.92,4.75-.91,11.22.03,19.41.89,7.75,1.82,12.4,2.79,13.95,1.13,1.97,1.75,3.34,1.83,4.1.21,1.86-.54,3.46-2.25,4.82-1.71,1.36-3.7,2.17-5.96,2.42-6.42.74-9.95-1.62-10.57-7.08-.06-.54,0-1.33.19-2.34.18-1.02.26-1.74.21-2.18-.64-5.57-1.88-13.8-3.74-24.7-1.86-10.9-3.1-19.08-3.72-24.54-.56-4.91,2.4-7.74,8.88-8.48,3.84-.44,6.6.3,8.28,2.2,2.97-3.77,6.56-5.89,10.77-6.38,2.88-.33,5.72.07,8.53,1.18,1.9.67,4.22,2.31,6.95,4.93,2.73,2.62,4.19,4.75,4.38,6.38Z"/> <path class="nwb-c-1" d="M1006.4,211.4c.62,5.46-2.97,10.19-10.79,14.17-6.09,3.13-12.62,5.09-19.58,5.89-18.49,2.12-28.83-6.38-31.02-25.48-.9-7.86.2-16.83,3.3-26.92,3.81-12.38,9.38-18.99,16.71-19.83,6.6-.76,14.02,1.11,22.26,5.58,8.24,4.48,12.69,9.61,13.35,15.39.82,7.2-2.06,13.34-8.66,18.41-5.81,4.54-13.03,7.3-21.68,8.29-1.68.19-4.49-.42-8.42-1.86,1.67,10.32,5.62,15.12,11.87,14.4,5.28-.6,10.32-2.56,15.11-5.88,4.79-3.31,7.91-5.05,9.35-5.22,5.16-.59,7.89.42,8.19,3.04ZM983.22,182.7c-.31-2.73-1.48-5.22-3.5-7.48-2.02-2.26-4.47-3.22-7.36-2.89-3.96.45-6.84,2.39-8.64,5.8-1.49,2.94-2.02,6.26-1.59,9.97.24,2.07,1.21,3.68,2.92,4.81,1.71,1.13,3.77,1.56,6.17,1.28,8.76-1,12.77-4.83,12.01-11.49Z"/> </g> <g> <path class="nwb-c-9" d="M967.09,187.53c.08.68.29.93.71,1.21.35.23.94.54,2.04.54.23,0,.48-.02.74-.04,1.12-1.26,2.06-2.56,2.77-3.89,1.17-2.19,1.76-4.11,1.76-5.77l-4.97-1.37c-.82.52-1.46,1.25-2,2.27-1.01,1.99-1.36,4.33-1.05,7.07Z"/> <path class="nwb-c-9" d="M941.07,187.44c-.18.22-.35.44-.55.65-2.4,2.54-5.16,4.01-8.2,4.35-.43.05-.87.07-1.29.07-1.19,0-2.37-.19-3.52-.56-.28-.09-.55-.21-.82-.33,1.29,1.47,2.89,2.78,4.83,3.93,2.09,1.24,4.85,2.13,8.25,2.69.14-3.45.57-7.05,1.29-10.8Z"/> <path class="nwb-c-9" d="M853.35,96.94v82.27c0,6.87-5.6,10.31-16.81,10.31v7.46h19l-.46-4.04-.05-.43c-1.05-8.35-.88-14.42,3.37-16.88,1.96-1.14,4-1.83,6.06-2.07.75-.08,1.49-.13,2.23-.13,3.09,0,6.06.76,8.83,2.25,5.03,2.72,6.49,6.74,6.82,9.64.33,2.84.48,6.69.47,11.66h6.17c-1-6.13-1.77-11.24-2.3-15.28-.18-.7-.27-1.46-.28-2.26-.03-.23-.06-.47-.08-.69-.17-1.47-.13-2.78.07-3.95v-32.89c.65-.83,2.21-1.24,4.69-1.24,4.56,0,8.31,1.1,11.24,3.29,2.93,2.19,5.54,5.33,7.82,9.42,1.37,2.46,2.7,5.21,4.01,8.25,1.44-.52,2.94-.87,4.51-1.05.84-.1,1.69-.14,2.53-.14,2.8,0,5.61.54,8.33,1.61,2.58.93,5.41,2.89,8.65,6,3.31,3.17,5.15,5.91,5.73,8.54,1.42-4.39,3.1-8.14,5.03-11.26-1.02-3.5-2.38-7.02-4.09-10.57-1.3-2.6-2.77-4.88-4.4-6.83-1.63-1.95-3.62-3.61-5.96-4.97-2.35-1.36-5.21-2.45-8.6-3.28-3.39-.83-7.43-1.54-12.12-2.13,11.6-1.3,20.78-4.48,27.56-9.52,6.77-5.04,10.16-11.59,10.16-19.65,0-4.27-.68-8.21-2.05-11.83-1.37-3.61-3.59-6.76-6.65-9.43-3.06-2.67-7.01-4.77-11.82-6.32-4.82-1.54-10.62-2.31-17.4-2.31s-11.89.03-16.12.09c-4.24.06-7.98.15-11.24.27-3.26.12-6.39.21-9.38.27-3,.06-6.65.09-10.95.09h-30.69v7.82c12.12,0,18.18,3.32,18.18,9.95ZM886.38,96.98c0-5.83,1.95-8.74,5.86-8.74h3.91c3,0,5.8.33,8.41.98,2.6.66,4.85,1.78,6.74,3.39,1.89,1.6,3.39,3.78,4.5,6.51,1.11,2.74,1.66,6.19,1.66,10.35,0,5.11-.56,9.16-1.66,12.13-1.11,2.98-2.67,5.21-4.69,6.69-2.02,1.49-4.43,2.44-7.23,2.85-2.8.42-5.96.62-9.48.62h-4.89c-1.69,0-2.74-.59-3.13-1.78v-33Z"/> </g> <g> <path class="nwb-c-9" d="M762.11,187.09c4.09,2.17,7.54,5.06,10.32,8.69,3.29-4.53,7.36-7.11,12.15-7.65l.68-.08c.01-.6-.02-1.49-.19-2.74-.27.07-.53.14-.81.21-4.76,1.13-11.11,1.69-19.06,1.69-1.09,0-2.12-.04-3.09-.11Z"/> <path class="nwb-c-9" d="M718.49,100.32v78.89c0,6.56-5.36,9.98-16.05,10.28.23,2.71.52,5.07.72,6.67.04.29.07.56.1.82h12.61c1.74-3.41,4.33-6.36,7.78-8.81,5.36-3.82,11.57-5.76,18.44-5.76.84,0,1.7.03,2.56.09,2.72.18,5.28.55,7.7,1.09-1.19-1.29-1.8-2.92-1.8-4.91v-33.23c0-2.84,2.21-4.44,6.65-4.8,3.52.12,6.51.42,8.99.89,2.47.47,4.53,1.36,6.16,2.67,1.63,1.31,2.9,3.2,3.81,5.69.91,2.49,1.56,5.75,1.95,9.77h11.34v-47.44h-11.34c-.39,4.26-1.24,7.64-2.54,10.13-1.3,2.49-2.97,4.35-4.98,5.6-2.02,1.24-4.33,2.04-6.94,2.4-2.61.36-5.47.53-8.6.53s-4.5-1.42-4.5-4.25v-31.14c0-2.12,1.17-3.74,3.52-4.86,2.34-1.12,5.67-1.68,9.97-1.68,4.95,0,9.45.15,13.49.44,4.04.3,7.62,1.24,10.75,2.84,3.13,1.6,5.8,4.15,8.01,7.64,2.21,3.5,3.91,8.5,5.08,15.01l11.92-.89-1.56-34.83h-112.19v7.82c12.64,0,18.96,4.44,18.96,13.33Z"/> <path class="nwb-c-9" d="M807.06,163.02c2.52,2.4,4,5.19,4.36,8.32.36,3.17.18,6.41-.55,9.61-.21.92-.34,1.82-.39,2.73,1.97.15,3.95.46,5.81.97l3.64-24.46-11.14-1.42c-.58,1.48-1.16,2.89-1.73,4.25Z"/> </g> <path class="nwb-c-9" d="M635.54,164.93c.21,0,.43-.02.64-.02,6.03,0,10.87,1.91,14.36,5.69l.16.17.14.19c1.29,1.69,2.43,4.47,3.69,9.01.68,2.64,1.33,5.24,2,7.89.78,2.51,1.9,5.56,3.35,9.12h18.69c-.04-.45-.08-.82-.11-1.08v-.18c-.14-2.09-.17-4.18-.13-6.28-9.73-.59-14.73-4.89-14.97-12.89l-2.35-80.31c0-1.18.2-2.31.59-3.38.39-1.07,1.27-2.04,2.64-2.93,1.37-.89,3.23-1.6,5.57-2.13,2.35-.53,5.47-.8,9.38-.8v-7.82h-46.13l-36.35,86-37.72-86h-48.16l-4.22,7.82c4.69,0,8.34.24,10.95.71,2.6.47,4.53,1.1,5.77,1.87,1.24.77,1.95,1.72,2.15,2.84.2,1.13.29,2.4.29,3.82l-1.56,77.65c-.13,5.33-1.76,9.27-4.89,11.82-3.13,2.55-7.62,3.82-13.49,3.82l4.09,7.46h44.58v-7.46c-12.77,0-19.15-4.74-19.15-14.21l.78-71.25,41.83,92.93h17.59l38.7-93.46,1.29,61.41Z"/> </g> </g> </svg></div>
   </div>
 </header>
 
-<section class="trust">
-  <div class="wn">
-    <p class="trust-q" data-t="tq">חיה פצועה, שריפה מתחילה, מפגע בשמורה — <b>מישהו קרוב תמיד רואה ראשון.</b></p>
-    <div class="trust-src" data-t="ts">העיקרון שעליו נבנה SH✡MER Nature</div>
-  </div>
-</section>
-
-<section class="sec">
-  <div class="w">
-    <div class="sec-head">
-      <span class="eyebrow" data-t="eb2">איך זה יעבוד</span>
-      <h2 class="h2" data-t="h2a">שלושה צעדים.</h2>
-    </div>
-    <div class="steps">
-      <div class="step"><div class="n">1</div><h3 class="h3" data-t="s1t">רואה — מדווח/ת</h3>
-        <p data-t="s1d">צילום, סוג המפגע, והמיקום נלכד אוטומטית. עשר שניות.</p></div>
-      <div class="step"><div class="n">2</div><h3 class="h3" data-t="s2t">מי שקרוב מקבל התרעה</h3>
-        <p data-t="s2d">המתנדבים והגורמים באזור מקבלים את הדיווח מיד.</p></div>
-      <div class="step"><div class="n">3</div><h3 class="h3" data-t="s3t">מישהו מגיע — ואת/ה יודע/ת</h3>
-        <p data-t="s3d">רואים מי בדרך ומה קרה בסוף.</p></div>
-    </div>
-  </div>
-</section>
-
-<section class="sec sec-light">
-  <div class="w">
-    <div class="sec-head">
-      <span class="eyebrow" data-t="eb3">מה זה יכסה</span>
-      <h2 class="h2" data-t="h2b">כל מה שאין לו קול.</h2>
-    </div>
-    <div class="vals-grid">
-      <div class="val"><div class="bar"></div><h3 class="h3" data-t="v1t">חילוץ בעלי חיים</h3><p data-t="v1d">חיה פצועה או לכודה — המתנדב הקרוב שיודע לטפל מקבל התרעה עם מיקום מדויק.</p></div>
-      <div class="val"><div class="bar"></div><h3 class="h3" data-t="v2t">שריפות בהתחלה</h3><p data-t="v2d">שריפת חורש מתחילה קטנה. דקות קובעות. דיווח מוקדם מגיע מיד לכל מי שבטווח.</p></div>
-      <div class="val"><div class="bar"></div><h3 class="h3" data-t="v3t">חופים וים</h3><p data-t="v3d">זיהום, דגה פגועה, זרם מסוכן, מדוזות — מפה חיה מאנשים שנמצאים שם עכשיו.</p></div>
-      <div class="val"><div class="bar"></div><h3 class="h3" data-t="v4t">מפגעים בשמורות</h3><p data-t="v4d">פסולת, פגיעה בצמחייה, רכב במקום אסור — תיעוד עם מיקום.</p></div>
-      <div class="val"><div class="bar"></div><h3 class="h3" data-t="v5t">מפת סכנות חיה</h3><p data-t="v5d">לפני שיוצאים לטיול — מה מסוכן היום באזור. לא ארכיון.</p></div>
-      <div class="val"><div class="bar"></div><h3 class="h3" data-t="v6t">אותה רשת שומרים</h3><p data-t="v6d">אותם מעגלי אמון — הפעם עבור הטבע.</p></div>
+<!-- ══ HERO ══ -->
+<section class="hero">
+  <picture>
+    <source media="(max-width:860px)" srcset="../nature-v2/img/dog.jpg">
+    <img class="hero-bg" src="../SHOMERNature_BannerBIG.jpg" alt="" aria-hidden="true">
+  </picture>
+  <div class="hero-shade"></div>
+  <div class="wrap hero-inner">
+    <div class="hero-phone"><img src="img/landing/app-map.jpg" alt="מסך המפה של SH✡MER Nature" data-ta="altmap" loading="eager" width="540" height="1169"></div>
+    <div class="hero-text">
+      <svg class="wm-svg" role="img" aria-label="SH✡MER Nature" id="nwl-Layer_2" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 1006.47 279.8"> <defs> <style> .nwl-c-1 { fill: url(#nwl-linear-gradient-8); } .nwl-c-2 { fill: url(#nwl-linear-gradient-7); } .nwl-c-3 { fill: url(#nwl-linear-gradient-5); } .nwl-c-4 { fill: url(#nwl-linear-gradient-6); } .nwl-c-5 { fill: url(#nwl-linear-gradient-4); } .nwl-c-6 { fill: url(#nwl-linear-gradient-3); } .nwl-c-7 { fill: url(#nwl-linear-gradient-2); } .nwl-c-8 { fill: url(#nwl-linear-gradient); } .nwl-c-9 { fill: #fff; } .nwl-c-10 { fill: #50db0f; } </style> <linearGradient id="nwl-linear-gradient" x1="366.82" y1="10.85" x2="366.82" y2="73.9" gradientUnits="userSpaceOnUse"> <stop offset="0" stop-color="#faac22"/> <stop offset="1" stop-color="#50db0f"/> </linearGradient> <linearGradient id="nwl-linear-gradient-2" x1="397.07" y1="262.98" x2="397.07" y2="198.45" xlink:href="#nwl-linear-gradient"/> <linearGradient id="nwl-linear-gradient-3" x1="666.14" y1="232.55" x2="671.64" y2="279.3" gradientUnits="userSpaceOnUse"> <stop offset="0" stop-color="#50db0f"/> <stop offset="1" stop-color="#0b5a5f"/> </linearGradient> <linearGradient id="nwl-linear-gradient-4" x1="741.81" y1="223.65" x2="747.31" y2="270.4" xlink:href="#nwl-linear-gradient-3"/> <linearGradient id="nwl-linear-gradient-5" x1="800.15" y1="216.79" x2="805.65" y2="263.54" xlink:href="#nwl-linear-gradient-3"/> <linearGradient id="nwl-linear-gradient-6" x1="850.96" y1="210.81" x2="856.46" y2="257.56" xlink:href="#nwl-linear-gradient-3"/> <linearGradient id="nwl-linear-gradient-7" x1="918.1" y1="202.91" x2="923.6" y2="249.66" xlink:href="#nwl-linear-gradient-3"/> <linearGradient id="nwl-linear-gradient-8" x1="974.25" y1="196.31" x2="979.75" y2="243.05" xlink:href="#nwl-linear-gradient-3"/> </defs> <g id="nwl-Layer_1-2" data-name="Layer 1"> <g> <g> <g> <path class="nwl-c-9" d="M73.29,117.37c-1.04-4.74-2.35-9.06-3.91-12.97-1.56-3.91-3.49-7.29-5.77-10.13-2.28-2.84-4.89-5.03-7.82-6.57-2.93-1.54-6.22-2.31-9.87-2.31-7.56,0-13.42,1.4-17.59,4.18-4.17,2.79-6.25,6.44-6.25,10.94,0,3.2.71,5.82,2.15,7.83,1.43,2.02,3.52,3.83,6.25,5.43,2.74,1.6,6.09,3.08,10.07,4.45,3.97,1.37,8.44,2.94,13.39,4.71,5.6,2.02,10.75,4.04,15.44,6.05,4.69,2.02,8.7,4.45,12.02,7.3s5.89,6.29,7.72,10.32c1.82,4.03,2.74,9.13,2.74,15.3s-1.08,11.21-3.23,15.84c-2.15,4.63-5.21,8.57-9.19,11.84-3.98,3.26-8.73,5.75-14.27,7.47-5.54,1.72-11.63,2.58-18.27,2.58-4.82,0-9.48-.53-13.97-1.6s-8.44-2.96-11.82-5.69c-2.61,1.66-5.31,3.14-8.11,4.44-2.8,1.3-5.7,2.37-8.7,3.2-1.56-4.15-2.67-8.32-3.32-12.53-.65-4.2-.98-8.56-.98-13.06,0-3.08.1-6.1.29-9.06.2-2.96.55-5.98,1.08-9.06h12.7c0,3.91.55,7.88,1.66,11.9,1.11,4.03,2.9,7.73,5.37,11.11,2.47,3.38,5.7,6.13,9.68,8.26,3.97,2.13,8.76,3.2,14.37,3.2,5.08,0,9.35-.5,12.8-1.51,3.45-1.01,6.25-2.4,8.4-4.18,2.15-1.78,3.71-3.82,4.69-6.13.98-2.31,1.47-4.77,1.47-7.37,0-4.15-1.17-7.61-3.52-10.39-2.35-2.78-6.19-5-11.53-6.66-7.95-2.49-15.25-4.94-21.89-7.37-6.65-2.43-12.41-5.33-17.3-8.71-4.89-3.38-8.7-7.37-11.43-11.99-2.74-4.62-4.1-10.31-4.1-17.06,0-5.09,1.08-9.68,3.23-13.77,2.15-4.09,5.05-7.55,8.7-10.39,3.65-2.84,7.92-5,12.8-6.49,4.89-1.48,10.07-2.22,15.54-2.22,4.82,0,9.45.8,13.88,2.4,4.43,1.6,8.14,4.29,11.14,8.08,1.43-2.37,3.52-4.32,6.25-5.86,2.74-1.54,5.47-2.67,8.21-3.38,1.95,5.69,3.16,12.11,3.62,19.28.46,7.17.68,13.95.68,20.34h-13.49Z"/> <path class="nwl-c-9" d="M191.93,196.98v-7.46c12.77,0,19.16-3.61,19.16-10.84v-35.89c-1.3-.59-3.1-1.09-5.38-1.51-2.28-.41-4.98-.62-8.11-.62h-23.45c-4.82,0-9.06.71-12.7,2.13v35.89c0,7.23,5.86,10.84,17.59,10.84v7.46h-69.39v-7.46c13.16,0,19.74-3.61,19.74-10.84v-77.65c0-9.36-6.58-14.04-19.74-14.04v-7.82h69.39v7.82c-11.73,0-17.59,4.7-17.59,14.09v29.08c1.95.59,3.91,1.01,5.86,1.25,1.95.24,4.23.36,6.84.36h23.45c6.77,0,11.27-.47,13.49-1.43v-29.26c0-9.4-6.39-14.09-19.16-14.09v-7.82h62.68l6.31,7.82c-11.86,0-17.79,4.68-17.79,14.04v77.65c0,7.23,5.93,10.84,17.79,10.84l-5.03,7.46h-63.96Z"/> </g> <g id="nwl-tiLNYP"> <g> <polygon class="nwl-c-10" points="428.57 208.04 438.58 190.54 471.74 190.59 414.86 91.97 435.09 92.04 502.02 208.07 428.57 208.04"/> <polygon class="nwl-c-10" points="292.15 86.13 348.92 184.52 328.85 184.62 261.87 68.58 335.29 68.63 325.36 86.11 292.15 86.13"/> <polygon class="nwl-c-10" points="404.53 190.54 394.42 208.07 261.93 208.07 298.67 144.34 308.66 161.86 292.16 190.56 404.53 190.54"/> <path class="nwl-c-10" d="M455.16,114.87l16.8-28.7c-.59-.11-112.44-.06-112.44-.06l9.97-17.53h132.52s-36.77,63.65-36.77,63.65l-10.08-17.36Z"/> <polygon class="nwl-c-8" points="325.78 132.35 315.67 114.9 381.94 0 417.97 62.53 397.95 62.58 381.9 35.02 325.78 132.35"/> <polygon class="nwl-c-7" points="345.94 214.14 365.99 214 381.99 241.66 438.15 144.33 448.21 161.86 381.93 276.64 345.94 214.14"/> </g> </g> </g> <g> <path class="nwl-c-6" d="M698.38,198.34l4.85,47.13c.43,4.82-.21,9.88-1.91,15.17-2.28,6.69-5.64,10.28-10.08,10.79-6.6.76-13.72-3.51-21.36-12.82-5.53-6.89-11.45-16.61-17.75-29.16-3.74-8.2-7.53-16.39-11.39-24.58-.4,18.85-.23,31.44.49,37.77,1.6,13.97,3.45,21.89,5.55,23.75,2.1,1.86,3.21,3.28,3.32,4.27.24,2.08-.75,4.04-2.97,5.9-2.22,1.86-4.53,2.92-6.93,3.2-3.36.38-6.49-2.52-9.39-8.71-2.26-4.83-3.62-9.32-4.1-13.47-.21-1.85-.47-4.62-.77-8.29-.3-3.67-.55-6.43-.77-8.29-.51-4.48-.67-11.2-.48-20.18.18-8.98.03-15.71-.49-20.18l-2.29-19.98c-.03-.22-.15-.53-.38-.95-.23-.41-.36-.73-.38-.95-.25-2.18,1.17-4.17,4.25-5.96,2.5-1.5,5.08-2.41,7.72-2.71,6.12-.7,10.71.6,13.77,3.9.86,1.12,1.8,3.55,2.84,7.31.66,2.58,1.33,5.21,2,7.9,2.33,7.59,7.54,19.6,15.62,36.04,9.63,19.36,16.26,28.83,19.86,28.42,1.32-.15,1.81-1.76,1.45-4.82-.1-.88-5.2-53.42-5.2-53.42-.4-6.71.11-13.42,1.53-20.12,2.08-9.43,5.76-14.46,11.05-15.06.02,0,.03,0,.05,0,3.17-.33,5.45,3.2,3.91,6-4.96,9.01-2.22,26.73-1.6,32.12Z"/> <path class="nwl-c-5" d="M775.5,231.7c-.95,14.14-2.1,24.09-3.45,29.83-.83,3.36-3.48,4.89-7.94,4.59-6.76-.45-9.56-3.72-8.43-9.81-6.21,2.23-12.56,3.12-19.08,2.69-6.27-.42-12.15-2.25-17.62-5.48-6.53-3.85-9.61-8.41-9.26-13.67.35-5.15,4.53-9.72,12.55-13.7,7.26-3.59,13.97-5.17,20.12-4.76l15.38,1.03.26-3.92c.88-11.41-2.47-17.38-10.07-17.89-9.53-.64-14.56,3.06-15.1,11.09-.18,2.71-1.96,3.96-5.34,3.73-2.05-.14-4.13-1.13-6.25-2.98-2.12-1.85-3.11-3.7-2.99-5.57.41-6.14,3.16-11.02,8.25-14.64,5.09-3.62,11.01-5.21,17.76-4.76,22.67,1.52,33.07,16.26,31.2,44.21ZM756.84,236.39c.15-2.19-1.59-3.41-5.21-3.65-15.08-1.01-22.83,1.72-23.26,8.19-.24,3.51,2.96,5.48,9.59,5.93,4.1.28,8.03-.51,11.79-2.35,4.5-2.01,6.86-4.72,7.09-8.11Z"/> <path class="nwl-c-3" d="M820.75,194.82c.34,2.95-4.35,5.59-14.06,7.91.04,2.43.55,7.9,1.52,16.42l1.24,10.81c.25,2.18.98,5.36,2.19,9.54,1.21,4.18,1.93,7.3,2.17,9.37.2,1.75-.58,3.41-2.35,5-1.76,1.59-3.61,2.49-5.53,2.71-3,.34-5.79-1.71-8.37-6.17-1.97-3.42-3.15-6.83-3.54-10.21l-3.97-34.71c-5.61-.13-8.85-.26-9.72-.38-3.22-.51-4.93-1.59-5.12-3.23-.05-.43.01-.94.19-1.51,2.66-4.39,5.91-6.81,9.75-7.25.24-.03.6-.07,1.08-.12.49.06.86.07,1.1.04,2.52-.29,3.41-3.1,2.68-8.44l-1.37-11.95c-.74-1.13-1.16-2.13-1.26-3.01-.16-1.42.61-2.81,2.32-4.16,1.71-1.36,3.4-2.13,5.07-2.32,2.5-.29,5,.51,7.5,2.38,2.5,1.87,3.9,4.01,4.17,6.41.3,2.62.15,5.27-.46,7.93-.61,2.67-.7,5.36-.26,8.08l.08.66c9.47-.2,14.45,1.89,14.95,6.25Z"/> <path class="nwl-c-4" d="M877.37,185.88c.39,3.38.52,8.52.4,15.43-.12,6.91.02,12.11.42,15.59.35,3.05,1.02,7.58,2.01,13.59.99,6.01,1.66,10.48,1.99,13.42.29,2.5-1.91,4.03-6.59,4.56-4.8.55-8.1-1.17-9.9-5.17-4.25,3.25-8.54,5.12-12.86,5.62-3.48.4-7.55,0-12.18-1.18-4.64-1.18-7.99-2.87-10.07-5.07-4.01-4.19-6.59-11.35-7.75-21.51-.41-3.57-.55-4.04-.56-13.88,0-1.48.6-3.03,1.89-3.77,6.55-3.72,16.1-4.78,15.51,12.45-.12,3.57.64,9.67.64,9.67.3,2.62,1.39,5.26,3.28,7.92,2.29,3.06,4.76,4.43,7.41,4.13,5.16-.59,8.66-4.03,10.5-10.33,1.21-4.34,1.47-9.46.8-15.35l-2.25-19.65c-.18-1.57-1.58-11,.86-12.42,1.37-.79,2.74-1.27,4.13-1.43,2.88-.33,5.59.19,8.12,1.55,2.53,1.37,3.94,3.3,4.22,5.8Z"/> <path class="nwl-c-2" d="M939.07,178.01s0,.02,0,.02c.27,2.41-.52,4.86-2.18,6.62-1.57,1.67-3.28,2.61-5.13,2.82-.91.1-1.81.01-2.69-.28-2.11-.69-3.67-2.5-4.3-4.63-1.04-3.49-3.09-5.06-6.16-4.71-2.16.25-4.21,5.74-6.14,16.46-.92,4.75-.91,11.22.03,19.41.89,7.75,1.82,12.4,2.79,13.95,1.13,1.97,1.75,3.34,1.83,4.1.21,1.86-.54,3.46-2.25,4.82-1.71,1.36-3.7,2.17-5.96,2.42-6.42.74-9.95-1.62-10.57-7.08-.06-.54,0-1.33.19-2.34.18-1.02.26-1.74.21-2.18-.64-5.57-1.88-13.8-3.74-24.7-1.86-10.9-3.1-19.08-3.72-24.54-.56-4.91,2.4-7.74,8.88-8.48,3.84-.44,6.6.3,8.28,2.2,2.97-3.77,6.56-5.89,10.77-6.38,2.88-.33,5.72.07,8.53,1.18,1.9.67,4.22,2.31,6.95,4.93,2.73,2.62,4.19,4.75,4.38,6.38Z"/> <path class="nwl-c-1" d="M1006.4,211.4c.62,5.46-2.97,10.19-10.79,14.17-6.09,3.13-12.62,5.09-19.58,5.89-18.49,2.12-28.83-6.38-31.02-25.48-.9-7.86.2-16.83,3.3-26.92,3.81-12.38,9.38-18.99,16.71-19.83,6.6-.76,14.02,1.11,22.26,5.58,8.24,4.48,12.69,9.61,13.35,15.39.82,7.2-2.06,13.34-8.66,18.41-5.81,4.54-13.03,7.3-21.68,8.29-1.68.19-4.49-.42-8.42-1.86,1.67,10.32,5.62,15.12,11.87,14.4,5.28-.6,10.32-2.56,15.11-5.88,4.79-3.31,7.91-5.05,9.35-5.22,5.16-.59,7.89.42,8.19,3.04ZM983.22,182.7c-.31-2.73-1.48-5.22-3.5-7.48-2.02-2.26-4.47-3.22-7.36-2.89-3.96.45-6.84,2.39-8.64,5.8-1.49,2.94-2.02,6.26-1.59,9.97.24,2.07,1.21,3.68,2.92,4.81,1.71,1.13,3.77,1.56,6.17,1.28,8.76-1,12.77-4.83,12.01-11.49Z"/> </g> <g> <path class="nwl-c-9" d="M967.09,187.53c.08.68.29.93.71,1.21.35.23.94.54,2.04.54.23,0,.48-.02.74-.04,1.12-1.26,2.06-2.56,2.77-3.89,1.17-2.19,1.76-4.11,1.76-5.77l-4.97-1.37c-.82.52-1.46,1.25-2,2.27-1.01,1.99-1.36,4.33-1.05,7.07Z"/> <path class="nwl-c-9" d="M941.07,187.44c-.18.22-.35.44-.55.65-2.4,2.54-5.16,4.01-8.2,4.35-.43.05-.87.07-1.29.07-1.19,0-2.37-.19-3.52-.56-.28-.09-.55-.21-.82-.33,1.29,1.47,2.89,2.78,4.83,3.93,2.09,1.24,4.85,2.13,8.25,2.69.14-3.45.57-7.05,1.29-10.8Z"/> <path class="nwl-c-9" d="M853.35,96.94v82.27c0,6.87-5.6,10.31-16.81,10.31v7.46h19l-.46-4.04-.05-.43c-1.05-8.35-.88-14.42,3.37-16.88,1.96-1.14,4-1.83,6.06-2.07.75-.08,1.49-.13,2.23-.13,3.09,0,6.06.76,8.83,2.25,5.03,2.72,6.49,6.74,6.82,9.64.33,2.84.48,6.69.47,11.66h6.17c-1-6.13-1.77-11.24-2.3-15.28-.18-.7-.27-1.46-.28-2.26-.03-.23-.06-.47-.08-.69-.17-1.47-.13-2.78.07-3.95v-32.89c.65-.83,2.21-1.24,4.69-1.24,4.56,0,8.31,1.1,11.24,3.29,2.93,2.19,5.54,5.33,7.82,9.42,1.37,2.46,2.7,5.21,4.01,8.25,1.44-.52,2.94-.87,4.51-1.05.84-.1,1.69-.14,2.53-.14,2.8,0,5.61.54,8.33,1.61,2.58.93,5.41,2.89,8.65,6,3.31,3.17,5.15,5.91,5.73,8.54,1.42-4.39,3.1-8.14,5.03-11.26-1.02-3.5-2.38-7.02-4.09-10.57-1.3-2.6-2.77-4.88-4.4-6.83-1.63-1.95-3.62-3.61-5.96-4.97-2.35-1.36-5.21-2.45-8.6-3.28-3.39-.83-7.43-1.54-12.12-2.13,11.6-1.3,20.78-4.48,27.56-9.52,6.77-5.04,10.16-11.59,10.16-19.65,0-4.27-.68-8.21-2.05-11.83-1.37-3.61-3.59-6.76-6.65-9.43-3.06-2.67-7.01-4.77-11.82-6.32-4.82-1.54-10.62-2.31-17.4-2.31s-11.89.03-16.12.09c-4.24.06-7.98.15-11.24.27-3.26.12-6.39.21-9.38.27-3,.06-6.65.09-10.95.09h-30.69v7.82c12.12,0,18.18,3.32,18.18,9.95ZM886.38,96.98c0-5.83,1.95-8.74,5.86-8.74h3.91c3,0,5.8.33,8.41.98,2.6.66,4.85,1.78,6.74,3.39,1.89,1.6,3.39,3.78,4.5,6.51,1.11,2.74,1.66,6.19,1.66,10.35,0,5.11-.56,9.16-1.66,12.13-1.11,2.98-2.67,5.21-4.69,6.69-2.02,1.49-4.43,2.44-7.23,2.85-2.8.42-5.96.62-9.48.62h-4.89c-1.69,0-2.74-.59-3.13-1.78v-33Z"/> </g> <g> <path class="nwl-c-9" d="M762.11,187.09c4.09,2.17,7.54,5.06,10.32,8.69,3.29-4.53,7.36-7.11,12.15-7.65l.68-.08c.01-.6-.02-1.49-.19-2.74-.27.07-.53.14-.81.21-4.76,1.13-11.11,1.69-19.06,1.69-1.09,0-2.12-.04-3.09-.11Z"/> <path class="nwl-c-9" d="M718.49,100.32v78.89c0,6.56-5.36,9.98-16.05,10.28.23,2.71.52,5.07.72,6.67.04.29.07.56.1.82h12.61c1.74-3.41,4.33-6.36,7.78-8.81,5.36-3.82,11.57-5.76,18.44-5.76.84,0,1.7.03,2.56.09,2.72.18,5.28.55,7.7,1.09-1.19-1.29-1.8-2.92-1.8-4.91v-33.23c0-2.84,2.21-4.44,6.65-4.8,3.52.12,6.51.42,8.99.89,2.47.47,4.53,1.36,6.16,2.67,1.63,1.31,2.9,3.2,3.81,5.69.91,2.49,1.56,5.75,1.95,9.77h11.34v-47.44h-11.34c-.39,4.26-1.24,7.64-2.54,10.13-1.3,2.49-2.97,4.35-4.98,5.6-2.02,1.24-4.33,2.04-6.94,2.4-2.61.36-5.47.53-8.6.53s-4.5-1.42-4.5-4.25v-31.14c0-2.12,1.17-3.74,3.52-4.86,2.34-1.12,5.67-1.68,9.97-1.68,4.95,0,9.45.15,13.49.44,4.04.3,7.62,1.24,10.75,2.84,3.13,1.6,5.8,4.15,8.01,7.64,2.21,3.5,3.91,8.5,5.08,15.01l11.92-.89-1.56-34.83h-112.19v7.82c12.64,0,18.96,4.44,18.96,13.33Z"/> <path class="nwl-c-9" d="M807.06,163.02c2.52,2.4,4,5.19,4.36,8.32.36,3.17.18,6.41-.55,9.61-.21.92-.34,1.82-.39,2.73,1.97.15,3.95.46,5.81.97l3.64-24.46-11.14-1.42c-.58,1.48-1.16,2.89-1.73,4.25Z"/> </g> <path class="nwl-c-9" d="M635.54,164.93c.21,0,.43-.02.64-.02,6.03,0,10.87,1.91,14.36,5.69l.16.17.14.19c1.29,1.69,2.43,4.47,3.69,9.01.68,2.64,1.33,5.24,2,7.89.78,2.51,1.9,5.56,3.35,9.12h18.69c-.04-.45-.08-.82-.11-1.08v-.18c-.14-2.09-.17-4.18-.13-6.28-9.73-.59-14.73-4.89-14.97-12.89l-2.35-80.31c0-1.18.2-2.31.59-3.38.39-1.07,1.27-2.04,2.64-2.93,1.37-.89,3.23-1.6,5.57-2.13,2.35-.53,5.47-.8,9.38-.8v-7.82h-46.13l-36.35,86-37.72-86h-48.16l-4.22,7.82c4.69,0,8.34.24,10.95.71,2.6.47,4.53,1.1,5.77,1.87,1.24.77,1.95,1.72,2.15,2.84.2,1.13.29,2.4.29,3.82l-1.56,77.65c-.13,5.33-1.76,9.27-4.89,11.82-3.13,2.55-7.62,3.82-13.49,3.82l4.09,7.46h44.58v-7.46c-12.77,0-19.15-4.74-19.15-14.21l.78-71.25,41.83,92.93h17.59l38.7-93.46,1.29,61.41Z"/> </g> </g> </svg>
+      <span class="hero-eb"><svg class="ic" aria-hidden="true"><use href="#i-leaf"/></svg><span data-t="eb">גרסת בטא · חינם</span></span>
+      <h1 data-t="h1">שומרים על מי שאין לו קול.</h1>
+      <p data-t="sub"></p>
+      <div class="hero-cta">
+        <a class="btn-orange" href="../nature-v2/SHOMER-Nature.apk" download="SHOMER-Nature.apk" data-get>
+          <svg class="ic" aria-hidden="true"><use href="#i-down"/></svg><span data-t="cta">להורדה - חינם!</span>
+        </a>
+        <button class="btn-line" type="button" data-install><svg class="ic" aria-hidden="true"><use href="#i-app"/></svg><span data-t="cta2">התקנה כאפליקציה</span></button>
+      </div>
+      <p class="hero-meta" data-t="meta"></p>
     </div>
   </div>
 </section>
 
-<section class="close" id="wait">
-  <div class="w">
-    <h2 class="h2" data-t="cl1">רוצה להיות הראשון?</h2>
-    <p class="lead" data-t="cl2">נעדכן אותך ברגע ש-SH✡MER Nature עולה לאוויר.</p>
-    <div style="display:flex;gap:10px;max-width:420px;margin:0 auto;flex-wrap:wrap;justify-content:center">
-      <input type="email" id="wl" placeholder="you@email.com" inputmode="email" autocomplete="email"
-        style="flex:1;min-width:190px;min-height:52px;border:1px solid var(--line);border-radius:999px;
-               padding:0 20px;font:400 16px 'Heebo',sans-serif;color:var(--ink)">
-      <button class="btn" onclick="joinWL()"><span data-t="wlb">עדכנו אותי</span></button>
+<!-- ══ PRINCIPLE ══ -->
+<section class="arrive">
+  <div class="wrap arrive-inner">
+    <div>
+      <div class="arrive-kicker"><span data-t="kick">העיקרון שעליו מתבסס</span> <span class="wordmark">SH<span class="star">✡</span>MER<em>Nature</em></span></div>
+      <div class="arrive-lead" data-t="lead"></div>
+      <div class="arrive-big" data-t="big"></div>
     </div>
-    <div id="wlm" style="margin-top:16px;font-size:14px;min-height:20px;font-weight:500"></div>
-    <p class="note" data-t="note"><b>SH✡MER Nature אינו תחליף לשירותי חירום.</b> במצב חירום חייג/י <span class="num">100</span> · <span class="num">101</span> · <span class="num">102</span>.</p>
+    <div class="arrive-figure">
+      <div class="blk b1"></div><div class="blk b2"></div>
+      <img src="../nature-v2/img/hero-tall.jpg" alt="" data-ta="alt1" loading="lazy" width="800" height="724">
+    </div>
   </div>
 </section>
 
-<footer><div class="w"><p>SH✡MER Nature · © 2026 3Shamrocks Studio</p></div></footer>
+<!-- ══ REPORT TYPES ══ -->
+<section class="adv" id="what">
+  <div class="wrap">
+    <h2><span data-t="h2a">על מה מדווחים ב-</span><span class="wordmark">SH<span class="star">✡</span>MER<em>Nature</em></span></h2>
+    <p class="sub" data-t="h2as">לחצו על כל סוג לפרטים.</p>
+    <div class="types">
+      <details class="type"><summary><span class="t-ic"><svg class="ic"><use href="#i-paw"/></svg></span><h3 data-t="t1"></h3><span class="ts" data-t="t1s"></span><span class="more"><span data-t="more">פרטים</span><svg class="ic"><use href="#i-chev"/></svg></span></summary><p data-t="t1d"></p></details>
+      <details class="type"><summary><span class="t-ic"><svg class="ic"><use href="#i-fire"/></svg></span><h3 data-t="t2"></h3><span class="ts" data-t="t2s"></span><span class="more"><span data-t="more">פרטים</span><svg class="ic"><use href="#i-chev"/></svg></span></summary><p data-t="t2d"></p></details>
+      <details class="type"><summary><span class="t-ic"><svg class="ic"><use href="#i-dump"/></svg></span><h3 data-t="t3"></h3><span class="ts" data-t="t3s"></span><span class="more"><span data-t="more">פרטים</span><svg class="ic"><use href="#i-chev"/></svg></span></summary><p data-t="t3d"></p></details>
+      <details class="type"><summary><span class="t-ic"><svg class="ic"><use href="#i-water"/></svg></span><h3 data-t="t4"></h3><span class="ts" data-t="t4s"></span><span class="more"><span data-t="more">פרטים</span><svg class="ic"><use href="#i-chev"/></svg></span></summary><p data-t="t4d"></p></details>
+      <details class="type"><summary><span class="t-ic"><svg class="ic"><use href="#i-med"/></svg></span><h3 data-t="t5"></h3><span class="ts" data-t="t5s"></span><span class="more"><span data-t="more">פרטים</span><svg class="ic"><use href="#i-chev"/></svg></span></summary><p data-t="t5d"></p></details>
+      <details class="type"><summary><span class="t-ic"><svg class="ic"><use href="#i-trail"/></svg></span><h3 data-t="t6"></h3><span class="ts" data-t="t6s"></span><span class="more"><span data-t="more">פרטים</span><svg class="ic"><use href="#i-chev"/></svg></span></summary><p data-t="t6d"></p></details>
+      <details class="type uxo"><summary><span class="t-ic"><svg class="ic"><use href="#i-debris"/></svg></span><h3 data-t="t7"></h3><span class="ts" data-t="t7s"></span><span class="more"><span data-t="more">פרטים</span><svg class="ic"><use href="#i-chev"/></svg></span></summary><p data-t="t7d"></p></details>
+      <details class="type lost"><summary><span class="t-ic"><svg class="ic"><use href="#i-lost"/></svg></span><h3 data-t="t8"></h3><span class="ts" data-t="t8s"></span><span class="more"><span data-t="more">פרטים</span><svg class="ic"><use href="#i-chev"/></svg></span></summary><p data-t="t8d"></p></details>
+    </div>
+    <p class="types-note" data-t="tnote"></p>
+  </div>
+</section>
+
+<!-- ══ FOR WHOM ══ -->
+<section class="whom">
+  <div class="wrap">
+    <h2 class="sec-h" data-t="h2b">לחיות, לים, לשביל.</h2>
+    <div class="cards">
+      <div class="card"><img src="../nature-v2/img/pets.jpg" alt="" data-ta="alt2" loading="lazy" width="750" height="399"><div><h3 data-t="c1"></h3><p data-t="c1d"></p></div></div>
+      <div class="card"><img src="../nature-v2/img/turtle.jpg" alt="" data-ta="alt3" loading="lazy" width="690" height="399"><div><h3 data-t="c2"></h3><p data-t="c2d"></p></div></div>
+      <div class="card"><img src="../nature-v2/img/trail.jpg" alt="" data-ta="alt4" loading="lazy" width="500" height="720"><div><h3 data-t="c3"></h3><p data-t="c3d"></p></div></div>
+    </div>
+  </div>
+</section>
+
+<!-- ══ OUTDOORS ══ -->
+<section class="out">
+  <div class="wrap out-in">
+    <div class="out-pic"><img src="../nature-v2/img/dog.jpg" alt="" data-ta="alt5" loading="lazy" width="686" height="858"></div>
+    <div>
+      <span class="kick" data-t="eb4">יוצאים לשטח</span>
+      <h2 data-t="h2c">רגועים יותר בכל טיול.</h2>
+      <ul class="feats">
+        <li><span class="f-ic"><svg class="ic"><use href="#i-sos"/></svg></span><span><b data-t="f1"></b><span class="d" data-t="f1d"></span></span></li>
+        <li><span class="f-ic"><svg class="ic"><use href="#i-timer"/></svg></span><span><b data-t="f2"></b><span class="d" data-t="f2d"></span></span></li>
+        <li><span class="f-ic"><svg class="ic"><use href="#i-book"/></svg></span><span><b data-t="f3"></b><span class="d" data-t="f3d"></span></span></li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- ══ APP SCREENS (real screenshots of this build) ══ -->
+<section class="screens">
+  <div class="wrap">
+    <h2 class="sec-h"><span data-t="scr">כך זה נראה ב-</span><span class="wordmark">SH<span class="star">✡</span>MER<em>Nature</em></span></h2>
+    <div class="car-track">
+      <figure class="shot"><img src="img/landing/app-map.jpg" alt="" data-ta="altmap" loading="lazy" width="540" height="1169"><figcaption data-t="s_map">מפה</figcaption></figure>
+      <figure class="shot"><img src="img/landing/app-report.jpg" alt="" data-ta="altrep" loading="lazy" width="540" height="1169"><figcaption data-t="s_rep">דיווח</figcaption></figure>
+      <figure class="shot"><img src="img/landing/app-guide.jpg" alt="" data-ta="altgd" loading="lazy" width="540" height="1169"><figcaption data-t="s_gd">מדריך חירום</figcaption></figure>
+    </div>
+  </div>
+</section>
+
+<!-- ══ INSTALL ══ -->
+<section class="inst" id="install">
+  <div class="wrap">
+    <h2 class="sec-h" data-t="h2d">איך מתקינים</h2>
+    <p class="sub" data-t="h2ds"></p>
+    <div class="inst-grid">
+      <ol class="steps">
+        <li><span class="n">1</span><span><b data-t="s1"></b><span class="d" data-t="s1d"></span></span></li>
+        <li><span class="n">2</span><span><b data-t="s2"></b><span class="d" data-t="s2d"></span></span></li>
+        <li><span class="n">3</span><span><b data-t="s3"></b><span class="d" data-t="s3d"></span></span></li>
+      </ol>
+      <div class="inst-side">
+        <a class="btn-orange" href="../nature-v2/SHOMER-Nature.apk" download="SHOMER-Nature.apk"><svg class="ic" aria-hidden="true"><use href="#i-down"/></svg><span data-t="apk">הורדת קובץ ההתקנה (APK)</span></a>
+        <button class="btn-line" type="button" data-install><svg class="ic" aria-hidden="true"><use href="#i-app"/></svg><span data-t="cta2b">התקנה כאפליקציה · אייפון ומחשב</span></button>
+        <a class="open-web" href="nature.html"><span data-t="openweb">או פתיחה מיד בדפדפן</span><svg class="ic" aria-hidden="true"><use href="#i-ext"/></svg></a>
+        <div class="qr"><img src="img/landing/qr-nature.svg" alt="QR" width="96" height="96"><span><b data-t="qrt"></b><span data-t="qrs"></span></span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══ FAMILY: main SH✡MER ══ -->
+<section class="fam">
+  <div class="wrap">
+    <div class="fam-card">
+      <img src="../SHOMER_logo_big.png" alt="SH✡MER" width="120" height="120">
+      <div>
+        <h2><span data-t="famh">גם בעיר: </span><span class="wordmark">SH<span class="star">✡</span>MER</span></h2>
+        <p data-t="famp"></p>
+      </div>
+      <div class="fam-cta">
+        <a class="btn-orange" href="https://www.shomer-app.co.il/"><span data-t="famc1">לאתר SH✡MER</span></a>
+        <a class="btn-line" href="https://www.shomer-app.co.il/shomer.html"><span data-t="famc2">פתיחת אפליקציית SH✡MER</span></a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══ FAQ ══ -->
+<section class="faq-sec">
+  <div class="wrap">
+    <h2 class="sec-h" data-t="h2e">שאלות נפוצות</h2>
+    <div class="faq">
+      <details><summary><span data-t="q1"></span><svg class="ic"><use href="#i-chev"/></svg></summary><p data-t="a1"></p></details>
+      <details><summary><span data-t="q2"></span><svg class="ic"><use href="#i-chev"/></svg></summary><p data-t="a2"></p></details>
+      <details><summary><span data-t="q3"></span><svg class="ic"><use href="#i-chev"/></svg></summary><p data-t="a3"></p></details>
+      <details><summary><span data-t="q4"></span><svg class="ic"><use href="#i-chev"/></svg></summary><p data-t="a4"></p></details>
+      <details><summary><span data-t="q5"></span><svg class="ic"><use href="#i-chev"/></svg></summary><p data-t="a5"></p></details>
+    </div>
+  </div>
+</section>
+
+<!-- ══ CLOSING ══ -->
+<section class="close-cta">
+  <picture><source media="(max-width:620px)" srcset="../nature-v2/img/pets.jpg"><img class="bg" src="../SHOMERNature_BannerBIG.jpg" alt="" aria-hidden="true"></picture>
+  <div class="wrap close-in">
+    <svg class="wm-svg" role="img" aria-label="SH✡MER Nature" id="nwc-Layer_2" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 1006.47 279.8"> <defs> <style> .nwc-c-1 { fill: url(#nwc-linear-gradient-8); } .nwc-c-2 { fill: url(#nwc-linear-gradient-7); } .nwc-c-3 { fill: url(#nwc-linear-gradient-5); } .nwc-c-4 { fill: url(#nwc-linear-gradient-6); } .nwc-c-5 { fill: url(#nwc-linear-gradient-4); } .nwc-c-6 { fill: url(#nwc-linear-gradient-3); } .nwc-c-7 { fill: url(#nwc-linear-gradient-2); } .nwc-c-8 { fill: url(#nwc-linear-gradient); } .nwc-c-9 { fill: #fff; } .nwc-c-10 { fill: #50db0f; } </style> <linearGradient id="nwc-linear-gradient" x1="366.82" y1="10.85" x2="366.82" y2="73.9" gradientUnits="userSpaceOnUse"> <stop offset="0" stop-color="#faac22"/> <stop offset="1" stop-color="#50db0f"/> </linearGradient> <linearGradient id="nwc-linear-gradient-2" x1="397.07" y1="262.98" x2="397.07" y2="198.45" xlink:href="#nwc-linear-gradient"/> <linearGradient id="nwc-linear-gradient-3" x1="666.14" y1="232.55" x2="671.64" y2="279.3" gradientUnits="userSpaceOnUse"> <stop offset="0" stop-color="#50db0f"/> <stop offset="1" stop-color="#0b5a5f"/> </linearGradient> <linearGradient id="nwc-linear-gradient-4" x1="741.81" y1="223.65" x2="747.31" y2="270.4" xlink:href="#nwc-linear-gradient-3"/> <linearGradient id="nwc-linear-gradient-5" x1="800.15" y1="216.79" x2="805.65" y2="263.54" xlink:href="#nwc-linear-gradient-3"/> <linearGradient id="nwc-linear-gradient-6" x1="850.96" y1="210.81" x2="856.46" y2="257.56" xlink:href="#nwc-linear-gradient-3"/> <linearGradient id="nwc-linear-gradient-7" x1="918.1" y1="202.91" x2="923.6" y2="249.66" xlink:href="#nwc-linear-gradient-3"/> <linearGradient id="nwc-linear-gradient-8" x1="974.25" y1="196.31" x2="979.75" y2="243.05" xlink:href="#nwc-linear-gradient-3"/> </defs> <g id="nwc-Layer_1-2" data-name="Layer 1"> <g> <g> <g> <path class="nwc-c-9" d="M73.29,117.37c-1.04-4.74-2.35-9.06-3.91-12.97-1.56-3.91-3.49-7.29-5.77-10.13-2.28-2.84-4.89-5.03-7.82-6.57-2.93-1.54-6.22-2.31-9.87-2.31-7.56,0-13.42,1.4-17.59,4.18-4.17,2.79-6.25,6.44-6.25,10.94,0,3.2.71,5.82,2.15,7.83,1.43,2.02,3.52,3.83,6.25,5.43,2.74,1.6,6.09,3.08,10.07,4.45,3.97,1.37,8.44,2.94,13.39,4.71,5.6,2.02,10.75,4.04,15.44,6.05,4.69,2.02,8.7,4.45,12.02,7.3s5.89,6.29,7.72,10.32c1.82,4.03,2.74,9.13,2.74,15.3s-1.08,11.21-3.23,15.84c-2.15,4.63-5.21,8.57-9.19,11.84-3.98,3.26-8.73,5.75-14.27,7.47-5.54,1.72-11.63,2.58-18.27,2.58-4.82,0-9.48-.53-13.97-1.6s-8.44-2.96-11.82-5.69c-2.61,1.66-5.31,3.14-8.11,4.44-2.8,1.3-5.7,2.37-8.7,3.2-1.56-4.15-2.67-8.32-3.32-12.53-.65-4.2-.98-8.56-.98-13.06,0-3.08.1-6.1.29-9.06.2-2.96.55-5.98,1.08-9.06h12.7c0,3.91.55,7.88,1.66,11.9,1.11,4.03,2.9,7.73,5.37,11.11,2.47,3.38,5.7,6.13,9.68,8.26,3.97,2.13,8.76,3.2,14.37,3.2,5.08,0,9.35-.5,12.8-1.51,3.45-1.01,6.25-2.4,8.4-4.18,2.15-1.78,3.71-3.82,4.69-6.13.98-2.31,1.47-4.77,1.47-7.37,0-4.15-1.17-7.61-3.52-10.39-2.35-2.78-6.19-5-11.53-6.66-7.95-2.49-15.25-4.94-21.89-7.37-6.65-2.43-12.41-5.33-17.3-8.71-4.89-3.38-8.7-7.37-11.43-11.99-2.74-4.62-4.1-10.31-4.1-17.06,0-5.09,1.08-9.68,3.23-13.77,2.15-4.09,5.05-7.55,8.7-10.39,3.65-2.84,7.92-5,12.8-6.49,4.89-1.48,10.07-2.22,15.54-2.22,4.82,0,9.45.8,13.88,2.4,4.43,1.6,8.14,4.29,11.14,8.08,1.43-2.37,3.52-4.32,6.25-5.86,2.74-1.54,5.47-2.67,8.21-3.38,1.95,5.69,3.16,12.11,3.62,19.28.46,7.17.68,13.95.68,20.34h-13.49Z"/> <path class="nwc-c-9" d="M191.93,196.98v-7.46c12.77,0,19.16-3.61,19.16-10.84v-35.89c-1.3-.59-3.1-1.09-5.38-1.51-2.28-.41-4.98-.62-8.11-.62h-23.45c-4.82,0-9.06.71-12.7,2.13v35.89c0,7.23,5.86,10.84,17.59,10.84v7.46h-69.39v-7.46c13.16,0,19.74-3.61,19.74-10.84v-77.65c0-9.36-6.58-14.04-19.74-14.04v-7.82h69.39v7.82c-11.73,0-17.59,4.7-17.59,14.09v29.08c1.95.59,3.91,1.01,5.86,1.25,1.95.24,4.23.36,6.84.36h23.45c6.77,0,11.27-.47,13.49-1.43v-29.26c0-9.4-6.39-14.09-19.16-14.09v-7.82h62.68l6.31,7.82c-11.86,0-17.79,4.68-17.79,14.04v77.65c0,7.23,5.93,10.84,17.79,10.84l-5.03,7.46h-63.96Z"/> </g> <g id="nwc-tiLNYP"> <g> <polygon class="nwc-c-10" points="428.57 208.04 438.58 190.54 471.74 190.59 414.86 91.97 435.09 92.04 502.02 208.07 428.57 208.04"/> <polygon class="nwc-c-10" points="292.15 86.13 348.92 184.52 328.85 184.62 261.87 68.58 335.29 68.63 325.36 86.11 292.15 86.13"/> <polygon class="nwc-c-10" points="404.53 190.54 394.42 208.07 261.93 208.07 298.67 144.34 308.66 161.86 292.16 190.56 404.53 190.54"/> <path class="nwc-c-10" d="M455.16,114.87l16.8-28.7c-.59-.11-112.44-.06-112.44-.06l9.97-17.53h132.52s-36.77,63.65-36.77,63.65l-10.08-17.36Z"/> <polygon class="nwc-c-8" points="325.78 132.35 315.67 114.9 381.94 0 417.97 62.53 397.95 62.58 381.9 35.02 325.78 132.35"/> <polygon class="nwc-c-7" points="345.94 214.14 365.99 214 381.99 241.66 438.15 144.33 448.21 161.86 381.93 276.64 345.94 214.14"/> </g> </g> </g> <g> <path class="nwc-c-6" d="M698.38,198.34l4.85,47.13c.43,4.82-.21,9.88-1.91,15.17-2.28,6.69-5.64,10.28-10.08,10.79-6.6.76-13.72-3.51-21.36-12.82-5.53-6.89-11.45-16.61-17.75-29.16-3.74-8.2-7.53-16.39-11.39-24.58-.4,18.85-.23,31.44.49,37.77,1.6,13.97,3.45,21.89,5.55,23.75,2.1,1.86,3.21,3.28,3.32,4.27.24,2.08-.75,4.04-2.97,5.9-2.22,1.86-4.53,2.92-6.93,3.2-3.36.38-6.49-2.52-9.39-8.71-2.26-4.83-3.62-9.32-4.1-13.47-.21-1.85-.47-4.62-.77-8.29-.3-3.67-.55-6.43-.77-8.29-.51-4.48-.67-11.2-.48-20.18.18-8.98.03-15.71-.49-20.18l-2.29-19.98c-.03-.22-.15-.53-.38-.95-.23-.41-.36-.73-.38-.95-.25-2.18,1.17-4.17,4.25-5.96,2.5-1.5,5.08-2.41,7.72-2.71,6.12-.7,10.71.6,13.77,3.9.86,1.12,1.8,3.55,2.84,7.31.66,2.58,1.33,5.21,2,7.9,2.33,7.59,7.54,19.6,15.62,36.04,9.63,19.36,16.26,28.83,19.86,28.42,1.32-.15,1.81-1.76,1.45-4.82-.1-.88-5.2-53.42-5.2-53.42-.4-6.71.11-13.42,1.53-20.12,2.08-9.43,5.76-14.46,11.05-15.06.02,0,.03,0,.05,0,3.17-.33,5.45,3.2,3.91,6-4.96,9.01-2.22,26.73-1.6,32.12Z"/> <path class="nwc-c-5" d="M775.5,231.7c-.95,14.14-2.1,24.09-3.45,29.83-.83,3.36-3.48,4.89-7.94,4.59-6.76-.45-9.56-3.72-8.43-9.81-6.21,2.23-12.56,3.12-19.08,2.69-6.27-.42-12.15-2.25-17.62-5.48-6.53-3.85-9.61-8.41-9.26-13.67.35-5.15,4.53-9.72,12.55-13.7,7.26-3.59,13.97-5.17,20.12-4.76l15.38,1.03.26-3.92c.88-11.41-2.47-17.38-10.07-17.89-9.53-.64-14.56,3.06-15.1,11.09-.18,2.71-1.96,3.96-5.34,3.73-2.05-.14-4.13-1.13-6.25-2.98-2.12-1.85-3.11-3.7-2.99-5.57.41-6.14,3.16-11.02,8.25-14.64,5.09-3.62,11.01-5.21,17.76-4.76,22.67,1.52,33.07,16.26,31.2,44.21ZM756.84,236.39c.15-2.19-1.59-3.41-5.21-3.65-15.08-1.01-22.83,1.72-23.26,8.19-.24,3.51,2.96,5.48,9.59,5.93,4.1.28,8.03-.51,11.79-2.35,4.5-2.01,6.86-4.72,7.09-8.11Z"/> <path class="nwc-c-3" d="M820.75,194.82c.34,2.95-4.35,5.59-14.06,7.91.04,2.43.55,7.9,1.52,16.42l1.24,10.81c.25,2.18.98,5.36,2.19,9.54,1.21,4.18,1.93,7.3,2.17,9.37.2,1.75-.58,3.41-2.35,5-1.76,1.59-3.61,2.49-5.53,2.71-3,.34-5.79-1.71-8.37-6.17-1.97-3.42-3.15-6.83-3.54-10.21l-3.97-34.71c-5.61-.13-8.85-.26-9.72-.38-3.22-.51-4.93-1.59-5.12-3.23-.05-.43.01-.94.19-1.51,2.66-4.39,5.91-6.81,9.75-7.25.24-.03.6-.07,1.08-.12.49.06.86.07,1.1.04,2.52-.29,3.41-3.1,2.68-8.44l-1.37-11.95c-.74-1.13-1.16-2.13-1.26-3.01-.16-1.42.61-2.81,2.32-4.16,1.71-1.36,3.4-2.13,5.07-2.32,2.5-.29,5,.51,7.5,2.38,2.5,1.87,3.9,4.01,4.17,6.41.3,2.62.15,5.27-.46,7.93-.61,2.67-.7,5.36-.26,8.08l.08.66c9.47-.2,14.45,1.89,14.95,6.25Z"/> <path class="nwc-c-4" d="M877.37,185.88c.39,3.38.52,8.52.4,15.43-.12,6.91.02,12.11.42,15.59.35,3.05,1.02,7.58,2.01,13.59.99,6.01,1.66,10.48,1.99,13.42.29,2.5-1.91,4.03-6.59,4.56-4.8.55-8.1-1.17-9.9-5.17-4.25,3.25-8.54,5.12-12.86,5.62-3.48.4-7.55,0-12.18-1.18-4.64-1.18-7.99-2.87-10.07-5.07-4.01-4.19-6.59-11.35-7.75-21.51-.41-3.57-.55-4.04-.56-13.88,0-1.48.6-3.03,1.89-3.77,6.55-3.72,16.1-4.78,15.51,12.45-.12,3.57.64,9.67.64,9.67.3,2.62,1.39,5.26,3.28,7.92,2.29,3.06,4.76,4.43,7.41,4.13,5.16-.59,8.66-4.03,10.5-10.33,1.21-4.34,1.47-9.46.8-15.35l-2.25-19.65c-.18-1.57-1.58-11,.86-12.42,1.37-.79,2.74-1.27,4.13-1.43,2.88-.33,5.59.19,8.12,1.55,2.53,1.37,3.94,3.3,4.22,5.8Z"/> <path class="nwc-c-2" d="M939.07,178.01s0,.02,0,.02c.27,2.41-.52,4.86-2.18,6.62-1.57,1.67-3.28,2.61-5.13,2.82-.91.1-1.81.01-2.69-.28-2.11-.69-3.67-2.5-4.3-4.63-1.04-3.49-3.09-5.06-6.16-4.71-2.16.25-4.21,5.74-6.14,16.46-.92,4.75-.91,11.22.03,19.41.89,7.75,1.82,12.4,2.79,13.95,1.13,1.97,1.75,3.34,1.83,4.1.21,1.86-.54,3.46-2.25,4.82-1.71,1.36-3.7,2.17-5.96,2.42-6.42.74-9.95-1.62-10.57-7.08-.06-.54,0-1.33.19-2.34.18-1.02.26-1.74.21-2.18-.64-5.57-1.88-13.8-3.74-24.7-1.86-10.9-3.1-19.08-3.72-24.54-.56-4.91,2.4-7.74,8.88-8.48,3.84-.44,6.6.3,8.28,2.2,2.97-3.77,6.56-5.89,10.77-6.38,2.88-.33,5.72.07,8.53,1.18,1.9.67,4.22,2.31,6.95,4.93,2.73,2.62,4.19,4.75,4.38,6.38Z"/> <path class="nwc-c-1" d="M1006.4,211.4c.62,5.46-2.97,10.19-10.79,14.17-6.09,3.13-12.62,5.09-19.58,5.89-18.49,2.12-28.83-6.38-31.02-25.48-.9-7.86.2-16.83,3.3-26.92,3.81-12.38,9.38-18.99,16.71-19.83,6.6-.76,14.02,1.11,22.26,5.58,8.24,4.48,12.69,9.61,13.35,15.39.82,7.2-2.06,13.34-8.66,18.41-5.81,4.54-13.03,7.3-21.68,8.29-1.68.19-4.49-.42-8.42-1.86,1.67,10.32,5.62,15.12,11.87,14.4,5.28-.6,10.32-2.56,15.11-5.88,4.79-3.31,7.91-5.05,9.35-5.22,5.16-.59,7.89.42,8.19,3.04ZM983.22,182.7c-.31-2.73-1.48-5.22-3.5-7.48-2.02-2.26-4.47-3.22-7.36-2.89-3.96.45-6.84,2.39-8.64,5.8-1.49,2.94-2.02,6.26-1.59,9.97.24,2.07,1.21,3.68,2.92,4.81,1.71,1.13,3.77,1.56,6.17,1.28,8.76-1,12.77-4.83,12.01-11.49Z"/> </g> <g> <path class="nwc-c-9" d="M967.09,187.53c.08.68.29.93.71,1.21.35.23.94.54,2.04.54.23,0,.48-.02.74-.04,1.12-1.26,2.06-2.56,2.77-3.89,1.17-2.19,1.76-4.11,1.76-5.77l-4.97-1.37c-.82.52-1.46,1.25-2,2.27-1.01,1.99-1.36,4.33-1.05,7.07Z"/> <path class="nwc-c-9" d="M941.07,187.44c-.18.22-.35.44-.55.65-2.4,2.54-5.16,4.01-8.2,4.35-.43.05-.87.07-1.29.07-1.19,0-2.37-.19-3.52-.56-.28-.09-.55-.21-.82-.33,1.29,1.47,2.89,2.78,4.83,3.93,2.09,1.24,4.85,2.13,8.25,2.69.14-3.45.57-7.05,1.29-10.8Z"/> <path class="nwc-c-9" d="M853.35,96.94v82.27c0,6.87-5.6,10.31-16.81,10.31v7.46h19l-.46-4.04-.05-.43c-1.05-8.35-.88-14.42,3.37-16.88,1.96-1.14,4-1.83,6.06-2.07.75-.08,1.49-.13,2.23-.13,3.09,0,6.06.76,8.83,2.25,5.03,2.72,6.49,6.74,6.82,9.64.33,2.84.48,6.69.47,11.66h6.17c-1-6.13-1.77-11.24-2.3-15.28-.18-.7-.27-1.46-.28-2.26-.03-.23-.06-.47-.08-.69-.17-1.47-.13-2.78.07-3.95v-32.89c.65-.83,2.21-1.24,4.69-1.24,4.56,0,8.31,1.1,11.24,3.29,2.93,2.19,5.54,5.33,7.82,9.42,1.37,2.46,2.7,5.21,4.01,8.25,1.44-.52,2.94-.87,4.51-1.05.84-.1,1.69-.14,2.53-.14,2.8,0,5.61.54,8.33,1.61,2.58.93,5.41,2.89,8.65,6,3.31,3.17,5.15,5.91,5.73,8.54,1.42-4.39,3.1-8.14,5.03-11.26-1.02-3.5-2.38-7.02-4.09-10.57-1.3-2.6-2.77-4.88-4.4-6.83-1.63-1.95-3.62-3.61-5.96-4.97-2.35-1.36-5.21-2.45-8.6-3.28-3.39-.83-7.43-1.54-12.12-2.13,11.6-1.3,20.78-4.48,27.56-9.52,6.77-5.04,10.16-11.59,10.16-19.65,0-4.27-.68-8.21-2.05-11.83-1.37-3.61-3.59-6.76-6.65-9.43-3.06-2.67-7.01-4.77-11.82-6.32-4.82-1.54-10.62-2.31-17.4-2.31s-11.89.03-16.12.09c-4.24.06-7.98.15-11.24.27-3.26.12-6.39.21-9.38.27-3,.06-6.65.09-10.95.09h-30.69v7.82c12.12,0,18.18,3.32,18.18,9.95ZM886.38,96.98c0-5.83,1.95-8.74,5.86-8.74h3.91c3,0,5.8.33,8.41.98,2.6.66,4.85,1.78,6.74,3.39,1.89,1.6,3.39,3.78,4.5,6.51,1.11,2.74,1.66,6.19,1.66,10.35,0,5.11-.56,9.16-1.66,12.13-1.11,2.98-2.67,5.21-4.69,6.69-2.02,1.49-4.43,2.44-7.23,2.85-2.8.42-5.96.62-9.48.62h-4.89c-1.69,0-2.74-.59-3.13-1.78v-33Z"/> </g> <g> <path class="nwc-c-9" d="M762.11,187.09c4.09,2.17,7.54,5.06,10.32,8.69,3.29-4.53,7.36-7.11,12.15-7.65l.68-.08c.01-.6-.02-1.49-.19-2.74-.27.07-.53.14-.81.21-4.76,1.13-11.11,1.69-19.06,1.69-1.09,0-2.12-.04-3.09-.11Z"/> <path class="nwc-c-9" d="M718.49,100.32v78.89c0,6.56-5.36,9.98-16.05,10.28.23,2.71.52,5.07.72,6.67.04.29.07.56.1.82h12.61c1.74-3.41,4.33-6.36,7.78-8.81,5.36-3.82,11.57-5.76,18.44-5.76.84,0,1.7.03,2.56.09,2.72.18,5.28.55,7.7,1.09-1.19-1.29-1.8-2.92-1.8-4.91v-33.23c0-2.84,2.21-4.44,6.65-4.8,3.52.12,6.51.42,8.99.89,2.47.47,4.53,1.36,6.16,2.67,1.63,1.31,2.9,3.2,3.81,5.69.91,2.49,1.56,5.75,1.95,9.77h11.34v-47.44h-11.34c-.39,4.26-1.24,7.64-2.54,10.13-1.3,2.49-2.97,4.35-4.98,5.6-2.02,1.24-4.33,2.04-6.94,2.4-2.61.36-5.47.53-8.6.53s-4.5-1.42-4.5-4.25v-31.14c0-2.12,1.17-3.74,3.52-4.86,2.34-1.12,5.67-1.68,9.97-1.68,4.95,0,9.45.15,13.49.44,4.04.3,7.62,1.24,10.75,2.84,3.13,1.6,5.8,4.15,8.01,7.64,2.21,3.5,3.91,8.5,5.08,15.01l11.92-.89-1.56-34.83h-112.19v7.82c12.64,0,18.96,4.44,18.96,13.33Z"/> <path class="nwc-c-9" d="M807.06,163.02c2.52,2.4,4,5.19,4.36,8.32.36,3.17.18,6.41-.55,9.61-.21.92-.34,1.82-.39,2.73,1.97.15,3.95.46,5.81.97l3.64-24.46-11.14-1.42c-.58,1.48-1.16,2.89-1.73,4.25Z"/> </g> <path class="nwc-c-9" d="M635.54,164.93c.21,0,.43-.02.64-.02,6.03,0,10.87,1.91,14.36,5.69l.16.17.14.19c1.29,1.69,2.43,4.47,3.69,9.01.68,2.64,1.33,5.24,2,7.89.78,2.51,1.9,5.56,3.35,9.12h18.69c-.04-.45-.08-.82-.11-1.08v-.18c-.14-2.09-.17-4.18-.13-6.28-9.73-.59-14.73-4.89-14.97-12.89l-2.35-80.31c0-1.18.2-2.31.59-3.38.39-1.07,1.27-2.04,2.64-2.93,1.37-.89,3.23-1.6,5.57-2.13,2.35-.53,5.47-.8,9.38-.8v-7.82h-46.13l-36.35,86-37.72-86h-48.16l-4.22,7.82c4.69,0,8.34.24,10.95.71,2.6.47,4.53,1.1,5.77,1.87,1.24.77,1.95,1.72,2.15,2.84.2,1.13.29,2.4.29,3.82l-1.56,77.65c-.13,5.33-1.76,9.27-4.89,11.82-3.13,2.55-7.62,3.82-13.49,3.82l4.09,7.46h44.58v-7.46c-12.77,0-19.15-4.74-19.15-14.21l.78-71.25,41.83,92.93h17.59l38.7-93.46,1.29,61.41Z"/> </g> </g> </svg>
+    <h2 data-t="cl1">שומרים על מי שאין לו קול.</h2>
+    <a class="btn-orange" href="../nature-v2/SHOMER-Nature.apk" download="SHOMER-Nature.apk" data-get><svg class="ic" aria-hidden="true"><use href="#i-down"/></svg><span data-t="cta">להורדה - חינם!</span></a>
+  </div>
+</section>
+
+<!-- ══ DISCLAIMER + FOOTER ══ -->
+<div class="disc-wrap"><div class="wrap"><div class="disc-card"><p class="disc-txt" data-t="note"></p></div></div></div>
+<div class="foot-badge-wrap"><img class="foot-badge" src="nature-badge.png" alt="SH✡MER Nature"></div>
+<footer class="foot">
+  <div class="wrap">
+    <div class="foot-links">
+      <a href="https://www.shomer-app.co.il/" data-t="fl1">SH✡MER לעיר</a>
+      <a href="nature.html" data-t="fl0">פתחו את האפליקציה</a>
+      <a href="privacy.html" data-t="fl2">פרטיות</a>
+      <a href="https://www.shomer-app.co.il/terms.html" data-t="fl3">תנאים</a>
+      <a href="https://www.shomer-app.co.il/accessibility.html" data-t="fl4">הצהרת נגישות</a>
+      <a href="mailto:support@shomer-app.co.il" data-t="fl5">כתבו לנו</a>
+    </div>
+    <div class="foot-social">
+      <a href="https://www.linkedin.com/company/sh%E2%9C%A1mer/" target="_blank" rel="noopener" aria-label="LinkedIn"><svg class="ic" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="3.4"/><path d="M7.2 10.4v6.4M7.2 7.4v.02M11 16.8v-6.4M11 13.2c0-1.6 1-2.8 2.5-2.8s2.5 1.1 2.5 2.8v3.6"/></svg></a>
+      <a href="https://www.instagram.com/shomer.app" target="_blank" rel="noopener" aria-label="Instagram"><svg class="ic" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4.2"/><circle cx="17.4" cy="6.6" r="1.2" fill="currentColor" stroke="none"/></svg></a>
+      <a href="mailto:support@shomer-app.co.il" aria-label="Email"><svg class="ic" viewBox="0 0 24 24"><rect x="2.5" y="5" width="19" height="14" rx="2.6"/><path d="M3 7l9 6 9-6"/></svg></a>
+    </div>
+    <div class="foot-meta"><img src="3shamrocks.png" alt="3Shamrocks Studio"><span>© 2026 3Shamrocks Studio · SH✡MER Nature</span></div>
+  </div>
+</footer>
+
+<!-- ══ INSTALL DIALOG ══ -->
+<dialog id="inst" aria-labelledby="inst-t">
+  <div class="dsheet">
+    <div class="sh-top"><h2 id="inst-t" data-t="it">התקנת SH✡MER Nature</h2><button class="x" type="button" data-close aria-label="סגירה">×</button></div>
+    <div class="seg" role="tablist">
+      <button type="button" role="tab" id="tb-and" aria-controls="p-and" data-tab="and">Android</button>
+      <button type="button" role="tab" id="tb-ios" aria-controls="p-ios" data-tab="ios">iPhone</button>
+      <button type="button" role="tab" id="tb-pc" aria-controls="p-pc" data-tab="pc" data-t="tpc">מחשב</button>
+    </div>
+    <div class="pane" id="p-and" role="tabpanel" aria-labelledby="tb-and">
+      <div class="row"><a class="btn-orange" href="../nature-v2/SHOMER-Nature.apk" download="SHOMER-Nature.apk"><svg class="ic" aria-hidden="true"><use href="#i-down"/></svg><span data-t="apk">הורדת קובץ ההתקנה (APK)</span></a></div>
+      <ol><li data-t="a_1"></li><li data-t="a_2"></li><li data-t="a_3"></li></ol>
+      <div class="or" data-t="or">או בלי קובץ</div>
+      <button class="btn-line dark" type="button" data-pwa><span data-t="pwa">הוספה למסך הבית</span></button>
+      <p class="hint" data-t="a_h"></p>
+    </div>
+    <div class="pane" id="p-ios" role="tabpanel" aria-labelledby="tb-ios" hidden>
+      <div class="row"><a class="btn-orange" href="nature.html"><span data-t="openios">פתיחת האפליקציה ב-Safari</span></a></div>
+      <ol><li data-t="i_1"></li><li><span data-t="i_2"></span> <span class="kbd"><svg class="ic"><use href="#i-share"/></svg></span></li><li data-t="i_3"></li></ol>
+      <p class="hint" data-t="i_h"></p>
+    </div>
+    <div class="pane" id="p-pc" role="tabpanel" aria-labelledby="tb-pc" hidden>
+      <div class="qrbox">
+        <img src="img/landing/qr-nature.svg" alt="QR" width="130" height="130">
+        <div><p data-t="pc1" style="font-weight:800"></p><p data-t="pc2" style="color:var(--ink-soft);font-size:15px"></p><p class="url">www.shomer-app.co.il/nature/</p></div>
+      </div>
+      <div class="or" data-t="or2">או</div>
+      <button class="btn-line dark" type="button" data-pwa><span data-t="pwapc">התקנה במחשב (Chrome / Edge)</span></button>
+    </div>
+  </div>
+</dialog>
 
 <script>
 var T={
- he:{nav:"SH✡MER העירוני",eb:"בקרוב · COMING SOON",h1:"שומרים על מי שאין לו קול.",
-  sub:"אותה רשת שמירה — הפעם ליער, לחוף, לחי ולסביבה.",cta:"הצטרפ/י לרשימת ההמתנה",
-  alt:"כבר מוגן/ת בעיר? <a href='https://www.shomer-app.co.il/'>ל-SH✡MER העירוני</a> &nbsp;·&nbsp; <a href='nature.html' style='font-weight:800'>נסו את הבטא ←</a>",
-  tq:"חיה פצועה, שריפה מתחילה, מפגע בשמורה — <b>מישהו קרוב תמיד רואה ראשון.</b>",
-  ts:"העיקרון שעליו נבנה SH✡MER Nature",eb2:"איך זה יעבוד",h2a:"שלושה צעדים.",
-  s1t:"רואה — מדווח/ת",s1d:"צילום, סוג המפגע, והמיקום נלכד אוטומטית. עשר שניות.",
-  s2t:"מי שקרוב מקבל התרעה",s2d:"המתנדבים והגורמים באזור מקבלים את הדיווח מיד.",
-  s3t:"מישהו מגיע — ואת/ה יודע/ת",s3d:"רואים מי בדרך ומה קרה בסוף.",
-  eb3:"מה זה יכסה",h2b:"כל מה שאין לו קול.",
-  v1t:"חילוץ בעלי חיים",v1d:"חיה פצועה או לכודה — המתנדב הקרוב שיודע לטפל מקבל התרעה עם מיקום מדויק.",
-  v2t:"שריפות בהתחלה",v2d:"שריפת חורש מתחילה קטנה. דקות קובעות. דיווח מוקדם מגיע מיד לכל מי שבטווח.",
-  v3t:"חופים וים",v3d:"זיהום, דגה פגועה, זרם מסוכן, מדוזות — מפה חיה מאנשים שנמצאים שם עכשיו.",
-  v4t:"מפגעים בשמורות",v4d:"פסולת, פגיעה בצמחייה, רכב במקום אסור — תיעוד עם מיקום.",
-  v5t:"מפת סכנות חיה",v5d:"לפני שיוצאים לטיול — מה מסוכן היום באזור. לא ארכיון.",
-  v6t:"אותה רשת שומרים",v6d:"אותם מעגלי אמון — הפעם עבור הטבע.",
-  cl1:"רוצה להיות הראשון?",cl2:"נעדכן אותך ברגע ש-SH✡MER Nature עולה לאוויר.",wlb:"עדכנו אותי",
-  note:"<b>SH✡MER Nature אינו תחליף לשירותי חירום.</b> במצב חירום חייג/י <span class='num'>100</span> · <span class='num'>101</span> · <span class='num'>102</span>."},
- en:{nav:"Urban SH✡MER",eb:"COMING SOON",h1:"Guarding what has no voice.",
-  sub:"The same guardian network — this time for the forest, the coast, wildlife and the environment.",
-  cta:"Join the waitlist",alt:"Already protected in the city? <a href='https://www.shomer-app.co.il/'>Urban SH✡MER</a> &nbsp;·&nbsp; <a href='nature.html' style='font-weight:800'>Try the beta →</a>",
-  tq:"An injured animal, a fire starting, damage in a reserve — <b>someone nearby always sees it first.</b>",
-  ts:"The principle SH✡MER Nature is built on",eb2:"How it will work",h2a:"Three steps.",
-  s1t:"See it, report it",s1d:"A photo, the type, and location captured automatically. Ten seconds.",
-  s2t:"Whoever is near is alerted",s2d:"Volunteers and authorities in the area get it immediately.",
-  s3t:"Someone comes — and you know",s3d:"See who is on the way and how it ended.",
-  eb3:"What it will cover",h2b:"Everything without a voice.",
-  v1t:"Animal rescue",v1d:"An injured or trapped animal — the nearest capable volunteer is alerted with a precise location.",
-  v2t:"Fires at the start",v2d:"A brush fire starts small. Minutes decide. Early reports reach everyone in range.",
-  v3t:"Coast and sea",v3d:"Pollution, harmed marine life, dangerous currents, jellyfish — a live map from people who are there now.",
-  v4t:"Damage in reserves",v4d:"Dumping, damage to vegetation, vehicles where they should not be — documented with location.",
-  v5t:"Live hazard map",v5d:"Before you set out — what is dangerous today. Not an archive.",
-  v6t:"The same guardian network",v6d:"The same circles of trust — this time for nature.",
-  cl1:"Want to be first?",cl2:"We will tell you the moment SH✡MER Nature goes live.",wlb:"Notify me",
-  note:"<b>SH✡MER Nature is not a substitute for emergency services.</b> In an emergency call <span class='num'>100</span> · <span class='num'>101</span> · <span class='num'>102</span>."},
- ar:{nav:"شومير الحضري",eb:"قريبًا · COMING SOON",h1:"نحرس من لا صوت له.",
-  sub:"نفس شبكة الحماية — هذه المرة للغابة والشاطئ والحياة البرية والبيئة.",
-  cta:"انضم لقائمة الانتظار",alt:"محميّ في المدينة؟ <a href='https://www.shomer-app.co.il/'>شومير الحضري</a> &nbsp;·&nbsp; <a href='nature.html' style='font-weight:800'>جرّب النسخة التجريبية ←</a>",
-  tq:"حيوان مصاب، حريق يبدأ، ضرر في محمية — <b>من يكون قريبًا يراه أولاً دائمًا.</b>",
-  ts:"المبدأ الذي بُني عليه شومير الطبيعة",eb2:"كيف سيعمل",h2a:"ثلاث خطوات.",
-  s1t:"ترى — تُبلّغ",s1d:"صورة، نوع الضرر، والموقع يُلتقط تلقائيًا. عشر ثوانٍ.",
-  s2t:"من هو قريب يُنبَّه",s2d:"المتطوعون والجهات في المنطقة يستلمون البلاغ فورًا.",
-  s3t:"أحدهم يصل — وأنت تعلم",s3d:"ترى من في الطريق وماذا حدث في النهاية.",
-  eb3:"ما الذي سيغطيه",h2b:"كل ما لا صوت له.",
-  v1t:"إنقاذ الحيوانات",v1d:"حيوان مصاب أو محاصر — أقرب متطوع مؤهل يُنبَّه بموقع دقيق.",
-  v2t:"الحرائق في بدايتها",v2d:"حريق الأحراش يبدأ صغيرًا. الدقائق تحسم. البلاغ المبكر يصل لكل من في النطاق.",
-  v3t:"الشواطئ والبحر",v3d:"تلوث، أحياء بحرية متضررة، تيارات خطرة، قناديل — خريطة حية ممن هم هناك الآن.",
-  v4t:"أضرار في المحميات",v4d:"نفايات، ضرر بالنباتات، مركبات في أماكن ممنوعة — موثّق بالموقع.",
-  v5t:"خريطة مخاطر حية",v5d:"قبل الخروج — ما هو خطر اليوم. ليس أرشيفًا.",
-  v6t:"نفس شبكة الحُرّاس",v6d:"نفس دوائر الثقة — هذه المرة للطبيعة.",
-  cl1:"تريد أن تكون الأول؟",cl2:"سنخبرك فور إطلاق شومير الطبيعة.",wlb:"أبلغوني",
-  note:"<b>شومير الطبيعة ليس بديلاً عن خدمات الطوارئ.</b> في الطوارئ اتصل بـ <span class='num'>100</span> · <span class='num'>101</span> · <span class='num'>102</span>."}
+ he:{ctas:"להורדה - חינם!",cta:"להורדה - חינם!",cta2:"התקנה כאפליקציה",cta2b:"התקנה כאפליקציה · אייפון ומחשב",eb:"גרסת בטא · חינם",
+  h1:"שומרים על מי שאין לו קול.",
+  sub:"חיה פצועה, שריפה קטנה, פסולת בשמורה, נפל בשטח. מתעדים עם תמונה ומיקום מדויק ויודעים מה עושים ולמי מתקשרים. ובטיול: SOS שמגיע לשומרים שלי, ומדריכי עזרה ראשונה בכיס.",
+  meta:"אנדרואיד: קובץ התקנה · אייפון ומחשב: התקנה מהדפדפן",
+  kick:"העיקרון שעליו מתבסס",lead:"חיה פצועה, שריפה שמתחילה, נפל בשטח -",big:"מי שקרוב<br><em>רואה ראשון.</em>",
+  h2a:"על מה מדווחים ב-",h2as:"לחצו על כל סוג לפרטים.",more:"פרטים",
+  t1:"חיה פצועה",t1s:"כלב, חתול, ציפור או צב",t1d:"מצאתם חיה פצועה או לכודה? מצלמים, בוחרים \"חיה פצועה\", והמיקום נוסף לבד. כך יש בידיכם תיעוד מדויק למסור למי שיכול לעזור.",
+  t2:"שריפה / עשן",t2s:"לתפוס אותה כשהיא קטנה",t2d:"שריפת חורש מתחילה קטנה. מתרחקים, מחייגים 102, ומתעדים עם תמונה ומיקום מדויק.",
+  t3:"זיהום / פסולת",t3s:"בשמורה, ביער או בחוף",t3d:"שקיות, פסולת בניין, נפט בחוף. תיעוד עם תמונה ומיקום, כדי שאפשר יהיה לטפל ולנקות.",
+  t4:"זרם קורע / טביעה",t4s:"זרם, גלים, מתרחץ בקושי",t4d:"זרם חזק או מתרחץ בקושי? במצב חירום חייגו 101 או 100. הדיווח שומר את המקום והשעה.",
+  t5:"עזרה רפואית",t5s:"מטייל נפגע או לא מרגיש טוב",t5d:"חייגו 101. באפליקציה מחכים מדריכי עזרה ראשונה צעד אחר צעד: דימום, כוויה, מכת חום, החייאה ועוד.",
+  t6:"מפגע בשטח",t6s:"עץ שנפל, סלע, בור",t6d:"עץ שחוסם את השביל, סלע שהתדרדר, גשר שבור. מתעדים עם תמונה ומיקום, תחת \"אחר\".",
+  t7:"נפל / שרידי רקטה",t7s:"לא מתקרבים, לא נוגעים",t7d:"מצאתם רקטה, שבר של מיירט או חפץ חשוד? לא מתקרבים ולא נוגעים, מרחיקים אנשים ובעלי חיים ומחייגים 100. האפליקציה מציגה את הנחיות הבטיחות לפני הדיווח.",
+  t8:"מטייל נעדר",t8s:"מישהו מהשומרים שלי לא חזר",t8d:"אדם מהשומרים שלי לא חזר מהשביל? מפעילים התראת \"מטייל נעדר\" עם המיקום האחרון שלו (בדיוק של כ-100 מטר), והיא מוצגת על המפה למשתמשי האפליקציה. וחייגו 100.",
+  tnote:"<b>חשוב לדעת:</b> דיווח נשמר בטלפון שלך בלבד ולא נשלח לאף אחד. במצב חירום חייגו 100 · 101 · 102.",
+  h2b:"לחיות, לים, לשביל.",
+  c1:"בעלי חיים",c1d:"כלבים, חתולים וחיות בר שצריכים יד.",c2:"ים וחוף",c2d:"צבי ים, דגים ועופות שנלכדו בפסולת.",c3:"יער ושבילים",c3d:"והאנשים שיוצאים ליהנות מהם.",
+  eb4:"יוצאים לשטח",h2c:"רגועים יותר בכל טיול.",
+  f1:"SOS לטיול",f1d:"לחיצה אחת, והשומרים שלי מקבלים את המיקום שלך.",
+  f2:"טיימר בטיחות",f2d:"יוצאים לבד? אם לא תאשרו בזמן שהכול בסדר, השומרים שלי יקבלו התרעה.",
+  f3:"מדריכי עזרה ראשונה",f3d:"כוויה, דימום, מכת חום, טביעה. צעד אחר צעד, בעברית פשוטה.",
+  scr:"כך זה נראה ב-",s_map:"מפה",s_rep:"דיווח",s_gd:"מדריך חירום",
+  h2d:"איך מתקינים",h2ds:"שלושה צעדים פשוטים, בלי חנות אפליקציות.",
+  s1:"לוחצים \"להורדה\"",s1d:"בטלפון. במחשב? סורקים את הקוד.",s2:"מתקינים",s2d:"אנדרואיד: קובץ התקנה (APK). אייפון: הוספה למסך הבית מ-Safari.",s3:"פותחים ונרשמים",s3d:"מספר טלפון ושם, וזהו.",
+  apk:"הורדת קובץ ההתקנה (APK)",openweb:"או פתיחה מיד בדפדפן",
+  qrt:"במחשב? סרקו עם הטלפון",qrs:"פותח את SH✡MER Nature בטלפון",
+  famh:"גם בעיר: ",famp:"SH✡MER לעיר: SOS בלחיצה אחת, מיקום חי ומעגלי שומרים. מאותה משפחה, חינם.",famc1:"לאתר SH✡MER",famc2:"פתיחת אפליקציית SH✡MER",
+  h2e:"שאלות נפוצות",
+  q1:"זה עולה כסף?",a1:"לא. SH✡MER Nature חינם.",
+  q2:"זו אפליקציה נפרדת מ-SH✡MER?",a2:"כן. SH✡MER Nature היא אפליקציה נפרדת לטבע, לבעלי חיים ולטיולים, מאותה משפחה. כבר יש לך חשבון SH✡MER? אפשר להתחבר איתו.",
+  q3:"למה לא מחנות האפליקציות?",a3:"אנחנו בגרסת בטא. באנדרואיד מורידים קובץ התקנה ישירות מכאן. באייפון מוסיפים למסך הבית מ-Safari.",
+  q4:"מה קורה למידע שלי?",a4:"דיווחים נשמרים בטלפון שלך. השם שלך לא מוצג אלא אם בחרת להציג אותו. המספר שלך משמש לאימות ולשליחת עזרה, אף פעם לא לשיווק. <a href='privacy.html'>מדיניות הפרטיות</a>",
+  q5:"זה מחליף את שירותי החירום?",a5:"לא. SH✡MER Nature לא מזעיק רשויות בשבילך. במצב חירום חייגו 100, 101 או 102.",
+  cl1:"שומרים על מי שאין לו קול.",
+  note:"<b>SH✡MER Nature הוא כלי עזר קהילתי בלבד, לא שירות חירום ולא תחליף לו.</b><br>השימוש על אחריות המשתמש בלבד; 3Shamrocks Studio אינה אחראית לכל נזק ישיר או עקיף. בחירום חייגו <span class='num'>100</span> · <span class='num'>101</span> · <span class='num'>102</span>.",
+  fl0:"פתחו את האפליקציה",fl1:"SH✡MER לעיר",fl2:"פרטיות",fl3:"תנאים",fl4:"הצהרת נגישות",fl5:"כתבו לנו",
+  it:"התקנת SH✡MER Nature",tpc:"מחשב",
+  a_1:"לוחצים על הכפתור. הקובץ יורד לטלפון.",a_2:"פותחים את הקובץ מההתראה או מתיקיית ההורדות.",a_3:"אם הטלפון שואל, מאשרים \"התקנה ממקור זה\", ולוחצים \"התקנה\".",
+  or:"או בלי קובץ",or2:"או",pwa:"הוספה למסך הבית",pwapc:"התקנה במחשב (Chrome / Edge)",
+  a_h:"אם לא נפתח חלון התקנה: ב-Chrome לוחצים על <span class='kbd'><svg class='ic'><use href='#i-dots'/></svg></span> ואז \"הוספה למסך הבית\".",
+  openios:"פתיחת האפליקציה ב-Safari",i_1:"פותחים את האפליקציה ב-Safari.",i_2:"לוחצים על כפתור השיתוף",i_3:"בוחרים \"הוספה למסך הבית\", ואז \"הוספה\".",i_h:"האייקון מופיע במסך הבית ונפתח כמו אפליקציה.",
+  pc1:"סורקים עם מצלמת הטלפון",pc2:"הדף ייפתח בטלפון, ומשם מתקינים.",
+  alt1:"אישה כורעת ליד כלב פצוע ומחזיקה טלפון",alt2:"גור כלבים וחתלתול ישנים על הדשא",alt3:"צב ים לכוד ברשת על החוף",alt4:"שביל הליכה ביער",alt5:"אישה עם כלב פצוע ברחוב, בשעת שקיעה",
+  altmap:"מסך המפה של SH✡MER Nature",altrep:"מסך הדיווח של SH✡MER Nature, כולל נפל",altgd:"מדריך החירום של SH✡MER Nature",close:"סגירה"},
+ en:{ctas:"Download - free!",cta:"Download - free!",cta2:"Install as an app",cta2b:"Install as an app · iPhone & computer",eb:"Beta · Free",
+  h1:"Caring for those who have no voice.",
+  sub:"An injured animal, a small fire, litter in a reserve, rocket debris in a field. Record it with a photo and an exact location, and know what to do and who to call. On the trail: an SOS that reaches My Shomers, and first-aid guides in your pocket.",
+  meta:"Android: install file · iPhone & computer: install from the browser",
+  kick:"The principle behind",lead:"An injured animal, a fire starting, debris in a field -",big:"whoever is closest<br><em>sees it first.</em>",
+  h2a:"What you can report in ",h2as:"Tap any type for details.",more:"Details",
+  t1:"Injured animal",t1s:"A dog, cat, bird or turtle",t1d:"Found an injured or trapped animal? Take a photo, choose \"Injured animal\", and the location is added for you. You then have an exact record to hand to whoever can help.",
+  t2:"Fire / smoke",t2s:"Catch it while it is small",t2d:"A brush fire starts small. Keep clear, call 102, and record it with a photo and an exact location.",
+  t3:"Pollution / litter",t3s:"In a reserve, forest or beach",t3d:"Bags, building waste, oil on the beach. A photo and a location, so it can be handled and cleaned up.",
+  t4:"Rip current / drowning",t4s:"Currents, waves, a swimmer in trouble",t4d:"A strong current or a swimmer in trouble? In an emergency call 101 or 100. The report keeps the place and the time.",
+  t5:"Medical help",t5s:"A hiker is hurt or unwell",t5d:"Call 101. The app has step-by-step first-aid guides: bleeding, burns, heat stroke, CPR and more.",
+  t6:"Hazard on the trail",t6s:"A fallen tree, a rock, a hole",t6d:"A tree blocking the path, a fallen rock, a broken bridge. Record it with a photo and a location, under \"Other\".",
+  t7:"Fallen rocket / debris",t7s:"Keep away, do not touch",t7d:"Found a rocket, an interceptor fragment or a suspicious object? Do not go closer or touch it, keep people and animals away, and call 100. The app shows the safety steps before you report.",
+  t8:"Lost hiker",t8s:"Someone from My Shomers did not come back",t8d:"Someone from My Shomers did not come back from the trail? Raise a \"Lost hiker\" alert with their last location (to about 100 m), and it shows on the map for app users. And call 100.",
+  tnote:"<b>Good to know:</b> a report is saved on your phone only and is not sent to anyone. In an emergency call 100 · 101 · 102.",
+  h2b:"For animals, the sea and the trail.",
+  c1:"Animals",c1d:"Dogs, cats and wildlife that need a hand.",c2:"Sea and coast",c2d:"Sea turtles, fish and birds caught in litter.",c3:"Forests and trails",c3d:"And the people who go out to enjoy them.",
+  eb4:"Heading outdoors",h2c:"Calmer on every trip.",
+  f1:"Trip SOS",f1d:"One tap, and My Shomers get your location.",
+  f2:"Safety timer",f2d:"Going alone? If you do not check in on time, My Shomers get an alert.",
+  f3:"First-aid guides",f3d:"Burns, bleeding, heat stroke, drowning. Step by step, in plain words.",
+  scr:"How it looks in ",s_map:"Map",s_rep:"Report",s_gd:"Emergency guide",
+  h2d:"How to install",h2ds:"Three simple steps, no app store.",
+  s1:"Tap \"Download\"",s1d:"On your phone. On a computer? Scan the code.",s2:"Install",s2d:"Android: an install file (APK). iPhone: add to Home Screen from Safari.",s3:"Open and sign up",s3d:"A phone number and a name. That is it.",
+  apk:"Download the install file (APK)",openweb:"or open it now in the browser",
+  qrt:"On a computer? Scan with your phone",qrs:"Opens SH✡MER Nature on your phone",
+  famh:"In the city too: ",famp:"SH✡MER for the city: one-tap SOS, live location and Shomer circles. Same family, free.",famc1:"SH✡MER website",famc2:"Open the SH✡MER app",
+  h2e:"Questions",
+  q1:"Does it cost money?",a1:"No. SH✡MER Nature is free.",
+  q2:"Is it separate from SH✡MER?",a2:"Yes. SH✡MER Nature is its own app for nature, animals and trips, from the same family. Already have a SH✡MER account? You can sign in with it.",
+  q3:"Why not from the app store?",a3:"We are in beta. On Android you download the install file right here. On iPhone you add it to your Home Screen from Safari.",
+  q4:"What happens to my data?",a4:"Reports are saved on your phone. Your name is not shown unless you choose to show it. Your number is used for verification and for sending help, never for marketing. <a href='privacy.html'>Privacy policy</a>",
+  q5:"Does it replace emergency services?",a5:"No. SH✡MER Nature does not call the authorities for you. In an emergency call 100, 101 or 102.",
+  cl1:"Caring for those who have no voice.",
+  note:"<b>SH✡MER Nature is a community aid tool only - not an emergency service or a substitute for one.</b><br>Use is entirely at your own risk; 3Shamrocks Studio accepts no liability for any direct or indirect damage. In an emergency call <span class='num'>100</span> · <span class='num'>101</span> · <span class='num'>102</span>.",
+  fl0:"Open the app",fl1:"SH✡MER for the city",fl2:"Privacy",fl3:"Terms",fl4:"Accessibility",fl5:"Contact us",
+  it:"Install SH✡MER Nature",tpc:"Computer",
+  a_1:"Tap the button. The file downloads to your phone.",a_2:"Open it from the notification or your Downloads folder.",a_3:"If your phone asks, allow \"Install from this source\", then tap \"Install\".",
+  or:"or without a file",or2:"or",pwa:"Add to Home screen",pwapc:"Install on this computer (Chrome / Edge)",
+  a_h:"If no install window opens: in Chrome tap <span class='kbd'><svg class='ic'><use href='#i-dots'/></svg></span> and then \"Add to Home screen\".",
+  openios:"Open the app in Safari",i_1:"Open the app in Safari.",i_2:"Tap the Share button",i_3:"Choose \"Add to Home Screen\", then \"Add\".",i_h:"The icon appears on your Home Screen and opens like an app.",
+  pc1:"Scan with your phone camera",pc2:"The page opens on your phone; install from there.",
+  alt1:"A woman kneels by an injured dog holding a phone",alt2:"A puppy and a kitten asleep on the grass",alt3:"A sea turtle caught in a net on the beach",alt4:"A forest hiking trail",alt5:"A woman with an injured dog on the street at sunset",
+  altmap:"The SH✡MER Nature map screen",altrep:"The SH✡MER Nature report screen, including fallen rocket",altgd:"The SH✡MER Nature emergency guide",close:"Close"},
+ ar:{ctas:"تحميل - مجانًا!",cta:"تحميل - مجانًا!",cta2:"التثبيت كتطبيق",cta2b:"التثبيت كتطبيق · آيفون والحاسوب",eb:"نسخة تجريبية · مجانًا",
+  h1:"نحمي من لا صوت له.",
+  sub:"حيوان مصاب، حريق صغير، نفايات في محمية، بقايا صاروخ في الحقل. وثّق بصورة وموقع دقيق، واعرف ماذا تفعل وبمن تتصل. وفي الرحلة: SOS يصل إلى حُرّاسي، وأدلة إسعاف أولي في جيبك.",
+  meta:"أندرويد: ملف تثبيت · آيفون والحاسوب: تثبيت من المتصفح",
+  kick:"المبدأ الذي يقوم عليه",lead:"حيوان مصاب، حريق يبدأ، بقايا صاروخ في الحقل -",big:"الأقرب<br><em>يرى أولًا.</em>",
+  h2a:"عمّا تبلّغ في ",h2as:"اضغط على أي نوع للتفاصيل.",more:"تفاصيل",
+  t1:"حيوان مصاب",t1s:"كلب، قطة، طائر أو سلحفاة",t1d:"وجدت حيوانًا مصابًا أو عالقًا؟ صوّر، اختر \"حيوان مصاب\"، ويُضاف الموقع تلقائيًا. هكذا يكون لديك توثيق دقيق تسلّمه لمن يستطيع المساعدة.",
+  t2:"حريق / دخان",t2s:"التقطه وهو صغير",t2d:"حريق الأحراش يبدأ صغيرًا. ابتعد، اتصل بـ 102، ووثّق بصورة وموقع دقيق.",
+  t3:"تلوث / نفايات",t3s:"في محمية أو غابة أو شاطئ",t3d:"أكياس، مخلفات بناء، نفط على الشاطئ. صورة وموقع، كي يمكن المعالجة والتنظيف.",
+  t4:"تيار ساحب / غرق",t4s:"تيار، أمواج، سبّاح في ضيق",t4d:"تيار قوي أو سبّاح في ضيق؟ في الطوارئ اتصل بـ 101 أو 100. البلاغ يحفظ المكان والوقت.",
+  t5:"مساعدة طبية",t5s:"متنزّه أصيب أو ليس بخير",t5d:"اتصل بـ 101. في التطبيق أدلة إسعاف أولي خطوة بخطوة: نزيف، حروق، ضربة شمس، إنعاش وغيرها.",
+  t6:"خطر في المسار",t6s:"شجرة سقطت، صخرة، حفرة",t6d:"شجرة تسد المسار، صخرة انهارت، جسر مكسور. وثّق بصورة وموقع، تحت \"أخرى\".",
+  t7:"بقايا صاروخ / شظايا",t7s:"لا تقترب، لا تلمس",t7d:"وجدت صاروخًا أو شظية صاروخ اعتراضي أو جسمًا مشبوهًا؟ لا تقترب ولا تلمس، أبعِد الناس والحيوانات واتصل بـ 100. يعرض التطبيق تعليمات السلامة قبل البلاغ.",
+  t8:"متنزّه مفقود",t8s:"شخص من حُرّاسي لم يعد",t8d:"شخص من حُرّاسي لم يعد من المسار؟ فعّل تنبيه \"متنزّه مفقود\" مع آخر موقع له (بدقة نحو 100 متر)، ويظهر على الخريطة لمستخدمي التطبيق. واتصل بـ 100.",
+  tnote:"<b>من المهم أن تعرف:</b> البلاغ يُحفظ على هاتفك فقط ولا يُرسل إلى أحد. في الطوارئ اتصل بـ 100 · 101 · 102.",
+  h2b:"للحيوانات، للبحر، للمسار.",
+  c1:"الحيوانات",c1d:"كلاب وقطط وحيوانات برية تحتاج يدًا.",c2:"البحر والشاطئ",c2d:"سلاحف بحرية وأسماك وطيور عالقة في النفايات.",c3:"الغابات والمسارات",c3d:"والناس الذين يخرجون للاستمتاع بها.",
+  eb4:"الخروج إلى الطبيعة",h2c:"أكثر هدوءًا في كل رحلة.",
+  f1:"SOS للرحلة",f1d:"لمسة واحدة، ويحصل حُرّاسي على موقعك.",
+  f2:"مؤقّت الأمان",f2d:"تخرج وحدك؟ إذا لم تؤكد في الوقت أنك بخير، يتلقى حُرّاسي تنبيهًا.",
+  f3:"أدلة الإسعاف الأولي",f3d:"حروق، نزيف، ضربة شمس، غرق. خطوة بخطوة، بكلمات بسيطة.",
+  scr:"هكذا يبدو ",s_map:"الخريطة",s_rep:"البلاغ",s_gd:"دليل الطوارئ",
+  h2d:"كيف تثبّت",h2ds:"ثلاث خطوات بسيطة، بدون متجر تطبيقات.",
+  s1:"اضغط \"تحميل\"",s1d:"على هاتفك. على الحاسوب؟ امسح الرمز.",s2:"ثبّت",s2d:"أندرويد: ملف تثبيت (APK). آيفون: إضافة إلى الشاشة الرئيسية من Safari.",s3:"افتح وسجّل",s3d:"رقم هاتف واسم، وهذا كل شيء.",
+  apk:"تنزيل ملف التثبيت (APK)",openweb:"أو افتحه الآن في المتصفح",
+  qrt:"على الحاسوب؟ امسح بهاتفك",qrs:"يفتح SH✡MER Nature على هاتفك",
+  famh:"في المدينة أيضًا: ",famp:"SH✡MER للمدينة: SOS بلمسة واحدة، موقع مباشر ودوائر حماية. من نفس العائلة، مجانًا.",famc1:"موقع SH✡MER",famc2:"فتح تطبيق SH✡MER",
+  h2e:"أسئلة شائعة",
+  q1:"هل هو مدفوع؟",a1:"لا. SH✡MER Nature مجاني.",
+  q2:"هل هو منفصل عن SH✡MER؟",a2:"نعم. SH✡MER Nature تطبيق مستقل للطبيعة والحيوانات والرحلات، من نفس العائلة. لديك حساب SH✡MER؟ يمكنك الدخول به.",
+  q3:"لماذا ليس من متجر التطبيقات؟",a3:"نحن في نسخة تجريبية. على أندرويد تنزّل ملف التثبيت من هنا مباشرة. على آيفون تضيفه إلى الشاشة الرئيسية من Safari.",
+  q4:"ماذا يحدث لمعلوماتي؟",a4:"البلاغات تُحفظ على هاتفك. لا يظهر اسمك إلا إذا اخترت إظهاره. رقمك يُستخدم للتحقق ولإرسال المساعدة، وليس للتسويق أبدًا. <a href='privacy.html'>سياسة الخصوصية</a>",
+  q5:"هل يحل محل خدمات الطوارئ؟",a5:"لا. SH✡MER Nature لا يتصل بالسلطات نيابة عنك. في الطوارئ اتصل بـ 100 أو 101 أو 102.",
+  cl1:"نحمي من لا صوت له.",
+  note:"<b>SH✡MER Nature أداة مساعدة مجتمعية فقط، وليست خدمة طوارئ ولا بديلاً عنها.</b><br>الاستخدام على مسؤولية المستخدم وحده؛ 3Shamrocks Studio غير مسؤولة عن أي ضرر مباشر أو غير مباشر. في الطوارئ اتصل بـ <span class='num'>100</span> · <span class='num'>101</span> · <span class='num'>102</span>.",
+  fl0:"افتح التطبيق",fl1:"SH✡MER للمدينة",fl2:"الخصوصية",fl3:"الشروط",fl4:"إمكانية الوصول",fl5:"راسلنا",
+  it:"تثبيت SH✡MER Nature",tpc:"حاسوب",
+  a_1:"اضغط الزر. يُنزَّل الملف إلى هاتفك.",a_2:"افتحه من الإشعار أو من مجلد التنزيلات.",a_3:"إذا سألك الهاتف، اسمح بـ \"التثبيت من هذا المصدر\"، ثم اضغط \"تثبيت\".",
+  or:"أو بدون ملف",or2:"أو",pwa:"إضافة إلى الشاشة الرئيسية",pwapc:"التثبيت على الحاسوب (Chrome / Edge)",
+  a_h:"إذا لم تظهر نافذة التثبيت: في Chrome اضغط <span class='kbd'><svg class='ic'><use href='#i-dots'/></svg></span> ثم \"إضافة إلى الشاشة الرئيسية\".",
+  openios:"فتح التطبيق في Safari",i_1:"افتح التطبيق في Safari.",i_2:"اضغط زر المشاركة",i_3:"اختر \"إضافة إلى الشاشة الرئيسية\"، ثم \"إضافة\".",i_h:"تظهر الأيقونة على الشاشة الرئيسية وتفتح كتطبيق.",
+  pc1:"امسح بكاميرا الهاتف",pc2:"تفتح الصفحة على هاتفك، ومن هناك تثبّت.",
+  alt1:"امرأة تجثو بجانب كلب مصاب وتحمل هاتفًا",alt2:"جرو وقطة صغيرة نائمان على العشب",alt3:"سلحفاة بحرية عالقة في شبكة على الشاطئ",alt4:"مسار مشي في الغابة",alt5:"امرأة مع كلب مصاب في الشارع وقت الغروب",
+  altmap:"شاشة الخريطة في SH✡MER Nature",altrep:"شاشة البلاغ في SH✡MER Nature، بما فيها بقايا الصاروخ",altgd:"دليل الطوارئ في SH✡MER Nature",close:"إغلاق"}
 };
+var LANG='he';
 function setLang(l){
-  document.documentElement.lang=l;
-  document.documentElement.dir=(l==='en')?'ltr':'rtl';
-  document.querySelectorAll('[data-t]').forEach(function(el){
-    var k=el.getAttribute('data-t'); if(T[l]&&T[l][k]!=null) el.innerHTML=T[l][k];
-  });
-  ['he','en','ar'].forEach(function(x){var b=document.getElementById('L-'+x); if(b)b.classList.toggle('on',x===l);});
-  try{localStorage.setItem('shomerLang',l);}catch(e){}
+  if(!T[l]) return; LANG=l;
+  var d=document.documentElement; d.lang=l; d.dir=(l==='en')?'ltr':'rtl';
+  document.querySelectorAll('[data-t]').forEach(function(el){ var k=el.getAttribute('data-t'); if(T[l][k]!=null) el.innerHTML=T[l][k]; });
+  document.querySelectorAll('[data-ta]').forEach(function(el){ var k=el.getAttribute('data-ta'); if(T[l][k]!=null) el.alt=T[l][k]; });
+  var x=document.querySelector('[data-close]'); if(x) x.setAttribute('aria-label',T[l].close);
+  document.querySelectorAll('.langs button').forEach(function(b){ b.classList.toggle('on',b.getAttribute('data-lang')===l); });
+  try{ localStorage.setItem('shomerLang',l); }catch(e){}
 }
-try{var sl=localStorage.getItem('shomerLang'); if(sl&&sl!=='he')setLang(sl);}catch(e){}
-function joinWL(){
-  var i=document.getElementById('wl'), m=document.getElementById('wlm');
-  var v=(i.value||'').trim();
-  if(!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(v)){ m.style.color='#D93B3B';
-    m.textContent=(currentLangIs('he')?'נא להזין כתובת אימייל תקינה':'Please enter a valid email'); return; }
-  try{ var k='shomerNatureWL', L=JSON.parse(localStorage.getItem(k)||'[]');
-       if(L.indexOf(v)===-1) L.push(v); localStorage.setItem(k, JSON.stringify(L)); }catch(e){}
-  m.style.color='#2F8A10';
-  m.textContent=(currentLangIs('he')?'נרשמת! נעדכן אותך ברגע שנעלה לאוויר.':'You are on the list.');
-  i.value='';
+document.querySelectorAll('.langs button').forEach(function(b){ b.addEventListener('click',function(){ setLang(b.getAttribute('data-lang')); }); });
+setLang('he');
+try{ var sl=localStorage.getItem('shomerLang'); if(sl && sl!=='he' && T[sl]) setLang(sl); }catch(e){}
+
+/* Install: Android gets the APK straight away; iPhone and computers get the install sheet. */
+var ua=navigator.userAgent||'';
+var isIOS=/iPhone|iPad|iPod/i.test(ua)||(navigator.platform==='MacIntel'&&navigator.maxTouchPoints>1);
+var isAnd=/Android/i.test(ua);
+var dlg=document.getElementById('inst');
+function pick(tab){
+  document.querySelectorAll('[data-tab]').forEach(function(b){ b.setAttribute('aria-selected', b.getAttribute('data-tab')===tab?'true':'false'); });
+  ['and','ios','pc'].forEach(function(p){ document.getElementById('p-'+p).hidden=(p!==tab); });
 }
-function currentLangIs(l){ return document.documentElement.lang===l; }
-document.addEventListener('keydown',function(e){
-  if(e.key==='Enter'&&document.activeElement&&document.activeElement.id==='wl') joinWL();
-});
-(function(){
-  var io=new IntersectionObserver(function(es){es.forEach(function(e){
-    if(e.isIntersecting){e.target.style.opacity='1';e.target.style.transform='none';io.unobserve(e.target);}})},{threshold:.14});
-  document.querySelectorAll('.step,.val,.sec-head').forEach(function(e,n){
-    e.style.opacity='0';e.style.transform='translateY(16px)';
-    e.style.transition='opacity .65s ease '+(n%3*.08)+'s, transform .65s ease '+(n%3*.08)+'s';
-    io.observe(e);});
-})();
+function openInstall(){
+  pick(isIOS?'ios':isAnd?'and':'pc');
+  if(dlg.showModal){ try{ dlg.showModal(); }catch(e){ dlg.setAttribute('open',''); } } else dlg.setAttribute('open','');
+}
+function closeInstall(){ if(dlg.close) dlg.close(); else dlg.removeAttribute('open'); }
+document.querySelectorAll('[data-install]').forEach(function(b){ b.addEventListener('click',openInstall); });
+document.querySelectorAll('[data-get]').forEach(function(a){ a.addEventListener('click',function(e){ if(!isAnd){ e.preventDefault(); openInstall(); } }); });
+document.querySelectorAll('[data-tab]').forEach(function(b){ b.addEventListener('click',function(){ pick(b.getAttribute('data-tab')); }); });
+document.querySelector('[data-close]').addEventListener('click',closeInstall);
+dlg.addEventListener('click',function(e){ if(e.target===dlg) closeInstall(); });
+
+/* "Add to Home screen": the browser's own install prompt when it offers one (Chrome / Edge),
+   otherwise the app opens and the person installs it from the browser menu. */
+var deferred=null;
+window.addEventListener('beforeinstallprompt',function(e){ e.preventDefault(); deferred=e; });
+document.querySelectorAll('[data-pwa]').forEach(function(b){ b.addEventListener('click',function(){
+  if(deferred){ deferred.prompt(); deferred.userChoice.finally(function(){ deferred=null; }); }
+  else { location.href='nature.html'; }
+}); });
+if('serviceWorker' in navigator){ try{ navigator.serviceWorker.register('sw.js').catch(function(){}); }catch(e){} }
+if(location.hash==='#get') openInstall();
 </script>
-<script>if('serviceWorker' in navigator)navigator.serviceWorker.register('/shomer-nature/sw.js').catch(()=>{});</script>
 </body>
 </html>
