@@ -80,13 +80,13 @@ header.bar{position:relative;z-index:60;background:var(--bar);border-bottom:1px 
 
 /* ══ HERO ══ */
 .hero{position:relative;background:#0A1630;overflow:visible}
-.hero-bg{position:absolute;top:0;left:0;width:100%;height:clamp(460px,44vw,600px);object-fit:cover;object-position:50% 40%}
-.hero-shade{position:absolute;top:0;left:0;right:0;height:clamp(460px,44vw,600px);background:
-  linear-gradient(270deg,rgba(8,16,36,.80) 0%,rgba(9,18,40,.62) 40%,rgba(10,20,44,.30) 75%,rgba(10,20,44,.15) 100%),
-  linear-gradient(180deg,rgba(8,16,36,.35) 0%,rgba(8,16,36,0) 45%,rgba(8,16,36,.70) 100%)}
+.hero-bg{position:absolute;top:0;left:0;width:100%;height:calc(100% - 60px);min-height:clamp(460px,44vw,600px);object-fit:cover;object-position:40% 50%}
+.hero-shade{position:absolute;top:0;left:0;right:0;height:calc(100% - 60px);min-height:clamp(460px,44vw,600px);background:
+  linear-gradient(270deg,rgba(8,16,36,.90) 0%,rgba(9,18,40,.76) 30%,rgba(10,20,44,.22) 54%,rgba(10,20,44,0) 70%),
+  linear-gradient(180deg,rgba(8,16,36,.30) 0%,rgba(8,16,36,0) 30%,rgba(8,16,36,0) 70%,rgba(8,16,36,.55) 100%)}
 .hero-inner{position:relative;display:grid;grid-template-columns:1fr;justify-items:end;align-items:center;
   min-height:clamp(460px,44vw,600px);margin-bottom:60px;direction:ltr}
-.hero-text{direction:rtl;text-align:right;color:#fff;max-width:600px;padding:30px 0;z-index:3}
+.hero-text{direction:rtl;text-align:right;color:#fff;max-width:540px;padding:30px 0;z-index:3}
 html[dir=ltr] .hero-text{direction:ltr;text-align:left}
 .hero-text .wm-svg{width:clamp(220px,22vw,300px);margin:0 0 14px auto;filter:drop-shadow(0 3px 18px rgba(0,0,0,.6))}
 html[dir=ltr] .hero-text .wm-svg{margin:0 auto 14px 0}
@@ -98,9 +98,18 @@ html[dir=ltr] .hero-text .wm-svg{margin:0 auto 14px 0}
 html[dir=rtl] .hero-text p{margin-inline-start:auto}
 .hero-cta{display:flex;flex-wrap:wrap;gap:12px;margin-top:24px;justify-content:flex-start}
 .hero-meta{margin-top:12px!important;font-size:14px!important;color:#C9D4EA!important}
-.hero-phone{position:absolute;left:3.5%;bottom:-72px;width:clamp(230px,20vw,290px);z-index:6;border-radius:34px;padding:9px;
-  background:linear-gradient(160deg,#1a2438,#05080f);border:1px solid #3A465F;box-shadow:0 34px 66px -20px rgba(0,0,0,.72)}
-.hero-phone img{border-radius:26px;width:100%;aspect-ratio:9/19.5;object-fit:cover;object-position:top}
+.hero-phone{position:absolute;left:3.5%;bottom:-72px;width:clamp(230px,20vw,290px);z-index:6;border-radius:38px;padding:9px;
+  background:linear-gradient(160deg,#2a3550 0%,#0b1120 45%,#05080f 100%);border:1px solid #4A5672;
+  box-shadow:inset 0 0 0 2px #0a0f1b,0 0 0 1px rgba(80,219,15,.18),0 40px 80px -22px rgba(0,0,0,.78),0 0 70px -18px rgba(80,219,15,.35)}
+.hero-phone::before,.hero-phone::after{content:"";position:absolute;width:3px;border-radius:3px;background:linear-gradient(180deg,#5a6684,#2a3348)}
+.hero-phone::before{right:-4px;top:22%;height:13%}
+.hero-phone::after{left:-4px;top:18%;height:8%;box-shadow:0 52px 0 #3a4560}
+.hero-phone img{border-radius:30px;width:100%;aspect-ratio:9/19.5;object-fit:cover;object-position:top}
+.hp-island{position:absolute;top:17px;left:50%;transform:translateX(-50%);width:30%;height:16px;border-radius:999px;background:#03050a;z-index:2;opacity:.92}
+.hero-chips{list-style:none;display:flex;flex-wrap:wrap;gap:8px;margin-top:18px}
+.hero-chips li{display:inline-flex;align-items:center;gap:7px;padding:6px 13px 6px 11px;border-radius:999px;font-size:14.5px;font-weight:700;color:#fff;
+  background:rgba(8,16,36,.55);border:1px solid color-mix(in srgb,var(--tc) 55%,transparent);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px)}
+.hero-chips .ic{width:17px;height:17px;color:var(--tc)}
 
 /* ══ PRINCIPLE (white, image + orange/green blocks) ══ */
 .arrive{background:#fff;padding:clamp(66px,8.5vw,124px) 0}
@@ -124,22 +133,46 @@ html[dir=ltr] .arrive-inner{direction:ltr}
 .adv .sub{text-align:center;color:var(--navy-text);font-size:clamp(16px,1.3vw,19px);margin-bottom:clamp(36px,4.5vw,64px)}
 .types{display:grid;grid-template-columns:repeat(4,1fr);gap:clamp(14px,1.8vw,24px)}
 .type{background:rgba(255,255,255,.04);border:1px solid rgba(185,198,224,.18);border-radius:22px;padding:22px 18px;text-align:center;transition:border-color .2s,background .2s}
-.type[open]{border-color:rgba(80,219,15,.55);background:rgba(80,219,15,.06)}
+.type[open]{border-color:color-mix(in srgb,var(--tc,var(--green)) 60%,transparent);background:color-mix(in srgb,var(--tc,var(--green)) 7%,transparent)}
 .type summary{list-style:none;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:10px}
 .type summary::-webkit-details-marker{display:none}
-.t-ic{width:78px;height:78px;border:2px solid var(--green);border-radius:50%;display:flex;align-items:center;justify-content:center;color:var(--green)}
+.t-ic{width:78px;height:78px;border:1.5px solid color-mix(in srgb,var(--tc,var(--green)) 60%,transparent);border-radius:24px;display:flex;align-items:center;justify-content:center;color:var(--tc,var(--green));
+  background:color-mix(in srgb,var(--tc,var(--green)) 16%,transparent);box-shadow:0 10px 26px -12px color-mix(in srgb,var(--tc,var(--green)) 70%,transparent)}
 .t-ic .ic{width:36px;height:36px;stroke-width:1.7}
 .type h3{font-size:clamp(17px,1.4vw,21px);color:#fff}
 .type .ts{font-size:14.5px;color:var(--navy-text)}
-.type .more{display:inline-flex;align-items:center;gap:4px;font-size:13px;color:var(--green);font-weight:700}
+.type .more{display:inline-flex;align-items:center;gap:4px;font-size:13px;color:var(--tc,var(--green));font-weight:700}
 .type .more .ic{width:15px;height:15px;transition:transform .2s}
 .type[open] .more .ic{transform:rotate(180deg)}
 .type p{margin-top:12px;font-size:15px;line-height:1.7;color:#DCE4F3;text-align:start}
-.type.uxo .t-ic{border-color:var(--orange);color:var(--orange)}
-.type.uxo[open]{border-color:rgba(252,153,24,.6);background:rgba(252,153,24,.07)}
 .types-note{margin:clamp(28px,3vw,40px) auto 0;max-width:720px;text-align:center;font-size:15px;color:var(--navy-text);
   border:1px solid rgba(185,198,224,.22);border-radius:16px;padding:14px 20px}
 .types-note b{color:#fff}
+
+
+/* ══ REAL MOMENTS (white, icon-led cards, linked to the news source) ══ */
+.moments{background:#fff;padding:clamp(64px,8vw,116px) 0;background-image:radial-gradient(1200px 380px at 50% 0,rgba(80,219,15,.07),transparent 70%)}
+.m-kick{display:block;text-align:center;font-size:14px;color:var(--orange);font-weight:700;letter-spacing:.06em;margin-bottom:10px}
+.moments .sec-h{color:var(--ink)}
+.m-sub{text-align:center;color:var(--ink-soft);font-size:clamp(16px,1.3vw,19px);max-width:62ch;margin:0 auto clamp(32px,4vw,56px)}
+.m-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:clamp(14px,1.8vw,24px)}
+.m-card{position:relative;display:flex;flex-direction:column;gap:10px;background:#fff;border:1px solid #E3E7EF;border-radius:22px;padding:22px 20px 18px;
+  box-shadow:0 22px 44px -28px rgba(20,30,60,.45);overflow:hidden}
+.m-card::before{content:"";position:absolute;inset:0 0 auto 0;height:5px;background:var(--tc)}
+.m-top{display:flex;align-items:center;gap:12px}
+.m-ic{flex:none;width:56px;height:56px;border-radius:18px;display:flex;align-items:center;justify-content:center;color:var(--tc);
+  background:color-mix(in srgb,var(--tc) 14%,#fff);border:1.5px solid color-mix(in srgb,var(--tc) 45%,#fff)}
+.m-ic .ic{width:28px;height:28px;stroke-width:1.8;filter:brightness(.82)}
+.m-where{font-size:13.5px;font-weight:700;color:var(--ink-soft)}
+.m-card h3{font-size:clamp(18px,1.45vw,21px);color:var(--ink);line-height:1.3}
+.m-story{color:var(--ink-soft);font-size:15.5px;line-height:1.65}
+.m-how{display:flex;gap:8px;align-items:flex-start;margin-top:auto;background:var(--light);border-radius:14px;padding:10px 12px;font-size:14.5px;color:var(--ink);line-height:1.55}
+.m-how .ic{flex:none;width:18px;height:18px;margin-top:2px;color:var(--green-d)}
+.m-src{display:inline-flex;align-items:center;gap:5px;font-size:13.5px;font-weight:700;color:var(--green-d);padding:6px 0;align-self:flex-start}
+.m-src:hover{text-decoration:underline}
+.m-src .ic{width:14px;height:14px}
+.m-note{margin:clamp(26px,3vw,38px) auto 0;max-width:720px;text-align:center;font-size:14.5px;color:var(--ink-soft)}
+.m-cta{display:flex;justify-content:center;margin-top:20px}
 
 /* ══ FOR WHOM (light band, photo cards) ══ */
 .whom{background:var(--light);padding:clamp(60px,8vw,110px) 0}
@@ -269,6 +302,7 @@ dialog#inst::backdrop{background:rgba(6,15,30,.72)}
 @media (max-width:980px){
   .types{grid-template-columns:repeat(2,1fr)}
   .cards{grid-template-columns:1fr;max-width:520px;margin:0 auto}
+  .m-grid{grid-template-columns:repeat(2,1fr)}
   .inst-grid{grid-template-columns:1fr}
   .fam-card{grid-template-columns:1fr;text-align:center;justify-items:center}
   .car-track{justify-content:flex-start}
@@ -296,12 +330,19 @@ dialog#inst::backdrop{background:rgba(6,15,30,.72)}
   .bar-left{gap:10px}
   .bar-left .btn-orange{font-size:13px;min-height:44px;padding:0 14px}
   .hero-cta .btn-orange,.hero-cta .btn-line{width:100%;max-width:340px}
+  /* hero: text on the dark top, the kitten and puppy in the middle, the phone overlaps the bottom */
+  .hero-bg,.hero-shade{height:calc(100% - 330px);min-height:560px;object-position:50% 100%}
+  .hero-shade{background:linear-gradient(180deg,rgba(8,16,36,.86) 0%,rgba(8,16,36,.74) 34%,rgba(8,16,36,.30) 50%,rgba(8,16,36,0) 60%,rgba(8,16,36,0) 84%,rgba(8,16,36,.45) 100%)}
+  .hero-text>p[data-t=sub],.hero-meta,.hero-chips,.hero-cta .btn-line{display:none!important}
+  .hero-phone{margin-top:250px}
   .types{grid-template-columns:1fr 1fr;gap:12px}
   .type{padding:16px 10px}
   .t-ic{width:62px;height:62px}.t-ic .ic{width:30px;height:30px}
   .type.uxo,.type.lost{grid-column:1/-1}
   .type p{font-size:14.5px}
   .qrbox{flex-direction:column;text-align:center}
+  .m-grid{grid-template-columns:1fr}
+  .m-cta .btn-orange{width:100%;max-width:340px}
   .inst .qr{display:none}
 }
 @media (prefers-reduced-motion:reduce){*{scroll-behavior:auto!important;transition:none!important}}
@@ -350,17 +391,23 @@ dialog#inst::backdrop{background:rgba(6,15,30,.72)}
 <!-- ══ HERO ══ -->
 <section class="hero">
   <picture>
-    <source media="(max-width:860px)" srcset="../nature-v2/img/dog.jpg">
-    <img class="hero-bg" src="../SHOMERNature_BannerBIG.jpg" alt="" aria-hidden="true">
+    <source media="(max-width:620px)" srcset="img/landing/hero-pets-tall.jpg">
+    <img class="hero-bg" src="img/landing/hero-pets-wide.jpg" alt="" aria-hidden="true" width="2400" height="1000" fetchpriority="high">
   </picture>
   <div class="hero-shade"></div>
   <div class="wrap hero-inner">
-    <div class="hero-phone"><img src="img/landing/app-map.jpg" alt="מסך המפה של SH✡MER Nature" data-ta="altmap" loading="eager" width="540" height="1169"></div>
+    <div class="hero-phone"><span class="hp-island" aria-hidden="true"></span><img src="img/landing/app-report.jpg" alt="מסך הדיווח של SH✡MER Nature" data-ta="altrep" loading="eager" width="540" height="1169"></div>
     <div class="hero-text">
       <svg class="wm-svg" role="img" aria-label="SH✡MER Nature" id="nwl-Layer_2" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 1006.47 279.8"> <defs> <style> .nwl-c-1 { fill: url(#nwl-linear-gradient-8); } .nwl-c-2 { fill: url(#nwl-linear-gradient-7); } .nwl-c-3 { fill: url(#nwl-linear-gradient-5); } .nwl-c-4 { fill: url(#nwl-linear-gradient-6); } .nwl-c-5 { fill: url(#nwl-linear-gradient-4); } .nwl-c-6 { fill: url(#nwl-linear-gradient-3); } .nwl-c-7 { fill: url(#nwl-linear-gradient-2); } .nwl-c-8 { fill: url(#nwl-linear-gradient); } .nwl-c-9 { fill: #fff; } .nwl-c-10 { fill: #50db0f; } </style> <linearGradient id="nwl-linear-gradient" x1="366.82" y1="10.85" x2="366.82" y2="73.9" gradientUnits="userSpaceOnUse"> <stop offset="0" stop-color="#faac22"/> <stop offset="1" stop-color="#50db0f"/> </linearGradient> <linearGradient id="nwl-linear-gradient-2" x1="397.07" y1="262.98" x2="397.07" y2="198.45" xlink:href="#nwl-linear-gradient"/> <linearGradient id="nwl-linear-gradient-3" x1="666.14" y1="232.55" x2="671.64" y2="279.3" gradientUnits="userSpaceOnUse"> <stop offset="0" stop-color="#50db0f"/> <stop offset="1" stop-color="#0b5a5f"/> </linearGradient> <linearGradient id="nwl-linear-gradient-4" x1="741.81" y1="223.65" x2="747.31" y2="270.4" xlink:href="#nwl-linear-gradient-3"/> <linearGradient id="nwl-linear-gradient-5" x1="800.15" y1="216.79" x2="805.65" y2="263.54" xlink:href="#nwl-linear-gradient-3"/> <linearGradient id="nwl-linear-gradient-6" x1="850.96" y1="210.81" x2="856.46" y2="257.56" xlink:href="#nwl-linear-gradient-3"/> <linearGradient id="nwl-linear-gradient-7" x1="918.1" y1="202.91" x2="923.6" y2="249.66" xlink:href="#nwl-linear-gradient-3"/> <linearGradient id="nwl-linear-gradient-8" x1="974.25" y1="196.31" x2="979.75" y2="243.05" xlink:href="#nwl-linear-gradient-3"/> </defs> <g id="nwl-Layer_1-2" data-name="Layer 1"> <g> <g> <g> <path class="nwl-c-9" d="M73.29,117.37c-1.04-4.74-2.35-9.06-3.91-12.97-1.56-3.91-3.49-7.29-5.77-10.13-2.28-2.84-4.89-5.03-7.82-6.57-2.93-1.54-6.22-2.31-9.87-2.31-7.56,0-13.42,1.4-17.59,4.18-4.17,2.79-6.25,6.44-6.25,10.94,0,3.2.71,5.82,2.15,7.83,1.43,2.02,3.52,3.83,6.25,5.43,2.74,1.6,6.09,3.08,10.07,4.45,3.97,1.37,8.44,2.94,13.39,4.71,5.6,2.02,10.75,4.04,15.44,6.05,4.69,2.02,8.7,4.45,12.02,7.3s5.89,6.29,7.72,10.32c1.82,4.03,2.74,9.13,2.74,15.3s-1.08,11.21-3.23,15.84c-2.15,4.63-5.21,8.57-9.19,11.84-3.98,3.26-8.73,5.75-14.27,7.47-5.54,1.72-11.63,2.58-18.27,2.58-4.82,0-9.48-.53-13.97-1.6s-8.44-2.96-11.82-5.69c-2.61,1.66-5.31,3.14-8.11,4.44-2.8,1.3-5.7,2.37-8.7,3.2-1.56-4.15-2.67-8.32-3.32-12.53-.65-4.2-.98-8.56-.98-13.06,0-3.08.1-6.1.29-9.06.2-2.96.55-5.98,1.08-9.06h12.7c0,3.91.55,7.88,1.66,11.9,1.11,4.03,2.9,7.73,5.37,11.11,2.47,3.38,5.7,6.13,9.68,8.26,3.97,2.13,8.76,3.2,14.37,3.2,5.08,0,9.35-.5,12.8-1.51,3.45-1.01,6.25-2.4,8.4-4.18,2.15-1.78,3.71-3.82,4.69-6.13.98-2.31,1.47-4.77,1.47-7.37,0-4.15-1.17-7.61-3.52-10.39-2.35-2.78-6.19-5-11.53-6.66-7.95-2.49-15.25-4.94-21.89-7.37-6.65-2.43-12.41-5.33-17.3-8.71-4.89-3.38-8.7-7.37-11.43-11.99-2.74-4.62-4.1-10.31-4.1-17.06,0-5.09,1.08-9.68,3.23-13.77,2.15-4.09,5.05-7.55,8.7-10.39,3.65-2.84,7.92-5,12.8-6.49,4.89-1.48,10.07-2.22,15.54-2.22,4.82,0,9.45.8,13.88,2.4,4.43,1.6,8.14,4.29,11.14,8.08,1.43-2.37,3.52-4.32,6.25-5.86,2.74-1.54,5.47-2.67,8.21-3.38,1.95,5.69,3.16,12.11,3.62,19.28.46,7.17.68,13.95.68,20.34h-13.49Z"/> <path class="nwl-c-9" d="M191.93,196.98v-7.46c12.77,0,19.16-3.61,19.16-10.84v-35.89c-1.3-.59-3.1-1.09-5.38-1.51-2.28-.41-4.98-.62-8.11-.62h-23.45c-4.82,0-9.06.71-12.7,2.13v35.89c0,7.23,5.86,10.84,17.59,10.84v7.46h-69.39v-7.46c13.16,0,19.74-3.61,19.74-10.84v-77.65c0-9.36-6.58-14.04-19.74-14.04v-7.82h69.39v7.82c-11.73,0-17.59,4.7-17.59,14.09v29.08c1.95.59,3.91,1.01,5.86,1.25,1.95.24,4.23.36,6.84.36h23.45c6.77,0,11.27-.47,13.49-1.43v-29.26c0-9.4-6.39-14.09-19.16-14.09v-7.82h62.68l6.31,7.82c-11.86,0-17.79,4.68-17.79,14.04v77.65c0,7.23,5.93,10.84,17.79,10.84l-5.03,7.46h-63.96Z"/> </g> <g id="nwl-tiLNYP"> <g> <polygon class="nwl-c-10" points="428.57 208.04 438.58 190.54 471.74 190.59 414.86 91.97 435.09 92.04 502.02 208.07 428.57 208.04"/> <polygon class="nwl-c-10" points="292.15 86.13 348.92 184.52 328.85 184.62 261.87 68.58 335.29 68.63 325.36 86.11 292.15 86.13"/> <polygon class="nwl-c-10" points="404.53 190.54 394.42 208.07 261.93 208.07 298.67 144.34 308.66 161.86 292.16 190.56 404.53 190.54"/> <path class="nwl-c-10" d="M455.16,114.87l16.8-28.7c-.59-.11-112.44-.06-112.44-.06l9.97-17.53h132.52s-36.77,63.65-36.77,63.65l-10.08-17.36Z"/> <polygon class="nwl-c-8" points="325.78 132.35 315.67 114.9 381.94 0 417.97 62.53 397.95 62.58 381.9 35.02 325.78 132.35"/> <polygon class="nwl-c-7" points="345.94 214.14 365.99 214 381.99 241.66 438.15 144.33 448.21 161.86 381.93 276.64 345.94 214.14"/> </g> </g> </g> <g> <path class="nwl-c-6" d="M698.38,198.34l4.85,47.13c.43,4.82-.21,9.88-1.91,15.17-2.28,6.69-5.64,10.28-10.08,10.79-6.6.76-13.72-3.51-21.36-12.82-5.53-6.89-11.45-16.61-17.75-29.16-3.74-8.2-7.53-16.39-11.39-24.58-.4,18.85-.23,31.44.49,37.77,1.6,13.97,3.45,21.89,5.55,23.75,2.1,1.86,3.21,3.28,3.32,4.27.24,2.08-.75,4.04-2.97,5.9-2.22,1.86-4.53,2.92-6.93,3.2-3.36.38-6.49-2.52-9.39-8.71-2.26-4.83-3.62-9.32-4.1-13.47-.21-1.85-.47-4.62-.77-8.29-.3-3.67-.55-6.43-.77-8.29-.51-4.48-.67-11.2-.48-20.18.18-8.98.03-15.71-.49-20.18l-2.29-19.98c-.03-.22-.15-.53-.38-.95-.23-.41-.36-.73-.38-.95-.25-2.18,1.17-4.17,4.25-5.96,2.5-1.5,5.08-2.41,7.72-2.71,6.12-.7,10.71.6,13.77,3.9.86,1.12,1.8,3.55,2.84,7.31.66,2.58,1.33,5.21,2,7.9,2.33,7.59,7.54,19.6,15.62,36.04,9.63,19.36,16.26,28.83,19.86,28.42,1.32-.15,1.81-1.76,1.45-4.82-.1-.88-5.2-53.42-5.2-53.42-.4-6.71.11-13.42,1.53-20.12,2.08-9.43,5.76-14.46,11.05-15.06.02,0,.03,0,.05,0,3.17-.33,5.45,3.2,3.91,6-4.96,9.01-2.22,26.73-1.6,32.12Z"/> <path class="nwl-c-5" d="M775.5,231.7c-.95,14.14-2.1,24.09-3.45,29.83-.83,3.36-3.48,4.89-7.94,4.59-6.76-.45-9.56-3.72-8.43-9.81-6.21,2.23-12.56,3.12-19.08,2.69-6.27-.42-12.15-2.25-17.62-5.48-6.53-3.85-9.61-8.41-9.26-13.67.35-5.15,4.53-9.72,12.55-13.7,7.26-3.59,13.97-5.17,20.12-4.76l15.38,1.03.26-3.92c.88-11.41-2.47-17.38-10.07-17.89-9.53-.64-14.56,3.06-15.1,11.09-.18,2.71-1.96,3.96-5.34,3.73-2.05-.14-4.13-1.13-6.25-2.98-2.12-1.85-3.11-3.7-2.99-5.57.41-6.14,3.16-11.02,8.25-14.64,5.09-3.62,11.01-5.21,17.76-4.76,22.67,1.52,33.07,16.26,31.2,44.21ZM756.84,236.39c.15-2.19-1.59-3.41-5.21-3.65-15.08-1.01-22.83,1.72-23.26,8.19-.24,3.51,2.96,5.48,9.59,5.93,4.1.28,8.03-.51,11.79-2.35,4.5-2.01,6.86-4.72,7.09-8.11Z"/> <path class="nwl-c-3" d="M820.75,194.82c.34,2.95-4.35,5.59-14.06,7.91.04,2.43.55,7.9,1.52,16.42l1.24,10.81c.25,2.18.98,5.36,2.19,9.54,1.21,4.18,1.93,7.3,2.17,9.37.2,1.75-.58,3.41-2.35,5-1.76,1.59-3.61,2.49-5.53,2.71-3,.34-5.79-1.71-8.37-6.17-1.97-3.42-3.15-6.83-3.54-10.21l-3.97-34.71c-5.61-.13-8.85-.26-9.72-.38-3.22-.51-4.93-1.59-5.12-3.23-.05-.43.01-.94.19-1.51,2.66-4.39,5.91-6.81,9.75-7.25.24-.03.6-.07,1.08-.12.49.06.86.07,1.1.04,2.52-.29,3.41-3.1,2.68-8.44l-1.37-11.95c-.74-1.13-1.16-2.13-1.26-3.01-.16-1.42.61-2.81,2.32-4.16,1.71-1.36,3.4-2.13,5.07-2.32,2.5-.29,5,.51,7.5,2.38,2.5,1.87,3.9,4.01,4.17,6.41.3,2.62.15,5.27-.46,7.93-.61,2.67-.7,5.36-.26,8.08l.08.66c9.47-.2,14.45,1.89,14.95,6.25Z"/> <path class="nwl-c-4" d="M877.37,185.88c.39,3.38.52,8.52.4,15.43-.12,6.91.02,12.11.42,15.59.35,3.05,1.02,7.58,2.01,13.59.99,6.01,1.66,10.48,1.99,13.42.29,2.5-1.91,4.03-6.59,4.56-4.8.55-8.1-1.17-9.9-5.17-4.25,3.25-8.54,5.12-12.86,5.62-3.48.4-7.55,0-12.18-1.18-4.64-1.18-7.99-2.87-10.07-5.07-4.01-4.19-6.59-11.35-7.75-21.51-.41-3.57-.55-4.04-.56-13.88,0-1.48.6-3.03,1.89-3.77,6.55-3.72,16.1-4.78,15.51,12.45-.12,3.57.64,9.67.64,9.67.3,2.62,1.39,5.26,3.28,7.92,2.29,3.06,4.76,4.43,7.41,4.13,5.16-.59,8.66-4.03,10.5-10.33,1.21-4.34,1.47-9.46.8-15.35l-2.25-19.65c-.18-1.57-1.58-11,.86-12.42,1.37-.79,2.74-1.27,4.13-1.43,2.88-.33,5.59.19,8.12,1.55,2.53,1.37,3.94,3.3,4.22,5.8Z"/> <path class="nwl-c-2" d="M939.07,178.01s0,.02,0,.02c.27,2.41-.52,4.86-2.18,6.62-1.57,1.67-3.28,2.61-5.13,2.82-.91.1-1.81.01-2.69-.28-2.11-.69-3.67-2.5-4.3-4.63-1.04-3.49-3.09-5.06-6.16-4.71-2.16.25-4.21,5.74-6.14,16.46-.92,4.75-.91,11.22.03,19.41.89,7.75,1.82,12.4,2.79,13.95,1.13,1.97,1.75,3.34,1.83,4.1.21,1.86-.54,3.46-2.25,4.82-1.71,1.36-3.7,2.17-5.96,2.42-6.42.74-9.95-1.62-10.57-7.08-.06-.54,0-1.33.19-2.34.18-1.02.26-1.74.21-2.18-.64-5.57-1.88-13.8-3.74-24.7-1.86-10.9-3.1-19.08-3.72-24.54-.56-4.91,2.4-7.74,8.88-8.48,3.84-.44,6.6.3,8.28,2.2,2.97-3.77,6.56-5.89,10.77-6.38,2.88-.33,5.72.07,8.53,1.18,1.9.67,4.22,2.31,6.95,4.93,2.73,2.62,4.19,4.75,4.38,6.38Z"/> <path class="nwl-c-1" d="M1006.4,211.4c.62,5.46-2.97,10.19-10.79,14.17-6.09,3.13-12.62,5.09-19.58,5.89-18.49,2.12-28.83-6.38-31.02-25.48-.9-7.86.2-16.83,3.3-26.92,3.81-12.38,9.38-18.99,16.71-19.83,6.6-.76,14.02,1.11,22.26,5.58,8.24,4.48,12.69,9.61,13.35,15.39.82,7.2-2.06,13.34-8.66,18.41-5.81,4.54-13.03,7.3-21.68,8.29-1.68.19-4.49-.42-8.42-1.86,1.67,10.32,5.62,15.12,11.87,14.4,5.28-.6,10.32-2.56,15.11-5.88,4.79-3.31,7.91-5.05,9.35-5.22,5.16-.59,7.89.42,8.19,3.04ZM983.22,182.7c-.31-2.73-1.48-5.22-3.5-7.48-2.02-2.26-4.47-3.22-7.36-2.89-3.96.45-6.84,2.39-8.64,5.8-1.49,2.94-2.02,6.26-1.59,9.97.24,2.07,1.21,3.68,2.92,4.81,1.71,1.13,3.77,1.56,6.17,1.28,8.76-1,12.77-4.83,12.01-11.49Z"/> </g> <g> <path class="nwl-c-9" d="M967.09,187.53c.08.68.29.93.71,1.21.35.23.94.54,2.04.54.23,0,.48-.02.74-.04,1.12-1.26,2.06-2.56,2.77-3.89,1.17-2.19,1.76-4.11,1.76-5.77l-4.97-1.37c-.82.52-1.46,1.25-2,2.27-1.01,1.99-1.36,4.33-1.05,7.07Z"/> <path class="nwl-c-9" d="M941.07,187.44c-.18.22-.35.44-.55.65-2.4,2.54-5.16,4.01-8.2,4.35-.43.05-.87.07-1.29.07-1.19,0-2.37-.19-3.52-.56-.28-.09-.55-.21-.82-.33,1.29,1.47,2.89,2.78,4.83,3.93,2.09,1.24,4.85,2.13,8.25,2.69.14-3.45.57-7.05,1.29-10.8Z"/> <path class="nwl-c-9" d="M853.35,96.94v82.27c0,6.87-5.6,10.31-16.81,10.31v7.46h19l-.46-4.04-.05-.43c-1.05-8.35-.88-14.42,3.37-16.88,1.96-1.14,4-1.83,6.06-2.07.75-.08,1.49-.13,2.23-.13,3.09,0,6.06.76,8.83,2.25,5.03,2.72,6.49,6.74,6.82,9.64.33,2.84.48,6.69.47,11.66h6.17c-1-6.13-1.77-11.24-2.3-15.28-.18-.7-.27-1.46-.28-2.26-.03-.23-.06-.47-.08-.69-.17-1.47-.13-2.78.07-3.95v-32.89c.65-.83,2.21-1.24,4.69-1.24,4.56,0,8.31,1.1,11.24,3.29,2.93,2.19,5.54,5.33,7.82,9.42,1.37,2.46,2.7,5.21,4.01,8.25,1.44-.52,2.94-.87,4.51-1.05.84-.1,1.69-.14,2.53-.14,2.8,0,5.61.54,8.33,1.61,2.58.93,5.41,2.89,8.65,6,3.31,3.17,5.15,5.91,5.73,8.54,1.42-4.39,3.1-8.14,5.03-11.26-1.02-3.5-2.38-7.02-4.09-10.57-1.3-2.6-2.77-4.88-4.4-6.83-1.63-1.95-3.62-3.61-5.96-4.97-2.35-1.36-5.21-2.45-8.6-3.28-3.39-.83-7.43-1.54-12.12-2.13,11.6-1.3,20.78-4.48,27.56-9.52,6.77-5.04,10.16-11.59,10.16-19.65,0-4.27-.68-8.21-2.05-11.83-1.37-3.61-3.59-6.76-6.65-9.43-3.06-2.67-7.01-4.77-11.82-6.32-4.82-1.54-10.62-2.31-17.4-2.31s-11.89.03-16.12.09c-4.24.06-7.98.15-11.24.27-3.26.12-6.39.21-9.38.27-3,.06-6.65.09-10.95.09h-30.69v7.82c12.12,0,18.18,3.32,18.18,9.95ZM886.38,96.98c0-5.83,1.95-8.74,5.86-8.74h3.91c3,0,5.8.33,8.41.98,2.6.66,4.85,1.78,6.74,3.39,1.89,1.6,3.39,3.78,4.5,6.51,1.11,2.74,1.66,6.19,1.66,10.35,0,5.11-.56,9.16-1.66,12.13-1.11,2.98-2.67,5.21-4.69,6.69-2.02,1.49-4.43,2.44-7.23,2.85-2.8.42-5.96.62-9.48.62h-4.89c-1.69,0-2.74-.59-3.13-1.78v-33Z"/> </g> <g> <path class="nwl-c-9" d="M762.11,187.09c4.09,2.17,7.54,5.06,10.32,8.69,3.29-4.53,7.36-7.11,12.15-7.65l.68-.08c.01-.6-.02-1.49-.19-2.74-.27.07-.53.14-.81.21-4.76,1.13-11.11,1.69-19.06,1.69-1.09,0-2.12-.04-3.09-.11Z"/> <path class="nwl-c-9" d="M718.49,100.32v78.89c0,6.56-5.36,9.98-16.05,10.28.23,2.71.52,5.07.72,6.67.04.29.07.56.1.82h12.61c1.74-3.41,4.33-6.36,7.78-8.81,5.36-3.82,11.57-5.76,18.44-5.76.84,0,1.7.03,2.56.09,2.72.18,5.28.55,7.7,1.09-1.19-1.29-1.8-2.92-1.8-4.91v-33.23c0-2.84,2.21-4.44,6.65-4.8,3.52.12,6.51.42,8.99.89,2.47.47,4.53,1.36,6.16,2.67,1.63,1.31,2.9,3.2,3.81,5.69.91,2.49,1.56,5.75,1.95,9.77h11.34v-47.44h-11.34c-.39,4.26-1.24,7.64-2.54,10.13-1.3,2.49-2.97,4.35-4.98,5.6-2.02,1.24-4.33,2.04-6.94,2.4-2.61.36-5.47.53-8.6.53s-4.5-1.42-4.5-4.25v-31.14c0-2.12,1.17-3.74,3.52-4.86,2.34-1.12,5.67-1.68,9.97-1.68,4.95,0,9.45.15,13.49.44,4.04.3,7.62,1.24,10.75,2.84,3.13,1.6,5.8,4.15,8.01,7.64,2.21,3.5,3.91,8.5,5.08,15.01l11.92-.89-1.56-34.83h-112.19v7.82c12.64,0,18.96,4.44,18.96,13.33Z"/> <path class="nwl-c-9" d="M807.06,163.02c2.52,2.4,4,5.19,4.36,8.32.36,3.17.18,6.41-.55,9.61-.21.92-.34,1.82-.39,2.73,1.97.15,3.95.46,5.81.97l3.64-24.46-11.14-1.42c-.58,1.48-1.16,2.89-1.73,4.25Z"/> </g> <path class="nwl-c-9" d="M635.54,164.93c.21,0,.43-.02.64-.02,6.03,0,10.87,1.91,14.36,5.69l.16.17.14.19c1.29,1.69,2.43,4.47,3.69,9.01.68,2.64,1.33,5.24,2,7.89.78,2.51,1.9,5.56,3.35,9.12h18.69c-.04-.45-.08-.82-.11-1.08v-.18c-.14-2.09-.17-4.18-.13-6.28-9.73-.59-14.73-4.89-14.97-12.89l-2.35-80.31c0-1.18.2-2.31.59-3.38.39-1.07,1.27-2.04,2.64-2.93,1.37-.89,3.23-1.6,5.57-2.13,2.35-.53,5.47-.8,9.38-.8v-7.82h-46.13l-36.35,86-37.72-86h-48.16l-4.22,7.82c4.69,0,8.34.24,10.95.71,2.6.47,4.53,1.1,5.77,1.87,1.24.77,1.95,1.72,2.15,2.84.2,1.13.29,2.4.29,3.82l-1.56,77.65c-.13,5.33-1.76,9.27-4.89,11.82-3.13,2.55-7.62,3.82-13.49,3.82l4.09,7.46h44.58v-7.46c-12.77,0-19.15-4.74-19.15-14.21l.78-71.25,41.83,92.93h17.59l38.7-93.46,1.29,61.41Z"/> </g> </g> </svg>
       <span class="hero-eb"><svg class="ic" aria-hidden="true"><use href="#i-leaf"/></svg><span data-t="eb">גרסת בטא · חינם</span></span>
       <h1 data-t="h1">שומרים על מי שאין לו קול.</h1>
       <p data-t="sub"></p>
+      <ul class="hero-chips" aria-hidden="true">
+        <li style="--tc:#50DB0F"><svg class="ic"><use href="#i-paw"/></svg><span data-t="t1"></span></li>
+        <li style="--tc:#FC9918"><svg class="ic"><use href="#i-fire"/></svg><span data-t="t2c"></span></li>
+        <li style="--tc:#FAAC22"><svg class="ic"><use href="#i-dump"/></svg><span data-t="t3c"></span></li>
+        <li style="--tc:#7FA6F2"><svg class="ic"><use href="#i-lost"/></svg><span data-t="t8"></span></li>
+      </ul>
       <div class="hero-cta">
         <a class="btn-orange" href="../nature-v2/SHOMER-Nature.apk" download="SHOMER-Nature.apk" data-get>
           <svg class="ic" aria-hidden="true"><use href="#i-down"/></svg><span data-t="cta">להורדה - חינם!</span>
@@ -393,16 +440,57 @@ dialog#inst::backdrop{background:rgba(6,15,30,.72)}
     <h2><span data-t="h2a">על מה מדווחים ב-</span><span class="wordmark">SH<span class="star">✡</span>MER<em>Nature</em></span></h2>
     <p class="sub" data-t="h2as">לחצו על כל סוג לפרטים.</p>
     <div class="types">
-      <details class="type"><summary><span class="t-ic"><svg class="ic"><use href="#i-paw"/></svg></span><h3 data-t="t1"></h3><span class="ts" data-t="t1s"></span><span class="more"><span data-t="more">פרטים</span><svg class="ic"><use href="#i-chev"/></svg></span></summary><p data-t="t1d"></p></details>
-      <details class="type"><summary><span class="t-ic"><svg class="ic"><use href="#i-fire"/></svg></span><h3 data-t="t2"></h3><span class="ts" data-t="t2s"></span><span class="more"><span data-t="more">פרטים</span><svg class="ic"><use href="#i-chev"/></svg></span></summary><p data-t="t2d"></p></details>
-      <details class="type"><summary><span class="t-ic"><svg class="ic"><use href="#i-dump"/></svg></span><h3 data-t="t3"></h3><span class="ts" data-t="t3s"></span><span class="more"><span data-t="more">פרטים</span><svg class="ic"><use href="#i-chev"/></svg></span></summary><p data-t="t3d"></p></details>
-      <details class="type"><summary><span class="t-ic"><svg class="ic"><use href="#i-water"/></svg></span><h3 data-t="t4"></h3><span class="ts" data-t="t4s"></span><span class="more"><span data-t="more">פרטים</span><svg class="ic"><use href="#i-chev"/></svg></span></summary><p data-t="t4d"></p></details>
-      <details class="type"><summary><span class="t-ic"><svg class="ic"><use href="#i-med"/></svg></span><h3 data-t="t5"></h3><span class="ts" data-t="t5s"></span><span class="more"><span data-t="more">פרטים</span><svg class="ic"><use href="#i-chev"/></svg></span></summary><p data-t="t5d"></p></details>
-      <details class="type"><summary><span class="t-ic"><svg class="ic"><use href="#i-trail"/></svg></span><h3 data-t="t6"></h3><span class="ts" data-t="t6s"></span><span class="more"><span data-t="more">פרטים</span><svg class="ic"><use href="#i-chev"/></svg></span></summary><p data-t="t6d"></p></details>
-      <details class="type uxo"><summary><span class="t-ic"><svg class="ic"><use href="#i-debris"/></svg></span><h3 data-t="t7"></h3><span class="ts" data-t="t7s"></span><span class="more"><span data-t="more">פרטים</span><svg class="ic"><use href="#i-chev"/></svg></span></summary><p data-t="t7d"></p></details>
-      <details class="type lost"><summary><span class="t-ic"><svg class="ic"><use href="#i-lost"/></svg></span><h3 data-t="t8"></h3><span class="ts" data-t="t8s"></span><span class="more"><span data-t="more">פרטים</span><svg class="ic"><use href="#i-chev"/></svg></span></summary><p data-t="t8d"></p></details>
+      <details class="type" style="--tc:#50DB0F"><summary><span class="t-ic"><svg class="ic"><use href="#i-paw"/></svg></span><h3 data-t="t1"></h3><span class="ts" data-t="t1s"></span><span class="more"><span data-t="more">פרטים</span><svg class="ic"><use href="#i-chev"/></svg></span></summary><p data-t="t1d"></p></details>
+      <details class="type" style="--tc:#FC9918"><summary><span class="t-ic"><svg class="ic"><use href="#i-fire"/></svg></span><h3 data-t="t2"></h3><span class="ts" data-t="t2s"></span><span class="more"><span data-t="more">פרטים</span><svg class="ic"><use href="#i-chev"/></svg></span></summary><p data-t="t2d"></p></details>
+      <details class="type" style="--tc:#FAAC22"><summary><span class="t-ic"><svg class="ic"><use href="#i-dump"/></svg></span><h3 data-t="t3"></h3><span class="ts" data-t="t3s"></span><span class="more"><span data-t="more">פרטים</span><svg class="ic"><use href="#i-chev"/></svg></span></summary><p data-t="t3d"></p></details>
+      <details class="type" style="--tc:#7FA6F2"><summary><span class="t-ic"><svg class="ic"><use href="#i-water"/></svg></span><h3 data-t="t4"></h3><span class="ts" data-t="t4s"></span><span class="more"><span data-t="more">פרטים</span><svg class="ic"><use href="#i-chev"/></svg></span></summary><p data-t="t4d"></p></details>
+      <details class="type" style="--tc:#B08CFF"><summary><span class="t-ic"><svg class="ic"><use href="#i-med"/></svg></span><h3 data-t="t5"></h3><span class="ts" data-t="t5s"></span><span class="more"><span data-t="more">פרטים</span><svg class="ic"><use href="#i-chev"/></svg></span></summary><p data-t="t5d"></p></details>
+      <details class="type" style="--tc:#E0A828"><summary><span class="t-ic"><svg class="ic"><use href="#i-trail"/></svg></span><h3 data-t="t6"></h3><span class="ts" data-t="t6s"></span><span class="more"><span data-t="more">פרטים</span><svg class="ic"><use href="#i-chev"/></svg></span></summary><p data-t="t6d"></p></details>
+      <details class="type uxo" style="--tc:#FF5A4E"><summary><span class="t-ic"><svg class="ic"><use href="#i-debris"/></svg></span><h3 data-t="t7"></h3><span class="ts" data-t="t7s"></span><span class="more"><span data-t="more">פרטים</span><svg class="ic"><use href="#i-chev"/></svg></span></summary><p data-t="t7d"></p></details>
+      <details class="type lost" style="--tc:#B6C2D6"><summary><span class="t-ic"><svg class="ic"><use href="#i-lost"/></svg></span><h3 data-t="t8"></h3><span class="ts" data-t="t8s"></span><span class="more"><span data-t="more">פרטים</span><svg class="ic"><use href="#i-chev"/></svg></span></summary><p data-t="t8d"></p></details>
     </div>
     <p class="types-note" data-t="tnote"></p>
+  </div>
+</section>
+
+<!-- ══ REAL MOMENTS: public news cases, told without names or photos of people ══ -->
+<section class="moments" id="moments">
+  <div class="wrap">
+    <span class="m-kick" data-t="mk"></span>
+    <h2 class="sec-h" data-t="mh"></h2>
+    <p class="m-sub" data-t="ms"></p>
+    <div class="m-grid">
+      <article class="m-card" style="--tc:#E0A828">
+        <div class="m-top"><span class="m-ic"><svg class="ic" aria-hidden="true"><use href="#i-trail"/></svg></span><span class="m-where" data-t="m1w"></span></div>
+        <h3 data-t="m1h"></h3>
+        <p class="m-story" data-t="m1p"></p>
+        <p class="m-how"><svg class="ic" aria-hidden="true"><use href="#i-leaf"/></svg><span data-t="m1a"></span></p>
+        <a class="m-src" href="https://www.maariv.co.il/news/israel/article-1305043" target="_blank" rel="noopener"><span data-t="msrc"></span> <span data-t="m1s"></span><svg class="ic" aria-hidden="true"><use href="#i-ext"/></svg></a>
+      </article>
+      <article class="m-card" style="--tc:#50DB0F">
+        <div class="m-top"><span class="m-ic"><svg class="ic" aria-hidden="true"><use href="#i-paw"/></svg></span><span class="m-where" data-t="m2w"></span></div>
+        <h3 data-t="m2h"></h3>
+        <p class="m-story" data-t="m2p"></p>
+        <p class="m-how"><svg class="ic" aria-hidden="true"><use href="#i-leaf"/></svg><span data-t="m2a"></span></p>
+        <a class="m-src" href="https://www.be106.net/207/110049" target="_blank" rel="noopener"><span data-t="msrc"></span> <span data-t="m2s"></span><svg class="ic" aria-hidden="true"><use href="#i-ext"/></svg></a>
+      </article>
+      <article class="m-card" style="--tc:#7FA6F2">
+        <div class="m-top"><span class="m-ic"><svg class="ic" aria-hidden="true"><use href="#i-water"/></svg></span><span class="m-where" data-t="m3w"></span></div>
+        <h3 data-t="m3h"></h3>
+        <p class="m-story" data-t="m3p"></p>
+        <p class="m-how"><svg class="ic" aria-hidden="true"><use href="#i-leaf"/></svg><span data-t="m3a"></span></p>
+        <a class="m-src" href="https://www.inn.co.il/news/650480" target="_blank" rel="noopener"><span data-t="msrc"></span> <span data-t="m3s"></span><svg class="ic" aria-hidden="true"><use href="#i-ext"/></svg></a>
+      </article>
+      <article class="m-card" style="--tc:#B08CFF">
+        <div class="m-top"><span class="m-ic"><svg class="ic" aria-hidden="true"><use href="#i-med"/></svg></span><span class="m-where" data-t="m4w"></span></div>
+        <h3 data-t="m4h"></h3>
+        <p class="m-story" data-t="m4p"></p>
+        <p class="m-how"><svg class="ic" aria-hidden="true"><use href="#i-leaf"/></svg><span data-t="m4a"></span></p>
+        <a class="m-src" href="https://www.jdn.co.il/news/2410764/" target="_blank" rel="noopener"><span data-t="msrc"></span> <span data-t="m4s"></span><svg class="ic" aria-hidden="true"><use href="#i-ext"/></svg></a>
+      </article>
+    </div>
+    <p class="m-note" data-t="mn"></p>
+    <div class="m-cta"><a class="btn-orange" href="../nature-v2/SHOMER-Nature.apk" download="SHOMER-Nature.apk" data-get><svg class="ic" aria-hidden="true"><use href="#i-down"/></svg><span data-t="mcta"></span></a></div>
   </div>
 </section>
 
@@ -411,7 +499,7 @@ dialog#inst::backdrop{background:rgba(6,15,30,.72)}
   <div class="wrap">
     <h2 class="sec-h" data-t="h2b">לחיות, לים, לשביל.</h2>
     <div class="cards">
-      <div class="card"><img src="../nature-v2/img/pets.jpg" alt="" data-ta="alt2" loading="lazy" width="750" height="399"><div><h3 data-t="c1"></h3><p data-t="c1d"></p></div></div>
+      <div class="card"><img src="img/landing/wild-gazelle.jpg" alt="" data-ta="alt2" loading="lazy" width="900" height="675"><div><h3 data-t="c1"></h3><p data-t="c1d"></p></div></div>
       <div class="card"><img src="../nature-v2/img/turtle.jpg" alt="" data-ta="alt3" loading="lazy" width="690" height="399"><div><h3 data-t="c2"></h3><p data-t="c2d"></p></div></div>
       <div class="card"><img src="../nature-v2/img/trail.jpg" alt="" data-ta="alt4" loading="lazy" width="500" height="720"><div><h3 data-t="c3"></h3><p data-t="c3d"></p></div></div>
     </div>
@@ -572,7 +660,7 @@ var T={
   h2a:"על מה מדווחים ב-",h2as:"לחצו על כל סוג לפרטים.",more:"פרטים",
   t1:"חיה פצועה",t1s:"כלב, חתול, ציפור או צב",t1d:"מצאתם חיה פצועה או לכודה? מצלמים, בוחרים \"חיה פצועה\", והמיקום נוסף לבד. כך יש בידיכם תיעוד מדויק למסור למי שיכול לעזור.",
   t2:"שריפה / עשן",t2s:"לתפוס אותה כשהיא קטנה",t2d:"שריפת חורש מתחילה קטנה. מתרחקים, מחייגים 102, ומתעדים עם תמונה ומיקום מדויק.",
-  t3:"זיהום / פסולת",t3s:"בשמורה, ביער או בחוף",t3d:"שקיות, פסולת בניין, נפט בחוף. תיעוד עם תמונה ומיקום, כדי שאפשר יהיה לטפל ולנקות.",
+  t3:"זיהום / פסולת",t2c:"שריפה",t3c:"פסולת",t3s:"בשמורה, ביער או בחוף",t3d:"שקיות, פסולת בניין, נפט בחוף. תיעוד עם תמונה ומיקום, כדי שאפשר יהיה לטפל ולנקות.",
   t4:"זרם קורע / טביעה",t4s:"זרם, גלים, מתרחץ בקושי",t4d:"זרם חזק או מתרחץ בקושי? במצב חירום חייגו 101 או 100. הדיווח שומר את המקום והשעה.",
   t5:"עזרה רפואית",t5s:"מטייל נפגע או לא מרגיש טוב",t5d:"חייגו 101. באפליקציה מחכים מדריכי עזרה ראשונה צעד אחר צעד: דימום, כוויה, מכת חום, החייאה ועוד.",
   t6:"מפגע בשטח",t6s:"עץ שנפל, סלע, בור",t6d:"עץ שחוסם את השביל, סלע שהתדרדר, גשר שבור. מתעדים עם תמונה ומיקום, תחת \"אחר\".",
@@ -597,6 +685,14 @@ var T={
   q3:"למה לא מחנות האפליקציות?",a3:"אנחנו בגרסת בטא. באנדרואיד מורידים קובץ התקנה ישירות מכאן. באייפון מוסיפים למסך הבית מ-Safari.",
   q4:"מה קורה למידע שלי?",a4:"דיווחים נשמרים בטלפון שלך. השם שלך לא מוצג אלא אם בחרת להציג אותו. המספר שלך משמש לאימות ולשליחת עזרה, אף פעם לא לשיווק. <a href='privacy.html'>מדיניות הפרטיות</a>",
   q5:"זה מחליף את שירותי החירום?",a5:"לא. SH✡MER Nature לא מזעיק רשויות בשבילך. במצב חירום חייגו 100, 101 או 102.",
+  mk:"רגעים אמיתיים",mh:"זה קורה באמת. וקרוב יותר ממה שנדמה.",
+  ms:"ארבעה מקרים שפורסמו בחדשות בישראל. בלי שמות ובלי תמונות של אנשים: רק מה שקרה, ומה אפשר לעשות כשזה קורה לידך.",
+  msrc:"המקור:",mcta:"להיות זה שקרוב - חינם",
+  m1w:"מדבר יהודה · אפריל 2026",m1h:"תעו בשטח, ונגמרו להם המים",m1p:"משפחה ומטייל בן 72 איבדו את הדרך במדבר יהודה ונשארו בלי מים. מתנדבי יחידת החילוץ ערבה הגיעו אליהם והחזירו אותם בשלום לרכב.",m1a:"SOS לטיול שולח לשומרים שלי את המיקום שלך, וטיימר הבטיחות מתריע אם לא אישרת בזמן שהכול בסדר.",m1s:"מעריב, 4.4.2026",
+  m2w:"פתח תקווה · יוני 2025",m2h:"חתול שרד שלושה ימים בין ההריסות",m2p:"אחרי נפילת טיל, חיילים שהתנדבו לפנות את הדירות שנפגעו מצאו אותו בחיים. אחרי סדרת בדיקות הוא אמור לחזור למשפחה שלו.",m2a:"דיווח \"חיה פצועה\" עם תמונה ומיקום מדויק, מוכן למסור למי שיכול לעזור.",m2s:"BE106 חדשות פתח תקווה, 19.6.2025",
+  m3w:"חוף תל דור · אוקטובר 2024",m3h:"צב ים ענק נמצא פצוע, מסובך בחוט דיג",m3p:"מתנדבת שצעדה על החוף ראתה אותו בין הסלעים, הזעיקה את רשות הטבע והגנים ונשארה לידו עד שפינו אותו למרכז ההצלה לצבי ים.",m3a:"מי שקרוב רואה ראשון. מצלמים, המיקום נוסף לבד, ויודעים למי להתקשר.",m3s:"ערוץ 7, 10.10.2024",
+  m4w:"נחל תקוע · מאי 2025",m4h:"נפל לבור בעומק 5 מטרים, בטיול לילה",m4p:"מתנדבי יחידת החילוץ עציון-יהודה הקימו מערכת חבלים, חובש ירד אליו ונתן טיפול ראשוני, והוא הועלה מהבור ופונה לבית החולים.",m4a:"מדריכי עזרה ראשונה צעד אחר צעד, וכפתור SOS ששולח לשומרים שלי את המיקום שלך.",m4s:"JDN, 20.5.2025",
+  mn:"SH✡MER Nature לא היה מעורב במקרים האלה. הם כאן כי הם מראים כמה חשוב מי שנמצא קרוב. במצב חירום חייגו 100 · 101 · 102.",
   cl1:"שומרים על מי שאין לו קול.",
   note:"<b>SH✡MER Nature הוא כלי עזר קהילתי בלבד, לא שירות חירום ולא תחליף לו.</b><br>השימוש על אחריות המשתמש בלבד; 3Shamrocks Studio אינה אחראית לכל נזק ישיר או עקיף. בחירום חייגו <span class='num'>100</span> · <span class='num'>101</span> · <span class='num'>102</span>.",
   fl0:"פתחו את האפליקציה",fl1:"SH✡MER לעיר",fl2:"פרטיות",fl3:"תנאים",fl4:"הצהרת נגישות",fl5:"כתבו לנו",
@@ -606,7 +702,7 @@ var T={
   a_h:"אם לא נפתח חלון התקנה: ב-Chrome לוחצים על <span class='kbd'><svg class='ic'><use href='#i-dots'/></svg></span> ואז \"הוספה למסך הבית\".",
   openios:"פתיחת האפליקציה ב-Safari",i_1:"פותחים את האפליקציה ב-Safari.",i_2:"לוחצים על כפתור השיתוף",i_3:"בוחרים \"הוספה למסך הבית\", ואז \"הוספה\".",i_h:"האייקון מופיע במסך הבית ונפתח כמו אפליקציה.",
   pc1:"סורקים עם מצלמת הטלפון",pc2:"הדף ייפתח בטלפון, ומשם מתקינים.",
-  alt1:"אישה כורעת ליד כלב פצוע ומחזיקה טלפון",alt2:"גור כלבים וחתלתול ישנים על הדשא",alt3:"צב ים לכוד ברשת על החוף",alt4:"שביל הליכה ביער",alt5:"אישה עם כלב פצוע ברחוב, בשעת שקיעה",
+  alt1:"אישה כורעת ליד כלב פצוע ומחזיקה טלפון",alt2:"מטייל מצלם צבי שנלכד בשקית ניילון במדבר",alt3:"צב ים לכוד ברשת על החוף",alt4:"שביל הליכה ביער",alt5:"אישה עם כלב פצוע ברחוב, בשעת שקיעה",
   altmap:"מסך המפה של SH✡MER Nature",altrep:"מסך הדיווח של SH✡MER Nature, כולל נפל",altgd:"מדריך החירום של SH✡MER Nature",close:"סגירה"},
  en:{ctas:"Download - free!",cta:"Download - free!",cta2:"Install as an app",cta2b:"Install as an app · iPhone & computer",eb:"Beta · Free",
   h1:"Caring for those who have no voice.",
@@ -616,7 +712,7 @@ var T={
   h2a:"What you can report in ",h2as:"Tap any type for details.",more:"Details",
   t1:"Injured animal",t1s:"A dog, cat, bird or turtle",t1d:"Found an injured or trapped animal? Take a photo, choose \"Injured animal\", and the location is added for you. You then have an exact record to hand to whoever can help.",
   t2:"Fire / smoke",t2s:"Catch it while it is small",t2d:"A brush fire starts small. Keep clear, call 102, and record it with a photo and an exact location.",
-  t3:"Pollution / litter",t3s:"In a reserve, forest or beach",t3d:"Bags, building waste, oil on the beach. A photo and a location, so it can be handled and cleaned up.",
+  t3:"Pollution / litter",t2c:"Fire",t3c:"Litter",t3s:"In a reserve, forest or beach",t3d:"Bags, building waste, oil on the beach. A photo and a location, so it can be handled and cleaned up.",
   t4:"Rip current / drowning",t4s:"Currents, waves, a swimmer in trouble",t4d:"A strong current or a swimmer in trouble? In an emergency call 101 or 100. The report keeps the place and the time.",
   t5:"Medical help",t5s:"A hiker is hurt or unwell",t5d:"Call 101. The app has step-by-step first-aid guides: bleeding, burns, heat stroke, CPR and more.",
   t6:"Hazard on the trail",t6s:"A fallen tree, a rock, a hole",t6d:"A tree blocking the path, a fallen rock, a broken bridge. Record it with a photo and a location, under \"Other\".",
@@ -641,6 +737,14 @@ var T={
   q3:"Why not from the app store?",a3:"We are in beta. On Android you download the install file right here. On iPhone you add it to your Home Screen from Safari.",
   q4:"What happens to my data?",a4:"Reports are saved on your phone. Your name is not shown unless you choose to show it. Your number is used for verification and for sending help, never for marketing. <a href='privacy.html'>Privacy policy</a>",
   q5:"Does it replace emergency services?",a5:"No. SH✡MER Nature does not call the authorities for you. In an emergency call 100, 101 or 102.",
+  mk:"Real moments",mh:"It really happens. Closer than you think.",
+  ms:"Four cases reported in the Israeli news. No names and no photos of people: just what happened, and what you can do when it happens near you.",
+  msrc:"Source:",mcta:"Be the one who is close - free",
+  m1w:"Judean Desert · April 2026",m1h:"Lost in the desert, out of water",m1p:"A family and a 72-year-old hiker lost their way in the Judean Desert and ran out of water. Volunteers of the Arava rescue unit reached them and brought them safely back to their car.",m1a:"Trip SOS sends your location to My Shomers, and the safety timer alerts them if you do not check in on time.",m1s:"Maariv, 4 Apr 2026",
+  m2w:"Petah Tikva · June 2025",m2h:"A cat survived three days in the rubble",m2p:"After a missile hit, soldiers volunteering to clear the damaged apartments found it alive. After a round of checks it is expected to go back to its family.",m2a:"An \"Injured animal\" report with a photo and an exact location, ready to hand to whoever can help.",m2s:"BE106 Petah Tikva News, 19 Jun 2025",
+  m3w:"Tel Dor beach · October 2024",m3h:"A giant sea turtle found hurt, tangled in fishing line",m3p:"A volunteer walking the beach spotted it on the rocks, alerted the Nature and Parks Authority and stayed with it until it was taken to the Sea Turtle Rescue Center.",m3a:"Whoever is closest sees it first. Take a photo, the location is added for you, and you know who to call.",m3s:"Arutz Sheva, 10 Oct 2024",
+  m4w:"Nahal Tekoa · May 2025",m4h:"Fell 5 metres into a pit on a night hike",m4p:"Volunteers of the Etzion-Yehuda rescue unit rigged ropes, a paramedic went down to give first aid, and he was lifted out and taken to hospital.",m4a:"Step-by-step first-aid guides, and an SOS that reaches My Shomers with your location.",m4s:"JDN, 20 May 2025",
+  mn:"SH✡MER Nature was not involved in these cases. They are here because they show how much the person nearby matters. In an emergency call 100 · 101 · 102.",
   cl1:"Caring for those who have no voice.",
   note:"<b>SH✡MER Nature is a community aid tool only - not an emergency service or a substitute for one.</b><br>Use is entirely at your own risk; 3Shamrocks Studio accepts no liability for any direct or indirect damage. In an emergency call <span class='num'>100</span> · <span class='num'>101</span> · <span class='num'>102</span>.",
   fl0:"Open the app",fl1:"SH✡MER for the city",fl2:"Privacy",fl3:"Terms",fl4:"Accessibility",fl5:"Contact us",
@@ -650,7 +754,7 @@ var T={
   a_h:"If no install window opens: in Chrome tap <span class='kbd'><svg class='ic'><use href='#i-dots'/></svg></span> and then \"Add to Home screen\".",
   openios:"Open the app in Safari",i_1:"Open the app in Safari.",i_2:"Tap the Share button",i_3:"Choose \"Add to Home Screen\", then \"Add\".",i_h:"The icon appears on your Home Screen and opens like an app.",
   pc1:"Scan with your phone camera",pc2:"The page opens on your phone; install from there.",
-  alt1:"A woman kneels by an injured dog holding a phone",alt2:"A puppy and a kitten asleep on the grass",alt3:"A sea turtle caught in a net on the beach",alt4:"A forest hiking trail",alt5:"A woman with an injured dog on the street at sunset",
+  alt1:"A woman kneels by an injured dog holding a phone",alt2:"A hiker photographs a gazelle caught in a plastic bag in the desert",alt3:"A sea turtle caught in a net on the beach",alt4:"A forest hiking trail",alt5:"A woman with an injured dog on the street at sunset",
   altmap:"The SH✡MER Nature map screen",altrep:"The SH✡MER Nature report screen, including fallen rocket",altgd:"The SH✡MER Nature emergency guide",close:"Close"},
  ar:{ctas:"تحميل - مجانًا!",cta:"تحميل - مجانًا!",cta2:"التثبيت كتطبيق",cta2b:"التثبيت كتطبيق · آيفون والحاسوب",eb:"نسخة تجريبية · مجانًا",
   h1:"نحمي من لا صوت له.",
@@ -660,7 +764,7 @@ var T={
   h2a:"عمّا تبلّغ في ",h2as:"اضغط على أي نوع للتفاصيل.",more:"تفاصيل",
   t1:"حيوان مصاب",t1s:"كلب، قطة، طائر أو سلحفاة",t1d:"وجدت حيوانًا مصابًا أو عالقًا؟ صوّر، اختر \"حيوان مصاب\"، ويُضاف الموقع تلقائيًا. هكذا يكون لديك توثيق دقيق تسلّمه لمن يستطيع المساعدة.",
   t2:"حريق / دخان",t2s:"التقطه وهو صغير",t2d:"حريق الأحراش يبدأ صغيرًا. ابتعد، اتصل بـ 102، ووثّق بصورة وموقع دقيق.",
-  t3:"تلوث / نفايات",t3s:"في محمية أو غابة أو شاطئ",t3d:"أكياس، مخلفات بناء، نفط على الشاطئ. صورة وموقع، كي يمكن المعالجة والتنظيف.",
+  t3:"تلوث / نفايات",t2c:"حريق",t3c:"نفايات",t3s:"في محمية أو غابة أو شاطئ",t3d:"أكياس، مخلفات بناء، نفط على الشاطئ. صورة وموقع، كي يمكن المعالجة والتنظيف.",
   t4:"تيار ساحب / غرق",t4s:"تيار، أمواج، سبّاح في ضيق",t4d:"تيار قوي أو سبّاح في ضيق؟ في الطوارئ اتصل بـ 101 أو 100. البلاغ يحفظ المكان والوقت.",
   t5:"مساعدة طبية",t5s:"متنزّه أصيب أو ليس بخير",t5d:"اتصل بـ 101. في التطبيق أدلة إسعاف أولي خطوة بخطوة: نزيف، حروق، ضربة شمس، إنعاش وغيرها.",
   t6:"خطر في المسار",t6s:"شجرة سقطت، صخرة، حفرة",t6d:"شجرة تسد المسار، صخرة انهارت، جسر مكسور. وثّق بصورة وموقع، تحت \"أخرى\".",
@@ -685,6 +789,14 @@ var T={
   q3:"لماذا ليس من متجر التطبيقات؟",a3:"نحن في نسخة تجريبية. على أندرويد تنزّل ملف التثبيت من هنا مباشرة. على آيفون تضيفه إلى الشاشة الرئيسية من Safari.",
   q4:"ماذا يحدث لمعلوماتي؟",a4:"البلاغات تُحفظ على هاتفك. لا يظهر اسمك إلا إذا اخترت إظهاره. رقمك يُستخدم للتحقق ولإرسال المساعدة، وليس للتسويق أبدًا. <a href='privacy.html'>سياسة الخصوصية</a>",
   q5:"هل يحل محل خدمات الطوارئ؟",a5:"لا. SH✡MER Nature لا يتصل بالسلطات نيابة عنك. في الطوارئ اتصل بـ 100 أو 101 أو 102.",
+  mk:"لحظات حقيقية",mh:"هذا يحدث فعلًا. وأقرب مما تظن.",
+  ms:"أربع حالات نُشرت في الأخبار في إسرائيل. بلا أسماء وبلا صور لأشخاص: فقط ما حدث، وما يمكنك فعله عندما يحدث بقربك.",
+  msrc:"المصدر:",mcta:"كن أنت القريب - مجانًا",
+  m1w:"صحراء يهودا · نيسان 2026",m1h:"ضلّوا الطريق ونفد منهم الماء",m1p:"عائلة ومتنزّه عمره 72 عامًا ضلّوا الطريق في صحراء يهودا وبقوا بلا ماء. وصل إليهم متطوعو وحدة الإنقاذ في العربة وأعادوهم سالمين إلى سيارتهم.",m1a:"SOS للرحلة يرسل موقعك إلى حُرّاسي، ومؤقّت الأمان ينبّههم إذا لم تؤكد في الوقت أنك بخير.",m1s:"معاريف، 4.4.2026",
+  m2w:"بيتح تكفا · حزيران 2025",m2h:"قطة صمدت ثلاثة أيام تحت الأنقاض",m2p:"بعد سقوط صاروخ، عثر عليها حيّة جنود تطوعوا لإخلاء الشقق المتضررة. بعد سلسلة فحوص من المتوقع أن تعود إلى عائلتها.",m2a:"بلاغ \"حيوان مصاب\" بصورة وموقع دقيق، جاهز لتسليمه لمن يستطيع المساعدة.",m2s:"BE106 أخبار بيتح تكفا، 19.6.2025",
+  m3w:"شاطئ تل دور · تشرين الأول 2024",m3h:"سلحفاة بحرية ضخمة وُجدت مصابة وعالقة بخيط صيد",m3p:"متطوعة كانت تمشي على الشاطئ رأتها بين الصخور، أبلغت سلطة الطبيعة والحدائق وبقيت بجانبها حتى نُقلت إلى مركز إنقاذ السلاحف البحرية.",m3a:"الأقرب يرى أولًا. صوّر، يُضاف الموقع تلقائيًا، وتعرف بمن تتصل.",m3s:"القناة 7، 10.10.2024",
+  m4w:"نحال تقوع · أيار 2025",m4h:"سقط في حفرة بعمق 5 أمتار خلال رحلة ليلية",m4p:"أقام متطوعو وحدة الإنقاذ عتصيون-يهودا نظام حبال، ونزل إليه مسعف وقدّم الإسعاف الأولي، ثم رُفع من الحفرة ونُقل إلى المستشفى.",m4a:"أدلة إسعاف أولي خطوة بخطوة، و SOS يصل إلى حُرّاسي مع موقعك.",m4s:"JDN، 20.5.2025",
+  mn:"لم يكن SH✡MER Nature مشاركًا في هذه الحالات. إنها هنا لأنها تُظهر كم هو مهم من يكون قريبًا. في الطوارئ اتصل بـ 100 · 101 · 102.",
   cl1:"نحمي من لا صوت له.",
   note:"<b>SH✡MER Nature أداة مساعدة مجتمعية فقط، وليست خدمة طوارئ ولا بديلاً عنها.</b><br>الاستخدام على مسؤولية المستخدم وحده؛ 3Shamrocks Studio غير مسؤولة عن أي ضرر مباشر أو غير مباشر. في الطوارئ اتصل بـ <span class='num'>100</span> · <span class='num'>101</span> · <span class='num'>102</span>.",
   fl0:"افتح التطبيق",fl1:"SH✡MER للمدينة",fl2:"الخصوصية",fl3:"الشروط",fl4:"إمكانية الوصول",fl5:"راسلنا",
@@ -694,14 +806,22 @@ var T={
   a_h:"إذا لم تظهر نافذة التثبيت: في Chrome اضغط <span class='kbd'><svg class='ic'><use href='#i-dots'/></svg></span> ثم \"إضافة إلى الشاشة الرئيسية\".",
   openios:"فتح التطبيق في Safari",i_1:"افتح التطبيق في Safari.",i_2:"اضغط زر المشاركة",i_3:"اختر \"إضافة إلى الشاشة الرئيسية\"، ثم \"إضافة\".",i_h:"تظهر الأيقونة على الشاشة الرئيسية وتفتح كتطبيق.",
   pc1:"امسح بكاميرا الهاتف",pc2:"تفتح الصفحة على هاتفك، ومن هناك تثبّت.",
-  alt1:"امرأة تجثو بجانب كلب مصاب وتحمل هاتفًا",alt2:"جرو وقطة صغيرة نائمان على العشب",alt3:"سلحفاة بحرية عالقة في شبكة على الشاطئ",alt4:"مسار مشي في الغابة",alt5:"امرأة مع كلب مصاب في الشارع وقت الغروب",
+  alt1:"امرأة تجثو بجانب كلب مصاب وتحمل هاتفًا",alt2:"متنزّه يصوّر غزالًا عالقًا في كيس نايلون في الصحراء",alt3:"سلحفاة بحرية عالقة في شبكة على الشاطئ",alt4:"مسار مشي في الغابة",alt5:"امرأة مع كلب مصاب في الشارع وقت الغروب",
   altmap:"شاشة الخريطة في SH✡MER Nature",altrep:"شاشة البلاغ في SH✡MER Nature، بما فيها بقايا الصاروخ",altgd:"دليل الطوارئ في SH✡MER Nature",close:"إغلاق"}
 };
+/* Real moments, NAMED version. NEEDS YOUR EYES.
+   OFF by default. A real person's name or photo needs their written consent first
+   (consent message: shomer-funnel/REAL-CASES-CONSENT.md), and the SH✡MER privacy policy
+   forbids exposing people. Flip to true only per case, after consent is on file.
+   Only cases listed here change; every other card keeps its anonymous text. */
+var REAL_CASES_NAMED=false;
+var NAMED={he:{},en:{},ar:{}}; /* filled per case only after consent: e.g. he:{m3p:"..."}. Texts ready in REAL-CASES-CONSENT.md */
 var LANG='he';
 function setLang(l){
   if(!T[l]) return; LANG=l;
   var d=document.documentElement; d.lang=l; d.dir=(l==='en')?'ltr':'rtl';
   document.querySelectorAll('[data-t]').forEach(function(el){ var k=el.getAttribute('data-t'); if(T[l][k]!=null) el.innerHTML=T[l][k]; });
+  if(REAL_CASES_NAMED && NAMED[l]) Object.keys(NAMED[l]).forEach(function(k){ var el=document.querySelector('[data-t="'+k+'"]'); if(el) el.innerHTML=NAMED[l][k]; });
   document.querySelectorAll('[data-ta]').forEach(function(el){ var k=el.getAttribute('data-ta'); if(T[l][k]!=null) el.alt=T[l][k]; });
   var x=document.querySelector('[data-close]'); if(x) x.setAttribute('aria-label',T[l].close);
   document.querySelectorAll('.langs button').forEach(function(b){ b.classList.toggle('on',b.getAttribute('data-lang')===l); });
