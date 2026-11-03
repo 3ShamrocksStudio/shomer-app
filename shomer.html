@@ -10612,7 +10612,7 @@ try{ hydrateIcons(document); }catch(e){}
 /* Loaded-build version - shown in the diagnostic panel so a phone can prove
    whether it's on the latest build or a STALE cached one. Keep in lock-step
    with sw.js SW_VERSION on every deploy. */
-var APP_VER='v312';
+var APP_VER='v313';
 var FB={ready:false,uid:null,db:null,_presTimer:null,connected:false,listening:false,pushState:'default',near:0,swVer:'?',
   authState:'connecting',sdkLoaded:false,persist:'',permErr:null,err:null,wsProbe:'',csp:''};
 /* Always log connection diagnostics to the console so the real failure can be SEEN in Chrome. */
@@ -11759,7 +11759,7 @@ function showRespToPerson(n){
 }
 function fbClearResponderMarkers(){ try{ Object.keys(fbResponderMarkers).forEach(function(uid){ try{MAP&&MAP.removeLayer(fbResponderMarkers[uid]);}catch(e){} }); }catch(e){} fbResponderMarkers={}; }
 /* Register this device's FCM token + location so the Cloud Function can target it for push. */
-function fbRegisterToken(token){ if(!FB.ready||!token)return; var rec={token:token,ts:Date.now()}; if(userLat!=null&&userLng!=null){ rec.lat=userLat; rec.lng=userLng; } try{ FB.db.ref('tokens/'+FB.uid).set(rec); }catch(e){} }
+function fbRegisterToken(token){ if(!FB.ready||!token)return; var rec={token:token,ts:Date.now()};   /* v313: no location in the push token (it was a precise point, kept forever, used by nothing). set() also overwrites an old one. */ try{ FB.db.ref('tokens/'+FB.uid).set(rec); }catch(e){} }
 /* Queue a targeted alarm - alarmFanout Cloud Function pushes it to the recipient even when their
    app is CLOSED (used by geofence arrival; check-in cross-device needs SHOMER-uid pairing). */
 function fbQueueAlarm(toUid,title,body,tag){ if(!FB.ready||!toUid)return; try{ FB.db.ref('alarms').push({fromUid:FB.uid,toUid:toUid,title:title,body:body,tag:tag||'shomer',ts:Date.now()}); }catch(e){} }
