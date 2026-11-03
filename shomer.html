@@ -16429,5 +16429,37 @@ function drillRenderProfile(){
   window.__shomerSosTakeover={show:show, ack:ack, clear:clearKey};   /* for tests */
 })();
 </script>
+<!-- ══ SOS PUSH TOKENS (sos-push-alarm) ══ Registers this device for the SOS alarm push:
+     tokens/<uid>/<device> = {token, ts, plat, lang, lat, lng}. The point is rounded to ~1 km and
+     left out in ghost mode; the server drops it after 2 days and the device after 90 days of no use.
+     Replaces the old single-record writer (fbRegisterToken), which stored a precise location.
+     NEEDS YOUR EYES: privacy-policy line for push tokens - see native/PUSH-ALARM-PLAN.md. -->
+<script>
+(function(){
+  var tries=0;
+  function devKey(t){ var h=5381; for(var i=0;i<t.length;i++){ h=(((h<<5)+h)^t.charCodeAt(i))>>>0; } return 'd'+('0000000'+h.toString(36)).slice(-7)+t.length.toString(36); }
+  function lang(){ var l=(typeof currentLang!=='undefined')?currentLang:'he'; return (l==='en'||l==='ar')?l:'he'; }
+  function reg(token, plat){
+    if(!token) return;
+    if(!(typeof FB!=='undefined'&&FB.ready&&FB._authReady&&FB.uid&&FB.db)){ if(tries++<40) setTimeout(function(){ reg(token,plat); },3000); return; }
+    var dk=devKey(String(token)), rec={token:String(token), ts:Date.now(), plat:plat==='android'?'android':'web', lang:lang()};
+    var hasLoc=(typeof userLat!=='undefined'&&userLat!=null&&userLng!=null&&!(SS&&SS.circleGhost));
+    if(hasLoc){ rec.lat=Math.round(userLat*100)/100; rec.lng=Math.round(userLng*100)/100; }   /* ~1 km, only for "SOS near you" */
+    var up={token:null, ts:null, lat:null, lng:null};   /* drop the old single-device record (it held a precise point) */
+    up[dk]=rec;
+    try{ if(SS._pushDev && SS._pushDev!==dk) up[SS._pushDev]=null; }catch(e){}   /* this device's previous (rotated) token */
+    FB.db.ref('tokens/'+FB.uid).update(up).then(function(){ try{ SS._pushDev=dk; saveStore(); }catch(e){} }).catch(function(e){ try{ fbLog('push token write failed:', (e&&e.code)||e); }catch(_){} });
+    if(!hasLoc && !(SS&&SS.circleGhost) && tries<45){ tries+=5; setTimeout(function(){ reg(token,plat); },60000); }   /* add the area once a location fix arrives */
+  }
+  window.fbRegisterToken=function(token){ reg(token,'web'); };              /* web push (browser) - same callers as before */
+  window.__shomerPushToken=function(token){ reg(token,'android'); };         /* native: new / rotated FCM token */
+  (function nativeToken(n){
+    var p=null; try{ p=(typeof shomerNativePlugin==='function')?shomerNativePlugin():null; }catch(e){}
+    if(!p){ if(n<10) setTimeout(function(){ nativeToken(n+1); },2000); return; }
+    if(typeof p.pushToken!=='function') return;                              /* older app build: no SOS push */
+    try{ p.pushToken().then(function(r){ if(r&&r.token) reg(r.token,'android'); }).catch(function(){}); }catch(e){}
+  })(0);
+})();
+</script>
 </body>
 </html>
