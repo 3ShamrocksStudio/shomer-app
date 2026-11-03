@@ -11,3 +11,6 @@ capacitor-cordova-ios-plugins
 # Generated Config files
 App/App/capacitor.config.json
 App/App/config.xml
+
+# Firebase iOS config: placed on the Mac, never committed (same rule as google-services.json)
+App/App/GoogleService-Info.plist
