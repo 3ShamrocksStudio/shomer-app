@@ -6271,11 +6271,14 @@ function initMap(){
  var _c0=[32.0853,34.7818], _z0=16;
  try{ if(userLat==null){ var _tc=tzCountry(); if(_tc && _tc!=='IL' && typeof GEO_BOX!=='undefined'){ for(var _i=0;_i<GEO_BOX.length;_i++){ var _b=GEO_BOX[_i]; if(_b[0]===_tc){ _c0=[(_b[1]+_b[2])/2,(_b[3]+_b[4])/2]; _z0=(_b[2]-_b[1])>15?4:6; break; } } } } }catch(_e){}
  MAP=window.L.map('map',{preferCanvas:true,zoomControl:false,attributionControl:true,
- center:_c0,zoom:_z0,minZoom:3,maxZoom:19,
+ center:_c0,zoom:_z0,minZoom:3,maxZoom:17,
  zoomSnap:.5,worldCopyJump:true});
- window.L.tileLayer(TILE_BASE,{maxZoom:16,className:'tiles-base',
+ /* v312: the Esri Dark Gray tiles stop at z16, the map went to z19. With maxZoom:16 Leaflet drew
+    NO tiles past 16 - streets and labels vanished on zoom-in. maxNativeZoom:16 upscales z16 instead,
+    and the map stops at 17 (2x) - past that the upscaled labels turn into a blur. */
+ window.L.tileLayer(TILE_BASE,{maxZoom:17,maxNativeZoom:16,className:'tiles-base',
  attribution:'Esri · HERE · Garmin · OpenStreetMap contributors'}).addTo(MAP);
- window.L.tileLayer(TILE_REF,{maxZoom:16,className:'tiles-ref',pane:'shadowPane'}).addTo(MAP);
+ window.L.tileLayer(TILE_REF,{maxZoom:17,maxNativeZoom:16,className:'tiles-ref',pane:'shadowPane'}).addTo(MAP);
  /* labels baked into OSM base */
  buildStatMarkers(); try{ checkInbox(); }catch(e){} try{ communityNudge(); }catch(e){} try{ setTimeout(communityNudge, 8000); }catch(e){} try{ renderPastEvents(); }catch(e){}
  // The container may have been laid out while hidden - recalc once visible.
