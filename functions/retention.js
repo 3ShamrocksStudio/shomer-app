@@ -5,12 +5,15 @@
       time ts for old alerts that never got a resolvedTs.
    2. AED records written before the ownership change still carry the creator's account id in `by`.
       The id is moved to the private dashown/aed_<id> record and removed from the shared record.
+   3. Push tokens (tokens/<uid>/<device>): a device not seen for 90 days is deleted; its coarse
+      (~1 km) point is removed after 2 days, like the live-presence rows.
    Open (active) alerts are never touched. */
 const DAY = 24 * 60 * 60 * 1000;
 const KEEP = 90 * DAY;
+const LOC_KEEP = 2 * DAY;
 
 async function runRetention(db, now = Date.now()) {
-  const out = {palertsDeleted: 0, aedsStripped: 0};
+  const out = {palertsDeleted: 0, aedsStripped: 0, tokensDeleted: 0, tokenPointsStripped: 0};
   const updates = {};
   const pa = (await db.ref('palerts').get()).val() || {};
   Object.keys(pa).forEach((id) => {
@@ -29,6 +32,21 @@ async function runRetention(db, now = Date.now()) {
     updates['dashown/aed_' + id] = a.by;
     updates['aeds/' + id + '/by'] = null;
     out.aedsStripped++;
+  });
+  const toks = (await db.ref('tokens').get()).val() || {};
+  Object.keys(toks).forEach((uid) => {
+    const rec = toks[uid]; if (!rec || typeof rec !== 'object') return;
+    const flat = typeof rec.token === 'string';
+    const devs = flat ? {'': rec} : rec;
+    Object.keys(devs).forEach((dk) => {
+      const d = devs[dk]; if (!d || typeof d !== 'object') return;
+      const base = 'tokens/' + uid + (flat ? '' : '/' + dk);
+      const ts = typeof d.ts === 'number' ? d.ts : 0;
+      if (now - ts > KEEP) { updates[base] = null; out.tokensDeleted++; return; }
+      if ((d.lat != null || d.lng != null) && now - ts > LOC_KEEP) {
+        updates[base + '/lat'] = null; updates[base + '/lng'] = null; out.tokenPointsStripped++;
+      }
+    });
   });
   if (Object.keys(updates).length) await db.ref().update(updates);
   return out;

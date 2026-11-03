@@ -1,5 +1,5 @@
 /* SH✡MER Cloud Functions (Blaze) — closed-app / background push via FCM.
-   - sosFanout:   on a new /sos event, push to nearby guardians' devices (even if app closed).
+   - sosFanout:   on a new SOS, push the alarm to the sender's SHOMERs + nearby devices (app closed too).
    - alarmFanout: on a /alarms/{id} item {toUid,title,body}, push to that user's device (used by
                   the mutual check-in miss + geofence arrival), then delete the queue item.
    Deploy:  firebase deploy --only functions
@@ -13,49 +13,55 @@ setGlobalOptions({region: 'us-central1', maxInstances: 10});
 const db = admin.database();
 const LINK = 'https://www.shomer-app.co.il/shomer.html';
 
-function distM(aLat, aLng, bLat, bLng) {
-  const R = 6371000, toRad = d => d * Math.PI / 180;
-  const dLat = toRad(bLat - aLat), dLng = toRad(bLng - aLng);
-  const s = Math.sin(dLat / 2) ** 2 + Math.cos(toRad(aLat)) * Math.cos(toRad(bLat)) * Math.sin(dLng / 2) ** 2;
-  return 2 * R * Math.asin(Math.min(1, Math.sqrt(s)));
+/* SOS fan-out (see native/PUSH-ALARM-PLAN.md). sos/<uid> is ONE record per person, overwritten
+   by every new SOS. A NEW SOS (new id/ts, or re-opened after resolve) pushes the alarm to the
+   sender's paired SHOMERs (any distance) and nearby devices (<=5 km, fresh ~1 km point only).
+   Ending the SOS sends a silent "clear" so the alarm stops on Android phones.
+   Type / position updates on the same event do not re-push. Logic: ./recipients.js. */
+const R = require('./recipients');
+async function sendAll(msgs) {
+  const out = {sent: 0, failed: 0, dead: []};
+  for (let i = 0; i < msgs.length; i += 500) {
+    const chunk = msgs.slice(i, i + 500);
+    const res = await admin.messaging().sendEach(chunk.map(m => m.msg));
+    res.responses.forEach((r, j) => {
+      if (r.success) { out.sent++; return; }
+      out.failed++;
+      const code = r.error && r.error.code;
+      if (code === 'messaging/registration-token-not-registered' || code === 'messaging/invalid-registration-token') out.dead.push(chunk[j].r);
+    });
+  }
+  return out;
 }
-
-/* SOS fan-out → nearby guardians (≤5 km), excluding the sender.
-   sos/<uid> is ONE record per person (v261+), overwritten by every new SOS, so this fires on
-   any write and pushes only when a NEW SOS event starts (new id/ts, or re-opened after resolve).
-   Type / position / resolve updates on the same event do not re-push. */
 exports.sosFanout = onValueWritten('/sos/{id}', async (event) => {
   const sos = event.data.after.val();
   const prev = event.data.before.val();
-  if (!sos || sos.resolved || sos.lat == null) return;
-  const isNew = !prev || prev.resolved || (sos.id || sos.ts) !== (prev.id || prev.ts);
-  if (!isNew) return;
-  // Targets = every PAIRED guardian (always, any distance) + every NEARBY SHOMER (≤5 km).
-  const [toksSnap, pairsSnap] = await Promise.all([
-    db.ref('tokens').get(),
-    db.ref('pairs/' + sos.uid).get()
-  ]);
-  const toks = toksSnap.val() || {};
-  const paired = new Set(pairsSnap.val() ? Object.keys(pairsSnap.val()) : []);
-  const tokenSet = new Set();
-  Object.keys(toks).forEach((uid) => {
-    if (uid === sos.uid) return;
-    const t = toks[uid];
-    if (!t || !t.token) return;
-    const isPaired = paired.has(uid);
-    const isNear = t.lat == null || distM(sos.lat, sos.lng, t.lat, t.lng) <= 5000;
-    if (isPaired || isNear) tokenSet.add(t.token);
-  });
-  const tokens = [...tokenSet];
-  if (!tokens.length) return;
-  const type = sos.type && sos.type !== 'unknown' ? ' · ' + sos.type : '';
-  await admin.messaging().sendEachForMulticast({
-    tokens: tokens.slice(0, 500),
-    notification: {title: '🚨 SH✡MER — SOS nearby', body: (sos.name || 'Someone') + ' needs help' + type},
-    data: {tag: 'sos-' + (sos.id || event.params.id), url: LINK},
-    webpush: {fcmOptions: {link: LINK}, headers: {Urgency: 'high', TTL: '600'}},
-    android: {priority: 'high'}, apns: {headers: {'apns-priority': '10'}}
-  });
+  const starting = R.isNewSos(prev, sos);
+  const ending = R.isResolved(prev, sos);
+  if (!starting && !ending) return;
+  const rec = starting ? sos : Object.assign({}, prev, {resolved: false});
+  if (!rec || !rec.uid || rec.uid !== event.params.id) return;   // sos/<uid> must be the sender's own record
+  const [toksSnap, pairsSnap] = await Promise.all([db.ref('tokens').get(), db.ref('pairs/' + rec.uid).get()]);
+  const recips = R.resolveRecipients({sos: rec, tokens: toksSnap.val() || {}, pairs: pairsSnap.val() || {}});
+  if (!recips.length) { console.log('sosFanout', starting ? 'start' : 'end', 'no recipients'); return; }
+  let msgs;
+  if (starting) {
+    // The name each paired recipient saved for the sender (their own pairs record) - never sent to nearby people.
+    const names = {};
+    await Promise.all([...new Set(recips.filter(r => r.role === 'paired').map(r => r.uid))].map(async (uid) => {
+      try { names[uid] = (await db.ref('pairs/' + uid + '/' + rec.uid + '/name').get()).val(); } catch (e) {}
+    }));
+    msgs = recips.map(r => ({r, msg: R.buildMessage(rec, r, names[r.uid])}));
+  } else {
+    msgs = recips.map(r => ({r, msg: R.buildClear(rec, r)})).filter(m => m.msg);
+  }
+  const out = await sendAll(msgs);
+  // Tokens FCM says are gone (app uninstalled / token rotated): remove them.
+  const rm = {};
+  out.dead.forEach((r) => { rm['tokens/' + r.uid + (r.dev ? '/' + r.dev : '')] = null; });
+  if (Object.keys(rm).length) { try { await db.ref().update(rm); } catch (e) {} }
+  console.log('sosFanout', starting ? 'start' : 'end', JSON.stringify({recipients: recips.length,
+    paired: recips.filter(r => r.role === 'paired').length, sent: out.sent, failed: out.failed, pruned: out.dead.length}));
 });
 
 /* Targeted alarm queue → one user's device (check-in miss, geofence arrival, guardian alerts). */
@@ -63,14 +69,14 @@ exports.alarmFanout = onValueCreated('/alarms/{id}', async (event) => {
   const a = event.data.val();
   try {
     if (a && a.toUid) {
-      const token = (await db.ref('tokens/' + a.toUid + '/token').get()).val();
-      if (token) {
+      const devs = R.devicesOf(a.toUid, (await db.ref('tokens/' + a.toUid).get()).val());
+      for (const {token} of devs) {
         await admin.messaging().send({
           token,
           notification: {title: a.title || 'SH✡MER', body: a.body || ''},
           data: {tag: a.tag || 'shomer', url: LINK},
           webpush: {fcmOptions: {link: LINK}, headers: {Urgency: 'high'}}
-        });
+        }).catch((e) => console.log('alarmFanout send failed', e && e.code));
       }
     }
   } finally {
