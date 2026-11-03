@@ -5,7 +5,7 @@
 	<key>CFBundleDevelopmentRegion</key>
 	<string>en</string>
 	<key>CFBundleDisplayName</key>
-        <string>SHOMER</string>
+	<string>SHOMER</string>
 	<key>CFBundleExecutable</key>
 	<string>$(EXECUTABLE_NAME)</string>
 	<key>CFBundleIdentifier</key>
@@ -22,6 +22,30 @@
 	<string>$(CURRENT_PROJECT_VERSION)</string>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
+	<!-- SH✡MER: permission texts (English base; Hebrew in he.lproj/InfoPlist.strings) -->
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>SH✡MER uses your location to attach it to an SOS, to share it with the people in My Shomers when you turn sharing on, and to show safety events near you.</string>
+	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
+	<string>With "Always", SH✡MER keeps sharing your location with the people in My Shomers, and can still send your SOS, when the app is in the background or your phone is locked. It only runs while location sharing is on, and you can pause it at any time.</string>
+	<key>NSContactsUsageDescription</key>
+	<string>SH✡MER opens your contacts only when you pick someone to invite to My Shomers. Only the name and number you pick are used.</string>
+	<key>NSCameraUsageDescription</key>
+	<string>SH✡MER uses the camera only for features you turn on: the theft-protection selfie and photos you add to a report or alert.</string>
+	<key>NSMicrophoneUsageDescription</key>
+	<string>SH✡MER uses the microphone only during a fake-call check-in, so you can answer by voice. You can type instead.</string>
+	<key>NSSpeechRecognitionUsageDescription</key>
+	<string>Speech recognition lets you answer a SH✡MER fake-call check-in by voice. You can type instead.</string>
+	<key>NSMotionUsageDescription</key>
+	<string>SH✡MER uses motion data for Shake-to-SOS: hard shaking starts an SOS countdown that you can cancel.</string>
+	<!-- location = background location sharing + background Shake-to-SOS; audio = the SOS alarm sound. -->
+	<key>UIBackgroundModes</key>
+	<array>
+		<string>location</string>
+		<string>audio</string>
+	</array>
+	<!-- HTTPS only, no custom encryption: answers the export-compliance question in App Store Connect. -->
+	<key>ITSAppUsesNonExemptEncryption</key>
+	<false/>
 	<key>UILaunchStoryboardName</key>
 	<string>LaunchScreen</string>
 	<key>UIMainStoryboardFile</key>
