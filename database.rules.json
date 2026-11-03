@@ -86,7 +86,31 @@
     "tokens": {
       "$uid": {
         ".read": false,
-        ".write": "auth != null && auth.uid == $uid"
+        ".write": "auth != null && auth.uid == $uid",
+        "$dev": {
+          ".validate": "$dev.matches(/^d[0-9a-z]{4,40}$/) && newData.hasChildren(['token','ts','plat']) && newData.child('token').isString() && newData.child('token').val().length >= 20 && newData.child('token').val().length <= 4096 && newData.child('ts').isNumber() && newData.child('ts').val() <= now + 120000 && newData.child('plat').val().matches(/^(android|web)$/)",
+          "token": {
+            ".validate": true
+          },
+          "ts": {
+            ".validate": true
+          },
+          "plat": {
+            ".validate": true
+          },
+          "lang": {
+            ".validate": "newData.isString() && newData.val().matches(/^(he|en|ar)$/)"
+          },
+          "lat": {
+            ".validate": "newData.isNumber() && newData.val() >= -90 && newData.val() <= 90"
+          },
+          "lng": {
+            ".validate": "newData.isNumber() && newData.val() >= -180 && newData.val() <= 180"
+          },
+          "$other": {
+            ".validate": false
+          }
+        }
       }
     },
     "alarms": {
