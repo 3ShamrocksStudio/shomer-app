@@ -97,7 +97,7 @@ Nothing could wake a closed app:
 | Web takeover (block A) | Merged to main → www.shomer-app.co.il (staging; the native app loads this page too) | none |
 | Rules + functions deploy | **Blocked** | No Firebase credential in this environment or in repo secrets. The 31 Oct workflow failed with "NO CREDENTIAL". Cloud Functions also need the **Blaze plan, which is pending Dave's explicit yes** (do not upgrade without it). Expected cost at this volume: $0, inside the free tier, but Blaze needs a billing account. |
 | `google-services.json` (Android app in Firebase) | **Blocked** | Firebase console → Project settings → Add app → Android → package `il.co.shomerapp` → download. Then add it as repo secret `GOOGLE_SERVICES_JSON` (or give it to Claude). |
-| Native build | CI ready (`android-build.yml`). versionCode/versionName = run number (auto-bumped, >61). Branch builds no longer overwrite the website APK. | Dispatch from this branch (or from main after merge) |
+| Native build | **Built**: CI run 41671233704 on this branch, v1.0.63 / versionCode 63, signed AAB `shomer-release-aab` + APK artifacts. No `google-services.json` yet, so push is off in it; the poll backup is in. Branch builds no longer overwrite the website APK. | Rebuild after `GOOGLE_SERVICES_JSON` is added, to turn push on |
 | Play testing track | Auto-upload step added. It runs only if the secret `PLAY_SERVICE_ACCOUNT_JSON` exists. | Today: Dave uploads the AAB artifact in Play Console → Testing → Internal testing → Create release. Testers then update automatically. |
 
 **Fastest path to testers.** The native build alone (poll backup) gives paired SHOMERs a real locked-phone alarm within about 1 minute, with no Firebase deploy. The full instant push needs: Blaze yes, a Firebase credential, and `google-services.json`.
@@ -107,6 +107,8 @@ Deploy commands, once a credential exists:
 firebase deploy --only database,functions:sosFanout,functions:alarmFanout,functions:privacyRetention --project shomergency
 ```
 `privacyRetention` should go out with the rest because it enforces the 2-day and 90-day token limits.
+
+Note: `native/.gitignore` ignores every `android/` folder. New files under `native/shomer-android/android/` need `git add -f`.
 
 ## 6. Tests (all without real pushes)
 - `cd functions && npm test`: 17 unit tests covering recipients (paired at any distance, nearby within 5 km, no-point and stale-point excluded, sender excluded, multi-device and dedupe, old shape), lifecycle states, message privacy (no precise location; no id or name for nearby), TTL and priority, and token retention.
