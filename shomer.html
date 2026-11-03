@@ -11351,7 +11351,7 @@ function fbOnAuthed(uid){
   if(FB._watchdog){ clearTimeout(FB._watchdog); FB._watchdog=null; }
   if(FB.err&&/^auth-timeout/.test(FB.err)) FB.err=null;
   if(FB._authReady && FB.uid===uid){ return; } // already running on this uid
-  FB.uid=uid; FB._authReady=true;
+  FB.uid=uid; FB._authReady=true; setTimeout(function(){ try{ evpMaybeLoad(); }catch(e){} },2500);
   fbLog('AUTH READY · secure uid =', uid, '· ID token acquired · opening SSE data layer');
   try{ fbStartPresence(); }catch(e){}
   try{ fbListenSOS(); }catch(e){}
@@ -12336,7 +12336,24 @@ function founderWatchList(){
       var v=snap&&snap.val?snap.val():null;
       FOUNDER_UIDS = v || {};
       try{ if(typeof repaintMarkers==='function') repaintMarkers(); }catch(e){}
+      try{ window._evpSrv = v || {}; evpMaybeLoad(); }catch(e){}
     });
+  }catch(e){}
+}
+/* EVENTS PREVIEW gate (3 Nov): the events preview file is downloaded ONLY for a preview
+   account - a uid in the rules-protected founders node (write:false) or the verified founder
+   phone. Everyone else never loads it: no change for them. ?evp=0 turns it off, ?evp=1 back on. */
+function evpMaybeLoad(){
+  try{
+    if(window._evpLoaded || !FB || !FB.uid) return;
+    var q=location.search;
+    if(/[?&]evp=0\b/.test(q)) { try{ localStorage.setItem('shomer_evp','off'); }catch(e){} return; }
+    if(/[?&]evp=1\b/.test(q)) { try{ localStorage.removeItem('shomer_evp'); }catch(e){} }
+    try{ if(localStorage.getItem('shomer_evp')==='off') return; }catch(e){}
+    var ok = (window._evpSrv && window._evpSrv[FB.uid]===true) || (isFounder() && !!(SS.security&&SS.security.phoneVerified));
+    if(!ok) return;
+    window._evpLoaded=true;
+    var sc=document.createElement('script'); sc.src='events-preview.js?nosw&v=1'; sc.async=true; document.head.appendChild(sc);
   }catch(e){}
 }
 function founderCrestSVG(size){
