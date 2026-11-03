@@ -17,3 +17,6 @@ Thumbs.db
 # Note: .claude/ is intentionally not committed (local agent state)
 .claude/
 _redesign/
+
+# Cloud Functions dependencies (installed by npm, never committed)
+functions/node_modules/
