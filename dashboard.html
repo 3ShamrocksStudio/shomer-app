@@ -2410,5 +2410,6 @@ function render(idx){
 (function(){var ts=document.getElementById('terr-sel');if(ts)ts.onchange=onTerrChange;})();
 boot();
 </script>
+<script>/* events preview layer: only with ?evp=1 (seeded news events, never in stats) */try{ if(/[?&]evp=1\b/.test(location.search)){ var _evs=document.createElement('script'); _evs.src='events-preview-dash.js?nosw&v=1'; document.head.appendChild(_evs); } }catch(e){}</script>
 </body>
 </html>
