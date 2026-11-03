@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<!-- SOS / alerts from My Shomers break through Focus. No Apple approval needed. -->
+	<key>com.apple.developer.usernotifications.time-sensitive</key>
+	<true/>
+	<!-- Added in the iPhone build session (see IOS-BUILD-RUNBOOK.md), not before:
+	     aps-environment (push), com.apple.developer.associated-domains (invite links),
+	     com.apple.developer.usernotifications.critical-alerts (only after Apple approves it). -->
+</dict>
+</plist>
