@@ -16187,5 +16187,121 @@ function drillRenderProfile(){
 }
 
 </script>
+<!-- ══ SOS ALARM TAKEOVER (sos-push-alarm) ══ An incoming SOS from one of my SHOMERs, or from an
+     SOS push, takes over the whole screen: flashing red, looping alarm, vibration, until the person
+     taps "I see it". It sits on top of the existing alert card (onPartnerSOS / showIncomingSOS),
+     which keeps its "I'm coming / Navigate / Call" buttons. Self-contained: wraps onPartnerSOS and
+     onPartnerSOSClear, changes nothing else. See native/PUSH-ALARM-PLAN.md. -->
+<style id="sos-tko-css">
+#sos-tko{position:fixed;inset:0;z-index:100010;display:none;flex-direction:column;align-items:center;justify-content:center;gap:16px;padding:24px 16px calc(24px + env(safe-area-inset-bottom,0px));text-align:center;color:#fff;background:#8A0E1A;animation:sosTkoFlash .9s steps(1,end) infinite;font-family:var(--font-main,'Inter','Heebo',system-ui,sans-serif)}
+#sos-tko.on{display:flex}
+@keyframes sosTkoFlash{0%{background:#8A0E1A}50%{background:#E8182C}}
+@media (prefers-reduced-motion:reduce){#sos-tko{animation-duration:2.4s}}
+#sos-tko .tk-h{font-size:14px;font-weight:900;letter-spacing:.14em}
+#sos-tko .tk-ring{width:118px;height:118px;border-radius:50%;border:6px solid #fff;display:flex;align-items:center;justify-content:center;font-size:40px;font-weight:900;animation:sosTkoRing 1s ease-out infinite}
+@keyframes sosTkoRing{0%{box-shadow:0 0 0 0 rgba(255,255,255,.85)}100%{box-shadow:0 0 0 38px rgba(255,255,255,0)}}
+#sos-tko .tk-n{font-size:30px;font-weight:900;line-height:1.15;max-width:520px;overflow-wrap:anywhere}
+#sos-tko .tk-s{font-size:16px;font-weight:700;opacity:.95;max-width:520px}
+#sos-tko .tk-b{min-height:58px;width:min(420px,100%);border-radius:999px;border:none;font-size:18px;font-weight:900;cursor:pointer;background:#fff;color:#B01220}
+#sos-tko .tk-b2{min-height:46px;width:min(420px,100%);border-radius:999px;border:1.5px solid rgba(255,255,255,.7);background:transparent;color:#fff;font-size:15px;font-weight:800;cursor:pointer}
+#sos-tko .tk-d{font-size:12px;font-weight:700;opacity:.88;max-width:420px}
+</style>
+<div id="sos-tko" role="alertdialog" aria-modal="true" aria-live="assertive" aria-labelledby="sos-tko-n" aria-hidden="true">
+  <div class="tk-h"></div><div class="tk-ring">SOS</div><div class="tk-n" id="sos-tko-n"></div><div class="tk-s"></div>
+  <button type="button" class="tk-b"></button><button type="button" class="tk-b2"></button><div class="tk-d"></div>
+</div>
+<script>
+(function(){
+  var TKO={key:null,sid:'',timer:null,stopAt:0,native:false,acked:{},area:null};
+  function L(he,en,ar){ var l=(typeof currentLang!=='undefined')?currentLang:'he'; return l==='he'?he:l==='ar'?ar:en; }
+  function np(){ try{ return (typeof shomerNativePlugin==='function')?shomerNativePlugin():null; }catch(e){ return null; } }
+  function q(s){ return document.querySelector('#sos-tko '+s); }
+  function ring(){
+    var p=np();
+    if(p&&typeof p.startGuardAlarm==='function'){ TKO.native=true; try{ p.startGuardAlarm(); }catch(e){} return; }   /* native: ALARM stream, max volume, ignores silent mode */
+    TKO.native=false;
+    (function loop(){
+      if(!TKO.key||Date.now()>TKO.stopAt) return;
+      try{ playAlarm(6000); }catch(e){}
+      try{ if(navigator.vibrate) navigator.vibrate([600,200,600,200,900]); }catch(e){}
+      TKO.timer=setTimeout(loop,6000);
+    })();
+  }
+  function silence(){
+    if(TKO.timer){ clearTimeout(TKO.timer); TKO.timer=null; }
+    try{ if(typeof stopAlarm==='function') stopAlarm(); }catch(e){}
+    try{ if(navigator.vibrate) navigator.vibrate(0); }catch(e){}
+    var p=np(); if(TKO.native&&p){ try{ p.stopGuardAlarm&&p.stopGuardAlarm(); }catch(e){} }
+    TKO.native=false;
+  }
+  function hide(){ var el=document.getElementById('sos-tko'); if(el){ el.classList.remove('on'); el.setAttribute('aria-hidden','true'); } }
+  /* o: {key, sid, name, paired, body, area:[lat,lng] (nearby push only, ~1 km)} */
+  function show(o){
+    if(!o||!o.key) return;
+    var a=TKO.acked[o.key]; if(a && Date.now()-a<30*60000) return;   /* already acknowledged this SOS */
+    var el=document.getElementById('sos-tko'); if(!el) return;
+    if(TKO.key===o.key && el.classList.contains('on')) return;
+    if(TKO.key) silence();
+    TKO.key=o.key; TKO.sid=o.sid||''; TKO.area=o.area||null; TKO.stopAt=Date.now()+3*60000;   /* sound stops after 3 min; the screen stays */
+    q('.tk-h').textContent=L('התרעת SOS','SOS ALERT','تنبيه SOS');
+    q('.tk-n').textContent=o.paired?(o.name||L('שומר/ת שלך','Your SHOMER','حارسك')):L('SOS בקרבתך','SOS near you','SOS بالقرب منك');
+    q('.tk-s').textContent=o.body||(o.paired?L('זקוק/ה לעזרה - עכשיו','needs help - right now','بحاجة إلى مساعدة - الآن'):L('מישהו באזור שלך צריך עזרה','Someone in your area needs help','شخص في منطقتك بحاجة إلى مساعدة'));
+    q('.tk-b').textContent=o.paired?L('ראיתי - פתח/י את האירוע','I see it - open the event','رأيت - افتح الحدث'):L('ראיתי - הצג/י את האזור','I see it - show the area','رأيت - اعرض المنطقة');
+    q('.tk-b2').textContent=L('השתק/י','Silence','إسكات');
+    q('.tk-d').textContent=L('⚠ SH✡MER אינו תחליף לחיוג 100 / 101 / 102','⚠ SH✡MER is not a substitute for calling 100 / 101 / 102','⚠ SH✡MER ليس بديلاً عن الاتصال بـ 100 / 101 / 102');
+    el.classList.add('on'); el.setAttribute('aria-hidden','false');
+    var p=np(); if(p&&typeof p.stopSosPush==='function'){ try{ p.stopSosPush({sid:TKO.sid}); }catch(e){} }   /* the push/poll alarm hands over to this screen */
+    ring();
+    try{ q('.tk-b').focus(); }catch(e){}
+  }
+  function ack(openIt){
+    var k=TKO.key, area=TKO.area; if(!k) return;
+    TKO.acked[k]=Date.now(); silence(); hide(); TKO.key=null;
+    if(!openIt) return;
+    try{
+      if(k.indexOf('p:')===0){ var c=document.getElementById('in-sos-'+k.slice(2)); if(c&&c.scrollIntoView) c.scrollIntoView({block:'nearest'}); }
+      else if(area&&typeof MAP!=='undefined'&&MAP){ MAP.setView(area,14,{animate:true}); }
+    }catch(e){}
+  }
+  function clearKey(k){ delete TKO.acked[k]; if(TKO.key===k){ silence(); hide(); TKO.key=null; } }
+  (function wire(){ var b=q('.tk-b'), b2=q('.tk-b2'); if(!b){ return setTimeout(wire,500); } b.onclick=function(){ ack(true); }; b2.onclick=function(){ ack(false); }; })();
+
+  /* 1) Live SOS from one of my SHOMERs (app open). Only a fresh SOS (not an "older SOS") takes over. */
+  if(typeof onPartnerSOS==='function'){
+    var _oP=onPartnerSOS, _oC=onPartnerSOSClear;
+    window.onPartnerSOS=function(puid){
+      var before=(typeof SOSBUS!=='undefined'&&SOSBUS.mine)?SOSBUS.mine[puid]:undefined;
+      var r=_oP.apply(this,arguments);
+      try{
+        if(before!==1 && SOSBUS.mine[puid]===1){
+          var rec=(FB&&FB._sosPeer&&FB._sosPeer[puid]&&FB._sosPeer[puid].rec)||null;
+          show({key:'p:'+puid, sid:rec?String(rec.id||rec.ts||''):'', name:(memberByPair(puid)||{}).name||'', paired:true});
+        }
+      }catch(e){}
+      return r;
+    };
+    window.onPartnerSOSClear=function(puid){
+      var r=_oC.apply(this,arguments);
+      try{ if(!SOSBUS.mine[puid]) clearKey('p:'+puid); }catch(e){}
+      return r;
+    };
+  }
+  /* 2) Opened from an SOS push (MainActivity passes the push data). No precise location in it:
+        a paired SOS is read from sos/<uid> by the live listener; a nearby one has a ~1 km area. */
+  window.__shomerSosPush=function(json){
+    var d={}; try{ d=(typeof json==='string')?JSON.parse(json):(json||{}); }catch(e){ return; }
+    if(d.kind!=='sos') return;
+    var paired=!!(d.from && typeof memberByPair==='function' && memberByPair(d.from));
+    if(paired){
+      show({key:'p:'+d.from, sid:d.sid||'', name:(memberByPair(d.from)||{}).name||'', paired:true});
+      try{ if(typeof fbListenSOS==='function') fbListenSOS(); }catch(e){}
+    } else {
+      var la=parseFloat(d.alat), lo=parseFloat(d.alng);
+      show({key:'n:'+(d.sid||''), sid:d.sid||'', paired:false, body:d.body||'', area:(isFinite(la)&&isFinite(lo))?[la,lo]:null});
+    }
+  };
+  window.__shomerSosTakeover={show:show, ack:ack, clear:clearKey};   /* for tests */
+})();
+</script>
 </body>
 </html>
