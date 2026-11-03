@@ -21,6 +21,10 @@ const LINK = 'https://www.shomer-app.co.il/shomer.html';
 const R = require('./recipients');
 async function sendAll(msgs) {
   const out = {sent: 0, failed: 0, dead: []};
+  if (process.env.FUNCTIONS_EMULATOR === 'true') {   // tests: never contact FCM from the emulator
+    msgs.forEach(m => console.log('EMULATOR-DRY-RUN', JSON.stringify({role: m.r.role, plat: m.r.plat, msg: m.msg})));
+    return out;
+  }
   for (let i = 0; i < msgs.length; i += 500) {
     const chunk = msgs.slice(i, i + 500);
     const res = await admin.messaging().sendEach(chunk.map(m => m.msg));
@@ -39,7 +43,7 @@ exports.sosFanout = onValueWritten('/sos/{id}', async (event) => {
   const starting = R.isNewSos(prev, sos);
   const ending = R.isResolved(prev, sos);
   if (!starting && !ending) return;
-  const rec = starting ? sos : Object.assign({}, prev, {resolved: false});
+  const rec = starting ? sos : prev;   // ending: same people as the alarm went to
   if (!rec || !rec.uid || rec.uid !== event.params.id) return;   // sos/<uid> must be the sender's own record
   const [toksSnap, pairsSnap] = await Promise.all([db.ref('tokens').get(), db.ref('pairs/' + rec.uid).get()]);
   const recips = R.resolveRecipients({sos: rec, tokens: toksSnap.val() || {}, pairs: pairsSnap.val() || {}});
@@ -68,7 +72,9 @@ exports.sosFanout = onValueWritten('/sos/{id}', async (event) => {
 exports.alarmFanout = onValueCreated('/alarms/{id}', async (event) => {
   const a = event.data.val();
   try {
-    if (a && a.toUid) {
+    // SOS itself is pushed ONCE, by sosFanout (alarm + full-screen). The app also queues a paired
+    // "SOS from <name>" item here (fbAlertPairedSos) - skip it so nobody gets two pushes per SOS.
+    if (a && a.toUid && a.tag !== 'sos') {
       const devs = R.devicesOf(a.toUid, (await db.ref('tokens/' + a.toUid).get()).val());
       for (const {token} of devs) {
         await admin.messaging().send({

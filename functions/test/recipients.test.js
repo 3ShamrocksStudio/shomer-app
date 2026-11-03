@@ -101,3 +101,14 @@ test('clear message: android only, no location', () => {
   assert.strictEqual(c.data.kind, 'sos_clear'); assert.strictEqual(c.data.from, '');
   assert.strictEqual(R.buildClear(sos, {token: 'T', plat: 'web', role: 'paired'}), null);
 });
+
+test('lifecycle spec states: closed states end it, reopen re-alarms', () => {
+  for (const st of ['cancelled', 'false_alarm', 'expired', 'resolved']) {
+    const closed = Object.assign({}, sos, {state: st});
+    assert.ok(R.isResolved(sos, closed), st);
+    assert.ok(!R.isNewSos(sos, closed), st);
+    assert.ok(R.isNewSos(closed, Object.assign({}, sos, {state: 'open'})), 'reopen after ' + st);
+    assert.strictEqual(R.resolveRecipients({sos: closed, tokens: {p1: {token: 'T'}}, pairs: {p1: {}}, now: NOW}).length, 0);
+  }
+  assert.ok(!R.isNewSos(Object.assign({}, sos, {state: 'accepted'}), Object.assign({}, sos, {state: 'onscene'})));
+});

@@ -39,7 +39,7 @@ function devicesOf(uid, rec) {
 
 /** @returns [{uid, dev, token, plat, lang, role:'paired'|'nearby', distM?}] - one entry per token. */
 function resolveRecipients({sos, tokens, pairs, now = Date.now(), radiusM = RADIUS_M}) {
-  if (!sos || sos.resolved || !isNum(sos.lat) || !isNum(sos.lng) || !sos.uid) return [];
+  if (!isOpen(sos) || !isNum(sos.lat) || !isNum(sos.lng) || !sos.uid) return [];
   const paired = new Set(Object.keys(pairs || {}));
   const byToken = new Map();
   Object.keys(tokens || {}).forEach((uid) => {
@@ -108,14 +108,20 @@ function buildClear(sos, r) {
   return null;   // web: the notification just stays until tapped; the app shows the event as ended
 }
 
-/** Is this write the START of a new SOS (not a type/position/resolve update)? */
+/* Open / closed. Today the record has resolved:true|false. EVENT-LIFECYCLE-SPEC.md adds
+   state: cancelled | false_alarm | expired | resolved (closed) and reopen - both are understood. */
+const CLOSED = {cancelled: 1, false_alarm: 1, expired: 1, resolved: 1};
+function isOpen(s) { return !!s && s.resolved !== true && !CLOSED[s.state]; }
+
+/** Is this write the START of a new SOS (or a reopen) - not a type/position/heartbeat update? */
 function isNewSos(prev, sos) {
-  if (!sos || sos.resolved || !isNum(sos.lat)) return false;
-  return !prev || !!prev.resolved || (sos.id || sos.ts) !== (prev.id || prev.ts);
+  if (!isOpen(sos) || !isNum(sos.lat)) return false;
+  return !isOpen(prev) || (sos.id || sos.ts) !== (prev.id || prev.ts);
 }
+/** Did an open SOS just close (or get deleted)? */
 function isResolved(prev, sos) {
-  return !!prev && !prev.resolved && (!sos || !!sos.resolved);
+  return isOpen(prev) && !isOpen(sos);
 }
 
-module.exports = {resolveRecipients, buildMessage, buildClear, isNewSos, isResolved, devicesOf, distM, coarse,
+module.exports = {isOpen, resolveRecipients, buildMessage, buildClear, isNewSos, isResolved, devicesOf, distM, coarse,
   RADIUS_M, LOC_MAX_AGE_MS, TTL_S, NEARBY_ALARM};
