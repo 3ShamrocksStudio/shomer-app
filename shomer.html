@@ -634,8 +634,10 @@ body.sheet-open .ff-fab{opacity:0;pointer-events:none;}
 .sos-btn{width:90px;height:90px;border-radius:50%;background:radial-gradient(circle at 36% 28%,#FF3B50 0%,#E0182C 42%,#9A0F1E 100%);border:3.5px solid rgba(255,255,255,.2);box-shadow:0 0 0 4px rgba(204,20,38,.4),0 10px 40px rgba(204,20,38,.66),0 0 70px rgba(204,20,38,.22),inset 0 2px 6px rgba(255,255,255,.18),inset 0 -6px 14px rgba(0,0,0,.34);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;transition:transform .12s,box-shadow .12s,filter .12s;position:relative;z-index:1;}
 .sos-btn:hover{filter:brightness(1.06);}
 .sos-btn:active{transform:scale(.9);}
-.sos-btn.active{background:radial-gradient(circle at 36% 28%,#F0A024 0%,#D08012 45%,#7A4A00 100%);box-shadow:0 0 0 4px rgba(192,120,8,.44),0 10px 40px rgba(192,120,8,.64);animation:sa .9s ease-in-out infinite;}
+/* v312: SOS stays SH✡MER red in every state (it used to turn orange while active) - the active state is shown by a pulse + expanding ring */
+.sos-btn.active{background:radial-gradient(circle at 36% 28%,#FF3B50 0%,#E8182C 42%,#8A0E1A 100%);box-shadow:0 0 0 4px rgba(232,24,44,.5),0 10px 40px rgba(204,20,38,.7);animation:sa .9s ease-in-out infinite,sosring 1.2s ease-out infinite;}
 @keyframes sa{0%,100%{transform:scale(1)}50%{transform:scale(1.07)}}
+@keyframes sosring{0%{box-shadow:0 0 0 0 rgba(232,24,44,.8),0 10px 40px rgba(204,20,38,.7)}100%{box-shadow:0 0 0 24px rgba(232,24,44,0),0 10px 40px rgba(204,20,38,.7)}}
 .sos-txt{font-size:18px;font-weight:900;letter-spacing:3px;color:#fff;line-height:1;text-shadow:0 1px 4px rgba(0,0,0,.4);}
 .sos-sub{font-size:10px;font-weight:800;letter-spacing:.6px;color:#FF9aa3;text-transform:uppercase;}
 
