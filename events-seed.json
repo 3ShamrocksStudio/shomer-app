@@ -1,87 +1,131 @@
 {
-  "v": 1,
-  "updated": "2026-11-03",
-  "note": "Preview-only seed events from published Israeli news. Shown only to preview accounts. Not user reports; never counted in paid statistics. City/area-level points only (2 dp).",
-  "events": [
-    {
-      "id": "zalka",
-      "mem": true,
-      "cat": "violence",
-      "at": "2026-04-21T19:00:00Z",
-      "atKind": "date",
-      "lat": 32.09, "lng": 34.88,
-      "area": {"he": "פתח תקווה", "en": "Petah Tikva"},
-      "sum": {
-        "he": "ימנו בנימין זלקה ז״ל, בן 21, הותקף ונדקר בפתח תקווה בערב יום העצמאות, אחרי שביקש מקבוצת נערים לשמור על הסדר בפיצרייה שבה עבד. הוא מת מפצעיו בבית החולים.",
-        "en": "Yemane Binyamin Zalka, 21, was attacked and stabbed in Petah Tikva on Independence Day eve after asking a group of teenagers to keep order at the pizzeria where he worked. He died of his wounds in hospital."
-      },
-      "src": {"name": "N12", "url": "https://www.mako.co.il/news-law/2026_q2/Article-f6a371cc9bdbd91027.htm"},
-      "src2": {"name": "ynetnews", "url": "https://www.ynetnews.com/article/2866zicrf"}
-    },
-    {
-      "id": "rahat-1102",
-      "cat": "violence",
-      "at": "2026-11-02T17:10:26Z",
-      "atKind": "reported",
-      "lat": 31.39, "lng": 34.75,
-      "area": {"he": "רהט", "en": "Rahat"},
-      "sum": {
-        "he": "צעיר נרצח בירי ברהט ושניים נוספים נפצעו באורח בינוני. לפי החשד הראשוני של המשטרה: סכסוך פלילי בין משפחות.",
-        "en": "A young man was shot dead in Rahat and two others were moderately injured. Police suspect a criminal dispute between families."
-      },
-      "src": {"name": "ynet", "url": "https://www.ynet.co.il/news/article/bjaxsnitzg"}
-    },
-    {
-      "id": "isfiya-1101",
-      "cat": "violence",
-      "at": "2026-11-01T04:25:00Z",
-      "atKind": "time",
-      "lat": 32.72, "lng": 35.06,
-      "area": {"he": "עוספיא", "en": "Isfiya"},
-      "sum": {
-        "he": "גבר בן 23 נורה למוות בעוספיא בשעות הבוקר. לפי המשטרה, הרקע ככל הנראה פלילי.",
-        "en": "A 23-year-old man was shot dead in Isfiya in the morning. Police say the background is apparently criminal."
-      },
-      "src": {"name": "ynet", "url": "https://www.ynet.co.il/news/article/hyv25sntgl"}
-    },
-    {
-      "id": "telsheva-1030",
-      "cat": "violence",
-      "at": "2026-10-30T20:32:47Z",
-      "atKind": "reported",
-      "lat": 31.25, "lng": 34.86,
-      "area": {"he": "תל שבע", "en": "Tel Sheva"},
-      "sum": {
-        "he": "גבר נורה למוות בתל שבע. לפי החשד, הרקע: סכסוך פלילי בין משפחות.",
-        "en": "A man was shot dead in Tel Sheva. Police suspect a criminal dispute between families."
-      },
-      "src": {"name": "הארץ", "url": "https://www.haaretz.co.il/news/law/2026-10-30/ty-article/000001a1-8e80-def7-adad-8ef84cf20000"}
-    },
-    {
-      "id": "dimona-1103",
-      "cat": "medical",
-      "at": "2026-11-03T16:35:18Z",
-      "atKind": "reported",
-      "lat": 31.07, "lng": 35.03,
-      "area": {"he": "דימונה", "en": "Dimona"},
-      "sum": {
-        "he": "תאונה בין שני כלי רכב בדימונה: אישה כבת 65 נפצעה קשה ושישה נוספים נפצעו קל. מד״א פינה אותם לסורוקה.",
-        "en": "Two-vehicle crash in Dimona: a woman of about 65 was seriously injured and six others lightly. MDA took them to Soroka."
-      },
-      "src": {"name": "ynet", "url": "https://www.ynet.co.il/news/article/h1ibpkptze"}
-    },
-    {
-      "id": "pt-sirkin-1103",
-      "cat": "medical",
-      "at": "2026-11-03T13:36:14Z",
-      "atKind": "reported",
-      "lat": 32.10, "lng": 34.92,
-      "area": {"he": "פתח תקווה · צומת סירקין", "en": "Petah Tikva · Sirkin junction"},
-      "sum": {
-        "he": "רוכב קורקינט חשמלי כבן 20 נפצע קשה מפגיעת אוטובוס בצומת סירקין בפתח תקווה. מד״א פינה אותו לבילינסון.",
-        "en": "An e-scooter rider of about 20 was seriously injured when hit by a bus at Sirkin junction, Petah Tikva. MDA took him to Beilinson."
-      },
-      "src": {"name": "ynet", "url": "https://www.ynet.co.il/news/article/hykgxwdazx"}
-    }
-  ]
+ "v": 1,
+ "updated": "2026-11-03",
+ "note": "Preview-only seed events from published Israeli news. Shown only to preview accounts. Not user reports; never counted in paid statistics. City/area-level points only (2 dp).",
+ "events": [
+  {
+   "id": "zalka",
+   "cat": "violence",
+   "at": "2026-04-21T19:00:00Z",
+   "atKind": "date",
+   "lat": 32.09,
+   "lng": 34.88,
+   "area": {
+    "he": "פתח תקווה",
+    "en": "Petah Tikva"
+   },
+   "sum": {
+    "he": "ימנו בנימין זלקה ז״ל, בן 21, הותקף ונדקר בפתח תקווה בערב יום העצמאות, אחרי שביקש מקבוצת נערים לשמור על הסדר בפיצרייה שבה עבד. הוא מת מפצעיו בבית החולים.",
+    "en": "Yemane Binyamin Zalka, 21, was attacked and stabbed in Petah Tikva on Independence Day eve after asking a group of teenagers to keep order at the pizzeria where he worked. He died of his wounds in hospital."
+   },
+   "src": {
+    "name": "N12",
+    "url": "https://www.mako.co.il/news-law/2026_q2/Article-f6a371cc9bdbd91027.htm"
+   },
+   "src2": {
+    "name": "ynetnews",
+    "url": "https://www.ynetnews.com/article/2866zicrf"
+   }
+  },
+  {
+   "id": "rahat-1102",
+   "cat": "violence",
+   "at": "2026-11-02T17:10:26Z",
+   "atKind": "reported",
+   "lat": 31.39,
+   "lng": 34.75,
+   "area": {
+    "he": "רהט",
+    "en": "Rahat"
+   },
+   "sum": {
+    "he": "צעיר נרצח בירי ברהט ושניים נוספים נפצעו באורח בינוני. לפי החשד הראשוני של המשטרה: סכסוך פלילי בין משפחות.",
+    "en": "A young man was shot dead in Rahat and two others were moderately injured. Police suspect a criminal dispute between families."
+   },
+   "src": {
+    "name": "ynet",
+    "url": "https://www.ynet.co.il/news/article/bjaxsnitzg"
+   }
+  },
+  {
+   "id": "isfiya-1101",
+   "cat": "violence",
+   "at": "2026-11-01T04:25:00Z",
+   "atKind": "time",
+   "lat": 32.72,
+   "lng": 35.06,
+   "area": {
+    "he": "עוספיא",
+    "en": "Isfiya"
+   },
+   "sum": {
+    "he": "גבר בן 23 נורה למוות בעוספיא בשעות הבוקר. לפי המשטרה, הרקע ככל הנראה פלילי.",
+    "en": "A 23-year-old man was shot dead in Isfiya in the morning. Police say the background is apparently criminal."
+   },
+   "src": {
+    "name": "ynet",
+    "url": "https://www.ynet.co.il/news/article/hyv25sntgl"
+   }
+  },
+  {
+   "id": "telsheva-1030",
+   "cat": "violence",
+   "at": "2026-10-30T20:32:47Z",
+   "atKind": "reported",
+   "lat": 31.25,
+   "lng": 34.86,
+   "area": {
+    "he": "תל שבע",
+    "en": "Tel Sheva"
+   },
+   "sum": {
+    "he": "גבר נורה למוות בתל שבע. לפי החשד, הרקע: סכסוך פלילי בין משפחות.",
+    "en": "A man was shot dead in Tel Sheva. Police suspect a criminal dispute between families."
+   },
+   "src": {
+    "name": "הארץ",
+    "url": "https://www.haaretz.co.il/news/law/2026-10-30/ty-article/000001a1-8e80-def7-adad-8ef84cf20000"
+   }
+  },
+  {
+   "id": "dimona-1103",
+   "cat": "medical",
+   "at": "2026-11-03T16:35:18Z",
+   "atKind": "reported",
+   "lat": 31.07,
+   "lng": 35.03,
+   "area": {
+    "he": "דימונה",
+    "en": "Dimona"
+   },
+   "sum": {
+    "he": "תאונה בין שני כלי רכב בדימונה: אישה כבת 65 נפצעה קשה ושישה נוספים נפצעו קל. מד״א פינה אותם לסורוקה.",
+    "en": "Two-vehicle crash in Dimona: a woman of about 65 was seriously injured and six others lightly. MDA took them to Soroka."
+   },
+   "src": {
+    "name": "ynet",
+    "url": "https://www.ynet.co.il/news/article/h1ibpkptze"
+   }
+  },
+  {
+   "id": "pt-sirkin-1103",
+   "cat": "medical",
+   "at": "2026-11-03T13:36:14Z",
+   "atKind": "reported",
+   "lat": 32.1,
+   "lng": 34.92,
+   "area": {
+    "he": "פתח תקווה · צומת סירקין",
+    "en": "Petah Tikva · Sirkin junction"
+   },
+   "sum": {
+    "he": "רוכב קורקינט חשמלי כבן 20 נפצע קשה מפגיעת אוטובוס בצומת סירקין בפתח תקווה. מד״א פינה אותו לבילינסון.",
+    "en": "An e-scooter rider of about 20 was seriously injured when hit by a bus at Sirkin junction, Petah Tikva. MDA took him to Beilinson."
+   },
+   "src": {
+    "name": "ynet",
+    "url": "https://www.ynet.co.il/news/article/hykgxwdazx"
+   }
+  }
+ ]
 }
