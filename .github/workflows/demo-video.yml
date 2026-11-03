@@ -34,6 +34,7 @@ jobs:
           mkdir -p android/app/src/main/res/raw && cp -v shomer-android/android/app/src/main/res/raw/* android/app/src/main/res/raw/ || true
           mkdir -p android/app/src/main/res/drawable && cp -v shomer-android/android/app/src/main/res/drawable/ic_stat_shomer.xml android/app/src/main/res/drawable/ || true
           node scripts/apply-manifest.js
+          grep -q "firebase-messaging" android/app/build.gradle || sed -i "/^dependencies {/a\    implementation platform('com.google.firebase:firebase-bom:33.5.1')\n    implementation 'com.google.firebase:firebase-messaging'" android/app/build.gradle
           cd android && ./gradlew assembleDebug --stacktrace
           ls -la app/build/outputs/apk/debug/
       - name: Enable KVM (+ emulator audio library)
