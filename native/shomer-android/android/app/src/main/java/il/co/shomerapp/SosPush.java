@@ -21,7 +21,7 @@ import java.util.Map;
  * INCOMING SOS ALARM from a push (app closed, phone locked). Called by ShomerMessagingService
  * for a data-only, high-priority FCM message sent by the sosFanout Cloud Function.
  *  - Paired SHOMER (and nearby, unless the server turns that off): looping alarm on the ALARM
- *    stream through AlarmForegroundService + a full-screen alert over the lock screen.
+ *    stream through IncomingAlarmService (separate from my own SOS siren) + a full-screen alert.
  *  - If Android refuses the foreground service, an INSISTENT notification (alarm sound repeats
  *    until opened) on the "shomer_sos_alert" channel does the job instead.
  *  - Tapping opens SHOMER on the event (MainActivity hands the push data to the web app).
@@ -72,12 +72,8 @@ final class SosPush {
     boolean loop = !"0".equals(d.get("alarm"));
     if (loop) {
       // High-priority FCM lets the app start a foreground service from the background.
-      Intent i = new Intent(c, AlarmForegroundService.class);
-      i.putExtra("in_title", title); i.putExtra("in_body", body); i.putExtra(EXTRA, j.toString());
-      try {
-        if (Build.VERSION.SDK_INT >= 26) c.startForegroundService(i); else c.startService(i);
-        return;
-      } catch (Throwable e) { /* fall through to the insistent notification */ }
+      try { IncomingAlarmService.start(c, title, body, j.toString()); return; }
+      catch (Throwable e) { /* fall through to the insistent notification */ }
     }
     show(c, title, body, j.toString(), loop);
   }
@@ -119,7 +115,7 @@ final class SosPush {
   }
   static void stopAll(Context c) {
     c.getSharedPreferences(P, Context.MODE_PRIVATE).edit().remove("ringing").apply();
-    try { AlarmForegroundService.stopAlarm(c); } catch (Throwable e) {}
+    try { IncomingAlarmService.stop(c); } catch (Throwable e) {}   // never AlarmForegroundService/AlarmPlayer: those are MY OWN SOS siren
     try { ((NotificationManager) c.getSystemService(Context.NOTIFICATION_SERVICE)).cancel(NOTIF_ID); } catch (Throwable e) {}
   }
 

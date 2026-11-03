@@ -51,6 +51,12 @@
         android:value="Background shake-to-SOS emergency trigger for a personal-safety app" />
 </service>
 
+<!-- ── Incoming SOS alarm (someone else's SOS) - separate from my own SOS siren ── -->
+<service
+    android:name="il.co.shomerapp.IncomingAlarmService"
+    android:exported="false"
+    android:foregroundServiceType="mediaPlayback" />
+
 <!-- ── SOS push: SHOMER's own FCM receiver (rings the incoming-SOS alarm, app closed too) ── -->
 <service
     android:name="il.co.shomerapp.ShomerMessagingService"

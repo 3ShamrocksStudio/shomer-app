@@ -48,6 +48,10 @@
                 android:value="Background shake-to-SOS emergency trigger for a personal-safety app" />
         </service>
         <service
+            android:name=".IncomingAlarmService"
+            android:exported="false"
+            android:foregroundServiceType="mediaPlayback" />
+        <service
             android:name=".ShomerMessagingService"
             android:exported="false">
             <intent-filter>

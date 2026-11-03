@@ -41,10 +41,7 @@ public class AlarmForegroundService extends Service {
       stopSelf();
       return START_NOT_STICKY;
     }
-    // Incoming SOS from a push (SosPush) uses its own title + opens the event; own SOS unchanged.
-    Notification n = (intent != null && intent.hasExtra("in_title"))
-        ? buildIncoming(intent.getStringExtra("in_title"), intent.getStringExtra("in_body"), intent.getStringExtra(SosPush.EXTRA))
-        : buildNotification();
+    Notification n = buildNotification();
     if (Build.VERSION.SDK_INT >= 34) {
       startForeground(1, n, android.content.pm.ServiceInfo.FOREGROUND_SERVICE_TYPE_MEDIA_PLAYBACK);
     } else {
@@ -115,27 +112,6 @@ public class AlarmForegroundService extends Service {
         .addAction(0, "⛔ STOP / \u05e2\u05e6\u05d5\u05e8 \u05d0\u05d6\u05e2\u05e7\u05d4", stopPi)
         .setPriority(NotificationCompat.PRIORITY_MAX)
         .setCategory(NotificationCompat.CATEGORY_ALARM)
-        .build();
-  }
-
-  private Notification buildIncoming(String title, String body, String json) {
-    SosPush.channels(this);
-    PendingIntent pi = SosPush.openIntent(this, json);
-    Intent stopI = new Intent(this, AlarmForegroundService.class);
-    stopI.setAction("STOP");
-    PendingIntent stopPi = PendingIntent.getService(this, 1, stopI, PendingIntent.FLAG_IMMUTABLE);
-    return new NotificationCompat.Builder(this, SosPush.CH_LOOP)
-        .setContentTitle(title)
-        .setContentText(body)
-        .setSmallIcon(R.drawable.ic_stat_shomer)
-        .setColor(0xFFCC1426)
-        .setOngoing(true)
-        .setContentIntent(pi)
-        .setFullScreenIntent(pi, true)
-        .addAction(0, "\u26D4 \u05d4\u05e9\u05ea\u05e7 / Silence", stopPi)
-        .setPriority(NotificationCompat.PRIORITY_MAX)
-        .setCategory(NotificationCompat.CATEGORY_ALARM)
-        .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
         .build();
   }
 

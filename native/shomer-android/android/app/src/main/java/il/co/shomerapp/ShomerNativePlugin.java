@@ -172,11 +172,26 @@ public class ShomerNativePlugin extends Plugin {
     } catch (Throwable e) { r.put("token", SosPush.token(getContext())); call.resolve(r); }
   }
 
-  /** The web app is showing this SOS itself: never ring it again from push/poll, stop the push alarm. */
+  /** Web takeover rings someone else's SOS on the separate incoming-alarm service (never my own siren). */
   @PluginMethod
-  public void stopSosPush(PluginCall call) {
+  public void startIncomingAlarm(PluginCall call) {
+    try { IncomingAlarmService.start(getContext(), call.getString("title", "\uD83D\uDEA8 SH\u2721MER SOS"), call.getString("body", ""), null); } catch (Throwable e) {}
+    call.resolve();
+  }
+  /** Person acknowledged / silenced the incoming SOS: stop that alarm only, and leave the lock screen. */
+  @PluginMethod
+  public void stopIncomingAlarm(PluginCall call) {
+    try { IncomingAlarmService.stop(getContext()); } catch (Throwable e) {}
+    try { MainActivity a = MainActivity.sActive; if (a != null) a.clearOverLock(); } catch (Throwable e) {}
+    call.resolve();
+  }
+
+  /** The web takeover is showing this SOS: never ring it again from push/poll, and drop the fallback
+   *  notification. A ringing IncomingAlarmService keeps ringing - the takeover owns it from now on. */
+  @PluginMethod
+  public void sosSeen(PluginCall call) {
     try { String sid = call.getString("sid", null); if (sid != null && sid.length() > 0) SosPush.seen(getContext(), sid); } catch (Throwable e) {}
-    try { SosPush.stopAll(getContext()); } catch (Throwable e) {}
+    try { ((android.app.NotificationManager) getContext().getSystemService(Context.NOTIFICATION_SERVICE)).cancel(SosPush.NOTIF_ID); } catch (Throwable e) {}
     call.resolve();
   }
 

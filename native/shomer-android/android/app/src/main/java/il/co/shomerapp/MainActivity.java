@@ -92,8 +92,8 @@ public class MainActivity extends BridgeActivity {
   }
 
   /** Opened from an incoming-SOS push: show over the lock screen and hand the push data to the web
-   *  app (retried until it is ready). Once the web app took it, its full-screen takeover rings
-   *  instead, so the push's own alarm service is stopped then. */
+   *  app (retried until it is ready, also while the WebView is still being created). The takeover
+   *  then owns the ringing IncomingAlarmService and stops it when the person acknowledges. */
   private void dispatchSosPush(Intent intent) {
     String j = intent != null ? intent.getStringExtra(SosPush.EXTRA) : null;
     if (j == null) return;
@@ -105,14 +105,28 @@ public class MainActivity extends BridgeActivity {
   private void deliverPush(final String quotedJson, final int attempt) {
     runOnUiThread(() -> {
       try {
-        if (getBridge() == null) return;
+        if (getBridge() == null) {   // WebView not up yet (cold start): keep the push and try again
+          if (attempt < 60) getWindow().getDecorView().postDelayed(() -> deliverPush(quotedJson, attempt + 1), 750);
+          return;
+        }
         getBridge().eval("(typeof window.__shomerSosPush==='function')?(window.__shomerSosPush(" + quotedJson + "),'ok'):'wait'", (v) -> {
-          if (v != null && v.contains("ok")) { try { AlarmForegroundService.stopAlarm(this); } catch (Throwable e) {} return; }
+          if (v != null && v.contains("ok")) return;   // the takeover now owns the ringing alarm
           if (attempt < 60) getWindow().getDecorView().postDelayed(() -> deliverPush(quotedJson, attempt + 1), 750);
         });
       } catch (Exception e) {
         if (attempt < 60) getWindow().getDecorView().postDelayed(() -> deliverPush(quotedJson, attempt + 1), 750);
       }
+    });
+  }
+
+  /** The person acknowledged the incoming SOS: stop showing SHOMER over the lock screen. */
+  void clearOverLock() {
+    runOnUiThread(() -> {
+      try {
+        if (Build.VERSION.SDK_INT >= 27) { setShowWhenLocked(false); setTurnScreenOn(false); }
+        else { getWindow().clearFlags(WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED | WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON); }
+        getWindow().clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+      } catch (Throwable e) {}
     });
   }
 
