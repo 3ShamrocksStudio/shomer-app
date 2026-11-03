@@ -102,10 +102,10 @@
             ".validate": "newData.isString() && newData.val().matches(/^(he|en|ar)$/)"
           },
           "lat": {
-            ".validate": "newData.isNumber() && newData.val() >= -90 && newData.val() <= 90"
+            ".validate": "newData.isNumber() && (newData.val() + '').matches(/^-?[0-9]{1,3}(\\.[0-9]{1,2}0*)?$/) && newData.val() >= -90 && newData.val() <= 90"
           },
           "lng": {
-            ".validate": "newData.isNumber() && newData.val() >= -180 && newData.val() <= 180"
+            ".validate": "newData.isNumber() && (newData.val() + '').matches(/^-?[0-9]{1,3}(\\.[0-9]{1,2}0*)?$/) && newData.val() >= -180 && newData.val() <= 180"
           },
           "$other": {
             ".validate": false
@@ -267,6 +267,10 @@
         ".write": "auth != null && ($id.beginsWith('hb_') || $id.beginsWith('sf_') || $id.beginsWith('pa_') || $id.beginsWith('aed_')) && (!data.exists() || data.val() === auth.uid) && (!newData.exists() || newData.val() === auth.uid)",
         ".validate": "newData.isString()"
       }
+    },
+    "pushlog": {
+      ".read": false,
+      ".write": false
     }
   }
 }

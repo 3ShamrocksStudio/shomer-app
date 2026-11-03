@@ -7,6 +7,7 @@
       The id is moved to the private dashown/aed_<id> record and removed from the shared record.
    3. Push tokens (tokens/<uid>/<device>): a device not seen for 90 days is deleted; its coarse
       (~1 km) point is removed after 2 days, like the live-presence rows.
+   4. pushlog/<uid> (last SOS push time, for the 2-minute cooldown) is removed after 1 day.
    Open (active) alerts are never touched. */
 const DAY = 24 * 60 * 60 * 1000;
 const KEEP = 90 * DAY;
@@ -48,6 +49,8 @@ async function runRetention(db, now = Date.now()) {
       }
     });
   });
+  const pl = (await db.ref('pushlog').get()).val() || {};
+  Object.keys(pl).forEach((uid) => { if (typeof pl[uid] !== 'number' || now - pl[uid] > DAY) updates['pushlog/' + uid] = null; });
   if (Object.keys(updates).length) await db.ref().update(updates);
   return out;
 }

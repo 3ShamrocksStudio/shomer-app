@@ -10,7 +10,8 @@ const sos = {uid: 'sender', id: 's1', lat: TLV.lat, lng: TLV.lng, ts: NOW - 1000
 const near = {lat: 32.09, lng: 34.79};                 // ~1 km away
 const far = {lat: 31.7683, lng: 35.2137};              // Jerusalem, ~54 km
 
-function run(tokens, pairs, extra) { return R.resolveRecipients(Object.assign({sos, tokens, pairs, now: NOW}, extra)); }
+const mutual = pairs => Object.fromEntries(Object.keys(pairs || {}).map(u => [u, {name: 'back'}]));
+function run(tokens, pairs, extra) { return R.resolveRecipients(Object.assign({sos, tokens, pairs, back: mutual(pairs), now: NOW}, extra)); }
 
 test('paired SHOMER gets it at any distance', () => {
   const r = run({p1: {d1: {token: 'T-p1', ts: NOW, plat: 'android', lat: far.lat, lng: far.lng}}}, {p1: {name: 'x'}});
@@ -54,8 +55,8 @@ test('old single-device token shape still works', () => {
 });
 
 test('resolved / location-less SOS has no recipients', () => {
-  assert.strictEqual(R.resolveRecipients({sos: Object.assign({}, sos, {resolved: true}), tokens: {p1: {token: 'T'}}, pairs: {p1: {}}, now: NOW}).length, 0);
-  assert.strictEqual(R.resolveRecipients({sos: Object.assign({}, sos, {lat: null}), tokens: {p1: {token: 'T'}}, pairs: {p1: {}}, now: NOW}).length, 0);
+  assert.strictEqual(R.resolveRecipients({sos: Object.assign({}, sos, {resolved: true}), tokens: {p1: {token: 'T'}}, pairs: {p1: {}}, back: {p1: {}}, now: NOW}).length, 0);
+  assert.strictEqual(R.resolveRecipients({sos: Object.assign({}, sos, {lat: null}), tokens: {p1: {token: 'T'}}, pairs: {p1: {}}, back: {p1: {}}, now: NOW}).length, 0);
 });
 
 test('new-SOS detection: new id or re-open pushes; type/position updates do not', () => {
@@ -111,4 +112,22 @@ test('lifecycle spec states: closed states end it, reopen re-alarms', () => {
     assert.strictEqual(R.resolveRecipients({sos: closed, tokens: {p1: {token: 'T'}}, pairs: {p1: {}}, now: NOW}).length, 0);
   }
   assert.ok(!R.isNewSos(Object.assign({}, sos, {state: 'accepted'}), Object.assign({}, sos, {state: 'onscene'})));
+});
+
+test('D1: a one-sided link is NOT paired (far stranger gets nothing, near one only as nearby)', () => {
+  const tokens = {x: {d1: {token: 'T-x', ts: NOW, plat: 'android', lat: far.lat, lng: far.lng}},
+                  y: {d1: {token: 'T-y', ts: NOW, plat: 'android', lat: near.lat, lng: near.lng}}};
+  const r = R.resolveRecipients({sos, tokens, pairs: {x: {}, y: {}}, back: {x: null, y: null}, now: NOW});
+  assert.deepStrictEqual(r.map(t => [t.uid, t.role]), [['y', 'nearby']]);
+  const r2 = R.resolveRecipients({sos, tokens, pairs: {x: {}}, back: {x: {name: 'n'}}, now: NOW});
+  assert.deepStrictEqual(r2.filter(t => t.uid === 'x').map(t => t.role), ['paired']);
+  assert.strictEqual(R.resolveRecipients({sos, tokens, pairs: {x: {}}, now: NOW}).filter(t => t.uid === 'x').length, 0, 'no back info = not paired');
+});
+
+test('D2: one SOS push per sender per 2 minutes', () => {
+  assert.ok(R.cooldownOk(null, NOW));
+  assert.ok(!R.cooldownOk(NOW - 60000, NOW));
+  assert.ok(!R.cooldownOk(NOW - R.COOLDOWN_MS + 1, NOW));
+  assert.ok(R.cooldownOk(NOW - R.COOLDOWN_MS, NOW));
+  assert.strictEqual(R.COOLDOWN_MS, 120000);
 });

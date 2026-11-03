@@ -2,8 +2,9 @@
    Pure functions (no Firebase calls) so they can be unit-tested. Used by sosFanout in index.js.
 
    Recipients (same rules the app already uses):
-   - PAIRED: every account the sender linked with (pairs/<sender>/<uid>), at any distance. These
-     are exactly the people the database rules let read sos/<sender>.
+   - PAIRED: linked BOTH ways (pairs/<sender>/<uid> AND pairs/<uid>/<sender>), at any distance.
+     A one-sided link (someone added a uid on their own) is not enough - otherwise anyone could
+     ring a stranger's phone from anywhere.
    - NEARBY: any other account whose device reported a coarse (~1 km) point in the last 2 days,
      within 5 km of the SOS. A device with no point, or an old point, is NOT treated as nearby.
 
@@ -16,7 +17,8 @@
 const RADIUS_M = 5000;
 const LOC_MAX_AGE_MS = 2 * 24 * 60 * 60 * 1000;   // device points older than this are ignored
 const TTL_S = 900;                                 // undelivered after 15 min = too late to help
-const NEARBY_ALARM = true;                          // false = nearby strangers get a heads-up but no looping alarm
+const NEARBY_ALARM = true;
+const COOLDOWN_MS = 2 * 60 * 1000;                 // at most one SOS push per sender per 2 min                          // false = nearby strangers get a heads-up but no looping alarm
 
 function distM(aLat, aLng, bLat, bLng) {
   const R = 6371000, toRad = d => d * Math.PI / 180;
@@ -37,10 +39,11 @@ function devicesOf(uid, rec) {
     .map(k => Object.assign({uid, dev: k}, rec[k], {plat: rec[k].plat || 'web'}));
 }
 
-/** @returns [{uid, dev, token, plat, lang, role:'paired'|'nearby', distM?}] - one entry per token. */
-function resolveRecipients({sos, tokens, pairs, now = Date.now(), radiusM = RADIUS_M}) {
+/** pairs = pairs/<sender>; back = {uid: pairs/<uid>/<sender> or null} for those uids.
+ *  @returns [{uid, dev, token, plat, lang, role:'paired'|'nearby', distM?}] - one entry per token. */
+function resolveRecipients({sos, tokens, pairs, back, now = Date.now(), radiusM = RADIUS_M}) {
   if (!isOpen(sos) || !isNum(sos.lat) || !isNum(sos.lng) || !sos.uid) return [];
-  const paired = new Set(Object.keys(pairs || {}));
+  const paired = new Set(Object.keys(pairs || {}).filter(uid => !!(back && back[uid])));
   const byToken = new Map();
   Object.keys(tokens || {}).forEach((uid) => {
     if (uid === sos.uid) return;
@@ -113,6 +116,9 @@ function buildClear(sos, r) {
 const CLOSED = {cancelled: 1, false_alarm: 1, expired: 1, resolved: 1};
 function isOpen(s) { return !!s && s.resolved !== true && !CLOSED[s.state]; }
 
+/** Per-sender cooldown: may this sender trigger an SOS push now? */
+function cooldownOk(lastTs, now = Date.now()) { return !isNum(lastTs) || now - lastTs >= COOLDOWN_MS; }
+
 /** Is this write the START of a new SOS (or a reopen) - not a type/position/heartbeat update? */
 function isNewSos(prev, sos) {
   if (!isOpen(sos) || !isNum(sos.lat)) return false;
@@ -123,5 +129,5 @@ function isResolved(prev, sos) {
   return isOpen(prev) && !isOpen(sos);
 }
 
-module.exports = {isOpen, resolveRecipients, buildMessage, buildClear, isNewSos, isResolved, devicesOf, distM, coarse,
+module.exports = {isOpen, cooldownOk, COOLDOWN_MS, resolveRecipients, buildMessage, buildClear, isNewSos, isResolved, devicesOf, distM, coarse,
   RADIUS_M, LOC_MAX_AGE_MS, TTL_S, NEARBY_ALARM};

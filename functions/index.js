@@ -45,17 +45,26 @@ exports.sosFanout = onValueWritten('/sos/{id}', async (event) => {
   if (!starting && !ending) return;
   const rec = starting ? sos : prev;   // ending: same people as the alarm went to
   if (!rec || !rec.uid || rec.uid !== event.params.id) return;   // sos/<uid> must be the sender's own record
+  if (starting) {
+    // Abuse guard: one SOS push per sender per 2 min (pushlog/<uid> is server-only).
+    const logRef = db.ref('pushlog/' + rec.uid);
+    const tx = await logRef.transaction((last) => (R.cooldownOk(last) ? Date.now() : undefined));
+    if (!tx.committed) { console.log('sosFanout start skipped: cooldown'); return; }
+  }
   const [toksSnap, pairsSnap] = await Promise.all([db.ref('tokens').get(), db.ref('pairs/' + rec.uid).get()]);
-  const recips = R.resolveRecipients({sos: rec, tokens: toksSnap.val() || {}, pairs: pairsSnap.val() || {}});
+  const pairs = pairsSnap.val() || {};
+  // Paired = linked both ways: read each partner's own record for the sender (also holds the
+  // name that partner saved for them - used only in that partner's push).
+  const back = {};
+  await Promise.all(Object.keys(pairs).slice(0, 200).map(async (uid) => {
+    try { back[uid] = (await db.ref('pairs/' + uid + '/' + rec.uid).get()).val(); } catch (e) { back[uid] = null; }
+  }));
+  const recips = R.resolveRecipients({sos: rec, tokens: toksSnap.val() || {}, pairs, back});
   if (!recips.length) { console.log('sosFanout', starting ? 'start' : 'end', 'no recipients'); return; }
   let msgs;
   if (starting) {
-    // The name each paired recipient saved for the sender (their own pairs record) - never sent to nearby people.
-    const names = {};
-    await Promise.all([...new Set(recips.filter(r => r.role === 'paired').map(r => r.uid))].map(async (uid) => {
-      try { names[uid] = (await db.ref('pairs/' + uid + '/' + rec.uid + '/name').get()).val(); } catch (e) {}
-    }));
-    msgs = recips.map(r => ({r, msg: R.buildMessage(rec, r, names[r.uid])}));
+    // The name each paired recipient saved for the sender - never sent to nearby people.
+    msgs = recips.map(r => ({r, msg: R.buildMessage(rec, r, r.role === 'paired' && back[r.uid] ? back[r.uid].name : null)}));
   } else {
     msgs = recips.map(r => ({r, msg: R.buildClear(rec, r)})).filter(m => m.msg);
   }
