@@ -4473,6 +4473,7 @@ function _nudgeGeoNow(){
  try{ navigator.geolocation.getCurrentPosition(function(p){ userLat=p.coords.latitude; userLng=p.coords.longitude; try{ccSyncFromGeo&&ccSyncFromGeo();}catch(e){} try{moveUserDot(userLat,userLng);}catch(e){} try{startGeoWatch();}catch(e){} try{ if(MAP) MAP.setView([userLat,userLng], Math.max(MAP.getZoom?MAP.getZoom():16,16)); }catch(e){} }, function(){}, {enableHighAccuracy:true,timeout:15000,maximumAge:0}); }catch(e){}
 }
 function nudgeMaybeShow(){
+ return dykMaybeShow();   /* v312: one tip system - "הידעת?" (basics first), via the popup scheduler */
  try{
   if(!popupTurn('nudge',4,nudgeMaybeShow)) return;
   var n=nudgeState();
@@ -4489,38 +4490,81 @@ function nudgeMaybeShow(){
 }
 
 /* ═══ "Did you know?" feature-discovery tips — shown at most once per 2 days ═══ */
+/* ══ v312 "הידעת?" TIPS - teach real features, ordered by the person's own progress ══
+   One short line + one button that opens the feature. Basics (lvl 1) before advanced (lvl 3);
+   a feature already used is never tipped; random within the current level; each tip shown once.
+   Shown only through the popup scheduler (idle, never typing / onboarding / tour / SOS, 1 per session).
+   State: SS.dyk2 = {seen:{key:ts}, used:{key:ts}} - local only. */
+function dykState(){ SS.dyk2=SS.dyk2||{}; SS.dyk2.seen=SS.dyk2.seen||{}; SS.dyk2.used=SS.dyk2.used||{}; return SS.dyk2; }
+function dykUsed(k){ try{ var st=dykState(); if(!st.used[k]){ st.used[k]=Date.now(); saveStore(); } }catch(e){} }
+function _dykMembers(){ return (SS.circleMembers||[]).filter(function(m){ return m && !m.pending; }); }
+function _dykScroll(id){ setTimeout(function(){ try{ var el=document.getElementById(id); if(el) el.scrollIntoView({block:'center',behavior:'smooth'}); }catch(e){} }, 450); }
 var DYK_TIPS=[
- {k:'checkin', he:'הגדר/י טיימר צ׳ק-אין: אם לא תאשר/י בזמן, SHOMER מתריע למעגל שלך.', en:'Set a check-in timer: if you don\'t confirm in time, SHOMER alerts your circle.', ar:'اضبط مؤقت تسجيل الوصول: إن لم تؤكد في الوقت المحدد، ينبّه SHOMER دائرتك.', act:function(){ try{op('sh-dms');}catch(e){} }},
- {k:'pin', he:'קוד ביטול שקט: בטל/י SOS שגוי עם PIN — בלי שמישהו יראה.', en:'Silent-cancel PIN: dismiss a false SOS with a PIN so no one sees.', ar:'رمز الإلغاء الصامت: ألغِ SOS خاطئاً برمز دون أن يرى أحد.', act:function(){ try{openSetPin();}catch(e){} }},
- {k:'map', he:'מפה חיה: ראה/י דיווחים על אירועים באזורך ב-REAL TIME.', en:'Live map: see real-time community incidents in your area — and add your own report.', ar:'الخريطة الحية: شاهد بلاغات المجتمع الفورية وأضف بلاغك الخاص.', act:function(){ try{var u=document.getElementById('nav-upd');if(u)u.click();}catch(e){} }},
- {k:'invite', he:'כל שומר שמזמין חבר חדש — מחזק את הרשת שמגינה על כולנו.', en:'Every SHOMER who invites a friend strengthens the whole community network.', ar:'كل حارس يدعو صديقاً يعزز شبكة الحماية للجميع.', act:function(){ try{shareInvite();}catch(e){} }},
- {k:'stalk', he:'זיהוי עקיבה: אם מישהו עוקב אחריך — SHOMER מזהה ומתריע. הפעל/י בהגדרות.', en:'Stalking detection: if someone follows your movements, SHOMER detects and alerts. Enable in Settings.', ar:'كشف المتابعة: يكتشف SHOMER أي شخص يتعقبك. فعّله من الإعدادات.', act:function(){ try{setReveal('#n-stalk-nm');}catch(e){} }},
- {k:'nature', he:'נסה/י SHOMER NATURE — מפת נתיבים לשימוש בשטח פתוח.', en:'Try SHOMER NATURE — trails and nature-area map for outdoor use.', ar:'جرّب SHOMER NATURE — خرائط المسارات للاستخدام في الهواء الطلق.', act:function(){ try{location.href='nature.html';}catch(e){} }},
- {k:'dms', he:'שומר אוטומטי: אם לא תגיב/י תוך זמן — SOS יישלח אוטומטית. מנוחת דעת מלאה.', en:'Dead-man switch: if you don\'t respond in time, SOS is sent automatically. Total peace of mind.', ar:'مفتاح الأمان: إن لم تستجب في الوقت المحدد، يُرسَل SOS تلقائياً.', act:function(){ try{op('sh-dms');}catch(e){} }}
+ {k:'circle',lvl:1, used:function(){ return _dykMembers().length>0; },
+  he:'השומרים שלך מקבלים את ה-SOS שלך. הוסף/י את הראשון.', ar:'حُرّاسك يتلقّون استغاثتك. أضف أوّلهم.', en:'Your SHOMERs get your SOS. Add your first one.',
+  cta:['הוסף/י שומר','أضف حارساً','Add a SHOMER'], act:function(){ openCircles(); _dykScroll('agf-code'); }},
+ {k:'geo',lvl:1, ok:function(){ return typeof userLat!=='undefined' && userLat==null; }, used:function(){ return typeof userLat!=='undefined' && userLat!=null; },
+  he:'בלי מיקום, עזרה לא תמצא אותך. הפעל/י מיקום.', ar:'بدون الموقع لن تجدك المساعدة. فعّل الموقع.', en:'Without location, help can\'t find you. Turn it on.',
+  cta:['הפעל/י מיקום','فعّل الموقع','Turn on location'], act:function(){ nudgeAskGeo(); }},
+ {k:'code',lvl:1, used:function(){ return !!(SS.security&&/^\d{4,6}$/.test(SS.security.pin||'')); },
+  he:'קוד ביטול מונע ממישהו אחר לבטל לך SOS.', ar:'رمز الإلغاء يمنع غيرك من إلغاء استغاثتك.', en:'A cancel code stops anyone else from cancelling your SOS.',
+  cta:['הגדר/י קוד','اضبط الرمز','Set a code'], act:function(){ openSetPin(); }},
+ {k:'guide',lvl:1,
+  he:'מדריך החירום עובד גם בלי אינטרנט: החייאה, חנק, דימום.', ar:'دليل الطوارئ يعمل حتى بدون إنترنت: إنعاش، اختناق، نزيف.', en:'The emergency guide works offline: CPR, choking, bleeding.',
+  cta:['פתח/י מדריך','افتح الدليل','Open the guide'], act:function(){ openGuide(); }},
+ {k:'invcode',lvl:2, used:function(){ return (gdState().pairs||[]).some(function(p){ return p&&p.partnerUid&&!p.pending; }); },
+  he:'קיבלת קוד הזמנה? מקלידים אותו ישר ב"השומרים שלי".', ar:'وصلك رمز دعوة؟ اكتبه مباشرة في «حُرّاسي».', en:'Got an invite code? Type it right in My SHOMERs.',
+  cta:['הקלד/י קוד','اكتب الرمز','Enter a code'], act:function(){ openCircles(); _dykScroll('agf-code'); }},
+ {k:'move',lvl:2, ok:function(){ return _dykMembers().length>0 && circlesList().length>1; },
+  he:'אפשר להעביר שומר למעגל אחר: "העבר למעגל" בשורה שלו.', ar:'يمكنك نقل حارس لدائرة أخرى: «نقل لدائرة» في سطره.', en:'Move a SHOMER to another circle: tap "Move circle" on their row.',
+  cta:['השומרים שלי','حُرّاسي','My SHOMERs'], act:function(){ openCircles(); _dykScroll('circ-members'); }},
+ {k:'ghost',lvl:2, used:function(){ return !!SS.circleGhost; },
+  he:'מצב רפאים משהה את שיתוף המיקום שלך בנגיעה אחת.', ar:'وضع التخفّي يوقف مشاركة موقعك بلمسة واحدة.', en:'Ghost mode pauses your location sharing in one tap.',
+  cta:['למצב רפאים','وضع التخفّي','Ghost mode'], act:function(){ openCircles(); _dykScroll('ghost-tog'); }},
+ {k:'aed',lvl:2,
+  he:'מכיר/ה דפיברילטור בסביבה? הוסף/י אותו למפה.', ar:'تعرف جهاز إنعاش قلبي قريباً؟ أضفه للخريطة.', en:'Know a defibrillator nearby? Add it to the map.',
+  cta:['הוסף/י AED','أضف AED','Add an AED'], act:function(){ aedPlaceMode(); }},
+ {k:'ios',lvl:2, ok:function(){ try{ return isIOSSafariTab(); }catch(e){ return false; } },
+  he:'באייפון: הוספה למסך הבית שומרת אותך מחובר/ת ומקבל/ת התראות.', ar:'على آيفون: الإضافة للشاشة الرئيسية تبقيك متصلاً وتصلك التنبيهات.', en:'On iPhone, Add to Home Screen keeps you signed in and alerted.',
+  cta:['איך?','كيف؟','How?'], act:function(){ var he=currentLang==='he',ar=currentLang==='ar'; toast(he?'שיתוף ⤴ ← "הוסף למסך הבית"':ar?'مشاركة ⤴ ← «أضف إلى الشاشة الرئيسية»':'Share ⤴ → "Add to Home Screen"',''); }},
+ {k:'read',lvl:3,
+  he:'כל כרטיס במדריך החירום מוקרא בקול, שלב אחר שלב.', ar:'كل بطاقة في دليل الطوارئ تُقرأ بصوت عالٍ، خطوة بخطوة.', en:'Every emergency-guide card can be read aloud, step by step.',
+  cta:['נסה/י','جرّب','Try it'], act:function(){ openGuide(); setTimeout(function(){ try{ openGuideTopic('cpr'); }catch(e){} }, 350); }},
+ {k:'dms',lvl:3, used:function(){ return !!(SS.dms&&SS.dms.active); },
+  he:'"שומר אוטומטי" שולח SOS אם לא אישרת בזמן שאת/ה בסדר.', ar:'«الحارس التلقائي» يرسل SOS إن لم تؤكد في الوقت أنك بخير.', en:'Auto SHOMER sends an SOS if you don\'t confirm you\'re OK in time.',
+  cta:['פתח/י','افتح','Open'], act:function(){ op('sh-dms'); }},
+ {k:'checkin',lvl:3, used:function(){ return !!(SS.checkin&&SS.checkin.enabled); },
+  he:'טיימר צ׳ק-אין: אם לא תאשר/י בזמן, המעגל שלך מקבל התראה.', ar:'مؤقت تسجيل الوصول: إن لم تؤكد في الوقت، تُنبَّه دائرتك.', en:'Check-in timer: if you don\'t confirm in time, your circle is alerted.',
+  cta:['פתח/י','افتح','Open'], act:function(){ op('sh-checkin'); }}
 ];
-/* "Did you know?" banner — centred, same style as nudge-bar, at most once per 2 days */
+/* The next tip for THIS person: lowest level that still has an unused, unseen, applicable tip; random inside it. */
+function dykPick(){
+  var st=dykState(), c=DYK_TIPS.filter(function(t){
+    try{ if(t.ok && !t.ok()) return false; if(st.used[t.k] || (t.used && t.used())) return false; return !st.seen[t.k]; }catch(e){ return false; } });
+  if(!c.length) return null;
+  var lv=Math.min.apply(null, c.map(function(t){ return t.lvl; }));
+  c=c.filter(function(t){ return t.lvl===lv; });
+  return c[Math.floor(Math.random()*c.length)];
+}
+function dykText(t){ var L=currentLang; return {tx:L==='he'?t.he:L==='ar'?t.ar:t.en, cta:t.cta[L==='he'?0:L==='ar'?1:2]}; }
 function dykMaybeShow(){
  try{
   if(!popupTurn('dyk',6,dykMaybeShow)) return;
-  if(!SS.dyk) SS.dyk={lastTs:0,idx:0};
-  var st=SS.dyk;
-  if(st.lastTs && (Date.now()-st.lastTs) < 2*24*3600000) return;
-  var he=currentLang==='he', ar=currentLang==='ar';
-  var tip=DYK_TIPS[(st.idx||0)%DYK_TIPS.length];
-  var tx=he?tip.he:ar?tip.ar:tip.en;
-  var lbl=he?'ידעת?':ar?'هل تعلم؟':'Did you know?';
-  var cta=he?'הראה לי':ar?'أرني':'Show me';
+  var tip=dykPick(); if(!tip) return false;
+  var he=currentLang==='he', ar=currentLang==='ar', T=dykText(tip);
+  var lbl=he?'הידעת?':ar?'هل تعلم؟':'Did you know?';
   var bar=document.createElement('div'); bar.id='dyk-bar'; bar.className='nudge-bar';
   bar.innerHTML='<span class="nudge-ic" aria-hidden="true">'+_nic(_NIC.bulb)+'</span>'
    +'<div style="font-size:11px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:#E0A828;margin-bottom:1px">'+lbl+'</div>'
-   +'<span class="nudge-tx">'+ESC(tx)+'</span>'
-   +'<button class="nudge-cta">'+ESC(cta)+'</button>'
-   +'<button class="nudge-x" aria-label="dismiss">✕</button>';
+   +'<span class="nudge-tx">'+ESC(T.tx)+'</span>'
+   +'<button class="nudge-cta">'+ESC(T.cta)+'</button>'
+   +'<button class="nudge-x" aria-label="'+(he?'סגור':ar?'إغلاق':'Close')+'">✕</button>';
   var app=document.getElementById('app')||document.body; app.appendChild(bar);
-  st.lastTs=Date.now(); st.idx=((st.idx||0)+1)%DYK_TIPS.length; try{saveStore();}catch(e){}
-  bar.querySelector('.nudge-cta').onclick=function(){ try{tip.act();}catch(e){} bar.remove(); };
+  dykState().seen[tip.k]=Date.now(); try{saveStore();}catch(e){}
+  bar.querySelector('.nudge-cta').onclick=function(){ bar.remove(); dykUsed(tip.k); try{tip.act();}catch(e){} };
   bar.querySelector('.nudge-x').onclick=function(){ bar.remove(); };
   setTimeout(function(){ try{if(bar&&bar.parentNode){bar.style.transition='opacity .4s';bar.style.opacity='0';setTimeout(function(){bar.remove();},400);}}catch(e){} }, 16000);
+  return true;
  }catch(e){}
 }
 
@@ -4664,7 +4708,14 @@ function renderProfile2(){ try{ drillRenderProfile(); }catch(e){} try{ var he=cu
   });
  }catch(e){} }
 
-function scheduleRetentionNudges(){ try{ if(!_isNative()||!_ln) return; var he=currentLang==='he'; var hasCode=!!(SS.security&&/^\\d{4,6}$/.test((SS.security.pin)||'')); var hasCircle=(SS.circleMembers||[]).some(function(m){return m&&!m.pending;}); var ns=[]; if(!hasCode||!hasCircle){ ns.push({id:91001,title:'SH\u2721MER',body:he?'\u05d4\u05e9\u05dc\u05d9\u05de\u05d5 \u05d0\u05ea \u05d4\u05d4\u05d2\u05d3\u05e8\u05ea MY SHOMER \u2014 \u05de\u05e2\u05d2\u05dc \u05d0\u05de\u05d5\u05df \u05d5\u05e7\u05d5\u05d3 \u05d0\u05d1\u05d8\u05d7\u05d4':'Finish setting up MY SHOMER \u2014 trusted circle + security code',channelId:'shomer-updates',autoCancel:true,schedule:{at:new Date(Date.now()+2*3600*1000)}}); } ns.push({id:91002,title:'SH\u2721MER',body:he?'\u05d3\u05e7\u05d4 \u05dc\u05d1\u05d3\u05d5\u05e7 \u05d0\u05ea \u05d4\u05d0\u05d6\u05d5\u05e8 \u05e9\u05dc\u05da \u2014 \u05d4\u05ea\u05e8\u05d0\u05d5\u05ea \u05d1\u05d8\u05d9\u05d7\u05d5\u05ea \u05d1\u05d6\u05de\u05df \u05d0\u05de\u05ea':'A minute to check your area \u2014 live safety updates near you',channelId:'shomer-updates',autoCancel:true,schedule:{at:new Date(Date.now()+24*3600*1000)}}); try{ if(_ln&&ns.length)_ln.schedule({notifications:ns}); }catch(e){} }catch(e){} }
+function scheduleRetentionNudges(){ try{ if(!_isNative()||!_ln) return;
+  /* v312: the reminder notifications are "הידעת?" tips too - the next unused features for this person */
+  var he=currentLang==='he', ar=currentLang==='ar', ttl=he?'הידעת? · SH✡MER':ar?'هل تعلم؟ · SH✡MER':'Did you know? · SH✡MER';
+  var st=dykState(), pool=DYK_TIPS.filter(function(t){ try{ return !(t.ok&&!t.ok()) && !st.used[t.k] && !(t.used&&t.used()) && !st.seen[t.k] && t.k!=='ios'; }catch(e){ return false; } })
+    .sort(function(x,y){ return x.lvl-y.lvl; });
+  try{ _ln.cancel({notifications:[{id:91001},{id:91002}]}); }catch(e){}
+  var ns=pool.slice(0,2).map(function(t,i){ return {id:91001+i,title:ttl,body:dykText(t).tx,channelId:'shomer-updates',autoCancel:true,schedule:{at:new Date(Date.now()+(i?48:24)*3600*1000)}}; });
+  if(ns.length) _ln.schedule({notifications:ns}); }catch(e){} }
 
 /* ═══ TESTER PROGRAM - 14 days, one small mission a day ═══
    Google Play only releases the app after 12+ testers stay opted in for 14 days in a
@@ -6926,7 +6977,7 @@ try{ window.addEventListener('popstate',function(){
     if(document.querySelector(_SH_LAYERS)) shHistPush();   /* something still open underneath - keep Back working for it */
   }catch(e){}
 }); }catch(e){}
-function op(id){ if(id==='sh-checkin'||id==='sh-dms'){ setTimeout(function(){ try{ fcMountSettings(); }catch(e){} },0); } closeAll();const el=document.getElementById(id);try{ if(typeof emApplyCountry==='function') emApplyCountry(); }catch(_e){}if(el)el.classList.add('open');syncSheetState(); if(el) shHistPush();
+function op(id){ if(id==='sh-dms'||id==='sh-checkin'){ try{ dykUsed(id==='sh-dms'?'dms':'checkin'); }catch(e){} } if(id==='sh-checkin'||id==='sh-dms'){ setTimeout(function(){ try{ fcMountSettings(); }catch(e){} },0); } closeAll();const el=document.getElementById(id);try{ if(typeof emApplyCountry==='function') emApplyCountry(); }catch(_e){}if(el)el.classList.add('open');syncSheetState(); if(el) shHistPush();
  if(id==='sh-set'){try{renderSetContacts();}catch(e){} try{setCatInit();}catch(e){}}
  if(id==='sh-rep'){ try{ var _sn=!!(SS.settings&&SS.settings.toggles&&SS.settings.toggles.p_showname); var _at=document.querySelector('#sh-rep .tog'); if(_at){ _at.classList.toggle('on',!_sn); _at.setAttribute('aria-checked',String(!_sn)); } }catch(e){} }   /* v293: Settings "show name on reports" sets the report's anonymous switch */   /* v284: sections fold/unfold from EVERY way into settings, not only the menu */
  if(id==='sh-circles'){ try{syncPairsToCircles();}catch(e){} try{renderCircles();}catch(e){} try{gdRenderList();}catch(e){} }   // was never re-rendered → circles list + toggles appeared empty
@@ -7068,7 +7119,7 @@ var EMERGENCY_GUIDE=[
  {"id":"bone","e":"🦴","t":{"he":"שברים ונקעים","en":"Fractures & sprains","ar":"الكسور والالتواءات"},"s":{"he":"כאב, נפיחות, עיוות","en":"Pain, swelling, deformity","ar":"ألم وتورّم وتشوّه"},"steps":{"he":["עצור/י דימום בלחץ סביב הפצע; כסה/י פצע פתוח בבד נקי.","מנע/י תנועה של האיבר הפגוע.","קבע/י את האיבר במצב שבו הוא נמצא.","הנח/י קרח עטוף במגבת (לא ישירות על העור) להפחתת נפיחות.","פנה/י לקבלת טיפול. חייג/י 101 בפציעה רצינית, דימום חמור או חשד לפגיעה בעמוד שדרה.","נקע: מנוחה · קרח · חבישה אלסטית נוחה · הרמה מעל גובה הלב (RICE)."],"en":["Stop any bleeding with pressure around the wound; cover an open wound with a clean cloth.","Prevent movement of the injured limb.","Support or splint it as it lies.","Place ice wrapped in a towel (not directly on skin) to reduce swelling.","Seek care. Call 101 for a serious injury, heavy bleeding, or suspected spinal injury.","Sprain: Rest · Ice · comfortable elastic Compression · Elevate above heart level (RICE)."],"ar":["أوقف أي نزيف بالضغط حول الجرح؛ غطِّ الجرح المفتوح بقماش نظيف.","امنع حركة الطرف المصاب.","ثبّته في وضعه الحالي.","ضع ثلجًا ملفوفًا بمنشفة (لا على الجلد مباشرة) لتقليل التورّم.","اطلب الرعاية. اتصل بـ101 عند إصابة خطيرة أو نزيف شديد أو اشتباه بإصابة العمود الفقري.","الالتواء: راحة · ثلج · ضغط مرن مريح · رفع فوق مستوى القلب (RICE)."]},"dont":{"he":"אל תנסה/י ליישר עצם או להחזיר פריקה · אל תזיז/י את האיבר שלא לצורך · אל תניח/י קרח ישירות על העור.","en":"Do not try to realign a bone or reduce a dislocation · do not move the limb unnecessarily · do not put ice directly on skin.","ar":"لا تحاول تقويم العظم أو ردّ الخلع · لا تحرّك الطرف دون داعٍ · لا تضع الثلج على الجلد مباشرة."},"src":"מד״א (MDA) · NHS · British Red Cross (RICE / POLICE)"},
  {"id":"call","e":"📞","t":{"he":"מתי ואיך לחייג","en":"When & how to call","ar":"متى وكيف تتصل"},"s":{"he":"101 מד״א · 100 משטרה · 102 כבאות","en":"101 MDA · 100 Police · 102 Fire","ar":"101 إسعاف · 100 شرطة · 102 إطفاء"},"steps":{"he":["חייג/י 101 (מד״א) למצב רפואי, 100 (משטרה) לסכנה/אלימות, 102 (כבאות) לשריפה/חילוץ.","ענה/י על שאלות המוקדן/ית במלואן ובדיוק - הן חשובות.","מסור/י מספר טלפון, כתובת מלאה, מה קרה, כמה נפגעים ומצבם.","עקוב/י אחר ההוראות והישאר/י על הקו.","שלח/י מישהו לכוון את הצוות למקום אם אפשר.","שים/י את הטלפון על רמקול כדי לפעול תוך כדי שיחה."],"en":["Call 101 (MDA) for medical, 100 (Police) for danger/violence, 102 (Fire) for fire/rescue.","Answer the dispatcher fully and accurately - the questions matter.","Give a phone number, full address, what happened, how many casualties and their condition.","Follow the instructions and stay on the line.","Send someone to guide the team to the location if possible.","Put the phone on speaker so you can act while talking."],"ar":["اتصل بـ101 (إسعاف) للحالة الطبية، 100 (شرطة) للخطر/العنف، 102 (إطفاء) للحريق/الإنقاذ.","أجب عن أسئلة المُشغّل بالكامل وبدقّة - فهي مهمة.","أعطِ رقم هاتف وعنوانًا كاملًا، وما حدث، وعدد المصابين وحالتهم.","اتبع التعليمات وابقَ على الخط.","أرسل شخصًا لإرشاد الفريق إلى المكان إن أمكن.","ضع الهاتف على مكبّر الصوت لتتصرّف أثناء الحديث."]},"src":"מד״א Magen David Adom · gov.il (101/100/102)"}
 ];
-function openGuide(){ guideBackToList(); guideRenderList(''); var s=document.getElementById('guide-search'); if(s)s.value=''; guideApplyLang(); op('sh-guide'); }
+function openGuide(){ dykUsed('guide'); guideBackToList(); guideRenderList(''); var s=document.getElementById('guide-search'); if(s)s.value=''; guideApplyLang(); op('sh-guide'); }
 function guideApplyLang(){ var L=currentLang==='ar'?'ar':currentLang==='en'?'en':'he', he=L==='he';
  setText('guide-ttl', he?'מדריך חירום':L==='ar'?'دليل الطوارئ':'Emergency Guide');
  setText('gd-disc', GUIDE_DISC[L]); setText('gd-back-lbl', he?'חזרה לרשימה':L==='ar'?'العودة للقائمة':'Back to list');
@@ -7292,7 +7343,7 @@ async function gReadRun(){
   }
   if(tok===gRead.tok){ gRead.playing=false; gRead.i=-1; gReadMark(); gReadUi(); try{ if(!(typeof sosActive!=='undefined'&&sosActive)) releaseWake(); }catch(e){} }
 }
-function gReadToggle(){
+function gReadToggle(){ dykUsed('read');
   if(gRead.playing){ gRead.playing=false; gRead.tok++; try{ fcHush(); }catch(e){} gReadUi(); return; }
   gRead.items=gReadBuild(); if(!gRead.items.length) return;
   if(gRead.i<0||gRead.i>=gRead.items.length) gRead.i=0;
@@ -7938,7 +7989,7 @@ function buildMemberRow(m,he){
        circlesList().forEach(function(cc){ var nm=_circName(cc)||(he?'מעגל':ar?'دائرة':'Circle');
          var c=document.createElement('button'); c.className='circ-chip'+(cc.id===m.cid?' cur':''); c.textContent=nm;
          c.onclick=function(e2){ e2.stopPropagation(); if(cc.id===m.cid){ pk.remove(); return; }
-           m.cid=cc.id; saveStore(); renderCircles();
+           m.cid=cc.id; dykUsed('move'); saveStore(); renderCircles();
            toast(he?('✓ הועבר/ה ל'+nm):ar?('✓ نُقل إلى '+nm):('✓ Moved to '+nm),'grn'); };
          pk.appendChild(c); });
        acts.insertAdjacentElement('afterend', pk); b.setAttribute('aria-expanded','true'); return; }
@@ -7967,7 +8018,7 @@ function buildMemberRow(m,he){
  t.onclick=(e)=>{e.stopPropagation();const k=t.getAttribute('data-k');m[k]=!m[k];t.classList.toggle('on',m[k]);saveStore();renderCircles();};
  });
  priv.querySelector('[data-a="rename"]').onclick=(e)=>{e.stopPropagation();const nn=prompt(he?'שם חדש עבור '+m.name+':':'New name for '+m.name+':',m.name);if(nn&&nn.trim()){m.name=nn.trim().substring(0,40);saveStore();renderCircles();toast(he?'✓ השם עודכן':'✓ Renamed','grn');}};
- priv.querySelectorAll('[data-mv]').forEach(b=>{b.onclick=(e)=>{e.stopPropagation();const tc=b.getAttribute('data-mv');if(tc===m.cid)return;m.cid=tc;saveStore();renderCircles();toast(he?'✓ הועבר/ה למעגל אחר':'✓ Moved to another circle','grn');};});
+ priv.querySelectorAll('[data-mv]').forEach(b=>{b.onclick=(e)=>{e.stopPropagation();const tc=b.getAttribute('data-mv');if(tc===m.cid)return;m.cid=tc;dykUsed('move');saveStore();renderCircles();toast(he?'✓ הועבר/ה למעגל אחר':'✓ Moved to another circle','grn');};});
  priv.querySelector('[data-a="remove"]').onclick=(e)=>{e.stopPropagation();removeMember(m.id);};
  var _pab=priv.querySelector('[data-a="palert"]'); if(_pab) _pab.onclick=(e)=>{e.stopPropagation(); openPersonAlert(m.id);};
  row.querySelector('.cm-main').onclick=()=>{priv.style.display=priv.style.display==='none'?'block':'none';};
@@ -8699,7 +8750,7 @@ function addCircle(){
  toast(he?'✓ מעגל חדש נוצר':'✓ New circle created','grn');
 }
 function leaveCircle(){}
-function toggleGhost(){
+function toggleGhost(){ dykUsed('ghost');
  SS.circleGhost=!SS.circleGhost; saveStore();
  const gt=document.getElementById('ghost-tog'),gr=document.getElementById('ghost-row');
  if(gt)gt.classList.toggle('on',SS.circleGhost);
@@ -9716,7 +9767,7 @@ function gdShareLink(){
 }
 function gdEnterCodeOpen(){ const i=document.getElementById('gd-enter-input'); if(i)i.value=''; gdOpen('gd-enter'); setTimeout(()=>{try{i&&i.focus();}catch(e){}},120); }
 /* v302: the code field lives on the SHOMERs screen itself - same checks as the old pop-up (identity + 4-digit code) */
-function agfCodeSubmit(){
+function agfCodeSubmit(){ dykUsed('invcode');
  var c=document.getElementById('agf-code'), g=document.getElementById('gd-enter-input'); var v=(c&&c.value||'').trim();
  if(!v){ try{ c.focus(); toast(currentLang==='he'?'הזן/י את קוד ההזמנה שקיבלת':currentLang==='ar'?'أدخل رمز الدعوة الذي تلقيته':'Enter the invite code you received','amb'); }catch(e){} return; }
  if(g) g.value=v; c.value=''; gdEnterCodeSubmit();
@@ -13837,7 +13888,7 @@ function aedFindNearest(){
    your gym, your shul. This is literally "אזרחים למען אזרחים". */
 /* Place a defibrillator by TAPPING THE MAP - you rarely stand exactly at the cabinet. */
 var AED_PLACING=false;
-function aedPlaceMode(){
+function aedPlaceMode(){ dykUsed('aed');
   var he=currentLang==='he';
   if(AED_PLACING){ aedPlaceCancel(); return; }
   AED_PLACING=true;
