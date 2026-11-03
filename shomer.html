@@ -2565,7 +2565,7 @@ body.otp-active .ob-steps{display:none!important;}
      <button class="agf-invite" type="button">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
        <path d="M20.5 11.6a8.4 8.4 0 0 1-12.4 7.4L3.5 20.5l1.6-4.4A8.4 8.4 0 1 1 20.5 11.6z"/><path d="M9 9.2c.2 2.6 2.9 5.4 5.6 5.7l1-1.3-1.8-1-.8.7a4.2 4.2 0 0 1-2.4-2.4l.7-.8-1-1.8z"/></svg>
-      <span data-he="הזמן/י שומר/ת בוואטסאפ" data-en="Invite a SH✡MER via WhatsApp" data-ar="ادعُ حارساً عبر واتساب">הזמן/י שומר/ת בוואטסאפ</span>
+      <span data-he="הזמנת שומר" data-en="Invite a SH✡MER" data-ar="دعوة حارس">הזמנת שומר</span>
      </button>
 
      <!-- Collapsed by default. Two gold buttons competing side by side made the screen
@@ -2664,7 +2664,7 @@ body.otp-active .ob-steps{display:none!important;}
  <div class="ff-pick" id="gd-invite" role="dialog" aria-modal="true" aria-labelledby="gd-invite-ttl" aria-hidden="true">
  <div class="ff-pick-card">
  <div class="ff-pick-hd">
- <span class="ff-pick-ttl" id="gd-invite-ttl"> הזמן/י שומר/ת</span>
+ <span class="ff-pick-ttl" id="gd-invite-ttl"> הזמנת שומר</span>
  <button class="sh-x" onclick="gdClose('gd-invite')" aria-label="סגור"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg></button>
  </div>
  <p style="font-size:12px;color:var(--tx2);line-height:1.6;margin-bottom:6px" id="gd-invite-help">שתף/י את הקישור עם מי שאת/ה סומך/ת עליו. כשהם יפתחו אותו ויאשרו - תיווצר חבירה מאובטחת, ותראו זה את מיקומו של זה.</p>
@@ -9957,10 +9957,10 @@ function gdApplyI18n(){
  setText('dd-guard',he?'השומרים שלי':'My SHOMERs');
  setText('gd-hero-t',he?'הוסף/י שומר/ת':'Add a SHOMER');
  setText('gd-hero-s',he?'צרף/י אדם שאת/ה סומך/ת עליו לרשימת „השומרים שלי”. הם יראו את מיקומך החי ואת/ה את שלהם - בהזמנה ואישור הדדי. אפשר להפסיק בכל רגע.':'Add someone you trust to your "My SHOMERs". They\'ll see your live location and you\'ll see theirs - by invite and mutual accept. You can stop anytime.');
- setText('gd-invite-lbl',he?'הזמן/י שומר/ת':'Invite a SHOMER');
+ setText('gd-invite-lbl',he?'הזמנת שומר':'Invite a SHOMER');
  setText('gd-enter-lbl',he?'יש לי קוד':'I have a code');
  setText('circ-demo-cap',he?'השומרים שלי':'My SHOMERs');
- setText('gd-invite-ttl',he?' הזמן/י שומר/ת':' Invite a SHOMER');
+ setText('gd-invite-ttl',he?' הזמנת שומר':' Invite a SHOMER');
  setText('gd-invite-help',he?'שתף/י את הקישור עם מי שאת/ה סומך/ת עליו. כשהם יפתחו אותו ויאשרו - תיווצר חבירה ותראו זה את מיקומו של זה.':'Share the link with someone you trust. When they open it and accept, you pair - and see each other\'s location.');
  setText('gd-copy-lbl',he?'העתק':'Copy');
  setText('gd-share-lbl',he?'שתף/י קישור':'Share link');
@@ -15284,6 +15284,8 @@ html[dir="rtl"] .sh-back svg{transform:scaleX(-1)}
 /* Primary invite action — gold, matching .agf-add, since this is now the main path */
 .agf-invite{width:100%;display:flex;align-items:center;justify-content:center;gap:9px;padding:14px 12px;border-radius:999px;border:0;background:var(--gold-grad,linear-gradient(135deg,#C09020,#E0A828 60%,#F5C840));color:#23170a;font-family:inherit;font-weight:900;font-size:14px;line-height:1.25;text-align:center;cursor:pointer;margin-bottom:14px}
 .agf-invite svg{width:18px;height:18px;flex:0 0 auto}
+.agf-invite span,#dd .ddr span{white-space:nowrap}   /* v312: these labels stay on one line (he/ar/en, 320-430px, large phone font) */
+#dd{width:max-content;min-width:240px;max-width:calc(100vw - 24px)}
 .agf-invite:active{transform:scale(.98)}
 .agf-more{width:100%;display:flex;align-items:center;justify-content:space-between;gap:8px;margin:0 0 4px;padding:11px 2px;background:none;border:0;border-top:1px solid var(--b2);color:var(--tx2);font-family:inherit;font-weight:700;font-size:13px;cursor:pointer}
 .agf-chev{color:var(--tx3);font-size:17px;transition:transform .18s}
