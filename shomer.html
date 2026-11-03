@@ -16325,14 +16325,24 @@ function drillRenderProfile(){
 </div>
 <script>
 (function(){
-  var TKO={key:null,sid:'',timer:null,stopAt:0,native:false,acked:{},area:null};
+  var TKO={key:null,sid:'',timer:null,stopAt:0,mode:'',area:null};
+  /* Acknowledged SOS ids survive a reload for 30 min (this device only, no personal data). */
+  var ACK_KEY='shomer_tko_ack', ACK_MS=30*60000;
+  function ackGet(){ try{ var a=JSON.parse(localStorage.getItem(ACK_KEY)||'{}')||{}, n=Date.now(), o={}; Object.keys(a).forEach(function(k){ if(n-a[k]<ACK_MS) o[k]=a[k]; }); return o; }catch(e){ return {}; } }
+  function ackSet(k,v){ var a=ackGet(); if(v) a[k]=v; else delete a[k]; try{ localStorage.setItem(ACK_KEY,JSON.stringify(a)); }catch(e){} }
+  function ackId(o){ return o.sid?('s:'+o.sid):o.key; }
+  function ownSosOn(){ try{ return typeof sosPhase!=='undefined' && sosPhase!=='idle'; }catch(e){ return false; } }
   function L(he,en,ar){ var l=(typeof currentLang!=='undefined')?currentLang:'he'; return l==='he'?he:l==='ar'?ar:en; }
   function np(){ try{ return (typeof shomerNativePlugin==='function')?shomerNativePlugin():null; }catch(e){ return null; } }
   function q(s){ return document.querySelector('#sos-tko '+s); }
-  function ring(){
+  /* Someone else's SOS must never share (or stop) MY OWN SOS siren. While my own SOS runs, the
+     takeover only vibrates - my siren is already sounding. */
+  function ring(title,body){
     var p=np();
-    if(p&&typeof p.startGuardAlarm==='function'){ TKO.native=true; try{ p.startGuardAlarm(); }catch(e){} return; }   /* native: ALARM stream, max volume, ignores silent mode */
-    TKO.native=false;
+    if(ownSosOn()){ TKO.mode='none'; try{ if(navigator.vibrate) navigator.vibrate([600,200,600,200,900]); }catch(e){} return; }
+    if(p&&typeof p.startIncomingAlarm==='function'){ TKO.mode='incoming'; try{ p.startIncomingAlarm({title:title||'',body:body||''}); }catch(e){} return; }   /* native: own service, ALARM stream, ignores silent mode */
+    if(p&&typeof p.startGuardAlarm==='function'){ TKO.mode='guard'; try{ p.startGuardAlarm(); }catch(e){} return; }       /* older app build */
+    TKO.mode='web';
     (function loop(){
       if(!TKO.key||Date.now()>TKO.stopAt) return;
       try{ playAlarm(6000); }catch(e){}
@@ -16342,16 +16352,17 @@ function drillRenderProfile(){
   }
   function silence(){
     if(TKO.timer){ clearTimeout(TKO.timer); TKO.timer=null; }
-    try{ if(typeof stopAlarm==='function') stopAlarm(); }catch(e){}
-    try{ if(navigator.vibrate) navigator.vibrate(0); }catch(e){}
-    var p=np(); if(TKO.native&&p){ try{ p.stopGuardAlarm&&p.stopGuardAlarm(); }catch(e){} }
-    TKO.native=false;
+    var p=np(), m=TKO.mode; TKO.mode='';
+    if(m==='web' && !ownSosOn()){ try{ if(typeof stopAlarm==='function') stopAlarm(); }catch(e){} }
+    if(!ownSosOn()){ try{ if(navigator.vibrate) navigator.vibrate(0); }catch(e){} }
+    if(m==='incoming'&&p){ try{ p.stopIncomingAlarm(); }catch(e){} }      /* also stops showing over the lock screen */
+    if(m==='guard'&&p){ try{ p.stopGuardAlarm&&p.stopGuardAlarm(); }catch(e){} }
   }
   function hide(){ var el=document.getElementById('sos-tko'); if(el){ el.classList.remove('on'); el.setAttribute('aria-hidden','true'); } }
   /* o: {key, sid, name, paired, body, area:[lat,lng] (nearby push only, ~1 km)} */
   function show(o){
     if(!o||!o.key) return;
-    var a=TKO.acked[o.key]; if(a && Date.now()-a<30*60000) return;   /* already acknowledged this SOS */
+    var acks=ackGet(); if(acks[ackId(o)] || acks[o.key]) return;   /* already acknowledged this SOS (survives a reload) */
     var el=document.getElementById('sos-tko'); if(!el) return;
     if(TKO.key===o.key && el.classList.contains('on')) return;
     if(TKO.key) silence();
@@ -16363,20 +16374,20 @@ function drillRenderProfile(){
     q('.tk-b2').textContent=L('השתק/י','Silence','إسكات');
     q('.tk-d').textContent=L('⚠ SH✡MER אינו תחליף לחיוג 100 / 101 / 102','⚠ SH✡MER is not a substitute for calling 100 / 101 / 102','⚠ SH✡MER ليس بديلاً عن الاتصال بـ 100 / 101 / 102');
     el.classList.add('on'); el.setAttribute('aria-hidden','false');
-    var p=np(); if(p&&typeof p.stopSosPush==='function'){ try{ p.stopSosPush({sid:TKO.sid}); }catch(e){} }   /* the push/poll alarm hands over to this screen */
-    ring();
+    var p=np(); if(p&&typeof p.sosSeen==='function'){ try{ p.sosSeen({sid:TKO.sid}); }catch(e){} }   /* push/poll will not ring this SOS again */
+    ring(q('.tk-n').textContent, q('.tk-s').textContent);
     try{ q('.tk-b').focus(); }catch(e){}
   }
   function ack(openIt){
     var k=TKO.key, area=TKO.area; if(!k) return;
-    TKO.acked[k]=Date.now(); silence(); hide(); TKO.key=null;
+    var n=Date.now(); ackSet(ackId({sid:TKO.sid,key:k}),n); ackSet(k,n); silence(); hide(); TKO.key=null;
     if(!openIt) return;
     try{
       if(k.indexOf('p:')===0){ var c=document.getElementById('in-sos-'+k.slice(2)); if(c&&c.scrollIntoView) c.scrollIntoView({block:'nearest'}); }
       else if(area&&typeof MAP!=='undefined'&&MAP){ MAP.setView(area,14,{animate:true}); }
     }catch(e){}
   }
-  function clearKey(k){ delete TKO.acked[k]; if(TKO.key===k){ silence(); hide(); TKO.key=null; } }
+  function clearKey(k){ ackSet(k,0); if(TKO.key===k){ silence(); hide(); TKO.key=null; } }   /* the SOS ended: a NEW one from them must alarm again (a new id is never in the ack list anyway) */
   (function wire(){ var b=q('.tk-b'), b2=q('.tk-b2'); if(!b){ return setTimeout(wire,500); } b.onclick=function(){ ack(true); }; b2.onclick=function(){ ack(false); }; })();
 
   /* 1) Live SOS from one of my SHOMERs (app open). Only a fresh SOS (not an "older SOS") takes over. */
@@ -16404,9 +16415,11 @@ function drillRenderProfile(){
   window.__shomerSosPush=function(json){
     var d={}; try{ d=(typeof json==='string')?JSON.parse(json):(json||{}); }catch(e){ return; }
     if(d.kind!=='sos') return;
-    var paired=!!(d.from && typeof memberByPair==='function' && memberByPair(d.from));
+    /* Cold start: my circle may not be loaded yet, so the server's role decides too. */
+    var paired=!!(d.from && ((d.role==='paired') || (typeof memberByPair==='function' && memberByPair(d.from))));
     if(paired){
-      show({key:'p:'+d.from, sid:d.sid||'', name:(memberByPair(d.from)||{}).name||'', paired:true});
+      var mb=(typeof memberByPair==='function'&&memberByPair(d.from))||{};
+      show({key:'p:'+d.from, sid:d.sid||'', name:mb.name||'', paired:true, body:mb.name?'':(d.title||'')});
       try{ if(typeof fbListenSOS==='function') fbListenSOS(); }catch(e){}
     } else {
       var la=parseFloat(d.alat), lo=parseFloat(d.alng);
