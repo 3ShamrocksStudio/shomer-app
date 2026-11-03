@@ -4467,7 +4467,7 @@ function _nudgeGeoNow(){
 }
 function nudgeMaybeShow(){
  try{
-  if(popupBusy()){ if((nudgeMaybeShow._tries=(nudgeMaybeShow._tries||0)+1)<10) setTimeout(nudgeMaybeShow, 45000); return; }
+  if(!popupTurn('nudge',4,nudgeMaybeShow)) return;
   var n=nudgeState();
   if(n.lastTs && (Date.now()-n.lastTs) < 18*3600000) return;   /* at most ~once / 18h */
   var pick=nudgePick(); if(!pick) return;
@@ -4494,7 +4494,7 @@ var DYK_TIPS=[
 /* "Did you know?" banner — centred, same style as nudge-bar, at most once per 2 days */
 function dykMaybeShow(){
  try{
-  if(popupBusy()){ if((dykMaybeShow._tries=(dykMaybeShow._tries||0)+1)<10) setTimeout(dykMaybeShow, 60000); return; }
+  if(!popupTurn('dyk',6,dykMaybeShow)) return;
   if(!SS.dyk) SS.dyk={lastTs:0,idx:0};
   var st=SS.dyk;
   if(st.lastTs && (Date.now()-st.lastTs) < 2*24*3600000) return;
@@ -4523,7 +4523,58 @@ function dykMaybeShow(){
    community nudges all used to fire on their own timers and stack on top of each other - and
    on top of an invite waiting for approval. Rule: emergencies and invites come first; any
    lower-priority card waits until the screen is clear, and is removed when an invite opens. */
-var POPUP_LOW_IDS=['tp-bar','nudge-bar','dyk-bar','community-nudge'], POPUP_LOW_SEL='.a2hs,.ios-install,.getapp-banner';
+var POPUP_LOW_IDS=['tp-bar','nudge-bar','dyk-bar','community-nudge','fsi-bar'], POPUP_LOW_SEL='.a2hs,.ios-install,.getapp-banner';
+/* ══ v312 POPUP SCHEDULER - ONE gate for every nudge, tip and prompt (Dave, 3 Nov) ══
+   The shake-to-SOS card used to pop up while the person was typing a code. Now every nudge/tip
+   is queued here and shown only at an idle moment:
+     - no input/textarea focused, nothing typed in the last 8 s
+     - no onboarding, tutorial, modal, open sheet or active SOS (popupBusy)
+     - the map has been idle (no touch / pan / zoom) for 5 s+
+   At most ONE popup per session; the highest-priority waiting one wins. Each popup keeps
+   its own "seen" rule - a popup whose rule says "not now" simply shows nothing. */
+var POPQ={q:[],t:null,cur:null,shown:false,typedAt:0,mapAt:Date.now()};
+try{ POPQ.shown=sessionStorage.getItem('shomer_pop_shown')==='1'; }catch(e){}
+(function(){ try{
+  var typed=function(e){ var t=e.target; if(t&&(t.tagName==='INPUT'||t.tagName==='TEXTAREA'||t.tagName==='SELECT'||t.isContentEditable)) POPQ.typedAt=Date.now(); };
+  ['input','keydown','focusin'].forEach(function(ev){ document.addEventListener(ev,typed,true); });
+  ['pointerdown','touchstart','wheel'].forEach(function(ev){ document.addEventListener(ev,function(){ POPQ.mapAt=Date.now(); },{capture:true,passive:true}); });
+}catch(e){} })();
+function popupIdle(){
+  try{
+    if(POPQ.shown) return false;
+    var a=document.activeElement; if(a&&(a.tagName==='INPUT'||a.tagName==='TEXTAREA'||a.tagName==='SELECT'||a.isContentEditable)) return false;
+    if(Date.now()-POPQ.typedAt<8000) return false;
+    if(popupBusy()) return false;
+    var ob=document.getElementById('ob'); if(ob && getComputedStyle(ob).display!=='none') return false;   /* onboarding on screen */
+    if(document.body.classList.contains('otp-active')) return false;
+    if(document.querySelector('.tour-ov.on,.sos-cd.on,#sc-modal,.cot-ask')) return false;              /* tutorial / SOS dialogs / modals */
+    var dl=document.querySelectorAll('[aria-modal="true"],[role="dialog"],[role="alertdialog"]');
+    for(var i=0;i<dl.length;i++){ var d=dl[i]; if(d.getAttribute('aria-hidden')==='true') continue; if(d.classList.contains('sheet')) continue;   /* sheets: body.sheet-open (popupBusy) */
+      var rc=d.getBoundingClientRect(); if(rc.width>0 && rc.height>0 && rc.bottom>0 && rc.top<innerHeight && getComputedStyle(d).visibility!=='hidden' && parseFloat(getComputedStyle(d).opacity)>0.05) return false; }
+    if(typeof MAP==='undefined'||!MAP) return false;
+    if(!MAP._popHook){ MAP._popHook=1; MAP.on('movestart zoomstart move zoom',function(){ POPQ.mapAt=Date.now(); }); }
+    if(Date.now()-POPQ.mapAt<5000) return false;
+  }catch(e){ return false; }
+  return true;
+}
+function popupLowCount(){ var n=0; try{ POPUP_LOW_IDS.forEach(function(id){ if(document.getElementById(id)) n++; }); n+=document.querySelectorAll(POPUP_LOW_SEL).length; }catch(e){} return n; }
+/* Queue fn(). It runs at the next idle moment; it counts as THE popup of this session if it
+   returned true or a popup card appeared. prio: lower = more important. */
+function popupSchedule(key, prio, fn){
+  if(POPQ.shown) return;
+  for(var i=0;i<POPQ.q.length;i++){ if(POPQ.q[i].key===key) return; }
+  POPQ.q.push({key:key,prio:prio,fn:fn}); POPQ.q.sort(function(a,b){ return a.prio-b.prio; });
+  if(POPQ.t) return;
+  POPQ.t=setInterval(function(){
+    if(POPQ.shown||!POPQ.q.length){ clearInterval(POPQ.t); POPQ.t=null; if(POPQ.shown) POPQ.q=[]; return; }
+    if(!popupIdle()) return;
+    var it=POPQ.q.shift(), before=popupLowCount(), r=false;
+    POPQ.cur=it.key; try{ r=it.fn(); }catch(e){} POPQ.cur=null;
+    if(r===true || popupLowCount()>before){ POPQ.shown=true; POPQ.q=[]; try{ sessionStorage.setItem('shomer_pop_shown','1'); }catch(e){} }
+  }, 1000);
+}
+/* For an existing xMaybeShow(): true = the scheduler is running it now, go ahead; false = it was queued, return. */
+function popupTurn(key, prio, fn){ if(POPQ.cur===key) return true; popupSchedule(key, prio, fn); return false; }
 function popupBusy(){
   try{
     if(_emergencyBusy()) return true;
@@ -5324,6 +5375,8 @@ window.__shomerNativeSOS=function(reason){ try{ if(typeof sosActive!=='undefined
     /* v287: Android 14+ - shake on a LOCKED phone needs permission to show the SOS over the lock
        screen. Ask once, plainly, with a button straight to the right system page. */
     try{ if(p.canFullScreen && !SS._fsiAsked){ setTimeout(function(){ p.canFullScreen().then(function(r){ if(r&&r.granted) return;
+      popupSchedule('fsi',1,function(){   /* v312: via the popup scheduler - never while typing a code, only at an idle moment */
+      if(SS._fsiAsked) return false;
       SS._fsiAsked=Date.now(); try{ saveStore(); }catch(e){}
       var he=currentLang==='he', ar=currentLang==='ar';
       var bar=document.createElement('div'); bar.className='nudge-bar'; bar.id='fsi-bar';
@@ -5333,6 +5386,7 @@ window.__shomerNativeSOS=function(reason){ try{ if(typeof sosActive!=='undefined
       document.body.appendChild(bar);
       bar.querySelector('.nudge-x').onclick=function(){ bar.remove(); };
       bar.querySelector('#fsi-go').onclick=function(){ bar.remove(); try{ p.openFullScreenSettings(); }catch(e){} };
+      return true; });
     }).catch(function(){}); }, 6000); } }catch(e){}
     try{ fbLog && fbLog('native wrapper active - un-silenceable alarm + background shake armed'); }catch(e){}
   }catch(e){}
@@ -6137,7 +6191,7 @@ function showCommunityNudge(msg, ctaLabel, action){
   try{
     var he=(typeof currentLang!=='undefined' && currentLang==='he');
     if(document.getElementById('community-nudge')) return;
-    if(popupBusy()) return;
+    if(!popupTurn('community2',7,function(){ showCommunityNudge(msg, ctaLabel, action); })) return;
     var b=document.createElement('div');
     b.id='community-nudge';
     b.style.cssText='position:fixed;left:50%;bottom:calc(var(--nav,64px) + 78px);transform:translateX(-50%);z-index:9400;max-width:90vw;width:340px;background:linear-gradient(160deg,#0F1D33,#132743);border:1px solid rgba(201,168,76,.35);border-radius:16px;box-shadow:0 12px 40px rgba(0,0,0,.5);padding:15px 16px;font-family:Heebo,sans-serif;direction:'+(he?'rtl':'ltr');
@@ -6188,10 +6242,7 @@ function communityNudge(){
         act:function(){ try{ if(typeof openGuardians==='function') openGuardians(); }catch(e){} } }
     ];
     var n = nudges[opens % nudges.length];
-    localStorage.setItem('shomerLastNudge', String(Date.now()));
-    setTimeout(function(){
-      try{ if(!popupBusy()) toast(he?n.he:n.en, '', n.act); }catch(e){}
-    }, 4500);   // let the map settle before inviting
+    popupSchedule('community',7,function(){ try{ localStorage.setItem('shomerLastNudge', String(Date.now())); }catch(e){} toast(he?n.he:n.en, '', n.act); return true; });   /* v312: shown by the popup scheduler at an idle moment */
   }catch(e){}
 }
 function checkInbox(){
@@ -14007,7 +14058,7 @@ function showGetAppBanner(){
     /* Respect dismissal for 7 days. */
     try{ var d=localStorage.getItem('shomerGetAppDismissed'); if(d && (Date.now()-parseInt(d,10) < 7*24*60*60*1000)) return; }catch(e){}
     if(document.querySelector('.getapp-banner')) return;
-    if(popupBusy()){ if((showGetAppBanner._t=(showGetAppBanner._t||0)+1)<10) setTimeout(showGetAppBanner,30000); return; }
+    if(!popupTurn('getapp',5,showGetAppBanner)) return;
     var he=(typeof currentLang!=='undefined' && currentLang==='he');
     var b=document.createElement('div');
     b.className='getapp-banner';
@@ -14026,7 +14077,7 @@ function showGetAppBanner(){
 }
 async function showA2HS(){
  if(!deferredPrompt||document.querySelector('.a2hs'))return;
- if(popupBusy()){ if((showA2HS._t=(showA2HS._t||0)+1)<10) setTimeout(showA2HS,30000); return; }
+ if(!popupTurn('a2hs',5,showA2HS)) return;
  const d=document.createElement('div');d.className='a2hs';
  d.innerHTML=`<img class="a2hs-icon" src="logo-192.png" alt=""><div class="a2hs-text"><div class="a2hs-t">${currentLang==='he'?'התקן את שומר':'Install Shomer'}</div><div class="a2hs-s">${currentLang==='he'?'גישה מהירה מהמסך הראשי':'Quick access from home screen'}</div></div><button class="a2hs-btn" id="a2hs-install">${currentLang==='he'?'התקן':'Install'}</button><span class="a2hs-x" id="a2hs-close"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg></span>`;
  document.body.appendChild(d);
@@ -14297,7 +14348,7 @@ function isIOSSafariTab(){
 function maybePromptInstall(){
   try{
     if(!isIOSSafariTab()) return;
-    if(popupBusy()){ if((maybePromptInstall._t=(maybePromptInstall._t||0)+1)<10) setTimeout(maybePromptInstall,30000); return; }
+    if(!popupTurn('install',2,maybePromptInstall)) return;
     var dismissed=false; try{ dismissed=sessionStorage.getItem('shomerInstallDismissed')==='1'; }catch(e){}
     if(dismissed) return;
     var he=currentLang==='he', ar=currentLang==='ar';
@@ -14317,7 +14368,7 @@ function maybePromptInstall(){
 function maybePromptBackgroundAlerts(){
   try{
     if(isIOSSafariTab()) return; // iOS is handled by the dedicated install prompt above
-    if(popupBusy()){ if((maybePromptBackgroundAlerts._t=(maybePromptBackgroundAlerts._t||0)+1)<10) setTimeout(maybePromptBackgroundAlerts,30000); return; }
+    if(!popupTurn('bgalerts',2,maybePromptBackgroundAlerts)) return;
     var dismissed=false; try{ dismissed=localStorage.getItem('shomerAlertsPrompted')==='1'; }catch(e){}
     if(dismissed) return;
     var st=bgAlertsState(); if(st==='on'||st==='unsupported'||st==='denied'||st==='ios-add-home') return;
@@ -15960,7 +16011,7 @@ function tpMaybeShow(){
   if(drillShabbatNow()) return;                    // Shabbat: no pop-up (not marked shown - it can come after havdalah)
   if(d.cardShown===day || drillDoneToday()) return;
   if(document.getElementById('tp-bar')) return;
-  if(popupBusy()) { if((tpMaybeShow._tries=(tpMaybeShow._tries||0)+1)<30) setTimeout(tpMaybeShow, 20000); return; }
+  if(!popupTurn('tp',3,tpMaybeShow)) return;
   d.cardShown=day; try{ saveStore(); }catch(e){}
   drillOpenCard();
  }catch(e){}
