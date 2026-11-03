@@ -5896,6 +5896,7 @@ function resolveSOS(){
   clearInterval(sosTimer); stopSosAlarm(); stopMaxAttention(); releaseWake();
   try{ if(curSosId){ FB.db&&FB.db.ref('responders/'+curSosId).off&&FB.db.ref('responders/'+curSosId).off(); delete fbRespStreams[curSosId]; } fbClearResponderMarkers(); }catch(e){}
   sosPhase='idle'; sosActive=false; window._sosSilent=false;
+  try{ SOSBUS._endedAt=Date.now(); SOSBUS._helpAck=0; Object.keys(SOSBUS.responders).forEach(function(k){ delete SOSBUS.responders[k]; }); sosPaintResponders(); sosPaintMyHelp(); }catch(e){}   /* v312: "help is coming" ends with the SOS, online or not */
   try{ var _cpb=document.getElementById('callpol-bar'); if(_cpb) _cpb.remove(); }catch(e){}   /* v293: the "call police?" offer ends with the SOS */
   var btn=document.getElementById('sos-btn');
   if(btn){btn.classList.remove('active');btn.setAttribute('aria-pressed','false');}
@@ -13200,6 +13201,9 @@ function sosWatchMyResponders(){
         var raw=snap&&snap.val?snap.val():null;
         var v=raw?unpackSOS(raw.name):null;
         var forMe = v && v.active && v.forTag===uidTag(FB.uid);   /* coming for ME, not someone else */
+        /* v312: only while my SOS is on, and never a stale record from an SOS that already ended */
+        if(forMe && !(typeof sosActive!=='undefined'&&sosActive)) forMe=false;
+        if(forMe && SOSBUS._endedAt && !((raw&&raw.ts||0)>SOSBUS._endedAt)) forMe=false;
         if(forMe) SOSBUS.responders[puid]=v; else delete SOSBUS.responders[puid];
         sosPaintResponders(); sosPaintMyHelp();
       });
@@ -13226,20 +13230,27 @@ function sosPaintResponders(){
 function sosPaintMyHelp(){
   if(window._sosSilent) return;   /* silent SOS: no bar, no vibration, nothing visible */
   var he=currentLang==='he';
+  var ar=currentLang==='ar';
   var ks=Object.keys(SOSBUS.responders);
   var b=document.getElementById('help-bar');
   try{ helpLayerUpdate(); }catch(e){}
-  if(!ks.length){ if(b) b.remove(); return; }
+  /* v312: the green "help is coming" bar lives only while MY SOS is on - it used to stay forever.
+     It clears when the SOS ends, and the person can acknowledge (✕) it; a NEW responder shows it again. */
+  var mine=(typeof sosActive!=='undefined'&&sosActive);
+  if(!mine || !ks.length){ if(b) b.remove(); if(!ks.length) SOSBUS._helpAck=0; return; }
+  if(SOSBUS._helpAck && ks.length<=SOSBUS._helpAck){ if(b) b.remove(); return; }
   if(!b){ b=document.createElement('div'); b.id='help-bar'; b.className='help-bar';
     document.body.appendChild(b);
     try{ if(navigator.vibrate) navigator.vibrate([80,60,80]); }catch(e){} }
   var names=ks.map(function(k){ return String(SOSBUS.responders[k].name||'').trim(); }).filter(Boolean);
   try{ var _ss=document.getElementById('ss-s'); if(_ss&&sosPhase==='active') _ss.textContent=(ks.length===1?(he?'שומר/ת אחד/ת בדרך אליך':'1 SHOMER on the way'):(he?(ks.length+' שומרים בדרך אליך'):(ks.length+' SHOMERs on the way'))); }catch(e){}
-  b.innerHTML='<div class="help-t">'+(he?'עזרה בדרך':'Help is coming')+'</div>'
+  b.innerHTML='<button class="help-x" aria-label="'+(he?'הבנתי':ar?'فهمت':'Got it')+'">\u2715</button>'
+   +'<div class="help-t">'+(he?'עזרה בדרך':ar?'المساعدة في الطريق':'Help is coming')+'</div>'
    +(names.length?'<div class="help-n">'+ESC(names.slice(0,3).join(' · '))+(ks.length>3?(' +'+(ks.length-3)):'')+'</div>':'')
-   +'<div class="help-s">'+(ks.length===1?(he?'שומר אחד בדרך אליך':'1 SHOMER on the way')
-                                         :(he?(ks.length+' שומרים בדרך אליך'):(ks.length+' SHOMERs on the way')))
-   +(function(){ var d=helpNearestM(); if(d==null) return ''; var t=d<1000?(Math.round(d/10)*10+(he?' מ׳':' m')):((d/1000).toFixed(1)+(he?' ק״מ':' km')); return ' · '+(he?'הקרוב/ה: ':'nearest: ')+t; })()+'</div>';
+   +'<div class="help-s">'+(ks.length===1?(he?'שומר אחד בדרך אליך':ar?'حارس واحد في الطريق إليك':'1 SHOMER on the way')
+                                         :(he?(ks.length+' שומרים בדרך אליך'):ar?(ks.length+' حُرّاس في الطريق إليك'):(ks.length+' SHOMERs on the way')))
+   +(function(){ var d=helpNearestM(); if(d==null) return ''; var t=d<1000?(Math.round(d/10)*10+(he?' מ׳':ar?' م':' m')):((d/1000).toFixed(1)+(he?' ק״מ':ar?' كم':' km')); return ' · '+(he?'הקרוב/ה: ':ar?'الأقرب: ':'nearest: ')+t; })()+'</div>';
+  b.querySelector('.help-x').onclick=function(){ SOSBUS._helpAck=Object.keys(SOSBUS.responders).length; b.remove(); };
 }
 /* ══ REMOTE ALARM STAND-DOWN ══════════════════════════════════════════════════════
    A trusted, paired "My SHOMER" can ask a blaring alarm to stand down - the recovery valve
@@ -15117,6 +15128,8 @@ body.aed-placing #map{cursor:crosshair}
 @keyframes respPulse{0%{transform:scale(.55);opacity:.9}70%{transform:scale(1.7);opacity:0}100%{opacity:0}}
 /* "help is coming" - the person in distress must never wonder if anyone saw it */
 .help-bar{position:fixed;left:12px;right:12px;top:calc(var(--hdr-top,0px) + var(--hdr) + 10px);z-index:100002;background:linear-gradient(135deg,#0E8F6E,#0B7355);border:1px solid rgba(61,220,151,.6);border-radius:16px;padding:13px 16px;box-shadow:0 12px 40px rgba(0,0,0,.6);max-width:520px;margin-inline:auto;animation:helpIn .35s ease-out}
+.help-bar .help-t,.help-bar .help-n,.help-bar .help-s{padding-inline-end:30px}
+.help-x{position:absolute;top:8px;inset-inline-end:8px;width:30px;height:30px;border:0;border-radius:50%;background:rgba(255,255,255,.16);color:#fff;font-size:14px;font-weight:800;cursor:pointer;line-height:30px;padding:0}
 .help-t{font-size:15px;font-weight:900;color:#fff;display:flex;align-items:center;gap:7px}
 .help-t::before{content:'';width:9px;height:9px;border-radius:50%;background:#fff;animation:respPulse 1.2s ease-out infinite}
 .help-n{font-size:13.5px;font-weight:800;color:#CFF7E7;margin-top:3px}
