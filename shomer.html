@@ -4608,6 +4608,15 @@ function popupIdle(){
   }catch(e){ return false; }
   return true;
 }
+/* Must-show cards (location off, update available) don't use the 1-per-session slot,
+   but they still wait while someone types or is onboarding. */
+function popupTypingOrSetup(){
+  try{ var a=document.activeElement; if(a&&(a.tagName==='INPUT'||a.tagName==='TEXTAREA'||a.tagName==='SELECT'||a.isContentEditable)) return true;
+    if(Date.now()-POPQ.typedAt<8000) return true;
+    var ob=document.getElementById('ob'); if(ob && getComputedStyle(ob).display!=='none') return true;
+    if(document.body.classList.contains('otp-active')||document.querySelector('.tour-ov.on')) return true; }catch(e){}
+  return false;
+}
 function popupLowCount(){ var n=0; try{ POPUP_LOW_IDS.forEach(function(id){ if(document.getElementById(id)) n++; }); n+=document.querySelectorAll(POPUP_LOW_SEL).length; }catch(e){} return n; }
 /* Queue fn(). It runs at the next idle moment; it counts as THE popup of this session if it
    returned true or a popup card appeared. prio: lower = more important. */
@@ -6480,6 +6489,7 @@ function locBarHide(){ var b=document.getElementById('loc-bar'); if(b) b.remove(
 function locBarShow(){
  if(userLat!=null || document.getElementById('loc-bar')) return;
  try{ if(typeof _emergencyBusy==='function' && _emergencyBusy()) return; }catch(e){}
+ try{ if(popupTypingOrSetup()){ setTimeout(locBarShow, 3000); return; } }catch(e){}   /* v312: never mid-typing / onboarding */
  var he=currentLang==='he', ar=currentLang==='ar';
  var b=document.createElement('div'); b.className='nudge-bar'; b.id='loc-bar';
  b.innerHTML='<span class="nudge-tx">'+(he?'המיקום כבוי - את/ה לא מופיע/ה במפה ולשומרים שלך':ar?'الموقع متوقف - أنت لا تظهر على الخريطة ولا لحُرّاسك':'Location is off - you are not on the map or visible to your SHOMERs')+'</span><button class="nudge-cta" id="loc-bar-go">'+(he?'הפעל/י מיקום':ar?'تفعيل الموقع':'Turn on location')+'</button><button class="nudge-x" aria-label="close">\u2715</button>';
@@ -7927,6 +7937,13 @@ function memberLabel(m,he,short){
  var d=new Date(p.addedTs||(m&&m.addedTs)||Date.now()), dd=('0'+d.getDate()).slice(-2)+'/'+('0'+(d.getMonth()+1)).slice(-2), hh=('0'+d.getHours()).slice(-2)+':'+('0'+d.getMinutes()).slice(-2);
  return he?('הזמנה בוואטסאפ · '+dd+' '+hh):('WhatsApp invite · '+dd+' '+hh);
 }
+/* v312 status dot key - real data only. 'old' (an SOS not updated for 30 min+) is not an active SOS. */
+function cmStKey(m){ try{ var sm=m.partnerUid&&SOSBUS&&SOSBUS.mine&&SOSBUS.mine[m.partnerUid];
+  if(sm && sm!=='old') return 'sos';
+  return (!m.pending&&m.seeThem&&m.live&&m.ts&&(Date.now()-m.ts)<180000)?'live':'off'; }catch(e){ return 'off'; } }
+setInterval(function(){ try{ var sc=document.getElementById('sh-circles'); if(!sc||!sc.classList.contains('open')) return;
+  document.querySelectorAll('#circ-members .cm-av[data-mid]').forEach(function(a){ var m=memberById(a.getAttribute('data-mid')); if(!m) return; var k=cmStKey(m);
+    if(!a.classList.contains('cm-st-'+k)){ a.classList.remove('cm-st-sos','cm-st-live','cm-st-off'); a.classList.add('cm-st-'+k); } }); }catch(e){} }, 30000);
 function buildMemberRow(m,he){
  const wrap=document.createElement('div');
  const st=statusOf(m,he);
@@ -7935,10 +7952,9 @@ function buildMemberRow(m,he){
  row.innerHTML=`
  ${(function(){ /* v312: the circle IS a live status dot - real data only: red = their SOS is active now
     (SOSBUS.mine, set while the alert is open), green = live presence in the last 3 min, grey = offline / not sharing */
-   var ar=currentLang==='ar', sos=!!(m.partnerUid&&SOSBUS&&SOSBUS.mine&&SOSBUS.mine[m.partnerUid]);
-   var live=!sos&&!m.pending&&m.seeThem&&m.live&&m.ts&&(Date.now()-m.ts)<180000;
-   var k=sos?'sos':live?'live':'off', t=sos?(he?'SOS פעיל':ar?'SOS نشط':'SOS active'):live?(he?'פעיל/ה עכשיו':ar?'نشط الآن':'Active now'):(he?'לא מחובר/ת או לא משתף/ת':ar?'غير متصل أو لا يشارك':'Offline or not sharing');
-   return '<div class="cm-av cm-st-'+k+'" role="img" aria-label="'+t+'" title="'+t+'"></div>'; })()}
+   var ar=currentLang==='ar', k=cmStKey(m);
+   var t=k==='sos'?(he?'SOS פעיל':ar?'SOS نشط':'SOS active'):k==='live'?(he?'פעיל/ה עכשיו':ar?'نشط الآن':'Active now'):(he?'לא מחובר/ת או לא משתף/ת':ar?'غير متصل أو لا يشارك':'Offline or not sharing');
+   return '<div class="cm-av cm-st-'+k+'" data-mid="'+ESC(String(m.id))+'" role="img" aria-label="'+t+'" title="'+t+'"></div>'; })()}
  <div class="cm-main">
  <div class="cm-nm">${ESC(memberLabel(m,he))}${(typeof m.rk==='number'&&m.partnerUid)?(' '+drillRankBadge(m.rk)):''}</div>
  <div class="cm-rel">${ESC(m.rel||'')}</div>
@@ -7952,13 +7968,13 @@ function buildMemberRow(m,he){
  acts.innerHTML=`
   ${m.pending ? '' : `<button class="cm-act ${shareOn?'on':''}" data-a="share">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s7-6.2 7-11a7 7 0 1 0-14 0c0 4.8 7 11 7 11Z"/><circle cx="12" cy="10" r="2.4"/></svg>
-    <span>${he?'שיתוף מיקום':'Location'}</span></button>
+    <span>${he?'שיתוף מיקום':currentLang==='ar'?'الموقع':'Location'}</span></button>
   <button class="cm-act on" data-a="ping">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 8a6 6 0 1 0-12 0c0 7-3 8-3 8h18s-3-1-3-8"/><path d="M10.3 21a2 2 0 0 0 3.4 0"/></svg>
-    <span>${he?'הכל טוב?':'All good?'}</span></button>
+    <span>${he?'הכל טוב?':currentLang==='ar'?'هل أنت بخير؟':'All good?'}</span></button>
   <button class="cm-act" data-a="locate">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="7"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3"/></svg>
-    <span>${he?'אתר/י':'Find'}</span></button>`}
+    <span>${he?'אתר/י':currentLang==='ar'?'تحديد':'Find'}</span></button>`}
   ${circlesList().length>1 ? `<button class="cm-act" data-a="move" aria-expanded="false">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8h13M13 4l4 4-4 4"/><path d="M20 16H7M11 12l-4 4 4 4"/></svg>
     <span>${he?'העבר למעגל':currentLang==='ar'?'نقل لدائرة':'Move circle'}</span></button>` : ''}
@@ -14227,6 +14243,7 @@ function updNotesFor(notes){
 function updShowBanner(pubV,done,notes){
   if(document.getElementById('upd-modal')) return;
   if(!done && window._updLaterV===pubV) return;   // "Later" means later - don't re-pop every 60s poll this session
+  try{ if(popupTypingOrSetup()){ setTimeout(function(){ updShowBanner(pubV,done,notes); }, 4000); return; } }catch(e){}   /* v312: never mid-typing / onboarding */
   var he=currentLang==='he', ar=currentLang==='ar';
   var title=done?(he?'SH\u2721MER \u05e2\u05d5\u05d3\u05db\u05df':ar?'\u062a\u0645 \u062a\u062d\u062f\u064a\u062b SH\u2721MER':'SH\u2721MER updated'):(he?'\u05e2\u05d3\u05db\u05d5\u05df \u05d6\u05de\u05d9\u05df':ar?'\u062a\u062d\u062f\u064a\u062b \u0645\u062a\u0627\u062d':'Update available');
   var sub=done?(he?'\u05d4\u05d0\u05e4\u05dc\u05d9\u05e7\u05e6\u05d9\u05d4 \u05e2\u05d5\u05d3\u05db\u05e0\u05d4 \u05dc\u05d2\u05e8\u05e1\u05d4 \u05d4\u05d0\u05d7\u05e8\u05d5\u05e0\u05d4 \u2014 \u05ea\u05d5\u05d3\u05d4!':ar?'\u062a\u0645 \u0627\u0644\u062a\u062d\u062f\u064a\u062b':'Updated to the latest version \u2014 thank you!'):(he?'\u05d2\u05e8\u05e1\u05d4 \u05d7\u05d3\u05e9\u05d4 \u05e9\u05dc SH\u2721MER \u05de\u05d5\u05db\u05e0\u05d4 \u2014 \u05e9\u05d9\u05e4\u05d5\u05e8\u05d9\u05dd, \u05de\u05d4\u05d9\u05e8\u05d5\u05ea \u05d5\u05ea\u05d9\u05e7\u05d5\u05e0\u05d9 \u05d0\u05d1\u05d8\u05d7\u05d4.':ar?'\u0646\u0633\u062e\u0629 \u062c\u062f\u064a\u062f\u0629 \u062c\u0627\u0647\u0632\u0629':'A new version of SH\u2721MER is ready \u2014 improvements, speed & security.');
