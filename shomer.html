@@ -4610,13 +4610,13 @@ function popupClearLow(){
        document.querySelectorAll(POPUP_LOW_SEL).forEach(function(e){ e.remove(); }); }catch(e){}
 }
 function _emergencyBusy(){ try{ return (typeof sosActive!=='undefined'&&sosActive) || (typeof sosPhase!=='undefined'&&sosPhase&&sosPhase!=='idle') || !!(SS&&SS.dms&&SS.dms.active); }catch(e){ return false; } }
-function fireUpdateNotice(){
+function fireUpdateNotice(noToast){
  try{
   var he=currentLang==='he',ar=currentLang==='ar';
   var title=he?'SH\u2721MER \u05e2\u05d5\u05d3\u05db\u05df':ar?'\u062a\u0645 \u062a\u062d\u062f\u064a\u062b SH\u2721MER':'SH\u2721MER updated';
   var body=he?'\u05d4\u05d0\u05e4\u05dc\u05d9\u05e7\u05e6\u05d9\u05d4 \u05e2\u05d5\u05d3\u05db\u05e0\u05d4 \u05dc\u05d2\u05e8\u05e1\u05d4 \u05d4\u05d0\u05d7\u05e8\u05d5\u05e0\u05d4':ar?'\u062a\u0645 \u0627\u0644\u062a\u062d\u062f\u064a\u062b \u0625\u0644\u0649 \u0623\u062d\u062f\u062b \u0625\u0635\u062f\u0627\u0631':'Updated to the latest version';   /* v304: no internal build number in user-facing text */
   try{ if(_ln){ _ln.schedule({notifications:[{id:(_lnId=(_lnId%2000000)+1),title:title,body:body,channelId:'shomer-updates',autoCancel:true,extra:{tag:'update'}}]}); } }catch(e){}
-  if(!_emergencyBusy()){ try{ toast(title+' \u00b7 '+body,'grn'); }catch(e){} }
+  if(!noToast && !_emergencyBusy()){ try{ toast(title+' \u00b7 '+body,'grn'); }catch(e){} }
  }catch(e){}
 }
 function checkSoftwareUpdate(){
@@ -4624,8 +4624,22 @@ function checkSoftwareUpdate(){
   if(!SS) return;
   var seen=SS._lastVerSeen||'';
   var changed=(seen && seen!==APP_VER)||(!seen && SS.onboarded);
-  if(changed){ try{ fireUpdateNotice(); }catch(e){} }  /* post-update: notification only, no popup. Popup fires solely from updCheck when a newer version is actually published. */
+  /* v312: the "what's new" lines used to appear only in the pre-update "Update available" card - which
+     most people never see, because a cold boot auto-reloads silently (it shows only when the reload is
+     held back, e.g. an SOS / check-in timer was running). Now EVERYONE gets one "SH✡MER updated" card
+     with the notes after the update, through the popup scheduler (never mid-typing / SOS / onboarding). */
+  if(changed){ SS._notesPending=APP_VER; try{ fireUpdateNotice(true); }catch(e){} }
   SS._lastVerSeen=APP_VER; try{saveStore();}catch(e){}
+  if(SS._notesPending===APP_VER){
+    fetch('version.json?cb='+Date.now(),{cache:'no-store'}).then(function(r){ return r.ok?r.json():null; }).then(function(d){
+      if(!d||d.v!==APP_VER) return;
+      if(!updNotesFor(d.notes).length){ delete SS._notesPending; try{saveStore();}catch(e){} return; }
+      popupSchedule('update',0,function(){
+        if(SS._notesPending!==APP_VER||document.getElementById('upd-modal')) return false;
+        updShowBanner(APP_VER,true,d.notes); delete SS._notesPending; try{saveStore();}catch(e){}
+        return !!document.getElementById('upd-modal'); });
+    }).catch(function(){});
+  }
  }catch(e){}
 }
 function testNotifications(){ try{ if(typeof updShowBanner==='function') updShowBanner((typeof APP_VER!=='undefined'?APP_VER:''),false); }catch(e){}
@@ -14132,6 +14146,16 @@ function updSetBadge(txt,stale){
  var b=document.getElementById('ver-badge'); if(b){ b.textContent=txt; b.style.color=stale?'#F5C840':'#6b7a9c'; }
  var s=document.getElementById('set-ver'); if(s){ fullVerLabel(function(f){ s.textContent=txt+' ('+f+')'; }); s.style.color=stale?'#F5C840':''; }   // Settings → About build row
 }
+/* v312: version.json notes = {he:[],ar:[],en:[]} - user-facing lines only, 1-3 per language.
+   A legacy flat array (he+en mixed) is filtered to the reader's script. */
+function updNotesFor(notes){
+  try{ var L=currentLang, a;
+    if(Array.isArray(notes)){ a=notes.filter(function(n){ var t=String(n||''); var he=/[\u0590-\u05FF]/.test(t), ar=/[\u0600-\u06FF]/.test(t); return L==='he'?he:L==='ar'?ar:(!he&&!ar); }); }
+    else if(notes&&typeof notes==='object'){ a=notes[L]||notes.en||[]; }
+    else a=[];
+    return a.filter(function(n){ return n&&String(n).trim(); }).slice(0,3);
+  }catch(e){ return []; }
+}
 function updShowBanner(pubV,done,notes){
   if(document.getElementById('upd-modal')) return;
   if(!done && window._updLaterV===pubV) return;   // "Later" means later - don't re-pop every 60s poll this session
@@ -14139,11 +14163,11 @@ function updShowBanner(pubV,done,notes){
   var title=done?(he?'SH\u2721MER \u05e2\u05d5\u05d3\u05db\u05df':ar?'\u062a\u0645 \u062a\u062d\u062f\u064a\u062b SH\u2721MER':'SH\u2721MER updated'):(he?'\u05e2\u05d3\u05db\u05d5\u05df \u05d6\u05de\u05d9\u05df':ar?'\u062a\u062d\u062f\u064a\u062b \u0645\u062a\u0627\u062d':'Update available');
   var sub=done?(he?'\u05d4\u05d0\u05e4\u05dc\u05d9\u05e7\u05e6\u05d9\u05d4 \u05e2\u05d5\u05d3\u05db\u05e0\u05d4 \u05dc\u05d2\u05e8\u05e1\u05d4 \u05d4\u05d0\u05d7\u05e8\u05d5\u05e0\u05d4 \u2014 \u05ea\u05d5\u05d3\u05d4!':ar?'\u062a\u0645 \u0627\u0644\u062a\u062d\u062f\u064a\u062b':'Updated to the latest version \u2014 thank you!'):(he?'\u05d2\u05e8\u05e1\u05d4 \u05d7\u05d3\u05e9\u05d4 \u05e9\u05dc SH\u2721MER \u05de\u05d5\u05db\u05e0\u05d4 \u2014 \u05e9\u05d9\u05e4\u05d5\u05e8\u05d9\u05dd, \u05de\u05d4\u05d9\u05e8\u05d5\u05ea \u05d5\u05ea\u05d9\u05e7\u05d5\u05e0\u05d9 \u05d0\u05d1\u05d8\u05d7\u05d4.':ar?'\u0646\u0633\u062e\u0629 \u062c\u062f\u064a\u062f\u0629 \u062c\u0627\u0647\u0632\u0629':'A new version of SH\u2721MER is ready \u2014 improvements, speed & security.');
   var nowL=done?(he?'\u05de\u05e2\u05d5\u05dc\u05d4':ar?'\u0645\u062a\u0627\u0628\u0639\u0629':'Continue'):(he?'\u05e2\u05d3\u05db\u05df \u05e2\u05db\u05e9\u05d9\u05d5':ar?'\u062d\u062f\u0651\u062b \u0627\u0644\u0622\u0646':'Update now');
-  var hasNotes=Array.isArray(notes)&&notes.length>0;
+  notes=updNotesFor(notes); var hasNotes=notes.length>0;
   var notesHdr=he?'\u05de\u05d4 \u05d7\u05d3\u05e9:':ar?'\u0627\u0644\u062c\u062f\u064a\u062f:':'What\'s new:';
   var ov=document.createElement('div'); ov.id='upd-modal';
   ov.setAttribute('style','position:fixed;inset:0;z-index:99998;display:flex;align-items:center;justify-content:center;padding:22px;background:rgba(6,11,22,.74);font-family:Rubik,system-ui,-apple-system,Segoe UI,Roboto,sans-serif');
-  ov.innerHTML='<div style="width:100%;max-width:340px;background:linear-gradient(180deg,#141a27,#0f1218);border:1px solid #2a3450;border-radius:22px;padding:26px 22px 18px;text-align:center;box-shadow:0 24px 70px rgba(0,0,0,.6)">'
+  ov.innerHTML='<div style="width:100%;max-width:340px;max-height:calc(100vh - 44px);max-height:calc(100dvh - 44px);overflow-y:auto;-webkit-overflow-scrolling:touch;background:linear-gradient(180deg,#141a27,#0f1218);border:1px solid #2a3450;border-radius:22px;padding:26px 22px 18px;text-align:center;box-shadow:0 24px 70px rgba(0,0,0,.6)">'
     +'<div style="position:relative;width:86px;height:86px;margin:0 auto 14px">'
     +'<img src="SHOMER_logo_big.png" alt="SH\u2721MER" width="86" height="86" style="width:86px;height:86px;object-fit:contain;filter:drop-shadow(0 8px 20px rgba(224,168,40,.38))">'
     +'<div style="position:absolute;inset-inline-end:-2px;bottom:-2px;width:31px;height:31px;border-radius:50%;background:'+(done?'#2ecc71':'#E0A828')+';display:flex;align-items:center;justify-content:center;box-shadow:0 3px 10px rgba(0,0,0,.5);border:2px solid #141a27">'
@@ -14153,7 +14177,7 @@ function updShowBanner(pubV,done,notes){
     +'<div style="font-size:12px;font-weight:800;letter-spacing:.14em;color:#E0A828;text-transform:uppercase;margin-bottom:6px">SH<span style="color:#F5C840">\u2721</span>MER</div>'
     +'<div style="font-size:21px;font-weight:800;color:#f2f5fb;margin-bottom:8px">'+title+'</div>'
     +'<div style="font-size:13.5px;color:#9aa6bd;line-height:1.55;margin-bottom:'+(hasNotes?'10':'20')+'px">'+sub+'</div>'
-    +(hasNotes?'<div style="text-align:start;background:rgba(255,255,255,.05);border-radius:10px;padding:10px 14px;margin-bottom:16px">'
+    +(hasNotes?'<div style="text-align:start;background:rgba(255,255,255,.05);border-radius:10px;padding:10px 14px;margin-bottom:16px;max-height:30vh;overflow-y:auto">'
       +'<div style="font-size:10px;font-weight:800;letter-spacing:.1em;color:#E0A828;text-transform:uppercase;margin-bottom:6px">'+notesHdr+'</div>'
       +notes.map(function(n){return '<div style="font-size:12.5px;color:#b8c3d8;line-height:1.6;padding:2px 0;display:flex;gap:7px"><span style="color:#E0A828;flex-shrink:0">\u203a</span><span>'+ESC(n)+'</span></div>';}).join('')
       +'</div>':'')
