@@ -158,6 +158,28 @@ public class ShomerNativePlugin extends Plugin {
     call.resolve();
   }
 
+  /** FCM token for SOS push ({token:null} when the build has no Firebase config yet). */
+  @PluginMethod
+  public void pushToken(PluginCall call) {
+    final JSObject r = new JSObject();
+    try {
+      if (com.google.firebase.FirebaseApp.getApps(getContext()).isEmpty()) { r.put("token", null); r.put("reason", "no-firebase-config"); call.resolve(r); return; }
+      com.google.firebase.messaging.FirebaseMessaging.getInstance().getToken().addOnCompleteListener(t -> {
+        String tok = t.isSuccessful() ? t.getResult() : SosPush.token(getContext());
+        if (tok != null) SosPush.saveToken(getContext(), tok);
+        r.put("token", tok); call.resolve(r);
+      });
+    } catch (Throwable e) { r.put("token", SosPush.token(getContext())); call.resolve(r); }
+  }
+
+  /** The web app is showing this SOS itself: never ring it again from push/poll, stop the push alarm. */
+  @PluginMethod
+  public void stopSosPush(PluginCall call) {
+    try { String sid = call.getString("sid", null); if (sid != null && sid.length() > 0) SosPush.seen(getContext(), sid); } catch (Throwable e) {}
+    try { SosPush.stopAll(getContext()); } catch (Throwable e) {}
+    call.resolve();
+  }
+
   @PluginMethod
   public void requestNotifications(PluginCall call) {
     if (Build.VERSION.SDK_INT >= 33 && getPermissionState("notifications") != com.getcapacitor.PermissionState.GRANTED) {
@@ -165,5 +187,13 @@ public class ShomerNativePlugin extends Plugin {
     } else {
       call.resolve();
     }
+  }
+
+  /** Android 13+ POST_NOTIFICATIONS answer (requestNotifications above names this callback). */
+  @com.getcapacitor.annotation.PermissionCallback
+  private void notifPermCallback(PluginCall call) {
+    JSObject r = new JSObject();
+    r.put("granted", getPermissionState("notifications") == com.getcapacitor.PermissionState.GRANTED);
+    call.resolve(r);
   }
 }

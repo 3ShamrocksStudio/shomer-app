@@ -51,6 +51,15 @@
         android:value="Background shake-to-SOS emergency trigger for a personal-safety app" />
 </service>
 
+<!-- ── SOS push: SHOMER's own FCM receiver (rings the incoming-SOS alarm, app closed too) ── -->
+<service
+    android:name="il.co.shomerapp.ShomerMessagingService"
+    android:exported="false">
+    <intent-filter>
+        <action android:name="com.google.firebase.MESSAGING_EVENT" />
+    </intent-filter>
+</service>
+
 <!-- ── Resume guarding after a reboot ── -->
 <receiver
     android:name="il.co.shomerapp.BootReceiver"

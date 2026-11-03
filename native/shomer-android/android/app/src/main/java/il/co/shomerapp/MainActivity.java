@@ -20,6 +20,8 @@ public class MainActivity extends BridgeActivity {
     sActive = this;
     ensureCameraPermission();
     dispatchShakeSos(getIntent());
+    dispatchSosPush(getIntent());
+    try { SosPush.channels(this); } catch (Throwable e) {}
   }
 
   /** The live activity (and its WebView bridge) while it exists - ShakeService uses it to fire
@@ -86,6 +88,39 @@ public class MainActivity extends BridgeActivity {
     super.onNewIntent(intent);
     setIntent(intent);
     dispatchShakeSos(intent);
+    dispatchSosPush(intent);
+  }
+
+  /** Opened from an incoming-SOS push: show over the lock screen and hand the push data to the web
+   *  app (retried until it is ready). Once the web app took it, its full-screen takeover rings
+   *  instead, so the push's own alarm service is stopped then. */
+  private void dispatchSosPush(Intent intent) {
+    String j = intent != null ? intent.getStringExtra(SosPush.EXTRA) : null;
+    if (j == null) return;
+    if ((intent.getFlags() & Intent.FLAG_ACTIVITY_LAUNCHED_FROM_HISTORY) != 0) return;
+    intent.removeExtra(SosPush.EXTRA);
+    showOverLock();
+    deliverPush(org.json.JSONObject.quote(j), 0);
+  }
+  private void deliverPush(final String quotedJson, final int attempt) {
+    runOnUiThread(() -> {
+      try {
+        if (getBridge() == null) return;
+        getBridge().eval("(typeof window.__shomerSosPush==='function')?(window.__shomerSosPush(" + quotedJson + "),'ok'):'wait'", (v) -> {
+          if (v != null && v.contains("ok")) { try { AlarmForegroundService.stopAlarm(this); } catch (Throwable e) {} return; }
+          if (attempt < 60) getWindow().getDecorView().postDelayed(() -> deliverPush(quotedJson, attempt + 1), 750);
+        });
+      } catch (Exception e) {
+        if (attempt < 60) getWindow().getDecorView().postDelayed(() -> deliverPush(quotedJson, attempt + 1), 750);
+      }
+    });
+  }
+
+  /** New FCM token while the app runs: the web app stores it in tokens/<uid>/<device>. */
+  void pushTokenToWeb(final String token) {
+    runOnUiThread(() -> {
+      try { if (getBridge() != null) getBridge().eval("window.__shomerPushToken&&window.__shomerPushToken(" + org.json.JSONObject.quote(token) + ")", null); } catch (Throwable e) {}
+    });
   }
 
   // Tell the web app to run its CANCELLABLE SOS countdown. The web layer owns the

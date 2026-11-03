@@ -80,6 +80,7 @@ final class BeatTask {
     if (app == null || webForeground) return;
     SharedPreferences sp = app.getSharedPreferences(P, Context.MODE_PRIVATE);
     try { checkGuardAlerts(sp); } catch (Throwable e) {}   // alerts from my linked SHOMERs reach a locked phone too
+    try { checkPartnerSos(sp); } catch (Throwable e) {}    // backup for the SOS push: my linked SHOMERs' live SOS
     if (!sp.getBoolean("on", false)) return;
     String key = sp.getString("key", null), uid = sp.getString("uid", null), dev = sp.getString("dev", null);
     String lat = sp.getString("lat", null), lng = sp.getString("lng", null);
@@ -169,6 +170,40 @@ final class BeatTask {
     ringingId = null;
     try { ((android.app.NotificationManager) c.getSystemService(Context.NOTIFICATION_SERVICE)).cancel(11); } catch (Throwable e) {}
   }
+  /** BACKUP PATH for the SOS push (native/PUSH-ALARM-PLAN.md): while SHOMER is off-screen, look at
+   *  the live SOS record of each SHOMER I linked with (sos/<theirUid> - the rules let only linked
+   *  people read it) and ring the same alarm the push would. Same dedupe as the push (SOS id), so
+   *  push + poll never ring twice. Nothing is written; only my own pairs list and their SOS are read. */
+  private static void checkPartnerSos(SharedPreferences sp) throws Exception {
+    String uid = sp.getString("uid", null); if (uid == null) return;
+    String t = token(app); if (t == null) return;
+    String pb = get(app, "pairs/" + uid, t); if (pb == null || pb.equals("null")) return;
+    JSONObject pairs = new JSONObject(pb);
+    java.util.Iterator<String> it = pairs.keys();
+    long now = System.currentTimeMillis();
+    String lang = Locale.getDefault().getLanguage();
+    boolean he = "iw".equals(lang) || "he".equals(lang), ar = "ar".equals(lang);
+    int n = 0;
+    while (it.hasNext() && n++ < 20) {
+      String puid = it.next();
+      String body = get(app, "sos/" + puid, t); if (body == null || body.equals("null")) continue;
+      JSONObject r = new JSONObject(body);
+      if (!puid.equals(r.optString("uid"))) continue;
+      String sid = r.has("id") ? r.optString("id") : String.valueOf(r.optLong("ts"));
+      if (r.optBoolean("resolved", false)) { SosPush.clear(app, sid); continue; }
+      if (now - r.optLong("ts", 0) > 25 * 60_000L) continue;
+      JSONObject pr = pairs.optJSONObject(puid);
+      String nm = pr != null ? pr.optString("name", "") : "";
+      if (nm.length() == 0) nm = he ? "\u05e9\u05d5\u05de\u05e8/\u05ea \u05e9\u05dc\u05da" : ar ? "\u062d\u0627\u0631\u0633\u0643" : "Your SHOMER";
+      java.util.HashMap<String, String> d = new java.util.HashMap<>();
+      d.put("kind", "sos"); d.put("role", "paired"); d.put("sid", sid); d.put("from", puid); d.put("src", "poll");
+      d.put("type", r.optString("type", "unknown")); d.put("ts", String.valueOf(r.optLong("ts")));
+      d.put("title", "\uD83D\uDEA8 SOS - " + nm);
+      d.put("body", he ? "\u05e4\u05ea\u05d7/\u05d9 \u05d0\u05ea SH\u2721MER \u05e2\u05db\u05e9\u05d9\u05d5" : ar ? "\u0627\u0641\u062a\u062d SH\u2721MER \u0627\u0644\u0622\u0646" : "Open SH\u2721MER now");
+      SosPush.handle(app, d);
+    }
+  }
+
   private static String get(Context c, String path, String tok) {
     HttpURLConnection k = null;
     try {
