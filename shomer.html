@@ -12546,7 +12546,7 @@ function evpMaybeLoad(){
     var ok = !!(FB && FB.uid) && ((window._evpSrv && window._evpSrv[FB.uid]===true) || (isFounder() && !!(SS.security&&SS.security.phoneVerified)));
     if(window._evpLoaded){ if(ok && window.EVP && EVP.enablePreview) EVP.enablePreview(); else if(ok) window._evpPreview=true; return; }
     window._evpLoaded=true; window._evpPreview=ok;
-    var sc=document.createElement('script'); sc.src='events-preview.js?nosw&v=322'; sc.async=true; document.head.appendChild(sc);
+    var sc=document.createElement('script'); sc.src='events-preview.js?nosw&v=324'; sc.async=true; document.head.appendChild(sc);
   }catch(e){}
 }
 setTimeout(function(){ try{ evpMaybeLoad(); }catch(e){} },6000);   /* v322: also without a signed-in session */
