@@ -28,12 +28,19 @@
 	<string>SHOMER detects a hard shake of your phone as a silent way to raise an SOS.</string>
 	<key>NSCameraUsageDescription</key>
 	<string>SHOMER uses the camera only when you choose to attach a photo to an incident report.</string>
+	<!--
+	  Only declare a background mode the shipped binary actually uses. App Store
+	  review rejects a declared mode with no code behind it, so this list grows
+	  as the Swift side of ShomerNative lands, not before:
+	    audio               <- add with the native alarm player
+	    remote-notification <- add with push-driven SOS wake-up
+	    fetch               <- add only if a real background refresh exists
+	  `location` is backed today by @capacitor-community/background-geolocation,
+	  which has a real iOS implementation.
+	-->
 	<key>UIBackgroundModes</key>
 	<array>
 		<string>location</string>
-		<string>audio</string>
-		<string>remote-notification</string>
-		<string>fetch</string>
 	</array>
 	<key>CFBundleLocalizations</key>
 	<array>
