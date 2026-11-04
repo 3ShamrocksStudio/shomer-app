@@ -8874,7 +8874,7 @@ function removeMember(id){
   }
 
   // 4. stop listening for their SOS
-  try{ if(puid){ FB.db.ref('invites/sos_'+puid).off(); delete SOSBUS.watchers[puid]; delete SOSBUS.mine[puid]; } }catch(e){}
+  try{ if(puid){ FB.db.ref('invites/sos_'+puid).off(); delete SOSBUS.watchers[puid]; delete SOSBUS.mine[puid]; try{updBdg();}catch(_){} } }catch(e){}
 
   if(mapLayers.circle[id]){ MAP&&MAP.removeLayer(mapLayers.circle[id]); delete mapLayers.circle[id]; }
   if(alertMemberId===id) clearCircleAlert();
