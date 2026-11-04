@@ -55,7 +55,6 @@ EVP.feedRow=function(ev){ if(ev.seed) return null; var q=confidence(ev); return 
 
 /* ── storage ── */
 function mine(){ try{ return JSON.parse(ls('shomer_evp_mine')||'[]'); }catch(e){ return []; } }
-function addMine(k){ var m=mine(); if(m.indexOf(k)<0){ m.push(k); ls('shomer_evp_mine',JSON.stringify(m.slice(-200))); } }
 function seedKey(id){ var map={}; try{ map=JSON.parse(ls('shomer_evp_seedkeys')||'{}'); }catch(e){} return map[id] || ('ps_'+id.replace(/[^a-z0-9]/gi,'')+'_'+String(FB.uid).slice(0,6)); }
 function setSeedKey(id,k){ var map={}; try{ map=JSON.parse(ls('shomer_evp_seedkeys')||'{}'); }catch(e){} map[id]=k; ls('shomer_evp_seedkeys',JSON.stringify(map)); }
 
@@ -185,34 +184,6 @@ async function vote_(k,which){
   catch(e){ if(typeof toast==='function') toast(he()?'לא נשמר - נסו שוב':'Not saved - try again','amb'); }
 }
 
-/* ── report: FAB → type → (optional line) → send = 3 taps ── */
-function openReport(){
-  var el=document.getElementById('evp-rep'); if(el) el.remove();
-  el=document.createElement('div'); el.id='evp-rep'; el.className='evp-rep';
-  var sel=null;
-  el.innerHTML='<div class="evp-rep-c"><button class="evp-x" aria-label="close">✕</button>'
-    +'<div class="evp-rep-h">'+(he()?'מה קורה?':'What is happening?')+'</div>'
-    +'<div class="evp-types">'+Object.keys(CATS).map(function(t){ var c=CATS[t]; return '<button data-t="'+t+'" style="--c:'+c.color+'"><span class="evp-ic" style="background:'+c.color+'"><svg class="ic" viewBox="0 0 24 24">'+_glyph(c.g)+'</svg></span>'+(he()?c.he:c.en)+'</button>'; }).join('')+'</div>'
-    +'<input class="evp-line" maxlength="80" placeholder="'+(he()?'שורה אחת (לא חובה)':'One line (optional)')+'">'
-    +'<button class="evp-send" disabled>'+(he()?'שליחה · אנונימי':'Send · anonymous')+'</button>'
-    +'<div class="evp-rep-n">'+(he()?'מיקום מעוגל לאזור (כ-1 ק״מ). בחירום חייגו 100 / 101 / 102.':'Location rounded to the area (~1 km). In an emergency call 100 / 101 / 102.')+'</div></div>';
-  document.body.appendChild(el);
-  el.querySelector('.evp-x').onclick=function(){ el.remove(); };
-  el.querySelectorAll('.evp-types button').forEach(function(b){ b.onclick=function(){ sel=b.getAttribute('data-t'); el.querySelectorAll('.evp-types button').forEach(function(x){ x.classList.toggle('on',x===b); }); el.querySelector('.evp-send').disabled=false; }; });
-  el.querySelector('.evp-send').onclick=function(){ if(sel) send(sel, el.querySelector('.evp-line').value, el); };
-}
-async function send(type,note,el){
-  var p=(typeof _myPos==='function')?_myPos():null;
-  if(!p){ toast(he()?'צריך מיקום כדי לדווח':'Location needed to report','amb'); return; }
-  note=String(note||'').replace(/\s+/g,' ').trim().slice(0,80);
-  try{ if(note && typeof MOD!=='undefined' && !MOD.checkText(note).ok){ toast(he()?'נא לנסח בכבוד':'Please rephrase respectfully','amb'); return; } }catch(e){}
-  var k=(typeof fbDashKey==='function')?fbDashKey('e_'):('e_'+Date.now());
-  var ev={by:FB.uid, ts:Date.now(), type:type, lat:r2(p.lat), lng:r2(p.lng), note:note, pv:1, status:'pending'};   /* anonymous: no name field at all */
-  try{ await fbRestWrite('PUT','events/'+k,ev); }catch(e){ toast(he()?'לא נשלח - נסו שוב':'Not sent - try again','amb'); return; }
-  addMine(k); EVP.items[k]=ev; paint(); el.remove(); go(k);
-  toast(he()?'נשלח בעילום שם (תצוגה מקדימה - רק את/ה רואה)':'Sent anonymously (preview - only you see it)','grn');
-}
-
 /* ── chrome ── */
 function css(){
   var s=document.createElement('style'); s.id='evp-css';
@@ -242,25 +213,13 @@ function css(){
   +'.evp-vote{display:flex;gap:8px;margin-top:10px}'
   +'.evp-vb{flex:1;min-height:42px;border-radius:12px;border:1px solid var(--b3,#2E4070);background:var(--n4);color:var(--tx0);font:600 13px var(--font-heb);cursor:pointer}'
   +'.evp-vb.on{background:var(--grn);border-color:var(--grn)}.evp-vb.d.on{background:var(--n6);border-color:var(--p2)}'
-  +'.evp-fab{position:absolute;right:12px;bottom:calc(var(--nav) + 14px);z-index:400;height:48px;padding:0 16px;border-radius:24px;background:linear-gradient(135deg,#C09020 0%,#E0A828 60%,#F5C840 100%);color:#0A1628;border:none;font:800 14px var(--font-heb);box-shadow:var(--e3);cursor:pointer}'
   +'.evp-pill{position:absolute;right:12px;bottom:calc(var(--nav) + 70px);z-index:400;height:34px;padding:0 12px;border-radius:17px;background:rgba(8,18,36,.92);border:1px solid var(--b3,#2E4070);color:var(--tx1);font:600 12px var(--font-heb);cursor:pointer}'
   +'.evp-pill b{color:var(--g3)}.evp-pill small{display:block;font-size:9px;color:var(--tx3);margin-top:-2px}'
-  +'.evp-rep{position:fixed;inset:0;z-index:640;background:rgba(0,0,0,.55);display:flex;align-items:flex-end}'
-  +'.evp-rep-c{position:relative;width:100%;background:var(--n2);border-radius:20px 20px 0 0;padding:16px 14px calc(16px + env(safe-area-inset-bottom,0px));color:var(--tx0);font-family:var(--font-heb)}'
-  +'.evp-rep-h{font-weight:800;font-size:17px;margin-bottom:12px}'
-  +'.evp-types{display:grid;grid-template-columns:repeat(5,1fr);gap:6px}'
-  +'.evp-types button{display:flex;flex-direction:column;align-items:center;gap:5px;padding:8px 2px;border-radius:12px;background:var(--n4);border:2px solid transparent;color:var(--tx0);font:600 12px var(--font-heb);cursor:pointer}'
-  +'.evp-types button.on{border-color:var(--c);background:var(--n5)}'
-  +'.evp-line{width:100%;box-sizing:border-box;margin-top:12px;height:44px;border-radius:12px;border:1px solid var(--b3,#2E4070);background:var(--n4);color:var(--tx0);padding:0 12px;font:14px var(--font-heb)}'
-  +'.evp-send{width:100%;margin-top:10px;height:48px;border-radius:14px;border:none;background:linear-gradient(135deg,#C09020 0%,#E0A828 60%,#F5C840 100%);color:#0A1628;font:800 15px var(--font-heb);cursor:pointer}'
-  +'.evp-send:disabled{opacity:.45}'
-  +'body.evp-on .evp-fab,body.evp-on .evp-pill{display:none}'
-  +'.evp-rep-n{margin-top:8px;font-size:11px;color:var(--tx3);text-align:center}';
+  +'body.evp-on .evp-pill{display:none}';
   document.head.appendChild(s);
 }
 function chrome(){
   var host=document.getElementById('map'); host=(host&&host.parentNode)||document.body;
-  var f=document.createElement('button'); f.className='evp-fab'; f.id='evp-fab'; f.textContent=he()?'＋ דיווח':'＋ Report'; f.onclick=openReport; host.appendChild(f);
   var p=document.createElement('button'); p.className='evp-pill'; p.id='evp-pill';
   p.innerHTML='<b>0</b> '+(he()?'אירועים':'events')+'<small>'+(he()?'תצוגה מקדימה · רק לך':'Preview · only you')+'</small>';
   p.onclick=function(){ var k=EVP.cur?EVP.order[(EVP.order.indexOf(EVP.cur)+1)%EVP.order.length]:EVP.order[0]; if(k) go(k); };
