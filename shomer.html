@@ -6998,7 +6998,7 @@ function openUpdates(){
  op('sh-upd');
  document.querySelectorAll('.nb').forEach(b=>b.classList.remove('on'));
  const nb=document.getElementById('nb-upd');if(nb)nb.classList.add('on');
- newUpd=0;updBdg(); try{ applyUpdFilter(); }catch(e){}
+ newUpd=0;updBdg(); try{ localStorage.setItem('shomerEvSeen',String(Date.now())); }catch(e){} try{ applyUpdFilter(); }catch(e){}
 }
 /* Mirror "any full sheet open" onto <body> so CSS can hide the floating SOS/FABs reliably (no :has dependency). */
 function syncSheetState(){ document.body.classList.toggle('sheet-open', !!document.querySelector('.sheet.open')); }
@@ -10892,7 +10892,7 @@ try{ hydrateIcons(document); }catch(e){}
 /* Loaded-build version - shown in the diagnostic panel so a phone can prove
    whether it's on the latest build or a STALE cached one. Keep in lock-step
    with sw.js SW_VERSION on every deploy. */
-var APP_VER='v323';
+var APP_VER='v324';
 var FB={ready:false,uid:null,db:null,_presTimer:null,connected:false,listening:false,pushState:'default',near:0,swVer:'?',
   authState:'connecting',sdkLoaded:false,persist:'',permErr:null,err:null,wsProbe:'',csp:''};
 /* Always log connection diagnostics to the console so the real failure can be SEEN in Chrome. */

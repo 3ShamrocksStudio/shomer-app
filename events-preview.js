@@ -143,7 +143,10 @@ function paint(){
     if(EVP.markers[k]){ EVP.markers[k].setIcon(icon); EVP.markers[k].setLatLng([ev.lat,ev.lng]); }
     else { var m=window.L.marker([ev.lat,ev.lng],{icon:icon,zIndexOffset:500}).addTo(MAP); m.on('click',function(e){ try{ window.L.DomEvent.stopPropagation(e); }catch(_){} openCard(k); }); EVP.markers[k]=m; }
   });
-  var pill=document.getElementById('evp-pill'); if(pill) pill.querySelector('b').textContent=String(EVP.order.length);
+  /* v324: no counter on the map - new events light the bell (באזור שלי) instead */
+  try{ var seen=+(localStorage.getItem('shomerEvSeen')||0), fresh=0;
+    EVP.order.forEach(function(k){ var e=EVP.items[k], t=+new Date((e&&(e.at||e.ts))||0); if(t>seen) fresh++; });
+    if(fresh>0 && typeof newUpd!=='undefined'){ newUpd=Math.max(newUpd,fresh); if(typeof updBdg==='function') updBdg(); } }catch(e){}
 }
 
 /* ── card ── */
@@ -267,10 +270,7 @@ function css(){
 }
 function chrome(){
   var host=document.getElementById('map'); host=(host&&host.parentNode)||document.body;
-  var p=document.createElement('button'); p.className='evp-pill'; p.id='evp-pill';
-  p.innerHTML='<b>0</b> '+(he()?'אירועים':'events');
-  p.onclick=function(){ var k=EVP.cur?EVP.order[(EVP.order.indexOf(EVP.cur)+1)%EVP.order.length]:EVP.order[0]; if(k) go(k); };
-  host.appendChild(p);
+  /* v324: the map counter pill was removed (Dave 4 Nov) - events show under the bell */
   try{ MAP.on('click',closeCard); }catch(e){}
   /* v320: opening another sheet closes the card (it opens again only on the next tap) */
   try{ if(typeof window.op==='function' && !window.op._evp){ var _op=window.op; window.op=function(){ closeCard(); return _op.apply(this,arguments); }; window.op._evp=1; } }catch(e){}
