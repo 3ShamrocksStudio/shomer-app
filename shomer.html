@@ -2014,7 +2014,7 @@ body.otp-active .ob-steps{display:none!important;}
  <button class="sh-x" onclick="cl('sh-upd')" aria-label="סגור"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg></button>
  </div>
  <div class="sh-body">
- <div class="upd-sub" id="upd-sub">מה קורה סביבך ואצל השומרים שלך</div>
+ <div class="upd-sub" id="upd-sub">מה קורה סביבך ואצל השומרים שבחרת</div>
  <div class="seg" role="tablist"><button class="on" id="seg-live" role="tab" onclick="setUpdSeg('live')"><span class="sdot"></span><span data-he="עכשיו" data-en="Live now" data-ar="الآن">עכשיו</span></button><button id="seg-past" role="tab" onclick="setUpdSeg('past')"><span data-he="ארכיון" data-en="Archive" data-ar="الأرشيف">ארכיון</span></button></div><div class="chip-row" role="group" aria-label="סינון">
  <button class="chip on" data-f="all" onclick="chipOn(this)">הכל</button>
  <button class="chip" data-f="sos" onclick="chipOn(this)">SOS</button>
@@ -3971,7 +3971,7 @@ function applyTranslations(){
  :'What was this? Accidental and test are removed from the map and never shown to others.');
  setText('sos-rs-ttl',currentLang==='he'?'✓ ה-SOS הסתיים':'✓ SOS ended');
  // Sheet titles
- setText('upd-ttl',T('upd_ttl')); setText('upd-sub',currentLang==='he'?'מה קורה סביבך ואצל השומרים שלך':currentLang==='ar'?'ما يحدث حولك ولدى حُرّاسك':'What is happening around you and your SH✡MERs'); try{ var _hb=document.querySelector('.hdr-bell'); if(_hb){ _hb.title=T('upd_ttl'); _hb.setAttribute('aria-label',T('upd_ttl')); } }catch(e){}setText('rep-ttl',T('rep_ttl'));setText('dms-ttl',T('dms_ttl'));
+ setText('upd-ttl',T('upd_ttl')); setText('upd-sub',currentLang==='he'?'מה קורה סביבך ואצל השומרים שבחרת':currentLang==='ar'?'ما يحدث حولك ولدى من اخترتهم':'What is happening around you and the people you chose'); try{ var _hb=document.querySelector('.hdr-bell'); if(_hb){ _hb.title=T('upd_ttl'); _hb.setAttribute('aria-label',T('upd_ttl')); } }catch(e){}setText('rep-ttl',T('rep_ttl'));setText('dms-ttl',T('dms_ttl'));
  setText('set-ttl',T('set_ttl'));setText('prof-ttl',T('prof_ttl'));setText('em-ttl',T('em_ttl'));
  setText('alarm-ttl',T('alarm_ttl'));
  // Map legend
@@ -6800,9 +6800,9 @@ function updItems(){
       closed:/טופל|נסגר|closed|resolved|handled/i.test(d.status||''), go:function(){ try{ MAP.setView([d.lat,d.lng],15); }catch(e){} openDetail(i); } }); }); }catch(e){}
   try{ if(window.EVP&&EVP.items){ var C=EVP.CATS||{}; Object.keys(EVP.items).forEach(function(k){ var e=EVP.items[k]; if(!e||typeof e.lat!=='number') return; var c=C[e.type]||C.other||{};
     out.push({k:'ev', ico:c.g||'clipboard', col:c.color||'#7E8CA0', ty:(he?c.he:c.en)||'', pl:e.area?(he?(e.area.he||e.area.en):(e.area.en||e.area.he)):'', ts:e.at||e.ts, lat:e.lat, lng:e.lng, d:km(e.lat,e.lng),
-      closed:/closed|resolved/i.test(e.status||''), go:function(){ EVP.go(k); } }); }); } }catch(e){}
+      closed:/closed|resolved/i.test(e.status||''), seed:true, go:function(){ EVP.go(k); } }); }); } }catch(e){}
   out.forEach(function(it){ it.age=it.ts?now-it.ts:0; it.live=it.k==='sos'||(!it.closed&&it.age<=UPD_LIVE_MS); });
-  return out.filter(function(it){ return it.k==='sos'||it.age<=UPD_KEEP_MS; });   /* 90-day retention */
+  return out.filter(function(it){ return it.k==='sos'||it.seed||it.age<=UPD_KEEP_MS; });   /* 90-day retention for user data; curated public news events (seed) stay, matching the map */
 }
 function updTime(ts){
   if(!ts) return ''; var d=new Date(ts), o={timeZone:'Asia/Jerusalem'};
@@ -10890,7 +10890,7 @@ try{ hydrateIcons(document); }catch(e){}
 /* Loaded-build version - shown in the diagnostic panel so a phone can prove
    whether it's on the latest build or a STALE cached one. Keep in lock-step
    with sw.js SW_VERSION on every deploy. */
-var APP_VER='v320';
+var APP_VER='v321';
 var FB={ready:false,uid:null,db:null,_presTimer:null,connected:false,listening:false,pushState:'default',near:0,swVer:'?',
   authState:'connecting',sdkLoaded:false,persist:'',permErr:null,err:null,wsProbe:'',csp:''};
 /* Always log connection diagnostics to the console so the real failure can be SEEN in Chrome. */
