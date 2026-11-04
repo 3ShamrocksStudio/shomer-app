@@ -6857,8 +6857,9 @@ function applyUpdFilter(){
 }
 function updBdg(){
  const b=document.getElementById('bell-dot'), btn=b&&b.closest('.hdr-bell');
- let sos=false; try{ sos=newUpd>0 && Object.keys((window.SOSBUS&&SOSBUS.mine)||{}).length>0; }catch(e){}
- if(b){b.classList.toggle('on',newUpd>0); b.textContent=newUpd>0?(newUpd>9?'9+':String(newUpd)):'';}
+ let sos=false; try{ var _m=(window.SOSBUS&&SOSBUS.mine)||{}; sos=Object.keys(_m).some(function(k){return _m[k]===1}); }catch(e){}   /* an active SOS in your circle keeps the bell red until it ends */
+ const on=newUpd>0||sos;
+ if(b){b.classList.toggle('on',on); b.textContent=newUpd>0?(newUpd>9?'9+':String(newUpd)):(sos?'SOS':'');}
  if(btn){btn.classList.toggle('has-new',newUpd>0&&!sos); btn.classList.toggle('has-sos',sos);}
 }
 
@@ -10905,7 +10906,7 @@ try{ hydrateIcons(document); }catch(e){}
 /* Loaded-build version - shown in the diagnostic panel so a phone can prove
    whether it's on the latest build or a STALE cached one. Keep in lock-step
    with sw.js SW_VERSION on every deploy. */
-var APP_VER='v325';
+var APP_VER='v326';
 var FB={ready:false,uid:null,db:null,_presTimer:null,connected:false,listening:false,pushState:'default',near:0,swVer:'?',
   authState:'connecting',sdkLoaded:false,persist:'',permErr:null,err:null,wsProbe:'',csp:''};
 /* Always log connection diagnostics to the console so the real failure can be SEEN in Chrome. */
@@ -13343,7 +13344,7 @@ function onPartnerSOS(puid, v, src){
   SOSBUS.lastTs=SOSBUS.lastTs||{}; if(v.ts && v.ts>(SOSBUS.lastTs[puid]||0)) SOSBUS.lastTs[puid]=v.ts;
   var _newest=SOSBUS.lastTs[puid]||0, old=!!(_newest && (Date.now()-_newest)>SOS_OLD_MS);
   if(SOSBUS.mine[puid]){ if(SOSBUS.mine[puid]==='old' && !old){ delete SOSBUS.mine[puid]; } else return; }   /* already showing (an old one that just got UPDATED escalates) */
-  SOSBUS.mine[puid]=old?'old':1;
+  SOSBUS.mine[puid]=old?'old':1; try{updBdg();}catch(e){}
   try{ var _sc=document.getElementById('sh-circles'); if(_sc&&_sc.classList.contains('open')) renderCircles(); }catch(e){}
   var he=currentLang==='he';
   /* the name I gave them (my private invite name for them) first - it is who I know */
@@ -13357,7 +13358,7 @@ function onPartnerSOS(puid, v, src){
 function onPartnerSOSClear(puid, src){
   /* the alert stays while ANY channel (bus or sos/<uid> record) still says active */
   var sm=(SOSBUS.src=SOSBUS.src||{})[puid]; if(sm){ delete sm[src||'bus']; if(Object.keys(sm).length) return; }
-  delete SOSBUS.mine[puid];
+  delete SOSBUS.mine[puid]; try{updBdg();}catch(e){}
   try{ var _sc=document.getElementById('sh-circles'); if(_sc&&_sc.classList.contains('open')) renderCircles(); }catch(e){}
   var el=document.getElementById('in-sos-'+puid); if(el) el.remove();
   try{ if(respTarget&&respTarget.key==='sos:'+puid) stopResponderNav(); }catch(e){}   /* their SOS ended - route goes with it */
