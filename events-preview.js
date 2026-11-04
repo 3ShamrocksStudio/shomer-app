@@ -95,7 +95,7 @@ async function refresh(){
   if(document.hidden) return;
   var ks=Object.keys(EVP.items);
   for(var i=0;i<ks.length;i++){ try{ var v=await get('events/'+ks[i]); if(v){ EVP.items[ks[i]]=v; } }catch(e){} }
-  paint(); if(EVP.cur && EVP.items[EVP.cur]) openCard(EVP.cur,true);
+  paint(); var _c=document.getElementById('evp-card'); if(EVP.cur && EVP.items[EVP.cur] && _c && _c.classList.contains('open')) openCard(EVP.cur,true);   /* v320: never re-opens a closed card */
 }
 
 /* ── map ── */
@@ -168,7 +168,7 @@ function openCard(k,quiet){
 }
 function closeCard(){ var el=document.getElementById('evp-card'); if(el) el.classList.remove('open'); document.body.classList.remove('evp-on'); EVP.cur=null; EVP.full=null; }
 function go(k){ var ev=EVP.items[k]; if(!ev) return; try{ MAP.flyTo([ev.lat,ev.lng], Math.max(12, Math.min(14, MAP.getZoom()||12)), {duration:.8}); }catch(e){} openCard(k); }
-EVP.go=go;
+EVP.go=go; EVP.close=closeCard;
 
 /* one user, one vote: atomic multi-path update (confirm XOR dispute); tap again = undo */
 async function vote_(k,which){
@@ -192,8 +192,8 @@ function css(){
   +'.evp-pin{width:32px;height:32px;border-radius:50%;background:var(--c);border:2px solid #0A1628;box-shadow:0 2px 8px rgba(0,0,0,.5);display:flex;align-items:center;justify-content:center;color:#fff}'
   +'.evp-pin .ic{width:18px;height:18px}'
   +'.evp-pin.evp-mem{background:#0A1628;border:2px solid #E0A828;box-shadow:0 0 0 4px rgba(224,168,40,.25),0 2px 8px rgba(0,0,0,.5)}'
-  +'.evp-card{position:absolute;left:10px;right:10px;bottom:calc(var(--nav) + 44px);z-index:610;background:var(--n2);border:1px solid var(--b3,#2E4070);border-radius:16px;padding:12px 14px 12px;box-shadow:var(--e3);color:var(--tx0);font-family:var(--font-heb);transform:translateY(140%);transition:transform .28s cubic-bezier(.25,1,.35,1)}'
-  +'.evp-card.open{transform:none}'
+  +'.evp-card{position:absolute;left:10px;right:10px;bottom:calc(var(--nav) + 44px + env(safe-area-inset-bottom,0px));z-index:610;background:var(--n2);border:1px solid var(--b3,#2E4070);border-radius:16px;padding:12px 14px 12px;box-shadow:var(--e3);color:var(--tx0);font-family:var(--font-heb);transform:translateY(140%);visibility:hidden;pointer-events:none;transition:transform .28s cubic-bezier(.25,1,.35,1),visibility 0s .28s}'
+  +'.evp-card.open{transform:none;visibility:visible;pointer-events:auto;transition:transform .28s cubic-bezier(.25,1,.35,1)}'
   +'.evp-x{position:absolute;top:6px;inset-inline-end:8px;background:none;border:none;color:var(--tx2);font-size:16px;padding:6px;cursor:pointer}'
   +'.evp-mem-l{display:flex;align-items:center;gap:6px;color:var(--g3);font-size:12px;font-weight:700;margin-bottom:6px;padding-inline-end:24px}'
   +'.evp-mem-l svg{width:16px;height:16px}'
@@ -225,6 +225,8 @@ function chrome(){
   p.onclick=function(){ var k=EVP.cur?EVP.order[(EVP.order.indexOf(EVP.cur)+1)%EVP.order.length]:EVP.order[0]; if(k) go(k); };
   host.appendChild(p);
   try{ MAP.on('click',closeCard); }catch(e){}
+  /* v320: opening another sheet closes the card (it opens again only on the next tap) */
+  try{ if(typeof window.op==='function' && !window.op._evp){ var _op=window.op; window.op=function(){ closeCard(); return _op.apply(this,arguments); }; window.op._evp=1; } }catch(e){}
 }
 
 async function start(){
@@ -234,7 +236,6 @@ async function start(){
   await loadMine(); paint();
   setInterval(refresh, 30000);
   document.addEventListener('visibilitychange', function(){ if(!document.hidden) refresh(); });
-  if(/[?&]evp=1\b/.test(location.search)){ var k=EVP.order[0]; if(k) setTimeout(function(){ go(k); },600); }
 }
 start();
 })();
