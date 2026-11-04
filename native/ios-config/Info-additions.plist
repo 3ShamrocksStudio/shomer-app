@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<!--
+  Keys merged into the generated ios/App/App/Info.plist by apply-ios-config.sh.
+  `npx cap add ios` regenerates that file from Capacitor's template on every CI
+  run, so anything SHOMER needs lives here instead, the same way the Android
+  build keeps its sources in native/shomer-android.
+
+  Every NS*UsageDescription below is shown verbatim to the user in the iOS
+  permission dialog, and Apple's reviewer reads them. A missing one is both an
+  automatic App Store rejection and a hard crash the first time the app asks.
+-->
+<plist version="1.0">
+<dict>
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>SHOMER shows you on the community map so the nearest guardian can reach you, and sends your location with an SOS.</string>
+	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
+	<string>SHOMER needs your location in the background so your SOS still reaches nearby guardians when your screen is off or another app is open.</string>
+	<key>NSLocationAlwaysUsageDescription</key>
+	<string>SHOMER needs your location in the background so your SOS still reaches nearby guardians when your screen is off or another app is open.</string>
+	<key>NSContactsUsageDescription</key>
+	<string>SHOMER uses your contacts only to let you pick who to invite as your personal SHOMER. Nothing is uploaded.</string>
+	<key>NSMicrophoneUsageDescription</key>
+	<string>SHOMER uses the microphone for hands-free voice commands during an emergency.</string>
+	<key>NSSpeechRecognitionUsageDescription</key>
+	<string>SHOMER recognises spoken commands so you can trigger help without touching the screen.</string>
+	<key>NSMotionUsageDescription</key>
+	<string>SHOMER detects a hard shake of your phone as a silent way to raise an SOS.</string>
+	<key>NSCameraUsageDescription</key>
+	<string>SHOMER uses the camera only when you choose to attach a photo to an incident report.</string>
+	<key>UIBackgroundModes</key>
+	<array>
+		<string>location</string>
+		<string>audio</string>
+		<string>remote-notification</string>
+		<string>fetch</string>
+	</array>
+	<key>CFBundleLocalizations</key>
+	<array>
+		<string>en</string>
+		<string>he</string>
+		<string>ar</string>
+	</array>
+	<key>CFBundleDisplayName</key>
+	<string>SHOMER</string>
+	<key>ITSAppUsesNonExemptEncryption</key>
+	<false/>
+</dict>
+</plist>

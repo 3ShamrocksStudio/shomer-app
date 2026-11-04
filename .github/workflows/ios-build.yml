@@ -1,0 +1,142 @@
+name: Build SHOMER iOS (TestFlight)
+
+# Ready to run the moment the Apple Developer account exists.
+# Needs these repo secrets (Settings -> Secrets and variables -> Actions):
+#   APPSTORE_ISSUER_ID     App Store Connect API key issuer id
+#   APPSTORE_KEY_ID        App Store Connect API key id
+#   APPSTORE_PRIVATE_KEY   contents of the AuthKey_XXXX.p8 file
+#   APPLE_TEAM_ID          10-character Apple team id
+# Until they are set the job stops at the preflight step with a clear message.
+
+on:
+  workflow_dispatch:
+  push:
+    tags:
+      - 'ios-*'
+
+jobs:
+  build-ios:
+    runs-on: macos-14
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Preflight — are the Apple credentials present?
+        env:
+          ISSUER: ${{ secrets.APPSTORE_ISSUER_ID }}
+          KEYID: ${{ secrets.APPSTORE_KEY_ID }}
+          P8: ${{ secrets.APPSTORE_PRIVATE_KEY }}
+          TEAM: ${{ secrets.APPLE_TEAM_ID }}
+        run: |
+          missing=""
+          [ -z "$ISSUER" ] && missing="$missing APPSTORE_ISSUER_ID"
+          [ -z "$KEYID" ]  && missing="$missing APPSTORE_KEY_ID"
+          [ -z "$P8" ]     && missing="$missing APPSTORE_PRIVATE_KEY"
+          [ -z "$TEAM" ]   && missing="$missing APPLE_TEAM_ID"
+          if [ -n "$missing" ]; then
+            echo "::error::NO APPLE CREDENTIAL IN REPO SECRETS —$missing"
+            echo "Add them under Settings -> Secrets and variables -> Actions, then re-run."
+            exit 1
+          fi
+          echo "All four Apple secrets present."
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install Capacitor dependencies
+        working-directory: native
+        run: npm install --no-audit --no-fund
+
+      - name: Generate the iOS project and sync web assets
+        working-directory: native
+        run: |
+          node scripts/copy-web.js
+          npx cap add ios
+          npx cap sync ios
+
+      - name: Apply SHOMER's Info.plist keys
+        # `cap add ios` writes Capacitor's stock Info.plist, which has none of
+        # SHOMER's permission strings or background modes. Without this step the
+        # build is an automatic App Store rejection and crashes on first ask.
+        working-directory: native
+        run: ./ios-config/apply-ios-config.sh
+
+      - name: Install CocoaPods dependencies
+        working-directory: native/ios/App
+        run: pod install --repo-update
+
+      - name: Read app version
+        id: ver
+        run: |
+          V=$(grep -o "APP_VER='[^']*'" shomer.html | head -1 | sed "s/APP_VER='//;s/'//")
+          echo "app_ver=$V" >> "$GITHUB_OUTPUT"
+          echo "Building $V (build ${{ github.run_number }})"
+
+      - name: Write App Store Connect API key
+        env:
+          P8: ${{ secrets.APPSTORE_PRIVATE_KEY }}
+          KEYID: ${{ secrets.APPSTORE_KEY_ID }}
+        run: |
+          mkdir -p ~/private_keys
+          printf '%s' "$P8" > ~/private_keys/AuthKey_${KEYID}.p8
+          chmod 600 ~/private_keys/AuthKey_${KEYID}.p8
+
+      - name: Build and archive
+        working-directory: native/ios/App
+        env:
+          TEAM: ${{ secrets.APPLE_TEAM_ID }}
+        run: |
+          xcodebuild -workspace App.xcworkspace \
+            -scheme App \
+            -configuration Release \
+            -destination 'generic/platform=iOS' \
+            -archivePath "$RUNNER_TEMP/SHOMER.xcarchive" \
+            CURRENT_PROJECT_VERSION=${{ github.run_number }} \
+            MARKETING_VERSION=1.0.${{ github.run_number }} \
+            DEVELOPMENT_TEAM="$TEAM" \
+            CODE_SIGN_STYLE=Automatic \
+            -allowProvisioningUpdates \
+            -authenticationKeyPath ~/private_keys/AuthKey_${{ secrets.APPSTORE_KEY_ID }}.p8 \
+            -authenticationKeyID ${{ secrets.APPSTORE_KEY_ID }} \
+            -authenticationKeyIssuerID ${{ secrets.APPSTORE_ISSUER_ID }} \
+            archive
+
+      - name: Export the .ipa
+        working-directory: native/ios/App
+        run: |
+          cat > "$RUNNER_TEMP/ExportOptions.plist" <<PLIST
+          <?xml version="1.0" encoding="UTF-8"?>
+          <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+          <plist version="1.0">
+          <dict>
+            <key>method</key><string>app-store-connect</string>
+            <key>teamID</key><string>${{ secrets.APPLE_TEAM_ID }}</string>
+            <key>uploadSymbols</key><true/>
+            <key>destination</key><string>export</string>
+          </dict>
+          </plist>
+          PLIST
+          xcodebuild -exportArchive \
+            -archivePath "$RUNNER_TEMP/SHOMER.xcarchive" \
+            -exportOptionsPlist "$RUNNER_TEMP/ExportOptions.plist" \
+            -exportPath "$RUNNER_TEMP/export" \
+            -allowProvisioningUpdates \
+            -authenticationKeyPath ~/private_keys/AuthKey_${{ secrets.APPSTORE_KEY_ID }}.p8 \
+            -authenticationKeyID ${{ secrets.APPSTORE_KEY_ID }} \
+            -authenticationKeyIssuerID ${{ secrets.APPSTORE_ISSUER_ID }}
+
+      - name: Upload to TestFlight
+        run: |
+          xcrun altool --upload-app -f "$RUNNER_TEMP"/export/*.ipa -t ios \
+            --apiKey ${{ secrets.APPSTORE_KEY_ID }} \
+            --apiIssuer ${{ secrets.APPSTORE_ISSUER_ID }}
+
+      - name: Keep the .ipa as a build artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: SHOMER-ios-${{ steps.ver.outputs.app_ver }}
+          path: ${{ runner.temp }}/export/*.ipa
+          if-no-files-found: ignore
