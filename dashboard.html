@@ -2410,6 +2410,6 @@ function render(idx){
 (function(){var ts=document.getElementById('terr-sel');if(ts)ts.onchange=onTerrChange;})();
 boot();
 </script>
-<script>/* events preview layer: only with ?evp=1 (seeded news events, never in stats) */try{ if(/[?&]evp=1\b/.test(location.search)){ var _evs=document.createElement('script'); _evs.src='events-preview-dash.js?nosw&v=319'; document.head.appendChild(_evs); } }catch(e){}</script>
+<script>/* v322 published-news events layer: on for everyone (never in stats); ?evp=0 hides it */try{ if(!/[?&]evp=0\b/.test(location.search)){ var _evs=document.createElement('script'); _evs.src='events-preview-dash.js?nosw&v=322'; document.head.appendChild(_evs); } }catch(e){}</script>
 </body>
 </html>

@@ -1,7 +1,11 @@
-/* SH✡MER · Events preview (NOT public).
-   Loaded ONLY by evpMaybeLoad() in shomer.html, i.e. only for a preview account
-   (uid listed in the rules-protected /founders node, or the verified founder phone).
-   Everyone else never downloads this file, so they see no change.
+/* SH✡MER · Events on the map (v322: shown to all users).
+   Loaded by evpMaybeLoad() in shomer.html for everyone.
+   - Everyone: the published-news seed events (events-seed.json) are shown read-only, straight from
+     the file. Nothing is written or read in the database for them (no new user data).
+   - Preview account (uid in the rules-protected /founders node, or the verified founder phone):
+     unchanged preview mode below - seed rows + votes in events/<key>.
+   - Retention: an event shows for 90 days from its event time ("at"), then drops off the map and
+     the lists. pinned:true keeps it (Zalka, Dave's request).
 
    Data (existing rules, nothing new to deploy):
    - events/<key>             owner-only read (rules). Seed rows: seed:true + source:url.
@@ -28,7 +32,19 @@ var CATS={
 };
 var CANDLE='<svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><path d="M12 2.5c1.6 2 2.3 3.3 2.3 4.4A2.3 2.3 0 0 1 12 9.2a2.3 2.3 0 0 1-2.3-2.3c0-1.1.7-2.4 2.3-4.4Z" fill="#F5C840"/><rect x="9" y="10.5" width="6" height="10" rx="1.2" fill="#E6ECF6"/><path d="M7 21.5h10" stroke="#E0A828" stroke-width="1.6" stroke-linecap="round"/></svg>';
 
-var EVP=window.EVP={ items:{}, markers:{}, order:[], cur:null, FEED:false };
+var EVP=window.EVP={ items:{}, markers:{}, order:[], cur:null, FEED:false, PV:!!window._evpPreview };
+/* v322 retention: 90 days from the event time; pinned events stay */
+function keepEv(e){ return !!(e && (e.pinned || ((e.at||e.ts||0) >= Date.now()-KEEP))); }
+EVP.keep=keepEv;
+/* v322 "מה עושים במצב כזה": calm, general tips in line with MDA / police / fire-service guidance */
+var TIPS={
+  violence:  {he:'התרחקו אל מקום בטוח ומואר ואל תתעמתו. מסרו למשטרה מיקום ותיאור.', en:'Move to a safe, well-lit place and do not confront anyone. Give the police the location and a description.'},
+  medical:   {he:'ודאו שהמקום בטוח לפני שמתקרבים. התקשרו למד״א והישארו על הקו: המוקדן ינחה אתכם עד שהצוות יגיע.', en:'Make sure the scene is safe before you approach. Call MDA and stay on the line: the dispatcher will guide you until the team arrives.'},
+  fire:      {he:'צאו מהמבנה בלי מעלית וסגרו דלתות מאחוריכם. בשטח פתוח התרחקו מכיוון התפשטות האש והעשן.', en:'Leave the building without using the lift and close doors behind you. Outdoors, move away from where the fire and smoke are spreading.'},
+  suspicious:{he:'אל תיגעו ואל תרימו חפץ חשוד או נפל, גם אם הוא נראה ישן. התרחקו, הרחיקו אחרים ודווחו למשטרה.', en:'Do not touch or pick up a suspicious object or ordnance, even if it looks old. Move away, keep others away and tell the police.'},
+  other:     {he:'הישמעו להנחיות הרשויות ועקבו אחרי עדכונים רשמיים בלבד.', en:'Follow the authorities\' instructions and rely on official updates only.'}
+};
+function evImg(t){ return 'img/events/'+(CATS[t]?t:'other')+'.svg'; }
 
 /* ── confidence: confirm/dispute balance, each vote weighted by distance + time to the event ── */
 function voteWeight(ev){
@@ -63,18 +79,29 @@ async function syncSeeds(){
   try{ var r=await fetch('events-seed.json?nosw&t='+Date.now(),{cache:'no-store'}); if(r.ok) j=await r.json(); }catch(e){}
   if(!j||!j.events) return;
   for(var i=0;i<j.events.length;i++){
-    var s=j.events[i], k=seedKey(s.id), at=Date.parse(s.at)||Date.now();
-    var base={by:FB.uid, ts:Date.now(), type:s.cat, seed:true, sid:s.id, source:s.src.url, srcName:s.src.name,
-      mem:!!s.mem, at:at, atKind:s.atKind||'', lat:r2(s.lat), lng:r2(s.lng), area:s.area, sum:s.sum, status:'seed'};
-    if(s.src2) base.source2=s.src2.url;
+    var s=j.events[i], at=Date.parse(s.at)||Date.now();
+    var base={by:(FB&&FB.uid)||'', ts:Date.now(), type:s.cat, seed:true, sid:s.id, source:s.src.url, srcName:s.src.name,
+      mem:!!s.mem, pinned:!!s.pinned, at:at, atKind:s.atKind||'', lat:r2(s.lat), lng:r2(s.lng), area:s.area, sum:s.sum, status:'seed'};
+    if(s.src2){ base.source2=s.src2.url; base.srcName2=s.src2.name; }
+    if(s.tip) base.tip=s.tip;
+    if(!EVP.PV){   /* everyone: read-only from the file, nothing stored */
+      var lk='seed_'+s.id.replace(/[^a-z0-9]/gi,'');
+      if(keepEv(base)) EVP.items[lk]=base; else delete EVP.items[lk];
+      continue;
+    }
+    var k=seedKey(s.id);
+    if(!keepEv(base)){   /* past 90 days: drop it, and remove this account's preview row */
+      try{ var old=await get('events/'+k); if(old && old.by===FB.uid) await fbRestWrite('DELETE','events/'+k); }catch(e){}
+      delete EVP.items[k]; continue;
+    }
     var cur=null;
     try{ cur=await get('events/'+k); }catch(e){ cur='denied'; }
     if(cur==='denied'){ k='ps_'+(typeof fbDashKey==='function'?fbDashKey('').slice(0,12):Date.now()); setSeedKey(s.id,k); cur=null; }
     if(cur && cur.by===FB.uid){
       /* keep votes, refresh the published text (wording can be edited in the seed file) */
-      var upd={type:base.type,source:base.source,srcName:base.srcName,mem:base.mem,at:base.at,atKind:base.atKind,lat:base.lat,lng:base.lng,area:base.area,sum:base.sum};
+      var upd={type:base.type,source:base.source,srcName:base.srcName,source2:base.source2||null,srcName2:base.srcName2||null,tip:base.tip||null,mem:base.mem,pinned:base.pinned,at:base.at,atKind:base.atKind,lat:base.lat,lng:base.lng,area:base.area,sum:base.sum};
       try{ await fbRestWrite('PATCH','events/'+k,upd); }catch(e){}
-      for(var f in upd) cur[f]=upd[f];
+      for(var f in upd){ if(upd[f]===null) delete cur[f]; else cur[f]=upd[f]; }
       EVP.items[k]=cur;
     } else {
       try{ await fbRestWrite('PUT','events/'+k,base); setSeedKey(s.id,k); EVP.items[k]=base; }catch(e){ EVP.items[k]=base; }  /* show it even if the write fails */
@@ -93,6 +120,7 @@ async function loadMine(){
 }
 async function refresh(){
   if(document.hidden) return;
+  if(!EVP.PV){ try{ await syncSeeds(); }catch(e){} paint(); return; }   /* everyone: re-read the file (new events, 90-day drop-off) */
   var ks=Object.keys(EVP.items);
   for(var i=0;i<ks.length;i++){ try{ var v=await get('events/'+ks[i]); if(v){ EVP.items[ks[i]]=v; } }catch(e){} }
   paint(); var _c=document.getElementById('evp-card'); if(EVP.cur && EVP.items[EVP.cur] && _c && _c.classList.contains('open')) openCard(EVP.cur,true);   /* v320: never re-opens a closed card */
@@ -106,6 +134,8 @@ function pinHTML(ev){
 }
 function paint(){
   if(typeof MAP==='undefined'||!MAP||!window.L){ setTimeout(paint,800); return; }
+  Object.keys(EVP.items).forEach(function(k){ if(!keepEv(EVP.items[k])) delete EVP.items[k]; });
+  Object.keys(EVP.markers).forEach(function(k){ if(!EVP.items[k]){ try{ MAP.removeLayer(EVP.markers[k]); }catch(e){} delete EVP.markers[k]; } });
   EVP.order=Object.keys(EVP.items).sort(function(a,b){ var A=EVP.items[a],B=EVP.items[b]; if(A.mem!==B.mem) return A.mem?-1:1; return (B.at||B.ts)-(A.at||A.ts); });
   EVP.order.forEach(function(k){
     var ev=EVP.items[k]; if(!ev||typeof ev.lat!=='number') return;
@@ -143,10 +173,17 @@ function openCard(k,quiet){
     : '';
   var area=ev.area?tr(ev.area):(he()?'באזור':'Nearby');
   var sum=ev.sum?tr(ev.sum):(ev.note||'');
+  /* v322: seed events are credited to the SH✡MER team per the outlet - never to a user */
+  function sl(u,n){ return u?'<a class="evp-src" href="'+esc(u)+'" target="_blank" rel="noopener">'+(he()?'מקור: ':'Source: ')+esc(n||'')+' ↗</a>':''; }
   var src = ev.seed
-    ? '<a class="evp-src" href="'+esc(ev.source)+'" target="_blank" rel="noopener">'+(he()?'מתוך פרסום בתקשורת · ':'From published news · ')+esc(ev.srcName||'')+' ↗</a>'
+    ? '<div class="evp-srcs"><span class="evp-by">'+(he()?'צוות SH✡MER · לפי ':'SH✡MER team · per ')+esc(ev.srcName||'')+'</span>'+sl(ev.source,ev.srcName)+sl(ev.source2,ev.srcName2)+'</div>'
     : '<span class="evp-src">'+(he()?'דיווח אנונימי':'Anonymous report')+'</span>';
-  var vote = ev.mem ? '' :
+  var tip=ev.tip?tr(ev.tip):(ev.mem?'':tr(TIPS[ev.type]||TIPS.other));
+  var more='<div class="evp-more">'
+    +(ev.mem?'':'<img class="evp-img" src="'+evImg(ev.type)+'" alt="" width="320" height="96" loading="lazy" decoding="async">')
+    +'<div class="evp-tip">'+(tip?'<b>'+(he()?'מה עושים במצב כזה':'What to do')+'</b>'+esc(tip):'')
+    +'<div class="evp-sos">'+(he()?'בחירום, חייגו קודם 100 · 101 · 102':'In an emergency, call 100 · 101 · 102 first')+'</div></div></div>';
+  var vote = (ev.mem || (ev.seed && !EVP.PV)) ? '' :
     '<div class="evp-vote">'
     +'<button class="evp-vb'+(v==='c'?' on':'')+'" data-v="c">✓ '+(he()?'אישרתי / ראיתי גם':'Confirm / I saw it')+(q.c?' · '+q.c:'')+'</button>'
     +'<button class="evp-vb d'+(v==='d'?' on':'')+'" data-v="d">✕ '+(he()?'לא נכון':'Not true')+(q.d?' · '+q.d:'')+'</button>'
@@ -155,18 +192,20 @@ function openCard(k,quiet){
     +'<div class="evp-row"><span class="evp-ic" style="background:'+(ev.mem?'#0A1628':c.color)+'">'+(ev.mem?CANDLE:'<svg class="ic" viewBox="0 0 24 24">'+_glyph(c.g)+'</svg>')+'</span>'
     +'<div class="evp-meta"><b>'+(he()?c.he:c.en)+'</b> · '+esc(ago(ev))+' · ~'+esc(area)+'</div>'
     +(ev.mem?'':'<span class="evp-chip" style="color:'+q.col+';border-color:'+q.col+'">'+q.lbl+' '+q.pct+'%</span>')+'</div>'
-    +'<div class="evp-sum'+(EVP.full===k?' full':'')+'" role="button" tabindex="0" aria-expanded="'+(EVP.full===k)+'">'+esc(sum)+'</div>'
+    +'<div class="evp-sum'+(EVP.full===k?' full':'')+'" role="button" tabindex="0" aria-expanded="'+(EVP.full===k)+'">'+esc(sum)+'<span class="evp-mo">'+(he()?' · עוד':' · more')+'</span></div>'
+    +more
     +'<div class="evp-foot">'+src+'<button class="evp-next">'+(he()?'הבא ›':'Next ›')+'</button></div>'
     +vote;
   el.classList.add('open'); document.body.classList.add('evp-on');
   el.querySelector('.evp-x').onclick=closeCard;
   el.querySelector('.evp-next').onclick=function(){ var i=EVP.order.indexOf(k); go(EVP.order[(i+1)%EVP.order.length]); };
-  var sm=el.querySelector('.evp-sum'), tg=function(){ var on=sm.classList.toggle('full'); sm.setAttribute('aria-expanded',on); EVP.full=on?k:null; };
+  var sm=el.querySelector('.evp-sum'), tg=function(){ var on=sm.classList.toggle('full'); el.classList.toggle('full',on); sm.setAttribute('aria-expanded',on); EVP.full=on?k:null; };
+  el.classList.toggle('full', EVP.full===k);
   sm.onclick=tg; sm.onkeydown=function(e){ if(e.key==='Enter'||e.key===' '){ e.preventDefault(); tg(); } };
   el.querySelector('.evp-row').onclick=tg; el.querySelector('.evp-row').style.cursor='pointer';
   el.querySelectorAll('.evp-vb').forEach(function(b){ b.onclick=function(){ vote_(k,b.getAttribute('data-v')); }; });
 }
-function closeCard(){ var el=document.getElementById('evp-card'); if(el) el.classList.remove('open'); document.body.classList.remove('evp-on'); EVP.cur=null; EVP.full=null; }
+function closeCard(){ var el=document.getElementById('evp-card'); if(el) el.classList.remove('open','full'); document.body.classList.remove('evp-on'); EVP.cur=null; EVP.full=null; }
 function go(k){ var ev=EVP.items[k]; if(!ev) return; try{ MAP.flyTo([ev.lat,ev.lng], Math.max(12, Math.min(14, MAP.getZoom()||12)), {duration:.8}); }catch(e){} openCard(k); }
 EVP.go=go; EVP.close=closeCard; EVP.CATS=CATS;   /* read by the באזור שלי list */
 
@@ -205,11 +244,19 @@ function css(){
   +'.evp-chip{flex:none;font-size:11px;font-weight:700;border:1px solid;border-radius:999px;padding:2px 8px}'
   +'.evp-sum{margin:8px 0 6px;font-size:14px;line-height:1.45;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;cursor:pointer}'
   +'.evp-sum.full{white-space:normal}'
+  +'.evp-mo{color:var(--g3);font-size:12px}.evp-sum.full .evp-mo{display:none}'
+  +'.evp-more{display:none}.evp-card.full .evp-more{display:block}'
+  +'.evp-card.full{max-height:calc(100vh - var(--nav,64px) - 120px);overflow:auto}'
+  +'.evp-img{display:block;width:100%;height:auto;max-height:72px;object-fit:cover;border-radius:12px;margin:2px 0 8px}'
+  +'.evp-tip{background:var(--n4);border-radius:12px;padding:8px 10px;font-size:12.5px;line-height:1.5;color:var(--tx1);margin-bottom:8px}'
+  +'.evp-tip b{display:block;color:var(--tx0);font-size:12px;margin-bottom:2px}'
+  +'.evp-sos{margin-top:4px;font-weight:700;color:var(--tx0)}'
+  +'.evp-srcs{display:flex;flex-wrap:wrap;gap:2px 10px;min-width:0}.evp-by{color:var(--tx2);width:100%}'
     /* a "הידעת?" tip that is up when a card opens moves to the top, so it never covers the card */
   +'body.evp-on .nudge-bar{top:calc(env(safe-area-inset-top,0px) + var(--hdr,60px) + 8px);transform:translateX(-50%);animation:none;max-height:calc(100vh - var(--nav,64px) - 300px);overflow:auto}'
   +'.evp-foot{display:flex;align-items:center;justify-content:space-between;gap:8px;font-size:11.5px}'
   +'.evp-src{color:var(--tx2);text-decoration:none}a.evp-src{color:var(--g3)}'
-  +'.evp-next{background:none;border:none;color:var(--tx1);font-size:12px;cursor:pointer;padding:4px}'
+  +'.evp-next{flex:none;white-space:nowrap;background:none;border:none;color:var(--tx1);font-size:12px;cursor:pointer;padding:4px}'
   +'.evp-vote{display:flex;gap:8px;margin-top:10px}'
   +'.evp-vb{flex:1;min-height:42px;border-radius:12px;border:1px solid var(--b3,#2E4070);background:var(--n4);color:var(--tx0);font:600 13px var(--font-heb);cursor:pointer}'
   +'.evp-vb.on{background:var(--grn);border-color:var(--grn)}.evp-vb.d.on{background:var(--n6);border-color:var(--p2)}'
@@ -221,7 +268,7 @@ function css(){
 function chrome(){
   var host=document.getElementById('map'); host=(host&&host.parentNode)||document.body;
   var p=document.createElement('button'); p.className='evp-pill'; p.id='evp-pill';
-  p.innerHTML='<b>0</b> '+(he()?'אירועים':'events')+'<small>'+(he()?'תצוגה מקדימה · רק לך':'Preview · only you')+'</small>';
+  p.innerHTML='<b>0</b> '+(he()?'אירועים':'events');
   p.onclick=function(){ var k=EVP.cur?EVP.order[(EVP.order.indexOf(EVP.cur)+1)%EVP.order.length]:EVP.order[0]; if(k) go(k); };
   host.appendChild(p);
   try{ MAP.on('click',closeCard); }catch(e){}
@@ -230,12 +277,16 @@ function chrome(){
 }
 
 async function start(){
-  if(typeof MAP==='undefined'||!MAP||!FB||!FB.uid){ setTimeout(start,800); return; }
+  if(typeof MAP==='undefined'||!MAP||(EVP.PV&&(!FB||!FB.uid))){ setTimeout(start,800); return; }
   css(); chrome();
   await syncSeeds(); paint();
-  await loadMine(); paint();
-  setInterval(refresh, 30000);
+  if(EVP.PV){ await loadMine(); paint(); }
+  setInterval(refresh, EVP.PV?30000:600000);
   document.addEventListener('visibilitychange', function(){ if(!document.hidden) refresh(); });
 }
+/* the founders list can arrive after the file loaded: switch this account to preview mode */
+EVP.enablePreview=async function(){ if(EVP.PV||!FB||!FB.uid) return; EVP.PV=true;
+  Object.keys(EVP.markers).forEach(function(k){ try{ MAP.removeLayer(EVP.markers[k]); }catch(e){} }); EVP.markers={}; EVP.items={};
+  await syncSeeds(); await loadMine(); paint(); };
 start();
 })();

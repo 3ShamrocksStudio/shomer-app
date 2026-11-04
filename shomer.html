@@ -6800,14 +6800,16 @@ function updItems(){
       closed:/טופל|נסגר|closed|resolved|handled/i.test(d.status||''), go:function(){ try{ MAP.setView([d.lat,d.lng],15); }catch(e){} openDetail(i); } }); }); }catch(e){}
   try{ if(window.EVP&&EVP.items){ var C=EVP.CATS||{}; Object.keys(EVP.items).forEach(function(k){ var e=EVP.items[k]; if(!e||typeof e.lat!=='number') return; var c=C[e.type]||C.other||{};
     out.push({k:'ev', ico:c.g||'clipboard', col:c.color||'#7E8CA0', ty:(he?c.he:c.en)||'', pl:e.area?(he?(e.area.he||e.area.en):(e.area.en||e.area.he)):'', ts:e.at||e.ts, lat:e.lat, lng:e.lng, d:km(e.lat,e.lng),
-      closed:/closed|resolved/i.test(e.status||''), seed:true, go:function(){ EVP.go(k); } }); }); } }catch(e){}
+      closed:/closed|resolved/i.test(e.status||''), seed:true, pin:!!e.pinned, ak:e.atKind||'', go:function(){ EVP.go(k); } }); }); } }catch(e){}
   out.forEach(function(it){ it.age=it.ts?now-it.ts:0; it.live=it.k==='sos'||(!it.closed&&it.age<=UPD_LIVE_MS); });
-  return out.filter(function(it){ return it.k==='sos'||it.seed||it.age<=UPD_KEEP_MS; });   /* 90-day retention for user data; curated public news events (seed) stay, matching the map */
+  return out.filter(function(it){ return it.k==='sos'||it.pin||it.age<=UPD_KEEP_MS; });   /* v322: 90 days from the event time for everything, matching the map; pinned events (Zalka) stay */
 }
-function updTime(ts){
+function updTime(ts,ak){
   if(!ts) return ''; var d=new Date(ts), o={timeZone:'Asia/Jerusalem'};
   try{ var hm=d.toLocaleTimeString('he-IL',Object.assign({hour:'2-digit',minute:'2-digit',hour12:false},o)), dm=d.toLocaleDateString('he-IL',Object.assign({day:'numeric',month:'numeric'},o)).replace(/\//g,'.');
     var today=new Date().toLocaleDateString('he-IL',o).replace(/\//g,'.')===d.toLocaleDateString('he-IL',o).replace(/\//g,'.');
+    if(ak==='date') return dm;   /* v322: date-only events show no made-up time; ~ = first news report */
+    if(ak==='reported') hm='~'+hm;
     return today?hm:(dm+' · '+hm); }catch(e){ return d.getDate()+'.'+(d.getMonth()+1); }
 }
 function applyUpdFilter(){
@@ -6837,7 +6839,7 @@ function applyUpdFilter(){
   list.forEach(function(it){
     var r=document.createElement('button'); r.type='button'; r.className='upd-row'+(it.live?'':' past'); r.setAttribute('role','listitem');
     r.innerHTML='<span class="upd-ic" style="background:'+it.col+'"><svg class="ic" viewBox="0 0 24 24">'+(typeof _glyph==='function'?_glyph(it.ico):'')+'</svg></span>'
-      +'<span class="upd-ty">'+ESC(it.ty)+'</span><span class="upd-pl">'+ESC(it.pl)+'</span><span class="upd-tm">'+ESC(updTime(it.ts))+'</span>';
+      +'<span class="upd-ty">'+ESC(it.ty)+'</span><span class="upd-pl">'+ESC(it.pl)+'</span><span class="upd-tm">'+ESC(updTime(it.ts,it.ak))+'</span>';
     r.onclick=function(){ cl('sh-upd'); setTimeout(function(){ try{ it.go(); }catch(e){} },120); };
     box.appendChild(r);
   });
@@ -10890,7 +10892,7 @@ try{ hydrateIcons(document); }catch(e){}
 /* Loaded-build version - shown in the diagnostic panel so a phone can prove
    whether it's on the latest build or a STALE cached one. Keep in lock-step
    with sw.js SW_VERSION on every deploy. */
-var APP_VER='v321';
+var APP_VER='v322';
 var FB={ready:false,uid:null,db:null,_presTimer:null,connected:false,listening:false,pushState:'default',near:0,swVer:'?',
   authState:'connecting',sdkLoaded:false,persist:'',permErr:null,err:null,wsProbe:'',csp:''};
 /* Always log connection diagnostics to the console so the real failure can be SEEN in Chrome. */
@@ -12530,22 +12532,24 @@ function founderWatchList(){
     });
   }catch(e){}
 }
-/* EVENTS PREVIEW gate (3 Nov): the events preview file is downloaded ONLY for a preview
-   account - a uid in the rules-protected founders node (write:false) or the verified founder
-   phone. Everyone else never loads it: no change for them. ?evp=0 turns it off, ?evp=1 back on. */
+/* EVENTS on the map (v322): loaded for EVERY user. Everyone sees the published-news seed events
+   read-only from events-seed.json (nothing stored). A preview account - a uid in the
+   rules-protected founders node (write:false) or the verified founder phone - also keeps the
+   preview tools (votes). 90 days from the event time, pinned events stay. ?evp=0 hides them on
+   that device, ?evp=1 shows them again. */
 function evpMaybeLoad(){
   try{
-    if(window._evpLoaded || !FB || !FB.uid) return;
     var q=location.search;
     if(/[?&]evp=0\b/.test(q)) { try{ localStorage.setItem('shomer_evp','off'); }catch(e){} return; }
     if(/[?&]evp=1\b/.test(q)) { try{ localStorage.removeItem('shomer_evp'); }catch(e){} }
     try{ if(localStorage.getItem('shomer_evp')==='off') return; }catch(e){}
-    var ok = (window._evpSrv && window._evpSrv[FB.uid]===true) || (isFounder() && !!(SS.security&&SS.security.phoneVerified));
-    if(!ok) return;
-    window._evpLoaded=true;
-    var sc=document.createElement('script'); sc.src='events-preview.js?nosw&v=320'; sc.async=true; document.head.appendChild(sc);
+    var ok = !!(FB && FB.uid) && ((window._evpSrv && window._evpSrv[FB.uid]===true) || (isFounder() && !!(SS.security&&SS.security.phoneVerified)));
+    if(window._evpLoaded){ if(ok && window.EVP && EVP.enablePreview) EVP.enablePreview(); else if(ok) window._evpPreview=true; return; }
+    window._evpLoaded=true; window._evpPreview=ok;
+    var sc=document.createElement('script'); sc.src='events-preview.js?nosw&v=322'; sc.async=true; document.head.appendChild(sc);
   }catch(e){}
 }
+setTimeout(function(){ try{ evpMaybeLoad(); }catch(e){} },6000);   /* v322: also without a signed-in session */
 function founderCrestSVG(size){
   var s=size||64;
   return '<svg class="fc-emb" viewBox="0 0 64 64" width="'+s+'" height="'+s+'" aria-hidden="true">'
