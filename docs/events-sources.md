@@ -42,3 +42,9 @@ The 5 kept non-Zalka events still have one source each (v321). A second source w
 ## Images and tips
 - Images are the app's own category illustrations, `img/events/<type>.svg` (about 1 KB each, lazy-loaded). They contain no news photos and no people.
 - "מה עושים במצב כזה" is one general tip per type (`TIPS` in `events-preview.js`). The flood, earthquake and Kiryat Gat events have a tip of their own (`tip`). Every card ends with "בחירום, חייגו קודם 100 · 101 · 102".
+
+
+## 2026-11-04 fact-check corrections
+- meashearim-0923 removed: sources disagree on the structure (Kipa: synagogue in Sha'arei Pina; JPost: residential temporary structure in Mea She'arim) and the first-report time.
+- south-floods-1027: summary trimmed to what both sources support (road closures).
+- haruvit-0926: removed unsourced location phrase and 'no injuries reported'.

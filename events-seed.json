@@ -188,8 +188,8 @@
     "en": "Eilat and the Arava"
    },
    "sum": {
-    "he": "גשמים עזים גרמו לשיטפונות בדרום. המשטרה סגרה קטעים מכביש 90 ומכבישים נוספים, והכניסה והיציאה מאילת ברכב נחסמו זמנית. כוחות הצלה חיפשו אנשים וכלי רכב שנתקעו באזורים מוצפים.",
-    "en": "Heavy rain caused flooding in the south. Police closed sections of Route 90 and other roads, and road access to and from Eilat was blocked for a time. Rescue teams searched for people and vehicles stuck in flooded areas."
+    "he": "גשמים עזים גרמו לשיטפונות בדרום. המשטרה סגרה קטעים מכביש 90 ומכבישים נוספים באזור אילת והערבה.",
+    "en": "Heavy rain caused flooding in the south. Police closed sections of Route 90 and other roads in the Eilat and Arava area."
    },
    "tip": {
     "he": "אל תיכנסו ברכב או ברגל לכביש מוצף או לנחל זורם. לפני יציאה לדרך בדקו אילו כבישים סגורים.",
@@ -292,12 +292,12 @@
    "lat": 31.7,
    "lng": 34.86,
    "area": {
-    "he": "יער חרובית · בין קריית מלאכי לבית שמש",
-    "en": "Haruvit Forest · between Kiryat Malachi and Beit Shemesh"
+    "he": "יער חרובית",
+    "en": "Haruvit Forest"
    },
    "sum": {
-    "he": "שריפה ביער חרובית כילתה כ-600 דונם חורש. 51 צוותי כיבוי ושמונה מטוסי כיבוי פעלו במקום, המטיילים פונו ולא דווח על נפגעים. כבאות והצלה חושדים בהצתה, והחקירה הועברה למשטרה.",
-    "en": "A fire in Haruvit Forest burned about 600 dunams of woodland. 51 fire crews and eight firefighting aircraft worked the scene; hikers were evacuated and no injuries were reported. Fire services suspect arson and passed the case to police."
+    "he": "שריפה ביער חרובית כילתה כ-600 דונם חורש. 51 צוותי כיבוי ושמונה מטוסי כיבוי פעלו במקום והמטיילים פונו. כבאות והצלה חושדים בהצתה, והחקירה הועברה למשטרה.",
+    "en": "A fire in Haruvit Forest burned about 600 dunams of woodland. 51 fire crews and eight firefighting aircraft worked the scene and hikers were evacuated. Fire services suspect arson and passed the case to police."
    },
    "src": {
     "name": "ynet",
@@ -306,30 +306,6 @@
    "src2": {
     "name": "דבר",
     "url": "https://www.davar1.co.il/698731/"
-   }
-  },
-  {
-   "id": "meashearim-0923",
-   "cat": "fire",
-   "at": "2026-09-23T15:30:00Z",
-   "atKind": "reported",
-   "lat": 31.79,
-   "lng": 35.22,
-   "area": {
-    "he": "ירושלים · מאה שערים",
-    "en": "Jerusalem · Mea She'arim"
-   },
-   "sum": {
-    "he": "שריפה פרצה בבית כנסת בשכונת מאה שערים בירושלים. לוחמי האש כיבו אותה ושללו לכודים; לא היו נפגעים, וכמה ספרי תורה ניזוקו.",
-    "en": "A fire broke out in a synagogue in Jerusalem's Mea She'arim neighbourhood. Firefighters put it out and ruled out anyone trapped; no one was hurt, and several Torah scrolls were damaged."
-   },
-   "src": {
-    "name": "כיפה",
-    "url": "https://www.kipa.co.il/%D7%97%D7%93%D7%A9%D7%95%D7%AA/1232191-0/"
-   },
-   "src2": {
-    "name": "Jerusalem Post",
-    "url": "https://www.jpost.com/israel-news/article-909476"
    }
   }
  ]
