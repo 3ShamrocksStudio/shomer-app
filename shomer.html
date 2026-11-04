@@ -2474,6 +2474,16 @@ body.otp-active .ob-steps{display:none!important;}
  .gd-d-sub{display:block;font-size:13px;color:var(--tx2);margin-top:4px;line-height:1.35;}
  .gd-step{display:flex;gap:12px;margin-bottom:14px;align-items:flex-start;border-radius:12px;transition:background .2s,box-shadow .2s;}
  .gd-step.speaking{background:rgba(240,184,64,.14);box-shadow:0 0 0 2px rgba(240,184,64,.55);padding:6px 6px 6px 0;}
+ /* v320: CPR metronome */
+ .cpr-m{margin:0 0 14px;}
+ .cpr-btn{width:100%;display:flex;align-items:center;gap:14px;min-height:76px;padding:10px 16px;border-radius:16px;border:1px solid var(--b2);background:var(--n3);color:var(--tx0);font-family:inherit;cursor:pointer;text-align:start;}
+ .cpr-m.on .cpr-btn{border-color:#E5484D;background:rgba(229,72,77,.10);}
+ .cpr-ring{flex:none;width:56px;height:56px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:#E5484D;color:#fff;font-weight:900;font-size:17px;box-shadow:0 0 0 0 rgba(229,72,77,.5);}
+ .cpr-ring.beat{animation:cprBeat .42s ease-out;}
+ @keyframes cprBeat{0%{transform:scale(1.18);box-shadow:0 0 0 0 rgba(229,72,77,.6)}100%{transform:scale(1);box-shadow:0 0 0 16px rgba(229,72,77,0)}}
+ .cpr-tx{display:flex;flex-direction:column;gap:2px;min-width:0}
+ .cpr-tx b{font-size:18px;font-weight:900}
+ .cpr-tx small{font-size:13px;color:var(--tx2)}
  .gr-bar{display:flex;align-items:center;gap:8px;margin:0 0 14px;padding:8px;border-radius:16px;background:var(--n3);border:1px solid var(--b2);}
  .gr-bar.on{border-color:rgba(240,184,64,.7);}
  .gr-main{flex:1;min-width:0;display:flex;align-items:center;gap:9px;min-height:48px;padding:0 14px;border:0;border-radius:12px;background:linear-gradient(135deg,#C09020,#E0A828 60%,#F5C840);color:#23170a;font-family:inherit;font-weight:900;font-size:15px;cursor:pointer;text-align:start;}
@@ -7026,7 +7036,7 @@ function renderSetContacts(){
 }
 function cl(id){
  try{stopPreview();}catch(e){}
- if(id==='sh-guide'){ try{ gReadStop(); }catch(e){} }   /* v306: closing the guide stops the read-aloud */
+ if(id==='sh-guide'){ try{ gReadStop(); }catch(e){} try{ cprStop(); }catch(e){} }   /* v306: closing the guide stops the read-aloud */
  if(id==='sh-rep'){ try{ stopCam(); }catch(e){} }   /* v293: closing the report screen turns the camera off */ // never leave a preview tone playing after a sheet closes
  const el=document.getElementById(id);if(el)el.classList.remove('open');
  syncSheetState();
@@ -7250,6 +7260,7 @@ function openGuideTopic(id){ var L=currentLang==='ar'?'ar':currentLang==='en'?'e
  html+='<button type="button" class="gd-notthis" onclick="var r=document.getElementById(\'gd-rel\');if(r)r.scrollIntoView({behavior:\'smooth\',block:\'center\'});">'+(he?'⇄ לא הכרטיס הנכון? מעבר מהיר':L==='ar'?'⇄ ليست البطاقة الصحيحة؟ انتقال سريع':'⇄ Wrong card? Quick switch')+'</button>';
  if(!emIsIL()){ var _en=emergencyNums(), _lb=emLabels(); html+='<div class="gd-dont" style="background:rgba(232,168,40,.12);border-color:var(--amb)"><div class="gd-dont-tx" style="color:var(--tx1)">📍 '+ESC(emCountryName())+': '+ESC(_lb.p+' '+_en.p+' · '+_lb.a+' '+_en.a+' · '+_lb.f+' '+_en.f)+'</div></div>'; }   /* v274: local numbers abroad */
  html+=gaPlayerHtml(L);   /* v306: hands-free read-aloud */
+ if(g.id==='cpr') html+=cprMetroHtml(L);   /* v320: compression beat */
  g.steps[L].forEach(function(st,i){ html+='<div class="gd-step" data-gstep="'+i+'"><span class="gd-num" style="background:'+col+'">'+(i+1)+'</span><span class="gd-step-tx">'+ESC(emLocalize(st))+'</span></div>'; });
  if(g.call){ html+='<div class="gd-dont" style="background:rgba(232,168,40,.12);border-color:var(--amb)"><div class="gd-dont-h" style="color:var(--amb)">📞 '+(he?'מתי לחייג ':L==='ar'?'متى تتصل بـ':'When to call ')+ambulanceNum()+'</div><div class="gd-dont-tx" style="color:var(--tx1)">'+ESC(emLocalize(g.call[L]))+'</div></div>'; }
  if(g.dont){ html+='<div class="gd-dont"><div class="gd-dont-h">⛔ '+(he?'אסור':L==='ar'?'ممنوع':'Do NOT')+'</div><div class="gd-dont-tx">'+ESC(g.dont[L])+'</div></div>'; }
@@ -7263,7 +7274,7 @@ function openGuideTopic(id){ var L=currentLang==='ar'?'ar':currentLang==='en'?'e
  html+=guideRelatedHtml(g.id,L);   /* v276: wrong card? jump sideways, no stress-scrolling */
  html+='<div class="gd-disc" style="margin-top:12px">'+GUIDE_DISC[L]+'</div>';
  html+='<div class="gd-src">'+(he?'מקור: ':L==='ar'?'المصدر: ':'Source: ')+ESC(g.src)+'</div>';
- try{ gReadStop(); }catch(e){} gRead.id=g.id;
+ try{ gReadStop(); }catch(e){} try{ cprStop(); }catch(e){} gRead.id=g.id;
  d.innerHTML=html;
  document.getElementById('guide-list-view').style.display='none';
  document.getElementById('guide-detail-view').style.display='block';
@@ -7409,7 +7420,63 @@ function guideRate(id,up){
   var r=document.getElementById('gd-rate');
   if(r) r.innerHTML='<span>'+(up?(he?'תודה! 🙏':ar?'شكراً! 🙏':'Thanks! 🙏'):(he?'תודה - נשפר את הכרטיס הזה':ar?'شكراً - سنحسّن هذه البطاقة':'Thanks - we will improve this card'))+'</span>';
 }
-function guideBackToList(){ try{ gReadStop(); }catch(e){} var lv=document.getElementById('guide-list-view'), dv=document.getElementById('guide-detail-view'); if(lv)lv.style.display='block'; if(dv)dv.style.display='none'; try{ var b=document.querySelector('#sh-guide .sh-body'); if(b) b.scrollTop=0; }catch(e){} }
+/* ══ v320: CPR COMPRESSION METRONOME (CPR card only) ══
+   110 compressions per minute = one beep every 545.45 ms. Inside the 100-120/min adult rate set by
+   MDA (מד"א), AHA 2020/2025 Guidelines (cpr.heart.org) and ERC 2021/2025 BLS Guidelines (cprguidelines.eu).
+   Hands-only: continuous compressions, no pause for breaths. Web Audio only (no audio file), scheduled
+   ahead on the audio clock so the beat stays steady; the ring pulses on each beat; the screen stays awake
+   (Wake Lock when available) and it stops when the card or the guide closes. */
+var CPR_BPM=110, CPR={on:false,ctx:null,next:0,timer:null,n:0,times:[],vis:[]};
+function cprMetroHtml(L){
+  var he=L==='he', ar=L==='ar';
+  return '<div class="cpr-m" id="cpr-m">'
+   +'<button type="button" class="cpr-btn" id="cpr-btn" onclick="cprToggle()" aria-pressed="false">'
+   +'<span class="cpr-ring" id="cpr-ring" aria-hidden="true"><span>'+CPR_BPM+'</span></span>'
+   +'<span class="cpr-tx"><b id="cpr-lbl">'+(he?'הפעלת קצב':ar?'تشغيل الإيقاع':'Start beat')+'</b><small>'+(he?'לחיצה בכל צליל':ar?'اضغط مع الصوت':'Push on beep')+'</small></span>'
+   +'</button></div>';
+}
+function cprBeep(t){
+  var c=CPR.ctx, o=c.createOscillator(), g=c.createGain();
+  o.type='square'; o.frequency.setValueAtTime(1500,t);          /* short, clear click-beep */
+  g.gain.setValueAtTime(0.0001,t); g.gain.exponentialRampToValueAtTime(1.0,t+0.004); g.gain.exponentialRampToValueAtTime(0.0001,t+0.06);
+  o.connect(g); g.connect(c.destination); o.start(t); o.stop(t+0.07);
+}
+function cprTick(){
+  if(!CPR.on||!CPR.ctx) return;
+  var c=CPR.ctx, step=60/CPR_BPM;
+  while(CPR.next < c.currentTime+0.12){
+    var t=CPR.next; cprBeep(t); CPR.times.push(t); if(CPR.times.length>400) CPR.times.shift(); CPR.n++;
+    (function(d){ CPR.vis.push(setTimeout(function(){ cprFlash(); CPR.vis.shift(); }, Math.max(0,d))); })((t-c.currentTime)*1000);
+    CPR.next = t+step;
+  }
+}
+function cprFlash(){ var r=document.getElementById('cpr-ring'); if(!r||!CPR.on) return; r.classList.remove('beat'); void r.offsetWidth; r.classList.add('beat'); }
+function cprUi(){
+  var L=currentLang==='ar'?'ar':currentLang==='en'?'en':'he', he=L==='he', ar=L==='ar';
+  var b=document.getElementById('cpr-btn'), l=document.getElementById('cpr-lbl'), m=document.getElementById('cpr-m');
+  if(b) b.setAttribute('aria-pressed',CPR.on?'true':'false'); if(m) m.classList.toggle('on',CPR.on);
+  if(l) l.textContent=CPR.on?(he?'עצירה':ar?'إيقاف':'Stop'):(he?'הפעלת קצב':ar?'تشغيل الإيقاع':'Start beat');
+}
+function cprStart(){
+  if(CPR.on) return;
+  try{ var AC=window.AudioContext||window.webkitAudioContext; if(!CPR.ctx) CPR.ctx=new AC(); if(CPR.ctx.state==='suspended') CPR.ctx.resume(); }catch(e){ CPR.ctx=null; }
+  if(!CPR.ctx){ try{ toast(currentLang==='he'?'אין צליל במכשיר':'No sound on this device','amb'); }catch(e){} return; }
+  CPR.on=true; CPR.n=0; CPR.times=[]; CPR.next=CPR.ctx.currentTime+0.06;
+  cprTick(); CPR.timer=setInterval(cprTick,25);
+  try{ if(typeof _wakeLock==='undefined'||!_wakeLock) acquireWake(); }catch(e){}
+  cprUi();
+}
+function cprStop(){
+  var was=CPR.on; CPR.on=false;
+  if(CPR.timer){ clearInterval(CPR.timer); CPR.timer=null; }
+  CPR.vis.forEach(clearTimeout); CPR.vis=[];
+  try{ if(CPR.ctx){ CPR.ctx.close(); } }catch(e){} CPR.ctx=null;   /* already-queued beeps end here */
+  if(was){ try{ if(!(typeof sosActive!=='undefined'&&sosActive) && !gRead.playing) releaseWake(); }catch(e){} }
+  cprUi();
+}
+function cprToggle(){ if(CPR.on) cprStop(); else cprStart(); }
+document.addEventListener&&document.addEventListener('visibilitychange',function(){ if(document.visibilityState==='visible'&&CPR.on){ try{ if(!_wakeLock) acquireWake(); if(CPR.ctx&&CPR.ctx.state==='suspended') CPR.ctx.resume(); }catch(e){} } });
+function guideBackToList(){ try{ gReadStop(); }catch(e){} try{ cprStop(); }catch(e){} var lv=document.getElementById('guide-list-view'), dv=document.getElementById('guide-detail-view'); if(lv)lv.style.display='block'; if(dv)dv.style.display='none'; try{ var b=document.querySelector('#sh-guide .sh-body'); if(b) b.scrollTop=0; }catch(e){} }
 /* v280: every screen, sheet and popup opens at its top. Watches for anything that becomes
    visible (class open/on/show/active, or aria-hidden="false") and resets its scroll. */
 (function(){
