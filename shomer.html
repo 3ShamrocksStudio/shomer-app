@@ -4596,6 +4596,7 @@ function popupIdle(){
     var a=document.activeElement; if(a&&(a.tagName==='INPUT'||a.tagName==='TEXTAREA'||a.tagName==='SELECT'||a.isContentEditable)) return false;
     if(Date.now()-POPQ.typedAt<8000) return false;
     if(popupBusy()) return false;
+    if(document.body.classList.contains('evp-on')) return false;   /* v319: an event card is open - the tip waits */
     var ob=document.getElementById('ob'); if(ob && getComputedStyle(ob).display!=='none') return false;   /* onboarding on screen */
     if(document.body.classList.contains('otp-active')) return false;
     if(document.querySelector('.tour-ov.on,.sos-cd.on,#sc-modal,.cot-ask')) return false;              /* tutorial / SOS dialogs / modals */
@@ -10767,7 +10768,7 @@ try{ hydrateIcons(document); }catch(e){}
 /* Loaded-build version - shown in the diagnostic panel so a phone can prove
    whether it's on the latest build or a STALE cached one. Keep in lock-step
    with sw.js SW_VERSION on every deploy. */
-var APP_VER='v318';
+var APP_VER='v319';
 var FB={ready:false,uid:null,db:null,_presTimer:null,connected:false,listening:false,pushState:'default',near:0,swVer:'?',
   authState:'connecting',sdkLoaded:false,persist:'',permErr:null,err:null,wsProbe:'',csp:''};
 /* Always log connection diagnostics to the console so the real failure can be SEEN in Chrome. */
@@ -12420,7 +12421,7 @@ function evpMaybeLoad(){
     var ok = (window._evpSrv && window._evpSrv[FB.uid]===true) || (isFounder() && !!(SS.security&&SS.security.phoneVerified));
     if(!ok) return;
     window._evpLoaded=true;
-    var sc=document.createElement('script'); sc.src='events-preview.js?nosw&v=1'; sc.async=true; document.head.appendChild(sc);
+    var sc=document.createElement('script'); sc.src='events-preview.js?nosw&v=319'; sc.async=true; document.head.appendChild(sc);
   }catch(e){}
 }
 function founderCrestSVG(size){

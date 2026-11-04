@@ -119,8 +119,15 @@ function paint(){
 
 /* ── card ── */
 function ago(ev){
+  /* the EVENT time (seed "at" = when it happened), never the row's created/publish time */
   var t=ev.at||ev.ts, d=new Date(t);
-  if(ev.atKind==='date' || Date.now()-t>14*DAY) return d.getDate()+'.'+(d.getMonth()+1)+'.'+d.getFullYear();
+  if(ev.atKind==='date') return d.getDate()+'.'+(d.getMonth()+1)+'.'+d.getFullYear();
+  if(ev.atKind==='time'||ev.atKind==='reported'){
+    var hm=''; try{ hm=d.toLocaleTimeString('he-IL',{timeZone:'Asia/Jerusalem',hour:'2-digit',minute:'2-digit',hour12:false}); }catch(e){ hm=('0'+d.getHours()).slice(-2)+':'+('0'+d.getMinutes()).slice(-2); }
+    var dm=''; try{ dm=d.toLocaleDateString('he-IL',{timeZone:'Asia/Jerusalem',day:'numeric',month:'numeric'}); }catch(e){ dm=d.getDate()+'.'+(d.getMonth()+1); }
+    return dm.replace(/\//g,'.')+' · '+(ev.atKind==='reported'?'~':'')+hm;   /* ~ = first news report, exact minute not published */
+  }
+  if(Date.now()-t>14*DAY) return d.getDate()+'.'+(d.getMonth()+1)+'.'+d.getFullYear();
   var m=Math.max(1,Math.round((Date.now()-t)/60000));
   if(m<60) return he()?('לפני '+m+' דק׳'):(m+' min ago');
   var h=Math.round(m/60); if(h<48) return he()?('לפני '+h+' שע׳'):(h+' h ago');
@@ -128,7 +135,7 @@ function ago(ev){
 }
 function myVote(ev){ var u=FB.uid; if(ev.confirms&&ev.confirms[u]) return 'c'; if(ev.disputes&&ev.disputes[u]) return 'd'; return ''; }
 function openCard(k,quiet){
-  var ev=EVP.items[k]; if(!ev) return; EVP.cur=k;
+  var ev=EVP.items[k]; if(!ev) return; if(EVP.cur!==k) EVP.full=null; EVP.cur=k;
   var c=CATS[ev.type]||CATS.other, q=confidence(ev), v=myVote(ev);
   var el=document.getElementById('evp-card');
   if(!el){ el=document.createElement('div'); el.id='evp-card'; el.className='evp-card'; document.body.appendChild(el); }
@@ -149,16 +156,18 @@ function openCard(k,quiet){
     +'<div class="evp-row"><span class="evp-ic" style="background:'+(ev.mem?'#0A1628':c.color)+'">'+(ev.mem?CANDLE:'<svg class="ic" viewBox="0 0 24 24">'+_glyph(c.g)+'</svg>')+'</span>'
     +'<div class="evp-meta"><b>'+(he()?c.he:c.en)+'</b> · '+esc(ago(ev))+' · ~'+esc(area)+'</div>'
     +(ev.mem?'':'<span class="evp-chip" style="color:'+q.col+';border-color:'+q.col+'">'+q.lbl+' '+q.pct+'%</span>')+'</div>'
-    +'<div class="evp-sum">'+esc(sum)+'</div>'
+    +'<div class="evp-sum'+(EVP.full===k?' full':'')+'" role="button" tabindex="0" aria-expanded="'+(EVP.full===k)+'">'+esc(sum)+'</div>'
     +'<div class="evp-foot">'+src+'<button class="evp-next">'+(he()?'הבא ›':'Next ›')+'</button></div>'
     +vote;
   el.classList.add('open'); document.body.classList.add('evp-on');
   el.querySelector('.evp-x').onclick=closeCard;
   el.querySelector('.evp-next').onclick=function(){ var i=EVP.order.indexOf(k); go(EVP.order[(i+1)%EVP.order.length]); };
-  el.querySelector('.evp-sum').onclick=function(){ this.classList.toggle('full'); };
+  var sm=el.querySelector('.evp-sum'), tg=function(){ var on=sm.classList.toggle('full'); sm.setAttribute('aria-expanded',on); EVP.full=on?k:null; };
+  sm.onclick=tg; sm.onkeydown=function(e){ if(e.key==='Enter'||e.key===' '){ e.preventDefault(); tg(); } };
+  el.querySelector('.evp-row').onclick=tg; el.querySelector('.evp-row').style.cursor='pointer';
   el.querySelectorAll('.evp-vb').forEach(function(b){ b.onclick=function(){ vote_(k,b.getAttribute('data-v')); }; });
 }
-function closeCard(){ var el=document.getElementById('evp-card'); if(el) el.classList.remove('open'); document.body.classList.remove('evp-on'); EVP.cur=null; }
+function closeCard(){ var el=document.getElementById('evp-card'); if(el) el.classList.remove('open'); document.body.classList.remove('evp-on'); EVP.cur=null; EVP.full=null; }
 function go(k){ var ev=EVP.items[k]; if(!ev) return; try{ MAP.flyTo([ev.lat,ev.lng], Math.max(12, Math.min(14, MAP.getZoom()||12)), {duration:.8}); }catch(e){} openCard(k); }
 EVP.go=go;
 
@@ -225,6 +234,8 @@ function css(){
   +'.evp-chip{flex:none;font-size:11px;font-weight:700;border:1px solid;border-radius:999px;padding:2px 8px}'
   +'.evp-sum{margin:8px 0 6px;font-size:14px;line-height:1.45;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;cursor:pointer}'
   +'.evp-sum.full{white-space:normal}'
+    /* a "הידעת?" tip that is up when a card opens moves to the top, so it never covers the card */
+  +'body.evp-on .nudge-bar{top:calc(env(safe-area-inset-top,0px) + var(--hdr,60px) + 8px);transform:translateX(-50%);animation:none;max-height:calc(100vh - var(--nav,64px) - 300px);overflow:auto}'
   +'.evp-foot{display:flex;align-items:center;justify-content:space-between;gap:8px;font-size:11.5px}'
   +'.evp-src{color:var(--tx2);text-decoration:none}a.evp-src{color:var(--g3)}'
   +'.evp-next{background:none;border:none;color:var(--tx1);font-size:12px;cursor:pointer;padding:4px}'
