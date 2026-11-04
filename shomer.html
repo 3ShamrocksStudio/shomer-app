@@ -520,6 +520,14 @@ body.sheet-open .diag-panel{display:none;}
 .pres-dot{position:relative;width:26px;height:26px;display:flex;align-items:center;justify-content:center;border-radius:50%;background:radial-gradient(circle,#3f6ac4 0%,#2350a8 70%);box-shadow:0 2px 7px rgba(0,0,0,.5);}
 .pres-ring{position:absolute;inset:0;border-radius:50%;background:rgba(63,106,196,.45);animation:presPulse 2.4s ease-out infinite;}
 @keyframes presPulse{0%{transform:scale(.7);opacity:.7}100%{transform:scale(2.2);opacity:0}}
+/* v320: every OTHER user = green pulsing dot, same style as the dashboard's live-presence dots
+   (dashboard.html: #2bc47e fill, #0c1b39 rim, .leaflet-pulse ring; grey #7c869c when not live). No star, no founder mark. */
+.oth-dot{position:absolute;left:50%;top:50%;width:13px;height:13px;border-radius:50%;background:#2bc47e;border:2px solid #0c1b39;transform:translate(-50%,-50%);z-index:2;animation:othPulse 1.6s infinite;}
+.mk-circle.mk-oth .oth-dot{top:19px;}
+.mk-circle.mk-oth .nm{border-color:#2bc47e;}
+@keyframes othPulse{0%{box-shadow:0 0 0 0 rgba(43,196,126,.55)}70%{box-shadow:0 0 0 13px rgba(43,196,126,0)}100%{box-shadow:0 0 0 0 rgba(43,196,126,0)}}
+.mk-oth:not(.live) .oth-dot{background:#7c869c;animation:none;opacity:.7;}
+.mk-circle.mk-oth:not(.live) .nm{border-color:#7c869c;}
 @keyframes ssf{0%,100%{background:var(--r3)}50%{background:var(--r2)}}
 .ss-row{display:flex;align-items:center;gap:10px;}
 /* SOS fast event-type picker - classify in one tap, never blocks the SOS */
@@ -6198,7 +6206,7 @@ function meIcon(){
  const p=PROFESSIONS[pr];
  // Ghost mode (sharing paused) takes visual priority over the profession badge.
  const badge=SS.circleGhost?`<div class="mk-me-badge" title="ghost">${ic('eye-off')}</div>`:(p?`<div class="mk-me-badge" title="${p.icon}">${ic(p.icon)}</div>`:'');
- var _isF = isFounder();
+ var _isF = true;   /* v320: every user's OWN position is the gold ✡ marker - and only their own */
     return window.L.divIcon({className:'shomer-marker mk3'+(_isF?' mk3-founder':''),
       html: _isF
         ? `<div class="mk-me-wrap mk-me-founder">${founderCrestSVG(40)}${badge}</div>`
@@ -8784,7 +8792,7 @@ function toggleGhost(){ dykUsed('ghost');
 /* ── Circle member map markers (pulsing avatar dots) ── */
 function circleIcon(m){
  return window.L.divIcon({className:'shomer-marker',
- html:`<div class="mk-circle${m.sos?' sos':''}${uidIsFounder({partnerUid:m.partnerUid})?' founder':''}" style="--cc:${m.color}">${uidIsFounder({partnerUid:m.partnerUid})?('<span class="mk-founder-crown">'+founderCrestSVG(26)+'</span>'):''}<div class="pulse"></div><div class="av">${m.emoji||''}</div><div class="nm">${ESC(m.name)}${m.sos?' ':''}</div></div>`,
+ html:`<div class="mk-circle${m.sos?' sos':' mk-oth live'}" style="--cc:${m.sos?m.color:'#2bc47e'}">${m.sos?('<div class="pulse"></div><div class="av">'+(m.emoji||'')+'</div>'):'<div class="oth-dot"></div>'}<div class="nm">${ESC(m.name)}${m.sos?' ':''}</div></div>`,
  iconSize:[38,38],iconAnchor:[19,19],popupAnchor:[0,-20]});
 }
 function clearCircleMarkers(){
@@ -9730,7 +9738,7 @@ function gdPos(p){ if(p.lat!=null&&p.lng!=null) return posShowable(p.lat,p.lng,p
 /* ── Map markers ── */
 function guardianIcon(p,live){
  return window.L.divIcon({className:'shomer-marker',
- html:`<div class="mk-circle${live?' live':''}${uidIsFounder(p)?' founder':''}" style="--cc:${p.color||'#C9A84C'}">${uidIsFounder(p)?('<span class="mk-emb">'+founderCrestSVG(42)+'</span>'):''}${live?'<div class="tag">LIVE</div>':(p.ts?'<div class="tag stale">'+ESC((currentLang==='he'?'נראה ':'seen ')+agoTxt(p.ts,currentLang==='he'))+'</div>':'')}<div class="pulse"></div><div class="av"></div><div class="nm">${ESC(p.name||(currentLang==='he'?'שומר/ת':'SHOMER'))}</div></div>`,
+ html:`<div class="mk-circle mk-oth${live?' live':''}">${live?'<div class="tag">LIVE</div>':(p.ts?'<div class="tag stale">'+ESC((currentLang==='he'?'נראה ':'seen ')+agoTxt(p.ts,currentLang==='he'))+'</div>':'')}<div class="oth-dot"></div><div class="nm">${ESC(p.name||(currentLang==='he'?'שומר/ת':'SHOMER'))}</div></div>`,
  iconSize:[38,38],iconAnchor:[19,19],popupAnchor:[0,-20]});
 }
 function gdUpdateMarker(p){
@@ -11057,7 +11065,7 @@ var fbPresenceMarkers={};
 /* Anonymized "a SHOMER is here" marker - coarse location, no name, no identity. */
 function presenceIcon(){
   return window.L.divIcon({className:'shomer-marker pres-mk',
-    html:'<div class="pres-dot"><span class="pres-ring"></span><svg viewBox="0 0 24 24" width="13" height="13" style="position:relative"><path d="M12 3l7 3v5c0 5-3.4 8.5-7 10-3.6-1.5-7-5-7-10V6Z" fill="#0A1628" stroke="#fff" stroke-width="2" stroke-linejoin="round"/></svg></div>',
+    html:'<div class="mk-oth live" style="position:relative;width:26px;height:26px"><div class="oth-dot"></div></div>',
     iconSize:[26,26],iconAnchor:[13,13]});
 }
 function fbLoad(src){return new Promise(function(res,rej){var s=document.createElement('script');s.src=src;s.onload=res;s.onerror=rej;document.head.appendChild(s);});}
