@@ -168,7 +168,7 @@ function openCard(k,quiet){
 }
 function closeCard(){ var el=document.getElementById('evp-card'); if(el) el.classList.remove('open'); document.body.classList.remove('evp-on'); EVP.cur=null; EVP.full=null; }
 function go(k){ var ev=EVP.items[k]; if(!ev) return; try{ MAP.flyTo([ev.lat,ev.lng], Math.max(12, Math.min(14, MAP.getZoom()||12)), {duration:.8}); }catch(e){} openCard(k); }
-EVP.go=go; EVP.close=closeCard;
+EVP.go=go; EVP.close=closeCard; EVP.CATS=CATS;   /* read by the באזור שלי list */
 
 /* one user, one vote: atomic multi-path update (confirm XOR dispute); tap again = undo */
 async function vote_(k,which){

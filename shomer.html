@@ -678,6 +678,16 @@ body.sheet-open .ff-fab{opacity:0;pointer-events:none;}
 .mb12{margin-bottom:12px;} .mb16{margin-bottom:16px;} .mb20{margin-bottom:20px;}
 
 /* ══════════ UPDATE CARDS ══════════ */
+.upd-sub{font-size:12.5px;color:var(--tx2);margin:-4px 2px 12px;}
+.upd-row{display:flex;align-items:center;gap:10px;width:100%;min-height:48px;padding:8px 10px;margin:0 0 6px;border-radius:12px;background:var(--n3);border:1px solid var(--b2);color:var(--tx0);font-family:inherit;font-size:14px;text-align:start;cursor:pointer;}
+.upd-row.past{opacity:.75;}
+.upd-ic{flex:none;width:28px;height:28px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;color:#fff;}
+.upd-ic .ic{width:16px;height:16px;}
+.upd-ty{flex:none;font-weight:800;}
+.upd-pl{flex:1;min-width:0;color:var(--tx1);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.upd-tm{flex:none;font-size:12px;color:var(--tx2);direction:ltr;font-variant-numeric:tabular-nums;}
+.upd-none{text-align:center;padding:30px 12px;color:var(--tx2);font-size:13px;line-height:1.7;}
+.upd-none b{display:block;color:var(--tx1);font-size:15px;}
 .chip-row{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;margin-bottom:14px;padding-bottom:2px;}
 .chip-row::-webkit-scrollbar{display:none;}
 .chip{flex-shrink:0;padding:5px 13px;border:1px solid var(--b1);border-radius:20px;background:var(--n3);font-size:11px;font-weight:600;color:var(--tx2);cursor:pointer;transition:all .15s;}
@@ -1755,7 +1765,7 @@ body.otp-active .ob-steps{display:none!important;}
  <span class="fb-status-txt" id="fb-status-txt">מתחבר…</span>
  </button>
  
- <button class="hdr-bell" onclick="openUpdates()" aria-label="עדכונים" title="עדכונים">
+ <button class="hdr-bell" onclick="openUpdates()" aria-label="באזור שלי" title="באזור שלי">
  <svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M18 8a6 6 0 1 0-12 0c0 7-3 9-3 9h18s-3-2-3-9" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><path d="M13.7 21a2 2 0 0 1-3.4 0" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
  <span class="bell-dot" id="bell-dot" aria-hidden="true"></span>
  </button>
@@ -2000,16 +2010,17 @@ body.otp-active .ob-steps{display:none!important;}
  <div class="sheet" id="sh-upd" role="dialog" aria-modal="true" aria-labelledby="upd-ttl">
  <div class="sh-pill" aria-hidden="true"></div>
  <div class="sh-head">
- <span class="sh-ttl" id="upd-ttl">עדכונים</span>
+ <span class="sh-ttl" id="upd-ttl">באזור שלי</span>
  <button class="sh-x" onclick="cl('sh-upd')" aria-label="סגור"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg></button>
  </div>
  <div class="sh-body">
- <div class="seg" role="tablist"><button class="on" id="seg-live" role="tab" onclick="setUpdSeg('live')"><span class="sdot"></span><span data-he="עכשיו" data-en="Live now" data-ar="الآن">עכשיו</span></button><button id="seg-past" role="tab" onclick="setUpdSeg('past')"><span data-he="ארכיון" data-en="Archive" data-ar="الأرشيف">ארכיון</span></button></div><div class="chip-row" role="group" aria-label="סנן עדכונים">
+ <div class="upd-sub" id="upd-sub">מה קורה סביבך ואצל השומרים שלך</div>
+ <div class="seg" role="tablist"><button class="on" id="seg-live" role="tab" onclick="setUpdSeg('live')"><span class="sdot"></span><span data-he="עכשיו" data-en="Live now" data-ar="الآن">עכשיו</span></button><button id="seg-past" role="tab" onclick="setUpdSeg('past')"><span data-he="ארכיון" data-en="Archive" data-ar="الأرشيف">ארכיון</span></button></div><div class="chip-row" role="group" aria-label="סינון">
  <button class="chip on" data-f="all" onclick="chipOn(this)">הכל</button>
- <button class="chip" data-f="sos" onclick="chipOn(this)">SOS פעיל</button>
+ <button class="chip" data-f="sos" onclick="chipOn(this)">SOS</button>
  <button class="chip" data-f="near" onclick="chipOn(this)">קרוב אליי</button>
- <button class="chip" data-f="assault" onclick="chipOn(this)">תקיפה</button>
- <button class="chip" data-f="closed" onclick="chipOn(this)">נסגר ✓</button>
+ <button class="chip" data-f="events" onclick="chipOn(this)">אירועים</button>
+ <button class="chip" data-f="closed" onclick="chipOn(this)">נסגר</button>
  </div>
  <div id="upd-list" role="list"></div>
  
@@ -2858,11 +2869,11 @@ const LANGS={
  vol:'עוצמת קול',test:'בדוק אזעקה',finish:'✓ כניסה לשומר',back:'← חזרה',
  shake:'<strong>Shake-to-SOS:</strong> 5 ניעורים חזקים מפעילים SOS אוטומטי.',
  dms_ob:'<strong>Dead Man\'s Switch:</strong> אם לא אישרת "הכל טוב?" תוך X דק׳ - SOS אוטומטי.',
- nav_map:'מפה',nav_sos:'חירום מיידי',nav_upd:'עדכונים',
+ nav_map:'מפה',nav_sos:'חירום מיידי',nav_upd:'באזור שלי',
  dd_rep:'דיווח אירוע',dd_dms:"שומר אוטומטי",dd_alarm:'הגדרות אזעקה',dd_prof:'פרופיל',dd_set:'הגדרות',dd_em:'מספרי חירום',
  ss_t:'SOS פעיל - אזעקה פועלת',ss_wait:'ממתין לתגובה...',
  cancel:'בטל SOS',ok_all:'✓ הכל טוב?',
- upd_ttl:'עדכונים',rep_ttl:'דיווח אירוע',dms_ttl:" שומר אוטומטי",
+ upd_ttl:'באזור שלי',rep_ttl:'דיווח אירוע',dms_ttl:" שומר אוטומטי",
  set_ttl:'הגדרות',prof_ttl:'הפרופיל שלי',em_ttl:'מספרי חירום',alarm_ttl:'הגדרות אזעקה',
  l1:'עבירת מין',l2:'תקיפה',l3:'מעקב',l4:'גנבה',l5:'סמים',l6:'רפואי',l7:'SOS חי',
  saved:'✓ הגדרות נשמרו',sent:' דיווח נשלח!',dms_on:'DMS פעיל',dms_off:'DMS כבוי',
@@ -2891,11 +2902,11 @@ const LANGS={
  vol:'Volume',test:'Test alarm',finish:'✓ Enter Shomer',back:'← Back',
  shake:'<strong>Shake-to-SOS:</strong> 5 hard shakes trigger automatic SOS.',
  dms_ob:"<strong>Auto-SHOMER:</strong> We ask 'All good?' every X min. No answer - we alert your SHOMERs.",
- nav_map:'Map',nav_sos:'Emergency',nav_upd:'Updates',
+ nav_map:'Map',nav_sos:'Emergency',nav_upd:'Around me',
  dd_rep:'Report incident',dd_dms:"שומר אוטומטי",dd_alarm:'Alarm settings',dd_prof:'Profile',dd_set:'Settings',dd_em:'Emergency numbers',
  ss_t:'SOS active - alarm firing',ss_wait:'Waiting for response...',
  cancel:'Cancel SOS',ok_all:'✓ I\'m OK',
- upd_ttl:'Updates',rep_ttl:'Report incident',dms_ttl:" שומר אוטומטי",
+ upd_ttl:'Around me',rep_ttl:'Report incident',dms_ttl:" שומר אוטומטי",
  set_ttl:'Settings',prof_ttl:'My profile',em_ttl:'Emergency numbers',alarm_ttl:' Alarm settings',
  l1:'Sexual assault',l2:'Violence',l3:'Stalking',l4:'Theft',l5:'Drugs',l6:'Medical',l7:'Live SOS',
  saved:'✓ Settings saved',sent:' Report sent!',dms_on:'DMS active',dms_off:'DMS off',
@@ -2924,11 +2935,11 @@ const LANGS={
  vol:'مستوى الصوت',test:'اختبار الإنذار',finish:'✓ الدخول لشومير',back:'← رجوع',
  shake:'<strong>هز للاستغاثة:</strong> 5 هزات قوية تُفعّل نداء الاستغاثة تلقائياً.',
  dms_ob:'<strong>مفتاح الأمان الميت:</strong> إذا لم تؤكد خلال X دقائق - إرسال تلقائي لنداء الاستغاثة.',
- nav_map:'الخريطة',nav_sos:'طوارئ',nav_upd:'التحديثات',
+ nav_map:'الخريطة',nav_sos:'طوارئ',nav_upd:'في منطقتي',
  dd_rep:'الإبلاغ عن حادثة',dd_dms:'مفتاح الأمان الميت',dd_alarm:'إعدادات الإنذار',dd_prof:'الملف الشخصي',dd_set:'الإعدادات',dd_em:'أرقام الطوارئ',
  ss_t:'نداء استغاثة نشط',ss_wait:'في انتظار الرد...',
  cancel:'إلغاء SOS',ok_all:'✓ كل شيء بخير',
- upd_ttl:'التحديثات',rep_ttl:'الإبلاغ عن حادثة',dms_ttl:' مفتاح الأمان الميت',
+ upd_ttl:'في منطقتي',rep_ttl:'الإبلاغ عن حادثة',dms_ttl:' مفتاح الأمان الميت',
  set_ttl:'الإعدادات',prof_ttl:'ملفي الشخصي',em_ttl:'أرقام الطوارئ',alarm_ttl:' إعدادات الإنذار',
  l1:'اعتداء جنسي',l2:'عنف',l3:'مطاردة',l4:'سرقة',l5:'مخدرات',l6:'طبي',l7:'SOS مباشر',
  saved:'✓ تم حفظ الإعدادات',sent:' تم إرسال البلاغ!',dms_on:'مفتاح الأمان نشط',dms_off:'مفتاح الأمان متوقف',
@@ -3590,7 +3601,7 @@ function buildDetailFromReport(rep){
  return {title:(currentLang==='he'?'דיווח: ':'Report: ')+(typeLabelOf(rep.type)||(currentLang==='he'?'אירוע':'incident')),
  type:rep.type||'viol',time:relTime(rep.ts),loc:rep.loc||'-',lat:rep.lat,lng:rep.lng,
  desc:rep.desc||'',responders:[],photos:(rep.photos?rep.photos.length:0),
- status:currentLang==='he'?'פתוח':'open', _rid:(rep.id||rep.key||null), _auth:(rep.fromUid||rep.uid||rep.by||null)};
+ status:currentLang==='he'?'פתוח':'open', _t:rep.ts||null, _rid:(rep.id||rep.key||null), _auth:(rep.fromUid||rep.uid||rep.by||null)};
 }
 /* User report → real Leaflet marker (crafted pin), tap opens full detail. */
 function addReportPin(rep){
@@ -3960,7 +3971,7 @@ function applyTranslations(){
  :'What was this? Accidental and test are removed from the map and never shown to others.');
  setText('sos-rs-ttl',currentLang==='he'?'✓ ה-SOS הסתיים':'✓ SOS ended');
  // Sheet titles
- setText('upd-ttl',T('upd_ttl'));setText('rep-ttl',T('rep_ttl'));setText('dms-ttl',T('dms_ttl'));
+ setText('upd-ttl',T('upd_ttl')); setText('upd-sub',currentLang==='he'?'מה קורה סביבך ואצל השומרים שלך':currentLang==='ar'?'ما يحدث حولك ولدى حُرّاسك':'What is happening around you and your SH✡MERs'); try{ var _hb=document.querySelector('.hdr-bell'); if(_hb){ _hb.title=T('upd_ttl'); _hb.setAttribute('aria-label',T('upd_ttl')); } }catch(e){}setText('rep-ttl',T('rep_ttl'));setText('dms-ttl',T('dms_ttl'));
  setText('set-ttl',T('set_ttl'));setText('prof-ttl',T('prof_ttl'));setText('em-ttl',T('em_ttl'));
  setText('alarm-ttl',T('alarm_ttl'));
  // Map legend
@@ -6771,29 +6782,65 @@ function setUpdSeg(s){
   if(pb){ pb.classList.toggle('on', UPD_SEG==='past'); pb.classList.toggle('past-on', UPD_SEG==='past'); }
   try{ applyUpdFilter(); }catch(e){}
 }
+/* v320 "באזור שלי": one list built from data the app already has - circle SOS alerts (SOSBUS),
+   community reports (DETAILS) and, for a preview account, the preview events (EVP). No new fields,
+   no names or ids, places are the event's own area. עכשיו = SOS + open events of the last 72 h
+   (within ~10 km and 24 h first, then by distance). ארכיון = closed or older, last 90 days only. */
+var UPD_LIVE_MS=72*3600000, UPD_KEEP_MS=90*86400000;
+function updItems(){
+  var out=[], now=Date.now(), he=currentLang==='he', ar=currentLang==='ar';
+  var me=(typeof _myPos==='function')?_myPos():null;
+  function km(la,ln){ return (me&&typeof la==='number'&&typeof ln==='number')?distMeters(me.lat,me.lng,la,ln)/1000:null; }
+  try{ Object.keys(SOSBUS.mine||{}).forEach(function(puid){ var v=(SOSBUS.lastV||{})[puid]||{};
+    out.push({k:'sos', ico:'sos', col:'#FF1A40', ty:'SOS', pl:(he?'מהמעגל שלך':ar?'من دائرتك':'From your circle'), ts:(SOSBUS.lastTs||{})[puid]||v.ts||now, lat:v.lat, lng:v.lng, d:km(v.lat,v.lng), closed:false,
+      go:function(){ try{ if(typeof v.lat==='number') MAP.setView([v.lat,v.lng],15); }catch(e){} } }); }); }catch(e){}
+  try{ if(typeof sosActive!=='undefined'&&sosActive&&me) out.push({k:'sos', ico:'sos', col:'#FF1A40', ty:'SOS', pl:(he?'שלך':ar?'لك':'Yours'), ts:now, lat:me.lat, lng:me.lng, d:0, closed:false, go:function(){ try{ MAP.setView([me.lat,me.lng],15); }catch(e){} } }); }catch(e){}
+  try{ DETAILS.forEach(function(d,i){ if(!d||typeof d.lat!=='number') return; var t=TYPES[d.type]||TYPES.viol, ts=+(d._t||d.ts||0)||null;
+    out.push({k:'ev', ico:t.icon, col:t.color, ty:(t.label&&t.label())||d.title, pl:(d.loc&&d.loc!=='-')?d.loc:'', ts:ts, lat:d.lat, lng:d.lng, d:km(d.lat,d.lng),
+      closed:/טופל|נסגר|closed|resolved|handled/i.test(d.status||''), go:function(){ try{ MAP.setView([d.lat,d.lng],15); }catch(e){} openDetail(i); } }); }); }catch(e){}
+  try{ if(window.EVP&&EVP.items){ var C=EVP.CATS||{}; Object.keys(EVP.items).forEach(function(k){ var e=EVP.items[k]; if(!e||typeof e.lat!=='number') return; var c=C[e.type]||C.other||{};
+    out.push({k:'ev', ico:c.g||'clipboard', col:c.color||'#7E8CA0', ty:(he?c.he:c.en)||'', pl:e.area?(he?(e.area.he||e.area.en):(e.area.en||e.area.he)):'', ts:e.at||e.ts, lat:e.lat, lng:e.lng, d:km(e.lat,e.lng),
+      closed:/closed|resolved/i.test(e.status||''), go:function(){ EVP.go(k); } }); }); } }catch(e){}
+  out.forEach(function(it){ it.age=it.ts?now-it.ts:0; it.live=it.k==='sos'||(!it.closed&&it.age<=UPD_LIVE_MS); });
+  return out.filter(function(it){ return it.k==='sos'||it.age<=UPD_KEEP_MS; });   /* 90-day retention */
+}
+function updTime(ts){
+  if(!ts) return ''; var d=new Date(ts), o={timeZone:'Asia/Jerusalem'};
+  try{ var hm=d.toLocaleTimeString('he-IL',Object.assign({hour:'2-digit',minute:'2-digit',hour12:false},o)), dm=d.toLocaleDateString('he-IL',Object.assign({day:'numeric',month:'numeric'},o)).replace(/\//g,'.');
+    var today=new Date().toLocaleDateString('he-IL',o).replace(/\//g,'.')===d.toLocaleDateString('he-IL',o).replace(/\//g,'.');
+    return today?hm:(dm+' · '+hm); }catch(e){ return d.getDate()+'.'+(d.getMonth()+1); }
+}
 function applyUpdFilter(){
   var l=document.getElementById('upd-list'); if(!l)return;
-  var he=currentLang==='he', shown=0;
-  [].slice.call(l.children).forEach(function(el){
-    if(el.id==='upd-empty') return;
-    var k=(el.getAttribute('data-kind')||'').toLowerCase();
-    var d=parseFloat(el.getAttribute('data-dist'));
-    var show=true;
-    if(UPD_FILTER==='sos')      show=/sos|urgent|red/.test(k);
-    else if(UPD_FILTER==='near')show=(!isNaN(d) && d<=3);
-    else if(UPD_FILTER==='assault') show=/assault|תקיפה|attack/.test(k);
-    else if(UPD_FILTER==='closed')  show=/closed|נסגר|resolved/.test(k);
-    el.style.display = show ? '' : 'none';
-    if(show) shown++;
-  });
-  var empty=document.getElementById('upd-empty');
-  if(!empty){
-    empty=document.createElement('div'); empty.id='upd-empty';
-    empty.style.cssText='text-align:center;color:var(--tx3);font-size:12.5px;padding:22px 8px';
-    l.appendChild(empty);
+  var he=currentLang==='he', ar=currentLang==='ar';
+  [].slice.call(l.children).forEach(function(el){ if(el.id!=='upd-rows') el.style.display='none'; });   /* the older cards stay in the DOM, unused */
+  var box=document.getElementById('upd-rows'); if(!box){ box=document.createElement('div'); box.id='upd-rows'; l.insertBefore(box,l.firstChild); }
+  var all=updItems(), f=UPD_FILTER, list;
+  if(f==='closed') list=all.filter(function(it){ return it.closed; });
+  else {
+    list=all.filter(function(it){ return UPD_SEG==='past' ? !it.live : it.live; });
+    if(f==='sos') list=list.filter(function(it){ return it.k==='sos'; });
+    else if(f==='near') list=list.filter(function(it){ return it.d!=null && it.d<=10; });
+    else if(f==='events') list=list.filter(function(it){ return it.k==='ev'; });
   }
-  empty.textContent = shown ? '' : (he?'אין עדכונים בסינון הזה':'Nothing matches this filter');
-  empty.style.display = shown ? 'none' : '';
+  function grp(it){ if(it.k==='sos') return 0; if(UPD_SEG==='live' && it.d!=null && it.d<=10 && it.age<=86400000) return 1; return 2; }
+  list.sort(function(a,b){ var g=grp(a)-grp(b); if(g) return g;
+    if(UPD_SEG==='live' && grp(a)===2 && a.d!=null && b.d!=null) return a.d-b.d;
+    return (b.ts||0)-(a.ts||0); });
+  box.innerHTML='';
+  if(!list.length){
+    var other=all.length && f==='all' && UPD_SEG==='live' && all.some(function(it){ return !it.live; });
+    box.innerHTML='<div class="upd-none"><b>'+(he?'אין כרגע. נעדכן כשיקרה משהו':ar?'لا شيء الآن. سنخبرك عندما يحدث شيء':'Nothing right now. We will update you')+'</b><span>'
+      +(other?(he?'אירועים קודמים בלשונית ארכיון':ar?'أحداث سابقة في الأرشيف':'Earlier events are in Archive'):(he?'אפשר לבחור סינון אחר':ar?'جرّب تصفية أخرى':'Try another filter'))+'</span></div>';
+    return;
+  }
+  list.forEach(function(it){
+    var r=document.createElement('button'); r.type='button'; r.className='upd-row'+(it.live?'':' past'); r.setAttribute('role','listitem');
+    r.innerHTML='<span class="upd-ic" style="background:'+it.col+'"><svg class="ic" viewBox="0 0 24 24">'+(typeof _glyph==='function'?_glyph(it.ico):'')+'</svg></span>'
+      +'<span class="upd-ty">'+ESC(it.ty)+'</span><span class="upd-pl">'+ESC(it.pl)+'</span><span class="upd-tm">'+ESC(updTime(it.ts))+'</span>';
+    r.onclick=function(){ cl('sh-upd'); setTimeout(function(){ try{ it.go(); }catch(e){} },120); };
+    box.appendChild(r);
+  });
 }
 function updBdg(){
  const b=document.getElementById('bell-dot');
@@ -6949,7 +6996,7 @@ function openUpdates(){
  op('sh-upd');
  document.querySelectorAll('.nb').forEach(b=>b.classList.remove('on'));
  const nb=document.getElementById('nb-upd');if(nb)nb.classList.add('on');
- newUpd=0;updBdg();
+ newUpd=0;updBdg(); try{ applyUpdFilter(); }catch(e){}
 }
 /* Mirror "any full sheet open" onto <body> so CSS can hide the floating SOS/FABs reliably (no :has dependency). */
 function syncSheetState(){ document.body.classList.toggle('sheet-open', !!document.querySelector('.sheet.open')); }
