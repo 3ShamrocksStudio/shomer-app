@@ -36,9 +36,9 @@ public class ShakeService extends Service implements SensorEventListener {
   private float gx, gy, gz;
   private int count;
   private long firstT, lastPeak;
-  private static final int REQUIRED = 6;
+  private static final int REQUIRED = 8;
   private static final long WINDOW = 1500, MIN_GAP = 120;
-  private static final double THRESHOLD = 16.0; // m/s^2 (gravity removed) — raised so casual movement never triggers
+  private static final double THRESHOLD = 18.0; // m/s^2 (gravity removed) — 16.0 fired while running across a road
 
   @Override
   public int onStartCommand(Intent intent, int flags, int startId) {

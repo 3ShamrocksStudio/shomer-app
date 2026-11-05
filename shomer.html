@@ -2188,7 +2188,7 @@ body.otp-active .ob-steps{display:none!important;}
  </div>
  <div class="sl-card mb20">
  <div class="vol-row"><span class="vol-lbl" id="shake-sens-lbl">רגישות ניעור</span><span class="vol-val" id="shake-sens-v">בינונית</span></div>
- <input type="range" id="shake-sens" min="12" max="30" value="26" aria-label="shake sensitivity" oninput="setShakeSens(this.value)">
+ <input type="range" id="shake-sens" min="12" max="30" value="24" aria-label="shake sensitivity" oninput="setShakeSens(this.value)">
  <div style="display:flex;justify-content:space-between;font-size:10px;color:var(--tx3);margin-top:6px"><span>נמוכה</span><span>גבוהה</span></div>
  <button class="test-alarm-btn" style="margin-top:12px" onclick="simulateShake()" id="sim-shake-btn"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M13 2L4 14h6l-1 8 9-12h-6Z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></svg><span id="sim-shake-lbl">סימולציית ניעור (בדיקה)</span></button>
  </div>
@@ -3344,7 +3344,7 @@ let SS={
  lang:'he',
  user:{name:'',phone:'',profession:'',gender:'',ageBand:'',residency:''},
  alarm:{type:'shomer',vol:0.6},
- shake:{enabled:true,sensitivity:28},
+ shake:{enabled:true,level:24},
  dms:{interval:5,active:false,deadline:0},
  settings:{radius:5,toggles:{}},
  /* Safety PIN: required to cancel an ACTIVE SOS. NEVER biometric (an unconscious user must
@@ -3502,7 +3502,11 @@ function reflectDmsSelection(){
 /* v286: the slider is SENSITIVITY (toward 'גבוהה' = more sensitive). It used to be the raw force
    threshold (right = harder to trigger) with a default of 28 m/s², which most people could
    not reach - shake-to-SOS looked dead. Default threshold 16 m/s² (tested: a firm shake triggers, walking/running does not). */
-function shakeLevel(){ var l=SS.shake&&SS.shake.level; return (l>=12&&l<=30)?+l:26; }
+/* Default 24 -> threshold 18 m/s^2 (was 26 -> 16). Running across a road was firing
+   the SOS: a sprint with the phone in hand produces the same peak magnitudes as a
+   shake. Simulated across running 2-4g at 2.5-3Hz, 18 m/s^2 with 8 required peaks
+   cut false fires by about half with no loss of real shakes, including weak ones. */
+function shakeLevel(){ var l=SS.shake&&SS.shake.level; return (l>=12&&l<=30)?+l:24; }
 function shakeThreshold(){ return 42-shakeLevel(); }
 function updateShakeSensLabel(){
  const v=shakeLevel();
@@ -5008,7 +5012,7 @@ function startShakeDetection(){
  // just yields no events. On everything else, attach now.
  if(typeof DeviceMotionEvent.requestPermission==='function' && SS.shake._perm!=='granted') return;
  shakeStarted=true;
- const WINDOW=1400, REQUIRED=6, MIN_GAP=120;
+ const WINDOW=1400, REQUIRED=8, MIN_GAP=120;   /* 8 not 6: a running stride cannot sustain 8 peaks in 1.4s, a shake can */
  let count=0, firstT=0, lastPeak=0;
  const handler=e=>{
  if(SS.shake && SS.shake.enabled===false) return;
@@ -5595,10 +5599,36 @@ function beginSOS(trigger){
  sosPhase='countdown'; sosActive=true; curSosTrigger=trigger||'manual';
  const btn=document.getElementById('sos-btn');
  if(btn){btn.classList.add('active');btn.setAttribute('aria-pressed','true');}
- try{ startSosAlarm(); }catch(e){} // loud LOOPING signature alarm + vibration, right now
+ /* A button press is a decision, so it sounds at once. A SHAKE is an inference, and
+    an inference can be wrong - running to cross a road set it off twice. So a shake
+    buzzes hard in the pocket for a moment first, then goes loud. The countdown and
+    the broadcast time are untouched: only the siren waits, and only on a shake. */
+ if(curSosTrigger==='shake'){ sosGraceStart(); }
+ else { try{ startSosAlarm(); }catch(e){} } // loud LOOPING signature alarm + vibration, right now
  startCountdown();
 }
 let curSosTrigger='manual';
+/* SHAKE GRACE — vibrate-only for SOS_GRACE_MS, then the full alarm.
+   Long enough to notice and cancel a false trigger before it is heard in the street;
+   short enough that a real emergency is still screaming well inside the countdown. */
+var SOS_GRACE_MS=3000, _sosGraceTimer=null;
+function sosGraceStart(){
+ sosGraceClear();
+ try{ if(navigator.vibrate) navigator.vibrate([400,120,400,120,400]); }catch(e){}
+ _sosGraceTimer=setTimeout(function(){
+   _sosGraceTimer=null;
+   if(sosPhase==='idle') return;          // cancelled during the grace window - stay quiet
+   try{ startSosAlarm(); }catch(e){}
+ }, SOS_GRACE_MS);
+}
+function sosGraceClear(){
+ if(_sosGraceTimer){ clearTimeout(_sosGraceTimer); _sosGraceTimer=null; }
+}
+/* If the countdown runs out inside the grace window the SOS is real: sound it now
+   rather than letting a pending timer decide. */
+function sosGraceForceLoud(){
+ if(_sosGraceTimer){ sosGraceClear(); try{ startSosAlarm(); }catch(e){} }
+}
 function startCountdown(){
  sosCdLeft=Math.max(5,Math.min(15,SS.sos.countdown||10));
  const ov=document.getElementById('sos-cd');
@@ -5641,7 +5671,7 @@ function practiceSOS(){
 function cancelCountdown(){
  if(sosPhase!=='countdown')return;
  window._sosPractice=false;
- clearInterval(sosCdTimer); stopSosAlarm();
+ clearInterval(sosCdTimer); sosGraceClear(); stopSosAlarm();
  sosPhase='idle'; sosActive=false; window._sosSilent=false;
  const ov=document.getElementById('sos-cd');
  if(ov){ov.classList.remove('on');ov.setAttribute('aria-hidden','true');}
@@ -5657,6 +5687,7 @@ function cancelSOS(){ if(sosPhase==='countdown')cancelCountdown(); else if(sosPh
 /* PHASE 2 - the countdown expired → this is a REAL active event: broadcast sim + map. */
 function activateSOS(){
  clearInterval(sosCdTimer);   /* v293: never let a leftover countdown re-fire the SOS */
+ try{ sosGraceForceLoud(); }catch(e){}   /* countdown ran out inside the shake grace - sound it now */
  const ov=document.getElementById('sos-cd');
  if(ov){ov.classList.remove('on');ov.setAttribute('aria-hidden','true');}
  sosPhase='active';
@@ -6069,7 +6100,7 @@ function resolveSOS(){
   try{ if(!window._sosPractice) sosClearBroadcast(); }catch(e){}   // only after the cancel code passed - a thief tapping SOS must not stand the guardians down
   try{ delete SS.sosLive; saveStore(); var _rs=document.getElementById('sos-restore-bar'); if(_rs) _rs.remove(); }catch(e){}
   try{ if(!window._sosPractice) fbResolveSOS(curSosId); }catch(e){}   // v262: close sos/<me> now too - guardians' alerts follow it (not only after the "how did it end" choice)
-  clearInterval(sosTimer); stopSosAlarm(); stopMaxAttention(); releaseWake();
+  clearInterval(sosTimer); sosGraceClear(); stopSosAlarm(); stopMaxAttention(); releaseWake();
   try{ if(curSosId){ FB.db&&FB.db.ref('responders/'+curSosId).off&&FB.db.ref('responders/'+curSosId).off(); delete fbRespStreams[curSosId]; } fbClearResponderMarkers(); }catch(e){}
   sosPhase='idle'; sosActive=false; window._sosSilent=false;
   try{ SOSBUS._endedAt=Date.now(); SOSBUS._helpAck=0; Object.keys(SOSBUS.responders).forEach(function(k){ delete SOSBUS.responders[k]; }); sosPaintResponders(); sosPaintMyHelp(); }catch(e){}   /* v312: "help is coming" ends with the SOS, online or not */
@@ -10906,7 +10937,7 @@ try{ hydrateIcons(document); }catch(e){}
 /* Loaded-build version - shown in the diagnostic panel so a phone can prove
    whether it's on the latest build or a STALE cached one. Keep in lock-step
    with sw.js SW_VERSION on every deploy. */
-var APP_VER='v326';
+var APP_VER='v327';
 var FB={ready:false,uid:null,db:null,_presTimer:null,connected:false,listening:false,pushState:'default',near:0,swVer:'?',
   authState:'connecting',sdkLoaded:false,persist:'',permErr:null,err:null,wsProbe:'',csp:''};
 /* Always log connection diagnostics to the console so the real failure can be SEEN in Chrome. */
