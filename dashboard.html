@@ -234,7 +234,7 @@
   .leaflet-pulse{border-radius:50%;animation:lpulse 1.6s infinite}
   @keyframes lpulse{0%{box-shadow:0 0 0 0 rgba(239,72,83,.55)}70%{box-shadow:0 0 0 13px rgba(239,72,83,0)}100%{box-shadow:0 0 0 0 rgba(239,72,83,0)}}
   /* ---------- small screens: allow scroll ---------- */
-  body.demo-on{padding-top:var(--demo-h,0px)}body.demo-on #app{height:calc(100vh - var(--demo-h,0px))}
+  body.demo-on{padding-top:var(--demo-h,0px)}body.demo-on .resp{top:var(--demo-h,0px);height:calc(100vh - var(--demo-h,0px))}body.demo-on #app{height:calc(100vh - var(--demo-h,0px))}
   @media(max-width:1100px){
     body.demo-on #app{height:auto;min-height:calc(100vh - var(--demo-h,0px))}
     body{overflow:auto}#app{height:auto;min-height:100vh;overflow:visible}
@@ -2419,6 +2419,6 @@ function render(idx){
 (function(){var ts=document.getElementById('terr-sel');if(ts)ts.onchange=onTerrChange;})();
 boot();
 </script>
-<script>/* v322 published-news events layer: on for everyone (never in stats); ?evp=0 hides it */try{ if(!/[?&]evp=0\b/.test(location.search)){ var _evs=document.createElement('script'); _evs.src='events-preview-dash.js?nosw&v=322'; document.head.appendChild(_evs); } }catch(e){}</script>
+<script>/* v322 published-news events layer: on for everyone (never in stats); ?evp=0 hides it */try{ if(!/[?&]evp=0\b/.test(location.search)){ var _evs=document.createElement('script'); _evs.src='events-preview-dash.js?nosw&v=332'; document.head.appendChild(_evs); } }catch(e){}</script>
 </body>
 </html>

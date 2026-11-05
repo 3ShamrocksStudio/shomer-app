@@ -31,7 +31,7 @@ function start(){
     });
     var b=document.createElement('div');
     b.textContent=evs.length+' אירועים מפרסומים בתקשורת · לא נכללים בסטטיסטיקה';
-    b.style.cssText='position:fixed;top:8px;left:50%;transform:translateX(-50%);z-index:9999;background:#0A1628;color:#F5C840;border:1px solid #E0A828;border-radius:999px;padding:6px 14px;font:600 12px Heebo,sans-serif;direction:rtl;pointer-events:none';
+    b.style.cssText='position:fixed;top:calc(8px + var(--demo-h,0px));left:50%;transform:translateX(-50%);z-index:9999;background:#0A1628;color:#F5C840;border:1px solid #E0A828;border-radius:999px;padding:6px 14px;font:600 12px Heebo,sans-serif;direction:rtl;pointer-events:none';
     document.body.appendChild(b); setTimeout(function(){ try{ b.remove(); }catch(e){} },8000);   /* v322: never covers the dashboard for long */
   }).catch(function(){});
 }
