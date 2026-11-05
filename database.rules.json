@@ -97,7 +97,9 @@
       }
     },
     "founders": {
-      ".read": "auth != null",
+      "$uid": {
+        ".read": "auth != null && auth.uid === $uid"
+      },
       ".write": false
     },
     "analytics": {

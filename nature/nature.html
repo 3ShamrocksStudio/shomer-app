@@ -9761,7 +9761,7 @@ try{ hydrateIcons(document); }catch(e){}
 /* Loaded-build version - shown in the diagnostic panel so a phone can prove
    whether it's on the latest build or a STALE cached one. Keep in lock-step
    with sw.js SW_VERSION on every deploy. */
-var APP_VER='v275';
+var APP_VER='v276';
 var FB={ready:false,uid:null,db:null,_presTimer:null,connected:false,listening:false,pushState:'default',near:0,swVer:'?',
   authState:'connecting',sdkLoaded:false,persist:'',permErr:null,err:null,wsProbe:'',csp:''};
 /* Always log connection diagnostics to the console so the real failure can be SEEN in Chrome. */
@@ -10148,7 +10148,7 @@ function fbStreamPrio(path){
   if(/^sos\/[^\/]+$/.test(path)) return 'top';                                              // v262: a paired person's SOS record - works in BOTH directions
   if(path==='sos'||/^pairs\//.test(path)||/^invites\/sos_/.test(path)) return 'high';      // SOS fan-out + my pairings
   if(/^invites\/(sd_|rp_)/.test(path)||/^responders\//.test(path)) return 'urgent-poll';   // only matter during an SOS
-  if(path==='founders') return 'rare';
+  if(path==='founders'||/^founders\//.test(path)) return 'rare';
   return 'low';
 }
 function fbSseCount(){ var n=0; for(var p in FB_STREAMS){ var s=FB_STREAMS[p]; if(s&&s.open&&s.mode==='sse') n++; } return n; }
@@ -10407,7 +10407,7 @@ function fbOnAuthed(uid){
   if(FB._watchdog){ clearTimeout(FB._watchdog); FB._watchdog=null; }
   if(FB.err&&/^auth-timeout/.test(FB.err)) FB.err=null;
   if(FB._authReady && FB.uid===uid){ return; } // already running on this uid
-  FB.uid=uid; FB._authReady=true;
+  FB.uid=uid; FB._authReady=true; try{ founderWatchList(); }catch(e){}
   fbLog('AUTH READY · secure uid =', uid, '· ID token acquired · opening SSE data layer');
   try{ fbStartPresence(); }catch(e){}
   try{ fbListenSOS(); }catch(e){}
@@ -11286,9 +11286,15 @@ function founderPublishSelf(){
 }
 function founderWatchList(){
   try{
-    if(!FB.db) return;
-    FB.db.ref('founders').on('value', function(snap){
-      var v=snap&&snap.val?snap.val():null;
+    if(!FB.db || !FB.uid || !FB._authReady) return;   /* needs the auth uid (re-run from fbOnAuthed) */
+    /* privacy: read ONLY my own founders entry - the list of founder accounts is never public */
+    var _me=FB.uid, _fp='founders/'+_me;
+    if(FB._fwPath===_fp) return;
+    if(FB._fwPath){ try{ FB.db.ref(FB._fwPath).off(); }catch(e){} }
+    FB._fwPath=_fp;
+    FB.db.ref(_fp).on('value', function(snap){
+      var x=snap&&snap.val?snap.val():null;
+      var v=x?{}:null; if(v) v[_me]=true;
       FOUNDER_UIDS = v || {};
       try{ if(typeof repaintMarkers==='function') repaintMarkers(); }catch(e){}
     });
