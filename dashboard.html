@@ -239,6 +239,8 @@
     .cmd-grid{grid-template-columns:1fr;grid-template-rows:none;grid-template-areas:"net" "crime" "prof" "map" "feed" "recs" "graph" "donut" "rank"}
     .cmd-grid>*{min-height:240px}.c-net,.c-crime,.c-prof{min-height:120px}.c-map{min-height:420px}
     .kpis{flex-wrap:wrap}.kpi{flex:1 1 30%}
+    #app .user-panel{flex:1 0 auto}#app .user-panel .up-head{flex-wrap:wrap}#app .user-panel .up-htx{flex:1 1 150px}#app .user-panel .up-terr{flex-wrap:wrap;white-space:normal}#app .user-panel .up-status{white-space:normal}
+    #app .nt-row{flex:1 0 auto;padding:4px 8px}#app .nt-row .nl{font-size:10.5px}
     #app .user-panel .up-org{white-space:normal;overflow:visible;text-overflow:clip;overflow-wrap:anywhere}
     .topbar{flex-wrap:wrap;height:auto;flex:0 0 auto;padding:6px 10px;gap:6px 8px}.clk{height:auto;border-inline:0;padding:0 4px}.terr-pick select{min-width:0;max-width:160px}
   }
@@ -524,6 +526,7 @@
 .nt-stack{display:flex;flex-direction:column;gap:7px;min-width:0;min-height:0}
 .nt-row{flex:1 1 0;min-height:0;display:flex;align-items:center;justify-content:space-between;gap:8px;padding:0 10px;border-radius:8px;background:rgba(12,27,57,.55);border:1px solid var(--line)}
 .nt-row .nl{font-size:11.5px;font-weight:700;color:var(--tx2);white-space:nowrap}
+.nt-row{gap:5px;padding:0 7px}.nt-row .nl{font-size:10.5px;line-height:1.1!important}
 .nt-row .nv{font-family:var(--num);font-variant-numeric:tabular-nums;font-size:clamp(16px,1.25vw,22px);font-weight:700;color:var(--tx);white-space:nowrap}
 .nt-row .nv small{font-size:11px;color:var(--tx3);font-weight:600}
 /* events board */
@@ -1934,8 +1937,8 @@ function buildKPIs(idx){
  el.innerHTML=''
   +'<div class="nt nt-on" title="מכשירים מאומתים (SH✡MER v279+) שדיווחו מיקום ב-90 השניות האחרונות, בכל הרשת · מקור: רשת SH✡MER (זמן אמת) · נספרים מאז 22.10.2026"><div class="nl" style="white-space:normal;line-height:1.15"><i></i>מכשירים מחוברים כעת</div><div class="nv">'+v(S.onlineNow)+'</div><div class="ns">'+(demo?'נתוני הדגמה':'כל הרשת')+'</div></div>'
   +'<div class="nt-stack">'
-   +'<div class="nt-row" title="היום = מ-00:00 (שעון ישראל) ועד עכשיו. כל מכשיר מאומת שהיה פעיל בטווח הזה נספר פעם אחת, בכל הרשת. הספירה מתאפסת בחצות."><span class="nl" style="white-space:normal;line-height:1.15">מכשירים פעילים היום<small style="display:block;font-size:10px;color:var(--tx3);font-weight:400">00:00 עד עכשיו</small>'+DL+'</span><span class="nv">'+v(S.activeToday)+'</span></div>'
-   +'<div class="nt-row" title="מכשירים עד 18 ק״מ ממרכז '+ESC(c.city)+': מחוברים כעת / פעילים היום (מחצות)"><span class="nl" style="white-space:normal;line-height:1.15">עד 18 ק״מ ממרכז העיר'+DL+'</span><span class="nv">'+v(S.onlineTerr)+'<small> / '+v(S.territoryActive)+'</small></span></div>'
+   +'<div class="nt-row" title="היום = מ-00:00 (שעון ישראל) ועד עכשיו. כל מכשיר מאומת שהיה פעיל בטווח הזה נספר פעם אחת, בכל הרשת. הספירה מתאפסת בחצות."><span class="nl" style="white-space:normal;line-height:1.15">מכשירים פעילים היום<small style="display:block;font-size:10px;color:var(--tx3);font-weight:400">'+(demo?'<b style="color:var(--gold)">הדגמה</b>':'00:00 עד עכשיו')+'</small></span><span class="nv">'+v(S.activeToday)+'</span></div>'
+   +'<div class="nt-row" title="מכשירים עד 18 ק״מ ממרכז '+ESC(c.city)+': מחוברים כעת / פעילים היום (מחצות)"><span class="nl" style="white-space:normal;line-height:1.15">עד 18 ק״מ ממרכז העיר</span><span class="nv">'+v(S.onlineTerr)+'<small> / '+v(S.territoryActive)+'</small></span></div>'
   +'</div>'
   +'<div class="nt nt-ev'+(hot?' hot':'')+'"'+(hot?' onclick="boardFocusLive()"':'')+' title="אירועים פתוחים מהרשת עד 18 ק״מ ממרכז העיר ב-24 השעות האחרונות'+(demo?' · בדמו: אירועי הדגמה':'')+'"><div class="nl">אירועים חיים</div><div class="nv">'+v(ev)+'</div><div class="ns">'+(demo?'הדגמה':(hot?'לטיפול עכשיו':(ev===0?'אין כרגע':'24 שעות')))+'</div></div>';
  try{ renderUserPanel(); }catch(e){}
