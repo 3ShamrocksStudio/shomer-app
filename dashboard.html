@@ -1442,10 +1442,12 @@ function isRealPresence(e){ return !!e&&_isPresRow(e)&&(e.status==='v2'||/^v2:/.
 function _presDev(e,id){ var m=String(e.status||'').match(/^(?:v2|d1):([0-9a-f]{6,})/); return m?m[1]:('row:'+id); }
 function _presDay(e){ var m=String(e.status||'').match(/^d1:[0-9a-f]+:(\d{4}-\d{2}-\d{2})$/); return m?m[1]:null; }
 function _ilDay(ts){ try{ return new Intl.DateTimeFormat('en-CA',{timeZone:'Asia/Jerusalem',year:'numeric',month:'2-digit',day:'2-digit'}).format(new Date(ts)); }catch(e){ return new Date(ts).toISOString().slice(0,10); } }
+/* sample network counts for demo mode only - labelled 'הדגמה' wherever shown */
+var DEMO_NET={onlineNow:38,activeToday:214,territoryActive:126,onlineTerr:21,activeEvents:0,reportersTerr:9,outTerr24:88,demo:true};
 function loadLive(c){
   _curCityObj=c;
   var demo=!!(CLIENT&&CLIENT.demo);
-  /* demo: incidents are simulated (clearly labelled); the network counts below still come from the real feed */
+  /* demo: incidents AND network counts are sample numbers (clearly labelled); nothing real is shown as a demo KPI */
   if(demo){ window._revReal=[]; demoLive(c); }
   var DB='https://shomergency-default-rtdb.firebaseio.com';
   var initial=!_liveInitDone, reqC=c;
@@ -1488,7 +1490,7 @@ function loadLive(c){
     }); }
     /* 100% real metrics from the sanitized live feed. If the feed could not be read, show "—", never 0. */
     window._net={ok:!!obj, at:now, pres:netPres, ev:netEv, city:c.city};
-    window._liveStats=obj?{ onlineNow:Object.keys(onlineUsers).length, activeToday:Object.keys(active24).length,
+    window._liveStats=demo?DEMO_NET:obj?{ onlineNow:Object.keys(onlineUsers).length, activeToday:Object.keys(active24).length,
       territoryActive:Object.keys(active24Terr).length, onlineTerr:Object.keys(onlineTerrUsers).length,
       activeEvents:evList.length, reportersTerr:Object.keys(reps).length, outTerr24:Object.keys(outTerr24).length, at:now }:{at:now};
     window._liveNet=evList.length; window._liveReporters=window._liveStats.reportersTerr;
@@ -1772,7 +1774,7 @@ function buildReportHtml(){
    if(pc&&M.med) sum.push('עבירות לכל 1,000 תושבים: <b>'+pc.toFixed(1)+'</b> (העיר האמצעית בארץ: '+M.med.toFixed(1)+'; אוכלוסייה לפי הערכת למ״ס).'); }
  else sum.push('<b>אין נתוני פשיעה רשמיים</b> לטריטוריה זו — הדוח מבוסס על נתוני הרשת והאירועים בלבד.');
  sum.push('אירועים: <b>'+liveOpen+'</b> חיים ופתוחים · <b>'+revOpen+'</b> קודמים שעדיין פתוחים · '+evRows.length+' בסך הכול בדוח'+(exCount?' ('+exCount+' אירועי דוגמה הוחרגו)':'')+'.');
- if(netOk) sum.push('מכשירי <bdi>SH✡MER</bdi> מאומתים פעילים עד 18 ק״מ ממרכז העיר היום (מחצות): <b>'+v(S.territoryActive)+'</b>.');
+ if(netOk) sum.push('מכשירי <bdi>SH✡MER</bdi> מאומתים פעילים עד 18 ק״מ ממרכז העיר היום (מחצות): <b>'+v(S.territoryActive)+'</b>'+(S.demo?' (נתוני הדגמה)':'')+'.');
  /* ---------- limitations ---------- */
  var lim=['נתוני המשטרה הם עבירות <b>שנרשמו</b> ברמת העיר לשנת 2025 בלבד; אין בהם נתוני שנה קודמת, פילוח לשכונות או עבירות שלא דווחו.',
   'הדירוג והממוצע הארצי מחושבים בין '+ncit+' הערים שבמאגר בלבד, לא בין כל הרשויות בישראל.',
@@ -1809,7 +1811,7 @@ function buildReportHtml(){
   +'<div class="meta">'+ESC(org)+'<br>הופק: '+gen+(tz?' ('+ESC(tz)+')':'')+'<br>מצב: '+(demo?'דמו':live?'תצוגה חיה':'חשבון לקוח')+'</div></div>'
   +'<h1>דוח ביטחון קהילתי · תמונת מצב</h1>'
   +'<div class="terr">טריטוריה: <b>'+ESC(c.city)+'</b>'+(c.country?' · '+ESC(c.country):'')+(has?'':' · ללא נתוני פשיעה רשמיים')+'</div>'
-  +(demo?'<div class="badge">דוח הדגמה — אירועים המסומנים "הדגמה" הם מדומים. נתוני המשטרה ונתוני הרשת אמיתיים.</div>':'')
+  +(demo?'<div class="badge">דוח הדגמה — אירועים המסומנים "הדגמה" הם מדומים. נתוני המשטרה אמיתיים; מוני המכשירים ברשת הם נתוני הדגמה.</div>':'')
   +'<section><h2>1. תקציר</h2><ul class="sum">'+sum.map(function(s){return '<li>• '+s+'</li>';}).join('')+'</ul></section>'
   +'<section><h2>2. אירועים חיים ואחרונים · מצב וטיפול</h2>'+evTable+(exCount?'<p class="note">'+exCount+' אירועי דוגמה מלוח האירועים לא נכללו בדוח.</p>':'')+'</section>'
   +'<section><h2>3. אזורים חמים</h2>'+hot+'</section>'
@@ -1916,7 +1918,7 @@ function updateLiveBanner(){ try{ buildKPIs(DATA._idx!=null?DATA._idx:0); }catch
    Same definitions in every mode; full definitions live in the tooltip, so the short sub-labels never truncate. */
 function buildKPIs(idx){
  var c=cityAt(idx); if(!c)return; var cities=DATA._sorted, n=cities.length, has=hasStats(c);
- var S=window._liveStats||{}, demo=!!(CLIENT&&CLIENT.demo);
+ var demo=!!(CLIENT&&CLIENT.demo), S=demo?DEMO_NET:(window._liveStats||{}), DL=demo?'<small style="display:block;font-size:10px;color:var(--gold);font-weight:700">נתוני הדגמה</small>':'';
  function kc(l,v,m,cls,tip){ return '<div class="kpi" title="'+ESC(tip)+'"><div class="kl"><span>'+l+'</span></div><div class="kv '+(cls||'')+'">'+v+'</div><div class="km">'+m+'</div></div>'; }
  var sevCls=has?(idx<n/3?'bad':idx<n*2/3?'gold':'ok'):'';
  var ck=document.getElementById('kpis-crime');
@@ -1929,10 +1931,10 @@ function buildKPIs(idx){
  var ev=demo?window._demoLiveCount:S.activeEvents, hot=ev>0;
  var el=document.getElementById('kpis'); if(!el)return;
  el.innerHTML=''
-  +'<div class="nt nt-on" title="מכשירים מאומתים (SH✡MER v279+) שדיווחו מיקום ב-90 השניות האחרונות, בכל הרשת · מקור: רשת SH✡MER (זמן אמת) · נספרים מאז 22.10.2026"><div class="nl" style="white-space:normal;line-height:1.15"><i></i>מכשירים מחוברים כעת</div><div class="nv">'+v(S.onlineNow)+'</div><div class="ns">כל הרשת</div></div>'
+  +'<div class="nt nt-on" title="מכשירים מאומתים (SH✡MER v279+) שדיווחו מיקום ב-90 השניות האחרונות, בכל הרשת · מקור: רשת SH✡MER (זמן אמת) · נספרים מאז 22.10.2026"><div class="nl" style="white-space:normal;line-height:1.15"><i></i>מכשירים מחוברים כעת</div><div class="nv">'+v(S.onlineNow)+'</div><div class="ns">'+(demo?'נתוני הדגמה':'כל הרשת')+'</div></div>'
   +'<div class="nt-stack">'
-   +'<div class="nt-row" title="היום = מ-00:00 (שעון ישראל) ועד עכשיו. כל מכשיר מאומת שהיה פעיל בטווח הזה נספר פעם אחת, בכל הרשת. הספירה מתאפסת בחצות."><span class="nl" style="white-space:normal;line-height:1.15">מכשירים פעילים היום<small style="display:block;font-size:10px;color:var(--tx3);font-weight:400">00:00 עד עכשיו</small></span><span class="nv">'+v(S.activeToday)+'</span></div>'
-   +'<div class="nt-row" title="מכשירים עד 18 ק״מ ממרכז '+ESC(c.city)+': מחוברים כעת / פעילים היום (מחצות)"><span class="nl" style="white-space:normal;line-height:1.15">עד 18 ק״מ ממרכז העיר</span><span class="nv">'+v(S.onlineTerr)+'<small> / '+v(S.territoryActive)+'</small></span></div>'
+   +'<div class="nt-row" title="היום = מ-00:00 (שעון ישראל) ועד עכשיו. כל מכשיר מאומת שהיה פעיל בטווח הזה נספר פעם אחת, בכל הרשת. הספירה מתאפסת בחצות."><span class="nl" style="white-space:normal;line-height:1.15">מכשירים פעילים היום<small style="display:block;font-size:10px;color:var(--tx3);font-weight:400">00:00 עד עכשיו</small>'+DL+'</span><span class="nv">'+v(S.activeToday)+'</span></div>'
+   +'<div class="nt-row" title="מכשירים עד 18 ק״מ ממרכז '+ESC(c.city)+': מחוברים כעת / פעילים היום (מחצות)"><span class="nl" style="white-space:normal;line-height:1.15">עד 18 ק״מ ממרכז העיר'+DL+'</span><span class="nv">'+v(S.onlineTerr)+'<small> / '+v(S.territoryActive)+'</small></span></div>'
   +'</div>'
   +'<div class="nt nt-ev'+(hot?' hot':'')+'"'+(hot?' onclick="boardFocusLive()"':'')+' title="אירועים פתוחים מהרשת עד 18 ק״מ ממרכז העיר ב-24 השעות האחרונות'+(demo?' · בדמו: אירועי הדגמה':'')+'"><div class="nl">אירועים חיים</div><div class="nv">'+v(ev)+'</div><div class="ns">'+(demo?'הדגמה':(hot?'לטיפול עכשיו':(ev===0?'אין כרגע':'24 שעות')))+'</div></div>';
  try{ renderUserPanel(); }catch(e){}
@@ -2329,7 +2331,7 @@ function recItems(idx,fk,noEx){
    var sec=ranked[0];
    if(sec&&sec.r>1.12&&sec.cs>=0.05) out.push({cls:'flag',i:'▲',t:catPlain(sec.k)+' — יותר מהממוצע בארץ',d:Math.round(sec.cs*100)+'% כאן לעומת '+Math.round(sec.ns*100)+'% בארץ. '+(ACT_PLAIN[sec.k]||''),why:'משטרת ישראל 2025'});
  }
- if(S.territoryActive!=null) out.push({cls:'info',i:'◉',t:'מכשירים פעילים היום עד 18 ק״מ ממרכז העיר: '+S.territoryActive,d:S.territoryActive<10?'כיסוי נמוך — לגייס מתנדבים ולהפיץ את האפליקציה בשכונות.':'יש כיסוי — אפשר להיעזר בשומרים לדיווח מהיר מהשטח.',why:'רשת SH✡MER · מכשירים מאומתים (v279+) פעילים היום (מחצות), עד 18 ק״מ ממרכז העיר · נספרים מאז 22.10.2026'});
+ if(S.territoryActive!=null) out.push({cls:'info',i:'◉',t:'מכשירים פעילים היום עד 18 ק״מ ממרכז העיר: '+S.territoryActive+(S.demo?' (נתוני הדגמה)':''),d:S.territoryActive<10?'כיסוי נמוך — לגייס מתנדבים ולהפיץ את האפליקציה בשכונות.':'יש כיסוי — אפשר להיעזר בשומרים לדיווח מהיר מהשטח.',why:'רשת SH✡MER · מכשירים מאומתים (v279+) פעילים היום (מחצות), עד 18 ק״מ ממרכז העיר · נספרים מאז 22.10.2026'});
  return out;
 }
 function closeRecDetail(){ var o=document.getElementById('rec-ov'); if(o)o.remove(); }
