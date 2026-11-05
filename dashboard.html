@@ -234,7 +234,9 @@
   .leaflet-pulse{border-radius:50%;animation:lpulse 1.6s infinite}
   @keyframes lpulse{0%{box-shadow:0 0 0 0 rgba(239,72,83,.55)}70%{box-shadow:0 0 0 13px rgba(239,72,83,0)}100%{box-shadow:0 0 0 0 rgba(239,72,83,0)}}
   /* ---------- small screens: allow scroll ---------- */
+  body.demo-on{padding-top:var(--demo-h,0px)}body.demo-on #app{height:calc(100vh - var(--demo-h,0px))}
   @media(max-width:1100px){
+    body.demo-on #app{height:auto;min-height:calc(100vh - var(--demo-h,0px))}
     body{overflow:auto}#app{height:auto;min-height:100vh;overflow:visible}
     .cmd-grid{grid-template-columns:1fr;grid-template-rows:none;grid-template-areas:"net" "crime" "prof" "map" "feed" "recs" "graph" "donut" "rank"}
     .cmd-grid>*{min-height:240px}.c-net,.c-crime,.c-prof{min-height:120px}.c-map{min-height:420px}
@@ -727,7 +729,7 @@ var DEMO_INC=[
 async function demoBoot(){
   await loadData();
   CLIENT={org:'עיריית תל אביב-יפו · דמו', territory:'תל אביב יפו', email:'demo', demo:true};
-  try{ if(!document.getElementById('demo-banner')){ var _db=document.createElement('div'); _db.id='demo-banner'; _db.textContent='נתוני הדגמה — חלק מהגרפים מציגים נתוני אמת ומסומנים כך'; _db.style.cssText='position:fixed;top:0;left:50%;transform:translateX(-50%);z-index:3000;background:#b3202d;color:#fff;font:800 13px Alef,system-ui,sans-serif;padding:5px 18px;border-radius:0 0 10px 10px;box-shadow:0 4px 14px rgba(0,0,0,.45);pointer-events:none'; document.body.appendChild(_db); } }catch(_e){}
+  try{ if(!document.getElementById('demo-banner')){ var _db=document.createElement('div'); _db.id='demo-banner'; _db.textContent='נתוני הדגמה — חלק מהגרפים מציגים נתוני אמת ומסומנים כך'; _db.style.cssText='position:fixed;top:0;left:50%;transform:translateX(-50%);z-index:3000;background:#b3202d;color:#fff;font:800 13px Alef,system-ui,sans-serif;padding:5px 18px;border-radius:0 0 10px 10px;box-shadow:0 4px 14px rgba(0,0,0,.45);pointer-events:none'; document.body.appendChild(_db); var _dh=function(){ try{ document.documentElement.style.setProperty('--demo-h',_db.offsetHeight+'px'); }catch(e){} }; _dh(); document.body.classList.add('demo-on'); window.addEventListener('resize',_dh); } }catch(_e){}
   document.getElementById('gate').classList.add('hidden');
   document.getElementById('app').classList.remove('hidden');
   document.getElementById('terr-name').textContent=CLIENT.territory;
