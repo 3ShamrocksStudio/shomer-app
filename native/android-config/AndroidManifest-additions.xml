@@ -70,5 +70,7 @@
     <category android:name="android.intent.category.DEFAULT" />
     <category android:name="android.intent.category.BROWSABLE" />
     <data android:scheme="https" android:host="www.shomer-app.co.il" android:pathPrefix="/i" />
-    <data android:scheme="https" android:host="shomer-app.co.il" android:pathPrefix="/i" />
+    <!-- apex shomer-app.co.il removed: it 301-redirects to www, so Android/Play
+         can't verify it (assetlinks must be served without redirects). The app
+         only ever generates www invite links. -->
 </intent-filter>
