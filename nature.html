@@ -351,10 +351,17 @@ document.addEventListener('keydown',function(e){
 (function(){
   var io=new IntersectionObserver(function(es){es.forEach(function(e){
     if(e.isIntersecting){e.target.style.opacity='1';e.target.style.transform='none';io.unobserve(e.target);}})},{threshold:.14});
-  document.querySelectorAll('.step,.val,.sec-head').forEach(function(e,n){
+  var els=document.querySelectorAll('.step,.val,.sec-head');
+  function showAll(){ els.forEach(function(e){ e.style.opacity='1'; e.style.transform='none'; try{io.unobserve(e);}catch(_){} }); }
+  /* never leave content hidden: reduced motion = no animation; anything not yet revealed shows after 2.5 s
+     (full-page screenshots, readers that jump, slow observers) and before printing */
+  if(window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  els.forEach(function(e,n){
+    if(e.getBoundingClientRect().top<innerHeight) return;   /* already on screen or above: no hide */
     e.style.opacity='0';e.style.transform='translateY(16px)';
     e.style.transition='opacity .65s ease '+(n%3*.08)+'s, transform .65s ease '+(n%3*.08)+'s';
     io.observe(e);});
+  setTimeout(showAll,2500); window.addEventListener('beforeprint',showAll);
 })();
 </script>
 </body>
