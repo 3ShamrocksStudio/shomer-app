@@ -2184,12 +2184,18 @@ body.otp-active .ob-steps{display:none!important;}
  <div class="set-grp"><div class="set-row" onclick="opFrom('sh-checkin','sh-set');try{reflectCheckin()}catch(e){}" role="button" tabindex="0"><div class="sr-l"><div class="sr-ic"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3l7 3v5c0 5-3.4 8.5-7 10-3.6-1.5-7-5-7-10V6Z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><path d="M9 12l2 2 4-4" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div><div class="sr-nm" data-he="צ׳ק-אין הדדי (עם שומר/ת)" data-en="Mutual check-in (with a SHOMER)">צ׳ק-אין הדדי</div><div class="sr-sb" data-he="„הכל טוב??” תקופתי - אם לא תאשר/י, השומר/ת מקבל/ה אזעקה." data-en="Periodic 'Are you OK?' - if you don't confirm, your SHOMER is alerted.">„הכל טוב??” תקופתי.</div></div></div><span id="ci-set-state" style="font-size:12px;font-weight:700;color:var(--tx3);white-space:nowrap">כבוי</span></div></div>
  <div class="sec-cap mb12" id="shake-set-lbl">Shake-to-SOS</div>
  <div class="set-grp">
- <div class="set-row"><div class="sr-l"><div class="sr-ic"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M13 2L4 14h6l-1 8 9-12h-6Z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></svg></div><div><div class="sr-nm" id="shake-tog-lbl">הפעל Shake-to-SOS</div><div class="sr-sb" id="shake-tog-sub">5 ניעורים חזקים → SOS</div></div></div><div class="tog on" id="shake-tog" onclick="toggleShake(this)" role="switch"></div></div>
+ <div class="set-row"><div class="sr-l"><div class="sr-ic"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M13 2L4 14h6l-1 8 9-12h-6Z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></svg></div><div><div class="sr-nm" id="shake-tog-lbl">הפעל Shake-to-SOS</div><div class="sr-sb" id="shake-tog-sub">3 ניעורים → SOS</div></div></div><div class="tog on" id="shake-tog" onclick="toggleShake(this)" role="switch"></div></div>
+ <div class="set-row"><div class="sr-l"><div class="sr-ic"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M11 5L6 9H3v6h3l5 4z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><path d="M16 9l5 6M21 9l-5 6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></div><div><div class="sr-nm" id="shake-silent-nm">מצב שקט</div><div class="sr-sb" id="shake-silent-sb">ניעור שולח SOS בלי צפירה בטלפון שלך. המעגל שלך עדיין מקבל התראה. הספירה לאחור ברטט בלבד.</div></div></div><div class="tog" id="shake-silent-tog" onclick="toggleShakeSilent(this)" role="switch" aria-label="silent mode"></div></div>
  </div>
  <div class="sl-card mb20">
  <div class="vol-row"><span class="vol-lbl" id="shake-sens-lbl">רגישות ניעור</span><span class="vol-val" id="shake-sens-v">בינונית</span></div>
- <input type="range" id="shake-sens" min="12" max="30" value="24" aria-label="shake sensitivity" oninput="setShakeSens(this.value)">
- <div style="display:flex;justify-content:space-between;font-size:10px;color:var(--tx3);margin-top:6px"><span>נמוכה</span><span>גבוהה</span></div>
+ <div class="dms-intervals" id="shake-sens-presets" role="radiogroup" aria-label="shake sensitivity" style="margin-bottom:10px">
+ <div class="dms-iv" data-sens="low" onclick="setShakeSens('low')" role="radio" tabindex="0"><div class="dms-iv-n" style="font-size:16px">נמוכה</div><div class="dms-iv-l">3 ניעורים חזקים</div></div>
+ <div class="dms-iv sel" data-sens="medium" onclick="setShakeSens('medium')" role="radio" tabindex="0"><div class="dms-iv-n" style="font-size:16px">בינונית</div><div class="dms-iv-l">3 ניעורים</div></div>
+ <div class="dms-iv" data-sens="high" onclick="setShakeSens('high')" role="radio" tabindex="0"><div class="dms-iv-n" style="font-size:16px">גבוהה</div><div class="dms-iv-l">2 ניעורים מהירים</div></div>
+ </div>
+ <div class="sr-sb" id="shake-sens-help" style="line-height:1.5">3 ניעורים נחרצים. ריצה והליכה לא מפעילות.</div>
+ <div class="sr-sb" id="shake-cd-note" style="line-height:1.5;margin-top:4px">לפני כל שליחה: ספירה לאחור עם כפתור ביטול.</div>
  <button class="test-alarm-btn" style="margin-top:12px" onclick="simulateShake()" id="sim-shake-btn"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M13 2L4 14h6l-1 8 9-12h-6Z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></svg><span id="sim-shake-lbl">סימולציית ניעור (בדיקה)</span></button>
  </div>
  <div class="sec-cap mb12" id="sos-safety-cap">בטיחות SOS</div>
@@ -2428,10 +2434,10 @@ body.otp-active .ob-steps{display:none!important;}
  <button class="call-btn" onclick="callNum('1202')"><div class="cc-ic"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3l7 3v5c0 5-3.4 8.5-7 10-3.6-1.5-7-5-7-10V6Z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></svg></div><div><div class="cc-nm" data-he="1202 - שב&quot;כ" data-en="1202 - Shin Bet">1202 - שב"כ</div><div class="cc-sb" data-he="אירוע ביטחוני" data-en="Security incident">אירוע ביטחוני</div></div></button>
  <div class="lock-card">
  <div class="lc-t"><svg class="ic" style="color:var(--g3)" viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="11" width="14" height="9" rx="2" fill="none" stroke="currentColor" stroke-width="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3" fill="none" stroke="currentColor" stroke-width="2"/></svg> <span data-he="SOS מנעילת מסך - ללא פתיחת אפליקציה" data-en="SOS from the lock screen - no need to open the app">SOS מנעילת מסך - ללא פתיחת אפליקציה</span></div>
- <div class="lc-b" data-i18n-html="1" data-he="<strong>iPhone:</strong> לחץ 3× על כפתור הצד → Emergency SOS.<br><strong>Android:</strong> לחץ 5× על כפתור ההפעלה → Emergency SOS.<br><strong>שומר Shake:</strong> ניעור 5× חזק מפעיל SOS אוטומטי.<br>הגדר 100 כאיש קשר חירום ראשון בטלפון." data-en="<strong>iPhone:</strong> press the side button 3× → Emergency SOS.<br><strong>Android:</strong> press the power button 5× → Emergency SOS.<br><strong>SHOMER Shake:</strong> 5 hard shakes triggers an automatic SOS.<br>Set 100 as your phone's primary emergency contact.">
+ <div class="lc-b" data-i18n-html="1" data-he="<strong>iPhone:</strong> לחץ 3× על כפתור הצד → Emergency SOS.<br><strong>Android:</strong> לחץ 5× על כפתור ההפעלה → Emergency SOS.<br><strong>שומר Shake:</strong> ניעור 3× מפעיל SOS אוטומטי.<br>הגדר 100 כאיש קשר חירום ראשון בטלפון." data-en="<strong>iPhone:</strong> press the side button 3× → Emergency SOS.<br><strong>Android:</strong> press the power button 5× → Emergency SOS.<br><strong>SHOMER Shake:</strong> 3 shakes trigger an automatic SOS.<br>Set 100 as your phone's primary emergency contact.">
  <strong>iPhone:</strong> לחץ 3× על כפתור הצד → Emergency SOS.<br>
  <strong>Android:</strong> לחץ 5× על כפתור ההפעלה → Emergency SOS.<br>
- <strong>שומר Shake:</strong> ניעור 5× חזק מפעיל SOS אוטומטי.<br>
+ <strong>שומר Shake:</strong> ניעור 3× מפעיל SOS אוטומטי.<br>
  הגדר 100 כאיש קשר חירום ראשון בטלפון.
  </div>
  </div>
@@ -2878,7 +2884,7 @@ const LANGS={
  geo_allow:'שתף מיקום',geo_next:'← כניסה למפה',geo_retry:' נסה שוב',geo_skip:'דלג – המשך בלי שיתוף מיקום',
  al1:'אזעקת SOS · שומר',al1d:'צליל החירום הייחודי - סירנה מתגברת, דיסוננטית ובלתי-נשכחת',al2:'',al2d:'',al3:'',al3d:'',
  vol:'עוצמת קול',test:'בדוק אזעקה',finish:'✓ כניסה לשומר',back:'← חזרה',
- shake:'<strong>Shake-to-SOS:</strong> 5 ניעורים חזקים מפעילים SOS אוטומטי.',
+ shake:'<strong>Shake-to-SOS:</strong> 3 ניעורים מפעילים SOS אוטומטי.',
  dms_ob:'<strong>Dead Man\'s Switch:</strong> אם לא אישרת "הכל טוב?" תוך X דק׳ - SOS אוטומטי.',
  nav_map:'מפה',nav_sos:'חירום מיידי',nav_upd:'באזור שלי',
  dd_rep:'דיווח אירוע',dd_dms:"שומר אוטומטי",dd_alarm:'הגדרות אזעקה',dd_prof:'פרופיל',dd_set:'הגדרות',dd_em:'מספרי חירום',
@@ -2911,7 +2917,7 @@ const LANGS={
  geo_allow:'Share location',geo_next:'Enter the map →',geo_retry:' Retry',geo_skip:'Skip – continue without sharing',
  al1:'SHOMER SOS alarm',al1d:'Our signature emergency sound - escalating, dissonant, unmistakable',al2:'',al2d:'',al3:'',al3d:'',
  vol:'Volume',test:'Test alarm',finish:'✓ Enter Shomer',back:'← Back',
- shake:'<strong>Shake-to-SOS:</strong> 5 hard shakes trigger automatic SOS.',
+ shake:'<strong>Shake-to-SOS:</strong> 3 shakes trigger automatic SOS.',
  dms_ob:"<strong>Auto-SHOMER:</strong> We ask 'All good?' every X min. No answer - we alert your SHOMERs.",
  nav_map:'Map',nav_sos:'Emergency',nav_upd:'Around me',
  dd_rep:'Report incident',dd_dms:"שומר אוטומטי",dd_alarm:'Alarm settings',dd_prof:'Profile',dd_set:'Settings',dd_em:'Emergency numbers',
@@ -2944,7 +2950,7 @@ const LANGS={
  geo_allow:'شارك الموقع',geo_next:'ادخل إلى الخريطة ←',geo_retry:' أعد المحاولة',geo_skip:'تخطّي - المتابعة بدون مشاركة الموقع',
  al1:'إنذار SOS · شومير',al1d:'صوت الطوارئ المميّز - تصاعدي، نشاز، لا يُنسى',al2:'',al2d:'',al3:'',al3d:'',
  vol:'مستوى الصوت',test:'اختبار الإنذار',finish:'✓ الدخول لشومير',back:'← رجوع',
- shake:'<strong>هز للاستغاثة:</strong> 5 هزات قوية تُفعّل نداء الاستغاثة تلقائياً.',
+ shake:'<strong>هز للاستغاثة:</strong> 3 هزات تُفعّل نداء الاستغاثة تلقائياً.',
  dms_ob:'<strong>مفتاح الأمان الميت:</strong> إذا لم تؤكد خلال X دقائق - إرسال تلقائي لنداء الاستغاثة.',
  nav_map:'الخريطة',nav_sos:'طوارئ',nav_upd:'في منطقتي',
  dd_rep:'الإبلاغ عن حادثة',dd_dms:'مفتاح الأمان الميت',dd_alarm:'إعدادات الإنذار',dd_prof:'الملف الشخصي',dd_set:'الإعدادات',dd_em:'أرقام الطوارئ',
@@ -2977,7 +2983,7 @@ const LANGS={
  geo_allow:'Разрешить геолокацию',geo_next:'Далее →',geo_retry:' Повторить',geo_skip:'Пропустить',
  al1:'Полицейская сирена',al1d:'440→1800Hz - самый узнаваемый',al2:'Сигнал тревоги',al2d:'1200Hz вспышки',al3:'Быстрые импульсы',al3d:'2800Hz - самый резкий',
  vol:'Громкость',test:'Тест сигнала',finish:'✓ Войти в Shomer',back:'← Назад',
- shake:'<strong>Встряска для SOS:</strong> 5 сильных встряхиваний запускают SOS.',
+ shake:'<strong>Встряска для SOS:</strong> 3 встряхивания запускают SOS.',
  dms_ob:'<strong>Мёртвая рука:</strong> Нет ответа через X мин - автоматический SOS.',
  nav_map:'Карта',nav_sos:'Тревога',nav_upd:'Обновления',
  dd_rep:'Сообщить об инциденте',dd_dms:'Мёртвая рука',dd_alarm:'Настройки сигнала',dd_prof:'Профиль',dd_set:'Настройки',dd_em:'Экстренные номера',
@@ -3010,7 +3016,7 @@ const LANGS={
  geo_allow:'የቦታ ፍቃድ ፍቀድ',geo_next:'ቀጣይ →',geo_retry:' እንደገና ሞክር',geo_skip:'ዝለል',
  al1:'የፖሊስ ሳይረን',al1d:'440→1800Hz - በቀላሉ ይታወቃል',al2:'አደጋ ጊዜ ቀንድ',al2d:'1200Hz - ትኩረት ይስባል',al3:'ፈጣን ምቶች',al3d:'2800Hz - በጣም ጎርጓሪ',
  vol:'ድምፅ ደረጃ',test:'ማንቂያ ሙከራ',finish:'✓ ወደ Shomer ግባ',back:'← ተመለስ',
- shake:'<strong>ወዝ-ወዝ ለ SOS:</strong> 5 ጠንካራ ወዝ-ወዝ SOS ያስጀምራል።',
+ shake:'<strong>ወዝ-ወዝ ለ SOS:</strong> 3 ወዝ-ወዝ SOS ያስጀምራል።',
  dms_ob:'<strong>שומר אוטומטי:</strong> X ደቂቃ ውስጥ ካልተረጋገጠ - SOS ይላካል።',
  nav_map:'ካርታ',nav_sos:'አደጋ',nav_upd:'ዜናዎች',
  dd_rep:'ክስተት ሪፖርት',dd_dms:'שומר אוטומטי',dd_alarm:'የማንቂያ ቅንጅቶች',dd_prof:'መገለጫ',dd_set:'ቅንጅቶች',dd_em:'አደጋ ጊዜ ቁጥሮች',
@@ -3043,7 +3049,7 @@ const LANGS={
  geo_allow:'Autoriser la localisation',geo_next:'Continuer →',geo_retry:' Réessayer',geo_skip:'Ignorer',
  al1:'Sirène de police',al1d:'440→1800Hz - la plus reconnaissable',al2:'Klaxon d\'urgence',al2d:'1200Hz - capteur d\'attention',al3:'Impulsions rapides',al3d:'2800Hz - le plus agressif',
  vol:'Volume',test:'Tester l\'alarme',finish:'✓ Entrer dans Shomer',back:'← Retour',
- shake:'<strong>Secouer pour SOS:</strong> 5 secousses fortes déclenchent un SOS automatique.',
+ shake:'<strong>Secouer pour SOS:</strong> 3 secousses déclenchent un SOS automatique.',
  dms_ob:"<strong>שומר אוטומטי:</strong> Si pas de confirmation en X min - SOS automatique.",
  nav_map:'Carte',nav_sos:'Urgence',nav_upd:'Mises à jour',
  dd_rep:'Signaler un incident',dd_dms:"שומר אוטומטי",dd_alarm:"Paramètres d'alarme",dd_prof:'Profil',dd_set:'Paramètres',dd_em:"Numéros d'urgence",
@@ -3158,7 +3164,7 @@ const AR={
  '102 - Fire & Rescue':'102 - الإطفاء والإنقاذ'/*SAFETY*/,'Fire / rescue':'حريق / إنقاذ'/*SAFETY*/,
  '1201 - ZAKA':'1201 - زاكا'/*SAFETY*/,'Accidents & disasters':'حوادث وكوارث'/*SAFETY*/,'1202 - Shin Bet':'1202 - الشاباك'/*SAFETY*/,'Security incident':'حادث أمني'/*SAFETY*/,
  'SOS from the lock screen - no need to open the app':'استغاثة من شاشة القفل - دون فتح التطبيق'/*SAFETY*/,
- '<strong>iPhone:</strong> press the side button 3× → Emergency SOS.<br><strong>Android:</strong> press the power button 5× → Emergency SOS.<br><strong>SHOMER Shake:</strong> 5 hard shakes triggers an automatic SOS.<br>Set 100 as your phone\'s primary emergency contact.':'<strong>آيفون:</strong> اضغط الزر الجانبي 3 مرات ← استغاثة طارئة.<br><strong>أندرويد:</strong> اضغط زر التشغيل 5 مرات ← استغاثة طارئة.<br><strong>هزّة شومير:</strong> 5 هزّات قوية تُفعّل استغاثة تلقائية.<br>اجعل 100 جهة الطوارئ الأساسية في هاتفك.'/*SAFETY*/,
+ '<strong>iPhone:</strong> press the side button 3× → Emergency SOS.<br><strong>Android:</strong> press the power button 5× → Emergency SOS.<br><strong>SHOMER Shake:</strong> 3 shakes trigger an automatic SOS.<br>Set 100 as your phone\'s primary emergency contact.':'<strong>آيفون:</strong> اضغط الزر الجانبي 3 مرات ← استغاثة طارئة.<br><strong>أندرويد:</strong> اضغط زر التشغيل 5 مرات ← استغاثة طارئة.<br><strong>هزّة شومير:</strong> 3 هزّات تُفعّل استغاثة تلقائية.<br>اجعل 100 جهة الطوارئ الأساسية في هاتفك.'/*SAFETY*/,
  // ── Settings long-tail (deep labels) ──
  'Dead Man\'s Switch':'مفتاح الأمان الميت',
  'Show a live route + distance when responding to an SOS. For verified responders/SHOMERs - not a replacement for 100/101/102.':'أظهر مساراً مباشراً + المسافة عند الاستجابة لنداء استغاثة. للمستجيبين/الحُرّاس المُوثَّقين - وليس بديلاً عن 100/101/102.'/*SAFETY*/,
@@ -3344,7 +3350,7 @@ let SS={
  lang:'he',
  user:{name:'',phone:'',profession:'',gender:'',ageBand:'',residency:''},
  alarm:{type:'shomer',vol:0.6},
- shake:{enabled:true,level:24},
+ shake:{enabled:true,silent:false},   /* v333: sens 'low'|'medium'|'high' set by the user; an old numeric `level` maps across (shakeSens) */
  dms:{interval:5,active:false,deadline:0},
  settings:{radius:5,toggles:{}},
  /* Safety PIN: required to cancel an ACTIVE SOS. NEVER biometric (an unconscious user must
@@ -3470,7 +3476,6 @@ function applyStoredSettings(){
  });
  // Shake UI
  const st=document.getElementById('shake-tog');if(st)st.classList.toggle('on',SS.shake.enabled!==false);
- const ssl=document.getElementById('shake-sens');if(ssl)ssl.value=shakeLevel();
  updateShakeSensLabel();
  // Settings toggles
  document.querySelectorAll('.tog[data-skey]').forEach(t=>{
@@ -3494,7 +3499,7 @@ function reflectAlarmSelection(){
  });
 }
 function reflectDmsSelection(){
- document.querySelectorAll('.dms-iv').forEach(d=>{
+ document.querySelectorAll('.dms-iv[data-min]').forEach(d=>{
  const m=Number(d.getAttribute('data-min'));
  d.classList.toggle('sel',m===dmsIv);
  });
@@ -3506,14 +3511,27 @@ function reflectDmsSelection(){
    the SOS: a sprint with the phone in hand produces the same peak magnitudes as a
    shake. Simulated across running 2-4g at 2.5-3Hz, 18 m/s^2 with 8 required peaks
    cut false fires by about half with no loss of real shakes, including weak ones. */
-function shakeLevel(){ var l=SS.shake&&SS.shake.level; return (l>=12&&l<=30)?+l:24; }
-function shakeThreshold(){ return 42-shakeLevel(); }
+/* v333: three named levels (SHAKE_LEVELS) replace the raw slider. A saved v286-v332 slider
+   value keeps its meaning: it showed Low below 21 and High above 27. */
+function shakeSens(){ var s=SS.shake||{}; if(s.sens==='low'||s.sens==='medium'||s.sens==='high') return s.sens; var l=+s.level; if(l>=12&&l<=30) return l<21?'low':(l>27?'high':'medium'); return 'medium'; }
+function shakeSilent(){ return !!(SS.shake&&SS.shake.silent); }
 function updateShakeSensLabel(){
- const v=shakeLevel();
- const he=currentLang==='he';
- let lbl=he?'בינונית':'Medium';
- if(v<21)lbl=he?'נמוכה':'Low';else if(v>27)lbl=he?'גבוהה':'High';
- setText('shake-sens-v',lbl);
+ var lv=shakeSens(), he=currentLang==='he', ar=currentLang==='ar';
+ var L=function(h,a,e){ return he?h:ar?a:e; };
+ var nm={low:L('נמוכה','منخفضة','Low'),medium:L('בינונית','متوسطة','Medium'),high:L('גבוהה','عالية','High')};
+ var cnt={low:L('3 ניעורים חזקים','3 هزّات قوية','3 strong shakes'),medium:L('3 ניעורים','3 هزّات','3 shakes'),high:L('2 ניעורים מהירים','هزّتان سريعتان','2 quick shakes')};
+ var help={low:L('צריך 3 ניעורים חזקים תוך 2 שניות. ריצה והליכה לא מפעילות.','تحتاج 3 هزّات قوية خلال ثانيتين. الجري والمشي لا يُفعّلانها.','Needs 3 strong shakes within 2 seconds. Running and walking won\'t set it off.'),
+   medium:L('3 ניעורים נחרצים. ריצה והליכה לא מפעילות.','3 هزّات حازمة. الجري والمشي لا يُفعّلانها.','3 firm shakes. Running and walking won\'t set it off.'),
+   high:L('2 ניעורים מהירים. הכי רגיש - ריצה מהירה עלולה להפעיל.','هزّتان سريعتان. الأكثر حساسية - قد يُفعّلها الجري السريع.','2 quick shakes. Most sensitive - a fast run may set it off.')};
+ var t=function(id,v){ var e=document.getElementById(id); if(e) e.textContent=v; };
+ t('shake-sens-v',nm[lv]); t('shake-sens-help',help[lv]);
+ t('shake-tog-sub',cnt[lv]+(ar?' ← ':' → ')+'SOS');
+ document.querySelectorAll('#shake-sens-presets .dms-iv').forEach(function(d){ var k=d.getAttribute('data-sens'); d.classList.toggle('sel',k===lv); d.setAttribute('aria-checked',k===lv?'true':'false');
+   var n=d.querySelector('.dms-iv-n'), l=d.querySelector('.dms-iv-l'); if(n) n.textContent=nm[k]; if(l) l.textContent=cnt[k]; });
+ t('shake-silent-nm',L('מצב שקט','الوضع الصامت','Silent mode'));
+ t('shake-silent-sb',L('ניעור שולח SOS בלי צפירה בטלפון שלך. המעגל שלך עדיין מקבל התראה. הספירה לאחור ברטט בלבד.','الهزّ يرسل الاستغاثة بدون صفارة على هاتفك. دائرتك تتلقى التنبيه كالمعتاد. العدّ التنازلي بالاهتزاز فقط.','A shake sends the SOS with no siren on your phone. Your circle is still alerted. The countdown only vibrates.'));
+ t('shake-cd-note',L('לפני כל שליחה: ספירה לאחור עם כפתור ביטול.','قبل أي إرسال: عدّ تنازلي مع زر إلغاء.','Before anything is sent: a countdown with a Cancel button.'));
+ var st=document.getElementById('shake-silent-tog'); if(st) st.classList.toggle('on',shakeSilent());
 }
 
 /* ── Generic settings toggle persistence ── */
@@ -3535,15 +3553,25 @@ function toggleShake(el){
  toast(SS.shake.enabled?(currentLang==='he'?' Shake-to-SOS פעיל':' Shake-to-SOS on'):(currentLang==='he'?'Shake-to-SOS כבוי':'Shake-to-SOS off'),SS.shake.enabled?'grn':'');
 }
 function setShakeSens(v){
- SS.shake.level=Number(v);
+ if(v!=='low'&&v!=='medium'&&v!=='high') return;
+ SS.shake.sens=v; delete SS.shake.level;
  updateShakeSensLabel();
  saveStore();
+ try{ shakeNativeConfig(); }catch(e){}
 }
-/* Manual trigger for desktop testing - behaves like 5 real shakes. */
+function toggleShakeSilent(el){
+ el.classList.toggle('on');
+ SS.shake.silent=el.classList.contains('on');
+ saveStore();
+ try{ shakeNativeConfig(); }catch(e){}
+ var he=currentLang==='he', ar=currentLang==='ar';
+ toast(SS.shake.silent?(he?'מצב שקט פעיל - ניעור ישלח SOS בלי צפירה':ar?'الوضع الصامت مفعّل - الهزّ يرسل بدون صفارة':'Silent mode on - a shake sends SOS with no siren'):(he?'מצב שקט כבוי':ar?'الوضع الصامت متوقف':'Silent mode off'),SS.shake.silent?'grn':'');
+}
+/* Manual trigger for desktop testing - behaves like a real shake (honours Silent mode). */
 function simulateShake(){
  try{ shakeArmPermission(); }catch(e){}   // also arm real motion permission from this tap (iOS)
  toast(currentLang==='he'?' ניעור זוהה':' Shake detected','amb');
- if(sosActive&&window._sosSilent){ try{ sosGoLoud(); }catch(_){} } else if(!sosActive)setTimeout(()=>triggerSOS('shake'),400);
+ if(sosActive&&window._sosSilent){ if(!shakeSilent()){ try{ sosGoLoud(); }catch(_){} } } else if(!sosActive)setTimeout(()=>triggerSOS('shake'),400);
 }
 
 /* ── Alarm settings persistence ── */
@@ -4024,7 +4052,6 @@ function applyTranslations(){
  const he=currentLang==='he', ar=currentLang==='ar';
  setText('shake-set-lbl',he?'Shake-to-SOS':'Shake-to-SOS');
  setText('shake-tog-lbl',he?'הפעל Shake-to-SOS':'Enable Shake-to-SOS');
- setText('shake-tog-sub',he?'5 ניעורים חזקים → SOS':'5 hard shakes → SOS');
  setText('shake-sens-lbl',he?'רגישות ניעור':'Shake sensitivity');
  setText('sim-shake-lbl',he?'סימולציית ניעור (בדיקה)':'Simulate shake (test)');
  setText('set-radius-lbl',he?'רדיוס התראה':'Alert radius');
@@ -4990,7 +5017,7 @@ function pushNotify(title,body,tag){
 /* ═══════════════════════════════════
  SHAKE-TO-SOS
 ═══════════════════════════════════ */
-let shakeStarted=false, _shakeGrav={x:0,y:0,z:0};
+let shakeStarted=false;
 /* iOS 13+ only DELIVERS devicemotion after requestPermission() is called from a REAL user
    gesture. Booting the listener silently (as before) meant shake never worked on iPhone.
    So: Android/desktop start immediately; iOS is armed from a tap (the Shake toggle, the
@@ -5006,35 +5033,69 @@ function shakeArmPermission(cb){
    } else { startShakeDetection(); if(cb)cb('granted'); }
  }catch(e){ if(cb)cb('error'); }
 }
+/*SHAKE-DETECTOR-BEGIN - v333 pattern detector. Mirrored 1:1 in native ShakeDetector.java; unit tests: tests/shake-detector.test.js */
+/* A shake is a fast BACK-AND-FORTH: strong acceleration peaks whose direction flips each
+   time, a short time apart. Running and walking make peaks too, but their strong peaks
+   repeat in the SAME direction (foot strikes) or swing back and forth too slowly (arm
+   swing), so they never build the chain. Peak strength alone is not enough: a sprint
+   with the phone in hand peaks as high as a shake.
+     thr   m/s² (gravity removed) a peak must exceed
+     peaks alternating peaks needed (2 = one back-and-forth shake)
+     win   ms they must all fall inside
+     gap   ms max between two alternating peaks (arm swing while running is ~330-450)
+     dur   ms max time a single peak may stay above thr (a long push is not a shake) */
+var SHAKE_LEVELS={
+ low:   {thr:21, peaks:5, win:2000, gap:280, dur:260},   /* 3 strong shakes within 2 s (the last stroke of a shake is always weaker, so 5 of its 6 peaks) */
+ medium:{thr:17, peaks:5, win:2000, gap:300, dur:280},   /* 3 firm shakes */
+ high:  {thr:13, peaks:4, win:1500, gap:300, dur:300}    /* 2 quick shakes (may also fire on a hard sprint - said so in Settings) */
+};
+function ShakeDetector(level){
+ var cfg=SHAKE_LEVELS[level]||SHAKE_LEVELS.medium, g=null, ep=null, chain=[];
+ function cosv(a,b){ var d=a.x*b.x+a.y*b.y+a.z*b.z, n=Math.sqrt((a.x*a.x+a.y*a.y+a.z*a.z)*(b.x*b.x+b.y*b.y+b.z*b.z)); return n?d/n:1; }
+ function peak(p){
+   var last=chain.length?chain[chain.length-1]:null, dt=last?p.t-last.t:0;
+   if(last && dt>=50 && dt<=cfg.gap && cosv(p.v,last.v)< -0.5) chain.push(p); else chain=[p];
+   while(chain.length && p.t-chain[0].t>cfg.win) chain.shift();
+   if(chain.length>=cfg.peaks){ chain=[]; return true; }
+   return false;
+ }
+ return {
+   setLevel:function(l){ var c=SHAKE_LEVELS[l]||SHAKE_LEVELS.medium; if(c!==cfg){ cfg=c; chain=[]; ep=null; } },
+   push:function(t,x,y,z){
+     if(!g){ g={x:x,y:y,z:z,t:t}; return false; }
+     /* gravity = slow low-pass (time constant 250 ms, so it behaves the same at 50, 60 or 100 Hz) */
+     var dt=Math.max(1,Math.min(100,t-g.t)), A=Math.exp(-dt/250); g.t=t;
+     g.x=A*g.x+(1-A)*x; g.y=A*g.y+(1-A)*y; g.z=A*g.z+(1-A)*z;
+     var v={x:x-g.x,y:y-g.y,z:z-g.z}, m=Math.sqrt(v.x*v.x+v.y*v.y+v.z*v.z), fired=false;
+     /* a peak ends when the push fades OR flips direction (a fast shake can flip between two samples) */
+     if(ep && (m<cfg.thr*0.5 || (m>cfg.thr && cosv(v,ep.v)<0))){ var e=ep; ep=null; if(e.bad) chain=[]; else fired=peak(e); }
+     if(m>cfg.thr){
+       if(!ep) ep={t0:t,t:t,m:m,v:v}; else if(m>ep.m){ ep.t=t; ep.m=m; ep.v=v; }
+       if(t-ep.t0>cfg.dur) ep.bad=true;
+     }
+     return fired;
+   }
+ };
+}
+/*SHAKE-DETECTOR-END*/
 function startShakeDetection(){
  if(!window.DeviceMotionEvent||shakeStarted) return;
  // On iOS, wait until permission is granted (arm from a gesture); attaching before grant
  // just yields no events. On everything else, attach now.
  if(typeof DeviceMotionEvent.requestPermission==='function' && SS.shake._perm!=='granted') return;
  shakeStarted=true;
- const WINDOW=1400, REQUIRED=8, MIN_GAP=120;   /* 8 not 6: a running stride cannot sustain 8 peaks in 1.4s, a shake can */
- let count=0, firstT=0, lastPeak=0;
+ const det=ShakeDetector(shakeSens());
  const handler=e=>{
  if(SS.shake && SS.shake.enabled===false) return;
- // Use includingGravity when present and high-pass out the slow gravity vector → pure
- // motion magnitude that behaves the SAME whether or not the platform pre-removes gravity.
+ // Use includingGravity when present; the detector high-passes the slow gravity vector out.
  const ag=e.accelerationIncludingGravity||e.acceleration; if(!ag) return;
- const A=0.9;   /* v286: slower gravity estimate - the old 0.8 filtered out most of a real shake */
- _shakeGrav.x=A*_shakeGrav.x+(1-A)*(ag.x||0);
- _shakeGrav.y=A*_shakeGrav.y+(1-A)*(ag.y||0);
- _shakeGrav.z=A*_shakeGrav.z+(1-A)*(ag.z||0);
- const dx=(ag.x||0)-_shakeGrav.x, dy=(ag.y||0)-_shakeGrav.y, dz=(ag.z||0)-_shakeGrav.z;
- const mag=Math.sqrt(dx*dx+dy*dy+dz*dz);
- const THRESHOLD=shakeThreshold();
+ det.setLevel(shakeSens());
  const now=Date.now();
- if(mag>THRESHOLD && now-lastPeak>MIN_GAP){
-   if(!firstT || now-firstT>WINDOW){ firstT=now; count=0; }   // (re)open the counting window
-   count++; lastPeak=now;
-   if(count>=REQUIRED){ count=0; firstT=0; if(now-(window._shakeFiredAt||0)<8000) return; window._shakeFiredAt=now;   /* v286: keep shaking after it fires must not count as a second press (that cancelled the countdown) */
-     if(typeof sosPhase!=='undefined'&&sosPhase==='countdown') return;
-     if(sosActive&&window._sosSilent){ try{ sosGoLoud(); }catch(_){} } else if(!sosActive){ try{navigator.vibrate&&navigator.vibrate([90,50,90]);}catch(_){}
-     triggerSOS('shake'); } }
- }
+ if(!det.push(now,ag.x||0,ag.y||0,ag.z||0)) return;
+ if(now-(window._shakeFiredAt||0)<8000) return; window._shakeFiredAt=now;   /* v286: keep shaking after it fires must not count as a second press (that cancelled the countdown) */
+ if(typeof sosPhase!=='undefined'&&sosPhase==='countdown') return;
+ if(sosActive&&window._sosSilent){ if(!shakeSilent()){ try{ sosGoLoud(); }catch(_){} } return; }   /* v333: in silent mode another shake never turns a silent SOS loud */
+ if(!sosActive){ try{navigator.vibrate&&navigator.vibrate([90,50,90]);}catch(_){} triggerSOS('shake'); }
  };
  try{ window.addEventListener('devicemotion',handler,{passive:true}); }catch(e){ shakeStarted=false; }
 }
@@ -5055,7 +5116,7 @@ function shakeArmOnFirstGesture(){
 ═══════════════════════════════════ */
 let dmsIv=5;
 function dmsPickIv(el,mins){
- document.querySelectorAll('.dms-iv').forEach(d=>d.classList.remove('sel'));
+ document.querySelectorAll('.dms-iv[data-min]').forEach(d=>d.classList.remove('sel'));
  el.classList.add('sel'); dmsIv=mins; dmsInterval=mins;
  SS.dms.interval=mins; saveStore();
  // Refresh the "how it works" text which embeds the interval.
@@ -5481,13 +5542,15 @@ function alarmResilienceStop(){
    falls through harmlessly to the existing Web-Audio alarm + in-app shake. ONE codebase. */
 function shomerIsNative(){ try{ return !!(window.Capacitor && window.Capacitor.isNativePlatform && window.Capacitor.isNativePlatform()); }catch(e){ return false; } }
 /* v288: arm the locked-phone shake detector only when the user's switch is on (called once settings are loaded) */
-function shakeNativeSync(){ try{ var p=shomerNativePlugin(); if(!p) return; if(SS.shake && SS.shake.enabled===false){ p.disableBackgroundShake && p.disableBackgroundShake(); } else { p.enableBackgroundShake && p.enableBackgroundShake(); } }catch(e){} }
+/* v333: level + silent reach the native detector (builds without setShakeConfig just ignore it) */
+function shakeNativeConfig(){ try{ var p=shomerNativePlugin(); if(!p||!p.setShakeConfig) return; var r=p.setShakeConfig({sens:shakeSens(),silent:shakeSilent()}); if(r&&r.catch) r.catch(function(){}); }catch(e){} }
+function shakeNativeSync(){ try{ shakeNativeConfig(); var p=shomerNativePlugin(); if(!p) return; if(SS.shake && SS.shake.enabled===false){ p.disableBackgroundShake && p.disableBackgroundShake(); } else { p.enableBackgroundShake && p.enableBackgroundShake(); } }catch(e){} }
 function shomerNativePlugin(){ try{ return (window.Capacitor && window.Capacitor.Plugins && window.Capacitor.Plugins.ShomerNative) || null; }catch(e){ return null; } }
 function nativeAlarmStart(){ try{ var p=shomerNativePlugin(); if(p&&p.startAlarm) p.startAlarm(); }catch(e){} }
 function nativeAlarmStop(){ try{ var p=shomerNativePlugin(); if(p&&p.stopAlarm) p.stopAlarm(); }catch(e){} }
 /* The native background-shake service launches the app and calls this to complete a REAL
    SOS over the existing REST/SSE flow (never the RTDB WebSocket SDK). */
-window.__shomerNativeSOS=function(reason){ try{ if(typeof sosActive!=='undefined' && sosActive){ if(window._sosSilent){ try{ sosGoLoud(); }catch(_){} } return; }
+window.__shomerNativeSOS=function(reason){ try{ if(typeof sosActive!=='undefined' && sosActive){ if(window._sosSilent && !((reason||'shake')==='shake' && shakeSilent())){ try{ sosGoLoud(); }catch(_){} } return; }   /* v333: a shake never turns a Silent-mode SOS loud */
   /* v287: the in-app detector and the native one can catch the SAME shake - a second trigger during the countdown would CANCEL it */
   if(typeof sosPhase!=='undefined' && sosPhase!=='idle') return; if((reason||'shake')==='shake' && SS.shake && SS.shake.enabled===false) return; if((reason||'shake')==='shake' && Date.now()-(window._shakeFiredAt||0)<8000) return; window._shakeFiredAt=Date.now();
   if(typeof triggerSOS==='function') triggerSOS(reason||'shake'); }catch(e){} };
@@ -5603,7 +5666,12 @@ function beginSOS(trigger){
     an inference can be wrong - running to cross a road set it off twice. So a shake
     buzzes hard in the pocket for a moment first, then goes loud. The countdown and
     the broadcast time are untouched: only the siren waits, and only on a shake. */
- if(curSosTrigger==='shake'){ sosGraceStart(); }
+ /* v333 SILENT MODE (Settings → Shake-to-SOS): no siren at all on this phone - the countdown
+    only vibrates, then the SOS goes out silently (activateSOS' silent path still alerts the
+    circle). Cancel works exactly as before. */
+ window._shakeQuiet=(curSosTrigger==='shake'&&shakeSilent());
+ if(window._shakeQuiet){ window._sosSilent=true; try{ navigator.vibrate&&navigator.vibrate([400,120,400]); }catch(e){} }
+ else if(curSosTrigger==='shake'){ sosGraceStart(); }
  else { try{ startSosAlarm(); }catch(e){} } // loud LOOPING signature alarm + vibration, right now
  startCountdown();
 }
@@ -5638,15 +5706,21 @@ function startCountdown(){
  sosCdTimer=setInterval(()=>{
  sosCdLeft--;
  if(sosCdLeft<=0){clearInterval(sosCdTimer);activateSOS();return;}
+ if(window._shakeQuiet){ try{ navigator.vibrate&&navigator.vibrate(60); }catch(e){} }   /* silent mode: a short buzz per second instead of the siren */
  renderCountdown();
  },1000);
 }
 function renderCountdown(){
  setText('sos-cd-num',String(sosCdLeft));
  const he=currentLang==='he';
+ if(window._shakeQuiet){
+ setText('sos-cd-ttl',he?' שולח SOS שקט…':currentLang==='ar'?' جارٍ إرسال SOS صامت…':' Sending silent SOS…');
+ setText('sos-cd-sub',he?'בלי צפירה. התראה למעגל שלך בעוד…':currentLang==='ar'?'بدون صفارة. تنبيه دائرتك خلال…':'No siren. Alerting your circle in…');
+ } else {
  setText('sos-cd-ttl',he?' שולח SOS…':currentLang==='ar'?' جارٍ إرسال SOS…':' Sending SOS…');
  setText('sos-cd-sub',he?'האזעקה פועלת. שידור לשומרים בקרבתך בעוד…'
  :currentLang==='ar'?'الإنذار يعمل. البث للحُرّاس القريبين خلال…':'Alarm is sounding. Broadcasting to nearby SHOMERs in…');
+ }
  setText('sos-cd-cancel',he?'אני בטוח/ה - בטל':currentLang==='ar'?'أنا بأمان - إلغاء':"I'm safe - Cancel");
  setText('sos-cd-hint',he?'ביטול עכשיו = אזעקת שווא. שום דבר לא ישודר ולא יופיע במפה.'
  :currentLang==='ar'?'الإلغاء الآن = إنذار كاذب. لن يُبث شيء ولن يظهر على الخريطة.':'Cancel now = false alarm. Nothing is broadcast and nothing appears on the map.');
@@ -5672,7 +5746,7 @@ function cancelCountdown(){
  if(sosPhase!=='countdown')return;
  window._sosPractice=false;
  clearInterval(sosCdTimer); sosGraceClear(); stopSosAlarm();
- sosPhase='idle'; sosActive=false; window._sosSilent=false;
+ sosPhase='idle'; sosActive=false; window._sosSilent=false; window._shakeQuiet=false;
  const ov=document.getElementById('sos-cd');
  if(ov){ov.classList.remove('on');ov.setAttribute('aria-hidden','true');}
  const btn=document.getElementById('sos-btn');
@@ -5690,7 +5764,7 @@ function activateSOS(){
  try{ sosGraceForceLoud(); }catch(e){}   /* countdown ran out inside the shake grace - sound it now */
  const ov=document.getElementById('sos-cd');
  if(ov){ov.classList.remove('on');ov.setAttribute('aria-hidden','true');}
- sosPhase='active';
+ sosPhase='active'; window._shakeQuiet=false;
  if(!window._sosSilent){ try{ nativeAlarmStart(); }catch(e){} }   // confirmed SOS -> un-silenceable native alarm (never for a silent/duress SOS)
  const he=currentLang==='he';
  sosRollDay();
