@@ -18,7 +18,7 @@ SRC, OUT = sys.argv[1], sys.argv[2]
 PROD = ['shomergency-default-rtdb.firebaseio.com', 'shomergency.firebaseapp.com',
         'otkvebgrdiayjnqrytrn.supabase.co', 'shomer-otp.shomer3s.workers.dev']
 PAGES = ['shomer.html', 'dashboard.html', 'index.html', 'nature.html', 'pricing.html',
-         'privacy.html', 'terms.html', 'nature/index.html']
+         'privacy.html', 'terms.html', 'nature/index.html', 'nature-dashboard.html']
 GUARD = """<script>/* PREVIEW GUARD: nothing here may write anywhere, or talk to production */
 (function(){window.SHOMER_PREVIEW=true;var BAD=/firebaseio|firebasedatabase|firebaseapp|googleapis|gstatic\\.com\\/firebasejs|supabase|workers\\.dev|twil\\.io|shomer-app\\.co\\.il|\\.invalid/i;
 function bad(u,m){try{var x=new URL(u,location.href);m=(m||'GET').toUpperCase();return BAD.test(x.href)||(m!=='GET'&&m!=='HEAD');}catch(e){return true;}}
@@ -34,6 +34,13 @@ BANNER = ('<div id="pv-banner" style="position:fixed;bottom:0;left:0;right:0;z-i
           'background:#E0A828;color:#0A1628;font:800 12px/1.3 Heebo,Alef,system-ui,sans-serif;'
           'text-align:center;padding:4px 8px;pointer-events:none">תצוגה מקדימה · לא האתר החי · '
           'שום דבר לא נשלח · PREVIEW, NOT LIVE · NEEDS YOUR EYES</div>')
+PV_TESTER = ('<div id="pv-tester" dir="rtl" style="position:fixed;top:calc(env(safe-area-inset-top,0px) + 6px);left:50%;transform:translateX(-50%);'
+             'z-index:2147483001;display:flex;gap:6px;align-items:center;background:#0F1712;border:1px solid #50DB0F;border-radius:999px;'
+             'padding:4px 6px;font:700 12px Heebo,Alef,system-ui,sans-serif;box-shadow:0 6px 20px rgba(0,0,0,.45);max-width:96vw">'
+             '<span style="color:#E0A828;padding:0 4px">בדיקה</span>'
+             '<button type="button" onclick="openNatureReport()" style="border:0;border-radius:999px;background:#50DB0F;color:#08120C;font:inherit;padding:7px 11px;cursor:pointer;white-space:nowrap">🌿 דיווח טבע</button>'
+             '<button type="button" onclick="openMyNatureReports()" style="border:1px solid #50DB0F;border-radius:999px;background:none;color:#8EF25A;font:inherit;padding:6px 10px;cursor:pointer;white-space:nowrap">הדיווחים שלי</button>'
+             '<a href="nature-dashboard.html?demo=1" target="_blank" rel="noopener" style="color:#C2D6C2;padding:0 6px;text-decoration:underline;white-space:nowrap">לוח טבע ↗</a></div>')
 APP_CFG = re.compile(r"<script>\s*window\.SHOMER_FB = \{.*?</script>", re.S)
 APP_STUB = ("<script>window.SHOMER_FB=null;window.SHOMER_VAPID='';window.SHOMER_PUSH_URL='';"
             "window.SHOMER_FCM=null;/* preview: no Firebase, no push */</script>")
@@ -50,6 +57,9 @@ def transform(path, s):
         assert n == 1, 'app Firebase config block not found'
         s, n = CSP_CONNECT.subn(CSP_SAFE, s, count=1)
         assert n == 1, 'app CSP connect-src not found'
+        # preview only: a tester bar, because there is no phone sign-in without a backend
+        i = s.rfind('</body>')
+        s = s[:i] + PV_TESTER + '\n' + s[i:]
     if path in ('nature.html', 'nature/index.html'):
         s = s.replace('function joinWL(', "function joinWL(){var m=document.getElementById('wlm');"
                       "if(m)m.textContent='תצוגה מקדימה: לא נשמר · Preview: not saved';}\nfunction _joinWL_off(", 1)
@@ -73,7 +83,7 @@ def copy_assets():
     for f in ('crime-stats.json', 'manifest.json', 'version.json', 'events-seed.json'):
         if os.path.exists(os.path.join(SRC, f)):
             shutil.copy2(os.path.join(SRC, f), os.path.join(OUT, f))
-    for d in ('img', 'site-assets', 'scenes'):
+    for d in ('img', 'site-assets', 'scenes', 'nature-assets'):
         if os.path.isdir(os.path.join(SRC, d)):
             shutil.copytree(os.path.join(SRC, d), os.path.join(OUT, d), dirs_exist_ok=True)
     os.makedirs(os.path.join(OUT, 'nature'), exist_ok=True)
