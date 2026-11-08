@@ -25,7 +25,8 @@ import androidx.core.app.NotificationCompat;
  * even when the app is backgrounded (and, on most devices, when swiped away — START_STICKY).
  * On trigger it sounds the un-silenceable alarm immediately AND launches the app with an
  * "shomer_sos=shake" intent so the web app completes the real SOS broadcast over REST/SSE.
- * Same gravity-compensated 5-shake algorithm as the web build.
+ * v333: the same ShakeDetector pattern check as the web build (Low / Medium / High), and the
+ * user's Settings (level + Silent mode) arrive through ShomerNativePlugin.setShakeConfig.
  */
 public class ShakeService extends Service implements SensorEventListener {
   private static final String CH = "shomer_shake";
@@ -33,15 +34,25 @@ public class ShakeService extends Service implements SensorEventListener {
   private Sensor acc;
   private PowerManager.WakeLock wl;
   private long lastFire;
-  private float gx, gy, gz;
-  private int count;
-  private long firstT, lastPeak;
-  private static final int REQUIRED = 8;
-  private static final long WINDOW = 1500, MIN_GAP = 120;
-  private static final double THRESHOLD = 18.0; // m/s^2 (gravity removed) — 16.0 fired while running across a road
+  private final ShakeDetector det = new ShakeDetector("medium");
+  private volatile boolean silent;
+  static volatile ShakeService sInstance;
+  static final String PREFS = "shomer_native";
+
+  /** Re-read level + Silent mode (called by the plugin when the user changes Settings). */
+  static void reloadConfig() { ShakeService s = sInstance; if (s != null) s.loadConfig(); }
+  private void loadConfig() {
+    try {
+      android.content.SharedPreferences sp = getSharedPreferences(PREFS, MODE_PRIVATE);
+      synchronized (det) { det.setLevel(sp.getString("shake_sens", "medium")); }
+      silent = sp.getBoolean("shake_silent", false);
+    } catch (Exception e) {}
+  }
 
   @Override
   public int onStartCommand(Intent intent, int flags, int startId) {
+    sInstance = this;
+    loadConfig();
     Notification n = buildNotification();
     if (Build.VERSION.SDK_INT >= 34) {
       startForeground(2, n, android.content.pm.ServiceInfo.FOREGROUND_SERVICE_TYPE_SPECIAL_USE);
@@ -73,19 +84,9 @@ public class ShakeService extends Service implements SensorEventListener {
 
   @Override
   public void onSensorChanged(SensorEvent e) {
-    float a = 0.9f;
-    gx = a * gx + (1 - a) * e.values[0];
-    gy = a * gy + (1 - a) * e.values[1];
-    gz = a * gz + (1 - a) * e.values[2];
-    double dx = e.values[0] - gx, dy = e.values[1] - gy, dz = e.values[2] - gz;
-    double mag = Math.sqrt(dx * dx + dy * dy + dz * dz);
-    long now = System.currentTimeMillis();
-    if (mag > THRESHOLD && now - lastPeak > MIN_GAP) {
-      if (firstT == 0 || now - firstT > WINDOW) { firstT = now; count = 0; }
-      count++;
-      lastPeak = now;
-      if (count >= REQUIRED) { count = 0; firstT = 0; fireSos(); }
-    }
+    boolean hit;
+    synchronized (det) { hit = det.push(e.timestamp / 1000000L, e.values[0], e.values[1], e.values[2]); }
+    if (hit) fireSos();
   }
 
   private void fireSos() {
@@ -132,15 +133,21 @@ public class ShakeService extends Service implements SensorEventListener {
         PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
 
     NotificationManager nm = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+    // Silent mode (v333): a channel with NO sound, and a neutral text, so nothing on this phone
+    // gives the SOS away. The vibration above is the only signal; the web countdown stays cancellable.
+    final boolean quiet = silent;
+    final String chId = quiet ? "shomer_shake_fire_quiet" : "shomer_shake_fire";
     if (Build.VERSION.SDK_INT >= 26) {
-      NotificationChannel fch = new NotificationChannel("shomer_shake_fire", "SHOMER SOS trigger", NotificationManager.IMPORTANCE_HIGH);
+      NotificationChannel fch = new NotificationChannel(chId, quiet ? "SHOMER (silent)" : "SHOMER SOS trigger", NotificationManager.IMPORTANCE_HIGH);
       fch.setDescription("Opens the SOS screen when you shake with the screen off");
+      if (quiet) { fch.setSound(null, null); fch.enableVibration(false); }
       try { fch.setBypassDnd(true); } catch (Exception e) {}
       nm.createNotificationChannel(fch);
     }
-    Notification fire = new NotificationCompat.Builder(this, "shomer_shake_fire")
-        .setContentTitle("SHOMER — SOS")
-        .setContentText("Shake detected — opening SOS…")
+    Notification fire = new NotificationCompat.Builder(this, chId)
+        .setContentTitle(quiet ? "SHOMER" : "SHOMER — SOS")
+        .setContentText(quiet ? "Tap to open" : "Shake detected — opening SOS…")
+        .setSilent(quiet)
         .setSmallIcon(R.drawable.ic_stat_shomer)
         .setPriority(NotificationCompat.PRIORITY_MAX)
         .setCategory(NotificationCompat.CATEGORY_ALARM)
@@ -168,7 +175,7 @@ public class ShakeService extends Service implements SensorEventListener {
     PendingIntent pi = PendingIntent.getActivity(this, 0, open, PendingIntent.FLAG_IMMUTABLE);
     return new NotificationCompat.Builder(this, CH)
         .setContentTitle("SHOMER — Shake-to-SOS armed")
-        .setContentText("Shake hard 5× to trigger an SOS")
+        .setContentText("Shake to trigger an SOS (you can cancel)")
         .setSmallIcon(R.drawable.ic_stat_shomer)
         .setOngoing(true)
         .setContentIntent(pi)
@@ -178,6 +185,7 @@ public class ShakeService extends Service implements SensorEventListener {
 
   @Override
   public void onDestroy() {
+    if (sInstance == this) sInstance = null;
     try { if (sm != null) sm.unregisterListener(this); } catch (Exception e) {}
     try { if (wl != null && wl.isHeld()) wl.release(); } catch (Exception e) {}
     try { AlarmPlayer.stop(this); } catch (Exception e) {}

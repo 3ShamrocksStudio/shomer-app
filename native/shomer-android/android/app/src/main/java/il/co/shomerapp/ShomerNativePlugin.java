@@ -90,6 +90,19 @@ public class ShomerNativePlugin extends Plugin {
     call.resolve();
   }
 
+  /** v333: the user's Shake-to-SOS Settings - sens "low" | "medium" | "high", silent true/false.
+   *  Saved per device so the detector keeps them across reboots (BootReceiver) and app kills. */
+  @PluginMethod
+  public void setShakeConfig(PluginCall call) {
+    String sens = call.getString("sens", "medium");
+    if (!"low".equals(sens) && !"high".equals(sens)) sens = "medium";
+    Boolean silent = call.getBoolean("silent", false);
+    getContext().getSharedPreferences(ShakeService.PREFS, Context.MODE_PRIVATE).edit()
+        .putString("shake_sens", sens).putBoolean("shake_silent", silent != null && silent).apply();
+    ShakeService.reloadConfig();
+    call.resolve();
+  }
+
   @PluginMethod
   public void disableBackgroundShake(PluginCall call) {
     getContext().stopService(new Intent(getContext(), ShakeService.class));
