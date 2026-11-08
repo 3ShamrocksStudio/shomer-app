@@ -66,4 +66,15 @@ function shake({ cycles = 3, f = 3.5, amp = 30, axis = [1, 0, 0], wobble = 3 }) 
     return [axis[0] * a + w, axis[1] * a, axis[2] * a - w];
   };
 }
-module.exports = { render, walk, run, shake, G };
+/* Hand-to-hand toss: a catch+throw in one hand every P seconds, free fall in between.
+   Each hand event reverses the sideways velocity (alternating ±h) and restores the upward
+   velocity lost in flight (always +up). `spin` = centripetal wobble while the phone flies. */
+function toss({ P = 0.3, ev = 0.11, h = 30, spin = 3 }) {
+  const up = G * (P - ev) * Math.PI / (2 * ev);
+  return t => {
+    const k = Math.floor(t / P), tp = t - k * P, sgn = k % 2 ? -1 : 1;
+    if (tp < ev) { const a = Math.sin(Math.PI * tp / ev); return [sgn * h * a, up * a, 0]; }
+    return [spin * Math.sin(40 * t), -G + spin * Math.cos(40 * t) * 0.5, spin * Math.cos(33 * t) * 0.5];
+  };
+}
+module.exports = { render, walk, run, shake, toss, G };

@@ -8,7 +8,9 @@ package il.co.shomerapp;
  * A shake is a fast BACK-AND-FORTH: strong peaks whose direction flips each time, a short
  * time apart. Running and walking make strong peaks too, but they repeat in the SAME
  * direction (foot strikes) or swing back and forth too slowly (arm swing), so they never
- * build the chain. Peak strength alone is not enough.
+ * build the chain. Peak strength alone is not enough. A toss also swaps direction, but the
+ * phone is in free fall between catches (reading ~0 incl. gravity for 70 ms+), which a shake
+ * never is, so free fall wipes the chain.
  */
 public final class ShakeDetector {
   /** thr m/s² (gravity removed), alternating peaks needed, window ms, max gap ms, max peak ms */
@@ -24,6 +26,7 @@ public final class ShakeDetector {
   private boolean ep, epBad; private long epT0, epT; private double epM, epX, epY, epZ;
   private final long[] ct = new long[MAXP]; private final double[][] cv = new double[MAXP][3]; private int cn;
   private String level = "";
+  private long ff0;   // free-fall start (0 = not in free fall)
 
   public ShakeDetector(String level) { setLevel(level); }
 
@@ -70,6 +73,7 @@ public final class ShakeDetector {
   /** One accelerometer sample INCLUDING gravity (m/s²) at time t (ms). True = shake pattern found. */
   public boolean push(long t, double x, double y, double z) {
     if (!init) { init = true; gx = x; gy = y; gz = z; gt = t; return false; }
+    if (x * x + y * y + z * z < 25) { if (ff0 == 0) ff0 = t; else if (t - ff0 >= 70) { cn = 0; ep = false; } } else ff0 = 0;
     double dt = Math.max(1, Math.min(100, t - gt)), a = Math.exp(-dt / 250.0); gt = t;
     gx = a * gx + (1 - a) * x; gy = a * gy + (1 - a) * y; gz = a * gz + (1 - a) * z;
     double vx = x - gx, vy = y - gy, vz = z - gz, m = Math.sqrt(vx * vx + vy * vy + vz * vz);

@@ -4645,7 +4645,8 @@ function dykMaybeShow(){
    community nudges all used to fire on their own timers and stack on top of each other - and
    on top of an invite waiting for approval. Rule: emergencies and invites come first; any
    lower-priority card waits until the screen is clear, and is removed when an invite opens. */
-var POPUP_LOW_IDS=['tp-bar','nudge-bar','dyk-bar','community-nudge','fsi-bar'], POPUP_LOW_SEL='.a2hs,.ios-install,.getapp-banner';
+var POPUP_LOW_IDS=['tp-bar','nudge-bar','dyk-bar','community-nudge','fsi-bar','loc-bar'],   /* v333: loc-bar too - it covered the SOS countdown Cancel button */
+    POPUP_LOW_SEL='.a2hs,.ios-install,.getapp-banner';
 /* ══ v312 POPUP SCHEDULER - ONE gate for every nudge, tip and prompt (Dave, 3 Nov) ══
    The shake-to-SOS card used to pop up while the person was typing a code. Now every nudge/tip
    is queued here and shown only at an idle moment:
@@ -5043,14 +5044,17 @@ function shakeArmPermission(cb){
      peaks alternating peaks needed (2 = one back-and-forth shake)
      win   ms they must all fall inside
      gap   ms max between two alternating peaks (arm swing while running is ~330-450)
-     dur   ms max time a single peak may stay above thr (a long push is not a shake) */
+     dur   ms max time a single peak may stay above thr (a long push is not a shake)
+   A toss (hand to hand, or into the air) also swaps direction, but between the catches the
+   phone is in free fall: the sensor reads almost 0 including gravity for 70 ms or more.
+   A shake never does (its near-0 moments last ~20-35 ms), so free fall wipes the chain. */
 var SHAKE_LEVELS={
  low:   {thr:21, peaks:5, win:2000, gap:280, dur:260},   /* 3 strong shakes within 2 s (the last stroke of a shake is always weaker, so 5 of its 6 peaks) */
  medium:{thr:17, peaks:5, win:2000, gap:300, dur:280},   /* 3 firm shakes */
  high:  {thr:13, peaks:4, win:1500, gap:300, dur:300}    /* 2 quick shakes (may also fire on a hard sprint - said so in Settings) */
 };
 function ShakeDetector(level){
- var cfg=SHAKE_LEVELS[level]||SHAKE_LEVELS.medium, g=null, ep=null, chain=[];
+ var cfg=SHAKE_LEVELS[level]||SHAKE_LEVELS.medium, g=null, ep=null, chain=[], ff0=0;
  function cosv(a,b){ var d=a.x*b.x+a.y*b.y+a.z*b.z, n=Math.sqrt((a.x*a.x+a.y*a.y+a.z*a.z)*(b.x*b.x+b.y*b.y+b.z*b.z)); return n?d/n:1; }
  function peak(p){
    var last=chain.length?chain[chain.length-1]:null, dt=last?p.t-last.t:0;
@@ -5061,8 +5065,9 @@ function ShakeDetector(level){
  }
  return {
    setLevel:function(l){ var c=SHAKE_LEVELS[l]||SHAKE_LEVELS.medium; if(c!==cfg){ cfg=c; chain=[]; ep=null; } },
-   push:function(t,x,y,z){
+   push:function(t,x,y,z,noG){
      if(!g){ g={x:x,y:y,z:z,t:t}; return false; }
+     if(!noG && x*x+y*y+z*z<25){ if(!ff0) ff0=t; else if(t-ff0>=70){ chain=[]; ep=null; } } else ff0=0;   /* free fall = toss / drop, not a shake */
      /* gravity = slow low-pass (time constant 250 ms, so it behaves the same at 50, 60 or 100 Hz) */
      var dt=Math.max(1,Math.min(100,t-g.t)), A=Math.exp(-dt/250); g.t=t;
      g.x=A*g.x+(1-A)*x; g.y=A*g.y+(1-A)*y; g.z=A*g.z+(1-A)*z;
@@ -5088,10 +5093,10 @@ function startShakeDetection(){
  const handler=e=>{
  if(SS.shake && SS.shake.enabled===false) return;
  // Use includingGravity when present; the detector high-passes the slow gravity vector out.
- const ag=e.accelerationIncludingGravity||e.acceleration; if(!ag) return;
+ const ig=e.accelerationIncludingGravity, ag=ig||e.acceleration; if(!ag) return;
  det.setLevel(shakeSens());
  const now=Date.now();
- if(!det.push(now,ag.x||0,ag.y||0,ag.z||0)) return;
+ if(!det.push(now,ag.x||0,ag.y||0,ag.z||0,!ig)) return;   /* no gravity in the reading = free-fall check off */
  if(now-(window._shakeFiredAt||0)<8000) return; window._shakeFiredAt=now;   /* v286: keep shaking after it fires must not count as a second press (that cancelled the countdown) */
  if(typeof sosPhase!=='undefined'&&sosPhase==='countdown') return;
  if(sosActive&&window._sosSilent){ if(!shakeSilent()){ try{ sosGoLoud(); }catch(_){} } return; }   /* v333: in silent mode another shake never turns a silent SOS loud */
