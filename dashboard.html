@@ -8,6 +8,7 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="layer-routing.js"></script>
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Alef:wght@400;700&family=Inter:wght@200;300;500;600;700&display=swap" rel="stylesheet">
 <style>
@@ -317,6 +318,18 @@
 </style>
 <style id="acct-css">
 .plan-badge{font-size:10px;font-weight:800;letter-spacing:.04em;background:rgba(224,168,40,.16);color:#F5C840;border:1px solid rgba(224,168,40,.4);border-radius:20px;padding:3px 9px;white-space:nowrap}
+.lyr{display:inline-flex;gap:4px;align-items:center;margin-inline-end:6px}
+.lyr .lyr-b{background:transparent;border:1px solid var(--blue-2);color:var(--tx2);border-radius:999px;padding:6px 11px;font:700 12px inherit;font-family:inherit;cursor:pointer;white-space:nowrap}
+.lyr .lyr-b[aria-pressed="true"]{background:rgba(224,168,40,.14);border-color:var(--gold);color:#fff}
+.lyr .lyr-b.nat[aria-pressed="true"]{background:rgba(80,219,15,.12);border-color:#50DB0F}
+.lyr .lyr-b[disabled]{opacity:.45;cursor:not-allowed}
+.lyr-tag{display:inline-block;margin-inline-start:6px;padding:1px 6px;border-radius:6px;font-size:10px;font-weight:800;background:rgba(80,219,15,.16);color:#7fe24a}
+.lyr-tag.both{background:rgba(232,89,12,.18);color:#ffb37a}
+.pr-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:12px 0}
+.pr-t{border:1px solid #2a3450;border-radius:14px;padding:12px;background:rgba(255,255,255,.02)}
+.pr-t h4{margin:0 0 6px;font-size:15px}.pr-t p{margin:0 0 8px;font-size:12px;color:#9fb0d0;line-height:1.5}
+.pr-p{font-weight:900;color:#ffd27a;font-size:13px}.pr-eyes{display:inline-block;margin-top:6px;font-size:10px;font-weight:800;color:#0a1628;background:#ffd27a;border-radius:6px;padding:2px 6px}
+@media (max-width:640px){.pr-grid{grid-template-columns:1fr}}
 .acct-ov{position:fixed;inset:0;z-index:99993;display:flex;align-items:center;justify-content:center;padding:22px;background:rgba(6,11,22,.7);font-family:Alef,system-ui,sans-serif}
 .acct-card{width:100%;max-width:440px;background:linear-gradient(180deg,#141a27,#0f1218);border:1px solid #2a3450;border-radius:18px;padding:20px 20px 16px;box-shadow:0 24px 70px rgba(0,0,0,.6);color:#eef1f7}
 .acct-card h3{font-size:17px;font-weight:800;margin:0}
@@ -608,7 +621,7 @@
     <div class="tb-sp"></div>
     <div class="terr-pick"><span id="terr-static" class="hidden">טריטוריה: <b id="terr-name" style="color:var(--gold)"></b></span><select id="terr-sel"></select></div>
     <div class="live off" id="live-ind" title="אין חיבור לנתונים חיים"><span class="d"></span><span id="org-name"></span></div>
-    <span class="plan-badge" id="plan-badge" title="סטטוס המוצר">גרסת בטא</span><button class="tbtn" id="trends-btn" onclick="openTrends()">📈 מגמות</button><button class="tbtn" id="team-btn" onclick="openTeam()">👥 צוות שומרים</button><button class="tbtn" id="acct-btn">⚙ חשבון</button><button class="tbtn" id="export-btn">⤓ ייצוא</button>
+    <span class="lyr" id="lyr" role="group" aria-label="שכבות"></span><span class="plan-badge" id="plan-badge" title="סטטוס המוצר">גרסת בטא</span><button class="tbtn" id="pricing-btn" onclick="openPricing()">📦 חבילות</button><button class="tbtn" id="trends-btn" onclick="openTrends()">📈 מגמות</button><button class="tbtn" id="team-btn" onclick="openTeam()">👥 צוות שומרים</button><button class="tbtn" id="acct-btn">⚙ חשבון</button><button class="tbtn" id="export-btn">⤓ ייצוא</button>
     <button class="tbtn" id="signout">יציאה</button>
   </div>
   <!-- Physical layout (viewer's left → right), independent of RTL:
@@ -720,15 +733,19 @@ document.getElementById('demo-btn').onclick=function(){ demoBoot(); };
 (function(){var sp=document.getElementById('spread-btn'); if(sp) sp.onclick=function(){ if(_curCity) toggleSpread(_curCity); };})();
 var DEMO_INC=[
  {kind:'sos',   nm:'קריאת SOS · אישה',        dlat:0.000,  dlng:-0.006, mins:3},
- {kind:'palert',k:'missing', nm:'אדם נעדר · דנה ל.', dlat:-0.016, dlng:0.002, mins:24},
+ {kind:'palert',k:'missing', nm:'אדם נעדר', dlat:-0.016, dlng:0.002, mins:24},
  {kind:'palert',k:'abduct',  nm:'חשד לחטיפה · קטין', dlat:0.009,  dlng:0.012, mins:47},
  {kind:'event', t:'עבירות נגד גוף', dlat:-0.004, dlng:-0.010, mins:72},
  {kind:'event', t:'עבירות כלפי הרכוש', dlat:0.013, dlng:0.004, mins:118},
- {kind:'event', t:'עבירות סדר ציבורי', dlat:-0.011, dlng:0.009, mins:205}
+ {kind:'event', t:'עבירות סדר ציבורי', dlat:-0.011, dlng:0.009, mins:205},
+ /* Nature layer sample rows (demo only, labelled הדגמה) */
+ {kind:'nature', type:'animal_injured', layer:'nature', doc:'תמונה + הערה', dlat:0.021, dlng:-0.014, mins:16},
+ {kind:'nature', type:'dumping',        layer:'nature', doc:'הערה',        dlat:-0.019, dlng:-0.018, mins:95},
+ {kind:'nature', type:'wildfire',       layer:'both',   doc:'תמונה',       dlat:0.024,  dlng:0.019,  mins:9}
 ];
 async function demoBoot(){
   await loadData();
-  CLIENT={org:'עיריית תל אביב-יפו · דמו', territory:'תל אביב יפו', email:'demo', demo:true};
+  CLIENT={org:'עיריית תל אביב-יפו · דמו', territory:'תל אביב יפו', email:'demo', demo:true, layers:['shomer','nature']}; try{ lyrInit(); }catch(_l){}
   try{ if(!document.getElementById('demo-banner')){ var _db=document.createElement('div'); _db.id='demo-banner'; _db.textContent='נתוני הדגמה — חלק מהגרפים מציגים נתוני אמת ומסומנים כך'; _db.style.cssText='position:fixed;top:0;left:50%;transform:translateX(-50%);z-index:3000;background:#b3202d;color:#fff;font:800 13px Alef,system-ui,sans-serif;padding:5px 18px;border-radius:0 0 10px 10px;box-shadow:0 4px 14px rgba(0,0,0,.45);pointer-events:none'; document.body.appendChild(_db); var _dh=function(){ try{ document.documentElement.style.setProperty('--demo-h',_db.offsetHeight+'px'); }catch(e){} }; _dh(); document.body.classList.add('demo-on'); window.addEventListener('resize',_dh); } }catch(_e){}
   document.getElementById('gate').classList.add('hidden');
   document.getElementById('app').classList.remove('hidden');
@@ -744,7 +761,7 @@ async function demoBoot(){
 }
 function demoLive(c){
   var now=Date.now();
-  var list=DEMO_INC.map(function(w,i){ return {id:'demo'+i, type:(w.kind==='sos'?'sos':(w.kind==='palert'?w.k:'event')), k:w.k, nm:w.nm, t:w.t, lat:c.lat+w.dlat, lng:c.lng+w.dlng, ts:now-w.mins*60000}; });
+  var list=DEMO_INC.map(function(w,i){ return {id:'demo'+i, type:(w.kind==='sos'?'sos':(w.kind==='palert'?w.k:(w.kind==='nature'?w.type:'event'))), layer:w.layer, doc:w.doc, k:w.k, nm:w.nm, t:w.t, lat:c.lat+w.dlat, lng:c.lng+w.dlng, ts:now-w.mins*60000}; });
   renderLive(c,list,{demo:true});
 }
 /* ── LIVE mode: real SH✡MER network data from the sanitized public /dashfeed path ──
@@ -753,7 +770,7 @@ function demoLive(c){
    When no events exist yet it shows an honest "awaiting data" state — never fabricated. */
 async function liveBoot(){
   await loadData();
-  CLIENT={org:'רשת SH✡MER · תצוגה חיה', territory:DATA._sorted[0].city, email:'live', demo:false, live:true};try{var _pb=document.getElementById('plan-badge');if(_pb)_pb.textContent='גרסת בטא';}catch(_e){};
+  CLIENT={org:'רשת SH✡MER · תצוגה חיה', territory:DATA._sorted[0].city, email:'live', demo:false, live:true, layers:['shomer','nature']}; try{ lyrInit(); }catch(_l){}try{var _pb=document.getElementById('plan-badge');if(_pb)_pb.textContent='גרסת בטא';}catch(_e){};
   document.getElementById('gate').classList.add('hidden');
   document.getElementById('app').classList.remove('hidden');
   document.getElementById('terr-name').textContent=CLIENT.territory;
@@ -775,7 +792,7 @@ async function boot(){
   var u=(await sb.auth.getUser()).data.user;
   if(!u){ liveBoot(); return; }
   var md=u.user_metadata||{};
-  CLIENT={org:md.org||'',territory:md.territory||'',email:u.email};
+  CLIENT={org:md.org||'',territory:md.territory||'',email:u.email,layers:lyrEntitled(md.layers)}; try{ lyrInit(); }catch(_l){}   /* an org turns on one layer or both, in one account */
   try{ if(teamLS('on')) setTimeout(function(){ teamInit().catch(function(){}); },1500); }catch(e){}   /* v310: a manager with a team hears leaders' alerts as soon as they log in */
   if(!CLIENT.territory){ // shouldn't happen, but guard
     CLIENT.territory=DATA._sorted[0].city;
@@ -1028,7 +1045,26 @@ function _liveBeep(){ try{ var AC=window.AudioContext||window.webkitAudioContext
 function _sosIcon(){ return L.divIcon({className:'sos-div',html:'<div class="sos-beacon"><span class="halo"></span><span class="core"></span></div>',iconSize:[44,44],iconAnchor:[22,22]}); }
 function _liveSvg(paths,w){ return '<svg viewBox="0 0 24 24" width="'+(w||17)+'" height="'+(w||17)+'" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">'+paths+'</svg>'; }
 var _LIVE_IC={sos:'<path d="M12 3l7 3v5c0 5-3.4 8.5-7 10-3.6-1.5-7-5-7-10V6Z"/><path d="M12 8v4"/><circle cx="12" cy="15.4" r=".95" fill="currentColor" stroke="none"/>',abduct:'<path d="M12 3l9.3 16.5h-18.6Z"/><path d="M12 9.3v4.3"/><circle cx="12" cy="16.6" r=".95" fill="currentColor" stroke="none"/>',missing:'<circle cx="11" cy="11" r="7"/><path d="M20 20l-3.4-3.4"/>'};
+/* ── Nature layer (decision 2026-11-07): one dashboard, two layers. Each layer shows only what that
+   role needs - no names, no ids, location rounded (~1 km). Layer comes from layer-routing.js. ── */
+var NAT_META={animal:{t:'בעל חיים',c:'#3FA34D'},envhaz:{t:'מפגע סביבתי',c:'#2E8B57'},animal_injured:{t:'חיה פצועה',c:'#3FA34D'},animal_abuse:{t:'התעללות בבעל חיים',c:'#8BC34A'},
+  dumping:{t:'השלכת אשפה',c:'#9E8F3A'},pollution:{t:'זיהום',c:'#3A9EA0'},reserve_hazard:{t:'מפגע בשמורה',c:'#2E8B57'},wildfire:{t:'שריפת חורש',c:'#E8590C'},rabies_animal:{t:'כלבת · חיה מסוכנת',c:'#C2185B'}};
+var NAT_SVG='<path d="M5 19c0-8 5-14 15-15-.4 9.6-6.4 15-14 15H5Z"/><path d="M5 19c3-4 6-6.5 10-8.5"/>';
+var LYR_VIS={shomer:true,nature:true};
+function lyrEntitled(v){ var a=Array.isArray(v)?v.filter(function(x){return x==='shomer'||x==='nature';}):[]; return a.length?a:['shomer']; }   /* existing accounts = the SH✡MER (person) layer */
+function lyrOf(e){ try{ if(window.ShomerRouting) return ShomerRouting.feedLayer(e); }catch(_){} return (e&&e.layer==='nature')?'nature':'shomer'; }
+function lyrShow(e){ var l=lyrOf(e), ent=(CLIENT&&CLIENT.layers)||['shomer'];
+  var s=LYR_VIS.shomer&&ent.indexOf('shomer')>=0, n=LYR_VIS.nature&&ent.indexOf('nature')>=0;
+  return l==='both'?(s||n):(l==='nature'?n:s); }
+function lyrInit(){ try{ var sv=JSON.parse(localStorage.getItem('shomer_dash_layers')||'null'); if(sv&&typeof sv==='object'){ LYR_VIS.shomer=sv.shomer!==false; LYR_VIS.nature=sv.nature!==false; } }catch(_){}
+  var el=document.getElementById('lyr'); if(!el) return; var ent=(CLIENT&&CLIENT.layers)||['shomer'];
+  el.innerHTML=[['shomer','👤 אדם'],['nature','🌿 טבע']].map(function(p){ var has=ent.indexOf(p[0])>=0;
+    return '<button class="lyr-b'+(p[0]==='nature'?' nat':'')+'" data-l="'+p[0]+'" aria-pressed="'+(has&&LYR_VIS[p[0]])+'"'+(has?'':' disabled title="השכבה לא פעילה בחשבון · ראו חבילות"')+' onclick="lyrToggle(\''+p[0]+'\')">'+p[1]+'</button>'; }).join(''); }
+function lyrToggle(l){ var ent=(CLIENT&&CLIENT.layers)||['shomer']; if(ent.indexOf(l)<0){ openPricing(); return; }
+  LYR_VIS[l]=!LYR_VIS[l]; try{ localStorage.setItem('shomer_dash_layers',JSON.stringify(LYR_VIS)); }catch(_){}
+  lyrInit(); try{ boardRefresh(); }catch(_){} }
 function _liveMeta(e){
+ var _nm=NAT_META[e.type]; if(_nm){ var _l=lyrOf(e); return {i:_liveSvg(NAT_SVG),t:_nm.t,c:_nm.c,nat:true,layer:_l}; }
  if(e.type==='sos') return {i:_liveSvg(_LIVE_IC.sos),t:(e.nm||'קריאת SOS'),c:'#FF1A40',sos:true};
  if(e.type==='abduct'||e.k==='abduct') return {i:_liveSvg(_LIVE_IC.abduct),t:(e.nm||'חשד לחטיפה'),c:'#D10029'};
  if(e.type==='missing'||e.k==='missing') return {i:_liveSvg(_LIVE_IC.missing),t:(e.nm||'אדם נעדר'),c:'#6D4AFF'};
@@ -1307,10 +1343,11 @@ function _boardRow(r){
  var st=isLive?'<span class="st-chip st-live">חי</span>':'<span class="st-chip st-'+r.status+'">'+ST_LBL[r.status]+'</span>';
  var src=r.ex?'':(r.demo?' · הדגמה':' · רשת שומרים');
  var meta=_ago(e.ts)+src+(r.note?' · '+ESC(r.note):(isLive?'':' · ללא הערת תוצאה'));
+ if(m.nat){ meta=_ago(e.ts)+' · מיקום בשטח ~1 ק״מ'+(e.doc?' · תיעוד: '+ESC(e.doc):'')+src+' · סוף: '+(r.note?ESC(r.note):(isLive?'פתוח':ST_LBL[r.status]||'פתוח')); }   /* Nature layer: hazard type, field location, documentation, outcome */
  var click=isLive?"openResponse('"+id+"')":"openEvEdit('"+id+"')";
  return '<div class="item fi'+(isLive?' lv':'')+(r.ex?' ex':'')+'" data-id="'+ESC(r.id)+'" onclick="'+click+'" title="'+ESC(m.t+(r.note?' — '+r.note:''))+'">'
   +'<span class="sev" style="background:'+m.c+'"></span><div class="dot" style="color:'+m.c+'">'+m.i+'</div>'
-  +'<div style="flex:1;min-width:0"><div class="nm">'+ESC(m.t)+(r.ex?'<span class="ex-tag">דוגמה</span>':'')+(isLive&&m.sos?'<span class="live-badge">● LIVE</span>':'')+'</div><div class="mt">'+meta+'</div></div>'
+  +'<div style="flex:1;min-width:0"><div class="nm">'+ESC(m.t)+(m.nat?(m.layer==='both'?'<span class="lyr-tag both">אדם + טבע</span>':'<span class="lyr-tag">טבע</span>'):'')+(r.ex?'<span class="ex-tag">דוגמה</span>':'')+(isLive&&m.sos?'<span class="live-badge">● LIVE</span>':'')+'</div><div class="mt">'+meta+'</div></div>'
   +st+'<button class="ib" title="מצב והערת תוצאה" aria-label="עריכה" onclick="event.stopPropagation();openEvEdit(\''+id+'\')">✎</button>'
   +(r.ex?'<button class="ib" title="מחיקת הדוגמה" aria-label="מחיקה" onclick="event.stopPropagation();boardDelete(\''+id+'\')">✕</button>':'')
   +'</div>'; }
@@ -1364,7 +1401,7 @@ function renderLive(c,list,opts){
  if(!liveLayer&&MAP){ liveLayer=L.layerGroup().addTo(MAP); }
  if(liveLayer){ liveLayer.clearLayers(); liveLayer._byId={}; }
  _lgClear('live');
- list=(list||[]).slice().sort(function(a,b){return (b.ts||0)-(a.ts||0);});
+ list=(list||[]).filter(lyrShow).slice().sort(function(a,b){return (b.ts||0)-(a.ts||0);});   /* only the layers this org turned on */
  var newSos=null;
  var _topSos=list.filter(function(e){return _liveMeta(e).sos;})[0];
  var _topSosId=_topSos?_evId(_topSos):null;
@@ -1378,7 +1415,7 @@ function renderLive(c,list,opts){
    mk.on('click',(function(eid){return function(){openResponse(eid);};})(id)); try{if(mk._path)mk._path.style.cursor='pointer';}catch(_e){}
    try{ mk.bindTooltip(_evTip(m,e,'חי · לחצו לפרטים ותגובה'),{direction:'top',offset:[0,-8]}); }catch(_t){}
    mk.addTo(liveLayer); liveLayer._byId[id]=mk;
-   _lgAdd('live',m.c,(m.sos?'SOS חי':(e.type==='abduct'||e.k==='abduct')?'חשד לחטיפה':(e.type==='missing'||e.k==='missing')?'אדם נעדר':('דיווח · '+catShort(e.t||e.type||'')))+(opts.demo?' (הדגמה)':''));
+   _lgAdd('live',m.c,m.nat?('טבע · '+m.t+(opts.demo?' (הדגמה)':'')):(m.sos?'SOS חי':(e.type==='abduct'||e.k==='abduct')?'חשד לחטיפה':(e.type==='missing'||e.k==='missing')?'אדם נעדר':('דיווח · '+catShort(e.t||e.type||'')))+(opts.demo?' (הדגמה)':''));
   }
   /* SOS rows are keyed by the person's uid, so a REPEAT SOS reuses the id: key = id + start ts */
   var _sk=id+'@'+(e.ts||0);
@@ -1386,7 +1423,7 @@ function renderLive(c,list,opts){
   var rv=B.reviews[id], st=(rv&&ST_LBL[rv.status])?rv.status:'open';
   (st==='open'?liveRows:revRows).push({id:id,e:e,m:m,live:true,demo:!!opts.demo,status:st,note:(rv&&rv.note)||''});
  });
- if(!opts.demo){ (window._revReal||[]).forEach(function(e){ var m=_liveMeta(e),id=_evId(e); _liveEvents[id]={e:e,m:m,demo:false}; var rv=B.reviews[id];
+ if(!opts.demo){ (window._revReal||[]).filter(lyrShow).forEach(function(e){ var m=_liveMeta(e),id=_evId(e); _liveEvents[id]={e:e,m:m,demo:false}; var rv=B.reviews[id];
    revRows.push({id:id,e:e,m:m,status:(rv&&ST_LBL[rv.status])?rv.status:(e.status==='resolved'?'closed':'open'),note:(rv&&rv.note)||''}); }); }
  B.examples.forEach(function(x){ var e={id:x.id,type:x.type,t:x.t,nm:x.nm,ts:x.ts}; revRows.push({id:x.id,e:e,m:_liveMeta(e),ex:true,status:ST_LBL[x.status]?x.status:'open',note:x.note||''}); });
  liveRows.sort(function(a,b){ return ((b.m.sos?1:0)-(a.m.sos?1:0))||((b.e.ts||0)-(a.e.ts||0)); });
@@ -1661,6 +1698,24 @@ function teamRender(){
   var pend=(teamLS('inv')||[]).filter(function(x){return !x.ask;}).length;
   if(pend) h+='<div class="tm-pend">'+pend+' הזמנות ממתינות לאישור</div>';
   box.innerHTML=h;
+}
+/* Packages - pay for what you turn on. One combined bundle, never a double charge.
+   Prices depend on the org's size and type: NOT set yet (NEEDS YOUR EYES). No payment here. */
+function openPricing(){
+  if(document.getElementById('pricing-ov')) return;
+  var ent=(CLIENT&&CLIENT.layers)||['shomer'];
+  var cur=ent.length>1?'both':ent[0];
+  function tier(k,h,who,desc){ return '<div class="pr-t"'+(k===cur?' style="border-color:var(--gold)"':'')+'><h4>'+h+(k===cur?' · <span style="color:var(--gold);font-size:11px">פעיל בחשבון</span>':'')+'</h4><p>'+desc+'</p><p><b>מתאים ל:</b> '+who+'</p><div class="pr-p">מחיר: לפי גודל וסוג הארגון · TBD</div><span class="pr-eyes">NEEDS YOUR EYES</span></div>'; }
+  var ov=document.createElement('div'); ov.id='pricing-ov'; ov.className='acct-ov';
+  ov.innerHTML='<div class="acct-card" style="max-width:720px"><div class="acct-head"><h3>📦 חבילות · משלמים על מה שמפעילים</h3><button class="acct-x" onclick="document.getElementById(\'pricing-ov\').remove()">✕</button></div>'
+   +'<div class="acct-sub">דשבורד אחד, שתי שכבות. ארגון שצריך את שתיהן מדליק אותן באותו חשבון. אין חיוב כפול.</div>'
+   +'<div class="pr-grid">'
+   +tier('shomer','👤 שכבת אדם','מועצה עירונית, קב״ט, רכז קהילה','זמן, מקום כללי, סוג, האם מישהו בדרך, פתוח או הסתיים. בלי שמות ובלי פרטים מזהים.')
+   +tier('nature','🌿 שכבת טבע','גוף טבע, שמורה, רכזי שטח','סוג המפגע, מיקום בשטח, תיעוד, ומה היה הסוף.')
+   +tier('both','👤🌿 חבילה משולבת','מועצה אזורית, יחידת חילוץ','שתי השכבות באותו חשבון ובאותו דשבורד, במחיר חבילה אחד.')
+   +'</div><div class="acct-note">התחלה בפיילוט לקהילה, ואחר כך לפי היקף או מספר תושבים. לשינוי החבילה פנו ל-dave@3shamrocks.com. אין תשלום מהמסך הזה.</div></div>';
+  ov.addEventListener('click',function(e){ if(e.target===ov) ov.remove(); });
+  document.body.appendChild(ov);
 }
 async function openTeam(){
   if(CLIENT&&CLIENT.demo){ alert('צוות שומרים זמין בחשבון עירייה מחובר.'); return; }
