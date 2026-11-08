@@ -50,7 +50,7 @@
       {
         // Android shows this while tracking. Required by the OS, and the user
         // deserves to see it — a safety app should never track invisibly.
-        backgroundMessage: 'SH\u2721MER is protecting you. Your guardians can see your location.',
+        backgroundMessage: 'SH\u2721MER is protecting you. The people you chose can see your location.',
         backgroundTitle: 'SH\u2721MER — active',
         requestPermissions: true,
         stale: false,
@@ -63,7 +63,7 @@
               if (confirm(
                 (typeof currentLang !== 'undefined' && currentLang === 'he')
                   ? 'כדי שהשומרים שלך יראו אותך גם כשהאפליקציה סגורה, צריך לאשר גישה למיקום "תמיד". לפתוח הגדרות?'
-                  : 'To let your guardians see you even when the app is closed, allow "Always" location access. Open settings?'
+                  : 'To let the people you chose see you even when the app is closed, allow "Always" location access. Open settings?'
               )) BG.openSettings();
             } catch (e) {}
           }

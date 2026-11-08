@@ -1,7 +1,7 @@
 {
  "name": "SH✡MER — Citizens Protecting Citizens",
  "short_name": "SH✡MER",
- "description": "Citizens helping citizens in emergency events. Real-time safety map, instant SOS, automatic guardian, and community protection. By 3Shamrocks.Studio",
+ "description": "Citizens helping citizens in emergency events. Real-time safety map, instant SOS, your chosen circle, and community protection. By 3Shamrocks.Studio",
  "start_url": "shomer.html",
  "scope": "./",
  "display": "standalone",
