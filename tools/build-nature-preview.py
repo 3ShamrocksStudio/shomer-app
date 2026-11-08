@@ -96,6 +96,19 @@ def main():
         os.makedirs(os.path.dirname(o), exist_ok=True)
         open(o, 'w', encoding='utf-8').write(transform(p, s))
     open(os.path.join(OUT, 'robots.txt'), 'w').write('User-agent: *\nDisallow: /\n')
+    # drop images no preview page, script or stylesheet mentions (keeps the preview small)
+    text = ''
+    for root, _, files in os.walk(OUT):
+        for f in files:
+            if f.endswith(('.html', '.js', '.css', '.json')):
+                text += open(os.path.join(root, f), encoding='utf-8', errors='ignore').read()
+    for d in (OUT, os.path.join(OUT, 'nature')):
+        for f in os.listdir(d):
+            if f.lower().endswith(('.jpg', '.jpeg', '.png', '.webp')) and f not in text:
+                os.remove(os.path.join(d, f))
+    for d in ('scenes', 'site-assets'):
+        if os.path.isdir(os.path.join(OUT, d)) and (d + '/') not in text:
+            shutil.rmtree(os.path.join(OUT, d))
     # hard gate: no production endpoint may survive anywhere in the build
     hits = []
     for root, _, files in os.walk(OUT):
