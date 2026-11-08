@@ -42,7 +42,13 @@
       outcome_need: 'בחרו תוצאה לפני סגירה', reporter_sees: 'המדווח/ת רואה: ', r_received: 'התקבל', r_handled: 'טופל',
       rep_title: 'דוח SH✡MER Nature', rep_period: 'תקופה: 30 הימים האחרונים', rep_demo: 'נתוני הדגמה. לא נתונים אמיתיים.',
       col_type: 'סוג', col_area: 'אזור', col_when: 'דווח', col_status: 'מצב', col_outcome: 'תוצאה', col_tth: 'זמן טיפול (דק׳)', col_doc: 'תיעוד', col_layer: 'שכבה',
-      ago_now: 'עכשיו', ago_m: 'לפני {n} דק׳', ago_h: 'לפני {n} שע׳'
+      ago_now: 'עכשיו', ago_m: 'לפני {n} דק׳', ago_h: 'לפני {n} שע׳',
+      org_demo: 'ארגון שטח · הדגמה', org_live: 'רשת SH✡MER · תצוגה חיה', b_pkg: '📦 חבילות', b_acct: '⚙ חשבון', b_exp: '⤓ ייצוא', b_out: 'יציאה', beta: 'גרסת בטא',
+      v_person: 'אדם', v_nature: 'טבע', banner: 'נתוני הדגמה · לא נתונים אמיתיים', live_t: 'נתונים חיים', nolive_t: 'אין חיבור לנתונים חיים',
+      pr_h: '📦 חבילות · משלמים על מה שמפעילים', pr_sub: 'דשבורד אחד, שתי שכבות. ארגון שצריך את שתיהן מדליק אותן באותו חשבון. אין חיוב כפול.',
+      pr_p: 'זמן, מקום כללי, סוג, האם מישהו בדרך, פתוח או הסתיים. בלי שמות ובלי פרטים מזהים.', pr_n: 'סוג המפגע, מיקום בשטח, תיעוד, ומה היה הסוף.', pr_b: 'שתי השכבות באותו חשבון ובאותו דשבורד, במחיר חבילה אחד.',
+      pr_wp: 'מועצה עירונית, קב״ט, רכז קהילה', pr_wn: 'גוף טבע, שמורה, רכזי שטח', pr_wb: 'מועצה אזורית, יחידת חילוץ', pr_fit: 'מתאים ל:', pr_price: 'מחיר: לפי גודל וסוג הארגון · TBD', pr_on: 'פעיל בחשבון',
+      pr_note: 'התחלה בפיילוט לקהילה, ואחר כך לפי היקף או מספר תושבים. לשינוי החבילה פנו ל-dave@3shamrocks.com. אין תשלום מהמסך הזה.'
     },
     en: {
       title: 'SH✡MER Nature · Field board', tag: 'Protecting those without a voice',
@@ -68,7 +74,13 @@
       outcome_need: 'Choose an outcome before closing', reporter_sees: 'The reporter sees: ', r_received: 'Received', r_handled: 'Handled',
       rep_title: 'SH✡MER Nature report', rep_period: 'Period: last 30 days', rep_demo: 'Demo data. Not real data.',
       col_type: 'Type', col_area: 'Area', col_when: 'Reported', col_status: 'Status', col_outcome: 'Outcome', col_tth: 'Time to handle (min)', col_doc: 'Documentation', col_layer: 'Layer',
-      ago_now: 'now', ago_m: '{n} min ago', ago_h: '{n} h ago'
+      ago_now: 'now', ago_m: '{n} min ago', ago_h: '{n} h ago',
+      org_demo: 'Field organisation · Demo', org_live: 'SH✡MER network · live view', b_pkg: '📦 Packages', b_acct: '⚙ Account', b_exp: '⤓ Export', b_out: 'Sign out', beta: 'Beta',
+      v_person: 'Person', v_nature: 'Nature', banner: 'Demo data · not real data', live_t: 'Live data', nolive_t: 'No live data connection',
+      pr_h: '📦 Packages · pay for what you turn on', pr_sub: 'One dashboard, two layers. An organisation that needs both turns them on in the same account. No double charge.',
+      pr_p: 'Time, general place, type, whether someone is on the way, open or closed. No names, no identifying details.', pr_n: 'Hazard type, field location, documentation, and how it ended.', pr_b: 'Both layers in the same account and dashboard, for one package price.',
+      pr_wp: 'City council, security officer, community coordinator', pr_wn: 'Nature body, reserve, field coordinators', pr_wb: 'Regional council, rescue unit', pr_fit: 'Fits:', pr_price: 'Price: by the organisation\'s size and type · TBD', pr_on: 'Active on this account',
+      pr_note: 'Starts with a community pilot, then by scope or number of residents. To change the package, write to dave@3shamrocks.com. No payment on this screen.'
     },
     ar: {
       title: 'SH✡MER Nature · لوحة الميدان', tag: 'نحمي من لا صوت له',
@@ -94,7 +106,13 @@
       outcome_need: 'اختر نتيجة قبل الإغلاق', reporter_sees: 'المُبلّغ يرى: ', r_received: 'تم الاستلام', r_handled: 'تمت المعالجة',
       rep_title: 'تقرير SH✡MER Nature', rep_period: 'الفترة: آخر 30 يوماً', rep_demo: 'بيانات تجريبية. ليست بيانات حقيقية.',
       col_type: 'النوع', col_area: 'المنطقة', col_when: 'وقت البلاغ', col_status: 'الحالة', col_outcome: 'النتيجة', col_tth: 'وقت المعالجة (د)', col_doc: 'التوثيق', col_layer: 'الطبقة',
-      ago_now: 'الآن', ago_m: 'قبل {n} د', ago_h: 'قبل {n} س'
+      ago_now: 'الآن', ago_m: 'قبل {n} د', ago_h: 'قبل {n} س',
+      org_demo: 'منظمة ميدانية · عرض تجريبي', org_live: 'شبكة SH✡MER · عرض مباشر', b_pkg: '📦 الباقات', b_acct: '⚙ الحساب', b_exp: '⤓ تصدير', b_out: 'خروج', beta: 'نسخة تجريبية',
+      v_person: 'أشخاص', v_nature: 'طبيعة', banner: 'بيانات تجريبية · ليست بيانات حقيقية', live_t: 'بيانات مباشرة', nolive_t: 'لا اتصال ببيانات مباشرة',
+      pr_h: '📦 الباقات · تدفع مقابل ما تفعّله', pr_sub: 'لوحة واحدة وطبقتان. المؤسسة التي تحتاج الاثنتين تفعّلهما في الحساب نفسه. لا دفع مزدوج.',
+      pr_p: 'الوقت، مكان عام، النوع، هل أحد في الطريق، مفتوح أو منتهٍ. بلا أسماء وبلا تفاصيل معرّفة.', pr_n: 'نوع الخطر، الموقع في الميدان، التوثيق، وكيف انتهى.', pr_b: 'الطبقتان في الحساب واللوحة نفسيهما، بسعر باقة واحد.',
+      pr_wp: 'مجلس بلدي، مسؤول أمن، منسّق مجتمع', pr_wn: 'جهة طبيعة، محمية، منسّقو ميدان', pr_wb: 'مجلس إقليمي، وحدة إنقاذ', pr_fit: 'مناسب لـ:', pr_price: 'السعر: حسب حجم المؤسسة ونوعها · TBD', pr_on: 'مفعّلة في الحساب',
+      pr_note: 'البداية بتجربة مجتمعية، ثم حسب الحجم أو عدد السكان. لتغيير الباقة راسلوا dave@3shamrocks.com. لا دفع من هذه الشاشة.'
     }
   };
   var TY = {
@@ -254,12 +272,58 @@
     var lg = document.querySelector('.topbar .logo-img');
     if (lg) { lg.src = v === 'nature' ? 'nature-assets/nature-logo-white.png' : 'SHOMER_logo_big.png'; lg.alt = v === 'nature' ? 'SH✡MER Nature' : 'SH✡MER'; }
     var sm = document.querySelector('.topbar .brand small'); if (sm) sm.textContent = v === 'nature' ? 'Nature · Field' : 'Command · Municipal Intelligence';
-    try { document.title = v === 'nature' ? 'SH✡MER Nature · לוח שטח' : 'SH✡MER Command · Municipal Intelligence'; } catch (_) {}
     try { if (window.lyrInit) lyrInit(); } catch (_) {}
+    wrapPricing(); chrome(v === 'nature');
+    if (v === 'person') { try { if (window._curCity && !(CLIENT && CLIENT.demo) && window.drawTerritory) drawTerritory(_curCity); } catch (_) {} }
     if (v === 'nature') { render(); setTimeout(function () { try { NMAP && NMAP.invalidateSize(); fitMap(); } catch (_) {} }, 60); }
     else { try { if (window.MAP) setTimeout(function () { MAP.invalidateSize(); }, 60); if (window.boardRefresh) boardRefresh(); } catch (_) {} }
   }
   NatDash.setView = setView;
+  NatDash.locale = function () { return LANG === 'en' ? 'en-GB' : LANG === 'ar' ? 'ar-EG' : 'he-IL'; };
+  function orgLabel() { if (CLIENT && CLIENT.demo) return t('org_demo'); if (CLIENT && CLIENT.live) return t('org_live'); return (CLIENT && CLIENT.org) || ''; }
+  NatDash.orgLabel = orgLabel;
+
+  /* the top bar and the demo banner follow the Nature view's language; the Person view gets its own words back */
+  var CHROME = [['pricing-btn', 'b_pkg'], ['acct-btn', 'b_acct'], ['export-btn', 'b_exp'], ['signout', 'b_out'], ['plan-badge', 'beta'], ['org-name', null], ['demo-banner', 'banner']];
+  var _orig = null;
+  function chrome(on) {
+    if (!_orig) _orig = {};
+    CHROME.forEach(function (c) {
+      var el = document.getElementById(c[0]); if (!el) return;
+      if (_orig[c[0]] === undefined) _orig[c[0]] = el.textContent;   /* first time we touch it = its own words */
+      if (on) el.textContent = c[1] ? t(c[1]) : orgLabel();
+      else if (c[0] === 'org-name') el.textContent = (CLIENT && CLIENT.org) || '';
+      else el.textContent = _orig[c[0]];
+    });
+    var tb = document.querySelector('#app .topbar'); if (tb) { if (on) { tb.setAttribute('dir', LANG === 'en' ? 'ltr' : 'rtl'); tb.setAttribute('lang', LANG); } else { tb.removeAttribute('dir'); tb.removeAttribute('lang'); } }
+    var li = document.getElementById('live-ind'); if (li && on) li.title = li.classList.contains('off') ? t('nolive_t') : t('live_t');
+    var vp = document.querySelector('#lyr .lyr-b[data-v="person"]'), vn = document.querySelector('#lyr .lyr-b[data-v="nature"]');
+    if (vp) vp.textContent = '👤 ' + (on ? t('v_person') : 'אדם'); if (vn) vn.textContent = '🌿 ' + (on ? t('v_nature') : 'טבע');
+    var g = document.getElementById('lyr'); if (g) g.setAttribute('aria-label', on ? t('d_layer') : 'שכבות');
+    try { document.title = on ? t('title') : 'SH✡MER Command · Municipal Intelligence'; } catch (_) {}
+    try { if (window.clkTick) clkTick(); } catch (_) {}
+    syncBanner();
+  }
+  NatDash.chrome = chrome;
+  /* the fixed demo banner reserves its own height, so it never covers the top bar (phones wrap it) */
+  function syncBanner() { var b = document.getElementById('demo-banner'); if (!b) return; try { document.documentElement.style.setProperty('--demo-h', b.offsetHeight + 'px'); } catch (_) {}
+    if (!b._ro && window.ResizeObserver) { b._ro = new ResizeObserver(function () { try { document.documentElement.style.setProperty('--demo-h', b.offsetHeight + 'px'); } catch (_) {} }); b._ro.observe(b); } }
+  NatDash.syncBanner = syncBanner;
+  function natPricing() {
+    if (document.getElementById('pricing-ov')) return;
+    var e = ent(), cur = e.length > 1 ? 'both' : e[0];
+    function tier(k, h, who, desc) { return '<div class="pr-t"' + (k === cur ? ' style="border-color:var(--gold)"' : '') + '><h4>' + esc(h) + (k === cur ? ' · <span style="color:var(--gold);font-size:11px">' + esc(t('pr_on')) + '</span>' : '') + '</h4><p>' + esc(desc) + '</p><p><b>' + esc(t('pr_fit')) + '</b> ' + esc(who) + '</p><div class="pr-p">' + esc(t('pr_price')) + '</div><span class="pr-eyes">NEEDS YOUR EYES</span></div>'; }
+    var ov = document.createElement('div'); ov.id = 'pricing-ov'; ov.className = 'acct-ov'; ov.setAttribute('dir', LANG === 'en' ? 'ltr' : 'rtl'); ov.setAttribute('lang', LANG);
+    ov.innerHTML = '<div class="acct-card" style="max-width:720px"><div class="acct-head"><h3>' + esc(t('pr_h')) + '</h3><button class="acct-x" aria-label="✕">✕</button></div>'
+      + '<div class="acct-sub">' + esc(t('pr_sub')) + '</div><div class="pr-grid">'
+      + tier('shomer', '👤 ' + t('p_person'), t('pr_wp'), t('pr_p')) + tier('nature', '🌿 ' + t('p_nature'), t('pr_wn'), t('pr_n')) + tier('both', '👤🌿 ' + t('p_both'), t('pr_wb'), t('pr_b'))
+      + '</div><div class="acct-note">' + esc(t('pr_note')) + '</div></div>';
+    ov.addEventListener('click', function (ev) { if (ev.target === ov) ov.remove(); });
+    ov.querySelector('.acct-x').onclick = function () { ov.remove(); };
+    document.body.appendChild(ov);
+  }
+  function wrapPricing() { if (!window.openPricing || window.openPricing._nat) return; var orig = window.openPricing;
+    window.openPricing = function () { if (VIEW === 'nature' && LANG !== 'he') return natPricing(); return orig.apply(this, arguments); }; window.openPricing._nat = true; }
   NatDash.onLive = function () { if (VIEW === 'nature') render(); };
 
   /* ── render ── */
@@ -284,7 +348,7 @@
       + '<section class="nd-card"><div class="nd-ch"><b>' + esc(t('flow')) + '</b></div><div class="nd-flow" id="nd-flow"></div></section>'
       + '<section class="nd-card"><div class="nd-ch"><b>' + esc(t('plan')) + '</b></div><div class="nd-plan" id="nd-plan"></div></section></div>'
       + '</div>';
-    host.querySelectorAll('.nd-langs button').forEach(function (b) { b.onclick = function () { LANG = b.getAttribute('data-l'); ls('shomer_nat_lang', LANG); render(); if (SEL) openCase(SEL); }; });
+    host.querySelectorAll('.nd-langs button').forEach(function (b) { b.onclick = function () { LANG = b.getAttribute('data-l'); ls('shomer_nat_lang', LANG); render(); chrome(true); if (SEL) openCase(SEL); }; });
     host.querySelector('#nd-export').onclick = function () { NatDash.exportReport(); };
     host.querySelector('#nd-csv').onclick = function () { NatDash.exportCSV(); };
     host.querySelector('#nd-reset').onclick = function () { NatDash.resetDemo(); };
@@ -332,6 +396,7 @@
     /* new preview reports: one gentle notice */
     all.forEach(function (c) { if (c.preview && !_seenBridge[c.id]) { _seenBridge[c.id] = 1; if (_bridgeReady && C.statusOf(c.state) === 'open') toast(t('t_new') + ': ' + ty(c.type)); } });
     _bridgeReady = true;
+    chrome(true);
   }
   var _bridgeReady = false;
 
@@ -463,7 +528,7 @@
     return '<!DOCTYPE html><html lang="' + LANG + '" dir="' + dir + '"><head><meta charset="utf-8"><title>' + esc(t('rep_title')) + '</title><style>' + css + '</style></head><body>'
       + (demo ? '<div class="demo">' + esc(t('rep_demo')) + '</div>' : '')
       + '<h1>' + esc(t('rep_title')) + '</h1>'
-      + '<div class="sub">' + esc((CLIENT && CLIENT.org) || '') + ' · ' + esc(t('rep_period')) + ' · ' + esc(full(Date.now())) + '</div>'
+      + '<div class="sub">' + esc(orgLabel()) + ' · ' + esc(t('rep_period')) + ' · ' + esc(full(Date.now())) + '</div>'
       + '<div class="k"><div>' + esc(t('k_open')) + '<b>' + m.open + '</b></div><div>' + esc(t('k_enroute')) + '<b>' + m.enroute + '</b></div><div>' + esc(t('k_handled')) + '<b>' + m.handled + '</b></div><div>' + esc(t('k_closed')) + '<b>' + m.closedInPeriod + '</b></div><div>' + esc(t('k_tth')) + '<b>' + esc(dur(m.medianHandleMin)) + '</b></div><div>' + esc(t('k_doc')) + '<b>' + (m.documentedPct == null ? '—' : m.documentedPct + '%') + '</b></div></div>'
       + '<table><thead><tr>' + head().map(function (h) { return '<th>' + esc(h) + '</th>'; }).join('') + '</tr></thead><tbody>'
       + rows.map(function (r) { return '<tr>' + r.map(function (v) { return '<td>' + esc(v) + '</td>'; }).join('') + '</tr>'; }).join('') + '</tbody></table>'

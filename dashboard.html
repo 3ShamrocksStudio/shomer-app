@@ -703,9 +703,10 @@ function hebNum(n){ if(!(n>0)) return ''; var H=[[400,'ת'],[300,'ש'],[200,'ר'
   return r.length>1?r.slice(0,-1)+'״'+r.slice(-1):r+'׳'; }
 function clkTick(){ try{ var now=Date.now(), q=ilParts(now);
   var t=document.getElementById('clk-time'); if(!t) return; t.innerHTML=q.hour+':'+q.minute+'<i>:'+q.second+'</i>';
-  var sh=document.getElementById('clk-short'); if(sh) sh.textContent=new Intl.DateTimeFormat('he-IL',{timeZone:IL_TZ,weekday:'short'}).format(new Date(now))+' '+q.day+'.'+q.month+'.'+q.year;
-  var d=document.getElementById('clk-date'); if(d) d.textContent=new Intl.DateTimeFormat('he-IL',{timeZone:IL_TZ,weekday:'long',day:'numeric',month:'long',year:'numeric'}).format(new Date(now));
-  var h=document.getElementById('clk-heb'); if(h){ try{ var hp={}; new Intl.DateTimeFormat('he-IL-u-ca-hebrew',{timeZone:IL_TZ,day:'numeric',month:'long',year:'numeric'}).formatToParts(new Date(now)).forEach(function(x){ hp[x.type]=x.value; });
+  var LOC=(window.NatDash&&NatDash.isOn()&&NatDash.locale)?NatDash.locale():'he-IL';
+  var sh=document.getElementById('clk-short'); if(sh) sh.textContent=new Intl.DateTimeFormat(LOC,{timeZone:IL_TZ,weekday:'short'}).format(new Date(now))+' '+q.day+'.'+q.month+'.'+q.year;
+  var d=document.getElementById('clk-date'); if(d) d.textContent=new Intl.DateTimeFormat(LOC,{timeZone:IL_TZ,weekday:'long',day:'numeric',month:'long',year:'numeric'}).format(new Date(now));
+  var h=document.getElementById('clk-heb'); if(h&&LOC!=='he-IL'){ h.textContent=''; } else if(h){ try{ var hp={}; new Intl.DateTimeFormat('he-IL-u-ca-hebrew',{timeZone:IL_TZ,day:'numeric',month:'long',year:'numeric'}).formatToParts(new Date(now)).forEach(function(x){ hp[x.type]=x.value; });
     h.textContent=hebNum(+hp.day)+' '+(/^ב/.test(hp.month)?'':'ב')+hp.month+' '+hebNum((+hp.year)%1000); }catch(e){ h.textContent=''; } }
  }catch(e){} }
 setInterval(clkTick,1000); document.addEventListener('DOMContentLoaded',clkTick);
@@ -994,11 +995,15 @@ function geoRings(geo){ var rings=[]; function ring(cs){return cs.map(function(p
   if(geo.type==='Polygon'){geo.coordinates.forEach(function(r){rings.push(ring(r));});}
   else if(geo.type==='MultiPolygon'){geo.coordinates.forEach(function(poly){poly.forEach(function(r){rings.push(ring(r));});});}
   return rings; }
+/* Outside address / boundary lookups (nominatim) only where they add something: never in the labelled demo,
+   never while the Nature view is open. A blocked or rate-limited lookup logs a browser error we cannot catch. */
+function _geoLookupOK(){ return !(CLIENT&&CLIENT.demo)&&!(window.NatDash&&NatDash.isOn()); }
 async function drawTerritory(c){
   if(c.pending){ window._terrFocus=function(){ MAP.setView([20,0],2,{animate:true}); }; try{ MAP.setView([20,0],2); }catch(e){} return; } /* worldwide territory still being located */
   window._terrFocus=function(){ MAP.setView([c.lat,c.lng],12,{animate:true}); };   /* provisional until the boundary arrives */
   var geo=_boundaryCache[c.city];
-  if(geo===undefined){
+  if(geo===undefined&&!_geoLookupOK()) geo=null;   /* demo / Nature view: no outside lookup (not cached, so the Person view can still fetch it later) */
+  else if(geo===undefined){
     /* dataset cities are Israeli → restrict the lookup to IL; worldwide territories pre-fill the cache in setIntlTerritory */
     try{ var url='https://nominatim.openstreetmap.org/search?format=jsonv2&polygon_geojson=1&limit=1'+(c.noData?'':'&countrycodes=il')+'&city='+encodeURIComponent(c.city.replace(/-/g,' '));
       var r=await fetch(url,{headers:{'Accept':'application/json'}}); var j=await r.json();
@@ -1118,6 +1123,7 @@ function bigSosAlert(id){
 function closeResponse(){ var p=document.getElementById('resp'); if(p){ p.classList.remove('on'); setTimeout(function(){try{p.remove();}catch(e){}},300); } try{ if(_respCircle){MAP.removeLayer(_respCircle);_respCircle=null;} }catch(e){} try{ var _rc=document.getElementById('rad-chip'); if(_rc)_rc.remove(); }catch(e){} }
 function stripGeocode(lat,lng){
  var box=document.getElementById('ls-addr-txt'); if(!box)return;
+ if(!_geoLookupOK()){ box.textContent=(+lat).toFixed(4)+', '+(+lng).toFixed(4); return; }
  try{
   fetch('https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat='+lat+'&lon='+lng+'&zoom=17&addressdetails=1&accept-language=he')
    .then(function(r){return r.ok?r.json():null;})
@@ -1298,6 +1304,7 @@ function respReinforce(id){
 }
 function respGeocode(lat,lng,demo){
  var box=document.getElementById('resp-addr'); if(!box) return;
+ if(!_geoLookupOK()){ box.textContent=demo?'כתובת מקורבת (נתוני הדגמה)':'כתובת לא זמינה · ראה קואורדינטות'; return; }
  try{
   fetch('https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat='+lat+'&lon='+lng+'&zoom=17&addressdetails=1&accept-language=he',{headers:{'Accept':'application/json'}})
    .then(function(r){ return r.ok?r.json():null; })

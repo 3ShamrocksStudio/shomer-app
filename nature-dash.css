@@ -154,3 +154,6 @@ body.nat-view .lyr .lyr-b.nat[aria-pressed="true"]{background:var(--nt-au2)!impo
   .nd-bar{grid-template-columns:minmax(80px,110px) 1fr 34px 64px;font-size:12px}.nd-title b{font-size:18px}
   .nd-dr{width:100vw}#nat-map{min-height:360px}}
 @media print{body.nat-view #nat-view{overflow:visible}}
+/* demo banner: full width on phones, never over the top bar (its height is reserved via --demo-h) */
+@media(max-width:640px){#demo-banner{left:0!important;right:0!important;transform:none!important;border-radius:0!important;text-align:center;font-size:12px!important;padding:4px 10px!important;line-height:1.35}}
+body.nat-view .topbar[dir=ltr] .clk{direction:ltr}
