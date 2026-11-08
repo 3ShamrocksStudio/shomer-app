@@ -67,7 +67,7 @@ test('33 an unclassified SOS never reaches the Nature layer', () => {
   assert.equal(R.route({origin: 'sos'}).nature, false);
 });
 
-test('34 a Nature report never goes to SH✡MER except fire near/uncertain', () => {
+test('34 a Nature report never goes to SH✡MER except fire near/uncertain or people in danger', () => {
   for (const t of R.NATURE_ONLY.concat(R.BOTH)) {
     const r = R.route({origin: 'nature', type: t, nearSettlement: false});
     assert.deepEqual(r.layers, ['nature'], t);
@@ -106,4 +106,36 @@ test('37 functions/ copy is byte-identical', () => {
   const a = fs.readFileSync(path.join(__dirname, '..', 'layer-routing.js'));
   const b = fs.readFileSync(path.join(__dirname, '..', 'functions', 'layer-routing.js'));
   assert.ok(a.equals(b), 'run: cp layer-routing.js functions/layer-routing.js');
+});
+
+test('38 Nature report, "someone is in danger" = yes -> both layers, one alert', () => {
+  for (const t of R.NATURE_ONLY.concat(R.BOTH)) {
+    const r = R.route({origin: 'nature', type: t, peopleInDanger: true, nearSettlement: false});
+    assert.deepEqual(r.layers, ['shomer', 'nature'], t);
+    assert.equal(r.reason, 'nature-people-in-danger');
+    assert.equal(r.alerts, 1);
+  }
+});
+
+test('39 "no one in danger" or no answer keeps a Nature report in Nature', () => {
+  for (const pd of [false, undefined, null]) {
+    assert.deepEqual(R.route({origin: 'nature', type: 'animal_injured', peopleInDanger: pd}).layers, ['nature'], String(pd));
+  }
+});
+
+test('40 an unclear danger answer fails safe to SH✡MER too', () => {
+  for (const pd of ['yes', 1, 'true', {}, 'no']) {
+    assert.deepEqual(R.route({origin: 'nature', type: 'dumping', peopleInDanger: pd}).layers, ['shomer', 'nature'], String(pd));
+  }
+});
+
+test('41 danger = no never cancels the fire-near-settlement rule', () => {
+  assert.deepEqual(R.route({origin: 'nature', type: 'wildfire', nearSettlement: true, peopleInDanger: false}).layers, ['shomer', 'nature']);
+  assert.deepEqual(R.route({origin: 'nature', type: 'wildfire', nearSettlement: null, peopleInDanger: false}).layers, ['shomer', 'nature']);
+});
+
+test('42 the danger answer never changes SOS routing or an unrecognised type', () => {
+  assert.deepEqual(R.route({origin: 'sos', peopleInDanger: false}).layers, ['shomer']);
+  assert.deepEqual(R.route({origin: 'sos', type: 'animal', peopleInDanger: true}).layers, ['nature']);
+  assert.deepEqual(R.route({origin: 'nature', type: 'zzz', peopleInDanger: true}).layers, ['shomer']);
 });

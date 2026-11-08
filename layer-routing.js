@@ -7,7 +7,7 @@
      - uncertain                                -> SH✡MER (fail-safe)
    An unclassified SOS is always a person in distress and goes to SH✡MER only.
    A Nature report (started without SOS) goes to Nature only, except a fire near a
-   settlement, which also goes to SH✡MER. Location alone NEVER makes an event Nature.
+   settlement, or a reporter who answers "yes, someone is in danger", which also go to SH✡MER. Location alone NEVER makes an event Nature.
    Pure functions, no I/O. Used by the app, the dashboard, Cloud Functions and the tests.
    functions/layer-routing.js must stay a byte-identical copy (a test checks it). */
 (function (root, factory) {
@@ -57,11 +57,13 @@
     };
   }
 
-  /* route({origin, type, nearSettlement})
+  /* route({origin, type, nearSettlement, peopleInDanger})
      origin:         'sos' | 'nature'   (anything else is treated as 'sos')
      type:           event type string  (missing / unknown / unrecognised = person)
      nearSettlement: true | false | null (only read for a fire in a Nature report;
                      null = "not sure" = uncertain = SH✡MER too)
+     peopleInDanger: "is anyone in danger?" - true escalates a Nature report to SH✡MER
+                     as well. false / missing = no. Any other value is unclear = SH✡MER too.
      Any other field (lat, lng, inReserve, ...) is ignored on purpose. */
   function route(input) {
     var o = (input && typeof input === 'object') ? input : {};
@@ -75,6 +77,9 @@
       return result(['shomer'], 'sos-person');
     }
     /* Nature report (started without SOS) */
+    var pd = o.peopleInDanger;
+    if ((isNatureOnly(t) || isBoth(t)) && pd !== undefined && pd !== null && pd !== false)
+      return result(['shomer', 'nature'], 'nature-people-in-danger');
     if (t === 'wildfire') {
       if (o.nearSettlement === false) return result(['nature'], 'nature-fire-far');
       return result(['shomer', 'nature'],
