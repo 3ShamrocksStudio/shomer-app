@@ -478,6 +478,8 @@
   try { var q = new URLSearchParams(location.search).get('nlang'); LANG = (q === 'en' || q === 'ar' || q === 'he') ? q : ((ls('shomer_nat_lang') === 'en' || ls('shomer_nat_lang') === 'ar') ? ls('shomer_nat_lang') : 'he'); } catch (_) {}
   /* the gate takes the Nature look when the page is opened for the Nature view */
   try { if (new URLSearchParams(location.search).get('view') === 'nature') { document.documentElement.classList.add('nat-entry'); document.addEventListener('DOMContentLoaded', function () { document.body.classList.add('nat-skin'); var g = document.getElementById('gate-tag'); if (g) g.textContent = 'SH✡MER Nature · שומרים על מי שאין לו קול'; }); } } catch (_) {}
+  /* if the account was already set up before this file ran, pick the view now */
+  try { if (window.CLIENT && typeof window.lyrInit === 'function') lyrInit(); } catch (_) {}
   /* preview: a report sent from the app on this device shows up here at once */
   window.addEventListener('storage', function (e) { if (e.key === BRIDGE && VIEW === 'nature') render(); });
   setInterval(function () { if (VIEW === 'nature' && !document.getElementById('nd-ov')) { try { render(); } catch (_) {} } }, 30000);
