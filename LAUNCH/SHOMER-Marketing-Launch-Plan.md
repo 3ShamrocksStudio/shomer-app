@@ -46,7 +46,7 @@ Citizens protecting citizens. An essential tool every parent wants for their chi
 ### Secondary (Reach & Credibility)
 - Hiking clubs, women's safety groups, parent WhatsApp/Telegram communities
 - Schools / youth movements (duty-of-care angle)
-- Nature & coastal volunteers (cross-promote Forest/Beach)
+- Nature & coastal volunteers (cross-promote Forest/Beach) — ON HOLD: Nature not yet marketed
 
 ### Longer-term (Institutional — prep now)
 - Regional NGOs, municipalities, Nature & Parks Authority
@@ -80,7 +80,7 @@ Citizens protecting citizens. An essential tool every parent wants for their chi
 - Arabic-speaking communities in Israel
 - Russian-speaking olim groups
 - Beach and coastal activity groups
-- Volunteer/nature protection groups (for Forest/Beach)
+- Volunteer/nature protection groups (for Forest/Beach) — ON HOLD: Nature not yet marketed
 
 ---
 
