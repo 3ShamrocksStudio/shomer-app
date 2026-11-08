@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SH✡MER · חבילות לארגונים</title>
+<meta name="description" content="דשבורד אחד, שתי שכבות: אדם וטבע. משלמים על מה שמפעילים.">
+<link rel="icon" href="badge-192.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Heebo:wght@400;500;700;800;900&display=swap" rel="stylesheet">
+<style>
+:root{--n0:#0A1628;--n1:#0F1E36;--n2:#152843;--ln:#24395C;--tx0:#F0F4FF;--tx1:#C8D4E8;--tx2:#8496B4;--au:#E0A828;--au3:#F2C55C;--nat:#50DB0F}
+*{margin:0;padding:0;box-sizing:border-box}
+html{-webkit-text-size-adjust:100%;overflow-x:hidden}
+body{background:var(--n0);color:var(--tx0);font-family:'Heebo',sans-serif;font-size:16px;line-height:1.6;overflow-x:hidden}
+a{color:var(--au3)}
+.w{max-width:1040px;margin:0 auto;padding:0 16px}
+nav{border-bottom:1px solid var(--ln)}
+.nav-in{display:flex;align-items:center;justify-content:space-between;height:60px;gap:12px}
+.brand{font-weight:900;font-size:17px;letter-spacing:.03em;color:var(--tx0);text-decoration:none}
+.brand .st{color:var(--au)}
+.lang{display:flex;gap:4px}
+.lang button{width:38px;height:34px;border-radius:8px;border:1px solid var(--ln);background:transparent;color:var(--tx1);font:700 13px 'Heebo',sans-serif;cursor:pointer}
+.lang button.on{border-color:var(--au);color:var(--tx0)}
+header{padding:56px 0 28px}
+.eb{font-size:12px;font-weight:800;letter-spacing:.14em;color:var(--au3)}
+h1{font-size:clamp(28px,5vw,44px);font-weight:900;letter-spacing:-.02em;line-height:1.15;margin:10px 0 12px}
+.lead{color:var(--tx1);font-size:17px;max-width:640px}
+.eyes{margin:22px 0 0;border:1px dashed var(--au);border-radius:12px;padding:10px 14px;font-size:13px;color:var(--au3);max-width:640px}
+.tiers{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin:32px 0}
+.tier{border:1px solid var(--ln);border-radius:18px;padding:22px;background:var(--n1);display:flex;flex-direction:column;gap:10px;min-width:0}
+.tier.nat{border-color:rgba(80,219,15,.35)}
+.tier.both{border-color:var(--au)}
+.who{font-size:12px;font-weight:800;letter-spacing:.08em;color:var(--tx2)}
+.tier h2{font-size:22px;font-weight:900}
+.tier.nat h2{color:var(--nat)}
+.price{font-size:26px;font-weight:900;color:var(--tx0)}
+.price small{display:block;font-size:13px;font-weight:500;color:var(--tx2)}
+.tier p{color:var(--tx1);font-size:15px}
+.tier ul{list-style:none;color:var(--tx1);font-size:14px;display:flex;flex-direction:column;gap:6px}
+.tier li::before{content:"·";color:var(--au);font-weight:900;margin-inline-end:6px}
+.notes{border-top:1px solid var(--ln);padding:26px 0 40px;color:var(--tx1);font-size:15px;display:grid;gap:10px}
+.note-s{color:var(--tx2);font-size:13px}
+footer{border-top:1px solid var(--ln);padding:22px 0 40px;color:var(--tx2);font-size:13px}
+@media(max-width:820px){.tiers{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<nav><div class="w nav-in">
+  <a class="brand" href="index.html">SH<span class="st">✡</span>MER</a>
+  <span class="lang"><button class="on" id="L-he" onclick="setLang('he')">עב</button><button id="L-en" onclick="setLang('en')">EN</button><button id="L-ar" onclick="setLang('ar')">عر</button></span>
+</div></nav>
+
+<header class="w">
+  <span class="eb" data-t="eb">לארגונים · רשויות · גופי טבע</span>
+  <h1 data-t="h1">דשבורד אחד. שתי שכבות. משלמים על מה שמפעילים.</h1>
+  <p class="lead" data-t="lead">שכבת אדם לביטחון הקהילה, שכבת טבע לשטח ולבעלי החיים. ארגון שצריך את שתיהן מדליק אותן באותו חשבון ובאותו דשבורד. אין חיוב כפול.</p>
+  <p class="eyes">NEEDS YOUR EYES · <span data-t="eyes">המחירים עוד לא נקבעו. המחיר לפי גודל וסוג הארגון.</span></p>
+</header>
+
+<main class="w">
+  <div class="tiers">
+    <div class="tier">
+      <span class="who" data-t="t1w">מועצה עירונית · קב״ט · רכז קהילה</span>
+      <h2 data-t="t1n">שכבת אדם</h2>
+      <div class="price">TBD<small data-t="tp">לפי גודל וסוג הארגון</small></div>
+      <p data-t="t1d">מה שקורה לאנשים ולקהילה בשטח שלכם.</p>
+      <ul><li data-t="t1a">זמן, מקום כללי וסוג האירוע</li><li data-t="t1b">האם מישהו בדרך</li><li data-t="t1c">פתוח או הסתיים</li><li data-t="t1e">בלי שמות ובלי פרטים מזהים</li></ul>
+    </div>
+    <div class="tier nat">
+      <span class="who" data-t="t2w">גוף טבע · שמורה · רכזי שטח</span>
+      <h2 data-t="t2n">שכבת טבע</h2>
+      <div class="price">TBD<small data-t="tp">לפי גודל וסוג הארגון</small></div>
+      <p data-t="t2d">שומרים על מי שאין לו קול.</p>
+      <ul><li data-t="t2a">סוג המפגע</li><li data-t="t2b">מיקום בשטח</li><li data-t="t2c">תיעוד</li><li data-t="t2e">ומה היה הסוף</li></ul>
+    </div>
+    <div class="tier both">
+      <span class="who" data-t="t3w">מועצה אזורית · יחידת חילוץ</span>
+      <h2 data-t="t3n">חבילה משולבת</h2>
+      <div class="price">TBD<small data-t="tp">לפי גודל וסוג הארגון</small></div>
+      <p data-t="t3d">שתי השכבות באותו חשבון ובאותו דשבורד, במחיר חבילה אחד.</p>
+      <ul><li data-t="t3a">מדליקים כל שכבה לפי הצורך</li><li data-t="t3b">צוות יכול לראות רק שכבה אחת</li><li data-t="t3c">אירוע ששייך לשתיהן מופיע בשתיהן</li></ul>
+    </div>
+  </div>
+  <div class="notes">
+    <p data-t="n1">מתחילים בפיילוט לקהילה, ואחר כך לפי היקף או מספר תושבים.</p>
+    <p data-t="n2">למשתמשים באפליקציה SH✡MER חינם. אפליקציה אחת, עם דיווח טבע בתוכה.</p>
+    <p><span data-t="n3">לפיילוט או להצעה לארגון:</span> <a href="mailto:support@shomer-app.co.il" dir="ltr">support@shomer-app.co.il</a></p>
+    <p class="note-s" data-t="n4">SH✡MER אינו תחליף לשירותי חירום. בחירום חייגו 100 · 101 · 102.</p>
+  </div>
+</main>
+<footer><div class="w">SH✡MER · SH✡MER Nature · © 2026 3Shamrocks Studio · <a href="privacy.html">פרטיות</a> · <a href="terms.html">תנאים</a></div></footer>
+
+<script>
+var T={
+ he:null,
+ en:{eb:"FOR ORGANISATIONS · AUTHORITIES · NATURE BODIES",h1:"One dashboard. Two layers. Pay for what you turn on.",
+  lead:"A person layer for community safety, a Nature layer for the field and for animals. An organisation that needs both turns them on in the same account and the same dashboard. No double charge.",
+  eyes:"Prices are not set yet. Price depends on the organisation's size and type.",tp:"by organisation size and type",
+  t1w:"CITY COUNCIL · SECURITY OFFICER · COMMUNITY COORDINATOR",t1n:"Person layer",t1d:"What happens to people and the community in your area.",
+  t1a:"Time, general location and type",t1b:"Whether someone is on the way",t1c:"Open or ended",t1e:"No names and no identifying details",
+  t2w:"NATURE BODY · RESERVE · FIELD COORDINATORS",t2n:"Nature layer",t2d:"Guarding those without a voice.",
+  t2a:"Type of hazard",t2b:"Location in the field",t2c:"Documentation",t2e:"And how it ended",
+  t3w:"REGIONAL COUNCIL · RESCUE UNIT",t3n:"Combined bundle",t3d:"Both layers in the same account and dashboard, at one bundle price.",
+  t3a:"Turn each layer on as needed",t3b:"A team can see one layer only",t3c:"An event that belongs to both shows in both",
+  n1:"We start with a community pilot, then by scale or number of residents.",n2:"SH✡MER is free for app users. One app, with nature reporting inside it.",
+  n3:"For a pilot or an offer for your organisation:",n4:"SH✡MER is not a substitute for emergency services. In an emergency call 100 · 101 · 102."},
+ ar:{eb:"للمؤسسات · السلطات · هيئات الطبيعة",h1:"لوحة واحدة. طبقتان. تدفع مقابل ما تشغّله.",
+  lead:"طبقة الأشخاص لأمان المجتمع، وطبقة الطبيعة للميدان وللحيوانات. المؤسسة التي تحتاج الاثنتين تشغّلهما في نفس الحساب ونفس اللوحة. بلا دفع مزدوج.",
+  eyes:"الأسعار لم تُحدَّد بعد. السعر حسب حجم المؤسسة ونوعها.",tp:"حسب حجم المؤسسة ونوعها",
+  t1w:"بلدية · ضابط أمن · منسّق مجتمع",t1n:"طبقة الأشخاص",t1d:"ما يحدث للناس وللمجتمع في منطقتكم.",
+  t1a:"الوقت والموقع العام والنوع",t1b:"هل هناك من في الطريق",t1c:"مفتوح أو انتهى",t1e:"بلا أسماء وبلا تفاصيل تعريفية",
+  t2w:"هيئة طبيعة · محمية · منسّقو ميدان",t2n:"طبقة الطبيعة",t2d:"نحرس من لا صوت له.",
+  t2a:"نوع الخطر",t2b:"الموقع في الميدان",t2c:"التوثيق",t2e:"وكيف انتهى",
+  t3w:"مجلس إقليمي · وحدة إنقاذ",t3n:"باقة مدمجة",t3d:"الطبقتان في نفس الحساب ونفس اللوحة، بسعر باقة واحد.",
+  t3a:"تشغيل كل طبقة حسب الحاجة",t3b:"يمكن لفريق رؤية طبقة واحدة فقط",t3c:"حدث يخص الطبقتين يظهر في كلتيهما",
+  n1:"نبدأ بتجربة للمجتمع، ثم حسب الحجم أو عدد السكان.",n2:"شومير مجاني لمستخدمي التطبيق. تطبيق واحد، وفيه بلاغ الطبيعة.",
+  n3:"لتجربة أو عرض لمؤسستكم:",n4:"شومير ليس بديلاً عن خدمات الطوارئ. في الطوارئ اتصل 100 · 101 · 102."}
+};
+T.he={}; document.querySelectorAll('[data-t]').forEach(function(el){ T.he[el.getAttribute('data-t')]=el.innerHTML; });
+function setLang(l){
+  if(!T[l]) l='he';
+  document.documentElement.lang=l; document.documentElement.dir=(l==='en')?'ltr':'rtl';
+  document.querySelectorAll('[data-t]').forEach(function(el){ var k=el.getAttribute('data-t'); if(T[l][k]!=null) el.innerHTML=T[l][k]; });
+  ['he','en','ar'].forEach(function(x){ var b=document.getElementById('L-'+x); if(b) b.classList.toggle('on',x===l); });
+  try{ localStorage.setItem('shomer_lang',l); }catch(e){}
+}
+(function(){ var q=(location.search.match(/[?&]lang=(he|en|ar)/)||[])[1], s=null; try{ s=localStorage.getItem('shomer_lang'); }catch(e){} if(q||s) setLang(q||s); })();
+</script>
+</body>
+</html>
