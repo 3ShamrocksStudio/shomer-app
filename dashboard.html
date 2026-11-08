@@ -9,6 +9,8 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="layer-routing.js"></script>
+<script src="nature-cases.js"></script>
+<link rel="stylesheet" href="nature-dash.css">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Alef:wght@400;700&family=Inter:wght@200;300;500;600;700&display=swap" rel="stylesheet">
 <style>
@@ -671,6 +673,8 @@
       <div class="legend" id="legend"></div>
     </section>
   </main>
+  <!-- SH✡MER Nature view: same account, same engine (nature-dash.js) -->
+  <div id="nat-view" aria-label="SH✡MER Nature"></div>
 </div>
 
 <script>
@@ -728,7 +732,7 @@ document.getElementById('signup-btn').onclick=async function(){
 document.getElementById('signout').onclick=async function(){ try{ if(!(CLIENT&&CLIENT.demo)) await sb.auth.signOut(); }catch(e){} location.reload(); };
 document.getElementById('demo-btn').onclick=function(){ demoBoot(); };
 (function(){ var lb=document.getElementById('live-btn'); if(lb) lb.onclick=function(){ liveBoot(); }; })();
-(function(){var ex=document.getElementById('export-btn'); if(ex) ex.onclick=function(){ try{exportReport();}catch(e){window.print();} };
+(function(){var ex=document.getElementById('export-btn'); if(ex) ex.onclick=function(){ try{ if(window.NatDash&&NatDash.isOn()){ NatDash.exportReport(); return; } exportReport();}catch(e){window.print();} };
  var ac=document.getElementById('acct-btn'); if(ac) ac.onclick=function(){ try{openSettings();}catch(e){} };})();
 (function(){var sp=document.getElementById('spread-btn'); if(sp) sp.onclick=function(){ if(_curCity) toggleSpread(_curCity); };})();
 var DEMO_INC=[
@@ -756,7 +760,7 @@ async function demoBoot(){
   var idx=DATA._sorted.findIndex(function(c){return c.city===CLIENT.territory;});
   render(idx>=0?idx:0);
   _applyTerrParam();
-  setTimeout(function(){ try{ var k=Object.keys(_liveEvents||{}).filter(function(id){return _liveEvents[id].m&&_liveEvents[id].m.sos;})[0]; if(k){ _playAlertTone(); openResponse(k); } }catch(e){} }, 2000);
+  setTimeout(function(){ try{ if(window.NatDash&&NatDash.isOn()) return; var k=Object.keys(_liveEvents||{}).filter(function(id){return _liveEvents[id].m&&_liveEvents[id].m.sos;})[0]; if(k){ _playAlertTone(); openResponse(k); } }catch(e){} }, 2000);
   /* note removed in console layout */
 }
 function demoLive(c){
@@ -790,9 +794,9 @@ async function boot(){
   await loadData();
   if(!document.getElementById('su-terr').options.length) fillTerr(document.getElementById('su-terr'));
   var u=(await sb.auth.getUser()).data.user;
-  if(!u){ liveBoot(); return; }
+  if(!u){ if(/[?&]demo=1\b/.test(location.search)) demoBoot(); else liveBoot(); return; }   /* ?demo=1 opens the labelled demo (e.g. the Nature view walkthrough) */
   var md=u.user_metadata||{};
-  CLIENT={org:md.org||'',territory:md.territory||'',email:u.email,layers:lyrEntitled(md.layers)}; try{ lyrInit(); }catch(_l){}   /* an org turns on one layer or both, in one account */
+  CLIENT={org:md.org||'',territory:md.territory||'',email:u.email,layers:lyrEntitled(md.layers),areas:(Array.isArray(md.areas)?md.areas:[])}; try{ lyrInit(); }catch(_l){}   /* an org turns on one layer or both, in one account */
   try{ if(teamLS('on')) setTimeout(function(){ teamInit().catch(function(){}); },1500); }catch(e){}   /* v310: a manager with a team hears leaders' alerts as soon as they log in */
   if(!CLIENT.territory){ // shouldn't happen, but guard
     CLIENT.territory=DATA._sorted[0].city;
@@ -1050,19 +1054,19 @@ var _LIVE_IC={sos:'<path d="M12 3l7 3v5c0 5-3.4 8.5-7 10-3.6-1.5-7-5-7-10V6Z"/><
 var NAT_META={animal:{t:'בעל חיים',c:'#3FA34D'},envhaz:{t:'מפגע סביבתי',c:'#2E8B57'},animal_injured:{t:'חיה פצועה',c:'#3FA34D'},animal_abuse:{t:'התעללות בבעל חיים',c:'#8BC34A'},
   dumping:{t:'השלכת אשפה',c:'#9E8F3A'},pollution:{t:'זיהום',c:'#3A9EA0'},reserve_hazard:{t:'מפגע בשמורה',c:'#2E8B57'},wildfire:{t:'שריפת חורש',c:'#E8590C'},rabies_animal:{t:'כלבת · חיה מסוכנת',c:'#C2185B'}};
 var NAT_SVG='<path d="M5 19c0-8 5-14 15-15-.4 9.6-6.4 15-14 15H5Z"/><path d="M5 19c3-4 6-6.5 10-8.5"/>';
-var LYR_VIS={shomer:true,nature:true};
+/* One account, one dashboard, two views: Person (this command grid) and Nature (nature-dash.js).
+   An org with both layers switches between them; a layer it has not turned on opens the packages panel. */
 function lyrEntitled(v){ var a=Array.isArray(v)?v.filter(function(x){return x==='shomer'||x==='nature';}):[]; return a.length?a:['shomer']; }   /* existing accounts = the SH✡MER (person) layer */
 function lyrOf(e){ try{ if(window.ShomerRouting) return ShomerRouting.feedLayer(e); }catch(_){} return (e&&e.layer==='nature')?'nature':'shomer'; }
-function lyrShow(e){ var l=lyrOf(e), ent=(CLIENT&&CLIENT.layers)||['shomer'];
-  var s=LYR_VIS.shomer&&ent.indexOf('shomer')>=0, n=LYR_VIS.nature&&ent.indexOf('nature')>=0;
-  return l==='both'?(s||n):(l==='nature'?n:s); }
-function lyrInit(){ try{ var sv=JSON.parse(localStorage.getItem('shomer_dash_layers')||'null'); if(sv&&typeof sv==='object'){ LYR_VIS.shomer=sv.shomer!==false; LYR_VIS.nature=sv.nature!==false; } }catch(_){}
+function lyrShow(e){ return lyrOf(e)!=='nature'; }   /* the Person view shows person events and shared (both) ones; Nature-only cases live in the Nature view */
+var _lyrPicked=false;
+function lyrInit(){
   var el=document.getElementById('lyr'); if(!el) return; var ent=(CLIENT&&CLIENT.layers)||['shomer'];
-  el.innerHTML=[['shomer','👤 אדם'],['nature','🌿 טבע']].map(function(p){ var has=ent.indexOf(p[0])>=0;
-    return '<button class="lyr-b'+(p[0]==='nature'?' nat':'')+'" data-l="'+p[0]+'" aria-pressed="'+(has&&LYR_VIS[p[0]])+'"'+(has?'':' disabled title="השכבה לא פעילה בחשבון · ראו חבילות"')+' onclick="lyrToggle(\''+p[0]+'\')">'+p[1]+'</button>'; }).join(''); }
-function lyrToggle(l){ var ent=(CLIENT&&CLIENT.layers)||['shomer']; if(ent.indexOf(l)<0){ openPricing(); return; }
-  LYR_VIS[l]=!LYR_VIS[l]; try{ localStorage.setItem('shomer_dash_layers',JSON.stringify(LYR_VIS)); }catch(_){}
-  lyrInit(); try{ boardRefresh(); }catch(_){} }
+  if(!_lyrPicked&&window.NatDash){ _lyrPicked=true; NatDash.pickInitial(); return; }
+  var cur=window.NatDash?NatDash.view():'person';
+  el.innerHTML=[['person','shomer','👤 אדם'],['nature','nature','🌿 טבע']].map(function(p){ var has=ent.indexOf(p[1])>=0;
+    return '<button class="lyr-b'+(p[0]==='nature'?' nat':'')+'" data-v="'+p[0]+'" aria-pressed="'+(cur===p[0])+'"'+(has?' title="'+(p[0]==='nature'?'תצוגת SH✡MER Nature':'תצוגת אדם')+'"':' title="השכבה לא פעילה בחשבון · ראו חבילות"')+' onclick="lyrToggle(\''+p[0]+'\')">'+p[2]+'</button>'; }).join(''); }
+function lyrToggle(v){ if(window.NatDash) NatDash.setView(v); }
 function _liveMeta(e){
  var _nm=NAT_META[e.type]; if(_nm){ var _l=lyrOf(e); return {i:_liveSvg(NAT_SVG),t:_nm.t,c:_nm.c,nat:true,layer:_l}; }
  if(e.type==='sos') return {i:_liveSvg(_LIVE_IC.sos),t:(e.nm||'קריאת SOS'),c:'#FF1A40',sos:true};
@@ -1313,7 +1317,7 @@ function respGeocode(lat,lng,demo){
 /* ===== events board · examples + operator review (status / outcome note) =====
    Stored ONLY in this browser (localStorage, every access in try/catch) — never written to Firebase.
    Examples are clearly tagged "דוגמה", editable/removable, and excluded from the exported report. */
-var BOARD_KEY='shomer_dash_board_v1', ST_LBL={open:'פתוח',handled:'טופל',closed:'נסגר'};
+var BOARD_KEY='shomer_dash_board_v1', ST_LBL={open:'פתוח',enroute:'בדרך',handled:'טופל',closed:'נסגר'};
 function _boardSeed(){ var now=Date.now(),H=36e5,D=864e5;
  return [
   {id:'ex1',type:'event',t:'עבירות סדר ציבורי',nm:'רעש והתקהלות בגינה ציבורית',ts:now-20*H,status:'open',note:''},
@@ -1396,7 +1400,7 @@ function saveEvEdit(id){
  _boardSave(B); closeEvEdit(); boardRefresh();
 }
 function renderLive(c,list,opts){
- opts=opts||{}; window._lastLive={c:c,list:list,opts:{demo:!!opts.demo}};
+ opts=opts||{}; window._lastLive={c:c,list:list,opts:{demo:!!opts.demo}}; try{ if(window.NatDash) setTimeout(NatDash.onLive,0); }catch(_n){}
  var feed=document.getElementById('feed'), B=_boardLoad();
  if(!liveLayer&&MAP){ liveLayer=L.layerGroup().addTo(MAP); }
  if(liveLayer){ liveLayer.clearLayers(); liveLayer._byId={}; }
@@ -2475,5 +2479,6 @@ function render(idx){
 boot();
 </script>
 <script>/* v322 published-news events layer: on for everyone (never in stats); ?evp=0 hides it */try{ if(!/[?&]evp=0\b/.test(location.search)){ var _evs=document.createElement('script'); _evs.src='events-preview-dash.js?nosw&v=332'; document.head.appendChild(_evs); } }catch(e){}</script>
+<script src="nature-dash.js"></script>
 </body>
 </html>
