@@ -651,7 +651,7 @@
       <div class="cb recs" id="recspane"></div>
     </section>
     <section class="card c-feed ops-feed" id="c-feed">
-      <div class="ch"><span class="t">⚡ לוח אירועים</span><span class="sp"></span><button class="ch-btn" id="ex-clear" style="display:none" onclick="boardClearExamples()" title="מחיקת כל אירועי הדוגמה מהלוח">נקה דוגמאות</button><span class="pill live" id="feed-src">רשת שומרים</span></div>
+      <div class="ch"><span class="t">⚡ לוח אירועים</span><span class="sp"></span><button class="ch-btn" id="ex-clear" style="display:none" onclick="boardClearExamples()" title="מחיקת כל אירועי הדוגמה מהלוח">נקה דוגמאות</button><span class="pill live" id="feed-src">רשת SH✡MER</span></div>
       <div class="cb feed" id="feed"><div class="empty">מתחבר לרשת SH✡MER…</div></div>
     </section>
     <!-- ROW 3 · LEFT: graph chart -->
@@ -666,7 +666,7 @@
     </section>
     <!-- ROWS 2–3 · RIGHT: MAP (hero) -->
     <section class="card c-map" id="c-map">
-      <div class="ch"><span class="t">מפת פשיעה · גבול שיפוט</span><span class="pill off">ציבורי</span><span class="sp"></span><span class="maptools"><button class="mini" id="spread-btn" title="הצג/הסתר שומרים">◉ שומרים</button><button class="mini on" id="tgl-bound" onclick="toggleMapLayer('bound')" title="הצג/הסתר גבול שיפוט">⬠ גבול</button></span></div>
+      <div class="ch"><span class="t">מפת פשיעה · גבול שיפוט</span><span class="pill off">ציבורי</span><span class="sp"></span><span class="maptools"><button class="mini" id="spread-btn" title="הצג/הסתר משתמשים">◉ משתמשים</button><button class="mini on" id="tgl-bound" onclick="toggleMapLayer('bound')" title="הצג/הסתר גבול שיפוט">⬠ גבול</button></span></div>
       <div class="map-wrap"><div id="map"></div><div class="insp" id="insp"></div></div>
       <div class="legend" id="legend"></div>
     </section>
@@ -843,7 +843,7 @@ function toggleMapLayer(which){
 var spreadLayer=null;
 function toggleSpread(c){
  var btn=document.getElementById('spread-btn');
- /* REAL-AUTH MODE: שומרים button toggles presLayer (real network pins from loadLive) */
+ /* REAL-AUTH MODE: users button toggles presLayer (real network pins from loadLive) */
  if(CLIENT&&!CLIENT.demo){
   if(presLayer){
    if(MAP.hasLayer(presLayer)){MAP.removeLayer(presLayer);if(btn)btn.classList.remove('on');}
@@ -926,7 +926,7 @@ function focusCat(k){
 }
 function focusAdvice(k,diff,cr,n){
   var sev=cr<=10?'עומס ארצי גבוה. ':'';
-  if(diff>12) return sev+'עבירות אלו נפוצות בטריטוריה מעל הממוצע הארצי (+'+diff+'%). מומלץ: מיקוד סיורים ותאורה באזורים החמים, קמפיין מניעה ממוקד, והפעלת רשת השומרים לדיווח מהיר.';
+  if(diff>12) return sev+'עבירות אלו נפוצות בטריטוריה מעל הממוצע הארצי (+'+diff+'%). מומלץ: מיקוד סיורים ותאורה באזורים החמים, קמפיין מניעה ממוקד, והפעלת רשת SH✡MER לדיווח מהיר.';
   if(diff<-12) return sev+'שיעור נמוך מהממוצע הארצי ('+diff+'%). שמרו על המגמה — נטרו נקודות חמות מקומיות והמשיכו אכיפה מונעת.';
   return sev+'שיעור קרוב לממוצע הארצי. נטרו שינויים רבעוניים ומקדו משאבים בנקודות החמות שבמפה.';
 }
@@ -973,7 +973,7 @@ function render(idx){
     card('פשיעה ל-1,000',pcTxt,'אוכלוסייה: הערכת למ״ס*')+
     card('אוכלוסייה (הערכה)',POP[c.city]?fmt(POP[c.city]):'—','הערכת למ״ס — לא נתון משטרה*');
   renderInsights(idx); renderSolutions(idx);
-  var fs=document.getElementById('feed-src'); if(fs)fs.textContent=(CLIENT&&CLIENT.demo)?'נתוני הדגמה':(_feedLive()?'רשת שומרים · חי':'רשת שומרים · אין חיבור');
+  var fs=document.getElementById('feed-src'); if(fs)fs.textContent=(CLIENT&&CLIENT.demo)?'נתוני הדגמה':(_feedLive()?'רשת SH✡MER · חי':'רשת SH✡MER · אין חיבור');
   // regional comparison: nearest 6 cities by distance
   var near=cities.map(function(x){return {x:x,d:Math.hypot((x.lat-c.lat),(x.lng-c.lng))};}).sort(function(a,b){return a.d-b.d;}).slice(0,6).map(function(o){return o.x;});
   var pcs=near.map(function(x){return {city:x.city, pc:perCap(x), tot:x.total};});
@@ -1030,7 +1030,7 @@ function renderInsights(idx){
   ranked.slice(0,2).forEach(function(o){ if(o.cs>o.ns*1.12){ var d=Math.round((o.cs/o.ns-1)*100);
     out.push({i:'▲',t:o.k+' — מעל הממוצע הארצי',d:Math.round(o.cs*100)+'% מהעבירות בטריטוריה מול '+Math.round(o.ns*100)+'% ארצי (+'+d+'%). המלצה: מיקוד משאבי מניעה, סיור ותאורה ציבורית באזורים הרלוונטיים.'}); }});
   // national load
-  out.push({i:'⌖',t:'עומס עבירות ארצי',d:'הטריטוריה מדורגת #'+(idx+1)+' מתוך '+cities.length+' בכמות העבירות המדווחות (משטרת ישראל 2025). '+(idx<10?'עומס גבוה — מצדיק חיזוק נוכחות ושיתוף רשת השומרים.':idx<30?'עומס בינוני ביחס לארץ.':'עומס נמוך יחסית — שמירה על מגמה.')});
+  out.push({i:'⌖',t:'עומס עבירות ארצי',d:'הטריטוריה מדורגת #'+(idx+1)+' מתוך '+cities.length+' בכמות העבירות המדווחות (משטרת ישראל 2025). '+(idx<10?'עומס גבוה — מצדיק חיזוק נוכחות ושיתוף רשת SH✡MER.':idx<30?'עומס בינוני ביחס לארץ.':'עומס נמוך יחסית — שמירה על מגמה.')});
   // dominant category
   var tc=topCat(c.cats);
   out.push({i:'◆',t:'סוג עבירה מוביל',d:tc.name+' — '+fmt(tc.val)+' עבירות ('+Math.round(tc.val/tot*100)+'% מהסך). עדיפות ראשונה להקצאת משאבים ולמסע הסברה ממוקד.'});
@@ -1161,10 +1161,10 @@ function openResponse(id){
   var groups=_respGroups(e);
   var gHtml=groups.map(function(g){return '<b onclick="respToggle(\''+g.k+'\',this)">'+g.i+' '+g.t+'</b>';}).join('');
   var coord=lat.toFixed(4)+', '+lng.toFixed(4);
-  var accTxt=o.demo?'מיקום מקורב · נתוני הדגמה':'מיקום מרשת שומרים · קואורדינטות מעובדות';
+  var accTxt=o.demo?'מיקום מקורב · נתוני הדגמה':'מיקום מרשת SH✡MER · קואורדינטות מעובדות';
   var p=document.createElement('div'); p.id='resp'; p.className='resp';
   p.innerHTML=''
-   +'<div class="resp-h"><span class="ic">'+m.i+'</span><div class="tt"><b>'+ESC(m.t)+'</b><span><span class="resp-live">● חי</span> · '+ago+' · '+(o.demo?'נתוני הדגמה':'רשת שומרים')+'</span></div><button class="resp-x" onclick="closeResponse()">✕</button></div>'
+   +'<div class="resp-h"><span class="ic">'+m.i+'</span><div class="tt"><b>'+ESC(m.t)+'</b><span><span class="resp-live">● חי</span> · '+ago+' · '+(o.demo?'נתוני הדגמה':'רשת SH✡MER')+'</span></div><button class="resp-x" onclick="closeResponse()">✕</button></div>'
    +'<div class="resp-b">'
    // 1 — LOCATION
    +'  <div class="rsec"><div class="rsec-h"><span class="rsec-n">1</span>מיקום האירוע</div>'
@@ -1186,14 +1186,14 @@ function openResponse(id){
    +'  <div class="rsec"><div class="rsec-h"><span class="rsec-n">3</span>שיגור לכוחות</div>'
    +'    <div class="rsec-hint">בחר/י למי לשגר, ואז שלח/י לאישור:</div>'
    +'    <div class="rg">'+gHtml+'</div>'
-   +'    <div class="resp-two"><div class="resp-esc" onclick="respReinforce(\''+id+'\')" title="מרחיב את טווח ההתראה (עדכון אוטומטי לשומרים/למוקד טרם חובר)">⬆️ בקש תגבור</div><div class="resp-bc" onclick="respLog(\''+id+'\',\'הודעה לקבוצה — לא נשלחה (שליחה מהדשבורד טרם חוברה)\')">📢 הודעה לקבוצה</div></div>'
+   +'    <div class="resp-two"><div class="resp-esc" onclick="respReinforce(\''+id+'\')" title="מרחיב את טווח ההתראה (עדכון אוטומטי למשתמשים/למוקד טרם חובר)">⬆️ בקש תגבור</div><div class="resp-bc" onclick="respLog(\''+id+'\',\'הודעה לקבוצה — לא נשלחה (שליחה מהדשבורד טרם חוברה)\')">📢 הודעה לקבוצה</div></div>'
    +'    <button class="resp-send" onclick="respDispatch(\''+id+'\')">⚡ סמן לשיגור · שיגור אוטומטי טרם חובר</button></div>'
    // 4 — NATIONAL
    +'  <div class="rsec"><div class="rsec-h"><span class="rsec-n">4</span>שירותים ארציים</div>'
    +'    <div class="resp-nat">'+(isIntl(curC())?'🚨 מספר החירום המקומי (112 / 911 — לפי המדינה)':'🚑 מד"א 101 · 🚔 משטרה 100 · 🚒 כבאות 102')+'<br><span style="color:#f0c75a">פרטי האירוע מוכנים להעברה ידנית ע״י המוקדן. אין שיגור אוטומטי לשירותי החירום.</span></div></div>'
    // 5 — LOG
    +'  <div class="rsec"><div class="rsec-h"><span class="rsec-n">5</span>יומן תגובה <span class="rsec-v">מתועד</span></div>'
-   +'    <div class="resp-log" id="resp-log"><div>• '+hh+' — אותר ע״י רשת שומרים</div></div></div>'
+   +'    <div class="resp-log" id="resp-log"><div>• '+hh+' — אותר ע״י רשת SH✡MER</div></div></div>'
    +'  <div class="rsec"><div class="rsec-h"><span class="rsec-n">6</span>ראיות והעברה חוקית</div>'
    +'    <div id="resp-evid">'+_evidenceHtml(o,id)+'</div>'
    +'    <div class="resp-nat" style="margin-top:9px">⚖️ העברת ראיות לאכיפה ('+(isIntl(curC())?'רשויות האכיפה המקומיות':'משטרה 100 / פרקליטות')+') מתבצעת ידנית ע״י הרשות, עם בסיס חוקי ותיעוד מלא. <span style="color:#f0c75a">אין שיגור אוטומטי.</span> העברה לגורמי ביטחון לאומי — בערוצים משפטיים פורמליים בלבד, לא דרך כלי זה.</span></div></div>'
@@ -1232,7 +1232,7 @@ function _respMenim(e,m){
   var t=e.type||e.t||'';
   var MEN={
    sos:{d:'הגעת שומר קרוב ראשון תוך דקות + שיחת 100/101 מיידית. זמן תגובה קצר הוא הגורם הקריטי ביותר.',s:'NFPA / מגן דוד אדום',u:'https://www.mdais.org'},
-   abduct:{d:'הפצת תיאור מיידית לשומרים + מוקד 100/106, חסימת צירי מילוט ושיתוף המיקום האחרון. שעה ראשונה קריטית.',s:'AMBER Alert · NCMEC',u:'https://www.missingkids.org'},
+   abduct:{d:'הפצת תיאור מיידית למשתמשים בקרבת מקום + מוקד 100/106, חסימת צירי מילוט ושיתוף המיקום האחרון. שעה ראשונה קריטית.',s:'AMBER Alert · NCMEC',u:'https://www.missingkids.org'},
    missing:{d:'חיפוש ברדיוס מתרחב מנקודת היעלמות + גיוס מתנדבים מקומיים, שיתוף תיאור/תמונה בהסכמה.',s:'יחידת איתור (SAR) · משטרת ישראל',u:'https://www.gov.il/he/departments/israel_police'}
   };
   var men=MEN[t]; if(men&&isIntl(curC())) men={d:men.d.replace(/100\/101|100\/106/g,'מספר החירום המקומי'),s:men.s,u:men.u};
@@ -1251,7 +1251,7 @@ function respSendAlert(id){
   var sel=Object.keys(_shareSel).filter(function(k){return _shareSel[k];});
   if(!sel.length){ try{ var w=document.getElementById('share-warn'); if(w)w.style.display='block'; }catch(e){} return; }
   var rad=window._shareRad||1.5;
-  var names={shomrim:'שומרים',police:'שוטרים',med:'צוותי רפואה',fire:'כבאות',all:'כל המגיבים'};
+  var names={shomrim:'משתמשים',police:'שוטרים',med:'צוותי רפואה',fire:'כבאות',all:'כל המגיבים'};
   var who=sel.map(function(k){return names[k]||k;}).join(', ');
   try{ respLog(id,'📣 התראת מיקום לא נשלחה (שליחה מהדשבורד טרם חוברה) · נמענים שנבחרו: '+who+' · רדיוס '+rad.toFixed(1)+' ק"מ'); }catch(e){}
   var card=document.getElementById('share-card');
@@ -1267,10 +1267,10 @@ function respShareLoc(lat,lng,id){
     var chip=function(k,col,lbl){ return '<button class="shr-ck'+(_shareSel[k]?' on':'')+'" style="--cc:'+col+'" onclick="_shareToggle(\''+k+'\',this)"><i></i>'+lbl+'</button>'; };
     var ov=document.createElement('div'); ov.id='share-ov'; ov.className='acct-ov';
     ov.innerHTML='<div class="acct-card" id="share-card" style="max-width:440px">'
-      +'<div class="acct-head"><h3>📤 שיתוף מיקום אירוע · התראה לשומרים</h3><button class="acct-x" onclick="closeShare()">✕</button></div>'
+      +'<div class="acct-head"><h3>📤 שיתוף מיקום אירוע · התראה למשתמשים</h3><button class="acct-x" onclick="closeShare()">✕</button></div>'
       +'<div class="acct-sub">שליחת התראה מהדשבורד טרם חוברה — ניתן לבחור נמענים ולתעד ביומן, או להעתיק קישור מפה ולשלוח ידנית.</div>'
       +'<div style="margin:12px 0 6px;font-size:12px;color:#9aa6bd;font-weight:700">נמענים</div>'
-      +'<div class="shr-chips">'+chip('shomrim','#E0A828','שומרים')+chip('police','#2962FF','שוטרים')+chip('med','#16A06A','רפואה')+chip('fire','#FF7A1A','כבאות')+chip('all','#ff6b78','כולם')+'</div>'
+      +'<div class="shr-chips">'+chip('shomrim','#E0A828','משתמשים')+chip('police','#2962FF','שוטרים')+chip('med','#16A06A','רפואה')+chip('fire','#FF7A1A','כבאות')+chip('all','#ff6b78','כולם')+'</div>'
       +'<div id="share-warn" style="display:none;color:#ff6b70;font-size:11.5px;margin-top:6px">בחר/י לפחות נמען אחד</div>'
       +'<div style="margin:14px 0 4px;font-size:12px;color:#9aa6bd;font-weight:700">רדיוס התראה <span id="share-radv" style="color:#f0c75a">'+window._shareRad.toFixed(1)+' ק"מ</span></div>'
       +'<input class="resp-slider" type="range" min="0.2" max="5" step="0.1" value="'+window._shareRad+'" oninput="_shareRad(this.value)">'
@@ -1288,7 +1288,7 @@ function respReinforce(id){
     var cur=(typeof _respRadius==='number'?_respRadius:1.5); var nr=Math.min(5,Math.round((cur+1.5)*10)/10);
     var sl=document.querySelector('.resp-slider'); if(sl){ sl.value=nr; }
     try{ respSetRadius(nr); }catch(e){} try{ respFitRadius(); }catch(e){}
-    respLog(id,'⬆️ בקשת תגבור — טווח ההתראה הורחב ל-'+nr.toFixed(1)+' ק"מ (עדכון אוטומטי לשומרים ול'+(isIntl(curC())?'מוקד העירוני':'מוקד 106')+' טרם חובר — יש ליצור קשר ישיר)');
+    respLog(id,'⬆️ בקשת תגבור — טווח ההתראה הורחב ל-'+nr.toFixed(1)+' ק"מ (עדכון אוטומטי למשתמשים ול'+(isIntl(curC())?'מוקד העירוני':'מוקד 106')+' טרם חובר — יש ליצור קשר ישיר)');
   }catch(e){}
 }
 function respGeocode(lat,lng,demo){
@@ -1341,7 +1341,7 @@ function _evTip(m,e,tail){ var _t=e.ts||Date.now(); return '<b>'+ESC(m.t)+'</b><
 function _boardRow(r){
  var e=r.e,m=r.m,isLive=r.live&&r.status==='open',id=_jsq(r.id);
  var st=isLive?'<span class="st-chip st-live">חי</span>':'<span class="st-chip st-'+r.status+'">'+ST_LBL[r.status]+'</span>';
- var src=r.ex?'':(r.demo?' · הדגמה':' · רשת שומרים');
+ var src=r.ex?'':(r.demo?' · הדגמה':' · רשת SH✡MER');
  var meta=_ago(e.ts)+src+(r.note?' · '+ESC(r.note):(isLive?'':' · ללא הערת תוצאה'));
  if(m.nat){ meta=_ago(e.ts)+' · מיקום בשטח ~1 ק״מ'+(e.doc?' · תיעוד: '+ESC(e.doc):'')+src+' · סוף: '+(r.note?ESC(r.note):(isLive?'פתוח':ST_LBL[r.status]||'פתוח')); }   /* Nature layer: hazard type, field location, documentation, outcome */
  var click=isLive?"openResponse('"+id+"')":"openEvEdit('"+id+"')";
@@ -1369,7 +1369,7 @@ function openEvEdit(id){
  var body=ex?('<label>תיאור</label><input id="ev-nm" maxlength="80" value="'+ESC(e.nm||'')+'">'
    +'<div class="ev-row2"><div><label>סוג</label><select id="ev-ty">'+EV_TYPES.map(function(t){return '<option value="'+ESC(t[0])+'"'+(t[0]===curT?' selected':'')+'>'+t[1]+'</option>';}).join('')+'</select></div>'
    +'<div><label>מועד</label><input id="ev-dt" type="datetime-local" dir="ltr" value="'+dtv+'"></div></div>')
-   :('<div style="font-size:13px;color:var(--tx2);margin-top:6px"><b style="color:var(--tx)">'+ESC(r.m.t)+'</b> · '+_ago(e.ts)+(r.demo?' · הדגמה':' · רשת שומרים')+'</div>'
+   :('<div style="font-size:13px;color:var(--tx2);margin-top:6px"><b style="color:var(--tx)">'+ESC(r.m.t)+'</b> · '+_ago(e.ts)+(r.demo?' · הדגמה':' · רשת SH✡MER')+'</div>'
      +'<div class="ev-rec"><div><span>נרשם</span><b dir="ltr">'+ilFull(e.ts||Date.now())+'</b> שעון ישראל</div>'
      +((e.lat!=null&&e.lng!=null)?'<div><span>מיקום</span><b dir="ltr">'+(+e.lat).toFixed(4)+', '+(+e.lng).toFixed(4)+'</b></div>':'')
      +'<div><span>מזהה</span><b dir="ltr" style="font-size:11px">'+ESC(id)+'</b></div>'
@@ -1460,7 +1460,7 @@ function renderLive(c,list,opts){
          +'<div class="ls-main">'
          +'<div class="ls-t">'+m0.i+' '+ESC(m0.t)+'</div>'
          +'<div class="ls-addr"><span id="ls-addr-txt">מאתר כתובת…</span></div>'
-         +'<div class="ls-resp">'+_chip('#E0A828',g,'שומרים זמינים')+_chip('#4fc3e8',(demo?(pol+med+fire):'—'),'מתנדבי חירום')+(demo?'<span class="ls-demo">נתוני הדגמה</span>':'')+'</div>'
+         +'<div class="ls-resp">'+_chip('#E0A828',g,'משתמשים זמינים')+_chip('#4fc3e8',(demo?(pol+med+fire):'—'),'מתנדבי חירום')+(demo?'<span class="ls-demo">נתוני הדגמה</span>':'')+'</div>'
          +'</div>'
          +'<div class="ls-go"><button onclick="event.stopPropagation();openResponse(\''+_jsq(id0)+'\')">פתח מרכז תגובה ←</button></div>';
        try{ stripGeocode(+e0.lat,+e0.lng); }catch(e){}
@@ -1616,7 +1616,7 @@ async function teamInvite(){
   await TEAM.db.ref('invites/'+tok).set({fromUid:TEAM.uid,ts:Date.now(),name:nm.slice(0,14)+'|||',team:true});
   var inv=teamLS('inv')||[]; inv.push({tok:tok,code:code,ts:Date.now()}); teamLS('inv',inv); teamWatchInvite(inv[inv.length-1]);
   var link='https://www.shomer-app.co.il/i/?g='+encodeURIComponent(tok)+'&c='+code;
-  var msg='הוזמנת לצוות השומרים של '+nm+' ב-SH✡MER. פתח/י את הקישור באפליקציה ואשר/י: '+link+' (קוד: '+code+')';
+  var msg='הוזמנת לצוות של '+nm+' ב-SH✡MER. פתח/י את הקישור באפליקציה ואשר/י: '+link+' (קוד: '+code+')';
   var box=document.getElementById('team-newinv'); if(box){ box.innerHTML='<div class="tm-inv"><div class="tm-inv-l">קישור הזמנה לראש צוות (קוד <b>'+code+'</b>) - תקף עד שמישהו מצטרף:</div><input readonly class="tm-inv-in" value="'+ESC(link)+'" onclick="this.select()"><div class="tm-inv-b"><button onclick="teamCopy(\''+ESC(link)+'\')">העתקה</button><a target="_blank" rel="noopener" href="https://wa.me/?text='+encodeURIComponent(msg)+'">וואטסאפ</a></div></div>'; }
 }
 function teamCopy(t){ try{ navigator.clipboard.writeText(t); }catch(e){} var b=event&&event.target; if(b){ b.textContent='✓ הועתק'; } }
@@ -2188,7 +2188,7 @@ function unfocus(){ if(DATA&&DATA._idx!=null){ _focus=null; document.getElementB
 /* ---- organisation profile ---- */
 /* live-feed health: last /dashfeed read succeeded AND is recent (poll = 12s; stale after 60s) */
 function _feedLive(){ var N=window._net; return !!(N&&N.ok&&(Date.now()-N.at)<6e4); }
-function _syncLiveInd(){ try{ var on=_feedLive()&&!(CLIENT&&CLIENT.demo), el=document.getElementById('live-ind'); if(el){ el.classList.toggle('off',!on); el.title=on?'נתונים חיים - עודכנו בדקה האחרונה':'אין חיבור לנתונים חיים'; } var fs=document.getElementById('feed-src'); if(fs) fs.textContent=(CLIENT&&CLIENT.demo)?'נתוני הדגמה':(on?'רשת שומרים · חי':'רשת שומרים · אין חיבור'); }catch(e){} }
+function _syncLiveInd(){ try{ var on=_feedLive()&&!(CLIENT&&CLIENT.demo), el=document.getElementById('live-ind'); if(el){ el.classList.toggle('off',!on); el.title=on?'נתונים חיים - עודכנו בדקה האחרונה':'אין חיבור לנתונים חיים'; } var fs=document.getElementById('feed-src'); if(fs) fs.textContent=(CLIENT&&CLIENT.demo)?'נתוני הדגמה':(on?'רשת SH✡MER · חי':'רשת SH✡MER · אין חיבור'); }catch(e){} }
 setInterval(_syncLiveInd,5000);
 function renderUserPanel(){
  var el=document.getElementById('user-panel'); if(!el)return;
@@ -2237,7 +2237,7 @@ function renderPresenceLayer(list, fitList){
     });
     var sbtn=document.getElementById('spread-btn');
     var isPaying=CLIENT&&!CLIENT.demo&&!CLIENT.live;
-    /* v293: live/paying views start with guardians ON once - after that the button decides (it used to switch itself back on every 12s) */
+    /* v293: live/paying views start with users ON once - after that the button decides (it used to switch itself back on every 12s) */
     if(!window._presAutoOn && ((CLIENT&&CLIENT.live)||isPaying)){ window._presAutoOn=true; if(sbtn&&!sbtn.classList.contains('on')) sbtn.classList.add('on'); }
     var showNow=!!(sbtn&&sbtn.classList.contains('on'));
     if(showNow){ presLayer.addTo(MAP); }
@@ -2392,7 +2392,7 @@ function recItems(idx,fk,noEx){
    var sec=ranked[0];
    if(sec&&sec.r>1.12&&sec.cs>=0.05) out.push({cls:'flag',i:'▲',t:catPlain(sec.k)+' — יותר מהממוצע בארץ',d:Math.round(sec.cs*100)+'% כאן לעומת '+Math.round(sec.ns*100)+'% בארץ. '+(ACT_PLAIN[sec.k]||''),why:'משטרת ישראל 2025'});
  }
- if(S.territoryActive!=null) out.push({cls:'info',i:'◉',t:'מכשירים פעילים היום עד 18 ק״מ ממרכז העיר: '+S.territoryActive+(S.demo?' (נתוני הדגמה)':''),d:S.territoryActive<10?'כיסוי נמוך — לגייס מתנדבים ולהפיץ את האפליקציה בשכונות.':'יש כיסוי — אפשר להיעזר בשומרים לדיווח מהיר מהשטח.',why:'רשת SH✡MER · מכשירים מאומתים (v279+) פעילים היום (מחצות), עד 18 ק״מ ממרכז העיר · נספרים מאז 22.10.2026'});
+ if(S.territoryActive!=null) out.push({cls:'info',i:'◉',t:'מכשירים פעילים היום עד 18 ק״מ ממרכז העיר: '+S.territoryActive+(S.demo?' (נתוני הדגמה)':''),d:S.territoryActive<10?'כיסוי נמוך — לגייס מתנדבים ולהפיץ את האפליקציה בשכונות.':'יש כיסוי — אפשר להיעזר במשתמשים לדיווח מהיר מהשטח.',why:'רשת SH✡MER · מכשירים מאומתים (v279+) פעילים היום (מחצות), עד 18 ק״מ ממרכז העיר · נספרים מאז 22.10.2026'});
  return out;
 }
 function closeRecDetail(){ var o=document.getElementById('rec-ov'); if(o)o.remove(); }
@@ -2468,7 +2468,7 @@ function render(idx){
  document.getElementById('donutpane').innerHTML=donutHero(idx);
  buildAnalysis(idx);buildRank(idx);
  try{ window._trNoAnim=false; renderTrendInline('analysispane'); }catch(e){}
- var fs=document.getElementById('feed-src');if(fs)fs.textContent=(CLIENT&&CLIENT.demo)?'נתוני הדגמה':(_feedLive()?'רשת שומרים · חי':'רשת שומרים · אין חיבור');
+ var fs=document.getElementById('feed-src');if(fs)fs.textContent=(CLIENT&&CLIENT.demo)?'נתוני הדגמה':(_feedLive()?'רשת SH✡MER · חי':'רשת SH✡MER · אין חיבור');
  loadLive(c);
 }
 (function(){var ts=document.getElementById('terr-sel');if(ts)ts.onchange=onTerrChange;})();

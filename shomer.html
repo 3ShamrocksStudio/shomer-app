@@ -1599,7 +1599,7 @@ body.otp-active .ob-steps{display:none!important;}
  <button type="button" id="si-cc-btn" class="cc-btn" onclick="openCCPicker('si-cc')" aria-label="Country code" style="flex:0 0 auto;width:120px"><span class="ccb-fl">🇮🇱</span><span class="ccb-dl" dir="ltr">+972</span><span class="ccb-ar" aria-hidden="true">▾</span></button>
  <select id="si-cc" aria-hidden="true" tabindex="-1" style="display:none"></select>
  </div>
- <p style="font-size:11px;color:var(--tx3);margin:-4px 0 14px;line-height:1.6" id="si-why">נשחזר את השם, מעגלי האמון והשומרים השמורים שלך.</p>
+ <p style="font-size:11px;color:var(--tx3);margin:-4px 0 14px;line-height:1.6" id="si-why">נשחזר את השם, מעגלי האמון והאנשים השמורים שלך.</p>
  <button class="ob-cta" id="si-submit-btn" onclick="obSignIn()"><span id="si-cta-t">התחבר/י</span></button>
  <button class="ob-returning" id="si-back" onclick="obShowSignUp()">משתמש חדש? יצירת חשבון</button>
  </div>
@@ -1609,7 +1609,7 @@ body.otp-active .ob-steps{display:none!important;}
  <div class="ob-panel" id="step1">
  <div class="ob-card">
  <h3 id="ob-h1">אישור מיקום</h3>
- <p class="desc" id="ob-d1">נדרש לשליחת SOS מיידי לשומרים בקרבתך ולמיפוי אירועים.</p>
+ <p class="desc" id="ob-d1">נדרש לשליחת SOS מיידי למשתמשים בקרבתך ולמיפוי אירועים.</p>
  <div class="geo-box" id="geo-box">
  <div class="geo-ic" aria-hidden="true"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 22s7-6.4 7-12a7 7 0 1 0-14 0c0 5.6 7 12 7 12Z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><circle cx="12" cy="10" r="2.6" fill="currentColor"/></svg></div>
  <div class="geo-t" id="geo-t"></div>
@@ -1630,7 +1630,7 @@ body.otp-active .ob-steps{display:none!important;}
   <div class="ob-panel" id="step2">
    <div class="ob-card">
     <h3 id="ob-h2">כמעט שם</h3>
-    <p class="desc" id="ob-d2">SH✡MER חינמי, לתמיד. המיקום שלך משותף רק עם השומרים שאת/ה מאשר/ת - ולעולם לא נמכר.</p>
+    <p class="desc" id="ob-d2">SH✡MER חינמי, לתמיד. המיקום שלך משותף רק עם האנשים שאת/ה מאשר/ת - ולעולם לא נמכר.</p>
     <button class="cta-gold" id="ob-finish-btn" onclick="obFinish()" style="width:100%;margin-top:14px"><span id="ob-finish-t">כניסה למפה</span></button>
    </div>
   </div>
@@ -1732,7 +1732,7 @@ body.otp-active .ob-steps{display:none!important;}
  <button class="hdr-near" id="hdr-near" style="display:none" onclick="explainNearby()" aria-live="polite">
  <div class="ldot" aria-hidden="true"></div>
  <span id="gnear-n">0</span>
- <span class="gnear-lbl" id="gnear-lbl" data-he="שומרים" data-en="SH✡MERs" data-ar="حُرّاس">שומרים</span>
+ <span class="gnear-lbl" id="gnear-lbl" data-he="משתמשים" data-en="SH✡MERs" data-ar="مستخدمون">משתמשים</span>
  </button>
  </div>
  <div class="hdr-center">
@@ -1804,7 +1804,7 @@ body.otp-active .ob-steps{display:none!important;}
  <div class="diag-row"><span class="diag-k" data-he="הרשאות (קריאה/כתיבה)" data-en="Permission (read/write)" data-ar="الصلاحيات (قراءة/كتابة)">הרשאות</span><span class="diag-v" id="diag-perm">-</span></div>
  <div class="diag-row"><span class="diag-k" data-he="בדיקת סוקט (WS)" data-en="Socket probe (WS)" data-ar="فحص السوكِت (WS)">בדיקת סוקט</span><span class="diag-v" id="diag-wsprobe" style="font-size:10px;max-width:62%;text-align:left;word-break:break-word">-</span></div>
  <div class="diag-row"><span class="diag-k" data-he="חסימת CSP" data-en="CSP block" data-ar="حظر CSP">חסימת CSP</span><span class="diag-v" id="diag-csp" style="font-size:10px;max-width:62%;text-align:left;word-break:break-word">-</span></div>
- <div class="diag-row"><span class="diag-k" data-he="שומרים שנראו" data-en="SHOMERs seen" data-ar="حُرّاس ظهروا">שומרים שנראו</span><span class="diag-v" id="diag-seen">0</span></div>
+ <div class="diag-row"><span class="diag-k" data-he="משתמשים שנראו" data-en="SHOMERs seen" data-ar="مستخدمون ظهروا">משתמשים שנראו</span><span class="diag-v" id="diag-seen">0</span></div>
  <div class="diag-row"><span class="diag-k" data-he="SOS אחרון שהתקבל" data-en="Last SOS received" data-ar="آخر نداء استغاثة">SOS אחרון שהתקבל</span><span class="diag-v" id="diag-lastsos">אין</span></div>
  <div class="diag-row"><span class="diag-k" data-he="דחיפת רקע" data-en="Background push" data-ar="إشعارات الخلفية">דחיפת רקע</span><span class="diag-v" id="diag-push">-</span></div>
  <div class="diag-row"><span class="diag-k" data-he="גרסה (אפליקציה · SW)" data-en="Build (app · SW)" data-ar="الإصدار (تطبيق · SW)">גרסה (אפליקציה · SW)</span><span class="diag-v" id="diag-build">-</span></div>
@@ -1830,7 +1830,7 @@ body.otp-active .ob-steps{display:none!important;}
  <div class="dd-sep"></div>
  <button class="ddr ddr-circ" onclick="op('sh-circles');closeDD()" role="menuitem">
   <div class="dd-ic c-circ" aria-hidden="true"><svg class="ic" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H7a4 4 0 0 0-4 4v2" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><circle cx="10" cy="7" r="3.4" fill="none" stroke="currentColor" stroke-width="2"/><path d="M21 21v-2a4 4 0 0 0-3-3.87M17.5 3.4a4 4 0 0 1 0 7.2" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></div>
-  <span id="dd-circ" data-he="השומרים שלי" data-en="My SHOMERs" data-ar="حُرّاسي">השומרים שלי</span>
+  <span id="dd-circ" data-he="השומרים שלי" data-en="My SHOMERs" data-ar="دائرتي">השומרים שלי</span>
  </button>
  <button class="ddr" onclick="op('sh-prof');closeDD()" role="menuitem">
   <div class="dd-ic c-prof" aria-hidden="true"><svg class="ic" viewBox="0 0 24 24"><circle cx="12" cy="8" r="3.7" fill="none" stroke="currentColor" stroke-width="2"/><path d="M5.5 20a6.5 6.5 0 0 1 13 0" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></div>
@@ -1872,7 +1872,7 @@ body.otp-active .ob-steps{display:none!important;}
  <div class="sos-cd" id="sos-cd" role="alertdialog" aria-modal="true" aria-labelledby="sos-cd-ttl" aria-describedby="sos-cd-sub" aria-hidden="true">
  <div class="sos-cd-card">
  <div class="sos-cd-ttl" id="sos-cd-ttl">שולח SOS…</div>
- <div class="sos-cd-sub" id="sos-cd-sub">האזעקה פועלת. שידור לשומרים בקרבתך בעוד…</div>
+ <div class="sos-cd-sub" id="sos-cd-sub">האזעקה פועלת. שידור למשתמשים בקרבתך בעוד…</div>
  <div class="sos-cd-ringwrap" aria-hidden="true">
  <div class="sos-cd-ring" id="sos-cd-ring"></div>
  <div class="sos-cd-num" id="sos-cd-num">10</div>
@@ -1943,9 +1943,9 @@ body.otp-active .ob-steps{display:none!important;}
  <div class="sh-head"><span class="sh-ttl" id="ci-ttl" data-he="צ׳ק-אין הדדי" data-en="Mutual check-in">צ׳ק-אין הדדי</span><button class="sh-x" onclick="cl('sh-checkin')" aria-label="close"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg></button></div>
  <div class="sh-body">
  <p class="set-help" data-he="מתג-מת חברתי דו-כיווני: האפליקציה תשאל אותך מדי פעם „הכל טוב??”. אם לא תאשר/י בזמן - השומר/ת המקושר/ת מקבל/ת אזעקה ויכול/ה לשלוח SOS בשמך." data-en="A two-way social שומר אוטומטי: the app periodically asks 'Are you OK?'. If you don't confirm in time, your paired SHOMER is alerted and can send an SOS on your behalf.">מתג-מת חברתי דו-כיווני.</p><p id="obv-cap-note" style="font-size:11px;color:var(--tx3);text-align:center;margin:4px 0 0" data-he="אשר/י שאינך רובוט, ואז תשלח לך SMS" data-en="Verify you're human, then SMS is sent">אשר/י שאינך רובוט, ואז תשלח לך SMS</p>
- <div class="sec-cap mb12" data-he="שומרים מקושרים (עד 5)" data-en="Paired SHOMERs (up to 5)">שומרים מקושרים (עד 5)</div>
+ <div class="sec-cap mb12" data-he="אנשים מקושרים (עד 5)" data-en="Paired SHOMERs (up to 5)">אנשים מקושרים (עד 5)</div>
  <div id="ci-SHOMERs-list" role="group" aria-label="Paired SHOMERs"></div>
- <p class="set-help" id="ci-SHOMERs-note" style="margin:6px 0 0" data-he="בחר/י עד 5 שומרים מהרשימה השמורה שלך." data-en="Choose up to 5 SHOMERs from your saved list.">בחר/י עד 5 שומרים מהרשימה השמורה שלך.</p>
+ <p class="set-help" id="ci-SHOMERs-note" style="margin:6px 0 0" data-he="בחר/י עד 5 אנשים מהרשימה השמורה שלך." data-en="Choose up to 5 SHOMERs from your saved list.">בחר/י עד 5 אנשים מהרשימה השמורה שלך.</p>
  <div class="sec-cap mb12" style="margin-top:6px" data-he="תדירות" data-en="Frequency">תדירות</div>
  <div class="dms-intervals" id="ci-freq" role="group">
  <div class="dms-iv" data-min="15" onclick="ciPick('freq',15,this)" tabindex="0"><div class="dms-iv-n">15</div><div class="dms-iv-l" data-he="דק׳" data-en="min">דק׳</div></div>
@@ -2106,7 +2106,7 @@ body.otp-active .ob-steps{display:none!important;}
  <div class="mb16">
  <div class="tog-row"><div><div class="tl" id="anon-lbl">דיווח אנונימי</div><div class="ts" id="anon-sub">שמך לא יוצג</div></div><div class="tog on" onclick="this.classList.toggle('on')" role="switch" aria-checked="true"></div></div>
  </div>
- <button class="cta-gold" onclick="sendReport()" id="rep-send-btn"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><circle cx="6" cy="12" r="2.6" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="18" cy="6" r="2.6" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="18" cy="18" r="2.6" fill="none" stroke="currentColor" stroke-width="2"/><path d="M8.3 10.8l7.4-3.6M8.3 13.2l7.4 3.6" fill="none" stroke="currentColor" stroke-width="2"/></svg><span id="rep-send-lbl">שלח דיווח לכל השומרים</span></button>
+ <button class="cta-gold" onclick="sendReport()" id="rep-send-btn"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><circle cx="6" cy="12" r="2.6" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="18" cy="6" r="2.6" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="18" cy="18" r="2.6" fill="none" stroke="currentColor" stroke-width="2"/><path d="M8.3 10.8l7.4-3.6M8.3 13.2l7.4 3.6" fill="none" stroke="currentColor" stroke-width="2"/></svg><span id="rep-send-lbl">שלח דיווח לכל המשתמשים</span></button>
  </div>
  </div>
 
@@ -2214,8 +2214,8 @@ body.otp-active .ob-steps{display:none!important;}
  <div class="set-grp">
  <div class="set-row"><div class="sr-l"><div class="sr-ic"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="11" width="14" height="9" rx="2" fill="none" stroke="currentColor" stroke-width="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3" fill="none" stroke="currentColor" stroke-width="2"/></svg></div><div><div class="sr-nm" id="hold-arm-lbl">מניעת לחיצה בטעות</div><div class="sr-sb" id="hold-arm-sub">לחיצה ארוכה של 2 שניות תפעיל SOS - כדי שלא יישלח מהכיס</div></div></div><div class="tog" id="hold-arm-tog" onclick="toggleHoldArm(this)" role="switch"></div></div>
  </div>
- <div class="set-grp"><div class="set-row" onclick="practiceSOS()" role="button" tabindex="0" id="sos-practice-row"><div class="sr-l"><div class="sr-ic"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8.5" fill="none" stroke="currentColor" stroke-width="2"/><path d="M10 8.5l5.5 3.5-5.5 3.5z" fill="currentColor"/></svg></div><div><div class="sr-nm" data-he="תרגול SOS" data-en="Practice SOS" data-ar="تمرين SOS">תרגול SOS</div><div class="sr-sb" data-he="SOS מלא בטלפון שלך בלבד - השומרים לא מקבלים כלום" data-en="A full SOS on your phone only - your SHOMERs get nothing" data-ar="SOS كامل على هاتفك فقط - لا يصل شيء لحرّاسك">SOS מלא בטלפון שלך בלבד - השומרים לא מקבלים כלום</div></div></div></div></div>
- <div class="set-cat"><div class="set-cat-ic"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 6l6-3 6 3 6-3v15l-6 3-6-3-6 3Z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><path d="M9 3v15M15 6v15" fill="none" stroke="currentColor" stroke-width="2"/></svg></div><div class="set-cat-t" data-he="שכבות מפה" data-en="Map layers">שכבות מפה</div></div><div class="sec-cap mb12" data-he="המפה נפתחת עם כל השכבות דלוקות. אפשר לכבות או להדליק כל שכבה כאן." data-en="The map opens with every layer on. Toggle any layer on or off here." data-ar="تفتح الخريطة وكل الطبقات مفعّلة. يمكنك تشغيل أو إيقاف أي طبقة هنا.">המפה נפתחת עם כל השכבות דלוקות. אפשר לכבות או להדליק כל שכבה כאן.</div><div class="set-grp"><div class="set-row"><div class="sr-l"><div class="sr-ic"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="13" width="4" height="7" rx="1" fill="none" stroke="currentColor" stroke-width="2"/><rect x="10" y="8" width="4" height="12" rx="1" fill="none" stroke="currentColor" stroke-width="2"/><rect x="17" y="3" width="4" height="17" rx="1" fill="none" stroke="currentColor" stroke-width="2"/></svg></div><div><div class="sr-nm" data-he="סטטיסטיקת פשיעה" data-en="Crime statistics" data-ar="إحصاءات الجريمة">סטטיסטיקת פשיעה</div><div class="sr-sb" data-he="סמני ערים · נתוני משטרת ישראל" data-en="City markers · Israel Police data" data-ar="علامات المدن · بيانات الشرطة">סמני ערים · נתוני משטרת ישראל</div></div></div><div class="tog on" data-skey="map_stats" onclick="mapLayerToggle(this,'stats')" role="switch"></div></div><div class="set-row"><div class="sr-l"><div class="sr-ic"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 22s7-6.4 7-12a7 7 0 1 0-14 0c0 5.6 7 12 7 12Z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><circle cx="12" cy="10" r="2.6" fill="currentColor"/></svg></div><div><div class="sr-nm" data-he="הדיווחים שלי" data-en="My reports" data-ar="بلاغاتي">הדיווחים שלי</div><div class="sr-sb" data-he="סיכות הדיווחים שהגשת" data-en="Pins of reports you filed" data-ar="دبابيس بلاغاتك">סיכות הדיווחים שהגשת</div></div></div><div class="tog on" data-skey="map_reports" onclick="mapLayerToggle(this,'reports')" role="switch"></div></div><div class="set-row"><div class="sr-l"><div class="sr-ic"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><circle cx="9" cy="8" r="3.2" fill="none" stroke="currentColor" stroke-width="2"/><path d="M3.5 19a5.5 5.5 0 0 1 11 0" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><circle cx="17" cy="9" r="2.4" fill="none" stroke="currentColor" stroke-width="2"/><path d="M15.5 14.4A4.6 4.6 0 0 1 20.5 19" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></div><div><div class="sr-nm" data-he="המעגל שלי" data-en="My circle" data-ar="دائرتي">המעגל שלי</div><div class="sr-sb" data-he="מיקום השומרים המקושרים אליך" data-en="Your linked SHOMERs’ location" data-ar="مواقع حُرّاسك المرتبطين">מיקום השומרים המקושרים אליך</div></div></div><div class="tog on" data-skey="map_circle" onclick="mapLayerToggle(this,'circle')" role="switch"></div></div><div class="set-row"><div class="sr-l"><div class="sr-ic"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8.5" fill="none" stroke="currentColor" stroke-width="2"/><path d="M12 7.5V12l3 2" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div><div class="sr-nm" data-he="אירועי עבר" data-en="Past events" data-ar="أحداث سابقة">אירועי עבר</div><div class="sr-sb" data-he="הצג אירועי עבר על המפה — למודעות בלבד" data-en="Show past events on the map — awareness only" data-ar="عرض الأحداث السابقة على الخريطة">הצג אירועי עבר על המפה — למודעות בלבד</div></div></div><div class="tog" id="set-past-tog" onclick="togglePastEvents();this.classList.toggle('on')" role="switch"></div></div></div><div class="set-cat"><div class="set-cat-ic"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="11" width="14" height="9" rx="2" fill="none" stroke="currentColor" stroke-width="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3" fill="none" stroke="currentColor" stroke-width="2"/></svg></div><div class="set-cat-t" data-he="מיקום ופרטיות" data-en="Location &amp; Privacy">מיקום ופרטיות</div></div>
+ <div class="set-grp"><div class="set-row" onclick="practiceSOS()" role="button" tabindex="0" id="sos-practice-row"><div class="sr-l"><div class="sr-ic"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8.5" fill="none" stroke="currentColor" stroke-width="2"/><path d="M10 8.5l5.5 3.5-5.5 3.5z" fill="currentColor"/></svg></div><div><div class="sr-nm" data-he="תרגול SOS" data-en="Practice SOS" data-ar="تمرين SOS">תרגול SOS</div><div class="sr-sb" data-he="SOS מלא בטלפון שלך בלבד - האנשים שבחרת לא מקבלים כלום" data-en="A full SOS on your phone only - your SHOMERs get nothing" data-ar="SOS كامل على هاتفك فقط - لا يصل شيء لمن اخترتهم">SOS מלא בטלפון שלך בלבד - האנשים שבחרת לא מקבלים כלום</div></div></div></div></div>
+ <div class="set-cat"><div class="set-cat-ic"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 6l6-3 6 3 6-3v15l-6 3-6-3-6 3Z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><path d="M9 3v15M15 6v15" fill="none" stroke="currentColor" stroke-width="2"/></svg></div><div class="set-cat-t" data-he="שכבות מפה" data-en="Map layers">שכבות מפה</div></div><div class="sec-cap mb12" data-he="המפה נפתחת עם כל השכבות דלוקות. אפשר לכבות או להדליק כל שכבה כאן." data-en="The map opens with every layer on. Toggle any layer on or off here." data-ar="تفتح الخريطة وكل الطبقات مفعّلة. يمكنك تشغيل أو إيقاف أي طبقة هنا.">המפה נפתחת עם כל השכבות דלוקות. אפשר לכבות או להדליק כל שכבה כאן.</div><div class="set-grp"><div class="set-row"><div class="sr-l"><div class="sr-ic"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="13" width="4" height="7" rx="1" fill="none" stroke="currentColor" stroke-width="2"/><rect x="10" y="8" width="4" height="12" rx="1" fill="none" stroke="currentColor" stroke-width="2"/><rect x="17" y="3" width="4" height="17" rx="1" fill="none" stroke="currentColor" stroke-width="2"/></svg></div><div><div class="sr-nm" data-he="סטטיסטיקת פשיעה" data-en="Crime statistics" data-ar="إحصاءات الجريمة">סטטיסטיקת פשיעה</div><div class="sr-sb" data-he="סמני ערים · נתוני משטרת ישראל" data-en="City markers · Israel Police data" data-ar="علامات المدن · بيانات الشرطة">סמני ערים · נתוני משטרת ישראל</div></div></div><div class="tog on" data-skey="map_stats" onclick="mapLayerToggle(this,'stats')" role="switch"></div></div><div class="set-row"><div class="sr-l"><div class="sr-ic"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 22s7-6.4 7-12a7 7 0 1 0-14 0c0 5.6 7 12 7 12Z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><circle cx="12" cy="10" r="2.6" fill="currentColor"/></svg></div><div><div class="sr-nm" data-he="הדיווחים שלי" data-en="My reports" data-ar="بلاغاتي">הדיווחים שלי</div><div class="sr-sb" data-he="סיכות הדיווחים שהגשת" data-en="Pins of reports you filed" data-ar="دبابيس بلاغاتك">סיכות הדיווחים שהגשת</div></div></div><div class="tog on" data-skey="map_reports" onclick="mapLayerToggle(this,'reports')" role="switch"></div></div><div class="set-row"><div class="sr-l"><div class="sr-ic"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><circle cx="9" cy="8" r="3.2" fill="none" stroke="currentColor" stroke-width="2"/><path d="M3.5 19a5.5 5.5 0 0 1 11 0" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><circle cx="17" cy="9" r="2.4" fill="none" stroke="currentColor" stroke-width="2"/><path d="M15.5 14.4A4.6 4.6 0 0 1 20.5 19" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></div><div><div class="sr-nm" data-he="המעגל שלי" data-en="My circle" data-ar="دائرتي">המעגל שלי</div><div class="sr-sb" data-he="מיקום האנשים המקושרים אליך" data-en="Your linked SHOMERs’ location" data-ar="مواقع من اخترتهم المرتبطين">מיקום האנשים המקושרים אליך</div></div></div><div class="tog on" data-skey="map_circle" onclick="mapLayerToggle(this,'circle')" role="switch"></div></div><div class="set-row"><div class="sr-l"><div class="sr-ic"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8.5" fill="none" stroke="currentColor" stroke-width="2"/><path d="M12 7.5V12l3 2" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div><div class="sr-nm" data-he="אירועי עבר" data-en="Past events" data-ar="أحداث سابقة">אירועי עבר</div><div class="sr-sb" data-he="הצג אירועי עבר על המפה — למודעות בלבד" data-en="Show past events on the map — awareness only" data-ar="عرض الأحداث السابقة على الخريطة">הצג אירועי עבר על המפה — למודעות בלבד</div></div></div><div class="tog" id="set-past-tog" onclick="togglePastEvents();this.classList.toggle('on')" role="switch"></div></div></div><div class="set-cat"><div class="set-cat-ic"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="11" width="14" height="9" rx="2" fill="none" stroke="currentColor" stroke-width="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3" fill="none" stroke="currentColor" stroke-width="2"/></svg></div><div class="set-cat-t" data-he="מיקום ופרטיות" data-en="Location &amp; Privacy">מיקום ופרטיות</div></div>
  <div class="sec-cap mb12" id="set-priv-lbl">פרטיות</div>
  <div class="set-grp">
  <div class="set-row" style="display:none" data-v293="no-backend"><div class="sr-l"><div class="sr-ic"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 22s7-6.4 7-12a7 7 0 1 0-14 0c0 5.6 7 12 7 12Z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><circle cx="12" cy="10" r="2.6" fill="currentColor"/></svg></div><div><div class="sr-nm" id="p-bgloc-nm">שיתוף מיקום ברקע</div><div class="sr-sb" id="p-bgloc-sb">נדרש ל-SOS ו-DMS - בלעדיו אי אפשר לשלוח את מיקומך בחירום</div></div></div><div class="tog on" data-skey="p_bgloc" onclick="this.classList.toggle('on');saveToggle(this)" role="switch"></div></div>
@@ -2258,7 +2258,7 @@ body.otp-active .ob-steps{display:none!important;}
  <div class="set-grp" style="border-color:var(--b4);">
  <button style="width:100%;padding:14px;background:var(--rb);border:none;font-size:14px;font-weight:800;color:#FF7080;display:flex;align-items:center;justify-content:center;gap:8px;cursor:pointer;" onclick="deleteAccount()" id="delete-account-btn"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 7h14M9 7V5.5A1.5 1.5 0 0 1 10.5 4h3A1.5 1.5 0 0 1 15 5.5V7M6.5 7l.8 12a2 2 0 0 0 2 1.9h5.4a2 2 0 0 0 2-1.9L17.5 7" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg><span data-he="מחיקת חשבון" data-en="Delete account" data-ar="حذف الحساب">מחיקת חשבון</span></button>
  </div>
- <div class="sr-sb" id="delete-hint" style="margin:8px 2px 16px;line-height:1.6" data-he="מחיקה מלאה וסופית: מוחק את כל הנתונים מהשרת (נוכחות, SOS, פרופיל, הגדרות), מסיר אותך ממעגלי השומרים המשויכים, ומבטל את שם המשתמש שנוצר אוטומטית. פתיחה מחדש יוצרת זהות חדשה לגמרי." data-en="Full, permanent erase: removes all your data from the server (presence, SOS, profile, settings), removes you from any paired SHOMERs' circles, and discards your auto-generated username. Reopening creates a brand-new identity.">מחיקה מלאה וסופית: מוחק את כל הנתונים מהשרת (נוכחות, SOS, פרופיל, הגדרות), מסיר אותך ממעגלי השומרים המשויכים, ומבטל את שם המשתמש שנוצר אוטומטית. פתיחה מחדש יוצרת זהות חדשה לגמרי.</div>
+ <div class="sr-sb" id="delete-hint" style="margin:8px 2px 16px;line-height:1.6" data-he="מחיקה מלאה וסופית: מוחק את כל הנתונים מהשרת (נוכחות, SOS, פרופיל, הגדרות), מסיר אותך מהמעגלים המשויכים, ומבטל את שם המשתמש שנוצר אוטומטית. פתיחה מחדש יוצרת זהות חדשה לגמרי." data-en="Full, permanent erase: removes all your data from the server (presence, SOS, profile, settings), removes you from any paired SHOMERs' circles, and discards your auto-generated username. Reopening creates a brand-new identity.">מחיקה מלאה וסופית: מוחק את כל הנתונים מהשרת (נוכחות, SOS, פרופיל, הגדרות), מסיר אותך מהמעגלים המשויכים, ומבטל את שם המשתמש שנוצר אוטומטית. פתיחה מחדש יוצרת זהות חדשה לגמרי.</div>
  <div class="set-row" onclick="toggleUpdSms(this.querySelector('.tog'))" role="button" tabindex="0">
     <div class="sr-l">
      <div class="sr-ic"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5h16v11H7l-3 3Z"/><path d="M8 9h8M8 12.5h5"/></svg></div>
@@ -2404,7 +2404,7 @@ body.otp-active .ob-steps{display:none!important;}
    <div class="defib-prompt" id="defib-prompt">
      <div class="defib-l">
        <span class="defib-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2L4.5 13H11l-1 9 8.5-11H12l1-9Z"/></svg></span>
-       <div><div class="defib-t" data-he="יש לך גישה לדפיברילטור?" data-en="Have access to a defibrillator?" data-ar="هل لديك وصول إلى جهاز إزالة الرجفان؟">יש לך גישה לדפיברילטור?</div><div class="defib-s" data-he="הוסף/י אותו למפה - כל שנייה קובעת בעצירת לב. יופיע לכל השומרים באזור." data-en="Add it to the map — every second counts in cardiac arrest. It'll show to all SH✡MER users nearby." data-ar="أضفه إلى الخريطة — كل ثانية مهمة في السكتة القلبية. سيظهر لكل الحُرّاس في المنطقة.">הוסף/י אותו למפה - כל שנייה קובעת בעצירת לב. יופיע לכל השומרים באזור.</div></div>
+       <div><div class="defib-t" data-he="יש לך גישה לדפיברילטור?" data-en="Have access to a defibrillator?" data-ar="هل لديك وصول إلى جهاز إزالة الرجفان؟">יש לך גישה לדפיברילטור?</div><div class="defib-s" data-he="הוסף/י אותו למפה - כל שנייה קובעת בעצירת לב. יופיע לכל המשתמשים באזור." data-en="Add it to the map — every second counts in cardiac arrest. It'll show to all SH✡MER users nearby." data-ar="أضفه إلى الخريطة — كل ثانية مهمة في السكتة القلبية. سيظهر لكل المستخدمين في المنطقة.">הוסף/י אותו למפה - כל שנייה קובעת בעצירת לב. יופיע לכל המשתמשים באזור.</div></div>
      </div>
      <button class="btn-secondary defib-add" data-he="הוסף דפיברילטור למפה" data-en="Add defibrillator to map" data-ar="أضف جهاز إزالة الرجفان إلى الخريطة" onclick="cl('sh-prof'); setTimeout(function(){ try{ aedPlaceMode(); }catch(e){} }, 300);">הוסף דפיברילטור למפה</button>
    </div>
@@ -2595,9 +2595,9 @@ body.otp-active .ob-steps{display:none!important;}
  <div class="sh-body">
  <!-- CIRCLES OF TRUST - light card, live counts, rename, add new -->
  
-   <!-- 1. מעגלי שומרים -->
+   <!-- 1. מעגלים -->
    <div class="lt-card" id="cot-card">
-   <div class="lt-h"><span>מעגלי שומרים</span></div>
+   <div class="lt-h"><span>מעגלים</span></div>
    <div id="cot-list"></div>
    <button class="cot-new" onclick="addCircle()">
      <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
@@ -2621,7 +2621,7 @@ body.otp-active .ob-steps{display:none!important;}
      <button class="agf-invite" type="button">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
        <path d="M20.5 11.6a8.4 8.4 0 0 1-12.4 7.4L3.5 20.5l1.6-4.4A8.4 8.4 0 1 1 20.5 11.6z"/><path d="M9 9.2c.2 2.6 2.9 5.4 5.6 5.7l1-1.3-1.8-1-.8.7a4.2 4.2 0 0 1-2.4-2.4l.7-.8-1-1.8z"/></svg>
-      <span data-he="הזמנת שומר" data-en="Invite a SH✡MER" data-ar="دعوة حارس">הזמנת שומר</span>
+      <span data-he="הזמנת שומר" data-en="Invite a SH✡MER" data-ar="دعوة شخص">הזמנת שומר</span>
      </button>
 
      <!-- Collapsed by default. Two gold buttons competing side by side made the screen
@@ -2750,7 +2750,7 @@ body.otp-active .ob-steps{display:none!important;}
  <div class="ff-pick" id="gd-addphone" role="dialog" aria-modal="true" aria-labelledby="gd-addph-ttl" aria-hidden="true">
  <div class="ff-pick-card">
  <div class="ff-pick-hd">
- <span class="ff-pick-ttl" id="gd-addph-ttl" data-he="הוסף/י שומר/ת" data-en="Add MY SH✡MER" data-ar="أضف حارسي">הוסף/י שומר/ת</span>
+ <span class="ff-pick-ttl" id="gd-addph-ttl" data-he="הוסף/י שומר/ת" data-en="Add MY SH✡MER" data-ar="أضف إلى دائرتي">הוסף/י שומר/ת</span>
  <button class="sh-x" onclick="gdClose('gd-addphone')" aria-label="סגור"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg></button>
  </div>
  <!-- FIND mode: enter a phone, verify it's a registered SHOMER -->
@@ -2881,7 +2881,7 @@ const LANGS={
  dir:'rtl',font:"'Heebo','Inter',sans-serif",
  ob_h0:'יצירת חשבון שומר',ob_d0:'מפת בטיחות חיה · SOS + אזעקה מיידית · עזרה הדדית',
  ob_phone:'050-000-0000 *',ob_why:'* מספר הטלפון משמש לאימות ולשליחת עזרה. לא ישמש לשיווק.',
- ob_h1:'אישור מיקום',ob_d1:'נדרש לשליחת SOS מיידי לשומרים בקרבתך.',
+ ob_h1:'אישור מיקום',ob_d1:'נדרש לשליחת SOS מיידי למשתמשים בקרבתך.',
  ob_h2:'הגדרות חירום',ob_d2:'הקש אזעקה כדי לשמוע אותה. היא תופעל עם לחיצת SOS.',
  geo_need:'נדרש אישור מיקום',geo_wait:'מחפש מיקום...',geo_ok:'מיקום אושר!',geo_err:'לא ניתן לאתר מיקום',
  geo_allow:'שתף מיקום',geo_next:'← כניסה למפה',geo_retry:' נסה שוב',geo_skip:'דלג – המשך בלי שיתוף מיקום',
@@ -2899,7 +2899,7 @@ const LANGS={
  saved:'✓ הגדרות נשמרו',sent:' דיווח נשלח!',dms_on:'DMS פעיל',dms_off:'DMS כבוי',
  rep_desc:'מה ראית? תאר: האירוע, המעורבים, מיקום מדויק, פרטים מזהים...',
  share_loc:'שתף מיקום נוכחי',loc_ok:' מיקום נקלט ✓',
- send:' שלח דיווח לכל השומרים',
+ send:' שלח דיווח לכל המשתמשים',
  open_det:'פתח פרטים מלאים ←',respond:' אני בדרך לעזור',call100:' התקשר ל-100',close:'סגור',responded:' תגובה נרשמה',
  dms_how:'<strong style="color:#FF7080">כיצד זה עובד:</strong> הפעל לפני הליכה לבד. כל X דקות - "הכל טוב??" - אם לא ענית תוך 60 שניות, SOS אוטומטי.',
  dms_start:' הפעל',dms_stop:' הפסק',dms_next:'בדיקה הבאה בעוד',dms_min:'דק׳',
@@ -2947,7 +2947,7 @@ const LANGS={
  dir:'rtl',font:"'Heebo','Inter',sans-serif",
  ob_h0:'إنشاء حساب شومير',ob_d0:'خريطة أمان مباشرة · نداء استغاثة فوري · مساعدة متبادلة',
  ob_phone:'رقم الهاتف *',ob_why:'* يُستخدم رقم هاتفك للتحقق وإرسال المساعدة فقط.',
- ob_h1:'تحديد الموقع',ob_d1:'مطلوب لإرسال نداء الاستغاثة فوراً للحراس القريبين منك.',
+ ob_h1:'تحديد الموقع',ob_d1:'مطلوب لإرسال نداء الاستغاثة فوراً للمستخدمين القريبين منك.',
  ob_h2:'إعدادات الطوارئ',ob_d2:'اختر الإنذار - يُفعَّل فوراً عند الضغط على SOS.',
  geo_need:'مطلوب إذن الموقع',geo_wait:'جارٍ التحديد...',geo_ok:'تم تأكيد الموقع!',geo_err:'لا يمكن تحديد موقعك',
  geo_allow:'شارك الموقع',geo_next:'ادخل إلى الخريطة ←',geo_retry:' أعد المحاولة',geo_skip:'تخطّي - المتابعة بدون مشاركة الموقع',
@@ -2965,13 +2965,13 @@ const LANGS={
  saved:'✓ تم حفظ الإعدادات',sent:' تم إرسال البلاغ!',dms_on:'مفتاح الأمان نشط',dms_off:'مفتاح الأمان متوقف',
  rep_desc:'ماذا رأيت؟ صف: الحادثة، الأشخاص المتورطين، الموقع الدقيق...',
  share_loc:'مشاركة الموقع الحالي',loc_ok:' تم تسجيل الموقع ✓',
- send:' إرسال البلاغ لجميع الحراس',
+ send:' إرسال البلاغ لجميع المستخدمين',
  open_det:'فتح التفاصيل الكاملة ←',respond:' أنا في الطريق',call100:' الاتصال بـ 100',close:'إغلاق',responded:' تم تسجيل الاستجابة',
  dms_how:"<strong style='color:#FF7080'>كيف يعمل:</strong> فعّله قبل السير وحدك. كل X دقائق - 'كل شيء بخير؟' - بدون رد خلال 60 ثانية = إرسال تلقائي لنداء الاستغاثة.",
  dms_start:' تفعيل',dms_stop:' إيقاف',dms_next:'الفحص التالي خلال',dms_min:'دقيقة',
  dms_on_badge:'نشط',dms_off_badge:'متوقف',
  em_intro:'انقر للاتصال المباشر. إذا لم تستطع الكلام - أبقِ الخط مفتوحاً.',
- profile_rank:'حارس المستوى الثاني',
+ profile_rank:'شومير المستوى الثاني',
  anon:'بلاغ مجهول',anon_sub:'لن يظهر اسمك',
  cam_empty:'لا توجد صور',cam_taken:' تم التقاط الصورة ✓',cam_added:' تمت إضافة الصورة ✓',cam_denied:' تم رفض الوصول',cam_nf:' الكاميرا غير موجودة',
  welcome:'مرحباً',
@@ -3087,12 +3087,12 @@ const LANGS={
 const AR={
  // ── Trilingual audit fills (check-in · geofence · verify · map labels) ──
  'Resend code':'إعادة إرسال الرمز','Not now':'ليس الآن','Legend':'مفتاح الخريطة',
- 'Paired SHOMER':'حارس مقترن','Frequency':'التكرار','Response window':'مهلة الاستجابة',
+ 'Paired SHOMER':'شخص مقترن','Frequency':'التكرار','Response window':'مهلة الاستجابة',
  'Start check-in':'بدء تسجيل الوصول','Arrival reminder':'تذكير الوصول','Place label':'اسم المكان',
  'Geofence radius':'نطاق السياج الجغرافي','Active reminders':'التذكيرات النشطة',
  'Works best while the app is open.':'يعمل بأفضل صورة أثناء فتح التطبيق.',
  'Contact (shares location)':'جهة اتصال (تشارك الموقع)','Add reminder (map center)':'إضافة تذكير (مركز الخريطة)',
- 'Add my SHOMER':'أضف حارسي','My SHOMER':'حارسي','Edit':'تعديل','Remove':'إزالة','Rename':'إعادة تسمية',
+ 'Add my SHOMER':'أضف إلى دائرتي','My SHOMER':'دائرتي','Edit':'تعديل','Remove':'إزالة','Rename':'إعادة تسمية',
  'Pending invite':'دعوة معلّقة','Invite sent':'أُرسلت الدعوة','Nickname':'الاسم المستعار',
  // ── Report form ──
  'Incident type':'نوع الحادثة','Suspicious stalking':'ملاحقة مشبوهة','Sexual harassment':'تحرّش جنسي',
@@ -3114,22 +3114,22 @@ const AR={
  'Skip - continue without location':'تخطّي - المتابعة بدون مشاركة الموقع','Skip – continue without sharing':'تخطّي - المتابعة بدون مشاركة الموقع',
  'Citizens for Citizens':'مواطنون من أجل مواطنين',
  // ── Map / header / status ──
- 'Map':'الخريطة','SHOMERs':'حُرّاس','SHOMER':'حارس','SHOMER':'حارس','Live event':'حدث مباشر',
- 'active SHOMERs near you (live)':'حُرّاس نشطون بقربك (مباشر)','An active SHOMER nearby (approximate, anonymous)':'حارس نشط في الجوار (موقع تقريبي، مجهول الهوية)',
+ 'Map':'الخريطة','SHOMERs':'مستخدمو شومير','SHOMER':'شومير','SHOMER':'شومير','Live event':'حدث مباشر',
+ 'active SHOMERs near you (live)':'مستخدمون نشطون بقربك (مباشر)','An active SHOMER nearby (approximate, anonymous)':'مستخدم نشط في الجوار (موقع تقريبي، مجهول الهوية)',
  // ── Status / connection panel ──
  'Connecting…':'جارٍ الاتصال…','Offline - not connected':'غير متصل','Connecting to the live service…':'جارٍ الاتصال بالخدمة المباشرة…',
  'No network right now. We\'ll reconnect automatically.':'لا يوجد اتصال بالشبكة حالياً. سنعيد الاتصال تلقائياً.',
  // ── SOS flow (⚠ SAFETY) ──
  'SOS nearby':'نداء استغاثة قريب'/*SAFETY*/,'Distress':'استغاثة'/*SAFETY*/,'Navigate':'توجيه'/*SAFETY*/,
  'Shake detected':'تم رصد هزّة','Responder nav active - live route':'توجيه المُستجيب نشط - مسار مباشر',
- 'SOS broadcast - nearby SHOMERs notified':'تم بثّ نداء الاستغاثة - تم إبلاغ الحُرّاس القريبين'/*SAFETY*/,
- 'A nearby SHOMER classified this:':'صنّف حارس قريب هذا الحدث:','Type set:':'تم تحديد النوع:',
- ' shared with nearby SHOMERs':' تمّت مشاركته مع الحُرّاس القريبين','I\'m on my way':'أنا في الطريق'/*SAFETY*/,
+ 'SOS broadcast - nearby SHOMERs notified':'تم بثّ نداء الاستغاثة - تم إبلاغ المستخدمين القريبين'/*SAFETY*/,
+ 'A nearby SHOMER classified this:':'صنّف مستخدم قريب هذا الحدث:','Type set:':'تم تحديد النوع:',
+ ' shared with nearby SHOMERs':' تمّت مشاركته مع المستخدمين القريبين','I\'m on my way':'أنا في الطريق'/*SAFETY*/,
  // ── Emergency / disclaimer (⚠ SAFETY) ──
  'Immediate emergency':'طوارئ فورية'/*SAFETY*/,
  // ── My SHOMERs / pairing ──
- 'My SHOMERs':'حُرّاسي','Add a SHOMER':'إضافة حارس','Invite a SHOMER':'دعوة حارس','I have a code':'لديّ رمز','Connect':'ربط',
- 'Find a SHOMER':'ابحث عن حارس','Copy':'نسخ','Share link':'مشاركة الرابط','Locate':'تحديد الموقع','Leave this circle':'مغادرة هذه الدائرة',
+ 'My SHOMERs':'دائرتي','Add a SHOMER':'إضافة شخص','Invite a SHOMER':'دعوة شخص','I have a code':'لديّ رمز','Connect':'ربط',
+ 'Find a SHOMER':'ابحث عن شخص','Copy':'نسخ','Share link':'مشاركة الرابط','Locate':'تحديد الموقع','Leave this circle':'مغادرة هذه الدائرة',
  '✓ Link copied':'✓ تم نسخ الرابط','Invalid code':'رمز غير صالح','Waiting to accept':'بانتظار القبول','Live location':'موقع مباشر','Waiting for live location':'بانتظار الموقع المباشر',
  // ── Settings ──
  'Settings':'الإعدادات','Reset':'إعادة تعيين','Reset app':'إعادة ضبط التطبيق','Sign out':'تسجيل الخروج','Signed out':'تم تسجيل الخروج',
@@ -3145,7 +3145,7 @@ const AR={
  'Location & Privacy':'الموقع والخصوصية','Account & About':'الحساب والمعلومات','Privacy':'الخصوصية','Safety & legal':'السلامة والشؤون القانونية',
  'Every SOS near you - most urgent, best left on':'كل نداء استغاثة قربك - الأكثر إلحاحاً، يُفضّل إبقاؤه مُفعّلاً'/*SAFETY*/,
  'Harassment/stalking reports near you':'بلاغات تحرّش/مطاردة قربك','Medical-help requests nearby':'طلبات مساعدة طبية في الجوار',
- 'A heads-up when a nearby incident is closed':'تنبيه عند إغلاق حادثة قريبة','A soft chime when a SHOMER joins, on a new event or an update':'نغمة خفيفة عند انضمام حارس أو عند حدث جديد أو تحديث',
+ 'A heads-up when a nearby incident is closed':'تنبيه عند إغلاق حادثة قريبة','A soft chime when a SHOMER joins, on a new event or an update':'نغمة خفيفة عند انضمام مستخدم أو عند حدث جديد أو تحديث',
  'Background location sharing':'مشاركة الموقع في الخلفية','Show name on updates':'إظهار الاسم في التحديثات','Prevent accidental SOS':'الضغط المطوّل للتفعيل',
  'SOS cancel code (PIN)':'رمز إلغاء الاستغاثة (PIN)','Mutual check-in':'تفقّد متبادل','Responder navigation (opt-in)':'توجيه المُستجيب (اختياري)',
  'Reset app':'إعادة ضبط التطبيق','Reset':'إعادة تعيين','Sign out':'تسجيل الخروج','Metric · m / km':'متري · م / كم','Imperial · ft / mi':'إمبراطوري · قدم / ميل',
@@ -3170,24 +3170,24 @@ const AR={
  '<strong>iPhone:</strong> press the side button 3× → Emergency SOS.<br><strong>Android:</strong> press the power button 5× → Emergency SOS.<br><strong>SHOMER Shake:</strong> 5 hard shakes triggers an automatic SOS.<br>Set 100 as your phone\'s primary emergency contact.':'<strong>آيفون:</strong> اضغط الزر الجانبي 3 مرات ← استغاثة طارئة.<br><strong>أندرويد:</strong> اضغط زر التشغيل 5 مرات ← استغاثة طارئة.<br><strong>هزّة شومير:</strong> 5 هزّات قوية تُفعّل استغاثة تلقائية.<br>اجعل 100 جهة الطوارئ الأساسية في هاتفك.'/*SAFETY*/,
  // ── Settings long-tail (deep labels) ──
  'Dead Man\'s Switch':'مفتاح الأمان الميت',
- 'Show a live route + distance when responding to an SOS. For verified responders/SHOMERs - not a replacement for 100/101/102.':'أظهر مساراً مباشراً + المسافة عند الاستجابة لنداء استغاثة. للمستجيبين/الحُرّاس المُوثَّقين - وليس بديلاً عن 100/101/102.'/*SAFETY*/,
+ 'Show a live route + distance when responding to an SOS. For verified responders/SHOMERs - not a replacement for 100/101/102.':'أظهر مساراً مباشراً + المسافة عند الاستجابة لنداء استغاثة. للمستجيبين/المستخدمين المُوثَّقين - وليس بديلاً عن 100/101/102.'/*SAFETY*/,
  'Required to cancel an active SOS - never a fingerprint.':'مطلوب لإلغاء نداء استغاثة نشط - وليس بصمة إصبع أبداً.'/*SAFETY*/,
- 'Mutual check-in (with a SHOMER)':'تفقّد متبادل (مع حارس)','Periodic \'Are you OK?\' - if you don\'t confirm, your SHOMER is alerted.':'تفقّد دوري „هل أنت بخير؟" - إن لم تؤكّد، يُنبَّه حارسك.'/*SAFETY*/,
+ 'Mutual check-in (with a SHOMER)':'تفقّد متبادل (مع شخص من دائرتك)','Periodic \'Are you OK?\' - if you don\'t confirm, your SHOMER is alerted.':'تفقّد دوري „هل أنت بخير؟" - إن لم تؤكّد، يُنبَّه شخص من دائرتك.'/*SAFETY*/,
  'Enable Shake-to-SOS':'تفعيل الهزّ للاستغاثة','5 hard shakes → SOS':'5 هزّات قوية ← استغاثة','Shake sensitivity':'حساسية الهزّ','Medium':'متوسطة','Simulate shake (test)':'محاكاة هزّة (اختبار)',
  'Press & hold 2s - prevents pocket-dials':'اضغط مع الاستمرار ثانيتين - يمنع الاتصال العَرَضي من الجيب',
  'Background location':'موقع الخلفية','Needed for SOS & DMS - without it your location can\'t be sent in an emergency':'ضروري لنداء الاستغاثة ومفتاح الأمان - بدونه لا يمكن إرسال موقعك في حالة الطوارئ'/*SAFETY*/,
  'Show name on reports':'إظهار الاسم في البلاغات','Off = your reports appear anonymously':'إيقاف = تظهر بلاغاتك دون اسم',
- 'Emergency contacts':'جهات اتصال الطوارئ','Primary':'أساسي','Secondary':'ثانوي','+ Connect a SHOMER':'+ ربط حارس','Language':'اللغة','Terms of Service':'شروط الخدمة','Terms':'الشروط','Disclaimer':'إخلاء المسؤولية',
+ 'Emergency contacts':'جهات اتصال الطوارئ','Primary':'أساسي','Secondary':'ثانوي','+ Connect a SHOMER':'+ ربط شخص','Language':'اللغة','Terms of Service':'شروط الخدمة','Terms':'الشروط','Disclaimer':'إخلاء المسؤولية',
  'Time to cancel a false alarm before the SOS is broadcast. Shorter = for high-risk situations.':'الوقت المتاح لإلغاء إنذار كاذب قبل بثّ نداء الاستغاثة. أقصر = لحالات الخطر العالي.'/*SAFETY*/,
  'Cancel window before broadcast':'مهلة الإلغاء قبل البثّ',
  'Clears profile, reports, SOS history & settings - returns to onboarding.':'يمسح الملف الشخصي والبلاغات وسجل الاستغاثة والإعدادات - ويعود إلى الإعداد الأولي.',
  'City markers are an':'علامات المدن هي',' aggregate statistical overview':' نظرة إحصائية إجمالية','aggregate statistical overview':'نظرة إحصائية إجمالية',
  'About SHOMER':'حول شومير','Data & sources':'البيانات والمصادر',
  // ── Profile extras ──
- 'Points':'نقاط','SHOMER level':'مستوى الحارس',
+ 'Points':'نقاط','SHOMER level':'مستوى شومير',
  // ── My SHOMERs / circles sheet ──
  'No one sees your location':'لا أحد يرى موقعك','Find a friend':'ابحث عن صديق','✓ New circle created':'✓ تم إنشاء دائرة جديدة',
- 'Add someone you trust to your "My SHOMERs". They\'ll see your live location and you\'ll see theirs - by invite and mutual accept. You can stop anytime.':'أضِف شخصاً تثق به إلى قائمة „حُرّاسي". سيرى موقعك المباشر وسترى موقعه - عبر دعوة وقبول متبادل. يمكنك الإيقاف في أي وقت.',
+ 'Add someone you trust to your "My SHOMERs". They\'ll see your live location and you\'ll see theirs - by invite and mutual accept. You can stop anytime.':'أضِف شخصاً تثق به إلى قائمة „دائرتي". سيرى موقعك المباشر وسترى موقعه - عبر دعوة وقبول متبادل. يمكنك الإيقاف في أي وقت.',
  'Ghost mode - pause sharing':'وضع التخفّي - إيقاف المشاركة مؤقتاً','Pair invite':'دعوة ربط','Connected':'مُرتبط','Pending':'قيد الانتظار'
 };
 /* ── GLOBAL ERROR CAPTURE (so the hidden diagnostics view can show the REAL last
@@ -3591,8 +3591,8 @@ function resetApp(){
    device id (shomerCID) and signs out - so reopening is a clean, new identity. */
 function deleteAccount(){
  const he=currentLang==='he', ar=currentLang==='ar';
- const msg=he?'למחוק לצמיתות את החשבון? כל הנתונים יימחקו (פרופיל, דיווחים, היסטוריית SOS, הגדרות, נוכחות) ותוסר/י ממעגלי השומרים המשויכים. פעולה בלתי הפיכה.'
-   :ar?'حذف الحساب نهائيًا؟ ستُمحى كل البيانات (الملف، البلاغات، سجل الاستغاثة، الإعدادات، التواجد) وستتم إزالتك من دوائر الحُرّاس المرتبطين. لا يمكن التراجع.'
+ const msg=he?'למחוק לצמיתות את החשבון? כל הנתונים יימחקו (פרופיל, דיווחים, היסטוריית SOS, הגדרות, נוכחות) ותוסר/י מהמעגלים המשויכים. פעולה בלתי הפיכה.'
+   :ar?'حذف الحساب نهائيًا؟ ستُمحى كل البيانات (الملف، البلاغات، سجل الاستغاثة، الإعدادات، التواجد) وستتم إزالتك من الدوائر المرتبطين. لا يمكن التراجع.'
    :'Permanently delete your account? All data will be erased (profile, reports, SOS history, settings, presence) and you\'ll be removed from any paired SHOMERs\' circles. This cannot be undone.';
  if(!window.confirm(msg))return;
  var uid=(FB&&FB.uid)||null;
@@ -3789,7 +3789,7 @@ function resumeDMS(){
  var _was=!!(SS.dms&&SS.dms.active&&SS.dms.deadline&&SS.dms.deadline>Date.now());
  SS.dms.active=false; if(SS.dms)SS.dms.active=false; try{saveStore();}catch(e){}
  /* ...but never SILENTLY: someone who armed it must know it is no longer watching. */
- if(_was){ setTimeout(function(){ try{ toast(currentLang==='he'?'השומר האוטומטי נעצר כשהאפליקציה נפתחה מחדש - הפעל/י אותו שוב אם צריך':currentLang==='ar'?'توقف الحارس التلقائي عند إعادة فتح التطبيق - شغّله مجددًا إن لزم':'The automatic guard stopped when the app restarted - turn it on again if you still need it','amb',function(){ try{op('sh-dms');}catch(e){} }); }catch(e){} }, 2500); }
+ if(_was){ setTimeout(function(){ try{ toast(currentLang==='he'?'השומר האוטומטי נעצר כשהאפליקציה נפתחה מחדש - הפעל/י אותו שוב אם צריך':currentLang==='ar'?'توقف شومير التلقائي عند إعادة فتح التطبيق - شغّله مجددًا إن لزم':'The automatic guard stopped when the app restarted - turn it on again if you still need it','amb',function(){ try{op('sh-dms');}catch(e){} }); }catch(e){} }, 2500); }
  return;
  if(!SS.dms.active||!SS.dms.deadline)return;
  const remain=Math.floor((SS.dms.deadline-Date.now())/1000);
@@ -4101,7 +4101,7 @@ function applyTranslations(){
  try{ legalApplyI18n(); }catch(e){}
  try{ emApplyCountry(); }catch(e){}   /* v274: local emergency numbers after the data-he sweep */
  renderReportsList();renderSosHistory();
- try{ var _he=currentLang==='he',_ar=currentLang==='ar'; document.querySelectorAll('#arr-ttl').forEach(function(e){ e.textContent=_he?'התראות מיקום השומרים שלי':_ar?'تنبيهات موقع حُرّاسي':'My SHOMERs location alerts'; }); }catch(e){}
+ try{ var _he=currentLang==='he',_ar=currentLang==='ar'; document.querySelectorAll('#arr-ttl').forEach(function(e){ e.textContent=_he?'התראות מיקום השומרים שלי':_ar?'تنبيهات موقع دائرتي':'My SHOMERs location alerts'; }); }catch(e){}
  // A language pick must flip the WHOLE app — re-render every dynamic view so none keeps the old language.
  try{ if(typeof renderProfile==='function') renderProfile(); }catch(e){}
  try{ if(typeof renderProfile2==='function') renderProfile2(); }catch(e){}
@@ -4126,13 +4126,13 @@ const NAMES={
 let nameAuto=true; // true until the user edits the name field themselves
 // Auto-generated handle: "Shomer" + a zero-padded number (e.g. Shomer00001). Editable.
 function pickRandomName(){if(pickRandomName._n==null)pickRandomName._n=Math.floor(Math.random()*9999)+1;return 'SH✡MER'+String(pickRandomName._n).padStart(4,'0');}
-function localizedGuardian(){return ({he:'שומר',en:'SHOMER',ar:'حارس',ru:'Страж',am:'ጠባቂ',fr:'Gardien'})[currentLang]||'SHOMER';}
+function localizedGuardian(){return ({he:'שומר',en:'SHOMER',ar:'شومير',ru:'Страж',am:'ጠባቂ',fr:'Gardien'})[currentLang]||'SHOMER';}
 /* Every user IS a SHOMER, so the profile shows a UNIQUE handle (SH✡MER####), never the
    generic word "שומר/SHOMER". Prefer a stored username; else derive a stable 4-digit
    handle from the phone or the auth uid so it's consistent across sessions. */
 function uniqueHandle(){
   try{
-    if(SS.user&&SS.user.username&&!/^(שומר|SHOMER|حارس)$/i.test(SS.user.username)) return SS.user.username;
+    if(SS.user&&SS.user.username&&!/^(שומר|SHOMER|حارس|شومير)$/i.test(SS.user.username)) return SS.user.username;
     var seed=(SS&&SS.phone)|| (typeof FB!=='undefined'&&FB&&FB.uid)|| (SS&&SS.security&&SS.security.firebaseUid)||'';
     if(seed){ var h=0; seed=''+seed; for(var i=0;i<seed.length;i++){ h=((h<<5)-h+seed.charCodeAt(i))|0; } var num=(Math.abs(h)%9999)+1; var handle='SH✡MER'+String(num).padStart(4,'0'); try{ if(SS.user){ SS.user.username=handle; saveStore(); } }catch(_){} return handle; }
   }catch(e){}
@@ -4176,7 +4176,7 @@ function obPaintSignIn(){
   try{
     setText('si-h',  obTx('כניסה לחשבון קיים','Sign in to your account','تسجيل الدخول إلى حسابك'));
     setText('si-d',  obTx('הזן/י את מספר הטלפון שאיתו נרשמת. נשלח קוד אימות ב-SMS ונשחזר את החשבון שלך.','Enter the number you registered with. We will text you a code and restore your account.','أدخل الرقم الذي سجّلت به. سنرسل رمز تحقق ونستعيد حسابك.'));
-    setText('si-why',obTx('אחרי האימות תיכנס/י לאפליקציה. השומרים שלך ישובו אליך כשיאשרו אותך מחדש.','After verifying you are in. Your SHOMERs reconnect when they approve you again.','بعد التحقق تدخل التطبيق. يعود حرّاسك عندما يوافقون عليك مجددًا.'));   /* honest: circles live on the old device; the live rules cannot restore them */
+    setText('si-why',obTx('אחרי האימות תיכנס/י לאפליקציה. השומרים שלך ישובו אליך כשיאשרו אותך מחדש.','After verifying you are in. Your SHOMERs reconnect when they approve you again.','بعد التحقق تدخل التطبيق. تعود دائرتك عندما يوافقون عليك مجددًا.'));   /* honest: circles live on the old device; the live rules cannot restore them */
     setText('si-cta-t',obTx('התחבר/י','Sign in','تسجيل الدخول'));
     var b=document.getElementById('si-back');
     if(b) b.textContent=obTx('משתמש חדש? יצירת חשבון','New here? Create an account','مستخدم جديد؟ إنشاء حساب');
@@ -4519,14 +4519,14 @@ function nudgePick(){
  var hasCode=!!(SS.security&&/^\d{4,6}$/.test((SS.security.pin)||''));
  var hasGeo=(typeof userLat!=='undefined'&&userLat!=null);
  if(!hasCircle && !_nudgeDismissed('circle',2))
-   return {kind:'circle', ic:_nic(_NIC.shield), tx:(he?'הגדרת את מעגל השומרים שלך? זה מי שיקבל את ה-SOS.':ar?'هل أضفت دائرة حُرّاسك؟ هم من يتلقّى استغاثتك.':'Set up your SHOMER circle? They receive your SOS.'), cta:(he?'הוסף/י':ar?'أضف':'Add'), act:function(){ try{openCircles();}catch(e){} }};
+   return {kind:'circle', ic:_nic(_NIC.shield), tx:(he?'הגדרת את מעגל השומרים שלך? זה מי שיקבל את ה-SOS.':ar?'هل أضفت دائرتك؟ هم من يتلقّى استغاثتك.':'Set up your SHOMER circle? They receive your SOS.'), cta:(he?'הוסף/י':ar?'أضف':'Add'), act:function(){ try{openCircles();}catch(e){} }};
  if(!hasCode && !_nudgeDismissed('code',2))
    return {kind:'code', ic:_nic(_NIC.lock), tx:(he?'הגדר/י קוד אבטחה — לביטול SOS והגנת גנב.':ar?'اضبط رمز الأمان — لإلغاء الاستغاثة وحماية السرقة.':'Set a security code — to cancel SOS + arm theft protection.'), cta:(he?'הגדר/י':ar?'اضبط':'Set'), act:function(){ try{openSetPin();}catch(e){} }};
  if(!hasGeo && !_nudgeDismissed('geo',1))
    return {kind:'geo', ic:_nic(_NIC.pin), tx:(he?'שתף/י מיקום כדי שעזרה תגיע אליך מהר.':ar?'شارك موقعك ليصلك العون بسرعة.':'Share your location so help reaches you fast.'), cta:(he?'שתף/י':ar?'شارك':'Share'), act:function(){ try{ nudgeAskGeo(); }catch(e){} }};
  var _cm=(SS.circleMembers||[]).filter(function(m){return m && !m.pending;});
  if(hasCircle && _cm.length<3 && !_nudgeDismissed('more',4))
-   return {kind:'more', ic:_nic(_NIC.people), tx:(he?'הוסף/י עוד שומרים — רשת גדולה יותר = עזרה מהירה יותר.':ar?'أضف المزيد من الحُرّاس.':'Add more SHOMERs — a bigger circle means faster help.'), cta:(he?'הוסף/י':ar?'أضف':'Add'), act:function(){ try{openCircles();}catch(e){} }};
+   return {kind:'more', ic:_nic(_NIC.people), tx:(he?'הוסף/י עוד אנשים למעגל — רשת גדולה יותר = עזרה מהירה יותר.':ar?'أضف المزيد من الأشخاص إلى دائرتك.':'Add more SHOMERs — a bigger circle means faster help.'), cta:(he?'הוסף/י':ar?'أضف':'Add'), act:function(){ try{openCircles();}catch(e){} }};
  if(hasCircle && !_nudgeDismissed('invite',5))
    return {kind:'invite', ic:_nic(_NIC.mail), tx:(he?'הזמן/י חבר/ה ל-SHOMER — ככל שיותר אנשים ברשת, כולם בטוחים יותר.':ar?'ادعُ صديقاً إلى SHOMER.':'Invite a friend to SHOMER — more people means everyone is safer.'), cta:(he?'הזמן/י':ar?'ادعُ':'Invite'), act:function(){ try{shareInvite();}catch(e){} }};
  if(hasGeo && !_nudgeDismissed('updates',3))
@@ -4569,8 +4569,8 @@ function _dykMembers(){ return (SS.circleMembers||[]).filter(function(m){ return
 function _dykScroll(id){ setTimeout(function(){ try{ var el=document.getElementById(id); if(el) el.scrollIntoView({block:'center',behavior:'smooth'}); }catch(e){} }, 450); }
 var DYK_TIPS=[
  {k:'circle',lvl:1, used:function(){ return _dykMembers().length>0; },
-  he:'השומרים שלך מקבלים את ה-SOS שלך. הוסף/י את הראשון.', ar:'حُرّاسك يتلقّون استغاثتك. أضف أوّلهم.', en:'Your SHOMERs get your SOS. Add your first one.',
-  cta:['הוסף/י שומר','أضف حارساً','Add a SHOMER'], act:function(){ openCircles(); _dykScroll('agf-code'); }},
+  he:'השומרים שלך מקבלים את ה-SOS שלך. הוסף/י את הראשון.', ar:'من اخترتهم يتلقّون استغاثتك. أضف أوّلهم.', en:'Your SHOMERs get your SOS. Add your first one.',
+  cta:['הוסף/י שומר','أضف شخصاً','Add a SHOMER'], act:function(){ openCircles(); _dykScroll('agf-code'); }},
  {k:'geo',lvl:1, ok:function(){ return typeof userLat!=='undefined' && userLat==null; }, used:function(){ return typeof userLat!=='undefined' && userLat!=null; },
   he:'בלי מיקום, עזרה לא תמצא אותך. הפעל/י מיקום.', ar:'بدون الموقع لن تجدك المساعدة. فعّل الموقع.', en:'Without location, help can\'t find you. Turn it on.',
   cta:['הפעל/י מיקום','فعّل الموقع','Turn on location'], act:function(){ nudgeAskGeo(); }},
@@ -4581,11 +4581,11 @@ var DYK_TIPS=[
   he:'מדריך החירום עובד גם בלי אינטרנט: החייאה, חנק, דימום.', ar:'دليل الطوارئ يعمل حتى بدون إنترنت: إنعاش، اختناق، نزيف.', en:'The emergency guide works offline: CPR, choking, bleeding.',
   cta:['פתח/י מדריך','افتح الدليل','Open the guide'], act:function(){ openGuide(); }},
  {k:'invcode',lvl:2, used:function(){ return (gdState().pairs||[]).some(function(p){ return p&&p.partnerUid&&!p.pending; }); },
-  he:'קיבלת קוד הזמנה? מקלידים אותו ישר ב"השומרים שלי".', ar:'وصلك رمز دعوة؟ اكتبه مباشرة في «حُرّاسي».', en:'Got an invite code? Type it right in My SHOMERs.',
+  he:'קיבלת קוד הזמנה? מקלידים אותו ישר ב"השומרים שלי".', ar:'وصلك رمز دعوة؟ اكتبه مباشرة في «دائرتي».', en:'Got an invite code? Type it right in My SHOMERs.',
   cta:['הקלד/י קוד','اكتب الرمز','Enter a code'], act:function(){ openCircles(); _dykScroll('agf-code'); }},
  {k:'move',lvl:2, ok:function(){ return _dykMembers().length>0 && circlesList().length>1; },
-  he:'אפשר להעביר שומר למעגל אחר: "העבר למעגל" בשורה שלו.', ar:'يمكنك نقل حارس لدائرة أخرى: «نقل لدائرة» في سطره.', en:'Move a SHOMER to another circle: tap "Move circle" on their row.',
-  cta:['השומרים שלי','حُرّاسي','My SHOMERs'], act:function(){ openCircles(); _dykScroll('circ-members'); }},
+  he:'אפשר להעביר שומר למעגל אחר: "העבר למעגל" בשורה שלו.', ar:'يمكنك نقل شخص لدائرة أخرى: «نقل لدائرة» في سطره.', en:'Move a SHOMER to another circle: tap "Move circle" on their row.',
+  cta:['השומרים שלי','دائرتي','My SHOMERs'], act:function(){ openCircles(); _dykScroll('circ-members'); }},
  {k:'ghost',lvl:2, used:function(){ return !!SS.circleGhost; },
   he:'מצב רפאים משהה את שיתוף המיקום שלך בנגיעה אחת.', ar:'وضع التخفّي يوقف مشاركة موقعك بلمسة واحدة.', en:'Ghost mode pauses your location sharing in one tap.',
   cta:['למצב רפאים','وضع التخفّي','Ghost mode'], act:function(){ openCircles(); _dykScroll('ghost-tog'); }},
@@ -4599,7 +4599,7 @@ var DYK_TIPS=[
   he:'כל כרטיס במדריך החירום מוקרא בקול, שלב אחר שלב.', ar:'كل بطاقة في دليل الطوارئ تُقرأ بصوت عالٍ، خطوة بخطوة.', en:'Every emergency-guide card can be read aloud, step by step.',
   cta:['נסה/י','جرّب','Try it'], act:function(){ openGuide(); setTimeout(function(){ try{ openGuideTopic('cpr'); }catch(e){} }, 350); }},
  {k:'dms',lvl:3, used:function(){ return !!(SS.dms&&SS.dms.active); },
-  he:'"שומר אוטומטי" שולח SOS אם לא אישרת בזמן שאת/ה בסדר.', ar:'«الحارس التلقائي» يرسل SOS إن لم تؤكد في الوقت أنك بخير.', en:'Auto SHOMER sends an SOS if you don\'t confirm you\'re OK in time.',
+  he:'"שומר אוטומטי" שולח SOS אם לא אישרת בזמן שאת/ה בסדר.', ar:'«شومير التلقائي» يرسل SOS إن لم تؤكد في الوقت أنك بخير.', en:'Auto SHOMER sends an SOS if you don\'t confirm you\'re OK in time.',
   cta:['פתח/י','افتح','Open'], act:function(){ op('sh-dms'); }},
  {k:'checkin',lvl:3, used:function(){ return !!(SS.checkin&&SS.checkin.enabled); },
   he:'טיימר צ׳ק-אין: אם לא תאשר/י בזמן, המעגל שלך מקבל התראה.', ar:'مؤقت تسجيل الوصول: إن لم تؤكد في الوقت، تُنبَّه دائرتك.', en:'Check-in timer: if you don\'t confirm in time, your circle is alerted.',
@@ -5371,7 +5371,7 @@ function fakeCallStart(cb){
     try{ var SR=window.Capacitor&&window.Capacitor.Plugins&&window.Capacitor.Plugins.SpeechRecognition; SR&&SR.stop&&SR.stop(); }catch(e){}
     var st=ov.querySelector('.fc-st'); if(st) st.textContent=he?'השיחה הסתיימה':ar?'انتهت المكالمة':'Call ended';
     setTimeout(function(){ ov.remove(); }, 900);
-    if(practice){ try{ toast(ok?(he?'✓ תרגול: ביטוי הקוד זוהה - הכל טוב':ar?'✓ تدريب: تم التعرف على الرمز':'✓ Practice: code recognised'):(he?'תרגול: כאן הייתה נשלחת התראה שקטה לשומרים שלך':ar?'تدريب: هنا كان سيُرسل تنبيه صامت لحرّاسك':'Practice: a silent alert would go to your SHOMERs now'), ok?'grn':'amb'); }catch(e){} return; }
+    if(practice){ try{ toast(ok?(he?'✓ תרגול: ביטוי הקוד זוהה - הכל טוב':ar?'✓ تدريب: تم التعرف على الرمز':'✓ Practice: code recognised'):(he?'תרגול: כאן הייתה נשלחת התראה שקטה לשומרים שלך':ar?'تدريب: هنا كان سيُرسل تنبيه صامت لمن اخترتهم':'Practice: a silent alert would go to your SHOMERs now'), ok?'grn':'amb'); }catch(e){} return; }
     if(window._fcCbCur===cb) window._fcCbCur=null;
     try{ ok ? (cb.ok&&cb.ok()) : (cb.fail&&cb.fail()); }catch(e){}
     try{ if(_prevCb&&_prevCb!==cb){ ok ? (_prevCb.ok&&_prevCb.ok()) : (_prevCb.fail&&_prevCb.fail()); } }catch(e){}
@@ -5421,7 +5421,7 @@ function fcMountSettings(){
   var f=fcState(), he=currentLang==='he', ar=currentLang==='ar';
   document.querySelectorAll('[data-fc-host]').forEach(function(h){
     h.innerHTML='<div class="sec-cap mb12" style="margin-top:14px">'+(he?'שיחה מאמא (בדיקה קולית)':ar?'مكالمة من أمي (فحص صوتي)':'Call from Mom (voice check)')+'</div>'
-      +'<p class="set-help" style="margin:0 0 8px">'+(he?'במקום השאלה „הכל טוב?” הטלפון יציג שיחה נכנסת. עונים ומנהלים שיחה קצרה - ובמהלכה אומרים את ביטוי הקוד. בלי הביטוי, שתיקה או ניתוק = התראה שקטה לשומרים שלך עם המיקום החי, בלי שום סימן או צליל בטלפון.':ar?'بدل سؤال «كل شيء بخير؟» يعرض الهاتف مكالمة واردة. أجب وتحدث قليلاً وقل عبارة الرمز خلال المكالمة. بدون العبارة أو صمت أو إنهاء = تنبيه صامت لحرّاسك مع موقعك المباشر.':'Instead of the "All good?" question, your phone shows an incoming call. Answer and chat briefly - say your code phrase during the call. No phrase, silence or hanging up = a silent alert to your SHOMERs with your live location, with no sign or sound on your phone.')+'</p>'
+      +'<p class="set-help" style="margin:0 0 8px">'+(he?'במקום השאלה „הכל טוב?” הטלפון יציג שיחה נכנסת. עונים ומנהלים שיחה קצרה - ובמהלכה אומרים את ביטוי הקוד. בלי הביטוי, שתיקה או ניתוק = התראה שקטה לשומרים שלך עם המיקום החי, בלי שום סימן או צליל בטלפון.':ar?'بدل سؤال «كل شيء بخير؟» يعرض الهاتف مكالمة واردة. أجب وتحدث قليلاً وقل عبارة الرمز خلال المكالمة. بدون العبارة أو صمت أو إنهاء = تنبيه صامت لمن اخترتهم مع موقعك المباشر.':'Instead of the "All good?" question, your phone shows an incoming call. Answer and chat briefly - say your code phrase during the call. No phrase, silence or hanging up = a silent alert to your SHOMERs with your live location, with no sign or sound on your phone.')+'</p>'
       +'<label class="fc-row"><input type="checkbox" class="fc-on"'+(f.on?' checked':'')+'> <span>'+(he?'הפעל שיחה מדומה':ar?'تفعيل المكالمة':'Use the fake call')+'</span></label>'
       +'<input class="ob-f fc-caller" type="text" maxlength="20" placeholder="'+(he?'שם המתקשר/ת (למשל: אמא)':ar?'اسم المتصل (مثلاً: أمي)':'Caller name (e.g. Mom)')+'" value="'+ESC(f.caller||'')+'" style="margin-top:8px">'
       +'<input class="ob-f fc-code" type="text" maxlength="32" autocomplete="off" placeholder="'+(he?'ביטוי קוד, 1-3 מילים (למשל: עוגת גבינה)':ar?'عبارة الرمز، 1-3 كلمات':'Code phrase, 1-3 words (e.g. cheese cake)')+'" value="'+ESC(f.code||'')+'" style="margin-top:8px">'
@@ -5669,8 +5669,8 @@ function renderCountdown(){
  setText('sos-cd-num',String(sosCdLeft));
  const he=currentLang==='he';
  setText('sos-cd-ttl',he?' שולח SOS…':currentLang==='ar'?' جارٍ إرسال SOS…':' Sending SOS…');
- setText('sos-cd-sub',he?'האזעקה פועלת. שידור לשומרים בקרבתך בעוד…'
- :currentLang==='ar'?'الإنذار يعمل. البث للحُرّاس القريبين خلال…':'Alarm is sounding. Broadcasting to nearby SHOMERs in…');
+ setText('sos-cd-sub',he?'האזעקה פועלת. שידור למשתמשים בקרבתך בעוד…'
+ :currentLang==='ar'?'الإنذار يعمل. البث للمستخدمين القريبين خلال…':'Alarm is sounding. Broadcasting to nearby SHOMERs in…');
  setText('sos-cd-cancel',he?'אני בטוח/ה - בטל':currentLang==='ar'?'أنا بأمان - إلغاء':"I'm safe - Cancel");
  setText('sos-cd-hint',he?'ביטול עכשיו = אזעקת שווא. שום דבר לא ישודר ולא יופיע במפה.'
  :currentLang==='ar'?'الإلغاء الآن = إنذار كاذب. لن يُبث شيء ولن يظهر على الخريطة.':'Cancel now = false alarm. Nothing is broadcast and nothing appears on the map.');
@@ -5755,7 +5755,7 @@ function activateSOS(){
  // PRACTICE: everything looks and sounds real on THIS phone; nothing leaves it.
  setText('ss-t',he?' תרגול SOS - אף אחד לא קיבל התראה':currentLang==='ar'?' تمرين SOS - لم يُبلَّغ أحد':' Practice SOS - nobody was notified');
  setText('ss-s',he?'כך זה נראה באמת. כבה/י עם קוד הביטול.':currentLang==='ar'?'هكذا يبدو الأمر حقًا. أوقِفه برمز الإلغاء.':'This is how it looks for real. Stop it with your cancel code.');
- toast(he?'תרגול: האזעקה אמיתית בטלפון שלך בלבד. השומרים לא קיבלו כלום.':currentLang==='ar'?'تمرين: الإنذار حقيقي على هاتفك فقط. لم يتلقَّ الحُرّاس شيئًا.':'Practice: the alarm is real on your phone only. Your SHOMERs got nothing.','amb');
+ toast(he?'תרגול: האזעקה אמיתית בטלפון שלך בלבד. האנשים שבחרת לא קיבלו כלום.':currentLang==='ar'?'تمرين: الإنذار حقيقي على هاتفك فقط. لم يتلقَّ من اخترتهم شيئًا.':'Practice: the alarm is real on your phone only. Your SHOMERs got nothing.','amb');
  return;
  }
  if(overLimit){
@@ -5769,8 +5769,8 @@ function activateSOS(){
  buildSosTypeBar(); reflectSosType();   /* nature-layer: no simulated 'nearby responder' auto-type - if the owner doesn't choose, it stays an unclassified person SOS */
  try{ fbPublishSOS(); }catch(e){} // cross-device: broadcast this SOS over RTDB
  try{ fbAlertPairedSos(); }catch(e){} // targeted closed-app push to paired SHOMERs
- try{ if(curSosId) fbRespondersListen(curSosId); }catch(e){} // live "N שומרים בדרך" as responders commit
- toast(he?' SOS שודר - שומרים בקרבתך עודכנו':currentLang==='ar'?' تم بث SOS - تم إبلاغ الحُرّاس القريبين':' SOS broadcast - nearby SHOMERs notified','red',function(){try{openUpdates();}catch(e){}});
+ try{ if(curSosId) fbRespondersListen(curSosId); }catch(e){} // live "N בדרך אליך" as responders commit
+ toast(he?' SOS שודר - משתמשים בקרבתך עודכנו':currentLang==='ar'?' تم بث SOS - تم إبلاغ المستخدمين القريبين':' SOS broadcast - nearby SHOMERs notified','red',function(){try{openUpdates();}catch(e){}});
  // Auto-dial prompt (opens dialer; a native app could place the call directly).
  setTimeout(()=>{
  if(sosPhase!=='active')return;
@@ -5848,7 +5848,7 @@ function pinRemove(){ var he=currentLang==='he', ar=currentLang==='ar';
  try{ delete SS.security.pin; saveStore(); }catch(e){} closeSosPin(); reflectPinSetState(); toast(he?'קוד הביטול הוסר':ar?'تمت إزالة رمز الإلغاء':'Cancel code removed','amb'); }
 function pinToggleShow(){ _pinShow=!_pinShow; reflectPinDots(); _pinSetTexts(); }
 function pinForgot(){ var he=currentLang==='he', ar=currentLang==='ar';
- var t=_pinOpts.forgot||(he?'מטעמי בטיחות אין עקיפה לקוד. אם זו התראה מהשומר/ת שלך - בקש/י ממנו/ה לעצור אותה מרחוק. אחרי זה אפשר להגדיר קוד חדש בהגדרות ← בטיחות.':ar?'لأسباب أمان لا يمكن تجاوز الرمز. إن كان هذا تنبيهًا من حارسك - اطلب منه إيقافه عن بُعد. بعدها يمكنك ضبط رمز جديد من الإعدادات ← الأمان.':'For safety the code cannot be bypassed. If this is an alert from your SHOMER, ask them to stop it remotely. Then set a new code in Settings → Safety.');
+ var t=_pinOpts.forgot||(he?'מטעמי בטיחות אין עקיפה לקוד. אם זו התראה מהשומר/ת שלך - בקש/י ממנו/ה לעצור אותה מרחוק. אחרי זה אפשר להגדיר קוד חדש בהגדרות ← בטיחות.':ar?'لأسباب أمان لا يمكن تجاوز الرمز. إن كان هذا تنبيهًا من شخص من دائرتك - اطلب منه إيقافه عن بُعد. بعدها يمكنك ضبط رمز جديد من الإعدادات ← الأمان.':'For safety the code cannot be bypassed. If this is an alert from your SHOMER, ask them to stop it remotely. Then set a new code in Settings → Safety.');
  toast(t,'amb'); }
 function _pinSetTexts(){ var he=currentLang==='he', ar=currentLang==='ar', m=_pinMode;
  var T={
@@ -5924,7 +5924,7 @@ function openSelfieGuard(photo){
   ov.innerHTML='<div class="selfie-card">'
     +(photo?('<img class="selfie-thumb" src="'+photo+'" alt="">'):'')
     +'<h3>'+(he?'זוהו 3 קודים שגויים':ar?'3 رموز خاطئة':'3 wrong codes')+'</h3>'
-    +'<p>'+(he?'אם זה הטלפון שלך - בטל/י עכשיו. אחרת, סלפי ומיקום יישלחו לשומרים שלך.':ar?'إن كان هاتفك فألغِ الآن، وإلا ستُرسل صورة وموقع لحُرّاسك.':'If this is your phone, cancel now. Otherwise a selfie + location go to your SHOMERs.')+'</p>'
+    +'<p>'+(he?'אם זה הטלפון שלך - בטל/י עכשיו. אחרת, סלפי ומיקום יישלחו לשומרים שלך.':ar?'إن كان هاتفك فألغِ الآن، وإلا ستُرسل صورة وموقع لمن اخترتهم.':'If this is your phone, cancel now. Otherwise a selfie + location go to your SHOMERs.')+'</p>'
     +'<div class="selfie-count" id="selfie-count">'+secs+'</div>'
     +'<button class="selfie-cancel" onclick="selfieGuardCancel()">'+(he?'זה אני - בטל':ar?'هذا أنا - إلغاء':'It\'s me - cancel')+'</button>'
     +'<div class="selfie-note">'+(he?'הצילום נלכד רק כשהאפליקציה פתוחה. צילום במסך נעול יתווסף בגרסה המותקנת.':ar?'يُلتقط فقط والتطبيق مفتوح.':'Capture works only while the app is open. Locked-screen capture arrives in the installed app.')+'</div>'
@@ -6026,11 +6026,11 @@ function checkinGuardianUids(){ var ids=(SS.checkin&&SS.checkin.SHOMERs)||[]; va
  return out; }
 function ciToggleGuardian(id){ var c=SS.checkin; if(!Array.isArray(c.SHOMERs))c.SHOMERs=[]; var i=c.SHOMERs.indexOf(id);
  if(i>=0){ c.SHOMERs.splice(i,1); }
- else { if(c.SHOMERs.length>=CHECKIN_MAX){ var he=currentLang==='he'; try{ toast(he?('אפשר לבחור עד '+CHECKIN_MAX+' שומרים'):('You can choose up to '+CHECKIN_MAX+' SHOMERs'),'amb'); }catch(e){} return; } c.SHOMERs.push(id); }
+ else { if(c.SHOMERs.length>=CHECKIN_MAX){ var he=currentLang==='he'; try{ toast(he?('אפשר לבחור עד '+CHECKIN_MAX+' אנשים'):('You can choose up to '+CHECKIN_MAX+' SHOMERs'),'amb'); }catch(e){} return; } c.SHOMERs.push(id); }
  saveStore(); renderCiGuardians(); }
 function renderCiGuardians(){ var host=document.getElementById('ci-SHOMERs-list'); if(!host)return; var he=currentLang==='he';
  var list=checkinSavedShomers(), sel=(SS.checkin&&SS.checkin.SHOMERs)||[];
- if(!list.length){ host.innerHTML='<div class="set-help" style="padding:4px 2px">'+(he?'אין שומרים שמורים עדיין - הוסף/י שומרים במסך „השומרים שלי”.':'No saved SHOMERs yet - add some in "My SHOMER".')+'</div>'; return; }
+ if(!list.length){ host.innerHTML='<div class="set-help" style="padding:4px 2px">'+(he?'אין אנשים שמורים עדיין - הוסף/י אנשים במסך „השומרים שלי”.':'No saved SHOMERs yet - add some in "My SHOMER".')+'</div>'; return; }
  host.innerHTML=list.map(function(m){ var on=sel.indexOf(m.id)>=0;
    return '<button type="button" class="ci-gd-row'+(on?' sel':'')+'" onclick="ciToggleGuardian(\''+m.id+'\')" aria-pressed="'+on+'" style="display:flex;align-items:center;gap:10px;width:100%;text-align:start;padding:11px 12px;margin-bottom:7px;border-radius:var(--r12);border:1px solid '+(on?'var(--g3)':'var(--b2)')+';background:'+(on?'rgba(224,168,40,.12)':'var(--n4)')+';color:var(--tx1);cursor:pointer">'
     +'<span style="width:18px;height:18px;flex:0 0 auto;border-radius:5px;border:2px solid '+(on?'var(--g3)':'var(--b3)')+';background:'+(on?'var(--g3)':'transparent')+';display:flex;align-items:center;justify-content:center;color:#23170a;font-weight:900;font-size:12px">'+(on?'✓':'')+'</span>'
@@ -6346,11 +6346,11 @@ function communityNudge(){
         en:'Know a defibrillator (AED) nearby? Add it to the map - it can save a life',
         cta_he:'הוסף/י AED', cta_en:'Add AED',
         act:function(){ try{ if(typeof aedPlaceMode==='function') aedPlaceMode(); }catch(e){} } },
-      { he:'רוצה להזהיר שומרים אחרים מסביבך? דווח/י על אירוע במפה',
+      { he:'רוצה להזהיר משתמשים אחרים מסביבך? דווח/י על אירוע במפה',
         en:'Want to warn other SHOMERs near you? Report an event on the map',
         cta_he:'דווח/י', cta_en:'Report',
         act:function(){ try{ if(typeof openReport==='function') openReport(); }catch(e){} } },
-      { he:'ככל שיותר שומרים סביבך - כך בטוח יותר. הזמן/י שכן או חבר/ה',
+      { he:'ככל שיותר משתמשים סביבך - כך בטוח יותר. הזמן/י שכן או חבר/ה',
         en:'The more SHOMERs around you, the safer everyone is. Invite a neighbor or friend',
         cta_he:'הזמן/י', cta_en:'Invite',
         act:function(){ try{ if(typeof openGuardians==='function') openGuardians(); }catch(e){} } }
@@ -6588,7 +6588,7 @@ function locBarShow(){
  try{ if(popupTypingOrSetup()){ setTimeout(locBarShow, 3000); return; } }catch(e){}   /* v312: never mid-typing / onboarding */
  var he=currentLang==='he', ar=currentLang==='ar';
  var b=document.createElement('div'); b.className='nudge-bar'; b.id='loc-bar';
- b.innerHTML='<span class="nudge-tx">'+(he?'המיקום כבוי - את/ה לא מופיע/ה במפה ולשומרים שלך':ar?'الموقع متوقف - أنت لا تظهر على الخريطة ولا لحُرّاسك':'Location is off - you are not on the map or visible to your SHOMERs')+'</span><button class="nudge-cta" id="loc-bar-go">'+(he?'הפעל/י מיקום':ar?'تفعيل الموقع':'Turn on location')+'</button><button class="nudge-x" aria-label="close">\u2715</button>';
+ b.innerHTML='<span class="nudge-tx">'+(he?'המיקום כבוי - את/ה לא מופיע/ה במפה ולשומרים שלך':ar?'الموقع متوقف - أنت لا تظهر على الخريطة ولا لمن اخترتهم':'Location is off - you are not on the map or visible to your SHOMERs')+'</span><button class="nudge-cta" id="loc-bar-go">'+(he?'הפעל/י מיקום':ar?'تفعيل الموقع':'Turn on location')+'</button><button class="nudge-x" aria-label="close">\u2715</button>';
  document.body.appendChild(b);
  b.querySelector('.nudge-x').onclick=function(){ b.remove(); };
  b.querySelector('#loc-bar-go').onclick=function(){
@@ -6650,7 +6650,7 @@ function openDetail(idx){
  <div style="font-size:11px;font-weight:700;color:var(--tx1);direction:ltr">${ESC(coordTxt)}</div>
  </div>`;
  const pHtml=d.photos>0?`<div class="sec-cap mb12"> ${currentLang==='he'?'תמונות מהאירוע':'Photos from incident'}</div><div class="det-photo-grid mb16">${Array(d.photos).fill('<div class="det-ph"></div>').join('')}</div>`:'';
- const rHtml=d.responders.length?`<div class="sec-cap mb12"> ${currentLang==='he'?'שומרים שהגיבו':'Responders'}</div>${d.responders.map(r=>`<div class="resp-row"><div class="resp-av">${ESC(r.nm[0])}</div><div><div class="resp-nm">${ESC(r.nm)}</div><div class="resp-d">${ESC(r.dist)}</div></div><span class="resp-st">${ESC(r.st)}</span></div>`).join('')}`:'';
+ const rHtml=d.responders.length?`<div class="sec-cap mb12"> ${currentLang==='he'?'משתמשים שהגיבו':'Responders'}</div>${d.responders.map(r=>`<div class="resp-row"><div class="resp-av">${ESC(r.nm[0])}</div><div><div class="resp-nm">${ESC(r.nm)}</div><div class="resp-d">${ESC(r.dist)}</div></div><span class="resp-st">${ESC(r.st)}</span></div>`).join('')}`:'';
  _curDetail=d;
  let ctas='';
  const _isPast=isPastEvent(d);
@@ -7138,13 +7138,13 @@ function renderSetContacts(){
   var pairs=(typeof gdState==='function'?(gdState().pairs||[]):[]).filter(function(p){ return !(p&&p.hidden&&p.pending&&!p.linked); });   /* v280: unused group-link slots stay invisible */
   if(!pairs.length){
     grp.innerHTML='<div style="padding:16px 14px;font-size:12.5px;color:var(--tx2);line-height:1.6;">'+
-      (he?'עדיין לא הוספת שומרים. הוסיפו משפחה או חברים - הם יקבלו התראה כששולחים SOS.':
-       ar?'لم تُضِف حُرّاسًا بعد. أضِف العائلة أو الأصدقاء - سيُنبَّهون عند إرسال نداء استغاثة.':
+      (he?'עדיין לא הוספת אנשים למעגל. הוסיפו משפחה או חברים - הם יקבלו התראה כששולחים SOS.':
+       ar?'لم تُضِف أحدًا بعد. أضِف العائلة أو الأصدقاء - سيُنبَّهون عند إرسال نداء استغاثة.':
        'No SHOMERs added yet. Add family or friends - they get alerted when you send an SOS.')+'</div>';
     return;
   }
   grp.innerHTML=pairs.map(function(p){
-    var nm=((p.name||'').trim())||(he?'שומר/ת':ar?'حارس':'SHOMER');
+    var nm=((p.name||'').trim())||(he?'שומר/ת':ar?'شخص':'SHOMER');
     var av=ESC(nm.charAt(0).toUpperCase());
     var linked=!!(p.linked&&p.partnerUid);
     var tag=linked?(he?'מקושר':ar?'مرتبط':'Linked'):(he?'ממתין':ar?'بانتظار':'Pending');
@@ -7618,12 +7618,12 @@ function tourSteps(){ var he=currentLang==='he', ar=currentLang==='ar'; var P=fu
    b:P({he:'כרטיסי עזרה ראשונה גלויים במבט (החייאה, חנק, דימום, שבץ ועוד) - עובד גם ללא אינטרנט.',en:'Glanceable first-aid cards (CPR, choking, bleeding, stroke and more) - works even offline.',ar:'بطاقات إسعاف أولي واضحة (إنعاش، اختناق، نزيف، سكتة والمزيد) - تعمل حتى دون إنترنت.'})},
   {sel:'#sos-btn', ic:'<path d="M12 3l7 3v5c0 5-3.4 8.5-7 10-3.6-1.5-7-5-7-10V6Z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>',
    t:P({he:'כפתור SOS',en:'SOS button',ar:'زر الاستغاثة'}),
-   b:P({he:'לחיצה שולחת את מיקומך ואזעקה לשומרים בקרבתך ולאנשי הקשר שלך. בחירום אמיתי חייגו גם 100 / 101 / 102.',en:'Press to send your location + an alarm to nearby SHOMERs and your contacts. In a real emergency also call 100 / 101 / 102.',ar:'اضغط لإرسال موقعك وإنذار إلى الحُرّاس القريبين وجهات اتصالك. في الطوارئ اتصل أيضًا بـ100 / 101 / 102.'})},
+   b:P({he:'לחיצה שולחת את מיקומך ואזעקה למשתמשים בקרבתך ולאנשי הקשר שלך. בחירום אמיתי חייגו גם 100 / 101 / 102.',en:'Press to send your location + an alarm to nearby SHOMERs and your contacts. In a real emergency also call 100 / 101 / 102.',ar:'اضغط لإرسال موقعك وإنذار إلى المستخدمين القريبين وجهات اتصالك. في الطوارئ اتصل أيضًا بـ100 / 101 / 102.'})},
   {sel:'#map-wrap', ic:'<path d="M9 4 3 6v14l6-2 6 2 6-2V4l-6 2-6-2Z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><path d="M9 4v14M15 6v14" fill="none" stroke="currentColor" stroke-width="2"/>',
    t:P({he:'מפת בטיחות חיה',en:'Live safety map',ar:'خريطة أمان مباشرة'}),
-   b:P({he:'רואים אירועים בקרבתכם ושומרים פעילים בזמן אמת. כשמתקבל SOS מוצג מסלול לאירוע.',en:'See nearby events and active SHOMERs in real time. When an SOS comes in, a route to it appears.',ar:'شاهد الأحداث القريبة والحُرّاس النشطين مباشرة. عند وصول استغاثة يظهر مسار إليها.'})},
+   b:P({he:'רואים אירועים בקרבתכם ומשתמשים פעילים בזמן אמת. כשמתקבל SOS מוצג מסלול לאירוע.',en:'See nearby events and active SHOMERs in real time. When an SOS comes in, a route to it appears.',ar:'شاهد الأحداث القريبة والمستخدمين النشطين مباشرة. عند وصول استغاثة يظهر مسار إليها.'})},
   {sel:'#menu-btn', ic:'<path d="M9 11a3 3 0 1 0 0-6 3 3 0 0 0 0 6Z" fill="none" stroke="currentColor" stroke-width="2"/><path d="M2.5 20a6.5 6.5 0 0 1 13 0" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M17 7.2a3 3 0 0 1 0 5.6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>',
-   t:P({he:'השומרים שלי',en:'My SHOMER',ar:'حُرّاسي'}),
+   t:P({he:'השומרים שלי',en:'My SHOMER',ar:'دائرتي'}),
    b:P({he:'בתפריט: חברו אנשים שאתם סומכים עליהם. הם יראו את מיקומכם החי ואתם את שלהם - בהזמנה ובאישור, וניתן לעצור בכל רגע.',en:'In the menu: connect people you trust. They see your live location and you see theirs - by invite + consent, and you can stop anytime.',ar:'في القائمة: اربط أشخاصًا تثق بهم. يرون موقعك المباشر وترى مواقعهم - بدعوة وموافقة، ويمكنك الإيقاف في أي وقت.'})}
  ];
 }
@@ -7843,7 +7843,7 @@ function renderArrivals(){
   });
   var cap=document.getElementById('arr-cap');
   if(cap) cap.textContent = he
-    ? ('עד '+ARR_G+' שומרים · '+ARR_P+' מיקומים לכל אחד - מגבלת מערכת ההפעלה היא 20.')
+    ? ('עד '+ARR_G+' אנשים · '+ARR_P+' מיקומים לכל אחד - מגבלת מערכת ההפעלה היא 20.')
     : (ARR_G+' SHOMERs x '+ARR_P+' places - the OS limit is 20.');
 }
 function _phAddr(f){ var p=(f&&f.properties)||{}; var st=(p.street||p.name||'')+(p.housenumber?(' '+p.housenumber):''); var city=p.city||p.town||p.village||p.county||''; return (st||city)+(st&&city?(' · '+city):''); }
@@ -8042,7 +8042,7 @@ function renderCircles(){
         if(!ms2.length){
           var e=document.createElement('div');
           e.className='cot-empty';
-          e.textContent=he?'אין שומרים במעגל הזה':'No SHOMERs in this circle';
+          e.textContent=he?'אין אנשים במעגל הזה':'No SHOMERs in this circle';
           sub.appendChild(e);
         }
         ms2.forEach(function(mm){
@@ -8070,7 +8070,7 @@ function renderCircles(){
     if(!ms3.length){
       var e2=document.createElement('div');
       e2.style.cssText='text-align:center;color:var(--tx3);font-size:12.5px;padding:18px';
-      e2.textContent=he?'עדיין אין שומרים - הוסף/י אנשים שאת/ה סומכ/ת עליהם.':'No SHOMERs yet - add people you trust.';
+      e2.textContent=he?'עדיין אין אנשים במעגל - הוסף/י אנשים שאת/ה סומכ/ת עליהם.':'No SHOMERs yet - add people you trust.';
       host.appendChild(e2);
     } else {
       try{ var _ar=currentLang==='ar'; SS.cmLeg=SS.cmLeg||{n:0,off:false};
@@ -8519,7 +8519,7 @@ function inviteBatchAsk(){
   if(!gdRequireConsent(inviteBatchAsk)) return;
   var old=document.getElementById('invwho-bar'); if(old) old.remove();
   var bar=document.createElement('div'); bar.id='invwho-bar'; bar.className='nudge-bar';
-  bar.innerHTML='<span class="nudge-tx" style="font-weight:800;font-size:17px">'+(he?'הזמנת שומרים בוואטסאפ':ar?'دعوة حرّاس عبر واتساب':'Invite SHOMERs on WhatsApp')+'</span>'
+  bar.innerHTML='<span class="nudge-tx" style="font-weight:800;font-size:17px">'+(he?'הזמנה למעגל בוואטסאפ':ar?'دعوة إلى دائرتك عبر واتساب':'Invite SHOMERs on WhatsApp')+'</span>'
    +'<span class="nudge-tx" style="font-size:14px;opacity:.9">'+(he?'בוואטסאפ בוחרים איש קשר אחד או כמה - עד '+INV_BATCH+' אנשים. כל מי שמצטרף מופיע אצלך אוטומטית עם השם והטלפון המאומתים שלו.':ar?'اختر في واتساب جهة واحدة أو أكثر (حتى '+INV_BATCH+'). كل من ينضم يظهر لديك تلقائياً باسمه وهاتفه.':'In WhatsApp pick one or more chats (up to '+INV_BATCH+'). Everyone who joins appears here automatically with their verified name and phone.')+'</span>'
    +'<button class="nudge-cta" id="invwho-go" style="background:#25D366;color:#062b14">'+(he?'פתח/י וואטסאפ':ar?'افتح واتساب':'Open WhatsApp')+'</button>'
    +'<button class="nudge-x" aria-label="close">\u2715</button>';
@@ -8730,7 +8730,7 @@ function openManage(){
   var old=document.getElementById('mng-panel'); if(old) old.remove();
   var p=document.createElement('div');
   p.id='mng-panel'; p.className='mng-panel';
-  p.innerHTML='<div class="mng-hd"><span>'+(he?'ניהול מעגלים ושומרים':'Manage circles & SHOMERs')+'</span>'
+  p.innerHTML='<div class="mng-hd"><span>'+(he?'ניהול מעגלים ואנשים':'Manage circles & SHOMERs')+'</span>'
     +'<button class="mng-x" onclick="document.getElementById(\'mng-panel\').remove()">✕</button></div>'
     +'<div class="mng-body" id="mng-body"></div>';
   document.body.appendChild(p);
@@ -8751,7 +8751,7 @@ function renderManage(){
     var list=document.createElement('div'); list.className='mng-list';
     if(!ms.length){
       var e=document.createElement('div'); e.className='mng-empty';
-      e.textContent=he?'אין שומרים במעגל זה':'No SHOMERs in this circle';
+      e.textContent=he?'אין אנשים במעגל זה':'No SHOMERs in this circle';
       list.appendChild(e);
     }
     ms.forEach(function(m){
@@ -8950,7 +8950,7 @@ function renameCircle(id){
 function addCircle(){
   var _he=currentLang==='he';
   if(circlesList().length>=6){
-    toast(_he?'6 מעגלים זה המקסימום. שנה/י שם למעגל קיים או הסר/י שומרים שאינך צריך/ה.':'6 circles is the max. Rename an existing circle, or remove SHOMERs you no longer need.','amb');
+    toast(_he?'6 מעגלים זה המקסימום. שנה/י שם למעגל קיים או הסר/י אנשים שאינך צריך/ה.':'6 circles is the max. Rename an existing circle, or remove SHOMERs you no longer need.','amb');
     return;
   }
  const he=currentLang==='he';
@@ -9003,7 +9003,7 @@ function gaMyName(){ return ((SS.user&&SS.user.name)||'').slice(0,40); }
 function gaWrite(toUid,rec){ return fbRestWrite('PUT','ping/'+toUid+'/'+FB.uid,rec); }
 /* ── sender ── */
 function gaSend(m,level){
-  if(!m||!m.partnerUid){ toast(gaT('אפשר לשלוח רק לשומר/ת מקושר/ת','يمكن الإرسال فقط لحارس مرتبط','Only for a linked SHOMER'),'amb'); return; }
+  if(!m||!m.partnerUid){ toast(gaT('אפשר לשלוח רק לשומר/ת מקושר/ת','يمكن الإرسال فقط لشخص مرتبط','Only for a linked SHOMER'),'amb'); return; }
   if(typeof FB==='undefined'||!FB.ready||!FB.uid){ toast(gaT('אין חיבור - נסה/י שוב','لا اتصال - حاول مجددًا','No connection - try again'),'amb'); return; }
   try{ if(isReviewAccount()){ toast(gaT('חשבון בדיקה - לא נשלח','حساب تجريبي - لم يُرسل','Test account - not sent'),'amb'); return; } }catch(e){}
   if(level==='alarm' && !confirm(gaT('לשלוח אזעקת חירום מלאה ל-'+(m.name||'')+'? היא תיעצר רק בקוד הביטול שלו/ה או ממך.','إرسال إنذار طوارئ كامل إلى '+(m.name||'')+'؟ لن يتوقف إلا برمز الإلغاء الخاص به أو منك.','Send a full emergency alarm to '+(m.name||'')+'? It stops only with their cancel code, or from you.'))) return;
@@ -9041,7 +9041,7 @@ function gaStatusText(uid){
 function gaCloseSheet(){ var e=document.getElementById('ga-pick'); if(e){ e.remove(); try{ shHistDrop(); }catch(_){} } }
 function gaOpen(memberId){
   var m=memberById(memberId); if(!m) return;
-  if(!m.partnerUid||m.pending){ toast(gaT('זמין אחרי שהשומר/ת מאשר/ת את החיבור','متاح بعد أن يقبل الحارس الربط','Available once they accept the link'),'amb'); return; }
+  if(!m.partnerUid||m.pending){ toast(gaT('זמין אחרי שהשומר/ת מאשר/ת את החיבור','متاح بعد أن يقبل الشخص الربط','Available once they accept the link'),'amb'); return; }
   gaCloseSheet();
   var o=gaOut()[m.partnerUid], active=o&&(o.level!=='check')&&(o.st==='sent'||o.st==='noans');
   var d=document.createElement('div'); d.id='ga-pick'; d.className='ga-pick'; d.setAttribute('role','dialog'); d.setAttribute('aria-modal','true');
@@ -9095,7 +9095,7 @@ function gaHandle(from,v){
 function gaShow(from,v){
   if(gaCur) gaEnd('replaced',true);
   gaCur={from:from,id:v.id,level:v.level,name:v.name||''};
-  var nm=ESC(v.name||gaT('השומר/ת שלך','حارسك','Your SHOMER'));
+  var nm=ESC(v.name||gaT('השומר/ת שלך','شخص من دائرتك','Your SHOMER'));
   var d=document.createElement('div'); d.id='ga-ov'; d.className='ga-ov lv-'+v.level; d.setAttribute('role','alertdialog'); d.setAttribute('aria-modal','true');
   if(v.level==='check'){
     d.innerHTML='<div class="ga-ov-card"><div class="ga-ov-ic">'+gReadIcon2('check')+'</div><div class="ga-ov-t">'+gaT(nm+' שואל/ת: הכל טוב?',nm+' يسأل: كل شيء بخير؟',nm+' asks: all good?')+'</div>'
@@ -9118,7 +9118,7 @@ function gaShow(from,v){
   var cd=d.querySelector('.ga-code'); if(cd) cd.onclick=function(){
     var cb=function(){ gaAnswer('coded'); gaEnd('coded'); toast(gaT('✓ נעצר. '+(v.name||'')+' יודע/ת שהכל בסדר.','✓ تم الإيقاف. يعرف '+(v.name||'')+' أن كل شيء بخير.','✓ Stopped. '+(v.name||'')+' knows you are OK.'),'grn'); };
     if(_pinHas()) openSosPin(cb,{ttl:gaT('עצירת ההתראה','إيقاف التنبيه','Stop the alert'),sub:gaT('הזן/י את קוד הביטול שלך.','أدخل رمز الإلغاء.','Enter your cancel code.'),
-      forgot:gaT('אין עקיפה לקוד. בקש/י מ'+(v.name||'השומר/ת')+' לעצור את ההתראה מרחוק, ואחר כך הגדר/י קוד חדש בהגדרות.','لا يمكن تجاوز الرمز. اطلب من '+(v.name||'حارسك')+' إيقاف التنبيه عن بُعد، ثم اضبط رمزًا جديدًا في الإعدادات.','The code cannot be bypassed. Ask '+(v.name||'your SHOMER')+' to stop it remotely, then set a new code in Settings.')});
+      forgot:gaT('אין עקיפה לקוד. בקש/י מ'+(v.name||'השומר/ת')+' לעצור את ההתראה מרחוק, ואחר כך הגדר/י קוד חדש בהגדרות.','لا يمكن تجاوز الرمز. اطلب من '+(v.name||'شخص من دائرتك')+' إيقاف التنبيه عن بُعد، ثم اضبط رمزًا جديدًا في الإعدادات.','The code cannot be bypassed. Ask '+(v.name||'your SHOMER')+' to stop it remotely, then set a new code in Settings.')});
     else openSetPin(cb);
   };
   try{ pushNotify('SH✡MER',(v.level==='check'?gaT('הכל טוב? - ','كل شيء بخير؟ - ','All good? - '):v.level==='alarm'?'🚨 ':'🔔 ')+(v.name||''),'ga-in'); }catch(e){}
@@ -9144,7 +9144,7 @@ function gaEnd(why,keep){
   if(!gaCur) return;
   gaSoundStop(); gaMarkSeen(gaCur.id);
   var d=document.getElementById('ga-ov'); if(d) d.remove();
-  if(why==='remote') toast(gaT((gaCur.name||'השומר/ת')+' עצר/ה את ההתראה',(gaCur.name||'حارسك')+' أوقف التنبيه',(gaCur.name||'Your SHOMER')+' stopped the alert'),'');
+  if(why==='remote') toast(gaT((gaCur.name||'השומר/ת')+' עצר/ה את ההתראה',(gaCur.name||'شخص من دائرتك')+' أوقف التنبيه',(gaCur.name||'Your SHOMER')+' stopped the alert'),'');
   gaCur=null;
   try{ if(!(typeof sosActive!=='undefined'&&sosActive)) releaseWake(); }catch(e){}
 }
@@ -10062,7 +10062,7 @@ function gdFillIdentity(inv){
   if(p) p.textContent=ph?('+'+String(ph).replace(/^\+/,'')):'';
   var h=document.getElementById('gd-ident-hint');
   if(h) h.textContent = (inv&&inv.team)
-    ? (he?'🏛 הזמנה לצוות השומרים של מוקד עירוני. אשר/י רק אם המוקד הזה ביקש ממך להצטרף. אפשר לנתק בכל רגע.':ar0?'🏛 دعوة لفريق حُرّاس مركز بلدي. وافق فقط إن طلب منك هذا المركز الانضمام. يمكن قطع الربط في أي وقت.':'🏛 Invitation to a municipal control-room SHOMER team. Accept only if this control room asked you to join. You can disconnect any time.')
+    ? (he?'🏛 הזמנה לצוות של מוקד עירוני. אשר/י רק אם המוקד הזה ביקש ממך להצטרף. אפשר לנתק בכל רגע.':ar0?'🏛 دعوة لفريق مركز بلدي. وافق فقط إن طلب منك هذا المركز الانضمام. يمكن قطع الربط في أي وقت.':'🏛 Invitation to a municipal control-room SHOMER team. Accept only if this control room asked you to join. You can disconnect any time.')
     : ph
     ? (he?'מכיר/ה את המספר הזה? בדוק/בדקי באנשי הקשר שלך.':'Do you know this number? Check your contacts.')
     : (he?'⚠️ אין מספר מאומת - היזהר/י.':'⚠️ No verified number - be careful.');   /* v309: dashboard team invites say what they are */
@@ -10115,7 +10115,7 @@ function gdInviteMsg(kind){
     loading:[T3('טוען את ההזמנה…','Loading the invite…','جارٍ تحميل الدعوة…'),''],
     invalid:[T3('ההזמנה לא נמצאה','Invite not found','الدعوة غير موجودة'),T3('ייתכן שפג תוקפה או שהקישור נקטע. בקש/י מהשולח/ת לשלוח הזמנה חדשה.','It may have expired or the link was cut. Ask the sender for a new invite.','ربما انتهت صلاحيتها. اطلب دعوة جديدة.')],
     own:[T3('זו ההזמנה ששלחת','This is your own invite','هذه دعوتك'),T3('שלח/י אותה לאדם שאת/ה רוצה להוסיף.','Send it to the person you want to add.','أرسلها للشخص الذي تريد إضافته.')],
-    already:[T3('כבר מחוברים','Already connected','متصلان بالفعل'),T3('אתם כבר שומרים זה של זה - אין צורך לאשר שוב.','You already guard each other - nothing to approve.','أنتما متصلان بالفعل.')],
+    already:[T3('כבר מחוברים','Already connected','متصلان بالفعل'),T3('אתם כבר מחוברים זה לזה - אין צורך לאשר שוב.','You already guard each other - nothing to approve.','أنتما متصلان بالفعل.')],
     used:[T3('ההזמנה כבר אושרה','This invite was already used','تم استخدام هذه الدعوة'),T3('כל הזמנה מאשרים פעם אחת. בקש/י מהשולח/ת הזמנה חדשה.','Each invite can be approved once. Ask the sender for a new one.','اطلب دعوة جديدة.')],
     net:[T3('אין חיבור כרגע','No connection right now','لا يوجد اتصال'),T3('בדוק/י את האינטרנט - ננסה שוב אוטומטית.','Check your internet - we will retry automatically.','تحقق من الإنترنت.')]
   }[kind]||['',''];
@@ -10370,7 +10370,7 @@ function disclaimerHTML(){ const he=currentLang==='he', ar=currentLang==='ar';
  </ul>
  <h4>ماذا يفعل شومير - وماذا لا يفعل</h4>
  <ul>
- <li> يُطلق إنذاراً صوتياً على جهازك، ويعرض موقعك على خريطتك، ويتيح لك مشاركة موقعك المباشر مع الحُرّاس الذين تربطهم.</li>
+ <li> يُطلق إنذاراً صوتياً على جهازك، ويعرض موقعك على خريطتك، ويتيح لك مشاركة موقعك المباشر مع الأشخاص الذين تربطهم.</li>
  <li> <strong>لا يتصل بالشرطة / الإسعاف / الإطفاء نيابةً عنك</strong> ولا يُبلّغ السلطات تلقائياً.</li>
  <li> لا يضمن أن يرى أحدٌ نداء استغاثتك أو يستجيب له أو يصل إليك.</li>
  <li> التنبيهات في الخلفية وعلى الشاشة المقفلة محدودة في نسخة الويب - أبقِ التطبيق مفتوحاً للحصول على حماية كاملة.</li>
@@ -10387,7 +10387,7 @@ function disclaimerHTML(){ const he=currentLang==='he', ar=currentLang==='ar';
  </ul>
  <h4>מה שומר עושה - ומה לא</h4>
  <ul>
- <li> מפעיל אזעקה קולית במכשירך, מציג את מיקומך על המפה, ומאפשר לשתף מיקום חי עם שומרים שחיברת.</li>
+ <li> מפעיל אזעקה קולית במכשירך, מציג את מיקומך על המפה, ומאפשר לשתף מיקום חי עם האנשים שחיברת.</li>
  <li> <strong>אינו מתקשר למשטרה/מד״א/כבאות עבורך</strong> ואינו מתריע לרשויות באופן אוטומטי.</li>
  <li> אינו מבטיח שמישהו יראה את ה-SOS שלך, יגיב או יגיע.</li>
  <li> התראות ברקע ובמסך נעול מוגבלות בגרסת הדפדפן - מומלץ להשאיר את האפליקציה פתוחה להגנה מלאה.</li>
@@ -10427,7 +10427,7 @@ function tosHTML(){ const he=currentLang==='he';
  <li>التزم بالقانون؛ أنت مسؤول عن المحتوى الذي تُبلّغ عنه.</li>
  </ul>
  <h4>4. مشاركة الموقع بالموافقة</h4>
- <p>مشاركة الموقع اختيارية (opt-in). أنت تتحكّم بمن يراك ويمكنك الإيقاف في أي لحظة (وضع التخفّي، فصل حارس، أو إعادة ضبط بياناتك).</p>
+ <p>مشاركة الموقع اختيارية (opt-in). أنت تتحكّم بمن يراك ويمكنك الإيقاف في أي لحظة (وضع التخفّي، فصل شخص، أو إعادة ضبط بياناتك).</p>
  <h4>5. توفّر الميزات</h4>
  <p>بعض الميزات - التنبيهات في الخلفية وعلى الشاشة المقفلة والتشفير من الطرف إلى الطرف - محدودة في نسخة الويب. للحصول على الحماية الكاملة، أبقِ التطبيق مفتوحاً.</p>
  <h4>6. تحمّل المخاطر</h4>
@@ -10505,14 +10505,14 @@ function privacyHTML(){ const he=currentLang==='he';
  <li><strong>البلاغات والصور</strong> التي تُنشئها، والتفضيلات (الإنذار، النطاق، اللغة).</li>
  </ul>
  <h4>كيف يُستخدم الموقع</h4>
- <p>يُستخدم الموقع لإظهارك على خريطتك الخاصة، ولإرفاقه بنداء استغاثة/بلاغ ترسله، ولمشاركة موقعك المباشر مع الحُرّاس <strong>الذين تربطهم بموافقتك</strong>. مشاركة الموقع اختيارية.</p>
+ <p>يُستخدم الموقع لإظهارك على خريطتك الخاصة، ولإرفاقه بنداء استغاثة/بلاغ ترسله، ولمشاركة موقعك المباشر مع الأشخاص <strong>الذين تربطهم بموافقتك</strong>. مشاركة الموقع اختيارية.</p>
  <h4>أين تُخزَّن البيانات</h4>
- <p><strong>معظم البيانات تُخزَّن على جهازك</strong> (تخزين محلي في المتصفّح). لإظهار الحُرّاس القريبين وبثّ نداء استغاثة، يُزامَن موقع تقريبي فقط عبر خدمة آنية مؤمَّنة. ولا تغادر بقية البيانات جهازك، باستثناء رابط دعوة تختار مشاركته.</p>
+ <p><strong>معظم البيانات تُخزَّن على جهازك</strong> (تخزين محلي في المتصفّح). لإظهار المستخدمين القريبين وبثّ نداء استغاثة، يُزامَن موقع تقريبي فقط عبر خدمة آنية مؤمَّنة. ولا تغادر بقية البيانات جهازك، باستثناء رابط دعوة تختار مشاركته.</p>
  <h4>المشاركة والبيع</h4>
  <p><strong>لا نبيع بياناتك ولا نشاركها مع أطراف ثالثة.</strong> لا توجد إعلانات ولا أدوات تتبّع/تحليلات.</p>
  <h4>أدوات تحكّمك</h4>
  <ul>
- <li><strong>إيقاف المشاركة</strong> - وضع التخفّي، أو إيقاف „شارك موقعي"، أو فصل حارس.</li>
+ <li><strong>إيقاف المشاركة</strong> - وضع التخفّي، أو إيقاف „شارك موقعي"، أو فصل شخص.</li>
  <li><strong>حذف كل شيء</strong> - الإعدادات ← إعادة ضبط التطبيق.</li>
  <li>إلغاء إذن الموقع عبر متصفّحك في أي وقت.</li>
  </ul>
@@ -10531,9 +10531,9 @@ function privacyHTML(){ const he=currentLang==='he';
  <li><strong>דיווחים ותמונות</strong> שאת/ה יוצר/ת, והעדפות (אזעקה, רדיוס, שפה).</li>
  </ul>
  <h4>איך נעשה שימוש במיקום</h4>
- <p>המיקום משמש כדי להציג אותך על המפה שלך, לצרף אותו ל-SOS/דיווח שאת/ה שולח/ת, ולשתף מיקום חי עם שומרים <strong>שאת/ה מחבר/ת בהסכמה</strong>. שיתוף מיקום הוא opt-in.</p>
+ <p>המיקום משמש כדי להציג אותך על המפה שלך, לצרף אותו ל-SOS/דיווח שאת/ה שולח/ת, ולשתף מיקום חי עם האנשים <strong>שאת/ה מחבר/ת בהסכמה</strong>. שיתוף מיקום הוא opt-in.</p>
  <h4>היכן המידע נשמר</h4>
- <p><strong>רוב המידע נשמר במכשירך</strong> (אחסון מקומי בדפדפן). כדי להציג אותך לשומרים שחיברת ולשדר SOS, המיקום מסונכרן דרך שירות זמן-אמת מאובטח: מיקום מדויק רק לשומרים שחיברת בהסכמה, ומיקום מקורב (כ-1 ק"מ) בלבד לכל השאר. צוות SH✡MER רשאי לגשת לנתוני מיקום רק לצורכי בטיחות ומניעת שימוש לרעה. שאר המידע אינו עוזב את מכשירך, למעט קישור הזמנה שאת/ה בוחר/ת לשתף.</p>
+ <p><strong>רוב המידע נשמר במכשירך</strong> (אחסון מקומי בדפדפן). כדי להציג אותך לאנשים שחיברת ולשדר SOS, המיקום מסונכרן דרך שירות זמן-אמת מאובטח: מיקום מדויק רק לאנשים שחיברת בהסכמה, ומיקום מקורב (כ-1 ק"מ) בלבד לכל השאר. צוות SH✡MER רשאי לגשת לנתוני מיקום רק לצורכי בטיחות ומניעת שימוש לרעה. שאר המידע אינו עוזב את מכשירך, למעט קישור הזמנה שאת/ה בוחר/ת לשתף.</p>
  <h4>שיתוף ומכירה</h4>
  <p><strong>איננו מוכרים את המידע שלך ואיננו משתפים אותו עם צדדים שלישיים.</strong> אין פרסומות ואין כלי מעקב/אנליטיקה.</p>
  <h4>השליטה שלך</h4>
@@ -10637,7 +10637,7 @@ let _consentCb=null;
 function renderConsentPoints(){
  const ul=document.getElementById('consent-points'); if(!ul)return; const he=currentLang==='he';
  const pts=he?[
- ['','המיקום החי שלך ישותף עם השומרים שאת/ה מחבר/ת - ורק איתם.'],
+ ['','המיקום החי שלך ישותף עם האנשים שאת/ה מחבר/ת - ורק איתם.'],
  ['','ניתן להפסיק בכל רגע: מצב רפאים, כיבוי השיתוף, או ניתוק.'],
  ['','המיקום משותף רק לאחר אישור, ורק עם מי שבחרת. התראות ברקע מוגבלות בגרסת הדפדפן.'],
  ['','איננו מוכרים את המידע שלך ואיננו משתפים אותו עם צדדים שלישיים.']
@@ -11097,7 +11097,7 @@ function explainStatus(){
   }
   if(!FB._authReady){ toast(he?'מחובר לרשת, מאמת זהות מאובטחת… (רגע)':ar?'متصل بالشبكة، جارٍ تأمين الهوية…':'Network up - securing identity… (a moment)','amb'); return; }
   var lines=[];
-  lines.push(he?('✓ מחובר ומאזין ל-SOS - '+(FB.near||0)+' שומרים פעילים בקרבת מקום'):('✓ Connected & listening - '+(FB.near||0)+' active SHOMERs nearby'));
+  lines.push(he?('✓ מחובר ומאזין ל-SOS - '+(FB.near||0)+' משתמשים פעילים בקרבת מקום'):('✓ Connected & listening - '+(FB.near||0)+' active SHOMERs nearby'));
   var ps=FB.pushState;
   if(ps==='granted') lines.push(he?'✓ התראות דחיפה פעילות - תקבל/י SOS גם כשהאפליקציה ברקע':'✓ Push on - you\'ll get SOS even when the app is in the background');
   else if(ps==='install-required') lines.push(he?'⚠ באייפון: הוסף/י לבית כדי לקבל התראות כשהאפליקציה סגורה (Safari → שתף → הוסף למסך הבית)':'⚠ iPhone: Add to Home Screen to get alerts when the app is closed (Safari → Share → Add to Home Screen)');
@@ -11855,14 +11855,14 @@ function fbDashBeat(hide, lat, lng){
 }
 function updateGuardiansNearby(n){
   var el=document.getElementById('gnear-n'); if(el)el.textContent=n;
-  try{ var lb=document.getElementById('gnear-lbl'); if(lb) lb.textContent=(n===1)?(currentLang==='he'?'שומר':currentLang==='ar'?'حارس':'SH✡MER'):(currentLang==='he'?'שומרים':currentLang==='ar'?'حُرّاس':'SH✡MERs'); }catch(e){}   // "1 שומרים" → "1 שומר" 
+  try{ var lb=document.getElementById('gnear-lbl'); if(lb) lb.textContent=(n===1)?(currentLang==='he'?'משתמש':currentLang==='ar'?'مستخدم':'SH✡MER'):(currentLang==='he'?'משתמשים':currentLang==='ar'?'مستخدمون':'SH✡MERs'); }catch(e){}   // "1 משתמשים" → "1 משתמש" 
   var box=document.getElementById('hdr-near'); if(box)box.style.display=(FB.ready&&n>0)?'flex':'none';
   FB.near=n; renderFbStatus();
   // cue when a new SHOMER joins nearby (skip the first/baseline sync)
   if(FB._prevNear!=null && n>FB._prevNear) playCue('join');
   FB._prevNear=n;
 }
-function explainNearby(){ var n=(document.getElementById('gnear-n')||{}).textContent||'0'; var he=currentLang==='he'; toast(he?n+' שומרים פעילים בקרבתך (נתון חי)':n+' active SHOMERs near you (live)',''); }
+function explainNearby(){ var n=(document.getElementById('gnear-n')||{}).textContent||'0'; var he=currentLang==='he'; toast(he?n+' משתמשים פעילים בקרבתך (נתון חי)':n+' active SHOMERs near you (live)',''); }
 /* Cross-device SOS over RTDB */
 function fbPublishSOS(){ if(!FB.ready||!curSosId)return; try{ if(window._sosPractice||isReviewAccount()) return; }catch(e){}
   // Secure rules require the SOS to be owned by auth.uid. If the secure uid hasn't
@@ -12053,7 +12053,7 @@ function openLiveSosDetail(sosId){
 }
 function respLiveHtml(n,list){
   var he=currentLang==='he', ar=currentLang==='ar';
-  var head='<div class="ev-resp-h"><span class="ev-resp-dot"></span><b>'+(n>0?(he?(n+' שומרים בדרך'):ar?(n+' حُرّاس في الطريق'):(n+' SHOMERs on the way')):(he?'עדיין אף אחד לא בדרך':ar?'لا أحد في الطريق بعد':'No responders yet'))+'</b></div>';
+  var head='<div class="ev-resp-h"><span class="ev-resp-dot"></span><b>'+(n>0?(he?(n+' אנשים בדרך'):ar?(n+' أشخاص في الطريق'):(n+' SHOMERs on the way')):(he?'עדיין אף אחד לא בדרך':ar?'لا أحد في الطريق بعد':'No responders yet'))+'</b></div>';
   var rows=(list||[]).slice(0,8).map(function(r){ var nm=(r.name&&r.name.trim())?r.name:(he?'שומר/ת':'SHOMER'); var d=(r.lat!=null&&userLat!=null)?fmtDistance(distMeters(userLat,userLng,r.lat,r.lng)):''; return '<div class="ev-resp-row"><span class="ev-resp-av">'+ESC(nm[0]||'ש')+'</span><span class="ev-resp-nm">'+ESC(nm)+'</span><span class="ev-resp-d">'+ESC(d)+'</span></div>'; }).join('');
   return head+rows;
 }
@@ -12102,10 +12102,10 @@ function fbRespondersListen(sosId){
 function responderIcon(){
   return window.L.divIcon({className:'shomer-marker resp-mk',html:'<div class="resp-dot"><span class="resp-ring"></span><svg viewBox="0 0 24 24" width="13" height="13" style="position:relative"><path d="M12 3l7 3v5c0 5-3.4 8.5-7 10-3.6-1.5-7-5-7-10V6Z" fill="#0E8840" stroke="#fff" stroke-width="2" stroke-linejoin="round"/></svg></div>',iconSize:[26,26],iconAnchor:[13,13]});
 }
-/* Person-in-need: a live "N שומרים בדרך" reassurance while their SOS is active. */
+/* Person-in-need: a live "N בדרך אליך" reassurance while their SOS is active. */
 function showRespToPerson(n){
   var he=currentLang==='he'; var el=document.getElementById('ss-s');
-  if(el && n>0){ el.textContent=(he?(n+' שומרים בדרך אליך - הישאר/י במקומך'):(n+' SHOMERs on the way - stay where you are')); }
+  if(el && n>0){ el.textContent=(he?(n+' אנשים בדרך אליך - הישאר/י במקומך'):(n+' SHOMERs on the way - stay where you are')); }
 }
 function fbClearResponderMarkers(){ try{ Object.keys(fbResponderMarkers).forEach(function(uid){ try{MAP&&MAP.removeLayer(fbResponderMarkers[uid]);}catch(e){} }); }catch(e){} fbResponderMarkers={}; }
 /* Register this device's FCM token + location so the Cloud Function can target it for push. */
@@ -12480,7 +12480,7 @@ function openSignalSheet(){
       +'<span class="sig-ic" style="color:'+s.c+'">'+s.ic+'</span>'
       +'<span>'+(he?s.he:s.en)+'</span></button>';
   }).join('');
-  d.innerHTML='<div class="sig-h">'+(he?'עדכן/י את השומרים':'Update the SHOMERs')+'</div>'
+  d.innerHTML='<div class="sig-h">'+(he?'עדכן/י את האנשים שבחרת':'Update the SHOMERs')+'</div>'
     +'<div class="sig-grid">'+btns+'</div>'
     +'<button class="sig-close">'+(he?'סגור':'Close')+'</button>';
   document.body.appendChild(d);
@@ -13318,8 +13318,8 @@ async function sosBroadcast(sosId, type){ try{ if(window._sosPractice||isReviewA
   if(ok){
     var n=(SS.circleMembers||[]).filter(function(m){return !m.pending;}).length;
     if(window._sosSilent){ /* silent SOS: nothing visible on this phone */ }
-    else if(n>0) toast(he?('\u2713 נשלחה התרעה ל'+n+(n===1?' שומר':' שומרים')):('\u2713 Alert sent to '+n+(n===1?' SHOMER':' SHOMERs')),'grn');
-    else toast(he?'\u26A0 אין לך עדיין שומרים שיקבלו את ההתרעה - התקשר/י 100. אחר כך הוסף/י שומרים':'\u26A0 You have no SHOMERs to receive this yet - call 100. Then add SHOMERs','amb',function(){ try{ openCircles(); }catch(e){} });
+    else if(n>0) toast(he?('\u2713 נשלחה התרעה ל'+n+(n===1?' אדם':' אנשים')):('\u2713 Alert sent to '+n+(n===1?' SHOMER':' SHOMERs')),'grn');
+    else toast(he?'\u26A0 אין לך עדיין אנשים במעגל שיקבלו את ההתרעה - התקשר/י 100. אחר כך הוסף/י אנשים למעגל':'\u26A0 You have no SHOMERs to receive this yet - call 100. Then add SHOMERs','amb',function(){ try{ openCircles(); }catch(e){} });
     sosWatchMyResponders();
     try{ sosWatchStandDown(); }catch(e){}
   } else { /* Queue it, keep retrying, and tell the user to call 100 NOW. */ try{ sosQueuePush(sosChan(FB.uid, sosSalt()), payload); }catch(e){} if(!window._sosSilent) toast(he?'\u26A0 ההתרעה טרם נשלחה - ננסה שוב אוטומטית. התקשר/י 100 עכשיו':'\u26A0 Alert not sent yet - retrying automatically. Call 100 now','sos'); }
@@ -13390,7 +13390,7 @@ function sosRestore(id, ts){ try{ if(isReviewAccount()){ SS.sosLive=null; try{sa
   if(_sil){ var _o=ts && (Date.now()-ts)>SOS_OLD_MS; SOSBUS.live=true; SOSBUS.hbOff=!!_o; try{ sosWatchMyResponders(); }catch(e){} try{ sosWatchStandDown(); }catch(e){} if(!_o) sosHeartbeat(true); return; }   /* silent SOS survives a reload - still invisible */
   var btn=document.getElementById('sos-btn'); if(btn){btn.classList.add('active');btn.setAttribute('aria-pressed','true');}
   try{ document.getElementById('sos-strip').classList.add('on'); }catch(e){}
-  setText('ss-t',he?' SOS פעיל - השומרים שלך רואים אותו':ar?' SOS نشط - حُرّاسك يرونه':' SOS active - your SHOMERs can see it');
+  setText('ss-t',he?' SOS פעיל - השומרים שלך רואים אותו':ar?' SOS نشط - من اخترتهم يرونه':' SOS active - your SHOMERs can see it');
   setText('ss-s',he?'לביטול - קוד הביטול':ar?'للإلغاء - رمز الإلغاء':'To cancel - use your cancel code');
   var old=ts && (Date.now()-ts)>SOS_OLD_MS;
   SOSBUS.live=true; SOSBUS.hbOff=!!old;
@@ -13399,7 +13399,7 @@ function sosRestore(id, ts){ try{ if(isReviewAccount()){ SS.sosLive=null; try{sa
   var b=document.getElementById('sos-restore-bar'); if(b) b.remove();
   b=document.createElement('div'); b.id='sos-restore-bar'; b.className='nudge-bar'; b.style.zIndex='100002';
   b.innerHTML='<span class="nudge-tx" style="font-weight:800">'+(he?'ה-SOS שלך עדיין פעיל':ar?'نداء SOS الخاص بك لا يزال نشطًا':'Your SOS is still active')+'</span>'
-    +'<span class="nudge-tx" style="font-size:13px;opacity:.9">'+(old?(he?'הוא נשלח לפני יותר מחצי שעה. עדיין צריך/ה עזרה?':ar?'أُرسل قبل أكثر من نصف ساعة. هل ما زلت بحاجة للمساعدة؟':'It was sent over 30 minutes ago. Still need help?'):(he?'השומרים שלך עדיין רואים התרעה. אם את/ה בטוח/ה - בטל/י עם קוד הביטול.':ar?'حُرّاسك ما زالوا يرون التنبيه. إن كنت بأمان - ألغِه برمز الإلغاء.':'Your SHOMERs still see the alert. If you are safe, cancel it with your code.'))+'</span>'
+    +'<span class="nudge-tx" style="font-size:13px;opacity:.9">'+(old?(he?'הוא נשלח לפני יותר מחצי שעה. עדיין צריך/ה עזרה?':ar?'أُرسل قبل أكثر من نصف ساعة. هل ما زلت بحاجة للمساعدة؟':'It was sent over 30 minutes ago. Still need help?'):(he?'השומרים שלך עדיין רואים התרעה. אם את/ה בטוח/ה - בטל/י עם קוד הביטול.':ar?'من اخترتهم ما زالوا يرون التنبيه. إن كنت بأمان - ألغِه برمز الإلغاء.':'Your SHOMERs still see the alert. If you are safe, cancel it with your code.'))+'</span>'
     +'<button class="nudge-cta" id="sosr-cancel">'+(he?'בטל/י SOS (קוד)':ar?'إلغاء SOS (رمز)':'Cancel SOS (code)')+'</button>'
     +'<button class="nudge-cta" id="sosr-keep" style="background:transparent;border:1px solid rgba(255,112,128,.6);color:#FF9AA5">'+(he?'עדיין צריך/ה עזרה':ar?'ما زلت بحاجة للمساعدة':'I still need help')+'</button>';
   document.body.appendChild(b);
@@ -13706,12 +13706,12 @@ function sosPaintMyHelp(){
     document.body.appendChild(b);
     try{ if(navigator.vibrate) navigator.vibrate([80,60,80]); }catch(e){} }
   var names=ks.map(function(k){ return String(SOSBUS.responders[k].name||'').trim(); }).filter(Boolean);
-  try{ var _ss=document.getElementById('ss-s'); if(_ss&&sosPhase==='active') _ss.textContent=(ks.length===1?(he?'שומר/ת אחד/ת בדרך אליך':'1 SHOMER on the way'):(he?(ks.length+' שומרים בדרך אליך'):(ks.length+' SHOMERs on the way'))); }catch(e){}
+  try{ var _ss=document.getElementById('ss-s'); if(_ss&&sosPhase==='active') _ss.textContent=(ks.length===1?(he?'שומר/ת אחד/ת בדרך אליך':'1 SHOMER on the way'):(he?(ks.length+' אנשים בדרך אליך'):(ks.length+' SHOMERs on the way'))); }catch(e){}
   b.innerHTML='<button class="help-x" aria-label="'+(he?'הבנתי':ar?'فهمت':'Got it')+'">\u2715</button>'
    +'<div class="help-t">'+(he?'עזרה בדרך':ar?'المساعدة في الطريق':'Help is coming')+'</div>'
    +(names.length?'<div class="help-n">'+ESC(names.slice(0,3).join(' · '))+(ks.length>3?(' +'+(ks.length-3)):'')+'</div>':'')
-   +'<div class="help-s">'+(ks.length===1?(he?'שומר אחד בדרך אליך':ar?'حارس واحد في الطريق إليك':'1 SHOMER on the way')
-                                         :(he?(ks.length+' שומרים בדרך אליך'):ar?(ks.length+' حُرّاس في الطريق إليك'):(ks.length+' SHOMERs on the way')))
+   +'<div class="help-s">'+(ks.length===1?(he?'אדם אחד בדרך אליך':ar?'شخص واحد في الطريق إليك':'1 SHOMER on the way')
+                                         :(he?(ks.length+' אנשים בדרך אליך'):ar?(ks.length+' أشخاص في الطريق إليك'):(ks.length+' SHOMERs on the way')))
    +(function(){ var d=helpNearestM(); if(d==null) return ''; var t=d<1000?(Math.round(d/10)*10+(he?' מ׳':ar?' م':' m')):((d/1000).toFixed(1)+(he?' ק״מ':ar?' كم':' km')); return ' · '+(he?'הקרוב/ה: ':ar?'الأقرب: ':'nearest: ')+t; })()+'</div>';
   b.querySelector('.help-x').onclick=function(){ SOSBUS._helpAck=Object.keys(SOSBUS.responders).length; b.remove(); };
 }
@@ -13762,7 +13762,7 @@ function showStandDownPrompt(v){
   if(window._sosSilent) return;   /* silent SOS: no alarm to stand down, and nothing may appear */
   if(document.getElementById('sd-prompt')) return;
   var he=currentLang==='he', ar=currentLang==='ar', rtl=(he||ar);
-  var name=String(((v&&v.fromUid&&memberByPair(v.fromUid))||{}).name||(v&&v.name)||'').trim()||(he?'שומר/ת מהימן/ה':ar?'حارس موثوق':'a trusted SHOMER');   // v262: the name I gave them
+  var name=String(((v&&v.fromUid&&memberByPair(v.fromUid))||{}).name||(v&&v.name)||'').trim()||(he?'שומר/ת מהימן/ה':ar?'شخص موثوق':'a trusted SHOMER');   // v262: the name I gave them
   var d=document.createElement('div'); d.id='sd-prompt';
   d.setAttribute('style','position:fixed;inset:0;z-index:100002;background:rgba(4,10,22,.93);display:flex;align-items:center;justify-content:center;padding:22px;direction:'+(rtl?'rtl':'ltr'));
   d.innerHTML='<div style="max-width:360px;background:linear-gradient(160deg,#0e1d3a,#122850);border:1px solid #E0A82e66;border-radius:18px;padding:22px;text-align:center;color:#f2f6ff;font-family:system-ui,-apple-system,sans-serif">'
@@ -15558,7 +15558,7 @@ body.aed-placing #map{cursor:crosshair}
 .map-count b{color:var(--g3)}
 .map-count .mc-dot{width:7px;height:7px;border-radius:50%;background:#3DDC97;flex:0 0 auto}
 
-/* ── מעגלי שומרים - wireframe layout ── */
+/* ── מעגלים - wireframe layout ── */
 .cot{display:flex;align-items:center;gap:10px;padding:12px 4px;border-bottom:1px solid rgba(0,0,0,.07);cursor:pointer}
 .cot-open{background:rgba(29,111,214,.06)}
 .cot-ed{background:none;border:0;color:#8c9bbd;cursor:pointer;padding:2px;display:flex;flex:0 0 auto}
@@ -15719,7 +15719,7 @@ body.aed-placing #map{cursor:crosshair}
 .cm-act:active svg{transform:scale(.9)}
 
 /* CARTO/Leaflet attribution - legally required, cannot be deleted.
-   Bottom-RIGHT corner: clears the SOS button (bottom-centre) and the שומרים banner (top-left). */
+   Bottom-RIGHT corner: clears the SOS button (bottom-centre) and the nearby-users banner (top-left). */
 .leaflet-bottom.leaflet-right{top:auto!important;bottom:2px!important;left:auto!important;right:3px!important}
 .leaflet-control-attribution{background:rgba(8,18,36,.45)!important;color:rgba(136,152,184,.38)!important;font-size:7px!important;padding:1px 4px!important;border-radius:4px;opacity:.5;margin:0!important;max-width:42vw;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;line-height:1.3}
 .leaflet-control-attribution a{color:rgba(136,152,184,.42)!important;text-decoration:none}
@@ -16223,7 +16223,7 @@ var DRILL_BANK=[
 ['ptsd','מישהו בהתקף חרדה. מה לא אומרים?',['"תירגע/י" או "זה לא נורא"','"אני כאן. את/ה בטוח/ה"','"נשום/נשמי איתי"','"מה את/ה רואה סביבך?"'],'Someone is in a panic attack. What should you NOT say?',['"Calm down" or "it is not a big deal"','"I am here. You are safe."','"Breathe with me"','"What can you see around you?"'],'"תירגע" מגביר מצוקה. מדברים לאט, משפטים קצרים, ונשארים.','"Calm down" increases distress. Speak slowly, short sentences, and stay.'],
 ['ptsd','מה זה תרגיל הקרקוע 5-4-3-2-1?',['5 דברים שרואים, 4 נוגעים, 3 שומעים, 2 מריחים, 1 טועמים','לספור לאחור מ-5','5 נשימות עמוקות','לקפוץ 5 פעמים'],'What is the 5-4-3-2-1 grounding exercise?',['5 things you see, 4 touch, 3 hear, 2 smell, 1 taste','Counting back from 5','5 deep breaths','Jumping 5 times'],'קרקוע בחושים מחזיר לכאן ועכשיו.','Grounding through the senses brings them back to the here and now.'],
 ['ptsd','חשש למחשבות אובדניות. למי פונים?',['ער״ן 1201 או 101','102','רק לחבר','לא לשאול על זה'],'Concern about suicidal thoughts. Who do you call?',['ERAN 1201 or 101','102','Only a friend','Do not ask about it'],'שואלים ישירות - זה לא "מכניס רעיון". ער״ן 1201 או 101.','Ask directly - it does not plant the idea. ERAN 1201 or 101.'],
-['app','לחצת SOS בטעות. מה קורה אם לוחצים "אני בטוח/ה - בטל" בזמן הספירה?',['זו אזעקת שווא - שום דבר לא משודר ולא מופיע במפה','השומרים מקבלים הודעה','המשטרה מוזעקת','צריך להזין קוד ביטול'],'You pressed SOS by mistake. What happens if you tap "I\'m safe - Cancel" during the countdown?',['It is a false alarm - nothing is broadcast, nothing on the map','Your SHOMERs get a message','Police are called','You must enter your cancel code'],'ביטול בזמן הספירה = אזעקת שווא. רק אחרי שהספירה נגמרת ה-SOS משודר.','Cancelling during the countdown = false alarm. The SOS is broadcast only after the countdown ends.'],
+['app','לחצת SOS בטעות. מה קורה אם לוחצים "אני בטוח/ה - בטל" בזמן הספירה?',['זו אזעקת שווא - שום דבר לא משודר ולא מופיע במפה','האנשים שבחרת מקבלים הודעה','המשטרה מוזעקת','צריך להזין קוד ביטול'],'You pressed SOS by mistake. What happens if you tap "I\'m safe - Cancel" during the countdown?',['It is a false alarm - nothing is broadcast, nothing on the map','Your SHOMERs get a message','Police are called','You must enter your cancel code'],'ביטול בזמן הספירה = אזעקת שווא. רק אחרי שהספירה נגמרת ה-SOS משודר.','Cancelling during the countdown = false alarm. The SOS is broadcast only after the countdown ends.'],
 ['app','SOS כבר פעיל. מה צריך כדי לבטל אותו?',['קוד הביטול שהגדרת','טביעת אצבע','לסגור את האפליקציה','לנער את הטלפון'],'An SOS is already active. What do you need to cancel it?',['The cancel code you set','A fingerprint','Closing the app','Shaking the phone'],'SOS פעיל מבוטל רק בקוד הביטול - כדי שמי שלקח את הטלפון לא יוכל לכבות אותו.','An active SOS is cancelled only with your cancel code - so whoever grabs the phone cannot stop it.'],
 ['app','למה SOS פעיל לא מבוטל בטביעת אצבע?',['כדי שאי אפשר יהיה לכבות אותו באצבע של אדם מחוסר הכרה','כי זה איטי','כי זה לא עובד באנדרואיד','זה דווקא אפשרי'],'Why can an active SOS not be cancelled with a fingerprint?',['So nobody can stop it with an unconscious person\'s finger','Because it is slow','It does not work on Android','Actually it can be'],'בכוונה: אדם מחוסר הכרה לא יכול לכבות את ההתראה שלו בעל כורחו.','By design: an unconscious person\'s alert can\'t be cancelled with their own finger.'],
 ['app','כמה זמן נמשכת ברירת המחדל של ספירת ה-SOS לפני השידור?',['10 שניות','שנייה אחת','דקה','אין ספירה'],'How long is the default SOS countdown before broadcast?',['10 seconds','1 second','1 minute','There is no countdown'],'ברירת מחדל 10 שניות (אפשר 5-15). האזעקה מתחילה מיד.','Default 10 seconds (5-15 allowed). The alarm starts immediately.'],
@@ -16232,7 +16232,7 @@ var DRILL_BANK=[
 ['app','מה עושה הצ׳ק-אין ההדדי?',['שואל "הכל טוב?" ואם לא מאשרים בזמן - השומרים שבחרת מקבלים התראה','שולח SOS כל שעה','מראה את המיקום לכולם','מחייג למשטרה'],'What does mutual check-in do?',['Asks "Are you OK?" - if you do not confirm in time, your chosen SHOMERs are alerted','Sends an SOS every hour','Shows your location to everyone','Calls the police'],'הצ׳ק-אין שואל כל כמה זמן. לא אישרת בחלון הזמן - השומרים שבחרת מקבלים התראה.','Check-in asks every interval. No confirmation in the window - your chosen SHOMERs are alerted.'],
 ['app','מה עושה "השומר האוטומטי" (Dead-man switch)?',['שולח SOS אוטומטית אם לא אישרת בזמן','מכבה את הטלפון','מצלם תמונה','שולח מיקום כל דקה לכולם'],'What does the automatic guard (dead-man switch) do?',['Sends an SOS automatically if you do not confirm in time','Turns the phone off','Takes a photo','Sends location to everyone every minute'],'כשהזמן נגמר בלי אישור - SOS נשלח אוטומטית. דקה לפני מקבלים אזהרה.','When time runs out without confirmation - an SOS is sent automatically. You get a warning a minute before.'],
 ['app','השומר האוטומטי פועל. כמה זמן לפני הסוף מקבלים אזהרה?',['דקה אחת','שעה','אין אזהרה','5 שניות'],'The automatic guard is running. How long before the end do you get a warning?',['1 minute','1 hour','No warning','5 seconds'],'60 שניות לפני הסוף מגיעה אזהרה "הכל טוב?".','60 seconds before the end you get an "Are you OK?" warning.'],
-['app','מה עושה "מצב רפאים"?',['משהה את שיתוף המיקום שלך','מסתיר את האפליקציה','מוחק את החשבון','משתיק אזעקות'],'What does ghost mode do?',['Pauses sharing your location','Hides the app','Deletes your account','Mutes alarms'],'מצב רפאים משהה את שיתוף המיקום עם השומרים עד שמכבים אותו.','Ghost mode pauses location sharing with your SHOMERs until you turn it off.'],
+['app','מה עושה "מצב רפאים"?',['משהה את שיתוף המיקום שלך','מסתיר את האפליקציה','מוחק את החשבון','משתיק אזעקות'],'What does ghost mode do?',['Pauses sharing your location','Hides the app','Deletes your account','Mutes alarms'],'מצב רפאים משהה את שיתוף המיקום עם האנשים שבחרת עד שמכבים אותו.','Ghost mode pauses location sharing with your SHOMERs until you turn it off.'],
 ['app','קיבלת הזמנה להיות שומר/ת. למה יש קוד בן 4 ספרות?',['כדי לוודא שההזמנה באמת מהאדם שאת/ה מכיר/ה','כדי לשלם','כדי לפתוח את הטלפון','אין סיבה'],'You got an invite to be a SHOMER. Why is there a 4-digit code?',['To confirm the invite really is from the person you know','To pay','To unlock the phone','No reason'],'אישור אפשרי רק כשהקוד תואם - כמו מספר בטיחות. לא בטוח/ה? התקשר/י ובקש/י את הקוד.','Approve works only when the code matches - like a safety number. Unsure? Call and ask for the code.'],
 ['app','מי רואה את "השם שלי בהזמנות"?',['רק מי שהזמנת או אישרת','כל משתמשי SH✡MER','כל מי שליד','אף אחד'],'Who sees "my name in invites"?',['Only people you invited or approved','Every SH✡MER user','Anyone nearby','Nobody'],'השם הפרטי מוצג רק לשומרים שלך. לכל השאר את/ה אנונימי/ת.','The private name is shown only to your SHOMERs. Everyone else sees you as anonymous.'],
 ['app','אישרת שומר/ת. מה הם יכולים לראות?',['את המיקום שלך בזמן אמת ואת ה-SOS שלך','את ההודעות שלך','את אנשי הקשר שלך','את התמונות שלך'],'You approved a SHOMER. What can they see?',['Your live location and your SOS','Your messages','Your contacts','Your photos'],'באישור הם רואים את המיקום החי שלך ומקבלים את ה-SOS. אפשר לעצור בכל רגע.','Once approved they see your live location and get your SOS. You can stop anytime.'],
@@ -16240,7 +16240,7 @@ var DRILL_BANK=[
 ['app','האם דיווח במפה מחליף התקשרות למשטרה?',['לא - בסכנה מתקשרים ל-100','כן','רק בלילה','רק בסוף שבוע'],'Does a map report replace calling the police?',['No - in danger, call 100','Yes','Only at night','Only on weekends'],'SH✡MER אינו תחליף לשירותי חירום. בסכנה: 100 / 101 / 102.','SH✡MER is not a substitute for emergency services. In danger: 100 / 101 / 102.'],
 ['app','מה קורה אחרי 3 קודי ביטול שגויים כשהגנת הגנב פעילה?',['האפליקציה מצלמת את מי שמחזיק את הטלפון','הטלפון ננעל לשבוע','ה-SOS מבוטל','כלום'],'With theft protection on, what happens after 3 wrong cancel codes?',['The app snaps a photo of whoever holds the phone','The phone locks for a week','The SOS is cancelled','Nothing'],'הגנת הגנב מצלמת אחרי 3 קודים שגויים - הוכחה לבעלים.','Theft protection snaps a photo after 3 wrong codes - evidence for the owner.'],
 ['app','הגעת למכסת ה-SOS היומית (3). מה קורה בלחיצה נוספת?',['האזעקה בטלפון עדיין פועלת, אבל השידור מושהה','שום דבר לא קורה','החשבון נחסם','ה-SOS נשלח לכולם'],'You hit the daily SOS limit (3). What happens on another press?',['The phone alarm still sounds, but the broadcast is paused','Nothing at all','Your account is blocked','It goes to everyone'],'האזעקה האישית לעולם לא נחסמת. רק השידור מושהה (מניעת שימוש לרעה).','The personal alarm is never blocked. Only the broadcast is paused (anti-abuse).'],
-['app','איך מוודאים שהשומרים יקבלו SOS גם כשהאפליקציה שלהם סגורה?',['לאפשר התראות (ובאנדרואיד - מיקום "תמיד")','לא צריך כלום','לכבות את הטלפון','להפעיל מצב רפאים'],'How do you make sure SHOMERs get SOS even when their app is closed?',['Allow notifications (and "Always" location on Android)','Nothing is needed','Turn the phone off','Turn on ghost mode'],'בלי התראות, התראה מגיעה רק כשהאפליקציה פתוחה.','Without notifications, alerts only arrive while the app is open.'],
+['app','איך מוודאים שהאנשים שבחרת יקבלו SOS גם כשהאפליקציה שלהם סגורה?',['לאפשר התראות (ובאנדרואיד - מיקום "תמיד")','לא צריך כלום','לכבות את הטלפון','להפעיל מצב רפאים'],'How do you make sure SHOMERs get SOS even when their app is closed?',['Allow notifications (and "Always" location on Android)','Nothing is needed','Turn the phone off','Turn on ghost mode'],'בלי התראות, התראה מגיעה רק כשהאפליקציה פתוחה.','Without notifications, alerts only arrive while the app is open.'],
 ['app','מה עושות "התראות מיקום השומרים שלי" (הגעות)?',['מתריעות כששומר/ת מגיע/ה לכתובת שהגדרת (למשל הביתה)','שולחות SOS','מוחקות את המיקום','מחייגות הביתה'],'What do "my SHOMERs\' location alerts" (arrivals) do?',['Alert you when a SHOMER reaches an address you set (e.g. home)','Send an SOS','Delete the location','Call home'],'בוחרים שומר/ת וכתובת מאומתת - ומקבלים התראה כשהם מגיעים.','Pick a SHOMER and a verified address - and get alerted when they arrive.'],
 ['app','תג החיבור למעלה כתום "מתחבר מחדש…". מה כדאי לעשות?',['לחכות רגע או להקיש עליו לניסיון מיידי; בחירום - לחייג','למחוק את האפליקציה','לכבות את המיקום','שום דבר לא יעזור'],'The status badge shows amber "Reconnecting…". What should you do?',['Wait a moment or tap it to retry now; in an emergency - call','Delete the app','Turn off location','Nothing helps'],'הקשה על התג מנסה להתחבר מיד. בחירום אמיתי - 100/101/102.','Tapping the badge retries at once. In a real emergency - 100/101/102.'],
 ['app','מה עושה ההחזקה הארוכה על כפתור ה-SOS (אם הופעלה בהגדרות)?',['מונעת SOS מלחיצה בטעות - צריך להחזיק כ-2 שניות','שולחת SOS כפול','מבטלת SOS','משתיקה את האזעקה'],'What does press-and-hold on SOS do (if enabled in Settings)?',['Prevents accidental SOS - hold about 2 seconds','Sends a double SOS','Cancels an SOS','Mutes the alarm'],'מצב החזקה מונע SOS מכיס או מלחיצה בטעות.','Hold-to-arm prevents pocket or accidental SOS.']
@@ -16523,10 +16523,10 @@ function readySteps(){
   var toProf=function(fn){ return function(){ try{ cl('sh-prof'); }catch(e){} setTimeout(fn,320); }; };
   var openQ=toProf(drillOpenCard);
   return [
-   [ {he:'שומר/ת ראשון/ה במעגל', en:'Your first guardian', ar:'أول حارس لك', she:'מישהו שמקבל את ה-SOS שלך', sen:'Someone who receives your SOS', sar:'شخص يتلقى استغاثتك', v:Math.min(g,1), of:1, act:function(){ shareInvite(); }},
+   [ {he:'שומר/ת ראשון/ה במעגל', en:'First person in your circle', ar:'أول شخص في دائرتك', she:'מישהו שמקבל את ה-SOS שלך', sen:'Someone who receives your SOS', sar:'شخص يتلقى استغاثتك', v:Math.min(g,1), of:1, act:function(){ shareInvite(); }},
      {he:'קוד ביטול SOS', en:'SOS cancel code', ar:'رمز إلغاء الاستغاثة', she:'מבטל התראת שווא בשקט', sen:'Silently cancels a false alarm', sar:'يلغي الإنذار الخاطئ بصمت', v:pin?1:0, of:1, act:function(){ setReveal('[onclick="openSetPin()"]'); }},
      {he:'יודע/ת למי מתקשרים', en:'Know who to call', ar:'تعرف بمن تتصل', she:'100 · 101 · 102', sen:'100 · 101 · 102', sar:'100 · 101 · 102', v:(learnCardRead('call')||drillBookLevel('call')>=1)?1:0, of:1, act:function(){ learnOpenCard('call'); }} ],
-   [ {he:'3 שומרים במעגל', en:'3 guardians in your circle', ar:'3 حراس في دائرتك', she:g+'/3', sen:g+'/3', sar:g+'/3', v:Math.min(g,3), of:3, act:function(){ shareInvite(); }},
+   [ {he:'3 אנשים במעגל', en:'3 people in your circle', ar:'3 أشخاص في دائرتك', she:g+'/3', sen:g+'/3', sar:g+'/3', v:Math.min(g,3), of:3, act:function(){ shareInvite(); }},
      {he:'יודע/ת לדווח על אירוע', en:'Know how to report', ar:'تعرف كيف تبلّغ', she:'פתיחת מסך הדיווח מספיקה', sen:'Opening the report screen is enough', sar:'يكفي فتح شاشة البلاغ', v:(l.flags.report||(SS.reports||[]).length)?1:0, of:1, act:function(){ try{ openReport(); }catch(e){} }},
      {he:'יודע/ת איפה הדפיברילטור הקרוב', en:'Know your nearest defibrillator', ar:'تعرف أقرب جهاز إزالة رجفان', she:'או הוסף/י אחד למפה', sen:'Or add one to the map', sar:'أو أضف واحدًا إلى الخريطة', v:(l.flags.aed||aeds)?1:0, of:1, act:toProf(function(){ try{ aedFindNearest(); }catch(e){} })} ],
    [ {he:'5 כרטיסים מצילי חיים', en:'5 life-saving cards', ar:'5 بطاقات منقذة للحياة', she:'החייאה · דימום · חנק · שבץ · לב', sen:'CPR · bleeding · choking · stroke · heart', sar:'إنعاش · نزيف · اختناق · سكتة · قلب', v:nRead(LEARN_CORE), of:5, act:function(){ learnOpenCard(learnNextCard(LEARN_CORE)||'cpr'); }},
@@ -16751,7 +16751,7 @@ function drillRenderProfile(){
     if(TKO.key) silence();
     TKO.key=o.key; TKO.sid=o.sid||''; TKO.area=o.area||null; TKO.stopAt=Date.now()+3*60000;   /* sound stops after 3 min; the screen stays */
     q('.tk-h').textContent=L('התרעת SOS','SOS ALERT','تنبيه SOS');
-    q('.tk-n').textContent=o.paired?(o.name||L('שומר/ת שלך','Your SHOMER','حارسك')):L('SOS בקרבתך','SOS near you','SOS بالقرب منك');
+    q('.tk-n').textContent=o.paired?(o.name||L('שומר/ת שלך','Your SHOMER','شخص من دائرتك')):L('SOS בקרבתך','SOS near you','SOS بالقرب منك');
     q('.tk-s').textContent=o.body||(o.paired?L('זקוק/ה לעזרה - עכשיו','needs help - right now','بحاجة إلى مساعدة - الآن'):L('מישהו באזור שלך צריך עזרה','Someone in your area needs help','شخص في منطقتك بحاجة إلى مساعدة'));
     q('.tk-b').textContent=o.paired?L('ראיתי - פתח/י את האירוע','I see it - open the event','رأيت - افتح الحدث'):L('ראיתי - הצג/י את האזור','I see it - show the area','رأيت - اعرض المنطقة');
     q('.tk-b2').textContent=L('השתק/י','Silence','إسكات');
