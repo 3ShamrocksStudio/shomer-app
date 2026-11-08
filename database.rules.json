@@ -210,6 +210,9 @@
         "status": {
           ".validate": "newData.isString()"
         },
+        "layer": {
+          ".validate": "newData.isString() && (newData.val() === 'shomer' || newData.val() === 'nature' || newData.val() === 'both')"
+        },
         "by": {
           ".validate": false
         },

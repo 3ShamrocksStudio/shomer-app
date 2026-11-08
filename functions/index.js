@@ -1,5 +1,6 @@
 /* SH✡MER Cloud Functions (Blaze) — closed-app / background push via FCM.
-   - sosFanout:   on a new /sos event, push to nearby guardians' devices (even if app closed).
+   - sosFanout:   on a new /sos event, push to nearby SHOMERs and the people the user chose (even if
+                  app closed); a later re-mark as a nature report sends one replacing update (same tag).
    - alarmFanout: on a /alarms/{id} item {toUid,title,body}, push to that user's device (used by
                   the mutual check-in miss + geofence arrival), then delete the queue item.
    Deploy:  firebase deploy --only functions
@@ -7,6 +8,7 @@
 const {onValueCreated, onValueWritten} = require('firebase-functions/v2/database');
 const {setGlobalOptions} = require('firebase-functions/v2');
 const admin = require('firebase-admin');
+const routing = require('./layer-routing');   // byte-identical copy of /layer-routing.js (tests check it)
 
 admin.initializeApp();
 setGlobalOptions({region: 'us-central1', maxInstances: 10});
@@ -28,8 +30,11 @@ exports.sosFanout = onValueWritten('/sos/{id}', async (event) => {
   const sos = event.data.after.val();
   const prev = event.data.before.val();
   if (!sos || sos.resolved || sos.lat == null) return;
-  const isNew = !prev || prev.resolved || (sos.id || sos.ts) !== (prev.id || prev.ts);
-  if (!isNew) return;
+  /* Nature layer (decision 2026-11-07): a new SOS is ALWAYS a person alert (it starts unclassified).
+     If the owner then marks it animal / environmental hazard, the same people get ONE update with the
+     SAME tag, which replaces the alert on their device: "nature report, not a person in distress". */
+  const action = routing.fanoutAction(prev, sos);
+  if (action === 'none') return;
   // Targets = every PAIRED guardian (always, any distance) + every NEARBY SHOMER (≤5 km).
   const [toksSnap, pairsSnap] = await Promise.all([
     db.ref('tokens').get(),
@@ -49,12 +54,16 @@ exports.sosFanout = onValueWritten('/sos/{id}', async (event) => {
   const tokens = [...tokenSet];
   if (!tokens.length) return;
   const type = sos.type && sos.type !== 'unknown' ? ' · ' + sos.type : '';
+  const note = action === 'nature-update'
+    ? {title: '🌿 SH✡MER — עדכון: דיווח טבע', body: 'זה דיווח טבע, לא מצוקת אדם · Nature report, not a person in distress'}
+    : {title: '🚨 SH✡MER — SOS nearby', body: (sos.name || 'Someone') + ' needs help' + type};
   await admin.messaging().sendEachForMulticast({
     tokens: tokens.slice(0, 500),
-    notification: {title: '🚨 SH✡MER — SOS nearby', body: (sos.name || 'Someone') + ' needs help' + type},
+    notification: note,
     data: {tag: 'sos-' + (sos.id || event.params.id), url: LINK},
-    webpush: {fcmOptions: {link: LINK}, headers: {Urgency: 'high', TTL: '600'}},
-    android: {priority: 'high'}, apns: {headers: {'apns-priority': '10'}}
+    webpush: {fcmOptions: {link: LINK}, headers: {Urgency: action === 'nature-update' ? 'normal' : 'high', TTL: '600'}},
+    android: {priority: 'high', notification: {tag: 'sos-' + (sos.id || event.params.id)}},
+    apns: {headers: {'apns-priority': '10', 'apns-collapse-id': 'sos-' + (sos.id || event.params.id)}}
   });
 });
 
