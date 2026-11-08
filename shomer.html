@@ -556,6 +556,15 @@ body.sheet-open .diag-panel{display:none;}
 .ss-type.nat.sel .ic{color:#2E8B0A;}
 .in-sos.nat{background:linear-gradient(160deg,#1d4a1a,#0f2a12)!important;animation:none!important;}
 .rep-nat-link{display:block;width:100%;margin:2px 0 10px;padding:10px 12px;border-radius:12px;border:1px dashed rgba(80,219,15,.45);background:transparent;color:var(--tx2);font:700 12px/1.4 inherit;font-family:inherit;text-align:center;cursor:pointer}
+.nat-chosen{display:flex;align-items:center;gap:10px;width:100%;padding:10px 12px;margin:0 0 12px;border-radius:12px;border:1px solid rgba(80,219,15,.45);background:rgba(80,219,15,.08);color:var(--tx0);font:inherit;cursor:pointer;text-align:start}.nat-chosen b{flex:1;font-size:14px}.nat-chg{font-size:11.5px;color:#8EF25A;font-weight:700}
+.nat-q{margin:0 0 4px}.nat-ql{font-size:13px;font-weight:800;color:var(--tx0);margin:0 0 6px}
+.nat-warn{font-size:12px;line-height:1.5;color:#FFB4B4;background:rgba(217,59,59,.12);border:1px solid rgba(217,59,59,.4);border-radius:10px;padding:8px 10px;margin:0 0 10px}
+.nat-row{display:flex;align-items:center;gap:10px;margin:0 0 8px}.nat-photo{flex:1;display:flex;align-items:center;justify-content:center;min-height:44px;border-radius:12px;border:1px dashed var(--b2);color:var(--tx1);font-size:12.5px;font-weight:700;cursor:pointer;padding:0 10px}
+#nat-photo-prev{width:56px;height:56px;object-fit:cover;border-radius:10px;border:1px solid var(--b2)}
+.nat-loc{font-size:11.5px;color:var(--tx2);margin:0 0 8px}
+.nat-send{width:100%;min-height:48px;border:0;border-radius:12px;background:linear-gradient(135deg,#2F8A10,#50DB0F 60%,#8EF25A);color:#08120C;font:800 15px inherit;font-family:inherit;cursor:pointer;margin:0 0 10px}.nat-send[disabled]{opacity:.4;cursor:not-allowed}
+.nat-mine{display:flex;flex-direction:column;gap:8px;margin:0 0 12px;max-height:50vh;overflow:auto}.nat-mi{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:12px;background:var(--n2);border:1px solid var(--b2)}.nat-mt{flex:1;min-width:0;display:flex;flex-direction:column}.nat-mt b{font-size:13.5px}.nat-mt span{font-size:11.5px;color:var(--tx2)}
+.nat-st{font-size:11.5px;font-weight:800;padding:3px 10px;border-radius:999px;background:rgba(255,255,255,.06);color:var(--tx1);white-space:nowrap}.nat-st.handled{background:rgba(80,219,15,.16);color:#8EF25A}.nat-st.received{background:rgba(224,168,40,.14);color:#F5C840}
 .rep-nat-q{display:flex;gap:8px;margin:0 0 10px}.rep-nat-q button{flex:1;min-height:40px;border-radius:10px;border:1px solid var(--b2);background:var(--n2);color:var(--tx1);font:700 12px inherit;font-family:inherit;cursor:pointer}.rep-nat-q button.sel{border-color:#50DB0F;color:#50DB0F}
 .ss-main{flex:1;min-width:0;}
 .ss-t{color:#fff;font-size:12px;font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
@@ -3284,13 +3293,13 @@ function buildSosTypeBar(){
 }
 function reflectSosType(){
   document.querySelectorAll('#ss-type-opts .ss-type').forEach(function(b){b.classList.toggle('sel',b.getAttribute('data-t')===curSosType);});
-  const he=currentLang==='he';
+  const he=currentLang==='he', ar=currentLang==='ar';
   const known=curSosType&&curSosType!=='unknown';
   const tt=document.getElementById('ss-t');
-  if(tt)tt.textContent=(curSosLayer==='nature'?(he?'דיווח טבע - ':'Nature report - '):(he?'SOS פעיל - ':'SOS active - '))+(known?sosTypeLabel(curSosType):(he?'סוג לא ידוע':'type unknown'));
+  if(tt)tt.textContent=(curSosLayer==='nature'?(he?'דיווח טבע - ':ar?'بلاغ طبيعة - ':'Nature report - '):(he?'SOS פעיל - ':ar?'SOS نشط - ':'SOS active - '))+(known?sosTypeLabel(curSosType):(he?'סוג לא ידוע':ar?'نوع غير معروف':'type unknown'))+(curSosLayer==='both'?(he?' · גם בשכבת הטבע':ar?' · أيضاً في طبقة الطبيعة':' · also in the Nature layer'):'');
   const lb=document.getElementById('ss-typebar-lbl');
-  if(lb)lb.textContent=known?(he?'סוג: '+sosTypeLabel(curSosType)+' - אפשר לשנות':'Type: '+sosTypeLabel(curSosType)+' - tap to change')
-                            :(he?'סוג האירוע - הקש/י לסיווג':'Emergency type - tap to classify');
+  if(lb)lb.textContent=known?(he?'סוג: '+sosTypeLabel(curSosType)+' - אפשר לשנות':ar?'النوع: '+sosTypeLabel(curSosType)+' - يمكن التغيير':'Type: '+sosTypeLabel(curSosType)+' - tap to change')
+                            :(he?'ההתרעה כבר נשלחה. סוג האירוע (לא חובה)':ar?'تم إرسال التنبيه. نوع الحدث (اختياري)':'Alert already sent. Event type (optional)');
 }
 /* Red urgent pulsing pin carrying the classified type glyph (or the SOS alert glyph if unknown). */
 function sosPinIcon(t){
@@ -3316,8 +3325,8 @@ function classifySOS(t,by){
   const ar=currentLang==='ar';
   if(by==='owner'&&_rt.layer==='nature')toast(he?'סומן כדיווח טבע. מי שכבר קיבל התרעה רואה שזה דיווח טבע, לא מצוקת אדם.':ar?'تم التعليم كبلاغ طبيعة. من تلقّى التنبيه يرى أنه بلاغ طبيعة وليس استغاثة شخص.':'Marked as a nature report. Anyone already alerted now sees it is a nature report, not a person in distress.','grn');
   else if(by==='owner'&&_rt.layer==='both')toast((he?'סוג עודכן: ':ar?'تم تحديث النوع: ':'Type set: ')+sosTypeLabel(t)+(he?' - מופיע גם בשכבת הטבע. התרעה אחת בלבד.':ar?' - يظهر أيضاً في طبقة الطبيعة. تنبيه واحد فقط.':' - also shown in the Nature layer. Still one alert.'),'red');
-  else if(by==='owner')toast((he?'סוג עודכן: ':'Type set: ')+sosTypeLabel(t)+(he?' - שודר למשתמשים בקרבתך':' - shared with nearby SHOMERs'),'red');
-  else toast((he?'שומר/ת בקרבת מקום סיווג/ה: ':'A nearby SHOMER classified this: ')+sosTypeLabel(t),'amb');
+  else if(by==='owner')toast((he?'סוג עודכן: ':ar?'تم تحديث النوع: ':'Type set: ')+sosTypeLabel(t)+(he?' - עודכן אצל מי שקיבל את ההתרעה':ar?' - تم التحديث لدى من تلقّى التنبيه':' - updated for everyone who got the alert'),'red');
+  else toast((he?'מישהו בקרבת מקום סיווג: ':ar?'شخص قريب صنّف الحدث: ':'Someone nearby classified this: ')+sosTypeLabel(t),'amb');
 }
 /* Incapacitated-user fallback (SIMULATED). If the event stays unclassified, a nearby
    responder classifies it - demonstrating community typing + real-time update. Real
@@ -5922,7 +5931,7 @@ function openSelfieGuard(photo){
   if(!ov){ ov=document.createElement('div'); ov.id='selfie-guard'; ov.className='selfie-ov'; document.body.appendChild(ov); }
   var secs=15;
   ov.innerHTML='<div class="selfie-card">'
-    +(photo?('<img class="selfie-thumb" src="'+photo+'" alt="">'):'')
+    +(photo?('<img class="selfie-thumb" '+'src="'+photo+'" alt="">'):'')
     +'<h3>'+(he?'זוהו 3 קודים שגויים':ar?'3 رموز خاطئة':'3 wrong codes')+'</h3>'
     +'<p>'+(he?'אם זה הטלפון שלך - בטל/י עכשיו. אחרת, סלפי ומיקום יישלחו לשומרים שלך.':ar?'إن كان هاتفك فألغِ الآن، وإلا ستُرسل صورة وموقع لمن اخترتهم.':'If this is your phone, cancel now. Otherwise a selfie + location go to your SHOMERs.')+'</p>'
     +'<div class="selfie-count" id="selfie-count">'+secs+'</div>'
@@ -5972,7 +5981,7 @@ function openTheftEvidence(){
   var evs=(SS.theftEvents||[]).slice().reverse();
   var rows=evs.length? evs.map(function(e){ var when=new Date(e.ts).toLocaleString(); var maps='https://www.google.com/maps?q='+e.lat+','+e.lng;
       return '<div style="display:flex;gap:11px;align-items:center;background:var(--n3);border:1px solid var(--b2);border-radius:12px;padding:10px;margin-bottom:8px">'
-        +(e.photo?('<img src="'+e.photo+'" style="width:56px;height:70px;object-fit:cover;border-radius:8px;border:1px solid var(--b3)" alt="">'):'<div style="width:56px;height:70px;border-radius:8px;background:var(--n4);display:grid;place-items:center;color:var(--tx3);font-size:10px">אין<br>תמונה</div>')
+        +(e.photo?('<img '+'src="'+e.photo+'" style="width:56px;height:70px;object-fit:cover;border-radius:8px;border:1px solid var(--b3)" alt="">'):'<div style="width:56px;height:70px;border-radius:8px;background:var(--n4);display:grid;place-items:center;color:var(--tx3);font-size:10px">אין<br>תמונה</div>')
         +'<div style="flex:1;min-width:0;text-align:start"><div style="font-size:12.5px;color:var(--tx1);font-weight:700">'+when+'</div><a href="'+maps+'" target="_blank" rel="noopener" style="font-size:12px;color:var(--g3)">'+(he?'פתח מיקום במפה ›':'Open location ›')+'</a></div></div>';
     }).join('') : '<div style="color:var(--tx3);font-size:13px;padding:14px 4px;text-align:center">'+(he?'אין עדיין ראיות. מופיעות אוטומטית לאחר 3 קודים שגויים כשההגנה פעילה.':'No evidence yet. Captured automatically after 3 wrong codes when protection is on.')+'</div>';
   ov.innerHTML='<div class="selfie-card" style="background:linear-gradient(180deg,#16233e,#0d1830);border-color:var(--b3);max-width:400px;text-align:start;max-height:80vh;overflow:auto">'
@@ -12702,36 +12711,130 @@ function natLabel(k){ var t=EVT.NATURE[k]; if(!t) return k; return currentLang==
    themselves. No siren, no person alert. Fire asks one question: is it near a settlement? */
 function openNatureReport(){
   var he=currentLang==='he', ar=currentLang==='ar';
+  function tx(h,a,e){ return he?h:ar?a:e; }
   var old=document.getElementById('rep-sheet'); if(old) old.remove();
   var d=document.createElement('div'); d.id='rep-sheet'; d.className='rep-sheet rep-nat';
   var btns=Object.keys(EVT.NATURE).map(function(k){
-    return '<button class="rep-type" data-t="'+k+'"><span class="rep-ic">'+EVT.NATURE[k].ic+'</span><span>'+ESC(natLabel(k))+'</span></button>';
+    return '<button type="button" class="rep-type" data-t="'+k+'"><span class="rep-ic">'+EVT.NATURE[k].ic+'</span><span>'+ESC(natLabel(k))+'</span></button>';
   }).join('');
+  var mine=natMine().length;
   d.innerHTML='<div class="rep-card">'
-    +'<div class="rep-h" style="color:#50DB0F">'+(he?'דיווח טבע':ar?'بلاغ طبيعة':'Nature report')+'</div>'
-    +'<div class="rep-sub">'+(he?'חיה פצועה, מפגע בשטח או פגיעה בסביבה. הדיווח עובר לשכבת הטבע, לרכזי השטח ולמתנדבי הטבע. בסכנת חיים? לחצו SOS או חייגו 100 / 101 / 102.':ar?'حيوان مصاب أو خطر في الطبيعة. يصل البلاغ إلى طبقة الطبيعة ومنسّقي الميدان. في خطر على الحياة؟ اضغط SOS أو اتصل 100 / 101 / 102.':'An injured animal, a hazard in the field or harm to nature. The report goes to the Nature layer, to field coordinators and nature volunteers. Life in danger? Press SOS or call 100 / 101 / 102.')+'</div>'
-    +'<div class="rep-grid">'+btns+'</div>'
-    +'<div id="rep-nat-fire" style="display:none"><div class="rep-sub" style="margin-bottom:8px">'+(he?'השריפה קרובה ליישוב?':ar?'هل الحريق قريب من بلدة؟':'Is the fire near a settlement?')+'</div>'
-    +'<div class="rep-nat-q"><button data-n="1">'+(he?'כן':ar?'نعم':'Yes')+'</button><button data-n="0">'+(he?'לא':ar?'لا':'No')+'</button><button data-n="">'+(he?'לא בטוח/ה':ar?'غير متأكد':'Not sure')+'</button></div></div>'
-    +'<textarea class="rep-note" id="rep-note" maxlength="140" placeholder="'+(he?'מה רואים? (לא חובה)':ar?'ماذا ترى؟ (اختياري)':'What do you see? (optional)')+'"></textarea>'
-    +'<button class="btn-ghost rep-close">'+(he?'ביטול':ar?'إلغاء':'Cancel')+'</button>'
+    +'<div class="rep-h" style="color:#50DB0F">'+tx('דיווח טבע','بلاغ طبيعة','Nature report')+'</div>'
+    +'<div class="rep-sub">'+tx('חיה פצועה, מפגע בשטח או פגיעה בסביבה. הדיווח עובר לשכבת הטבע, לרכזי השטח ולמתנדבי הטבע. בסכנת חיים? לחצו SOS או חייגו 100 / 101 / 102.','حيوان مصاب أو خطر في الطبيعة. يصل البلاغ إلى طبقة الطبيعة ومنسّقي الميدان. في خطر على الحياة؟ اضغط SOS أو اتصل 100 / 101 / 102.','An injured animal, a hazard in the field or harm to nature. The report goes to the Nature layer, to field coordinators and nature volunteers. Life in danger? Press SOS or call 100 / 101 / 102.')+'</div>'
+    +'<div id="nat-s1"><div class="rep-grid">'+btns+'</div></div>'
+    +'<div id="nat-s2" style="display:none">'
+    +  '<button type="button" class="nat-chosen" id="nat-chosen"></button>'
+    +  '<div class="nat-q"><div class="nat-ql">'+tx('מישהו בסכנה?','هل أحد في خطر؟','Is anyone in danger?')+'</div>'
+    +  '<div class="rep-nat-q" id="nat-danger"><button type="button" data-v="1">'+tx('כן','نعم','Yes')+'</button><button type="button" data-v="0">'+tx('לא','لا','No')+'</button></div>'
+    +  '<div class="nat-warn" id="nat-dwarn" style="display:none">'+tx('הדיווח יעלה גם לשכבת SH✡MER. אם חיים בסכנה עכשיו: לחצו SOS או חייגו 100 / 101 / 102.','سيصل البلاغ أيضاً إلى طبقة SH✡MER. إذا كانت حياة في خطر الآن: اضغط SOS أو اتصل 100 / 101 / 102.','The report also goes to the SH✡MER layer. If a life is in danger right now: press SOS or call 100 / 101 / 102.')+'</div></div>'
+    +  '<div class="nat-q" id="rep-nat-fire" style="display:none"><div class="nat-ql">'+tx('השריפה קרובה ליישוב?','هل الحريق قريب من بلدة؟','Is the fire near a settlement?')+'</div>'
+    +  '<div class="rep-nat-q" id="nat-near"><button type="button" data-n="1">'+tx('כן','نعم','Yes')+'</button><button type="button" data-n="0">'+tx('לא','لا','No')+'</button><button type="button" data-n="">'+tx('לא בטוח/ה','غير متأكد','Not sure')+'</button></div></div>'
+    +  '<div class="nat-row"><label class="nat-photo" for="nat-photo-in"><span id="nat-photo-lbl">📷 '+tx('הוספת תמונה (לא חובה)','إضافة صورة (اختياري)','Add a photo (optional)')+'</span><input id="nat-photo-in" type="file" accept="image/*" capture="environment" hidden></label>'
+    +  '<img id="nat-photo-prev" alt="" style="display:none"></div>'
+    +  '<div class="nat-loc" id="nat-loc">📍 '+tx('מיקום: מאתר…','الموقع: جارٍ التحديد…','Location: finding…')+'</div>'
+    +  '<textarea class="rep-note" id="rep-note" maxlength="140" placeholder="'+tx('מה רואים? (לא חובה)','ماذا ترى؟ (اختياري)','What do you see? (optional)')+'"></textarea>'
+    +  '<button type="button" class="nat-send" id="nat-send" disabled>'+tx('שליחת דיווח טבע','إرسال بلاغ الطبيعة','Send nature report')+'</button>'
+    +'</div>'
+    +'<button type="button" class="rep-nat-link" id="nat-mine-open"'+(mine?'':' style="display:none"')+'>'+tx('הדיווחים שלי','بلاغاتي','My reports')+' ('+mine+')</button>'
+    +'<button type="button" class="btn-ghost rep-close">'+tx('ביטול','إلغاء','Cancel')+'</button>'
     +'</div>';
   document.body.appendChild(d); try{ shHistPush(); }catch(_){}
-  function send(type, near){
-    var note=(document.getElementById('rep-note')||{}).value||'';
-    evtCreate(type, note, {origin:'nature', nearSettlement:near}).then(function(ok){ if(ok){ d.remove(); try{ shHistDrop(); }catch(_){} } });
-  }
-  d.querySelectorAll('.rep-type').forEach(function(b){
-    b.onclick=function(){
-      var k=b.getAttribute('data-t');
-      if(k==='wildfire'){ var f=d.querySelector('#rep-nat-fire'); if(f) f.style.display='block'; return; }   /* one question first */
-      send(k, null);
-    };
+  var S={type:null,danger:null,near:undefined,photo:null};
+  var $=function(q){ return d.querySelector(q); };
+  function ready(){ var ok=S.type&&S.danger!==null&&(S.type!=='wildfire'||S.near!==undefined); $('#nat-send').disabled=!ok; }
+  function pickType(k){ S.type=k; S.near=undefined;
+    $('#nat-s1').style.display='none'; $('#nat-s2').style.display='block';
+    $('#nat-chosen').innerHTML='<span class="rep-ic">'+EVT.NATURE[k].ic+'</span><b>'+ESC(natLabel(k))+'</b><span class="nat-chg">'+tx('שינוי','تغيير','Change')+'</span>';
+    $('#rep-nat-fire').style.display=k==='wildfire'?'block':'none';
+    d.querySelectorAll('#nat-near button').forEach(function(x){ x.classList.remove('sel'); });
+    ready(); }
+  d.querySelectorAll('.rep-type').forEach(function(b){ b.onclick=function(){ pickType(b.getAttribute('data-t')); }; });
+  $('#nat-chosen').onclick=function(){ $('#nat-s2').style.display='none'; $('#nat-s1').style.display='block'; };
+  d.querySelectorAll('#nat-danger button').forEach(function(b){ b.onclick=function(){
+    S.danger=b.getAttribute('data-v')==='1'; d.querySelectorAll('#nat-danger button').forEach(function(x){ x.classList.toggle('sel',x===b); });
+    $('#nat-dwarn').style.display=S.danger?'block':'none'; ready(); }; });
+  d.querySelectorAll('#nat-near button').forEach(function(b){ b.onclick=function(){
+    var n=b.getAttribute('data-n'); S.near=n==='1'?true:n==='0'?false:null;   /* "not sure" = uncertain = SH✡MER too */
+    d.querySelectorAll('#nat-near button').forEach(function(x){ x.classList.toggle('sel',x===b); }); ready(); }; });
+  $('#nat-photo-in').onchange=function(){ var f=this.files&&this.files[0]; natReadPhoto(f,function(u){ S.photo=u||null; var p=$('#nat-photo-prev');
+    if(u){ p.src=u; p.style.display='block'; $('#nat-photo-lbl').textContent='📷 '+tx('החלפת תמונה','تغيير الصورة','Change photo'); } else { p.style.display='none'; } }); };
+  natLocate(function(p){ var el=$('#nat-loc'); if(!el) return;
+    el.textContent=p?('📍 '+tx('מיקום מקורב (כ-1 ק״מ) יישלח עם הדיווח','سيُرسل موقع تقريبي (~1 كم) مع البلاغ','An approximate location (~1 km) is sent with the report'))
+                   :('📍 '+tx('צריך הרשאת מיקום כדי לדווח','يلزم إذن الموقع للإبلاغ','Location permission is needed to report')); });
+  $('#nat-send').onclick=function(){ var b=this; if(b.disabled) return; b.disabled=true;
+    var note=($('#rep-note')||{}).value||'';
+    evtCreate(S.type, note, {origin:'nature', nearSettlement:S.type==='wildfire'?S.near:undefined, peopleInDanger:S.danger, photo:S.photo}).then(function(ok){
+      if(ok){ d.remove(); try{ shHistDrop(); }catch(_){} } else { b.disabled=false; } }); };
+  $('#nat-mine-open').onclick=function(){ d.remove(); try{ shHistDrop(); }catch(_){} openMyNatureReports(); };
+  $('.rep-close').onclick=function(){ d.remove(); try{ shHistDrop(); }catch(_){} };
+}
+/* Downscale to a small JPEG. Re-encoding through a canvas also drops EXIF (no GPS, no device data). */
+function natReadPhoto(file, cb){
+  try{
+    if(!file||!/^image\//.test(file.type||'')){ cb(null); return; }
+    var r=new FileReader();
+    r.onload=function(){ var img=new Image(); img.onload=function(){
+      var max=800, w=img.width, h=img.height, sc=Math.min(1,max/Math.max(w,h));
+      w=Math.max(1,Math.round(w*sc)); h=Math.max(1,Math.round(h*sc));
+      var c=document.createElement('canvas'); c.width=w; c.height=h;
+      try{ c.getContext('2d').drawImage(img,0,0,w,h); var u=c.toDataURL('image/jpeg',0.6); if(u.length>220000) u=c.toDataURL('image/jpeg',0.4); cb(u); }catch(e){ cb(null); }
+    }; img.onerror=function(){ cb(null); }; img.src=r.result; };
+    r.onerror=function(){ cb(null); }; r.readAsDataURL(file);
+  }catch(e){ cb(null); }
+}
+function natLocate(cb){
+  var p=_myPos(); if(p){ cb(p); return; }
+  try{ navigator.geolocation.getCurrentPosition(function(g){ try{ userLat=g.coords.latitude; userLng=g.coords.longitude; }catch(_){} cb(_myPos()||{lat:g.coords.latitude,lng:g.coords.longitude}); },
+    function(){ cb(null); }, {enableHighAccuracy:false,timeout:8000,maximumAge:120000}); }catch(e){ cb(null); }
+}
+/* ── Reporter feedback: my own Nature reports, received / handled. Only my reports, nobody else's. ── */
+var NAT_BRIDGE='shomer_preview_nature_v1', NAT_BRIDGE_ST='shomer_preview_nature_st_v1';
+function natMine(){ try{ return Array.isArray(SS.natReports)?SS.natReports:[]; }catch(e){ return []; } }
+function natRemember(r){ try{ if(!Array.isArray(SS.natReports)) SS.natReports=[]; SS.natReports.unshift(r); SS.natReports=SS.natReports.slice(0,30); saveStore(); }catch(e){} }
+function natStatusOf(id){
+  return new Promise(function(res){
+    if(window.SHOMER_PREVIEW){ var o={}; try{ o=JSON.parse(localStorage.getItem(NAT_BRIDGE_ST)||'{}')||{}; }catch(e){} res(o[id]&&o[id].st==='handled'?'handled':'received'); return; }
+    if(typeof FB==='undefined'||!FB.ready){ res(null); return; }
+    fbRestFetch('dashfeed/'+encodeURIComponent(id)+'/status',{method:'GET'}).then(function(r){ return r.ok?r.json():null; }).then(function(s){
+      res(s==='handled'||s==='closed'||s==='resolved'?'handled':'received'); }).catch(function(){ res(null); });
   });
-  d.querySelectorAll('.rep-nat-q button').forEach(function(b){
-    b.onclick=function(){ var n=b.getAttribute('data-n'); send('wildfire', n==='1'?true:n==='0'?false:null); };   /* "not sure" = uncertain = SH✡MER too */
-  });
+}
+function openMyNatureReports(){
+  var he=currentLang==='he', ar=currentLang==='ar';
+  function tx(h,a,e){ return he?h:ar?a:e; }
+  var old=document.getElementById('rep-sheet'); if(old) old.remove();
+  var d=document.createElement('div'); d.id='rep-sheet'; d.className='rep-sheet rep-nat';
+  var list=natMine();
+  function when(ts){ try{ return new Date(ts).toLocaleString(he?'he-IL':ar?'ar':'en-GB',{day:'numeric',month:'numeric',hour:'2-digit',minute:'2-digit'}); }catch(e){ return ''; } }
+  d.innerHTML='<div class="rep-card">'
+    +'<div class="rep-h" style="color:#50DB0F">'+tx('הדיווחים שלי','بلاغاتي','My reports')+'</div>'
+    +'<div class="rep-sub">'+tx('רק הדיווחים שלך. רואים כאן אם הדיווח התקבל ואם טופל.','بلاغاتك فقط. ترى هنا إن استُلم البلاغ وإن تمت معالجته.','Only your reports. See here whether each one was received and handled.')+'</div>'
+    +(list.length?'<div class="nat-mine">'+list.map(function(r){ var t=EVT.NATURE[r.type]||{ic:'•'};
+      return '<div class="nat-mi"><span class="rep-ic">'+t.ic+'</span><div class="nat-mt"><b>'+ESC(natLabel(r.type))+'</b><span>'+ESC(when(r.ts))+(r.layer==='both'?' · '+tx('גם בשכבת SH✡MER','أيضاً في SH✡MER','also SH✡MER layer'):'')+'</span></div><span class="nat-st" data-id="'+ESC(r.id)+'">…</span></div>'; }).join('')+'</div>'
+      :'<div class="rep-sub">'+tx('עוד לא שלחת דיווח טבע.','لم ترسل بلاغ طبيعة بعد.','You have not sent a nature report yet.')+'</div>')
+    +'<button type="button" class="btn-ghost rep-close">'+tx('סגירה','إغلاق','Close')+'</button></div>';
+  document.body.appendChild(d); try{ shHistPush(); }catch(_){}
+  d.querySelectorAll('.nat-st').forEach(function(el){ natStatusOf(el.getAttribute('data-id')).then(function(s){
+    el.className='nat-st '+(s||'');
+    el.textContent=s==='handled'?tx('✓ טופל','✓ تمت المعالجة','✓ Handled'):s==='received'?tx('התקבל','تم الاستلام','Received'):tx('אין חיבור','لا اتصال','Offline'); }); });
   d.querySelector('.rep-close').onclick=function(){ d.remove(); try{ shHistDrop(); }catch(_){} };
+}
+/* Preview build only (window.SHOMER_PREVIEW, set by the staging guard): there is no backend, so the
+   report travels to the Nature dashboard on this same device through localStorage. Never on live. */
+function natPreviewSend(type, note, opts, rt){
+  var he=currentLang==='he', ar=currentLang==='ar';
+  return new Promise(function(res){ natLocate(function(p){
+    if(!p){ toast(he?'צריך מיקום כדי לדווח':ar?'يلزم الموقع للإبلاغ':'Location needed to report','amb'); res(false); return; }
+    var id='e_pv'+Date.now().toString(36)+Math.random().toString(36).slice(2,6);
+    var row={id:id,type:type,ts:Date.now(),lat:+(+p.lat).toFixed(2),lng:+(+p.lng).toFixed(2),layer:rt.layer,note:String(note||'').slice(0,140),
+      danger:opts.peopleInDanger===true,near:(opts.nearSettlement===true||opts.nearSettlement===false)?opts.nearSettlement:null,photo:opts.photo||null};
+    var a=[]; try{ a=JSON.parse(localStorage.getItem(NAT_BRIDGE)||'[]')||[]; }catch(e){}
+    a.unshift(row); a=a.slice(0,12);
+    var saved=false; for(var i=0;i<4&&!saved;i++){ try{ localStorage.setItem(NAT_BRIDGE,JSON.stringify(a)); saved=true; }catch(e){ a.pop(); row.photo=i>1?null:row.photo; } }
+    natRemember({id:id,type:type,ts:row.ts,layer:rt.layer});
+    toast(rt.layer==='both'?(he?'דיווח הטבע נשלח. הוא עובר לשכבת הטבע וגם לשכבת SH✡MER.':ar?'تم إرسال بلاغ الطبيعة. يصل إلى طبقة الطبيعة وأيضاً إلى طبقة SH✡MER.':'Nature report sent. It goes to the Nature layer and to the SH✡MER layer.')
+      :(he?'דיווח הטבע נשלח לשכבת הטבע. שמך לא נשלח.':ar?'تم إرسال بلاغ الطبيعة إلى طبقة الطبيعة. لم يُرسل اسمك.':'Nature report sent to the Nature layer. Your name was not sent.'),'grn');
+    res(saved); }); });
 }
 
 /* ═══════════════════════════════════════════════════════════════════════
@@ -12915,7 +13018,7 @@ function openPersonAlertDetail(id){
   d.innerHTML='<div class="rep-card">'
     +'<div style="display:inline-block;background:'+col+';color:#fff;font-size:11px;font-weight:800;padding:3px 10px;border-radius:7px;margin-bottom:8px">'+(a.kind==='abduct'?'🚨 ':'🔎 ')+kindL+'</div>'
     +'<div class="rep-h">'+ESC(a.subjName||'')+'</div>'
-    +(a.subjPhoto?'<img src="'+a.subjPhoto+'" alt="" style="width:100%;max-height:230px;object-fit:cover;border-radius:12px;margin:8px 0">':'')
+    +(a.subjPhoto?'<img '+'src="'+a.subjPhoto+'" alt="" style="width:100%;max-height:230px;object-fit:cover;border-radius:12px;margin:8px 0">':'')
     +(a.lastSeen?'<div class="rep-sub"><b>'+(he?'נראה/תה לאחרונה: ':ar?'آخر ظهور: ':'Last seen: ')+'</b>'+ESC(a.lastSeen)+'</div>':'')
     +(a.desc?'<div class="rep-sub">'+ESC(a.desc)+'</div>':'')
     +'<div class="rep-sub" style="direction:ltr;text-align:start">📍 '+ESC(locTxt)+(when?'  ·  '+when:'')+'</div>'
@@ -13036,6 +13139,7 @@ function evtCooldownLeft(){
 async function evtCreate(type, note, opts){
   var he=currentLang==='he'; opts=opts||{};
   try{ if(typeof MOD!=='undefined' && note){ var _mt=MOD.checkText(note); if(!_mt.ok){ toast(he?'הדיווח מכיל שפה לא הולמת. אנא נסח/י מחדש בכבוד.':'Your report contains inappropriate language. Please rephrase respectfully.','amb'); return; } } }catch(e){}
+  if(window.SHOMER_PREVIEW&&opts.origin==='nature'&&!(FB.ready&&FB.uid)){ var _prt=null; try{ _prt=window.ShomerRouting.route({origin:'nature',type:type,nearSettlement:opts.nearSettlement,peopleInDanger:opts.peopleInDanger}); }catch(e){} return natPreviewSend(type,note,opts,_prt||{layer:'both'}); }   /* staging preview only: no backend */
   if(!FB.ready||!FB.uid){ toast(he?'אין חיבור':'No connection','amb'); return; }
   if(!(SS.security&&SS.security.phoneVerified)){ toast(he?'צריך אימות טלפון כדי לדווח':'Phone verification required','amb'); return; }
   if(isReviewAccount()){ toast(he?'חשבון בדיקה - דיווחים ציבוריים מושבתים':'Test account - public reports are disabled','amb'); return; }   /* v289: the store-review account can't publish to the public map */
@@ -13046,7 +13150,7 @@ async function evtCreate(type, note, opts){
   if(!p){ toast(he?'צריך מיקום כדי לדווח':'Location needed to report','amb'); return; }
   var isNat=opts.origin==='nature';
   var spec=(isNat&&EVT.NATURE[type])||EVT.TYPES[type]||EVT.TYPES.suspicious;
-  var _rt=null; if(isNat){ try{ _rt=window.ShomerRouting?window.ShomerRouting.route({origin:'nature',type:type,nearSettlement:opts.nearSettlement}):null; }catch(e){} if(!_rt) _rt={layer:'both'}; }   /* routing missing: keep Nature AND fail safe to SH✡MER */
+  var _rt=null; if(isNat){ try{ _rt=window.ShomerRouting?window.ShomerRouting.route({origin:'nature',type:type,nearSettlement:opts.nearSettlement,peopleInDanger:opts.peopleInDanger}):null; }catch(e){} if(!_rt) _rt={layer:'both'}; }   /* routing missing: keep Nature AND fail safe to SH✡MER */
   var id=fbDashKey('e_');   /* v301: random id - the public feed key must not reveal who reported */
   var ev={
     by:FB.uid, byName:((SS.settings&&SS.settings.toggles&&SS.settings.toggles.p_showname)?((SS.user&&SS.user.name)||''):''), ts:Date.now(),   /* v300: reports are anonymous unless the user turned on "show name on reports" */
@@ -13056,11 +13160,12 @@ async function evtCreate(type, note, opts){
     tier:repTier(),
     status:'pending'           /* pending → confirmed → (or) disputed */
   };
-  if(_rt){ ev.origin='nature'; ev.layer=_rt.layer; if(opts.nearSettlement===true||opts.nearSettlement===false) ev.near=opts.nearSettlement; }
+  if(_rt){ ev.origin='nature'; ev.layer=_rt.layer; if(opts.nearSettlement===true||opts.nearSettlement===false) ev.near=opts.nearSettlement; if(opts.peopleInDanger===true) ev.danger=true; }   /* the photo stays on this phone until an org-only channel exists (NEEDS YOUR EYES) */
   var ok=false;
   try{ var w=await fbRestWrite('PUT','events/'+id, ev); ok=(w!==false); }catch(e){}
   if(ok){
     try{ dashFeedPush(id,ev.type,ev.lat,ev.lng,ev.layer); }catch(e){}
+    if(_rt) natRemember({id:id,type:type,ts:ev.ts,layer:ev.layer});   /* "my reports": received / handled, mine only */
     var r=repState(); r.made=(r.made||0)+1; r._posts=(r._posts||[]); r._posts.push(Date.now()); saveStore();
     if(_rt){ var _ar=currentLang==='ar'; toast(_rt.layer==='both'?(he?'דיווח הטבע נשמר. הוא עובר לשכבת הטבע וגם לשכבת SH✡MER, כי השריפה עלולה לסכן אנשים.':_ar?'تم حفظ بلاغ الطبيعة. يصل إلى طبقة الطبيعة وأيضاً إلى طبقة SH✡MER.':'Nature report saved. It goes to the Nature layer and to the SH✡MER layer, because the fire may put people at risk.'):(he?'דיווח הטבע נשמר בשכבת הטבע. שמך לא נשלח.':_ar?'تم حفظ بلاغ الطبيعة في طبقة الطبيعة.':'Nature report saved to the Nature layer. Your name was not sent.'),'grn'); }
     else toast((he?'הדיווח נשמר. אף אחד לא מקבל עליו התראה.':'Report saved. Nobody is alerted about it.')+(ev.byName?(he?' שמך מצורף לדיווח.':' Your name is attached.'):(he?' שמך לא נשלח.':' Your name was not sent.')),'grn');   /* honest: no app reads reports back yet, so nobody is notified */
@@ -13491,9 +13596,11 @@ function sosApplyLayerNotice(puid, layer, type){
     try{ if(!sosActive && typeof stopAlarm==='function') stopAlarm(); }catch(e){}   /* never silence MY OWN SOS siren */
   } else if(d.classList.contains('nat')){
     d.classList.remove('nat');
-    if(h) h.textContent=he?'התרעת SOS':'SOS ALERT';
-    if(s) s.textContent=he?'זקוק/ה לעזרה - עכשיו':'needs help - right now';
+    if(h) h.textContent=he?'התרעת SOS':ar?'تنبيه SOS':'SOS ALERT';
+    if(s) s.textContent=he?'זקוק/ה לעזרה - עכשיו':ar?'بحاجة للمساعدة - الآن':'needs help - right now';
   }
+  if(layer!=='both'&&layer!=='nature'&&h) h.textContent=h.textContent.replace(/ · 🌿.*$/,'');
+  if(layer==='both'&&h&&!/🌿/.test(h.textContent)) h.textContent+=' · 🌿 '+(he?'גם טבע':ar?'طبيعة أيضاً':'also Nature');   /* people may be at risk: it stays a person alert */
 }
 function memberByPair(puid){
   return (SS.circleMembers||[]).filter(function(m){return m.partnerUid===puid;})[0]||null;
