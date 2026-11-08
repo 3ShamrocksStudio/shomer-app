@@ -91,3 +91,17 @@ Rollback: revert the merge commit; rules and function are backward compatible (r
 6. **Store listing**: add "nature report" to the SH✡MER listing text; do not submit a Nature listing.
 7. **Studio site** `work/shomer.html`: change "SH✡MER Nature · Coming soon" to "nature reporting inside SH✡MER".
 8. **Nature report photo**: the app report has no photo yet (the dashboard "documentation" field shows only what exists).
+
+## 9. Nature dashboard and finalized app flow (8 Nov 2026)
+- **One codebase**: the Nature dashboard is the Nature view of `dashboard.html` (`nature-dash.js`, `nature-dash.css`, case logic in `nature-cases.js`). `nature-dashboard.html` only opens `dashboard.html?view=nature`. An org with both layers switches 👤 אדם / 🌿 טבע in the top bar; a layer it has not bought opens the packages panel. The Person view now shows person + shared ("both") rows only.
+- **Nature view**: KPIs (open, en route, handled, closed in 30 days, median time to handle, % documented), cases list with type / area / status filters, field map (~1 km circles), by-type bars with median time, lifecycle counts, package panel (prices TBD), printable report + CSV (formula-safe). Case drawer: reported → en route → handled → closed with an outcome; the trail is kept in the board store (this browser, like the Person view). HE / AR / EN inside the view. `?demo=1` opens the labelled demo (13 cases around Modi'in, "נתוני הדגמה").
+- **App Nature report**: type → "is anyone in danger?" (required; yes = SH✡MER too) → fire near a settlement (fire only) → optional photo (≤800 px JPEG, EXIF dropped) → note → send. Routing: `peopleInDanger` in `layer-routing.js` (tests 38-42). SOS untouched.
+- **Reporter feedback**: "My reports" shows only my own reports: received / handled (from `dashfeed/<id>/status`).
+- **Preview only** (`window.SHOMER_PREVIEW`): the report reaches the Nature dashboard on the same device through localStorage, and the dashboard's status goes back the same way. A tester bar replaces phone sign-in. Nothing of this runs on live.
+- Tests: `node --test tests/layer-routing.test.js tests/nature-cases.test.js` → 42 + 10 pass.
+
+### NEEDS YOUR EYES (added)
+9. **Photos and notes reach the org only in the preview.** On live, the photo stays on the reporter's phone and the note stays in the reporter-only record. Getting documentation to the org needs an org-only channel (not the public feed). Not built.
+10. **Status write-back**: the dashboard (Supabase login) cannot write `dashfeed/<id>/status` today, so on live the reporter would always see "received". Needs an org write path (rules + function). Not built, not deployed.
+11. **Nature view colours**: light stone work area with the dark green brand band (nature.html), not an all-dark green screen.
+12. The Person dashboard itself stays Hebrew only; the Nature view has HE / AR / EN.
