@@ -3316,7 +3316,7 @@ function classifySOS(t,by){
   const ar=currentLang==='ar';
   if(by==='owner'&&_rt.layer==='nature')toast(he?'סומן כדיווח טבע. מי שכבר קיבל התרעה רואה שזה דיווח טבע, לא מצוקת אדם.':ar?'تم التعليم كبلاغ طبيعة. من تلقّى التنبيه يرى أنه بلاغ طبيعة وليس استغاثة شخص.':'Marked as a nature report. Anyone already alerted now sees it is a nature report, not a person in distress.','grn');
   else if(by==='owner'&&_rt.layer==='both')toast((he?'סוג עודכן: ':ar?'تم تحديث النوع: ':'Type set: ')+sosTypeLabel(t)+(he?' - מופיע גם בשכבת הטבע. התרעה אחת בלבד.':ar?' - يظهر أيضاً في طبقة الطبيعة. تنبيه واحد فقط.':' - also shown in the Nature layer. Still one alert.'),'red');
-  else if(by==='owner')toast((he?'סוג עודכן: ':'Type set: ')+sosTypeLabel(t)+(he?' - שודר לשומרים בקרבתך':' - shared with nearby SHOMERs'),'red');
+  else if(by==='owner')toast((he?'סוג עודכן: ':'Type set: ')+sosTypeLabel(t)+(he?' - שודר למשתמשים בקרבתך':' - shared with nearby SHOMERs'),'red');
   else toast((he?'שומר/ת בקרבת מקום סיווג/ה: ':'A nearby SHOMER classified this: ')+sosTypeLabel(t),'amb');
 }
 /* Incapacitated-user fallback (SIMULATED). If the event stays unclassified, a nearby

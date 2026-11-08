@@ -621,7 +621,7 @@
     <div class="tb-sp"></div>
     <div class="terr-pick"><span id="terr-static" class="hidden">טריטוריה: <b id="terr-name" style="color:var(--gold)"></b></span><select id="terr-sel"></select></div>
     <div class="live off" id="live-ind" title="אין חיבור לנתונים חיים"><span class="d"></span><span id="org-name"></span></div>
-    <span class="lyr" id="lyr" role="group" aria-label="שכבות"></span><span class="plan-badge" id="plan-badge" title="סטטוס המוצר">גרסת בטא</span><button class="tbtn" id="pricing-btn" onclick="openPricing()">📦 חבילות</button><button class="tbtn" id="trends-btn" onclick="openTrends()">📈 מגמות</button><button class="tbtn" id="team-btn" onclick="openTeam()">👥 צוות שומרים</button><button class="tbtn" id="acct-btn">⚙ חשבון</button><button class="tbtn" id="export-btn">⤓ ייצוא</button>
+    <span class="lyr" id="lyr" role="group" aria-label="שכבות"></span><span class="plan-badge" id="plan-badge" title="סטטוס המוצר">גרסת בטא</span><button class="tbtn" id="pricing-btn" onclick="openPricing()">📦 חבילות</button><button class="tbtn" id="trends-btn" onclick="openTrends()">📈 מגמות</button><button class="tbtn" id="team-btn" onclick="openTeam()">👥 ראשי צוות</button><button class="tbtn" id="acct-btn">⚙ חשבון</button><button class="tbtn" id="export-btn">⤓ ייצוא</button>
     <button class="tbtn" id="signout">יציאה</button>
   </div>
   <!-- Physical layout (viewer's left → right), independent of RTL:
@@ -1718,10 +1718,10 @@ function openPricing(){
   document.body.appendChild(ov);
 }
 async function openTeam(){
-  if(CLIENT&&CLIENT.demo){ alert('צוות שומרים זמין בחשבון עירייה מחובר.'); return; }
+  if(CLIENT&&CLIENT.demo){ alert('ראשי צוות זמינים בחשבון עירייה מחובר.'); return; }
   if(document.getElementById('team-ov')) return;
   var ov=document.createElement('div'); ov.id='team-ov'; ov.className='acct-ov';
-  ov.innerHTML='<div class="acct-card" style="max-width:560px"><div class="acct-head"><h3>👥 צוות שומרים</h3><button class="acct-x" onclick="document.getElementById(\'team-ov\').remove()">✕</button></div>'
+  ov.innerHTML='<div class="acct-card" style="max-width:560px"><div class="acct-head"><h3>👥 ראשי צוות</h3><button class="acct-x" onclick="document.getElementById(\'team-ov\').remove()">✕</button></div>'
    +'<div class="acct-sub">ראשי הצוות שלך באפליקציה. „הכל טוב?” שואל בשקט; התראה ואזעקה מצלצלות בטלפון שלהם עד שהם מזינים את קוד הביטול שלהם (או עד שעוצרים מכאן).</div>'
    +'<div id="team-list"><div class="tm-empty">מתחבר…</div></div><div id="team-newinv"></div>'
    +'<button class="tm-add" onclick="teamInvite()">+ הזמנת ראש צוות</button>'
