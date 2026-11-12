@@ -4789,7 +4789,7 @@ var TP_MISSIONS=[
  {he:'הוסיפו אנשי קשר לחירום.', en:'Add emergency contacts.', cta_he:'לאנשי חירום', cta_en:'Open contacts', act:function(){ op('sh-em'); }},
  {he:'הכירו את השומר האוטומטי - SOS אם לא הגבתם בזמן.', en:'Meet the automatic guard - SOS if you do not respond in time.', cta_he:'לשומר האוטומטי', cta_en:'Open it', act:function(){ op('sh-dms'); }},
  {he:'הגדירו התראת הגעה - תדעו כשהשומר/ת שלכם מגיע/ה הביתה.', en:'Set an arrival alert - know when your SHOMER gets home.', cta_he:'להגעות', cta_en:'Open arrivals', act:function(){ openArrivals(); }},
- {he:'ספרו לנו מה עבד ומה לא - משפט אחד מספיק.', en:'Tell us what worked and what did not - one sentence is enough.', cta_he:'שלח/י משוב', cta_en:'Send feedback', act:function(){ try{ window.open('mailto:markodave@gmail.com?subject='+encodeURIComponent('SH✡MER tester feedback'),'_blank'); }catch(e){} }},
+ {he:'ספרו לנו מה עבד ומה לא - משפט אחד מספיק.', en:'Tell us what worked and what did not - one sentence is enough.', cta_he:'שלח/י משוב', cta_en:'Send feedback', act:function(){ try{ window.open('mailto:support@shomer-app.co.il?subject='+encodeURIComponent('SH✡MER tester feedback'),'_blank'); }catch(e){} }},
  {he:'יום 14 - סיימתם! תודה ענקית. השאירו את האפליקציה מותקנת - אתם חלק מהרשת.', en:'Day 14 - you made it! Huge thanks. Keep the app installed - you are part of the network.', cta_he:'סגור', cta_en:'Close', act:function(){}}
 ];
 function tpState(){ SS.tp=SS.tp||{}; if(!SS.tp.start){ SS.tp.start=tpToday(); SS.tp.seen={}; SS.tp.done={}; try{saveStore();}catch(e){} } SS.tp.seen=SS.tp.seen||{}; SS.tp.done=SS.tp.done||{}; return SS.tp; }
@@ -10937,7 +10937,7 @@ try{ hydrateIcons(document); }catch(e){}
 /* Loaded-build version - shown in the diagnostic panel so a phone can prove
    whether it's on the latest build or a STALE cached one. Keep in lock-step
    with sw.js SW_VERSION on every deploy. */
-var APP_VER='v332';
+var APP_VER='v333';
 var FB={ready:false,uid:null,db:null,_presTimer:null,connected:false,listening:false,pushState:'default',near:0,swVer:'?',
   authState:'connecting',sdkLoaded:false,persist:'',permErr:null,err:null,wsProbe:'',csp:''};
 /* Always log connection diagnostics to the console so the real failure can be SEEN in Chrome. */
