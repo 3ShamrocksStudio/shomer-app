@@ -12775,6 +12775,9 @@ async function paCreate(m, kind, desc, lastSeen, photo){
   if(photo && typeof photo==='string' && photo.length<60000) rec.subjPhoto=photo;
   var ok=false;
   try{ await fbRestWrite('PUT','dashown/'+id, FB.uid); }catch(e){}   /* private owner record (no user can read it): lets the rules know the alert is mine */
+  /* subjUid step 1: per-alert tag + private subject record. Both are best-effort and must never block or fail the alert. */
+  try{ var _tg=await paSubjTag(m.partnerUid, id); if(_tg) rec.subjTag=_tg; }catch(e){}
+  try{ var _ps=fbRestWrite('PUT','pasubj/'+id, m.partnerUid); if(_ps && _ps.catch) _ps.catch(function(){}); }catch(e){}   /* fire-and-forget: the live rules do not allow pasubj yet, so this is refused today */
   try{ var w=await fbRestWrite('PUT','palerts/'+id, rec); ok=(w!==false); }
   catch(e){ ok=false;
     /* until the new rules are published the server still requires the account id on a person alert;
@@ -12815,6 +12818,7 @@ function fbListenPersonAlerts(){
       else if(!FB._paAlerted[id]){ FB._paAlerted[id]=true; if(a.by!==FB.uid && !(SS.paMine&&SS.paMine[id])) fresh.push(Object.assign({id:id},a)); }
     });
     FB._paInit=true;
+    paFillTags(FB._paCache);
     if(fresh.length) paIncomingAlert(fresh[0]);
   }, function(e){});
 }
@@ -12830,7 +12834,21 @@ function paIncomingAlert(a){
 }
 
 /* ── Detail card: who can stand it down = subject, reporter, or a linked SHOMER ── */
-function paCanResolve(a){ try{ return a && (FB.uid===a.subjUid || FB.uid===a.by || (SS.paMine&&a.id&&SS.paMine[a.id]) || (typeof isGuardianOf==='function' && isGuardianOf(a.subjUid))); }catch(e){ return false; } }
+/* subjUid step 1: subjTag = first 32 hex of SHA-256(subjectUid:alertId); computed async, cached so paCanResolve stays sync */
+async function paSubjTag(uid, id){
+  try{ if(!uid || !id || !(window.crypto && crypto.subtle)) return '';
+    var buf=await crypto.subtle.digest('SHA-256', new TextEncoder().encode(uid+':'+id));
+    return Array.prototype.map.call(new Uint8Array(buf),function(x){ return ('0'+x.toString(16)).slice(-2); }).join('').slice(0,32);
+  }catch(e){ return ''; }
+}
+function paFillTags(all){
+  try{ var uids=[FB.uid]; ((gdState().pairs)||[]).forEach(function(p){ if(p.partnerUid && !p.pending) uids.push(p.partnerUid); });
+    var C=(FB._paTags=FB._paTags||{});
+    Object.keys(all||{}).forEach(function(id){ var a=all[id]; if(!a||!a.subjTag) return;
+      uids.forEach(function(u){ if(!u) return; paSubjTag(u,id).then(function(t){ if(t && t===a.subjTag){ (C[id]=C[id]||{})[t]=1; } }); }); });
+  }catch(e){}
+}
+function paCanResolve(a){ try{ return a && ((a.subjTag && a.id && FB._paTags && FB._paTags[a.id] && FB._paTags[a.id][a.subjTag]) || FB.uid===a.subjUid || FB.uid===a.by || (SS.paMine&&a.id&&SS.paMine[a.id]) || (typeof isGuardianOf==='function' && isGuardianOf(a.subjUid))); }catch(e){ return false; } }
 function openPersonAlertDetail(id){
   var he=currentLang==='he', ar=currentLang==='ar';
   var a=(FB._paCache||{})[id]; if(!a) return;
