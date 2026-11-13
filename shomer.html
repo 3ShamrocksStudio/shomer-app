@@ -12777,7 +12777,7 @@ async function paCreate(m, kind, desc, lastSeen, photo){
   try{ await fbRestWrite('PUT','dashown/'+id, FB.uid); }catch(e){}   /* private owner record (no user can read it): lets the rules know the alert is mine */
   /* subjUid step 1: per-alert tag + private subject record. Both are best-effort and must never block or fail the alert. */
   try{ var _tg=await paSubjTag(m.partnerUid, id); if(_tg) rec.subjTag=_tg; }catch(e){}
-  try{ var _ps=fbRestWrite('PUT','pasubj/'+id, m.partnerUid); if(_ps && _ps.catch) _ps.catch(function(){}); }catch(e){}   /* fire-and-forget: the live rules do not allow pasubj yet, so this is refused today */
+  try{ var _ps=fbRestWrite('PUT','pasubj/'+id, m.partnerUid); if(_ps && _ps.catch) _ps=_ps.catch(function(){}); await Promise.race([_ps, new Promise(function(r){ setTimeout(r,1500); })]); }catch(e){}   /* lands before palerts (the rule needs that), never waits over 1.5 s, never throws; the live rules refuse it today */
   try{ var w=await fbRestWrite('PUT','palerts/'+id, rec); ok=(w!==false); }
   catch(e){ ok=false;
     /* until the new rules are published the server still requires the account id on a person alert;
