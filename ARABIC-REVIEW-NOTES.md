@@ -62,4 +62,4 @@ Seven strings in "My SHOMERs" stayed Hebrew in EN and AR. Now tagged data-he/en/
 | Add to group: | أضف إلى مجموعة: | High |
 | Add SHOMER | أضف حارسًا | High |
 | My SHOMERs location alerts | تنبيهات موقع حُرّاسي | High (already used by #arr-ttl) |
-Still Hebrew in EN/AR (screen readers only): aria-labels "סגור", "שם השומר", "קבוצה", "מצב רפאים", "מעגלים" and the placeholder "סבא". The sweep does not touch attributes; a later pass can add them.
+Screen-reader labels and the name placeholder in the same panel now switch too (data-aria-* / data-ph-*): إغلاق (Close), اسم الحارس (SHOMER name), مجموعة (Group), وضع التخفّي (Ghost mode), الدوائر (Circles), placeholder جدّي (Grandpa). High confidence; glance at جدّي.

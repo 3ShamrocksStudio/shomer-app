@@ -2582,7 +2582,7 @@ body.otp-active .ob-steps{display:none!important;}
 
  <div class="sheet" id="sh-circles" role="dialog" aria-modal="true" aria-labelledby="circ-ttl">
  <div class="sh-pill" aria-hidden="true"></div>
- <div class="sh-head"><span class="sh-ttl" id="circ-ttl">השומרים שלי</span><button class="sh-x" onclick="cl('sh-circles')" aria-label="סגור"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg></button></div>
+ <div class="sh-head"><span class="sh-ttl" id="circ-ttl">השומרים שלי</span><button class="sh-x" onclick="cl('sh-circles')" aria-label="סגור" data-aria-he="סגור" data-aria-en="Close" data-aria-ar="إغلاق"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg></button></div>
  <div class="sh-body">
  <!-- CIRCLES OF TRUST - light card, live counts, rename, add new -->
  
@@ -2635,13 +2635,13 @@ body.otp-active .ob-steps{display:none!important;}
      <!-- my name for them -->
      <div class="agf-field">
       <label for="ag-name" data-he="שם השומר שלי:" data-en="My SHOMER's name:" data-ar="اسم حارسي:">שם השומר שלי:</label>
-      <input class="agf-in" id="ag-name" type="text" maxlength="24" placeholder="סבא" aria-label="שם השומר">
+      <input class="agf-in" id="ag-name" type="text" maxlength="24" placeholder="סבא" aria-label="שם השומר" data-ph-he="סבא" data-ph-en="Grandpa" data-ph-ar="جدّي" data-aria-he="שם השומר" data-aria-en="SHOMER name" data-aria-ar="اسم الحارس">
      </div>
 
      <!-- which circle -->
      <div class="agf-field">
       <label for="ag-circle" data-he="הוסף לקבוצה:" data-en="Add to group:" data-ar="أضف إلى مجموعة:">הוסף לקבוצה:</label>
-      <select class="agf-sel wide" id="ag-circle" aria-label="קבוצה"></select>
+      <select class="agf-sel wide" id="ag-circle" aria-label="קבוצה" data-aria-he="קבוצה" data-aria-en="Group" data-aria-ar="مجموعة"></select>
      </div>
 
      <div id="ag-hint" class="agf-hint" aria-live="polite"></div>
@@ -2684,10 +2684,10 @@ body.otp-active .ob-steps{display:none!important;}
  <div class="ghost-ic" aria-hidden="true"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 4l16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M9.5 9.6A3 3 0 0 0 14.4 14M6.3 6.7C3.7 8.3 2 12 2 12s3.6 6.5 10 6.5c1.6 0 3-.4 4.3-1M10 5.6c.6-.1 1.3-.1 2-.1 6.4 0 10 6.5 10 6.5a18 18 0 0 1-2.4 3.2" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
  <div><div class="ghost-nm" id="ghost-nm">מצב רפאים - השהה שיתוף</div><div class="ghost-sb" id="ghost-sb">אף אחד לא יראה את מיקומך</div></div>
  </div>
- <div class="tog" id="ghost-tog" onclick="toggleGhost()" role="switch" aria-label="מצב רפאים"></div>
+ <div class="tog" id="ghost-tog" onclick="toggleGhost()" role="switch" aria-label="מצב רפאים" data-aria-he="מצב רפאים" data-aria-en="Ghost mode" data-aria-ar="وضع التخفّي"></div>
  </div>
  
- <div class="circ-tabs" id="circ-tabs" role="tablist" aria-label="מעגלים"></div>
+ <div class="circ-tabs" id="circ-tabs" role="tablist" aria-label="מעגלים" data-aria-he="מעגלים" data-aria-en="Circles" data-aria-ar="الدوائر"></div>
  
  
 
@@ -4071,6 +4071,11 @@ function applyTranslations(){
  else { v=he; }
  if(el.dataset.i18nHtml!=null) el.innerHTML=v; else el.textContent=v;
  });
+ }catch(e){}
+ try{ /* attribute twins of the sweep: aria-label (data-aria-*) and placeholder (data-ph-*) */
+  const L2=(currentLang==='en'||currentLang==='ar')?currentLang:'he', cap=L2.charAt(0).toUpperCase()+L2.slice(1);
+  document.querySelectorAll('[data-aria-he]').forEach(el=>{ const v=el.dataset['aria'+cap]; if(v!=null) el.setAttribute('aria-label',v); });
+  document.querySelectorAll('[data-ph-he]').forEach(el=>{ const v=el.dataset['ph'+cap]; if(v!=null) el.setAttribute('placeholder',v); });
  }catch(e){}
  try{ gdApplyI18n(); gdRenderList(); gdRenderMarkers(); }catch(e){}
  try{ if(typeof guideApplyLang==='function'){ guideApplyLang(); guideFilter(); } }catch(e){}
