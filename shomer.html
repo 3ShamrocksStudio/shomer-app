@@ -10941,7 +10941,7 @@ try{ hydrateIcons(document); }catch(e){}
 /* Loaded-build version - shown in the diagnostic panel so a phone can prove
    whether it's on the latest build or a STALE cached one. Keep in lock-step
    with sw.js SW_VERSION on every deploy. */
-var APP_VER='v334';
+var APP_VER='v335';
 var FB={ready:false,uid:null,db:null,_presTimer:null,connected:false,listening:false,pushState:'default',near:0,swVer:'?',
   authState:'connecting',sdkLoaded:false,persist:'',permErr:null,err:null,wsProbe:'',csp:''};
 /* Always log connection diagnostics to the console so the real failure can be SEEN in Chrome. */
@@ -13299,6 +13299,12 @@ var SOS_ZOMBIE_MS=6*60*60*1000;
 function sosZombieClose(id, ts){
   try{
     if(!ts || (Date.now()-ts)<=SOS_ZOMBIE_MS) return false;
+    /* NEVER auto-close a silent / duress SOS. It deliberately stops beating so the phone
+       gives nothing away, which freezes its timestamp - so this cutoff would close exactly
+       the alert raised by someone who cannot touch their phone, and the toast below would
+       announce it on a screen an attacker may be holding. A duress alert ends only when a
+       person ends it. */
+    if(window._sosSilent || (SS.sosLive && SS.sosLive.silent)) return false;
     var he=currentLang==='he', ar=currentLang==='ar';
     try{ if(id) fbResolveSOS(id); }catch(e){}
     try{ sosClearBroadcast(); }catch(e){}
@@ -13343,6 +13349,11 @@ function sosRestore(id, ts){ try{ if(isReviewAccount()){ SS.sosLive=null; try{sa
   setText('ss-t',he?' SOS פעיל - השומרים שלך רואים אותו':ar?' SOS نشط - حُرّاسك يرونه':' SOS active - your SHOMERs can see it');
   setText('ss-s',he?'לביטול - קוד הביטול':ar?'للإلغاء - رمز الإلغاء':'To cancel - use your cancel code');
   var old=ts && (Date.now()-ts)>SOS_OLD_MS;
+  /* Dropping the cancel code is a SEPARATE, much higher bar than "stale enough to show
+     quietly". At 31 minutes an SOS is very plausibly still live, and a reload mid-emergency
+     is a designed-for path - so a code-free cancel there hands an attacker the exact button
+     the code was built to stop. Only a genuinely abandoned alert cancels without it. */
+  var codeFree=ts && (Date.now()-ts)>SOS_ZOMBIE_MS;
   SOSBUS.live=true; SOSBUS.hbOff=!!old;
   try{ sosWatchMyResponders(); }catch(e){} try{ sosWatchStandDown(); }catch(e){}
   if(!old) sosHeartbeat(true);
@@ -13350,10 +13361,10 @@ function sosRestore(id, ts){ try{ if(isReviewAccount()){ SS.sosLive=null; try{sa
   b=document.createElement('div'); b.id='sos-restore-bar'; b.className='nudge-bar'; b.style.zIndex='100002';
   b.innerHTML='<span class="nudge-tx" style="font-weight:800">'+(he?'ה-SOS שלך עדיין פעיל':ar?'نداء SOS الخاص بك لا يزال نشطًا':'Your SOS is still active')+'</span>'
     +'<span class="nudge-tx" style="font-size:13px;opacity:.9">'+(old?(he?'הוא נשלח לפני יותר מחצי שעה. עדיין צריך/ה עזרה?':ar?'أُرسل قبل أكثر من نصف ساعة. هل ما زلت بحاجة للمساعدة؟':'It was sent over 30 minutes ago. Still need help?'):(he?'השומרים שלך עדיין רואים התרעה. אם את/ה בטוח/ה - בטל/י עם קוד הביטול.':ar?'حُرّاسك ما زالوا يرون التنبيه. إن كنت بأمان - ألغِه برمز الإلغاء.':'Your SHOMERs still see the alert. If you are safe, cancel it with your code.'))+'</span>'
-    +'<button class="nudge-cta" id="sosr-cancel">'+(old?(he?'בטל/י SOS':ar?'إلغاء SOS':'Cancel SOS'):(he?'בטל/י SOS (קוד)':ar?'إلغاء SOS (رمز)':'Cancel SOS (code)'))+'</button>'
+    +'<button class="nudge-cta" id="sosr-cancel">'+(codeFree?(he?'בטל/י SOS':ar?'إلغاء SOS':'Cancel SOS'):(he?'בטל/י SOS (קוד)':ar?'إلغاء SOS (رمز)':'Cancel SOS (code)'))+'</button>'
     +'<button class="nudge-cta" id="sosr-keep" style="background:transparent;border:1px solid rgba(255,112,128,.6);color:#FF9AA5">'+(he?'עדיין צריך/ה עזרה':ar?'ما زلت بحاجة للمساعدة':'I still need help')+'</button>';
   document.body.appendChild(b);
-  document.getElementById('sosr-cancel').onclick=function(){ resolveSOS(!!old); };
+  document.getElementById('sosr-cancel').onclick=function(){ resolveSOS(!!codeFree); };
   document.getElementById('sosr-keep').onclick=function(){ b.remove(); sosHeartbeat(true); toast(he?'\u2713 ההתרעה עודכנה אצל השומרים שלך':ar?'\u2713 تم تحديث التنبيه':'\u2713 Your SHOMERs got a fresh alert','grn'); };
 }
 async function sosClearBroadcast(){
