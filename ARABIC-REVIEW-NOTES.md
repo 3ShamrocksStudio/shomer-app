@@ -50,3 +50,16 @@ Modern Standard Arabic, RTL verified clean at mobile.
 A small number of rarely-seen strings (demo contact names like "Danny", a few deep toasts) may still
 appear in English. They degrade to English (never stale Hebrew) and can be added to the `AR`
 dictionary one line at a time.
+
+## Circles panel strings (added 14 Nov 2026, branch i18n-circles, not live yet)
+Seven strings in "My SHOMERs" stayed Hebrew in EN and AR. Now tagged data-he/en/ar (the generic sweep translates them):
+| EN | AR | Note |
+|---|---|---|
+| SHOMER circles | دوائر الحُرّاس | Verify |
+| New circle | دائرة جديدة | High |
+| Add to my circle | إضافة إلى دائرتي | High (same as nature-layer a02da25) |
+| My SHOMER's name: | اسم حارسي: | High |
+| Add to group: | أضف إلى مجموعة: | High |
+| Add SHOMER | أضف حارسًا | High |
+| My SHOMERs location alerts | تنبيهات موقع حُرّاسي | High (already used by #arr-ttl) |
+Still Hebrew in EN/AR (screen readers only): aria-labels "סגור", "שם השומר", "קבוצה", "מצב רפאים", "מעגלים" and the placeholder "סבא". The sweep does not touch attributes; a later pass can add them.

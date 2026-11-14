@@ -2588,11 +2588,11 @@ body.otp-active .ob-steps{display:none!important;}
  
    <!-- 1. מעגלי שומרים -->
    <div class="lt-card" id="cot-card">
-   <div class="lt-h"><span>מעגלי שומרים</span></div>
+   <div class="lt-h"><span data-he="מעגלי שומרים" data-en="SHOMER circles" data-ar="دوائر الحُرّاس">מעגלי שומרים</span></div>
    <div id="cot-list"></div>
    <button class="cot-new" onclick="addCircle()">
      <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
-     <span>מעגל חדש</span>
+     <span data-he="מעגל חדש" data-en="New circle" data-ar="دائرة جديدة">מעגל חדש</span>
    </button>
  </div>
 
@@ -2603,7 +2603,7 @@ body.otp-active .ob-steps{display:none!important;}
    </div>
 
    <div class="shm-sec">
-    <div class="shm-h">הוספה לשומרים שלי</div>
+    <div class="shm-h" data-he="הוספה לשומרים שלי" data-en="Add to my circle" data-ar="إضافة إلى دائرتي">הוספה לשומרים שלי</div>
 
     <div class="agf">
      <!-- Primary path: share invite. Works on web, Android and iOS with no contacts
@@ -2634,19 +2634,19 @@ body.otp-active .ob-steps{display:none!important;}
 
      <!-- my name for them -->
      <div class="agf-field">
-      <label for="ag-name">שם השומר שלי:</label>
+      <label for="ag-name" data-he="שם השומר שלי:" data-en="My SHOMER's name:" data-ar="اسم حارسي:">שם השומר שלי:</label>
       <input class="agf-in" id="ag-name" type="text" maxlength="24" placeholder="סבא" aria-label="שם השומר">
      </div>
 
      <!-- which circle -->
      <div class="agf-field">
-      <label for="ag-circle">הוסף לקבוצה:</label>
+      <label for="ag-circle" data-he="הוסף לקבוצה:" data-en="Add to group:" data-ar="أضف إلى مجموعة:">הוסף לקבוצה:</label>
       <select class="agf-sel wide" id="ag-circle" aria-label="קבוצה"></select>
      </div>
 
      <div id="ag-hint" class="agf-hint" aria-live="polite"></div>
 
-     <button class="agf-add" onclick="addGuardian()">הוסף שומר</button>
+     <button class="agf-add" onclick="addGuardian()" data-he="הוסף שומר" data-en="Add SHOMER" data-ar="أضف حارسًا">הוסף שומר</button>
      </div>
 
      <!-- Neither of these is "add a guardian": one is for someone who WAS invited, the
@@ -2674,7 +2674,7 @@ body.otp-active .ob-steps{display:none!important;}
    <!-- geo-arrival alerts — distinct blue brand section, below Add -->
    <button class="arr-open" onclick="openArrivals()">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s7-5.6 7-11a7 7 0 1 0-14 0c0 5.4 7 11 7 11Z"/><circle cx="12" cy="10" r="2.6"/></svg>
-    <span>התראות מיקום השומרים שלי</span>
+    <span data-he="התראות מיקום השומרים שלי" data-en="My SHOMERs location alerts" data-ar="تنبيهات موقع حُرّاسي">התראות מיקום השומרים שלי</span>
     <span class="arr-chev">›</span>
    </button>
 
