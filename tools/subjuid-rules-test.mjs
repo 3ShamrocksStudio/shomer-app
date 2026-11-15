@@ -33,10 +33,19 @@ await t('nobody can read pasubj (stranger)', () => db('evil').ref('pasubj/pa_1')
 await t('second write to existing pasubj denied (reporter)', () => db('rep').ref('pasubj/pa_1').set('evil'), false);
 await t('second write to existing pasubj denied (stranger)', () => db('evil').ref('pasubj/pa_1').set('evil'), false);
 await t('pasubj by non-dashown-owner denied', () => db('evil').ref('pasubj/pa_9').set('evil'), false);
-await t('pasubj after palerts already exists denied', async () => {
+// Slow-network order: the client waits at most 1.5 s for pasubj, then writes palerts; the late pasubj write must still land,
+// or the subject could never stand down their own alert. Write-once + dashown-owner still block everyone else.
+await t('late pasubj after palerts exists, by dashown owner, allowed', async () => {
   await env.withSecurityRulesDisabled(async c => { await c.database().ref('dashown/pa_2').set('rep'); await c.database().ref('palerts/pa_2').set(rec); });
   return db('rep').ref('pasubj/pa_2').set('subj');
+}, true);
+await t('subject closes alert after late pasubj', () => db('subj').ref('palerts/pa_2/status').set('resolved'), true);
+await t('late pasubj by stranger denied', async () => {
+  await env.withSecurityRulesDisabled(async c => { await c.database().ref('dashown/pa_4').set('rep'); await c.database().ref('palerts/pa_4').set(rec); });
+  return db('evil').ref('pasubj/pa_4').set('evil');
 }, false);
+await t('stranger still cannot close alert with no pasubj', () => db('evil').ref('palerts/pa_4/status').set('resolved'), false);
+await t('late pasubj cannot overwrite an existing one', () => db('rep').ref('pasubj/pa_2').set('evil'), false);
 await t('pasubj value longer than 28 chars denied', async () => { await db('rep').ref('dashown/pa_3').set('rep'); return db('rep').ref('pasubj/pa_3').set('x'.repeat(29)); }, false);
 await env.cleanup();
 console.log(fail ? `${fail} FAILED` : 'ALL PASSED');

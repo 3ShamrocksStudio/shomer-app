@@ -242,7 +242,7 @@
     "pasubj": {
       "$id": {
         ".read": false,
-        ".write": "auth != null && !data.exists() && newData.exists() && root.child('dashown').child($id).val() === auth.uid && !root.child('palerts').child($id).exists()",
+        ".write": "auth != null && !data.exists() && newData.exists() && root.child('dashown').child($id).val() === auth.uid",
         ".validate": "newData.isString() && newData.val().length <= 28"
       }
     },

@@ -12,7 +12,7 @@ Today `subjUid` is used for two things only:
 
 ## The change
 1. **Private subject record.** On create, the reporter also writes `pasubj/$id = <subject uid>`, next to the existing `dashown/$id = <reporter uid>`.
-   - Rules: `pasubj` has `".read": false`. `$id` is writable once, only by the `dashown` owner of the same id, only while `palerts/$id` does not exist yet, value a string of 28 chars at most.
+   - Rules: `pasubj` has `".read": false`. `$id` is writable once, only by the `dashown` owner of the same id, value a string of 28 chars at most. (15 Nov: the earlier "only while `palerts/$id` does not exist yet" condition was dropped: on a slow network the client stops waiting for `pasubj` after 1.5 s and writes the alert, and the late `pasubj` write must still land or the subject could never close their own alert. It adds no power: the reporter already controls the whole alert, and write-once stops any later change. Emulator test covers this order.)
 2. **Rules switch.** In the `palerts/$id` write rule replace `data.child('subjUid').val() === auth.uid` with `root.child('pasubj').child($id).val() === auth.uid`. Add `"subjUid": {".validate": false}` so new records can no longer carry it.
 3. **Matching tag instead of the id.** The public record gets `subjTag = SHA-256(subjectUid + ':' + alertId)`, hex, first 32 chars.
    - The subject's app computes the tag from its own uid and the alert id. Each of the subject's Shomers computes it from the `partnerUid` values it already holds. Everyone else sees a value that differs per alert and cannot be linked across alerts or back to an account.
