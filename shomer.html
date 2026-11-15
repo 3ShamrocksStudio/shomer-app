@@ -1058,7 +1058,11 @@ body.sheet-open .ff-fab{opacity:0;pointer-events:none;}
 .resp-pill{border-radius:18px;}
 .resp-pill .rp-col{display:flex;flex-direction:column;gap:2px;min-width:0;}
 .resp-pill .rp-dis{color:#FFC2C8;font-size:10.5px;font-weight:700;white-space:nowrap;}
+/* The stop button is hidden on a LIVE emergency route so a responder cannot abandon it by a
+   stray tap. But it stayed hidden on a STALE one too, so a route to an SOS nobody ever cancelled
+   could not be dismissed at all - one sat on a user's map for days. Stale routes can be stopped. */
 .resp-pill.sos .rp-x{display:none;}
+.resp-pill.sos.stale .rp-x{display:flex;align-items:center;justify-content:center;}
 .resp-pill .rp-x{background:rgba(255,255,255,.14);border:none;color:#dff;border-radius:50%;width:22px;height:22px;cursor:pointer;font-size:12px;line-height:1;flex:0 0 auto;}
 .resp-consent{position:fixed;inset:0;z-index:1200;background:rgba(4,10,22,.86);backdrop-filter:blur(6px);display:none;align-items:center;justify-content:center;padding:22px;}
 .resp-consent.on{display:flex;}
@@ -9320,7 +9324,18 @@ function respondToSOS(lat,lng,label,opt){
   respTarget={lat:lat,lng:lng,label:label||'',key:opt.key||null};
   if(!same){ if(!sameKey){ respRoute=null; _respSeq++; } respMaybeReroute(); }
   startGeoWatch();
-  const pill=document.getElementById('resp-pill'); if(pill){ pill.classList.add('on'); pill.classList.toggle('sos',!!opt.key); }
+  /* Work out whether this is a route to a STALE alert, so the pill can offer a way out.
+     The age comes from the live record the key points at - no call site has to pass it. */
+  var _rUid=(opt.key&&/^live:/.test(opt.key))?opt.key.slice(5):null;
+  var _rTs=0; try{ if(_rUid && typeof fbLiveSos!=='undefined' && fbLiveSos[_rUid]) _rTs=+fbLiveSos[_rUid].ts||0; }catch(e){}
+  var _rStale=!!(_rTs && (Date.now()-_rTs)>SOS_OLD_MS);
+  /* Already dismissed this stale alert? Then the live-event watcher must not silently redraw its
+     route. Keyed to the timestamp, so a NEWER alert from the same person always routes again. */
+  if(_rStale && opt.quiet){
+    try{ var _dz=(SS.sosDismissed||{})[_rUid]||0; if(_rTs && _rTs<=_dz) return; }catch(e){}
+  }
+  respStaleUid=_rStale?_rUid:null;
+  const pill=document.getElementById('resp-pill'); if(pill){ pill.classList.add('on'); pill.classList.toggle('sos',!!opt.key); pill.classList.toggle('stale',_rStale); }
   const he=currentLang==='he', ar=currentLang==='ar';
   setText('resp-pill-dis', he?'לא תחליף לחיוג 100 / 101 / 102':ar?'ليس بديلاً عن الاتصال 100 / 101 / 102':'Not a substitute for calling 100 / 101 / 102');
   updateResponderDistance();
@@ -9332,10 +9347,22 @@ function respFollowTarget(key,lat,lng){
   if(respTarget.lat===lat&&respTarget.lng===lng) return;
   respTarget.lat=lat; respTarget.lng=lng; updateResponderDistance(); respMaybeReroute();
 }
+var respStaleUid=null;
 function stopResponderNav(){
+  /* Stopping a STALE alert's route also remembers it, so the live-event watcher does not simply
+     redraw the same route on the next app start. A live alert is only cleared from the screen. */
+  try{
+    if(respStaleUid){
+      SS.sosDismissed=SS.sosDismissed||{};
+      var _t=0; try{ _t=+(fbLiveSos[respStaleUid]||{}).ts||0; }catch(e){}
+      if(_t) SS.sosDismissed[respStaleUid]=Math.max(SS.sosDismissed[respStaleUid]||0,_t);
+      saveStore();
+    }
+  }catch(e){}
+  respStaleUid=null;
   respTarget=null; respRoute=null; _respSeq++;
   respRouteLayers.forEach(l=>{try{MAP.removeLayer(l);}catch(e){}}); respRouteLayers=[];
-  const pill=document.getElementById('resp-pill'); if(pill)pill.classList.remove('on','sos');
+  const pill=document.getElementById('resp-pill'); if(pill)pill.classList.remove('on','sos','stale');
 }
 /* v283: STREET ROUTE for the responder. Root cause of the straight line: the old code made ONE call
    to router.project-osrm.org (a car-only demo server whose "foot" is really driving) with no timeout,
@@ -10941,7 +10968,7 @@ try{ hydrateIcons(document); }catch(e){}
 /* Loaded-build version - shown in the diagnostic panel so a phone can prove
    whether it's on the latest build or a STALE cached one. Keep in lock-step
    with sw.js SW_VERSION on every deploy. */
-var APP_VER='v335';
+var APP_VER='v336';
 var FB={ready:false,uid:null,db:null,_presTimer:null,connected:false,listening:false,pushState:'default',near:0,swVer:'?',
   authState:'connecting',sdkLoaded:false,persist:'',permErr:null,err:null,wsProbe:'',csp:''};
 /* Always log connection diagnostics to the console so the real failure can be SEEN in Chrome. */
