@@ -5,6 +5,18 @@ on:
   push:
     tags:
       - 'android-*'
+    # The APK only ever rebuilt when someone remembered to dispatch it by hand, so
+    # the download on the site drifted behind the live app again and again - v309
+    # against v311, then v311 against v332, then v332 against v334. Anyone who
+    # downloaded in between got an app weeks old. Rebuild whenever the app itself
+    # changes, so the download can never fall behind the site again.
+    branches:
+      - main
+    paths:
+      - 'shomer.html'
+      - 'sw.js'
+      - 'version.json'
+      - 'native/**'
 
 jobs:
   build-android:
