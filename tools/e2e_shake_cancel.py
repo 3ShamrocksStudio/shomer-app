@@ -11,7 +11,8 @@ import asyncio, json, sys
 from playwright.async_api import async_playwright
 
 TR = json.load(open(sys.argv[1] if len(sys.argv) > 1 else "/tmp/traces.json"))
-URL = (sys.argv[2] if len(sys.argv) > 2 else "http://127.0.0.1:8899") + "/shomer.html"
+BASE = sys.argv[2] if len(sys.argv) > 2 else "http://127.0.0.1:8899"   # only this host is reachable
+URL = BASE + "/shomer.html?cb=" + str(__import__("time").time_ns())
 OLD = {"onboarded": True, "lang": "he", "user": {"name": "בודק", "phone": "972541234567"},
        "security": {"phoneVerified": True}, "shake": {"enabled": True, "level": 30}}
 RES = []
@@ -35,7 +36,7 @@ async def page_with(b, state):
                               geolocation={"latitude": 31.9, "longitude": 35.0}, permissions=["geolocation"])
     async def guard(route):
         u = route.request.url
-        if u.startswith("http://127.0.0.1") or u.startswith("http://localhost"):
+        if u.startswith("http://127.0.0.1") or u.startswith("http://localhost") or u.startswith(BASE + "/"):
             await route.continue_()
         else:
             await route.abort()
