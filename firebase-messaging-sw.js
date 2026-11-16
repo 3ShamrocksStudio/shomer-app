@@ -57,6 +57,17 @@ self.addEventListener('push', function (event) {
 });
 
 self.addEventListener('notificationclick', function (event) {
+  /* v337: "Stop - I'm OK" / "Cancel - I'm OK" on the SOS notification. Tell the open app; if it is closed,
+     open it with ?sosstop=1 so it stops the SOS as soon as it has restored it. */
+  if (event.action === 'sos-stop') {
+    event.notification.close();
+    event.waitUntil(clients.matchAll({ type: 'window', includeUncontrolled: true }).then(function (wins) {
+      for (const w of wins) { try { w.postMessage({ type: 'shomer-sos-stop' }); } catch (e) {} }
+      if (wins.length && 'focus' in wins[0]) return wins[0].focus();
+      return clients.openWindow('shomer.html?sosstop=1');
+    }));
+    return;
+  }
   event.notification.close();
   const data = event.notification.data || {};
   if (event.action === 'call-100') {

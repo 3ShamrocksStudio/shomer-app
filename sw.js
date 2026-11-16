@@ -8,7 +8,7 @@
 // (a) uses network-first for navigations so a stale shell can never trap the
 // user, and (b) deletes every cache it does not own on activate.
 
-const CACHE_NAME = 'shomer-ctapad-cache-v336';
+const CACHE_NAME = 'shomer-ctapad-cache-v337';
 // Derived from CACHE_NAME so the two can never drift apart (a hard-coded 'v247' made every
 // page load think its worker was stale and fire a self-heal reload mid-connect).
 const SW_VERSION = CACHE_NAME.replace(/^.*-(v\d+)$/, '$1');
@@ -160,6 +160,17 @@ self.addEventListener('push', event => {
 });
 
 self.addEventListener('notificationclick', event => {
+  /* v337: "Stop - I'm OK" / "Cancel - I'm OK" on the SOS notification. Tell the open app; if it is closed,
+     open it with ?sosstop=1 so it stops the SOS as soon as it has restored it. */
+  if (event.action === 'sos-stop') {
+    event.notification.close();
+    event.waitUntil(clients.matchAll({ type: 'window', includeUncontrolled: true }).then(function (wins) {
+      for (const w of wins) { try { w.postMessage({ type: 'shomer-sos-stop' }); } catch (e) {} }
+      if (wins.length && 'focus' in wins[0]) return wins[0].focus();
+      return clients.openWindow('shomer.html?sosstop=1');
+    }));
+    return;
+  }
   event.notification.close();
   if (event.action === 'call-100') {
     clients.openWindow('tel:100');
