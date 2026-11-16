@@ -16,6 +16,7 @@ URL = BASE + "/shomer.html?cb=" + str(__import__("time").time_ns())
 OLD = {"onboarded": True, "lang": "he", "user": {"name": "בודק", "phone": "972541234567"},
        "security": {"phoneVerified": True}, "shake": {"enabled": True, "level": 30}}
 RES = []
+SHOT = __import__("os").environ.get("SHK_SHOTS", "/tmp/")
 
 
 def check(name, ok, info=""):
@@ -78,7 +79,7 @@ async def main():
         await pg.wait_for_timeout(400)
         st = await pg.evaluate("()=>({ph:sosPhase, pre:document.getElementById('sos-pre').classList.contains('on')})")
         check("fresh user: listener running, switch off -> still nothing", st["ph"] == "idle" and not st["pre"], st)
-        check("app version", s["ver"] == "v337", s["ver"])
+        check("app version", s["ver"] == "v338", s["ver"])
         await ctx.close()
 
         # 2. existing user who had shake ON (old slider at 30 = 1.2 g): kept on, new safe level, one-time notice
@@ -98,18 +99,36 @@ async def main():
         await pg.evaluate(REPLAY, TR["shake"])
         await pg.wait_for_timeout(700)
         st = await pg.evaluate("""()=>({ph:sosPhase, pre:document.getElementById('sos-pre').classList.contains('on'),
-            ttl:document.getElementById('sos-pre-ttl').textContent, btn:document.getElementById('sos-pre-cancel').textContent,
+            ttl:document.getElementById('sos-pre-ttl').textContent, num:document.getElementById('sos-pre-num').textContent, btn:document.getElementById('sos-pre-cancel').textContent,
+            ring:getComputedStyle(document.getElementById('sos-pre-bar')).strokeDashoffset, logo:!!document.querySelector('#sos-pre .sos-pre-badge')&&!!document.querySelector('#sos-pre-wm svg'),
             siren:_alarmLoopTimer!==null, cd:document.getElementById('sos-cd').classList.contains('on'), sent:_calls.filter(c=>c[0]==='sosBroadcast').length})""")
         check("shake -> full-screen pre-alarm 'שולח SOS בעוד N…' + 'ביטול – אני בסדר'",
-              st["pre"] and st["ph"] == "countdown" and st["ttl"].startswith("שולח SOS בעוד") and st["btn"] == "ביטול – אני בסדר", st)
+              st["pre"] and st["ph"] == "countdown" and st["ttl"] == "שולח SOS בעוד…" and st["num"] in list("12345678") and st["btn"] == "ביטול – אני בסדר", st)
+        check("pre-alarm: SH✡MER badge + wordmark shown", st["logo"], st["logo"])
+        r1 = float((await pg.evaluate("()=>getComputedStyle(document.getElementById('sos-pre-bar')).strokeDashoffset")).replace("px", ""))
+        await pg.wait_for_timeout(500)
+        r2 = float((await pg.evaluate("()=>getComputedStyle(document.getElementById('sos-pre-bar')).strokeDashoffset")).replace("px", ""))
+        check("countdown ring drains smoothly (moves within a second)", r2 > r1 > 0, (r1, r2))
         check("pre-alarm: no siren, nothing sent", not st["siren"] and st["sent"] == 0 and not st["cd"], st)
-        await pg.screenshot(path="/tmp/shk_prealarm.png")
-        box = await pg.evaluate("()=>{const r=document.getElementById('sos-pre-cancel').getBoundingClientRect();return {w:r.width,h:r.height}}")
-        check("cancel button is huge (>=300x280 px at 390 px wide)", box["w"] >= 300 and box["h"] >= 280, box)
+        await pg.wait_for_timeout(1200)
+        await pg.screenshot(path=SHOT + "v2-prealarm-390.png")
+        box = await pg.evaluate("()=>{const r=document.getElementById('sos-pre-cancel').getBoundingClientRect();return {w:r.width,h:r.height,top:r.top,vh:innerHeight}}")
+        check("cancel button: large (>=300x64) and in the bottom third", box["w"] >= 300 and box["h"] >= 64 and box["top"] >= box["vh"] * 0.6, box)
         await pg.click("#sos-pre-cancel")
         await pg.wait_for_timeout(300)
         st = await pg.evaluate("()=>({ph:sosPhase, pre:document.getElementById('sos-pre').classList.contains('on'), siren:_alarmLoopTimer!==null, sent:_calls.length, toast:[...document.querySelectorAll('#toasts .t-tx')].map(e=>e.textContent).join('|')})")
         check("cancel: back to idle, overlay gone, nothing sent", st["ph"] == "idle" and not st["pre"] and not st["siren"] and st["sent"] == 0 and "שום דבר לא נשלח" in st["toast"], st)
+
+        # 4b. "שלח עכשיו" sends at once
+        await pg.evaluate("()=>{ window._shakeFiredAt=0; _calls.length=0; }")
+        await pg.evaluate(REPLAY, TR["shake"])
+        await pg.wait_for_timeout(500)
+        await pg.click("#sos-pre-now")
+        await pg.wait_for_timeout(300)
+        st = await pg.evaluate("()=>({ph:sosPhase, siren:_alarmLoopTimer!==null, sent:_calls.filter(c=>c[0]==='sosBroadcast').length})")
+        check("'שלח עכשיו' sends at once", st["ph"] == "active" and st["siren"] and st["sent"] == 1, st)
+        await pg.evaluate("()=>sosImOk()")
+        await pg.wait_for_timeout(300)
 
         # 5. shake, no cancel -> after 8 s the siren AND the alert go out together
         await pg.evaluate("()=>{ window._shakeFiredAt=0; _calls.length=0; }")
@@ -123,7 +142,8 @@ async def main():
             strobeBtn:(document.getElementById('strobe-stop')||{}).textContent})""")
         check("after 8 s: siren + alert together", st["ph"] == "active" and st["siren"] and st["sent"] == 1, st)
         check("stop control visible: 'עצור – אני בסדר'", st["strip"] and st["lbl"] == "עצור – אני בסדר", st)
-        await pg.screenshot(path="/tmp/shk_active.png")
+        await pg.evaluate("()=>{ var b=document.getElementById('callpol-bar'); if(b) b.remove(); }")
+        await pg.screenshot(path=SHOT + "v2-siren-stop-390.png")
         vis = await pg.evaluate("()=>{const s=document.getElementById('sos-strobe'); return !!(s&&getComputedStyle(s).display!=='none')}")
         await pg.click("#strobe-stop" if vis else "#ss-cancel")
         await pg.wait_for_timeout(300)
@@ -179,7 +199,7 @@ async def main():
         await pg.wait_for_timeout(400)
         q = await pg.evaluate("()=>({ph:sosPhase, st:(document.getElementById('shk-st')||{}).textContent, calls:_calls.length})")
         check("shake test: detected, no SOS, nothing sent", q["ph"] == "idle" and "זוהה" in (q["st"] or "") and q["calls"] == 0, q)
-        await pg.screenshot(path="/tmp/shk_test.png")
+        await pg.screenshot(path=SHOT + "v2-shake-test-390.png")
         await pg.evaluate("()=>shakeTestClose()")
 
         # 10. settings: Low / Medium / High

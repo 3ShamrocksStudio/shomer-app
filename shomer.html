@@ -557,22 +557,51 @@ body.sheet-open .diag-panel{display:none;}
 .ss-x:hover{background:rgba(255,255,255,.28);}
 
 /* ══════════ SOS CANCEL COUNTDOWN + RESOLUTION OVERLAYS ══════════ */
-.sos-pre{position:fixed;inset:0;z-index:100050;display:none;flex-direction:column;align-items:center;justify-content:center;gap:16px;padding:24px 16px calc(24px + env(safe-area-inset-bottom,0px));background:#3A0710;color:#fff;text-align:center;overflow-y:auto;}
-.sos-pre.on{display:flex;animation:sospre 1s ease-in-out infinite alternate;}
-@keyframes sospre{from{background:#3A0710}to{background:#5A0C18}}
-.sos-pre-ttl{font-size:34px;font-weight:900;line-height:1.15;letter-spacing:-.3px;font-variant-numeric:tabular-nums;}
-.sos-pre-sub{font-size:17px;line-height:1.5;color:#FFE1E4;max-width:380px;}
-.sos-pre-btn{width:100%;max-width:440px;min-height:36vh;border-radius:28px;background:#13A050;color:#fff;font-size:32px;font-weight:900;line-height:1.2;padding:18px;box-shadow:0 10px 40px rgba(0,0,0,.45),inset 0 0 0 4px rgba(255,255,255,.25);cursor:pointer;}
+/* v338 SOS PRE-ALARM, STOP and SHAKE TEST - built only from the brand tokens in :root
+   (navy --n*, gold --g*, emergency red --r*, platinum --sb, text --tx*, --grn, radii, elevation). */
+.sos-pre{position:fixed;inset:0;z-index:100050;display:none;flex-direction:column;align-items:center;justify-content:space-evenly;gap:12px;padding:calc(22px + env(safe-area-inset-top,0px)) 16px calc(22px + env(safe-area-inset-bottom,0px));background:radial-gradient(120% 70% at 50% 42%,var(--rb) 0%,transparent 62%),linear-gradient(180deg,var(--n1) 0%,var(--n0) 100%);color:var(--tx0);text-align:center;overflow-y:auto;}
+.sos-pre.on{display:flex;animation:cdfade .2s ease;}
+.sos-pre-brand{display:flex;flex-direction:column;align-items:center;gap:6px;}
+.sos-pre-badge{width:64px;height:64px;object-fit:contain;filter:drop-shadow(0 6px 18px rgba(0,0,0,.6));}
+.sos-pre-wm svg{height:24px;width:auto;display:block;}
+.sos-pre-mid{display:flex;flex-direction:column;align-items:center;gap:6px;}
+.sos-pre-ttl{font-size:24px;font-weight:900;color:var(--tx0);letter-spacing:-.3px;line-height:1.2;}
+.sos-pre-ringwrap{position:relative;width:min(58vw,224px);aspect-ratio:1;margin:12px auto 10px;}
+.sos-pre-ring{position:absolute;inset:0;width:100%;height:100%;transform:rotate(-90deg);overflow:visible;}
+.sos-pre-ring .trk{fill:none;stroke:var(--sb);stroke-width:7;}
+.sos-pre-ring .bar{fill:none;stroke:var(--r4);stroke-width:7;stroke-linecap:round;stroke-dasharray:339.29;stroke-dashoffset:0;transition:stroke-dashoffset 1s linear;filter:drop-shadow(0 0 8px var(--rg));}
+.sos-pre-ringwrap::after{content:'';position:absolute;inset:13%;border-radius:50%;background:radial-gradient(circle at 38% 30%,var(--n3),var(--n0));box-shadow:inset 0 1px 0 rgba(255,255,255,.05),var(--e2);}
+.sos-pre-num{position:absolute;inset:0;z-index:1;display:flex;align-items:center;justify-content:center;font-size:76px;font-weight:900;color:var(--tx0);text-shadow:0 2px 16px var(--rs);font-variant-numeric:tabular-nums;}
+.sos-pre-sub{font-size:16px;font-weight:700;line-height:1.5;color:var(--tx1);max-width:320px;}
+.sos-pre-act{width:100%;max-width:400px;display:flex;flex-direction:column;align-items:center;gap:10px;}
+.sos-pre-btn{width:100%;min-height:76px;border-radius:999px;background:linear-gradient(135deg,var(--g2) 0%,var(--g3) 60%,var(--g4) 100%);color:var(--n0);font-size:23px;font-weight:900;letter-spacing:.2px;display:flex;align-items:center;justify-content:center;gap:10px;box-shadow:0 8px 30px var(--gg),inset 0 1px 0 rgba(255,255,255,.35);animation:prepulse 2s ease-in-out infinite;cursor:pointer;}
+.sos-pre-btn .ic{width:26px;height:26px;}
 .sos-pre-btn:active{transform:scale(.98);}
-.sos-pre-note{font-size:14px;color:#FFC7CD;}
+.sos-pre-btn:focus-visible,.strobe-stop:focus-visible{outline:2px solid var(--gb);outline-offset:5px;}
+@keyframes prepulse{0%,100%{box-shadow:0 8px 30px var(--gg),0 0 0 0 var(--gb),inset 0 1px 0 rgba(255,255,255,.35)}50%{box-shadow:0 8px 30px var(--gg),0 0 0 10px transparent,inset 0 1px 0 rgba(255,255,255,.35)}}
+.sos-pre-now{background:none;border:0;color:var(--tx2);font-size:14px;font-weight:700;text-decoration:underline;text-underline-offset:3px;padding:8px 14px;cursor:pointer;}
+.sos-pre-note{font-size:13px;color:var(--tx2);}
+@media(max-height:640px){.sos-pre-badge{width:46px;height:46px;}.sos-pre-ringwrap{width:min(46vw,170px);}.sos-pre-num{font-size:58px;}.sos-pre-btn{min-height:64px;font-size:20px;}}
+@media(prefers-reduced-motion:reduce){.sos-pre-btn{animation:none;}.sos-pre-ring .bar{transition:none;}}
+/* "Stop - I'm OK" on the siren/strobe screen: the same gold brand pill */
+.strobe-stop{margin-top:18px;min-height:58px;padding:0 30px;border:none;border-radius:999px;background:linear-gradient(135deg,var(--g2) 0%,var(--g3) 60%,var(--g4) 100%);color:var(--n0);font-size:18px;font-weight:900;display:inline-flex;align-items:center;justify-content:center;gap:8px;box-shadow:0 8px 30px var(--gg),inset 0 1px 0 rgba(255,255,255,.35);animation:prepulse 2s ease-in-out infinite;cursor:pointer;}
+.strobe-stop .ic{width:22px;height:22px;}
+@media(prefers-reduced-motion:reduce){.strobe-stop{animation:none;}}
 .shk-sens{display:flex;gap:8px;margin-top:10px;}
 .shk-sens .chip{flex:1;padding:10px 6px;font-size:13px;text-align:center;}
-.shk-test{position:fixed;left:16px;right:16px;bottom:calc(16px + env(safe-area-inset-bottom,0px));z-index:100040;max-width:440px;margin:0 auto;background:var(--n2,#13233D);border:1px solid var(--b3,#C9A84C);border-radius:20px;padding:18px 16px;text-align:center;color:var(--tx1,#fff);box-shadow:0 12px 40px rgba(0,0,0,.5);}
-.shk-test h3{font-size:18px;font-weight:900;margin:0 0 6px;}
-.shk-test p{font-size:14px;line-height:1.5;margin:0 0 10px;color:var(--tx2,#cfd6e4);}
-.shk-test .shk-st{font-size:17px;font-weight:800;margin:6px 0 12px;}
-.shk-test .shk-st.hit{color:#2ECC71;}
-.shk-test button{width:100%;padding:12px;border-radius:14px;background:var(--n3,#1d3050);color:var(--tx1,#fff);font-weight:800;font-size:15px;}
+/* Shake test - a brand card (like the SOS countdown card) */
+.shk-test{position:fixed;left:16px;right:16px;bottom:calc(16px + env(safe-area-inset-bottom,0px));z-index:100040;max-width:400px;margin:0 auto;background:linear-gradient(180deg,var(--n3),var(--n2));border:1px solid var(--b3);border-radius:var(--r24);padding:20px 18px 18px;text-align:center;color:var(--tx0);box-shadow:var(--e4),inset 0 1px 0 rgba(255,255,255,.05);animation:cdfade .2s ease;}
+.shk-test .shk-hd{display:flex;align-items:center;justify-content:center;gap:10px;margin-bottom:10px;}
+.shk-test .shk-hd img{width:40px;height:40px;object-fit:contain;}
+.shk-test h3{font-size:19px;font-weight:900;color:var(--tx0);}
+.shk-test p{font-size:14px;line-height:1.55;margin:0 0 12px;color:var(--tx1);}
+.shk-test .shk-st{display:flex;align-items:center;justify-content:center;gap:8px;min-height:52px;padding:10px 14px;margin:0 0 14px;border-radius:var(--r16);background:var(--gd);border:1px solid var(--b3);color:var(--g4);font-size:15px;font-weight:800;line-height:1.4;}
+.shk-test .shk-st .ic{width:22px;height:22px;flex:0 0 auto;animation:shkwig 1.2s ease-in-out infinite;}
+.shk-test .shk-st.hit{background:var(--grn-b);border-color:var(--grn);color:var(--tx0);}
+.shk-test .shk-st.hit .ic{animation:none;color:var(--grn);}
+@keyframes shkwig{0%,100%{transform:rotate(0)}25%{transform:rotate(-14deg)}75%{transform:rotate(14deg)}}
+.shk-test .shk-done{width:100%;min-height:52px;border-radius:999px;background:linear-gradient(135deg,var(--g2) 0%,var(--g3) 60%,var(--g4) 100%);color:var(--n0);font-size:16px;font-weight:900;box-shadow:0 6px 24px var(--gg);}
+@media(prefers-reduced-motion:reduce){.shk-test .shk-st .ic{animation:none;}}
 .sos-cd{position:fixed;inset:0;z-index:9700;display:none;align-items:center;justify-content:center;padding:24px;background:rgba(6,15,30,.86);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);}
 .sos-cd.on{display:flex;animation:cdfade .2s ease;}
 @keyframes cdfade{from{opacity:0}to{opacity:1}}
@@ -588,7 +617,6 @@ body.sheet-open .diag-panel{display:none;}
 .strobe-sos{font-size:74px;font-weight:900;color:#fff;letter-spacing:6px;line-height:1;text-shadow:0 2px 12px rgba(0,0,0,.7);}
 .strobe-sub{font-size:16px;font-weight:800;color:#fff;margin-top:10px;letter-spacing:.5px;}
 .strobe-note{font-size:11px;color:rgba(255,255,255,.8);margin-top:10px;line-height:1.5;max-width:260px;}
-.strobe-stop{margin-top:18px;background:#fff;color:#0A1628;border:none;border-radius:999px;padding:11px 26px;font-size:14px;font-weight:800;cursor:pointer;}
 .strobe-min{display:block;margin:11px auto 0;background:none;border:none;color:rgba(255,255,255,.85);font-size:12px;font-weight:700;text-decoration:underline;cursor:pointer;}
 /* SOS cancel PIN keypad */
 .pin-dots{display:flex;justify-content:center;gap:14px;margin:18px 0 6px;}
@@ -1896,10 +1924,17 @@ body.otp-active .ob-steps{display:none!important;}
 
  <!-- v337 PRE-ALARM: every AUTOMATIC trigger (shake, Dead Man's Switch) warns first. No siren, nothing sent. -->
  <div class="sos-pre" id="sos-pre" role="alertdialog" aria-modal="true" aria-labelledby="sos-pre-ttl" aria-describedby="sos-pre-sub" aria-hidden="true">
- <div class="sos-pre-ttl" id="sos-pre-ttl" aria-live="assertive">שולח SOS בעוד 8…</div>
- <div class="sos-pre-sub" id="sos-pre-sub">זיהינו ניעור חזק. אם הכל בסדר, לחצו ביטול.</div>
- <button class="sos-pre-btn" id="sos-pre-cancel" onclick="sosPreCancel()">ביטול – אני בסדר</button>
+ <div class="sos-pre-brand"><img class="sos-pre-badge" src="SHOMER_logo_big.png" alt="" width="64" height="64"><div class="sos-pre-wm" id="sos-pre-wm" aria-hidden="true"></div></div>
+ <div class="sos-pre-mid">
+ <div class="sos-pre-ttl" id="sos-pre-ttl">שולח SOS בעוד…</div>
+ <div class="sos-pre-ringwrap" role="timer" aria-live="assertive" aria-atomic="true"><svg class="sos-pre-ring" viewBox="0 0 120 120" aria-hidden="true"><circle class="trk" cx="60" cy="60" r="54"/><circle class="bar" id="sos-pre-bar" cx="60" cy="60" r="54"/></svg><div class="sos-pre-num" id="sos-pre-num">8</div></div>
+ <div class="sos-pre-sub" id="sos-pre-sub">זיהינו ניעור חזק</div>
+ </div>
+ <div class="sos-pre-act">
+ <button class="sos-pre-btn" id="sos-pre-cancel" onclick="sosPreCancel()"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg><span id="sos-pre-cancel-lbl">ביטול – אני בסדר</span></button>
+ <button type="button" class="sos-pre-now" id="sos-pre-now" onclick="sosPreSendNow()">שלח עכשיו</button>
  <div class="sos-pre-note" id="sos-pre-note">שום דבר עוד לא נשלח.</div>
+ </div>
  </div>
 
  <!-- SOS MAX-ATTENTION - full-screen red/blue/white strobe + bold SOS message -->
@@ -1909,7 +1944,7 @@ body.otp-active .ob-steps{display:none!important;}
  <div class="strobe-sos">SOS</div>
  <div class="strobe-sub" id="strobe-sub" data-he="חירום - קוראים לעזרה" data-en="EMERGENCY - calling for help">חירום - קוראים לעזרה</div>
  <div class="strobe-note" id="strobe-note"></div>
- <button class="strobe-stop" onclick="sosImOk()" id="strobe-stop" data-he="עצור – אני בסדר" data-en="Stop – I'm OK" data-ar="أوقف – أنا بخير">עצור – אני בסדר</button>
+ <button class="strobe-stop" onclick="sosImOk()"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg><span id="strobe-stop" data-he="עצור – אני בסדר" data-en="Stop – I'm OK" data-ar="أوقف – أنا بخير">עצור – אני בסדר</span></button>
  <button class="strobe-min" onclick="minimizeStrobe()" id="strobe-min" data-he="הצג מפה / סיווג סוג" data-en="Show map / set type">הצג מפה / סיווג סוג</button>
  </div>
  </div>
@@ -3600,6 +3635,8 @@ function setShakeSens(v){
 /* v337 SHAKE TEST - a practice mode that NEVER sends anything and never sounds the siren. It used to be
    "simulate shake", which started a REAL SOS. Detection runs here even while the switch is off. */
 var _shakeTestT=null;
+var SHK_IC_PHONE='<svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><rect x="7" y="3" width="10" height="18" rx="2.2" fill="none" stroke="currentColor" stroke-width="2"/><path d="M11 18h2" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M3.5 9.5c-.8 1.6-.8 3.4 0 5M20.5 9.5c.8 1.6.8 3.4 0 5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>';
+var SHK_IC_OK='<svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="2"/><path d="M8 12.3l2.8 2.8L16.2 9.6" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>';
 function shakeTestOpen(){
  if(typeof sosPhase!=='undefined' && sosPhase!=='idle') return;
  var he=currentLang==='he', ar=currentLang==='ar';
@@ -3608,13 +3645,13 @@ function shakeTestOpen(){
  window._shakeTest=true; window._shakeTestHits=0; _shakeDet=null;
  try{ startShakeDetection(); }catch(e){}
  var d=document.createElement('div'); d.className='shk-test'; d.id='shk-test'; d.setAttribute('role','dialog'); d.setAttribute('aria-live','polite');
- d.innerHTML='<h3>'+(he?'בדיקת ניעור':ar?'اختبار الهزّ':'Shake test')+'</h3>'
+ d.innerHTML='<div class="shk-hd"><img src="SHOMER_logo_big.png" alt="" width="40" height="40"><h3>'+(he?'בדיקת ניעור':ar?'اختبار الهزّ':'Shake test')+'</h3></div>'
    +'<p>'+(he?'נערו את הטלפון חזק, הלוך-חזור. שום דבר לא נשלח ואין אזעקה.':ar?'هزّ الهاتف بقوة ذهابًا وإيابًا. لا يُرسل شيء ولا يوجد إنذار.':'Shake the phone hard, back and forth. Nothing is sent and there is no siren.')+'</p>'
-   +'<div class="shk-st" id="shk-st">'+(he?'מחכה לניעור…':ar?'بانتظار الهزّ…':'Waiting for a shake…')+'</div>'
-   +'<button type="button" id="shk-done">'+(he?'סיום':ar?'إنهاء':'Done')+'</button>';
+   +'<div class="shk-st" id="shk-st">'+SHK_IC_PHONE+'<span id="shk-st-tx">'+(he?'מחכה לניעור…':ar?'بانتظار الهزّ…':'Waiting for a shake…')+'</span></div>'
+   +'<button type="button" class="shk-done" id="shk-done">'+(he?'סיום':ar?'إنهاء':'Done')+'</button>';
  document.body.appendChild(d);
  d.querySelector('#shk-done').onclick=function(){ shakeTestClose(); };
- if(!window.DeviceMotionEvent){ setText('shk-st',he?'הדפדפן הזה לא מוסר תנועה. נסו בטלפון.':ar?'هذا المتصفح لا يوفّر الحركة. جرّب على الهاتف.':'This browser gives no motion data. Try on a phone.'); }
+ if(!window.DeviceMotionEvent){ setText('shk-st-tx',he?'הדפדפן הזה לא מוסר תנועה. נסו בטלפון.':ar?'هذا المتصفح لا يوفّر الحركة. جرّب على الهاتف.':'This browser gives no motion data. Try on a phone.'); }
  _shakeTestT=setTimeout(function(){ shakeTestClose(); }, 60000);
 }
 function shakeTestHit(){
@@ -3623,7 +3660,8 @@ function shakeTestHit(){
  try{ navigator.vibrate&&navigator.vibrate([120,80,120]); }catch(e){}
  var st=document.getElementById('shk-st'); if(!st) return;
  st.classList.add('hit');
- st.textContent=(he?'✓ זוהה! במצב אמיתי עכשיו מתחילה ספירה של 8 שניות לביטול.':ar?'✓ تم الرصد! في الوضع الحقيقي يبدأ الآن عدّ 8 ثوانٍ للإلغاء.':'✓ Detected! For real, an 8-second cancel countdown would start now.')+(window._shakeTestHits>1?' ('+window._shakeTestHits+')':'');
+ st.innerHTML=SHK_IC_OK+'<span id="shk-st-tx"></span>';
+ setText('shk-st-tx',(he?'זוהה! במצב אמיתי עכשיו מתחילה ספירה של 8 שניות לביטול.':ar?'تم الرصد! في الوضع الحقيقي يبدأ الآن عدّ 8 ثوانٍ للإلغاء.':'Detected! For real, an 8-second cancel countdown would start now.')+(window._shakeTestHits>1?' ('+window._shakeTestHits+')':''));
 }
 function shakeTestClose(){
  if(_shakeTestT){ clearTimeout(_shakeTestT); _shakeTestT=null; }
@@ -5799,6 +5837,8 @@ function sosIsAuto(tr){ return tr==='shake'||tr==='dms'; }
 function sosPreStart(){
  window._sosPre=true; _sosPreLeft=SOS_PRE_S;
  var ov=document.getElementById('sos-pre'); if(ov){ ov.classList.add('on'); ov.setAttribute('aria-hidden','false'); }
+ try{ var wm=document.getElementById('sos-pre-wm'), src=document.getElementById('shm-logo-svg'); if(wm && src && !wm.firstChild){ var c=src.cloneNode(true); c.removeAttribute('id'); c.removeAttribute('class'); c.setAttribute('aria-hidden','true'); wm.appendChild(c); } }catch(e){}
+ try{ var bar=document.getElementById('sos-pre-bar'); if(bar){ bar.style.transition='none'; bar.style.strokeDashoffset='0'; void bar.getBoundingClientRect(); bar.style.transition=''; } }catch(e){}
  sosPreRender(); sosPreBuzz();
  try{ acquireWake(); }catch(e){}
  try{ sosPreNotify(true); }catch(e){}
@@ -5813,10 +5853,14 @@ function sosPreStart(){
 }
 function sosPreRender(){
  var he=currentLang==='he', ar=currentLang==='ar', n=_sosPreLeft, dms=curSosTrigger==='dms';
- setText('sos-pre-ttl', he?('שולח SOS בעוד '+n+'…'):ar?('إرسال SOS خلال '+n+'…'):('Sending SOS in '+n+'…'));
- setText('sos-pre-sub', dms?(he?'לא אישרת שהכל בסדר. אם הכל טוב, לחצו ביטול.':ar?'لم تؤكد أنك بخير. إن كان كل شيء بخير، اضغط إلغاء.':'You did not confirm you are OK. If all is well, tap Cancel.')
-   :(he?'זיהינו ניעור חזק. אם הכל בסדר, לחצו ביטול.':ar?'رصدنا هزًّا قويًا. إن كان كل شيء بخير، اضغط إلغاء.':'We felt a strong shake. If all is well, tap Cancel.'));
- setText('sos-pre-cancel', he?'ביטול – אני בסדר':ar?'إلغاء – أنا بخير':"Cancel – I'm OK");
+ setText('sos-pre-ttl', he?'שולח SOS בעוד…':ar?'إرسال SOS خلال…':'Sending SOS in…');
+ setText('sos-pre-num', String(n));
+ /* the ring always heads for the NEXT second, so it drains smoothly from 8 to 0 */
+ try{ var bar=document.getElementById('sos-pre-bar'); if(bar) bar.style.strokeDashoffset=String(339.29*(1-Math.max(0,n-1)/SOS_PRE_S)); }catch(e){}
+ setText('sos-pre-sub', dms?(he?'לא אישרת שהכל בסדר':ar?'لم تؤكد أنك بخير':'You did not confirm you are OK')
+   :(he?'זיהינו ניעור חזק':ar?'رصدنا هزًّا قويًا':'We felt a strong shake'));
+ setText('sos-pre-cancel-lbl', he?'ביטול – אני בסדר':ar?'إلغاء – أنا بخير':"Cancel – I'm OK");
+ setText('sos-pre-now', he?'שלח עכשיו':ar?'أرسل الآن':'Send now');
  setText('sos-pre-note', he?'שום דבר עוד לא נשלח.':ar?'لم يُرسل شيء بعد.':'Nothing has been sent yet.');
 }
 /* strong vibration + a soft beep each second - never the siren */
@@ -5859,6 +5903,8 @@ function sosPreEnd(){
  activateSOS();                           // ... and the alerts, together
 }
 function sosPreCancel(){ cancelCountdown('pre'); }
+/* "Send now" - the person needs help and does not want to wait the 8 s */
+function sosPreSendNow(){ if(!window._sosPre) return; _sosPreLeft=0; sosPreEnd(); }
 
 /* SHAKE GRACE — vibrate-only for SOS_GRACE_MS, then the full alarm. (v337: used by the deliberate press.)
    Long enough to notice and cancel a false trigger before it is heard in the street;
@@ -11266,7 +11312,7 @@ try{ hydrateIcons(document); }catch(e){}
 /* Loaded-build version - shown in the diagnostic panel so a phone can prove
    whether it's on the latest build or a STALE cached one. Keep in lock-step
    with sw.js SW_VERSION on every deploy. */
-var APP_VER='v337';
+var APP_VER='v338';
 var FB={ready:false,uid:null,db:null,_presTimer:null,connected:false,listening:false,pushState:'default',near:0,swVer:'?',
   authState:'connecting',sdkLoaded:false,persist:'',permErr:null,err:null,wsProbe:'',csp:''};
 /* Always log connection diagnostics to the console so the real failure can be SEEN in Chrome. */
