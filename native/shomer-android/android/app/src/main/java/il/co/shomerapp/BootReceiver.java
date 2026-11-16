@@ -19,6 +19,8 @@ public class BootReceiver extends BroadcastReceiver {
     if (!Intent.ACTION_BOOT_COMPLETED.equals(a)
         && !"android.intent.action.QUICKBOOT_POWERON".equals(a)
         && !"com.htc.intent.action.QUICKBOOT_POWERON".equals(a)) return;
+    // v337: the service starts either way (it also carries locked-phone SHOMER alerts); it listens to the
+    // accelerometer only if the user's Shake-to-SOS switch is on.
     try {
       Intent svc = new Intent(ctx, ShakeService.class);
       if (Build.VERSION.SDK_INT >= 26) ctx.startForegroundService(svc);

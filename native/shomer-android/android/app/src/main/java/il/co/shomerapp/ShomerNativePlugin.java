@@ -54,6 +54,7 @@ public class ShomerNativePlugin extends Plugin {
   public void stopAlarm(PluginCall call) {
     AlarmForegroundService.stopAlarm(getContext());
     AlarmPlayer.stop(getContext());
+    try { ((android.app.NotificationManager) getContext().getSystemService(Context.NOTIFICATION_SERVICE)).cancel(7); } catch (Throwable e) {}   // the shake pre-alarm notice
     call.resolve();
   }
 
@@ -88,6 +89,29 @@ public class ShomerNativePlugin extends Plugin {
   public void stopGuardAlarm(PluginCall call) {
     try { BeatTask.clearGuardAlert(getContext()); } catch (Throwable e) {}
     call.resolve();
+  }
+
+  /** v337: the user's Shake-to-SOS switch and level, from the web app. The background service re-reads them. */
+  @PluginMethod
+  public void setShakeConfig(PluginCall call) {
+    Context c = getContext();
+    Boolean on = call.getBoolean("enabled", false);
+    String sens = call.getString("sens", "medium");
+    if (!"low".equals(sens) && !"high".equals(sens)) sens = "medium";
+    c.getSharedPreferences(ShakeService.PREFS, Context.MODE_PRIVATE).edit()
+        .putBoolean("shake_enabled", on != null && on).putString("shake_sens", sens).commit();
+    JSObject r = new JSObject(); r.put("ok", true); r.put("version", 337);
+    call.resolve(r);
+  }
+
+  /** v337: a STOP tapped in the notification while the web app was not running. Returns {ts} once, then clears it. */
+  @PluginMethod
+  public void takeStopPending(PluginCall call) {
+    android.content.SharedPreferences sp = getContext().getSharedPreferences(ShakeService.PREFS, Context.MODE_PRIVATE);
+    long ts = sp.getLong("stop_pending", 0L);
+    sp.edit().putLong("stop_pending", 0L).apply();
+    JSObject r = new JSObject(); r.put("ts", ts);
+    call.resolve(r);
   }
 
   @PluginMethod

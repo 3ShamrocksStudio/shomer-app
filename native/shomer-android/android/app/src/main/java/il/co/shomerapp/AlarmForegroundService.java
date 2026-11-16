@@ -35,12 +35,16 @@ public class AlarmForegroundService extends Service {
 
   @Override
   public int onStartCommand(Intent intent, int flags, int startId) {
-    // STOP action from the notification (always-reachable kill switch).
+    // STOP action from a notification (always-reachable kill switch, works on the lock screen).
+    // v337: also stops the fallback player and the pre-alarm buzz, and tells the web app to close the SOS
+    // and send "false alarm - I'm OK" - or leaves a note it acts on as soon as it opens.
     if (intent != null && "STOP".equals(intent.getAction())) {
+      handleStop(this);
       stopForeground(true);
       stopSelf();
       return START_NOT_STICKY;
     }
+    try { ((NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE)).cancel(7); } catch (Throwable e) {}   // v337: the pre-alarm notice is over
     Notification n = buildNotification();
     if (Build.VERSION.SDK_INT >= 34) {
       startForeground(1, n, android.content.pm.ServiceInfo.FOREGROUND_SERVICE_TYPE_MEDIA_PLAYBACK);
@@ -99,20 +103,32 @@ public class AlarmForegroundService extends Service {
     PendingIntent pi = PendingIntent.getActivity(this, 0, open,
         PendingIntent.FLAG_IMMUTABLE);
     // Always-reachable STOP button on the alarm notification.
-    Intent stopI = new Intent(this, AlarmForegroundService.class);
-    stopI.setAction("STOP");
-    PendingIntent stopPi = PendingIntent.getService(this, 1, stopI, PendingIntent.FLAG_IMMUTABLE);
+    PendingIntent stopPi = stopIntent(this);
     return new NotificationCompat.Builder(this, CH)
-        .setContentTitle("🚨 SHOMER — SOS")
-        .setContentText("Alarm active — tap STOP to silence, or open the app")
+        .setContentTitle("SH\u2721MER – SOS")
+        .setContentText("האזעקה פועלת. בסדר? הקישו \"עצור – אני בסדר\".")
         .setSmallIcon(R.drawable.ic_stat_shomer)
         .setOngoing(true)
         .setContentIntent(pi)
         .setFullScreenIntent(pi, true)
-        .addAction(0, "⛔ STOP / \u05e2\u05e6\u05d5\u05e8 \u05d0\u05d6\u05e2\u05e7\u05d4", stopPi)
+        .addAction(0, "עצור – אני בסדר", stopPi)
         .setPriority(NotificationCompat.PRIORITY_MAX)
         .setCategory(NotificationCompat.CATEGORY_ALARM)
         .build();
+  }
+
+  static PendingIntent stopIntent(Context c) {
+    Intent stopI = new Intent(c, AlarmForegroundService.class);
+    stopI.setAction("STOP");
+    return PendingIntent.getService(c, 1, stopI, PendingIntent.FLAG_IMMUTABLE);
+  }
+
+  static void handleStop(Context c) {
+    try { AlarmPlayer.stop(c); } catch (Throwable e) {}
+    try { NotificationManager nm = (NotificationManager) c.getSystemService(Context.NOTIFICATION_SERVICE); nm.cancel(7); nm.cancel(3); } catch (Throwable e) {}
+    boolean told = false;
+    try { MainActivity a = MainActivity.sActive; if (a != null) told = a.stopWeb(); } catch (Throwable e) {}
+    try { c.getSharedPreferences("shomer_native", Context.MODE_PRIVATE).edit().putLong("stop_pending", told ? 0L : System.currentTimeMillis()).apply(); } catch (Throwable e) {}
   }
 
   public static void stopAlarm(Context c) {

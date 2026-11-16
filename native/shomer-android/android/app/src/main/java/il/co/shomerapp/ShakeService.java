@@ -20,6 +20,11 @@ import android.os.Vibrator;
 import androidx.core.app.NotificationCompat;
 
 /**
+ * v337: detection = ShakeDetector (deliberate back-and-forth jerks, gait rejected; same code as the web).
+ * Runs only while the user's switch is on (prefs shomer_native/shake_enabled, set by the web app through
+ * setShakeConfig). A detection never sounds the siren: it buzzes for the 8 s pre-alarm, shows a notification
+ * with "ביטול – אני בסדר", and hands the web app the trigger, which runs the cancellable countdown.
+ *
  * BACKGROUND SHAKE-TO-SOS — the capability a pure PWA cannot have.
  * A foreground service with a live accelerometer listener, so 5 hard shakes trigger the SOS
  * even when the app is backgrounded (and, on most devices, when swiped away — START_STICKY).
@@ -33,71 +38,76 @@ public class ShakeService extends Service implements SensorEventListener {
   private Sensor acc;
   private PowerManager.WakeLock wl;
   private long lastFire;
-  private float gx, gy, gz;
-  private int count;
-  private long firstT, lastPeak;
-  private static final int REQUIRED = 8;
-  private static final long WINDOW = 1500, MIN_GAP = 120;
-  private static final double THRESHOLD = 18.0; // m/s^2 (gravity removed) — 16.0 fired while running across a road
+  private ShakeDetector det;
+  static final String PREFS = "shomer_native";
+  static boolean enabled(Context c) { return c.getSharedPreferences(PREFS, MODE_PRIVATE).getBoolean("shake_enabled", false); }
+  static String sens(Context c) { String s = c.getSharedPreferences(PREFS, MODE_PRIVATE).getString("shake_sens", "medium"); return ("low".equals(s) || "high".equals(s)) ? s : "medium"; }
 
   @Override
   public int onStartCommand(Intent intent, int flags, int startId) {
-    Notification n = buildNotification();
+    boolean on = enabled(this);
+    Notification n = buildNotification(on);
     if (Build.VERSION.SDK_INT >= 34) {
       startForeground(2, n, android.content.pm.ServiceInfo.FOREGROUND_SERVICE_TYPE_SPECIAL_USE);
     } else {
       startForeground(2, n);
     }
-    if (sm == null) {
-      sm = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
-      if (sm != null) {
-        // With the screen off the CPU sleeps and an ordinary accelerometer stops reporting -
-        // that is why shake did nothing on a locked phone. Use the WAKE-UP accelerometer where
-        // the phone has one (it wakes the CPU itself); otherwise hold a partial wake lock.
-        acc = sm.getDefaultSensor(Sensor.TYPE_ACCELEROMETER, true);
-        if (acc == null) {
-          acc = sm.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
-          try {
-            PowerManager pm = (PowerManager) getSystemService(Context.POWER_SERVICE);
-            wl = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "shomer:shake");
-            wl.setReferenceCounted(false);
-            wl.acquire();
-          } catch (Exception e) {}
-        }
-        if (acc != null) sm.registerListener(this, acc, SensorManager.SENSOR_DELAY_GAME);
-      }
-    }
+    // v337: this service also hosts BeatTask (locked-phone alerts from my SHOMERs + dashboard presence),
+    // so it keeps running; only the accelerometer follows the user's Shake-to-SOS switch.
+    if (on) listen(); else unlisten();
     try { BeatTask.start(this); } catch (Throwable e) {}   // keep this phone visible on the dashboard while the app is off-screen
     return START_STICKY;
   }
 
+  private void listen() {
+    det = new ShakeDetector(sens(this));   // (re)read the level on every start / config change
+    if (sm != null && acc != null) return;
+    sm = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
+    if (sm == null) return;
+    // With the screen off the CPU sleeps and an ordinary accelerometer stops reporting -
+    // that is why shake did nothing on a locked phone. Use the WAKE-UP accelerometer where
+    // the phone has one (it wakes the CPU itself); otherwise hold a partial wake lock.
+    acc = sm.getDefaultSensor(Sensor.TYPE_ACCELEROMETER, true);
+    if (acc == null) {
+      acc = sm.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
+      try {
+        PowerManager pm = (PowerManager) getSystemService(Context.POWER_SERVICE);
+        wl = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "shomer:shake");
+        wl.setReferenceCounted(false);
+        wl.acquire();
+      } catch (Exception e) {}
+    }
+    if (acc != null) sm.registerListener(this, acc, SensorManager.SENSOR_DELAY_GAME);
+  }
+
+  private void unlisten() {
+    det = null;
+    try { if (sm != null) sm.unregisterListener(this); } catch (Exception e) {}
+    sm = null; acc = null;
+    try { if (wl != null && wl.isHeld()) wl.release(); } catch (Exception e) {}
+    wl = null;
+  }
+
   @Override
   public void onSensorChanged(SensorEvent e) {
-    float a = 0.9f;
-    gx = a * gx + (1 - a) * e.values[0];
-    gy = a * gy + (1 - a) * e.values[1];
-    gz = a * gz + (1 - a) * e.values[2];
-    double dx = e.values[0] - gx, dy = e.values[1] - gy, dz = e.values[2] - gz;
-    double mag = Math.sqrt(dx * dx + dy * dy + dz * dz);
-    long now = System.currentTimeMillis();
-    if (mag > THRESHOLD && now - lastPeak > MIN_GAP) {
-      if (firstT == 0 || now - firstT > WINDOW) { firstT = now; count = 0; }
-      count++;
-      lastPeak = now;
-      if (count >= REQUIRED) { count = 0; firstT = 0; fireSos(); }
-    }
+    ShakeDetector d = det; if (d == null) return;
+    long t = e.timestamp / 1000000L;   // sensor clock, ms
+    if (d.push(t, e.values[0], e.values[1], e.values[2])) fireSos();
   }
 
   private void fireSos() {
     long now = System.currentTimeMillis();
     if (now - lastFire < 8000) return;   // still shaking after it fired - not a second press
     lastFire = now;
-    // Felt confirmation in the pocket: SOS is on its way (the countdown can still be cancelled).
+    // The 8 s pre-alarm, felt in the pocket: a strong buzz every second, no sound. Cancel (web or
+    // notification) stops it through AlarmPlayer.stop(), which cancels the vibrator.
     try {
       Vibrator v = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
       if (v != null) {
-        if (Build.VERSION.SDK_INT >= 26) v.vibrate(VibrationEffect.createWaveform(new long[]{0, 400, 150, 400, 150, 400}, -1));
-        else v.vibrate(new long[]{0, 400, 150, 400, 150, 400}, -1);
+        long[] pat = new long[17]; pat[0] = 0;
+        for (int i = 1; i < 17; i += 2) { pat[i] = 450; pat[i + 1] = 550; }
+        if (Build.VERSION.SDK_INT >= 26) v.vibrate(VibrationEffect.createWaveform(pat, -1));
+        else v.vibrate(pat, -1);
       }
     } catch (Throwable e) {}
     // 1) The app is running (screen off / locked / in the background): fire the SOS straight
@@ -139,9 +149,11 @@ public class ShakeService extends Service implements SensorEventListener {
       nm.createNotificationChannel(fch);
     }
     Notification fire = new NotificationCompat.Builder(this, "shomer_shake_fire")
-        .setContentTitle("SHOMER — SOS")
-        .setContentText("Shake detected — opening SOS…")
+        .setContentTitle("SH\u2721MER – זוהה ניעור")
+        .setContentText("SOS יישלח בעוד 8 שניות. לא צריך? הקישו ביטול.")
         .setSmallIcon(R.drawable.ic_stat_shomer)
+        .addAction(0, "ביטול – אני בסדר", AlarmForegroundService.stopIntent(this))
+        .setTimeoutAfter(10 * 60 * 1000L)
         .setPriority(NotificationCompat.PRIORITY_MAX)
         .setCategory(NotificationCompat.CATEGORY_ALARM)
         .setFullScreenIntent(pi, true)
@@ -157,7 +169,7 @@ public class ShakeService extends Service implements SensorEventListener {
 
   @Override public void onAccuracyChanged(Sensor sensor, int accuracy) {}
 
-  private Notification buildNotification() {
+  private Notification buildNotification(boolean on) {
     NotificationManager nm = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
     if (Build.VERSION.SDK_INT >= 26) {
       NotificationChannel ch = new NotificationChannel(CH, "SHOMER Shake-to-SOS", NotificationManager.IMPORTANCE_LOW);
@@ -167,8 +179,8 @@ public class ShakeService extends Service implements SensorEventListener {
     open.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
     PendingIntent pi = PendingIntent.getActivity(this, 0, open, PendingIntent.FLAG_IMMUTABLE);
     return new NotificationCompat.Builder(this, CH)
-        .setContentTitle("SHOMER — Shake-to-SOS armed")
-        .setContentText("Shake hard 5× to trigger an SOS")
+        .setContentTitle(on ? "SH\u2721MER – ניעור ל-SOS פעיל" : "SH\u2721MER פועל ברקע")
+        .setContentText(on ? "ניעור חזק הלוך-חזור פותח ספירה של 8 שניות לביטול" : "כדי שהתראות מהשומרים שלך יגיעו גם כשהטלפון נעול")
         .setSmallIcon(R.drawable.ic_stat_shomer)
         .setOngoing(true)
         .setContentIntent(pi)
@@ -178,8 +190,7 @@ public class ShakeService extends Service implements SensorEventListener {
 
   @Override
   public void onDestroy() {
-    try { if (sm != null) sm.unregisterListener(this); } catch (Exception e) {}
-    try { if (wl != null && wl.isHeld()) wl.release(); } catch (Exception e) {}
+    unlisten();
     try { AlarmPlayer.stop(this); } catch (Exception e) {}
     try { BeatTask.stop(); } catch (Throwable e) {}
     super.onDestroy();

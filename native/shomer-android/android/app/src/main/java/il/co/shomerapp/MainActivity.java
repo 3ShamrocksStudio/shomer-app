@@ -46,6 +46,27 @@ public class MainActivity extends BridgeActivity {
     return true;
   }
 
+  /** v337: the notification STOP reached the live web app: run "Stop - I'm OK" there. */
+  boolean stopWeb() {
+    if (getBridge() == null) return false;
+    deliverStop(0);
+    return true;
+  }
+
+  private void deliverStop(final int attempt) {
+    runOnUiThread(() -> {
+      try {
+        if (getBridge() == null) return;
+        getBridge().eval("(typeof window.__shomerNativeStop==='function')?window.__shomerNativeStop():'wait'", (v) -> {
+          if (v != null && v.contains("ok")) return;
+          if (attempt < 40) getWindow().getDecorView().postDelayed(() -> deliverStop(attempt + 1), 750);
+        });
+      } catch (Exception e) {
+        if (attempt < 40) getWindow().getDecorView().postDelayed(() -> deliverStop(attempt + 1), 750);
+      }
+    });
+  }
+
   private void deliverSos(final String reason, final int attempt) {
     runOnUiThread(() -> {
       try {
