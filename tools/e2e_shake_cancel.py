@@ -24,6 +24,10 @@ def check(name, ok, info=""):
 
 
 REPLAY = """(tr)=>new Promise(res=>{ let i=0; const t0=tr[0][0];
+  if(typeof DeviceMotionEvent==='undefined'){   /* desktop WebKit has no motion API: feed the same detector the handler uses */
+    const d=ShakeDetector(shakeSens());
+    for(const [t,x,y,z] of tr){ if(d.push(t,x,y,z)){ if(window._shakeTest) shakeTestHit(); else if(SS.shake.enabled===true) shakeFired('web'); } }
+    return res(tr.length); }
   const step=()=>{ if(i>=tr.length) return res(i);
     const [t,x,y,z]=tr[i++];
     window.dispatchEvent(new DeviceMotionEvent('devicemotion',{accelerationIncludingGravity:{x,y,z},acceleration:null,interval:16}));
@@ -58,7 +62,8 @@ async def page_with(b, state):
 
 async def main():
     async with async_playwright() as p:
-        b = await p.chromium.launch(args=["--no-sandbox", "--disable-dev-shm-usage", "--autoplay-policy=no-user-gesture-required"])
+        eng = __import__("os").environ.get("SHK_ENGINE", "chromium")   # SHK_ENGINE=webkit = Safari's engine
+        b = await (p.webkit.launch() if eng == "webkit" else p.chromium.launch(args=["--no-sandbox", "--disable-dev-shm-usage", "--autoplay-policy=no-user-gesture-required"]))
 
         # 1. fresh install: shake is OFF
         ctx, pg, errs = await page_with(b, None)   # a real fresh install: nothing saved yet
