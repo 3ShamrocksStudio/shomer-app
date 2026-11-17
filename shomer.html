@@ -1911,7 +1911,7 @@ body.otp-active .ob-steps{display:none!important;}
  <div class="sos-cd" id="sos-cd" role="alertdialog" aria-modal="true" aria-labelledby="sos-cd-ttl" aria-describedby="sos-cd-sub" aria-hidden="true">
  <div class="sos-cd-card">
  <div class="sos-cd-ttl" id="sos-cd-ttl">שולח SOS…</div>
- <div class="sos-cd-sub" id="sos-cd-sub">האזעקה פועלת. שידור לשומרים בקרבתך בעוד…</div>
+ <div class="sos-cd-sub" id="sos-cd-sub">האזעקה פועלת. ה-SOS יישלח בעוד…</div>
  <div class="sos-cd-ringwrap" aria-hidden="true">
  <div class="sos-cd-ring" id="sos-cd-ring"></div>
  <div class="sos-cd-num" id="sos-cd-num">10</div>
@@ -5943,10 +5943,10 @@ function renderCountdown(){
  setText('sos-cd-num',String(sosCdLeft));
  const he=currentLang==='he';
  setText('sos-cd-ttl',he?' שולח SOS…':currentLang==='ar'?' جارٍ إرسال SOS…':' Sending SOS…');
- if(_sosGraceTimer) setText('sos-cd-sub',he?'האזעקה תתחיל עוד רגע. שידור לשומרים בקרבתך בעוד…'
- :currentLang==='ar'?'سيبدأ الإنذار بعد لحظة. البث للحُرّاس القريبين خلال…':'The siren starts in a moment. Broadcasting to nearby SHOMERs in…');
- else setText('sos-cd-sub',he?'האזעקה פועלת. שידור לשומרים בקרבתך בעוד…'
- :currentLang==='ar'?'الإنذار يعمل. البث للحُرّاس القريبين خلال…':'Alarm is sounding. Broadcasting to nearby SHOMERs in…');
+ if(_sosGraceTimer) setText('sos-cd-sub',he?'האזעקה תתחיל עוד רגע. ה-SOS יישלח בעוד…'
+ :currentLang==='ar'?'سيبدأ الإنذار بعد لحظة. سيُرسَل نداء الاستغاثة خلال…':'The siren starts in a moment. Sending the SOS in…');
+ else setText('sos-cd-sub',he?'האזעקה פועלת. ה-SOS יישלח בעוד…'
+ :currentLang==='ar'?'الإنذار يعمل. سيُرسَل نداء الاستغاثة خلال…':'Alarm is sounding. Sending the SOS in…');
  setText('sos-cd-cancel',he?'אני בטוח/ה - בטל':currentLang==='ar'?'أنا بأمان - إلغاء':"I'm safe - Cancel");
  setText('sos-cd-hint',he?'ביטול עכשיו = אזעקת שווא. שום דבר לא ישודר ולא יופיע במפה.'
  :currentLang==='ar'?'الإلغاء الآن = إنذار كاذب. لن يُبث شيء ولن يظهر على الخريطة.':'Cancel now = false alarm. Nothing is broadcast and nothing appears on the map.');
