@@ -13857,7 +13857,7 @@ function showIncomingSOS(puid, nm, v, oldTs){
     /* Once you have committed, the banner must SHRINK and get out of the way - it used to
        sit there covering the whole screen, unresponsive. It becomes a small live status. */
     d.classList.add('acked');
-    d.querySelector('.in-sos-s').textContent = he?'אתה בדרך - הם יודעים':'You are on the way - they know';
+    d.querySelector('.in-sos-s').textContent = he?'את/ה בדרך - הם יודעים':'You are on the way - they know';
     var btns=d.querySelector('.in-sos-btns');
     btns.innerHTML='<button class="in-b sig">'+(he?'עדכון':'Update')+'</button>'
                   +'<button class="in-b map">'+(he?'נווט/י':'Navigate')+'</button>'
