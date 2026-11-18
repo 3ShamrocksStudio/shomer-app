@@ -1464,7 +1464,8 @@ function loadLive(c){
     var netPres=[], netEv=[], outTerr24={};
     var RECENT_PRES=18e5; /* map pins only for users seen in the last 30 min */
     if(obj){ Object.keys(obj).forEach(function(id){
-      var e=obj[id]; if(!e)return;
+      var e=obj[id]; if(!e||typeof e!=='object')return;
+      if(!/^[A-Za-z0-9_-]{1,80}$/.test(id) || (e.type!=null && !/^[a-z_]{1,24}$/.test(String(e.type))) || (e.status!=null && !/^[A-Za-z0-9:_-]{1,48}$/.test(String(e.status)))) return;   /* security: the public feed is world-writable by signed-in apps - skip any row that is not in the app's own format */
       var _lat=e.lat!=null?e.lat:(e.latitude!=null?e.latitude:(e.location&&e.location.lat!=null?e.location.lat:(e.location&&e.location.latitude!=null?e.location.latitude:null)));
       var _lng=e.lng!=null?e.lng:(e.longitude!=null?e.longitude:(e.location&&e.location.lng!=null?e.location.lng:(e.location&&e.location.longitude!=null?e.location.longitude:null)));
       if(_lat==null||_lng==null)return;

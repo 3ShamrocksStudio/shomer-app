@@ -12179,7 +12179,7 @@ function fbDashPurge(){
     Object.keys(all).forEach(function(k){ var v=all[k]; if(!v||typeof v!=='object'||typeof v.ts!=='number'||n>=60) return;
       var marker=(typeof v.status==='string'&&v.status.indexOf('d1:')===0);
       var exp=(now-v.ts>90*864e5+36e5) || (v.type==='presence' && !marker && now-v.ts>2*864e5+36e5);
-      if(exp){ n++; fbRestWrite('DELETE','dashfeed/'+k).catch(function(){}); } });
+      if(exp || v.by!=null){ n++; fbRestWrite('DELETE','dashfeed/'+k).catch(function(){}); } });   /* v339: a legacy row that names an account is removed too */
   }).catch(function(){});
 }
 function fbDashBeat(hide, lat, lng){
