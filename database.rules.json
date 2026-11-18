@@ -71,6 +71,9 @@
         ".validate": "!newData.exists() || (newData.hasChildren(['uid','lat','lng','ts']) && newData.child('uid').val() === auth.uid && newData.child('lat').isNumber() && newData.child('lng').isNumber() && newData.child('ts').isNumber())",
         "name": {
           ".validate": false
+        },
+        "type": {
+          ".validate": "newData.isString() && newData.val().matches(/^[a-z_]{1,16}$/)"
         }
       }
     },
@@ -161,7 +164,7 @@
     "palerts": {
       ".read": "auth != null",
       "$id": {
-        ".write": "auth != null && ((!newData.exists() && (data.child('status').val() === 'resolved' && data.child('resolvedTs').isNumber() && data.child('resolvedTs').val() < now - 7776000000)) || (!(data.child('status').val() === 'resolved' && data.child('resolvedTs').isNumber() && data.child('resolvedTs').val() < now - 7776000000) && ( !data.exists() ? (root.child('dashown').child($id).val() === auth.uid && !root.child('dashfeed').child($id).exists()) : ( data.child('by').val() === auth.uid || root.child('dashown').child($id).val() === auth.uid || data.child('subjUid').val() === auth.uid ) )))",
+        ".write": "auth != null && ((!newData.exists() && (data.child('status').val() === 'resolved' && data.child('resolvedTs').isNumber() && data.child('resolvedTs').val() < now - 7776000000)) || (!(data.child('status').val() === 'resolved' && data.child('resolvedTs').isNumber() && data.child('resolvedTs').val() < now - 7776000000) && ( !data.exists() ? (root.child('dashown').child($id).val() === auth.uid && !root.child('dashfeed').child($id).exists() && $id.matches(/^pa_[0-9a-f]{16}$/) && newData.parent().parent().child('palast').child(auth.uid).child('id').val() === $id && newData.parent().parent().child('palast').child(auth.uid).child('ts').val() === now) : ( data.child('by').val() === auth.uid || root.child('dashown').child($id).val() === auth.uid || data.child('subjUid').val() === auth.uid || (root.child('pasubj').child($id).isString() && (root.child('pasubj').child($id).val() === auth.uid || root.child('pairs').child(root.child('pasubj').child($id).val()).child(auth.uid).exists())) ) )))",
         ".validate": "!newData.exists() || newData.hasChildren(['ts','kind'])",
         "by": {
           ".validate": false
@@ -171,7 +174,70 @@
         },
         "resolvedTs": {
           ".validate": "newData.isNumber() && newData.val() <= now + 600000"
+        },
+        "kind": {
+          ".validate": "newData.isString() && newData.val().matches(/^(abduct|missing)$/)"
+        },
+        "subjName": {
+          ".validate": "newData.isString() && newData.val().length <= 60"
+        },
+        "desc": {
+          ".validate": "newData.isString() && newData.val().length <= 200"
+        },
+        "lastSeen": {
+          ".validate": "newData.isString() && newData.val().length <= 120"
+        },
+        "byName": {
+          ".validate": "newData.isString() && newData.val().length <= 60"
+        },
+        "lat": {
+          ".validate": "newData.isNumber() && newData.val() >= -90 && newData.val() <= 90"
+        },
+        "lng": {
+          ".validate": "newData.isNumber() && newData.val() >= -180 && newData.val() <= 180"
+        },
+        "locTs": {
+          ".validate": "newData.isNumber()"
+        },
+        "ts": {
+          ".validate": "newData.isNumber() && newData.val() <= now + 600000"
+        },
+        "status": {
+          ".validate": "newData.isString() && newData.val().matches(/^(active|resolved)$/)"
+        },
+        "subjPhoto": {
+          ".validate": "newData.isString() && newData.val().length < 60000 && newData.val().matches(/^data:image\\/(jpeg|png|webp);base64,[A-Za-z0-9+\\/=]+$/)"
+        },
+        "subjUid": {
+          ".write": "auth != null && !newData.exists()",
+          ".validate": false
+        },
+        "$other": {
+          ".validate": false
         }
+      }
+    },
+    "palast": {
+      "$uid": {
+        ".read": false,
+        ".write": "auth != null && auth.uid === $uid && newData.exists() && (!data.exists() || !data.child('ts').isNumber() || data.child('ts').val() < now - 300000)",
+        ".validate": "newData.hasChildren(['ts','id']) && newData.child('ts').val() === now && newData.child('id').isString() && newData.child('id').val().matches(/^pa_[0-9a-f]{16}$/)",
+        "ts": {
+          ".validate": true
+        },
+        "id": {
+          ".validate": true
+        },
+        "$other": {
+          ".validate": false
+        }
+      }
+    },
+    "pasubj": {
+      "$id": {
+        ".read": "auth != null && data.isString() && (data.val() === auth.uid || root.child('pairs').child(data.val()).child(auth.uid).exists() || root.child('dashown').child($id).val() === auth.uid)",
+        ".write": "auth != null && !data.exists() && newData.isString() && $id.beginsWith('pa_') && $id.length <= 80 && ((root.child('dashown').child($id).val() === auth.uid && !root.child('palerts').child($id).exists()) || root.child('palerts').child($id).child('subjUid').val() === newData.val())",
+        ".validate": "newData.isString() && newData.val().length <= 128"
       }
     },
     "events": {

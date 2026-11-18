@@ -13141,7 +13141,7 @@ async function paCreate(m, kind, desc, lastSeen, photo){
   if(isReviewAccount()){ toast(he?'חשבון בדיקה - דיווחים ציבוריים מושבתים':'Test account - public reports are disabled','amb'); return false; }   /* v289: the store-review account can't publish to the public map */
   if(typeof MOD!=='undefined'){ var mt=MOD.checkText((desc||'')+' '+(lastSeen||'')); if(mt && !mt.ok){ toast(he?'הטקסט מכיל שפה לא הולמת. נסח/י מחדש.':'The text contains inappropriate language. Please rephrase.','amb'); return false; } }
   var now=Date.now();
-  if(SS.paLast && (now-SS.paLast)<90000){ toast(he?('המתן/י '+Math.ceil((90000-(now-SS.paLast))/1000)+' שניות'):('Wait '+Math.ceil((90000-(now-SS.paLast))/1000)+'s'),'amb'); return false; }
+  if(SS.paLast && (now-SS.paLast)<300000){ toast(he?('המתן/י '+Math.ceil((300000-(now-SS.paLast))/1000)+' שניות'):('Wait '+Math.ceil((300000-(now-SS.paLast))/1000)+'s'),'amb'); return false; }   /* the database allows 1 person alert per account per 5 min */
   var warn = kind==='abduct'
     ? (he?'לשדר התראת חטיפה על '+(m.name||'')+' לרשת? זו התראה ברמת חירום הגבוהה ביותר.':'Broadcast an ABDUCTION alert for '+(m.name||'')+' to the network? This is the highest-urgency alert.')
     : (he?'לשדר התראת אדם נעדר על '+(m.name||'')+' לרשת?':'Broadcast a MISSING-PERSON alert for '+(m.name||'')+' to the network?');
@@ -13149,18 +13149,22 @@ async function paCreate(m, kind, desc, lastSeen, photo){
   var _go=await paCountdown(6);
   if(!_go){ toast(he?'בוטל - לא שודר':'Cancelled - not broadcast',''); return false; }
   var id=fbDashKey('pa_');   /* v301: random id - the public feed key must not reveal who reported */
-  var rec={ kind:kind, subjUid:m.partnerUid||'', subjName:(m.name||'').slice(0,60),
+  var rec={ kind:kind, subjName:(m.name||'').slice(0,60),
     desc:String(desc||'').slice(0,200), lastSeen:String(lastSeen||'').slice(0,120),
     lat:(m.lat!=null?+(+m.lat).toFixed(3):null), lng:(m.lng!=null?+(+m.lng).toFixed(3):null), locTs:m.ts||0,   /* privacy: ~110 m, enough to search an area */
     byName:((SS.settings&&SS.settings.toggles&&SS.settings.toggles.p_showname===true)?((SS.user&&SS.user.name)||''):'').slice(0,60), ts:now, status:'active' };   /* privacy: reporter's name only if "show name" is on; no account id in the public alert */
   if(photo && typeof photo==='string' && photo.length<60000) rec.subjPhoto=photo;
   var ok=false;
   try{ await fbRestWrite('PUT','dashown/'+id, FB.uid); }catch(e){}   /* private owner record (no user can read it): lets the rules know the alert is mine */
-  try{ var w=await fbRestWrite('PUT','palerts/'+id, rec); ok=(w!==false); }
+  /* security: one write = the alert + my "last alert" stamp (database: 1 per account per 5 min) + the
+     subject's account id in a private node (only the subject, their SHOMERs and the reporter can read it) */
+  var _up={}; _up['palerts/'+id]=rec; _up['palast/'+FB.uid]={id:id,ts:{'.sv':'timestamp'}}; if(m.partnerUid) _up['pasubj/'+id]=String(m.partnerUid);
+  try{ var w=await fbRestWrite('PATCH','', _up); ok=(w!==false); }
+  catch(e0){ ok=false; try{ var w=await fbRestWrite('PUT','palerts/'+id, rec); ok=(w!==false); }   /* rules not yet published: the plain write */
   catch(e){ ok=false;
     /* until the new rules are published the server still requires the account id on a person alert;
        an abduction alert must never fail, so only on that refusal does it go out with it */
-    if(e && (e.code==='PERMISSION_DENIED' || e.code==='unauthenticated')){ try{ rec.by=FB.uid; var w2=await fbRestWrite('PUT','palerts/'+id, rec); ok=(w2!==false); }catch(e2){ ok=false; } } }
+    if(e && (e.code==='PERMISSION_DENIED' || e.code==='unauthenticated')){ try{ rec.by=FB.uid; var w2=await fbRestWrite('PUT','palerts/'+id, rec); ok=(w2!==false); }catch(e2){ ok=false; } } } }
   if(ok){ try{ SS.paMine=SS.paMine||{}; SS.paMine[id]=1; }catch(e){} }
   if(ok){
     try{ dashFeedPush(id,(kind==='abduct'?'abduct':'missing'),rec.lat,rec.lng); }catch(e){}
@@ -13184,6 +13188,7 @@ function fbListenPersonAlerts(){
     FB._paCache={};
     Object.keys(all).forEach(function(id){ var a=all[id]; if(!a) return;
       if(a.status==='resolved' && (now-(+a.resolvedTs||+a.ts||0))>7776000000) return;   /* privacy: closed alerts are kept 90 days at most */
+      if(a.subjUid && !(FB._paMig=FB._paMig||{})[id]){ FB._paMig[id]=1; (function(pid,su){ fbRestWrite('PUT','pasubj/'+pid,String(su)).then(function(){ return fbRestWrite('DELETE','palerts/'+pid+'/subjUid'); }).catch(function(){}); })(id,a.subjUid); }   /* security: legacy alerts carried the subject's account id in public - move it to the private node */
       FB._paCache[id]=Object.assign({id:id},a);
       if(a.status==='resolved') return;
       if(a.ts && (now-a.ts)>STALE) return;
@@ -13213,7 +13218,7 @@ function paIncomingAlert(a){
 /* ── Detail card: who can stand it down = subject, reporter, or a linked SHOMER ── */
 /* security: a person-alert photo is only ever an inline base64 image (paReadPhoto) - never a link or script URL */
 function paSafePhoto(u){ return typeof u==='string' && u.length<60000 && /^data:image\/(jpeg|png|webp);base64,[A-Za-z0-9+\/=]+$/.test(u); }
-function paCanResolve(a){ try{ return a && (FB.uid===a.subjUid || FB.uid===a.by || (SS.paMine&&a.id&&SS.paMine[a.id]) || (typeof isGuardianOf==='function' && isGuardianOf(a.subjUid))); }catch(e){ return false; } }
+function paCanResolve(a){ try{ return a && (FB.uid===a.subjUid || FB.uid===a.by || a._subjOk || (SS.paMine&&a.id&&SS.paMine[a.id]) || (typeof isGuardianOf==='function' && isGuardianOf(a.subjUid))); }catch(e){ return false; } }
 function openPersonAlertDetail(id){
   var he=currentLang==='he', ar=currentLang==='ar';
   var a=(FB._paCache||{})[id]; if(!a) return;
@@ -13237,6 +13242,7 @@ function openPersonAlertDetail(id){
   document.body.appendChild(d);
   var nav=d.querySelector('#pa-nav'); if(nav) nav.onclick=function(){ try{ window.open('https://www.google.com/maps?q='+a.lat+','+a.lng,'_blank'); }catch(e){} };
   var rb=d.querySelector('#pa-resolve'); if(rb) rb.onclick=function(){ paResolve(id); };
+  if(!paCanResolve(a) && !a._subjChk){ a._subjChk=1; fbRestGet('pasubj/'+id).then(function(sn){ var v=sn&&sn.val&&sn.val(); if(v){ a._subjOk=true; if(document.getElementById('pa-detail')) openPersonAlertDetail(id); } }).catch(function(){}); }   /* the database lets only the subject, their SHOMERs and the reporter read this */
   d.querySelector('.rep-close').onclick=function(){ d.remove(); };
 }
 function paResolve(id){
