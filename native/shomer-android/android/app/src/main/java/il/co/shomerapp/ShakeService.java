@@ -39,6 +39,41 @@ public class ShakeService extends Service implements SensorEventListener {
   private PowerManager.WakeLock wl;
   private long lastFire;
   private ShakeDetector det;
+  /* ── v342: NATIVE pre-alarm countdown ────────────────────────────────────────────────────
+   * The siren and the 8-second countdown used to live entirely in the WebView's JavaScript
+   * (sosPreStart -> setInterval -> sosPreEnd -> startSosAlarm). On a locked phone Android
+   * suspends that WebView's timers, so the countdown never finished, the siren never sounded
+   * and nothing was ever broadcast - a shake produced a vibration and nothing else.
+   * This service is a foreground service and keeps running with the screen off, so the
+   * countdown belongs here. The web layer still runs its own countdown and cancel UI when it
+   * is awake; whichever cancel happens first stops this one too. */
+  static final long PRE_ALARM_MS = 8000;   // must match SOS_PRE_S (8) in shomer.html
+  private static final android.os.Handler PRE = new android.os.Handler(android.os.Looper.getMainLooper());
+  private static Runnable preTask;
+
+  static void armNativeAlarm(Context c) {
+    final Context app = c.getApplicationContext();
+    cancelNativeAlarm(app);
+    preTask = new Runnable() {
+      @Override public void run() {
+        preTask = null;
+        try {
+          if (AlarmForegroundService.isPlaying()) return;   // the web layer got there first
+          Intent a = new Intent(app, AlarmForegroundService.class);
+          if (Build.VERSION.SDK_INT >= 26) app.startForegroundService(a);
+          else app.startService(a);
+        } catch (Throwable e) {}
+      }
+    };
+    PRE.postDelayed(preTask, PRE_ALARM_MS);
+  }
+
+  /** Any cancel - the notification STOP, or "ביטול - אני בסדר" in the app - must kill this too,
+   *  or a cancelled SOS would still start screaming 8 seconds later. */
+  static void cancelNativeAlarm(Context c) {
+    try { if (preTask != null) { PRE.removeCallbacks(preTask); preTask = null; } } catch (Throwable e) {}
+  }
+
   static final String PREFS = "shomer_native";
   static boolean enabled(Context c) { return c.getSharedPreferences(PREFS, MODE_PRIVATE).getBoolean("shake_enabled", false); }
   static String sens(Context c) { String s = c.getSharedPreferences(PREFS, MODE_PRIVATE).getString("shake_sens", "medium"); return ("low".equals(s) || "high".equals(s)) ? s : "medium"; }
@@ -110,6 +145,10 @@ public class ShakeService extends Service implements SensorEventListener {
         else v.vibrate(pat, -1);
       }
     } catch (Throwable e) {}
+    // v342: start the NATIVE countdown immediately. This is what actually makes the siren sound
+    // on a locked phone - everything below depends on the WebView waking up, which on most
+    // devices it does not.
+    armNativeAlarm(this);
     // 1) The app is running (screen off / locked / in the background): fire the SOS straight
     //    into the live web app - no need to wait for the screen to come up.
     boolean fired = false;

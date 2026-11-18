@@ -123,7 +123,11 @@ public class AlarmForegroundService extends Service {
     return PendingIntent.getService(c, 1, stopI, PendingIntent.FLAG_IMMUTABLE);
   }
 
+  /** v342: lets the native pre-alarm countdown skip starting a siren the web layer already started. */
+  static boolean isPlaying() { return mp != null; }
+
   static void handleStop(Context c) {
+    try { ShakeService.cancelNativeAlarm(c); } catch (Throwable e) {}   // v342: or it fires 8 s after a cancel
     try { AlarmPlayer.stop(c); } catch (Throwable e) {}
     try { NotificationManager nm = (NotificationManager) c.getSystemService(Context.NOTIFICATION_SERVICE); nm.cancel(7); nm.cancel(3); } catch (Throwable e) {}
     boolean told = false;

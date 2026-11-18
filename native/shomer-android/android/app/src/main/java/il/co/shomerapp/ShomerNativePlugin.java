@@ -52,6 +52,7 @@ public class ShomerNativePlugin extends Plugin {
 
   @PluginMethod
   public void stopAlarm(PluginCall call) {
+    ShakeService.cancelNativeAlarm(getContext());   // v342: the web cancel must kill the native countdown too
     AlarmForegroundService.stopAlarm(getContext());
     AlarmPlayer.stop(getContext());
     try { ((android.app.NotificationManager) getContext().getSystemService(Context.NOTIFICATION_SERVICE)).cancel(7); } catch (Throwable e) {}   // the shake pre-alarm notice
