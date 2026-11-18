@@ -5223,15 +5223,23 @@ function startShakeDetection(){
 /* The ONE entry for a detected shake (in-app detector or the native background one). */
 function shakeFired(src){
  try{
-   if(window._shakeTest){ shakeTestHit(); return; }
-   if(!(SS.shake && SS.shake.enabled===true)) return;
+   /* v340: returns 'ok' = handled, stop retrying · 'wait' = app not ready yet, ask again.
+      The native background service retries on 'wait'. Before v340 every path returned
+      nothing and the native side hard-coded 'ok', so a shake that arrived while the
+      settings were still loading (cold start, phone locked) was dropped for good. */
+   if(window._shakeTest){ shakeTestHit(); return 'ok'; }
+   if(!window.SS || !SS.shake) return 'wait';                    /* settings not loaded yet - the cold-start race: retry */
+   if(SS.shake.enabled!==true) return 'ok';                      /* switched off on purpose - nothing to retry */
    if(typeof sosPhase!=='undefined' && sosPhase!=='idle'){
      if(sosPhase==='active' && window._sosSilent && src!=='native'){ try{ sosGoLoud(); }catch(_){} }   /* a silent SOS still turns loud on a shake */
-     return;                                                     /* never let a shake cancel or restart a running countdown */
+     return 'ok';                                                /* never let a shake cancel or restart a running countdown */
    }
-   var now=Date.now(); if(now-(window._shakeFiredAt||0)<8000) return; window._shakeFiredAt=now;
+   var now=Date.now(); if(now-(window._shakeFiredAt||0)<8000) return 'ok';  /* duplicate of the one just handled */
+   if(typeof triggerSOS!=='function') return 'wait';             /* page still booting */
+   window._shakeFiredAt=now;
    triggerSOS('shake');
- }catch(e){}
+   return 'ok';
+ }catch(e){ return 'wait'; }
 }
 /* One-time iOS arm: the first touch anywhere requests motion permission so Shake-to-SOS
    works even for users who never open Settings. No-op on Android/desktop. */
@@ -5705,9 +5713,10 @@ function nativeAlarmStop(){ try{ var p=shomerNativePlugin(); if(p&&p.stopAlarm) 
 window.__shomerNativeSOS=function(reason){ try{
   /* v337: a native shake goes through the same gate as the in-app one: switch on, no running SOS, 8 s apart,
      and it only ever starts the 8 s warning countdown */
-  if((reason||'shake')==='shake'){ if(window._nativeShakeOld===true) return; shakeFired('native'); return; }   /* pre-v337 app build: old detector - ignored */
-  if(typeof sosPhase!=='undefined' && sosPhase!=='idle') return;
-  if(typeof triggerSOS==='function') triggerSOS(reason); }catch(e){} };
+  if((reason||'shake')==='shake'){ if(window._nativeShakeOld===true) return 'ok'; return shakeFired('native')||'wait'; }   /* pre-v337 app build: old detector - ignored */
+  if(typeof sosPhase!=='undefined' && sosPhase!=='idle') return 'ok';
+  if(typeof triggerSOS!=='function') return 'wait';              /* v340: page still booting - tell native to retry */
+  triggerSOS(reason); return 'ok'; }catch(e){ return 'wait'; } };
 /* v337: the STOP button in the Android SOS notification - silence, close, tell the SHOMERs */
 window.__shomerNativeStop=function(){ try{ sosStopRequest('native'); }catch(e){} return 'ok'; };
 (function(){
@@ -11312,7 +11321,7 @@ try{ hydrateIcons(document); }catch(e){}
 /* Loaded-build version - shown in the diagnostic panel so a phone can prove
    whether it's on the latest build or a STALE cached one. Keep in lock-step
    with sw.js SW_VERSION on every deploy. */
-var APP_VER='v339';
+var APP_VER='v340';
 var FB={ready:false,uid:null,db:null,_presTimer:null,connected:false,listening:false,pushState:'default',near:0,swVer:'?',
   authState:'connecting',sdkLoaded:false,persist:'',permErr:null,err:null,wsProbe:'',csp:''};
 /* Always log connection diagnostics to the console so the real failure can be SEEN in Chrome. */

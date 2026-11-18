@@ -70,8 +70,16 @@ public class MainActivity extends BridgeActivity {
   private void deliverSos(final String reason, final int attempt) {
     runOnUiThread(() -> {
       try {
-        if (getBridge() == null) return;
-        getBridge().eval("(typeof window.__shomerNativeSOS==='function')?(window.__shomerNativeSOS('" + reason + "'),'ok'):'wait'", (v) -> {
+        // v340: the bridge may not exist yet on a cold start. Retry instead of dropping the
+        // SOS on the floor - this used to return silently and the trigger was lost for good.
+        if (getBridge() == null) {
+          if (attempt < 60) getWindow().getDecorView().postDelayed(() -> deliverSos(reason, attempt + 1), 750);
+          return;
+        }
+        // v340: use what the web layer ACTUALLY returns. This used to hard-code 'ok', so a
+        // shake arriving before the settings had loaded was reported as delivered and the
+        // retry loop stopped - the phone opened on the map and no SOS ever started.
+        getBridge().eval("(typeof window.__shomerNativeSOS==='function')?(window.__shomerNativeSOS('" + reason + "')||'wait'):'wait'", (v) -> {
           if (v != null && v.contains("ok")) return;
           if (attempt < 60) getWindow().getDecorView().postDelayed(() -> deliverSos(reason, attempt + 1), 750);
         });
