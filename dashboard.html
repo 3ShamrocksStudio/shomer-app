@@ -521,9 +521,12 @@
 .nt-on{background:linear-gradient(160deg,#1fa866,#11784a);color:#fff;box-shadow:inset 0 0 0 1px rgba(255,255,255,.14)}
 .nt-on .nl,.nt-on .ns{color:rgba(255,255,255,.88)}
 .nt-on .nl i{width:7px;height:7px;border-radius:50%;background:#fff;box-shadow:0 0 6px #fff;animation:pulse 1.6s infinite}
-.nt-ev{background:linear-gradient(160deg,#7e1621,#550b14);color:#fff;box-shadow:inset 0 0 0 1px rgba(255,140,150,.18)}
-.nt-ev .nl,.nt-ev .ns{color:rgba(255,225,228,.9)}
-.nt-ev.hot{animation:evhot 1.3s ease-in-out infinite;cursor:pointer}
+/* Calm by default: zero live events is the GOOD state and must not look like an emergency.
+   The red treatment belongs to .hot, which is set only when events are actually open. */
+.nt-ev{background:linear-gradient(160deg,#17304a,#0f2033);color:#fff;box-shadow:inset 0 0 0 1px rgba(150,200,255,.16)}
+.nt-ev .nl,.nt-ev .ns{color:rgba(225,238,255,.9)}
+.nt-ev.hot{background:linear-gradient(160deg,#7e1621,#550b14);box-shadow:inset 0 0 0 1px rgba(255,140,150,.18);animation:evhot 1.3s ease-in-out infinite;cursor:pointer}
+.nt-ev.hot .nl,.nt-ev.hot .ns{color:rgba(255,225,228,.9)}
 @keyframes evhot{0%,100%{background:linear-gradient(160deg,#7e1621,#550b14)}50%{background:linear-gradient(160deg,#b01f2d,#7a1019)}}
 .nt-stack{display:flex;flex-direction:column;gap:7px;min-width:0;min-height:0}
 .nt-row{flex:1 1 0;min-height:0;display:flex;align-items:center;justify-content:space-between;gap:8px;padding:0 10px;border-radius:8px;background:rgba(12,27,57,.55);border:1px solid var(--line)}
@@ -1523,7 +1526,21 @@ var CAT_META={
  'עבירות כלכליות':{s:'כלכלי',c:'#9b6cff',i:'<rect x="3" y="13" width="4" height="7"/><rect x="10" y="8" width="4" height="12"/><rect x="17" y="3" width="4" height="17"/>'}
 };
 function catCol(k){return (CAT_META[k]&&CAT_META[k].c)||'#888';}
-function catShort(k){return (CAT_META[k]&&CAT_META[k].s)||k;}
+/* CAT_META above is the POLICE ANNUAL-STATISTICS taxonomy (used by the charts). Live network
+   events carry their own types, which have no entry there - so catShort used to print the raw
+   English key and a Hebrew RTL board showed "unknown" and "suspicious". */
+var LIVE_LBL={
+ unknown:'דיווח', suspicious:'חשד', sos:'קריאת SOS', abduct:'חשד לחטיפה', missing:'אדם נעדר',
+ fire:'שריפה', medical:'רפואי', violence:'אלימות', accident:'תאונה', hazard:'מפגע',
+ theft:'גניבה', harassment:'הטרדה', weapon:'נשק', threat:'איום', animal:'בעלי חיים', other:'אחר'
+};
+function catShort(k){
+  if(CAT_META[k]&&CAT_META[k].s) return CAT_META[k].s;
+  if(k==null||k==='') return 'דיווח';
+  var lk=String(k).toLowerCase();
+  if(LIVE_LBL[lk]) return LIVE_LBL[lk];
+  return /^[\x00-\x7F]+$/.test(String(k))?'דיווח':k;   /* never show a raw English key on a Hebrew board */
+}
 function catIcon(k,sz){var m=CAT_META[k];sz=sz||16;return '<svg viewBox="0 0 24 24" width="'+sz+'" height="'+sz+'" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">'+(m?m.i:'')+'</svg>';}
 
 var SOLSET={
