@@ -3407,7 +3407,11 @@ let SS={
  lang:'he',
  user:{name:'',phone:'',profession:'',gender:'',ageBand:'',residency:''},
  alarm:{type:'shomer',vol:0.6},
- shake:{enabled:false,sens:'medium',v:2},   /* v337: OFF by default (opt-in in Settings); existing users migrated by shakeMigrate() */
+ shake:{enabled:true,sens:'medium',v:2},    /* v341: ON by default again. v337 switched it off after a false alarm, but
+                                               v338's 8-second countdown + big cancel made a false shake cost one tap
+                                               instead of a siren in public. A guardian feature nobody can find is a
+                                               feature that does not exist. Anyone who switched it OFF on purpose keeps
+                                               it off - shakeMigrate() only treats an explicit enabled:false as a choice. */
  dms:{interval:5,active:false,deadline:0},
  settings:{radius:5,toggles:{}},
  /* Safety PIN: required to cancel an ACTIVE SOS. NEVER biometric (an unconscious user must
@@ -3578,11 +3582,18 @@ function updateShakeSensLabel(){
 function shakeMigrate(){
  try{
    var raw=null; try{ raw=JSON.parse(localStorage.getItem(SKEY)||'null'); }catch(e){}
-   if(raw && raw.shake && raw.shake.v>=2) return;
+   if(raw && raw.shake && raw.shake.v>=3) return;
    var existing=!!(raw && raw.onboarded);
-   var wasOn=existing && !(raw.shake && raw.shake.enabled===false);
-   SS.shake={enabled:wasOn, sens:'medium', v:2};
-   if(wasOn) SS.shake.notice=1;
+   /* v341: v337 wrote enabled:false onto EVERY existing phone, so a stored false at v2 does not
+      mean the user chose it - almost nobody ever saw the switch. Shake is back on by default now
+      that v338's 8-second countdown makes a false trigger cost one tap instead of a public siren.
+      Everyone affected gets the notice bar below, so one tap turns it off again if they want. */
+   var cameFromV337=!!(raw && raw.shake && raw.shake.v===2);
+   var wasOn = !existing ? true
+             : cameFromV337 ? true
+             : !(raw.shake && raw.shake.enabled===false);
+   SS.shake={enabled:wasOn, sens:(raw&&raw.shake&&raw.shake.sens)||'medium', v:3};
+   if(existing && wasOn) SS.shake.notice=1;
    saveStore();
  }catch(e){}
 }
@@ -11321,7 +11332,7 @@ try{ hydrateIcons(document); }catch(e){}
 /* Loaded-build version - shown in the diagnostic panel so a phone can prove
    whether it's on the latest build or a STALE cached one. Keep in lock-step
    with sw.js SW_VERSION on every deploy. */
-var APP_VER='v340';
+var APP_VER='v341';
 var FB={ready:false,uid:null,db:null,_presTimer:null,connected:false,listening:false,pushState:'default',near:0,swVer:'?',
   authState:'connecting',sdkLoaded:false,persist:'',permErr:null,err:null,wsProbe:'',csp:''};
 /* Always log connection diagnostics to the console so the real failure can be SEEN in Chrome. */
