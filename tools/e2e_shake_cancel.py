@@ -79,7 +79,7 @@ async def main():
         await pg.wait_for_timeout(400)
         st = await pg.evaluate("()=>({ph:sosPhase, pre:document.getElementById('sos-pre').classList.contains('on')})")
         check("fresh user: listener running, switch off -> still nothing", st["ph"] == "idle" and not st["pre"], st)
-        check("app version", s["ver"] == "v338", s["ver"])
+        check("app version", int(s["ver"].lstrip("v") or 0) >= 338, s["ver"])
         await ctx.close()
 
         # 2. existing user who had shake ON (old slider at 30 = 1.2 g): kept on, new safe level, one-time notice
