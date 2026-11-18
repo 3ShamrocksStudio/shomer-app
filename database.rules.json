@@ -42,6 +42,9 @@
         },
         "fromPhone": {
           ".validate": "!$token.beginsWith('inbox_')"
+        },
+        "fromName": {
+          ".validate": "newData.isString() && newData.val().length <= 60"
         }
       }
     },

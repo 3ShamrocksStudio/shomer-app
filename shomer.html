@@ -6767,8 +6767,8 @@ function checkInbox(){
       if(invites.length){
         var first=box[invites[0]];
         var msg = he
-          ? (invites.length===1 ? ((first.fromName||'מישהו')+' הזמין/ה אותך להיות שומר/ת - פתח/י את הקישור שנשלח אליך') : ('יש לך '+invites.length+' הזמנות ממתינות'))
-          : (invites.length===1 ? ((first.fromName||'Someone')+' invited you - open the link they sent you') : ('You have '+invites.length+' pending invites'));
+          ? (invites.length===1 ? ((first.fromName?ESC(first.fromName):'מישהו')+' הזמין/ה אותך להיות שומר/ת - פתח/י את הקישור שנשלח אליך') : ('יש לך '+invites.length+' הזמנות ממתינות'))
+          : (invites.length===1 ? ((first.fromName?ESC(first.fromName):'Someone')+' invited you - open the link they sent you') : ('You have '+invites.length+' pending invites'));
         showInboxBanner(msg, invites, box);
       }
     }).catch(function(e){});
@@ -13211,6 +13211,8 @@ function paIncomingAlert(a){
 }
 
 /* ── Detail card: who can stand it down = subject, reporter, or a linked SHOMER ── */
+/* security: a person-alert photo is only ever an inline base64 image (paReadPhoto) - never a link or script URL */
+function paSafePhoto(u){ return typeof u==='string' && u.length<60000 && /^data:image\/(jpeg|png|webp);base64,[A-Za-z0-9+\/=]+$/.test(u); }
 function paCanResolve(a){ try{ return a && (FB.uid===a.subjUid || FB.uid===a.by || (SS.paMine&&a.id&&SS.paMine[a.id]) || (typeof isGuardianOf==='function' && isGuardianOf(a.subjUid))); }catch(e){ return false; } }
 function openPersonAlertDetail(id){
   var he=currentLang==='he', ar=currentLang==='ar';
@@ -13223,7 +13225,7 @@ function openPersonAlertDetail(id){
   d.innerHTML='<div class="rep-card">'
     +'<div style="display:inline-block;background:'+col+';color:#fff;font-size:11px;font-weight:800;padding:3px 10px;border-radius:7px;margin-bottom:8px">'+(a.kind==='abduct'?'🚨 ':'🔎 ')+kindL+'</div>'
     +'<div class="rep-h">'+ESC(a.subjName||'')+'</div>'
-    +(a.subjPhoto?'<img src="'+a.subjPhoto+'" alt="" style="width:100%;max-height:230px;object-fit:cover;border-radius:12px;margin:8px 0">':'')
+    +(paSafePhoto(a.subjPhoto)?'<img src="'+ESC(a.subjPhoto)+'" alt="" style="width:100%;max-height:230px;object-fit:cover;border-radius:12px;margin:8px 0">':'')
     +(a.lastSeen?'<div class="rep-sub"><b>'+(he?'נראה/תה לאחרונה: ':ar?'آخر ظهور: ':'Last seen: ')+'</b>'+ESC(a.lastSeen)+'</div>':'')
     +(a.desc?'<div class="rep-sub">'+ESC(a.desc)+'</div>':'')
     +'<div class="rep-sub" style="direction:ltr;text-align:start">📍 '+ESC(locTxt)+(when?'  ·  '+when:'')+'</div>'
