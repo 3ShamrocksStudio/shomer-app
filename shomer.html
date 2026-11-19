@@ -11468,7 +11468,7 @@ try{ hydrateIcons(document); }catch(e){}
 /* Loaded-build version - shown in the diagnostic panel so a phone can prove
    whether it's on the latest build or a STALE cached one. Keep in lock-step
    with sw.js SW_VERSION on every deploy. */
-var APP_VER='v345';
+var APP_VER='v346';
 var FB={ready:false,uid:null,db:null,_presTimer:null,connected:false,listening:false,pushState:'default',near:0,swVer:'?',
   authState:'connecting',sdkLoaded:false,persist:'',permErr:null,err:null,wsProbe:'',csp:''};
 /* Always log connection diagnostics to the console so the real failure can be SEEN in Chrome. */
@@ -14788,6 +14788,21 @@ function fbListenPairs(){
         try{ fbListenPeerLoc(uid); }catch(e){}    // subscribe to the newly-discovered partner's location
       });
       if(changed){ saveStore(); try{gdRenderMarkers();}catch(e){} if(document.getElementById('sh-circles')&&document.getElementById('sh-circles').classList.contains('open'))gdRenderList(); }
+      /* v346 SELF-HEAL: a SHOMER linked on this phone but missing from MY pairs/<me> (the write at pairing
+         failed) is a half link - they cannot read my SOS channel and my SOS push to them is refused. Re-write
+         my own side only (the rules allow nothing else), once per session, after a fresh read confirms it is
+         missing and the link is still on this phone. Their side heals the same way when their app opens. */
+      FB._pairHealed=FB._pairHealed||{};
+      (g.pairs||[]).forEach(function(p){
+        if(!p||!p.partnerUid||p.pending||p.linked!==true||all[p.partnerUid]||FB._pairHealed[p.partnerUid]) return;
+        FB._pairHealed[p.partnerUid]=1;
+        fbRestGet('pairs/'+FB.uid+'/'+p.partnerUid).then(function(sn){
+          if(sn&&sn.val&&sn.val()) return;
+          if(!(gdState().pairs||[]).some(function(x){ return x===p&&x.linked===true&&!x.pending; })) return;   /* removed meanwhile - never re-create */
+          fbLog('pairs self-heal: re-linking my side for', p.partnerUid.slice(0,6));
+          return fbRestWrite('PUT','pairs/'+FB.uid+'/'+p.partnerUid,{name:String(p.name||'').slice(0,40),token:p.token||'',ts:Date.now(),via:'heal'});
+        }).catch(function(){});
+      });
     }catch(e){}
   }, function(){ /* denied until /pairs rules deployed */ });
 }
