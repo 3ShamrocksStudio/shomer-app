@@ -11391,7 +11391,7 @@ function legalApplyI18n(){
  const oba=document.getElementById('ob-agree-txt'); if(oba)oba.innerHTML=he
  ?'בכניסה את/ה מסכים/ה ל<button type="button" class="lnk-inline" onclick="openLegal(\'tos\')">תנאי השימוש</button> ול<button type="button" class="lnk-inline" onclick="openLegal(\'privacy\')">מדיניות הפרטיות</button>. שיתוף מיקום הוא בהסכמה בלבד.'
  :ar?'بالدخول فإنك توافق على <button type="button" class="lnk-inline" onclick="openLegal(\'tos\')">شروط الاستخدام</button> و<button type="button" class="lnk-inline" onclick="openLegal(\'privacy\')">سياسة الخصوصية</button>. مشاركة الموقع تتم بالموافقة فقط.'
- :'By entering you agree to the <button type="button" class="lnk-inline" onclick="openLegal(\'tos\')">Terms of Service</button> andbutton type="button" class="lnk-inline" onclick="openLegal(\'privacy\')">Privacy Policy</button>. Location sharing is consent-only.';
+ :'By entering you agree to the <button type="button" class="lnk-inline" onclick="openLegal(\'tos\')">Terms of Service</button> and <button type="button" class="lnk-inline" onclick="openLegal(\'privacy\')">Privacy Policy</button>. Location sharing is consent-only.';
  /* SAFETY-CRITICAL - emergency dialing instruction; native-Arabic review required */
  setText('sos-cd-legal-txt',he?'שומר אינו מתקשר לרשויות. במצב חירום חייגו 100 / 101 / 102 בעצמכם.':ar?'شومير لا يتصل بالسلطات. في حالة الطوارئ اتصل بـ 100 / 101 / 102 بنفسك.':'Shomer does not call authorities. In an emergency, dial 100 / 101 / 102 yourself.');
  setText('disc-ttl',he?' כתב ויתור חירום':' Emergency disclaimer');
@@ -11407,7 +11407,7 @@ function legalApplyI18n(){
  setText('consent-cancel-btn',he?'ביטול':'Cancel');
  const cpz=document.getElementById('consent-policy'); if(cpz)cpz.innerHTML=he
  ?'בהסכמתך את/ה מאשר/ת את <button type="button" class="lnk-inline" onclick="openLegal(\'tos\')">תנאי השימוש</button> ו<button type="button" class="lnk-inline" onclick="openLegal(\'privacy\')">מדיניות הפרטיות</button>.'
- :'By agreeing you accept the <button type="button" class="lnk-inline" onclick="openLegal(\'tos\')">Terms of Service</button> andbutton type="button" class="lnk-inline" onclick="openLegal(\'privacy\')">Privacy Policy</button>.';
+ :'By agreeing you accept the <button type="button" class="lnk-inline" onclick="openLegal(\'tos\')">Terms of Service</button> and <button type="button" class="lnk-inline" onclick="openLegal(\'privacy\')">Privacy Policy</button>.';
  // footer + onboarding legal link labels
  setText('ob-ll-tos',he?'תנאי שימוש':'Terms'); setText('ob-ll-priv',he?'מדיניות פרטיות':'Privacy'); setText('ob-ll-disc',he?'כתב ויתור חירום':'Disclaimer');
  setText('set-ll-tos',he?'תנאי שימוש':'Terms'); setText('set-ll-priv',he?'מדיניות פרטיות':'Privacy'); setText('set-ll-disc',he?'כתב ויתור חירום':'Disclaimer');
@@ -11674,7 +11674,7 @@ try{ hydrateIcons(document); }catch(e){}
 /* Loaded-build version - shown in the diagnostic panel so a phone can prove
    whether it's on the latest build or a STALE cached one. Keep in lock-step
    with sw.js SW_VERSION on every deploy. */
-var APP_VER='v351';
+var APP_VER='v352';
 var FB={ready:false,uid:null,db:null,_presTimer:null,connected:false,listening:false,pushState:'default',near:0,swVer:'?',
   authState:'connecting',sdkLoaded:false,persist:'',permErr:null,err:null,wsProbe:'',csp:''};
 /* Always log connection diagnostics to the console so the real failure can be SEEN in Chrome. */

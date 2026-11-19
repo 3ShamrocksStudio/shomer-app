@@ -1,1 +1,1 @@
-{"v": "v351", "notes": {"he": ["אנדרואיד: מיקום ברקע פועל רק בזמן SOS פעיל, רק לשומרים של אותו SOS, ונעצר כשה-SOS נגמר"], "en": ["Android: background location runs only during a live SOS, only for that SOS's SHOMERs, and stops when the SOS ends"]}}
+{"v": "v352", "notes": {"he": ["אנגלית: טקסט ההסכמה בכניסה הציג קוד שבור - תוקן"], "en": ["English: the sign-in consent text showed broken code - fixed"]}}
