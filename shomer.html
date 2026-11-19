@@ -5149,9 +5149,11 @@ let shakeStarted=false, _shakeDet=null;
      dur   ms max time one peak may stay above thr */
 var SHAKE_G=9.81;
 var SHAKE_LEVELS={
- low:   {thr:3.0*SHAKE_G,  peaks:4, win:1500, gap:260, dur:220},   /* 2 strong back-and-forth shakes */
- medium:{thr:2.7*SHAKE_G, peaks:3, win:1500, gap:260, dur:240},   /* default: 3 strong jerks (back, forth, back) */
- high:  {thr:2.5*SHAKE_G,  peaks:3, win:1500, gap:260, dur:260}    /* same pattern, a little less force */
+ /* v344: lines lowered. At 2.7 g a real hand shake (about 2-2.5 g) never fired - in the tests only a
+    3.3 g shake did. Walking stays at zero at every level; the 8 s pre-alarm absorbs a rare jog trigger. */
+ low:   {thr:2.5*SHAKE_G,  peaks:4, win:1500, gap:260, dur:220},   /* 2 strong back-and-forth shakes */
+ medium:{thr:2.0*SHAKE_G, peaks:3, win:1500, gap:260, dur:240},   /* default: 3 strong jerks (back, forth, back) */
+ high:  {thr:1.9*SHAKE_G,  peaks:3, win:1500, gap:260, dur:260}    /* same pattern, a little less force */
 };
 function ShakeDetector(level){
  var cfg=SHAKE_LEVELS[level]||SHAKE_LEVELS.medium, g=null, ep=null, chain=[], ff0=0, strong=[], gaitUntil=0, bt=null, quiet=0;

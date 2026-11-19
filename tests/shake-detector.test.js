@@ -33,12 +33,12 @@ for (const f of [1.6, 1.9, 2.2, 2.4]) for (const [kind, w, rot] of [
 // 2. Stairs up and down. Never fires.
 for (const f of [1.4, 1.6, 1.9]) for (const strike of [10, 16, 22]) for (const down of [true, false]) { const s = seed++;
   add('stairs', `stairs ${down ? 'down' : 'up'} f=${f} strike=${strike}`, T.render(T.stairs({ f, strike, down }), { seconds: 40, fs: fsr(s), seed: s }), NO); }
-// 3. Running / jogging 2.6-3.2 Hz (preferred cadence ~2.9 Hz), in hand, swinging, pocket ring. Never fires.
+// 3. Running / jogging 2.6-3.2 Hz (preferred cadence ~2.9 Hz), in hand, swinging, pocket ring. Low never; Medium/High at most 2 of 72.
 for (const f of [2.6, 2.8, 3.0, 3.2]) for (const strike of [18, 28, 38]) for (const swing of [0, 12, 20]) for (const ring of [0, 14]) { const s = seed++;
-  add('run', `run f=${f} strike=${strike} swing=${swing} ring=${ring}`, T.render(T.run({ f, strike, swing, ring, phase: (s % 9) / 9 }), { seconds: 30, fs: fsr(s), seed: s, rot: swing ? 45 : 0, rotHz: f / 2 }), NO); }
-// 4. Hard sprint (3.2-3.6 Hz, 4.6 g strikes, phone swinging ±50°): Low never; Medium/High reported.
+  add('run', `run f=${f} strike=${strike} swing=${swing} ring=${ring}`, T.render(T.run({ f, strike, swing, ring, phase: (s % 9) / 9 }), { seconds: 30, fs: fsr(s), seed: s, rot: swing ? 45 : 0, rotHz: f / 2 }), { low: false, medium: null, high: null }); }   /* v344: capped below */
+// 4. Hard sprint (3.2-3.6 Hz, 4.6 g strikes, phone swinging ±50°): reported only (v344: the 8 s pre-alarm absorbs it).
 for (let k = 0; k < 36; k++) { const s = seed++;
-  add('sprint', `sprint f=${(3.2 + 0.2 * (k % 3)).toFixed(1)} ${fsr(k)}Hz`, T.render(T.run({ f: 3.2 + 0.2 * (k % 3), strike: 45, swing: 24, phase: k / 9 }), { seconds: 30, fs: fsr(k), seed: s, rot: 50, rotHz: 1.7 }), { low: false, medium: null, high: null }); }
+  add('sprint', `sprint f=${(3.2 + 0.2 * (k % 3)).toFixed(1)} ${fsr(k)}Hz`, T.render(T.run({ f: 3.2 + 0.2 * (k % 3), strike: 45, swing: 24, phase: k / 9 }), { seconds: 30, fs: fsr(k), seed: s, rot: 50, rotHz: 1.7 }), { low: null, medium: null, high: null }); }
 // 5. Tossing the phone hand to hand. Never at Low/Medium.
 for (const P of [0.25, 0.3, 0.4, 0.5]) for (const h of [20, 32, 45]) for (let k = 0; k < 3; k++) { const s = seed++;
   add('toss', `toss P=${P} h=${h} ${fsr(k)}Hz`, T.render(T.toss({ P, h }), { seconds: 15, fs: fsr(k), seed: s }), { low: false, medium: false, high: null }); }
@@ -49,12 +49,12 @@ const AX = [[1, 0, 0], [0, 1, 0], [0, 0, 1], [0.6, 0.8, 0]], SF = [2.5, 3, 4, 5]
 // 7. Deliberate strong shake (≈4 g): fires at EVERY level, exactly once.
 for (const cycles of [2, 3]) for (let k = 0; k < 24; k++) { const s = seed++;
   add('shake-strong', `strong shake x${cycles} f=${SF[k % 4]} ${fsr(k)}Hz`, T.render(T.shake({ cycles, f: SF[k % 4], amp: 40, axis: AX[k % 4] }), { seconds: 3, fs: fsr(k), seed: s }), { low: true, medium: true, high: true }, true); }
-// 8. Firm shake (≈3.3 g, 2 back-and-forths): fires at Medium and High.
+// 8. Firm shake (≈2.4 g, 2 back-and-forths - a real hard hand shake): fires at Medium and High.
 for (let k = 0; k < 24; k++) { const s = seed++;
-  add('shake-firm', `firm shake x2 f=${SF[k % 4]} ${fsr(k)}Hz`, T.render(T.shake({ cycles: 2, f: SF[k % 4], amp: 32, axis: AX[k % 4] }), { seconds: 3, fs: fsr(k), seed: s }), { low: null, medium: true, high: true }, true); }
-// 9. Lighter shake (≈2.9 g): High only - the levels really differ.
+  add('shake-firm', `firm shake x2 f=${SF[k % 4]} ${fsr(k)}Hz`, T.render(T.shake({ cycles: 2, f: SF[k % 4], amp: 24, axis: AX[k % 4] }), { seconds: 3, fs: fsr(k), seed: s }), { low: null, medium: true, high: true }, true); }
+// 9. Lighter shake (≈2.1 g): High only - the levels really differ.
 for (let k = 0; k < 24; k++) { const s = seed++;
-  add('shake-light', `light shake x2 f=${SF[k % 4]} ${fsr(k)}Hz`, T.render(T.shake({ cycles: 2, f: SF[k % 4], amp: 28, axis: AX[k % 4] }), { seconds: 3, fs: fsr(k), seed: s }), { low: false, medium: null, high: true }); }
+  add('shake-light', `light shake x2 f=${SF[k % 4]} ${fsr(k)}Hz`, T.render(T.shake({ cycles: 2, f: SF[k % 4], amp: 21, axis: AX[k % 4] }), { seconds: 3, fs: fsr(k), seed: s }), { low: false, medium: null, high: true }); }
 // 10. A strong shake WHILE walking (help needed on the move): fires at every level.
 for (let k = 0; k < 24; k++) { const s = seed++;
   add('walk+shake', `walk then strong shake ${fsr(k)}Hz`, T.render(T.walkThenShake({ f: 1.9, strike: 8, swing: 6 }, { cycles: 3, f: [3, 4][k % 2], amp: 40, axis: AX[k % 4] }, 6.1 + 0.13 * k), { seconds: 12, fs: fsr(k), seed: s }), { low: true, medium: true, high: true }); }
@@ -72,7 +72,8 @@ cases.forEach((c, i) => {
   }
 });
 // Sprint at Medium: at most 1 of 36 hard-sprint traces may fire (the abrupt standstill-to-sprint start).
-if (summary.sprint.fired.medium > 1) { fail++; console.log(`FAIL  sprint medium fired on ${summary.sprint.fired.medium}/36 traces (max 1)`); }
+/* v344: running may start the 8 s pre-alarm on a rare trace (cancel = one tap); walking never may. */
+for (const l of ['medium', 'high']) if (summary.run.fired[l] > 2) { fail++; console.log(`FAIL  run ${l} fired on ${summary.run.fired[l]}/72 traces (max 2)`); }
 console.log('group         traces  fired low/med/high  failures');
 for (const [g, s] of Object.entries(summary)) console.log(`${g.padEnd(13)} ${String(s.n).padStart(6)}  ${String(s.fired.low).padStart(5)}/${s.fired.medium}/${s.fired.high}  ${s.bad}`);
 

@@ -27,9 +27,17 @@ could not stop it. Shake-to-SOS is now **off by default**, a detection never sou
 
 | Level | Line (gravity removed) | Reversals | User text |
 |---|---|---|---|
-| Low | 3.0 g | 4 | very strong shake, back and forth twice |
-| **Medium (default)** | 2.7 g | 3 | strong shake, 3 quick back-and-forth moves |
-| High | 2.5 g | 3 | slightly lighter shake; a hard sprint may start the countdown |
+| Low | 2.5 g | 4 | very strong shake, back and forth twice |
+| **Medium (default)** | 2.0 g | 3 | strong shake, 3 quick back-and-forth moves |
+| High | 1.9 g | 3 | slightly lighter shake; a hard sprint may start the countdown |
+
+## v344 recalibration (19 Nov 2026)
+At 2.7 g (Medium) a shake fired only when the synthetic stroke peaked at about 3.3 g; 2.5 g shakes never fired.
+A hard shake by hand is about 2-2.5 g, so testers could not trigger it. The lines are now Low 2.5 g, Medium 2.0 g,
+High 1.9 g. Walking (incl. the 16 Nov incident pattern) and stairs stay at 0 at every level, and so does tossing.
+The cost is running: Medium fires on 1 of 72 jogging traces and 12 of 36 hard-sprint traces. Each of those
+only starts the 8 s pre-alarm (vibration + soft beeps, nothing sent), which is cancelled with one tap.
+Below 1.9 g the fast-walk-with-swinging-phone pattern starts firing again (1.8 g: 7 times in 78 minutes).
 
 ## Why these numbers (sources)
 1. **Bourke AK, O'Brien JV, Lyons GM (2007). Evaluation of a threshold-based tri-axial accelerometer fall

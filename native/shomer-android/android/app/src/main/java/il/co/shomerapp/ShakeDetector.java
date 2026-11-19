@@ -30,9 +30,9 @@ public final class ShakeDetector {
   private boolean bt; private long bt0, bt1;
 
   public ShakeDetector(String lvl) {
-    if ("low".equals(lvl)) { thr = 3.0 * G; peaks = 4; win = 1500; gap = 260; dur = 220; }
-    else if ("high".equals(lvl)) { thr = 2.5 * G; peaks = 3; win = 1500; gap = 260; dur = 260; }
-    else { thr = 2.7 * G; peaks = 3; win = 1500; gap = 260; dur = 240; }
+    if ("low".equals(lvl)) { thr = 2.5 * G; peaks = 4; win = 1500; gap = 260; dur = 220; }
+    else if ("high".equals(lvl)) { thr = 1.9 * G; peaks = 3; win = 1500; gap = 260; dur = 260; }
+    else { thr = 2.0 * G; peaks = 3; win = 1500; gap = 260; dur = 240; }
     level = lvl;
   }
 
