@@ -3641,7 +3641,7 @@ function toggleShake(el){
 }
 function setShakeSens(v){
  if(v!=='low'&&v!=='medium'&&v!=='high') return;
- SS.shake.sens=v; SS.shake.v=2; _shakeDet=null;
+ SS.shake.sens=v; SS.shake.v=3; _shakeDet=null;   /* v344: was 2 - shakeMigrate read that as "v337 forced it off" and re-enabled a switched-off shake */
  updateShakeSensLabel();
  saveStore();
  try{ shakeNativeSync(); }catch(e){}
@@ -5245,7 +5245,9 @@ function shakeFired(src){
       nothing and the native side hard-coded 'ok', so a shake that arrived while the
       settings were still loading (cold start, phone locked) was dropped for good. */
    if(window._shakeTest){ shakeTestHit(); return 'ok'; }
-   if(!window.SS || !SS.shake) return 'wait';                    /* settings not loaded yet - the cold-start race: retry */
+   /* v344: SS is a top-level `let`, so window.SS is ALWAYS undefined - this line returned 'wait' on every
+      shake since v340 and no shake (web or native) ever started the SOS. Test the binding itself. */
+   if(typeof SS==='undefined' || !SS || !SS.shake) return 'wait';   /* settings not loaded yet - the cold-start race: retry */
    if(SS.shake.enabled!==true) return 'ok';                      /* switched off on purpose - nothing to retry */
    if(typeof sosPhase!=='undefined' && sosPhase!=='idle'){
      if(sosPhase==='active' && window._sosSilent && src!=='native'){ try{ sosGoLoud(); }catch(_){} }   /* a silent SOS still turns loud on a shake */
@@ -11338,7 +11340,7 @@ try{ hydrateIcons(document); }catch(e){}
 /* Loaded-build version - shown in the diagnostic panel so a phone can prove
    whether it's on the latest build or a STALE cached one. Keep in lock-step
    with sw.js SW_VERSION on every deploy. */
-var APP_VER='v343';
+var APP_VER='v344';
 var FB={ready:false,uid:null,db:null,_presTimer:null,connected:false,listening:false,pushState:'default',near:0,swVer:'?',
   authState:'connecting',sdkLoaded:false,persist:'',permErr:null,err:null,wsProbe:'',csp:''};
 /* Always log connection diagnostics to the console so the real failure can be SEEN in Chrome. */
