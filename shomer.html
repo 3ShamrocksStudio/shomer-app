@@ -5097,20 +5097,20 @@ function scheduleRetentionNudges(){ try{ if(!_isNative()||!_ln) return;
    and a 19:00 reminder, so testers keep the app and actually use it. */
 var TP_DAYS=14;
 var TP_MISSIONS=[
- {he:'ברוכים הבאים לבדיקה! השאירו את SH✡MER מותקנת 14 יום - בדקו שהשם שלכם מופיע בפרופיל.', en:'Welcome to the test! Keep SH✡MER installed for 14 days - check your name shows in your profile.', cta_he:'לפרופיל', cta_en:'Open profile', act:function(){ op('sh-prof'); }},
- {he:'הוסיפו את השומר/ת הראשון/ה שלכם - שלחו הזמנה בוואטסאפ.', en:'Add your first SHOMER - send an invite on WhatsApp.', cta_he:'שלח/י הזמנה', cta_en:'Send invite', act:function(){ shareInvite(); }},
- {he:'הציצו במפה החיה - מה קורה באזור שלכם?', en:'Look at the live map - what is happening near you?', cta_he:'למפה', cta_en:'Open map', act:function(){}},
- {he:'הגדירו קוד ביטול שקט - כדי לבטל SOS שגוי.', en:'Set your silent-cancel code - to cancel a false SOS.', cta_he:'להגדרות', cta_en:'Open settings', act:function(){ setReveal('[onclick="openSetPin()"]'); }},
- {he:'אפשרו התראות - כדי לקבל SOS גם כשהאפליקציה ברקע.', en:'Allow notifications - so you get SOS alerts even when the app is in the background.', cta_he:'אפשר/י התראות', cta_en:'Allow notifications', act:function(){ enablePush(); }},
- {he:'נסו צ׳ק-אין הדדי עם השומר/ת שלכם.', en:'Try a mutual check-in with your SHOMER.', cta_he:'לצ׳ק-אין', cta_en:'Open check-in', act:function(){ op('sh-checkin'); }},
- {he:'קראו את המדריך הקצר - 2 דקות.', en:'Read the short guide - 2 minutes.', cta_he:'למדריך', cta_en:'Open guide', act:function(){ openGuide(); }},
- {he:'פתחו את מסך הדיווח - ראו איך מדווחים על אירוע (אין חובה לשלוח).', en:'Open the report screen - see how reporting works (no need to send).', cta_he:'למסך הדיווח', cta_en:'Open report', act:function(){ openReport(); }},
- {he:'הזמינו אדם נוסף למעגל השומרים שלכם.', en:'Invite one more person to your SHOMER circle.', cta_he:'שלח/י הזמנה', cta_en:'Send invite', act:function(){ shareInvite(); }},
- {he:'הוסיפו אנשי קשר לחירום.', en:'Add emergency contacts.', cta_he:'לאנשי חירום', cta_en:'Open contacts', act:function(){ op('sh-em'); }},
- {he:'הכירו את השומר האוטומטי - SOS אם לא הגבתם בזמן.', en:'Meet the automatic guard - SOS if you do not respond in time.', cta_he:'לשומר האוטומטי', cta_en:'Open it', act:function(){ op('sh-dms'); }},
- {he:'הגדירו התראת הגעה - תדעו כשהשומר/ת שלכם מגיע/ה הביתה.', en:'Set an arrival alert - know when your SHOMER gets home.', cta_he:'להגעות', cta_en:'Open arrivals', act:function(){ openArrivals(); }},
- {he:'ספרו לנו מה עבד ומה לא - משפט אחד מספיק.', en:'Tell us what worked and what did not - one sentence is enough.', cta_he:'שלח/י משוב', cta_en:'Send feedback', act:function(){ try{ window.open('mailto:support@shomer-app.co.il?subject='+encodeURIComponent('SH✡MER tester feedback'),'_blank'); }catch(e){} }},
- {he:'יום 14 - סיימתם! תודה ענקית. השאירו את האפליקציה מותקנת - אתם חלק מהרשת.', en:'Day 14 - you made it! Huge thanks. Keep the app installed - you are part of the network.', cta_he:'סגור', cta_en:'Close', act:function(){}}
+ {he:'ברוכים הבאים לבדיקה! השאירו את SH✡MER מותקנת 14 יום - בדקו שהשם שלכם מופיע בפרופיל.', en:'Welcome to the test! Keep SH✡MER installed for 14 days - check your name shows in your profile.', cta_he:'לפרופיל', cta_en:'Open profile', ar:'أهلاً بكم في التجربة! أبقوا شومير مثبّتاً 14 يوماً - تأكدوا أن اسمكم يظهر في الملف الشخصي.', cta_ar:'إلى الملف الشخصي', act:function(){ op('sh-prof'); }},
+ {he:'הוסיפו את השומרים הראשונים שלכם - שלחו הזמנה בוואטסאפ.', en:'Add your first SHOMER - send an invite on WhatsApp.', cta_he:'שלחו הזמנה', cta_en:'Send invite', ar:'أضيفوا أول حارس لكم - أرسلوا دعوة عبر واتساب.', cta_ar:'أرسلوا دعوة', act:function(){ shareInvite(); }},
+ {he:'הציצו במפה החיה - מה קורה באזור שלכם?', en:'Look at the live map - what is happening near you?', cta_he:'למפה', cta_en:'Open map', ar:'ألقوا نظرة على الخريطة الحيّة - ماذا يحدث في منطقتكم؟', cta_ar:'إلى الخريطة', act:function(){}},
+ {he:'הגדירו קוד ביטול שקט - כדי לבטל SOS שגוי.', en:'Set your silent-cancel code - to cancel a false SOS.', cta_he:'להגדרות', cta_en:'Open settings', ar:'حدّدوا رمز الإلغاء الصامت - لإلغاء نداء استغاثة خاطئ.', cta_ar:'إلى الإعدادات', act:function(){ setReveal('[onclick="openSetPin()"]'); }},
+ {he:'אפשרו התראות - כדי לקבל SOS גם כשהאפליקציה ברקע.', en:'Allow notifications - so you get SOS alerts even when the app is in the background.', cta_he:'אפשרו התראות', cta_en:'Allow notifications', ar:'فعّلوا الإشعارات - لتصلكم نداءات الاستغاثة حتى عندما يعمل التطبيق في الخلفية.', cta_ar:'فعّلوا الإشعارات', act:function(){ enablePush(); }},
+ {he:'נסו צ׳ק-אין הדדי עם השומרים שלכם.', en:'Try a mutual check-in with your SHOMER.', cta_he:'לצ׳ק-אין', cta_en:'Open check-in', ar:'جرّبوا التفقّد المتبادل مع حرّاسكم.', cta_ar:'إلى التفقّد المتبادل', act:function(){ op('sh-checkin'); }},
+ {he:'קראו את המדריך הקצר - 2 דקות.', en:'Read the short guide - 2 minutes.', cta_he:'למדריך', cta_en:'Open guide', ar:'اقرؤوا الدليل القصير - دقيقتان.', cta_ar:'إلى الدليل', act:function(){ openGuide(); }},
+ {he:'פתחו את מסך הדיווח - ראו איך מדווחים על אירוע (אין חובה לשלוח).', en:'Open the report screen - see how reporting works (no need to send).', cta_he:'למסך הדיווח', cta_en:'Open report', ar:'افتحوا شاشة البلاغ - تعرّفوا كيف يتم الإبلاغ عن حادث (لا داعي للإرسال).', cta_ar:'إلى شاشة البلاغ', act:function(){ openReport(); }},
+ {he:'הזמינו אדם נוסף למעגל השומרים שלכם.', en:'Invite one more person to your SHOMER circle.', cta_he:'שלחו הזמנה', cta_en:'Send invite', ar:'ادعوا شخصاً آخر إلى دائرة حرّاسكم.', cta_ar:'أرسلوا دعوة', act:function(){ shareInvite(); }},
+ {he:'הוסיפו אנשי קשר לחירום.', en:'Add emergency contacts.', cta_he:'לאנשי חירום', cta_en:'Open contacts', ar:'أضيفوا جهات اتصال للطوارئ.', cta_ar:'إلى جهات الطوارئ', act:function(){ op('sh-em'); }},
+ {he:'הכירו את השומר האוטומטי - SOS אם לא הגבתם בזמן.', en:'Meet the automatic guard - SOS if you do not respond in time.', cta_he:'לשומר האוטומטי', cta_en:'Open it', ar:'تعرّفوا على الحارس التلقائي - نداء استغاثة إذا لم تستجيبوا في الوقت المحدد.', cta_ar:'إلى الحارس التلقائي', act:function(){ op('sh-dms'); }},
+ {he:'הגדירו התראת הגעה - תדעו כשמישהו מהשומרים שלכם מגיע הביתה.', en:'Set an arrival alert - know when your SHOMER gets home.', cta_he:'להגעות', cta_en:'Open arrivals', ar:'فعّلوا تنبيه الوصول - لتعرفوا متى يصل أحد حرّاسكم إلى البيت.', cta_ar:'إلى تنبيهات الوصول', act:function(){ openArrivals(); }},
+ {he:'ספרו לנו מה עבד ומה לא - משפט אחד מספיק.', en:'Tell us what worked and what did not - one sentence is enough.', cta_he:'שלחו משוב', cta_en:'Send feedback', ar:'أخبرونا بما نجح وما لم ينجح - جملة واحدة تكفي.', cta_ar:'أرسلوا ملاحظاتكم', act:function(){ try{ window.open('mailto:support@shomer-app.co.il?subject='+encodeURIComponent('SH✡MER tester feedback'),'_blank'); }catch(e){} }},
+ {he:'יום 14 - סיימתם! תודה ענקית. השאירו את האפליקציה מותקנת - אתם חלק מהרשת.', en:'Day 14 - you made it! Huge thanks. Keep the app installed - you are part of the network.', cta_he:'סגור', cta_en:'Close', ar:'اليوم 14 - أنهيتم! شكراً جزيلاً. أبقوا التطبيق مثبّتاً - أنتم جزء من الشبكة.', cta_ar:'إغلاق', act:function(){}}
 ];
 function tpState(){ SS.tp=SS.tp||{}; if(!SS.tp.start){ SS.tp.start=tpToday(); SS.tp.seen={}; SS.tp.done={}; try{saveStore();}catch(e){} } SS.tp.seen=SS.tp.seen||{}; SS.tp.done=SS.tp.done||{}; return SS.tp; }
 function tpToday(){ var d=new Date(); return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'); }
@@ -6905,36 +6905,40 @@ function communityNudge(){
     var he=(typeof currentLang!=='undefined' && currentLang==='he');
     // Rotate through community-contribution prompts (citizens for citizens)
     var prompts=[
-      { he:'יש דפיברילטור (AED) בסביבתך? הוסף/י אותו למפה - זה יכול להציל חיים',
+      { he:'יש דפיברילטור (AED) בסביבה שלכם? הוסיפו אותו למפה - זה יכול להציל חיים',
+        ar:'هل يوجد جهاز إزالة رجفان (AED) قريب منكم؟ أضيفوه إلى الخريطة - قد ينقذ حياة',
         en:'Know a defibrillator (AED) nearby? Add it to the map - it can save a life',
-        cta_he:'הוסף/י AED', cta_en:'Add AED',
+        cta_he:'הוסיפו AED', cta_en:'Add AED', cta_ar:'أضيفوا الجهاز',
         act:function(){ try{ if(typeof aedPlaceMode==='function') aedPlaceMode(); }catch(e){} } },
-      { he:'רוצה להזהיר שומרים אחרים מסביבך? דווח/י על אירוע במפה',
+      { he:'רוצים להזהיר שומרים אחרים בסביבה? דווחו על אירוע במפה',
+        ar:'هل تريدون تحذير الحرّاس الآخرين من حولكم؟ أبلغوا عن حادث على الخريطة', cta_ar:'أبلغوا',
         en:'Want to warn other SHOMERs near you? Report an event on the map',
-        cta_he:'דווח/י', cta_en:'Report',
+        cta_he:'דווחו', cta_en:'Report',
         act:function(){ try{ if(typeof openReport==='function') openReport(); }catch(e){} } },
-      { he:'ככל שיותר שומרים סביבך - כך בטוח יותר. הזמן/י שכן או חבר/ה',
+      { he:'ככל שיותר שומרים סביבכם - כך בטוח יותר. הזמינו שכנים או חברים',
+        ar:'كلما زاد عدد الحرّاس حولكم زاد الأمان. ادعوا جاراً أو صديقاً', cta_ar:'ادعوا',
         en:'The more SHOMERs around you, the safer everyone is. Invite a neighbor or friend',
-        cta_he:'הזמן/י', cta_en:'Invite',
+        cta_he:'הזמינו', cta_en:'Invite',
         act:function(){ try{ if(typeof openGuardians==='function') openGuardians(); }catch(e){} } }
     ];
     // pick the prompt with a rotating index
     var idx=0; try{ idx=parseInt(localStorage.getItem('shomerNudgeIdx')||'0',10)%prompts.length; }catch(e){}
     var pr=prompts[idx];
     try{ localStorage.setItem('shomerNudgeIdx', String((idx+1)%prompts.length)); }catch(e){}
-    showCommunityNudge(he?pr.he:pr.en, he?pr.cta_he:pr.cta_en, pr.act);
+    var _ar=(typeof currentLang!=='undefined' && currentLang==='ar');
+    showCommunityNudge(he?pr.he:(_ar?pr.ar:pr.en), he?pr.cta_he:(_ar?pr.cta_ar:pr.cta_en), pr.act);
     window._communityNudgeShown=true;
     try{ localStorage.setItem('shomerLastNudge', String(now)); }catch(e){}
   }catch(e){}
 }
 function showCommunityNudge(msg, ctaLabel, action){
   try{
-    var he=(typeof currentLang!=='undefined' && currentLang==='he');
+    var he=(typeof currentLang!=='undefined' && currentLang==='he'), _ar=(typeof currentLang!=='undefined' && currentLang==='ar');
     if(document.getElementById('community-nudge')) return;
     if(!popupTurn('community2',7,function(){ showCommunityNudge(msg, ctaLabel, action); })) return;
     var b=document.createElement('div');
     b.id='community-nudge';
-    b.style.cssText='position:fixed;left:50%;bottom:calc(var(--nav,64px) + 78px);transform:translateX(-50%);z-index:9400;max-width:90vw;width:340px;background:linear-gradient(160deg,#0F1D33,#132743);border:1px solid rgba(201,168,76,.35);border-radius:16px;box-shadow:0 12px 40px rgba(0,0,0,.5);padding:15px 16px;font-family:Heebo,sans-serif;direction:'+(he?'rtl':'ltr');
+    b.style.cssText='position:fixed;left:50%;bottom:calc(var(--nav,64px) + 78px);transform:translateX(-50%);z-index:9400;max-width:90vw;width:340px;background:linear-gradient(160deg,#0F1D33,#132743);border:1px solid rgba(201,168,76,.35);border-radius:16px;box-shadow:0 12px 40px rgba(0,0,0,.5);padding:15px 16px;font-family:Heebo,sans-serif;direction:'+((he||_ar)?'rtl':'ltr');
     b.innerHTML=''
       +'<div style="display:flex;align-items:flex-start;gap:11px">'
       +  '<div style="flex-shrink:0;width:34px;height:34px;border-radius:9px;background:linear-gradient(135deg,#C09020,#E0A828,#F5C840);display:flex;align-items:center;justify-content:center">'
@@ -6943,7 +6947,7 @@ function showCommunityNudge(msg, ctaLabel, action){
       +  '<div style="flex:1"><div style="font-size:13px;font-weight:600;color:#e8eefc;line-height:1.45;margin-bottom:10px">'+msg+'</div>'
       +    '<div style="display:flex;gap:8px;align-items:center">'
       +      '<button id="cn-act" style="background:linear-gradient(135deg,#C09020,#E0A828,#F5C840);color:#0a0c12;border:none;border-radius:9px;padding:7px 15px;font:800 12.5px Heebo,sans-serif;cursor:pointer">'+ctaLabel+'</button>'
-      +      '<button id="cn-dismiss" style="background:transparent;color:#8c9bbd;border:none;padding:7px 10px;font:600 12px Heebo,sans-serif;cursor:pointer">'+(he?'אחר כך':'Later')+'</button>'
+      +      '<button id="cn-dismiss" style="background:transparent;color:#8c9bbd;border:none;padding:7px 10px;font:600 12px Heebo,sans-serif;cursor:pointer">'+(he?'אחר כך':(_ar?'لاحقاً':'Later'))+'</button>'
       +    '</div>'
       +  '</div>'
       +'</div>';
@@ -6971,18 +6975,21 @@ function communityNudge(){
 
     /* Rotate through community-contribution invitations. Each builds shared safety. */
     var nudges = [
-      { he:'יש דפיברילטור (AED) בסביבתך? הוסף/י אותו למפה - זה יכול להציל חיים',
+      { he:'יש דפיברילטור (AED) בסביבה שלכם? הוסיפו אותו למפה - זה יכול להציל חיים',
+        ar:'هل يوجد جهاز إزالة رجفان (AED) قريب منكم؟ أضيفوه إلى الخريطة - قد ينقذ حياة',
         en:'Know a defibrillator (AED) nearby? Add it to the map - it can save a life',
         act:function(){ try{ if(typeof aedPlaceMode==='function') aedPlaceMode(); }catch(e){} } },
-      { he:'ראית משהו שכדאי שאחרים ידעו? צור/י אירוע והזהר/י את הקהילה',
+      { he:'ראיתם משהו שכדאי שאחרים ידעו? צרו אירוע והזהירו את הקהילה',
+        ar:'رأيتم شيئاً يجب أن يعرفه الآخرون؟ أنشئوا حدثاً وحذّروا المجتمع',
         en:'Saw something others should know? Create an event and warn the community',
         act:function(){ try{ if(typeof openReport==='function') openReport(); }catch(e){} } },
-      { he:'הזמן/י שכן או חבר להיות שומר - ככל שיותר עיניים, כולנו בטוחים יותר',
+      { he:'הזמינו שכנים או חברים להיות שומרים - ככל שיותר עיניים, כולנו בטוחים יותר',
+        ar:'ادعوا جاراً أو صديقاً ليصبح حارساً - كلما زادت العيون زاد أمان الجميع',
         en:'Invite a neighbour or friend to be a SHOMER - more eyes keep us all safer',
         act:function(){ try{ if(typeof openGuardians==='function') openGuardians(); }catch(e){} } }
     ];
     var n = nudges[opens % nudges.length];
-    popupSchedule('community',7,function(){ try{ localStorage.setItem('shomerLastNudge', String(Date.now())); }catch(e){} toast(he?n.he:n.en, '', n.act); return true; });   /* v312: shown by the popup scheduler at an idle moment */
+    popupSchedule('community',7,function(){ try{ localStorage.setItem('shomerLastNudge', String(Date.now())); }catch(e){} toast(he?n.he:((typeof currentLang!=='undefined'&&currentLang==='ar')?n.ar:n.en), '', n.act); return true; });   /* v312: shown by the popup scheduler at an idle moment */
   }catch(e){}
 }
 function checkInbox(){
@@ -11674,7 +11681,7 @@ try{ hydrateIcons(document); }catch(e){}
 /* Loaded-build version - shown in the diagnostic panel so a phone can prove
    whether it's on the latest build or a STALE cached one. Keep in lock-step
    with sw.js SW_VERSION on every deploy. */
-var APP_VER='v353';
+var APP_VER='v354';
 var FB={ready:false,uid:null,db:null,_presTimer:null,connected:false,listening:false,pushState:'default',near:0,swVer:'?',
   authState:'connecting',sdkLoaded:false,persist:'',permErr:null,err:null,wsProbe:'',csp:''};
 /* Always log connection diagnostics to the console so the real failure can be SEEN in Chrome. */
@@ -16925,7 +16932,8 @@ html[dir="rtl"] .sh-back svg{transform:scaleX(-1)}
 })();
 </script>
 <script>
-/* DRILL BANK - [topic, he_q, he_opts(correct FIRST), en_q, en_opts(correct FIRST), he_why, en_why]
+/* DRILL BANK - [topic, he_q, he_opts(correct FIRST), en_q, en_opts(correct FIRST), he_why, en_why, ar_q?, ar_opts?, ar_why?]
+   Arabic (optional) exists for the 14 questions shown 19 Nov - 2 Dec 2026 (the current testers' 14 days); others fall back to English.
    Topics = EMERGENCY_GUIDE ids (feed ספר השומר) or 'app' (how SH✡MER works).
    Every answer is taken from the in-app Emergency Guide text or from the app's own code. */
 var DRILL_BANK=[
@@ -16936,15 +16944,15 @@ var DRILL_BANK=[
 ['call','למה כדאי להעביר את הטלפון לרמקול בזמן שיחת חירום?',['כדי לטפל בנפגע בזמן שמדברים','כדי שכולם ישמעו','כדי לחסוך בסוללה','כדי שהשיחה תהיה מוקלטת'],'Why put the phone on speaker during an emergency call?',['So you can treat the person while talking','So everyone can hear','To save battery','So the call is recorded'],'רמקול משאיר את הידיים פנויות לעזרה ראשונה בזמן ההנחיות.','Speaker keeps your hands free for first aid while you get instructions.'],
 ['cpr','אדם לא מגיב ולא נושם כרגיל. מה הצעד הראשון אחרי שזיהית?',['להתקשר ל-101 ולבקש דפיברילטור','לחפש דופק דקה שלמה','לתת לו לשתות','להזיז אותו לצל'],'Someone is unresponsive and not breathing normally. First step after you notice?',['Call 101 and ask for an AED','Check for a pulse for a full minute','Give them water','Move them into the shade'],'במדריך: מתקשרים ל-101 ומבקשים דפיברילטור, בלי לעכב בבדיקת דופק.','Guide: call 101 and ask for an AED - do not delay to check a pulse.'],
 ['cpr','באיזה קצב לוחצים בהחייאה?',['100-120 לחיצות בדקה','30 לחיצות בדקה','60 לחיצות בדקה','200 לחיצות בדקה'],'What compression rate is used in CPR?',['100-120 per minute','30 per minute','60 per minute','200 per minute'],'לוחצים חזק ומהר: 100-120 בדקה, עומק 5-6 ס״מ.','Push hard and fast: 100-120 per minute, 5-6 cm deep.'],
-['cpr','לא עברת הכשרה בהנשמות. מה עושים?',['עיסויים רצופים בלבד, בלי לעצור','רק הנשמות','מחכים לצוות בלי לגעת','לחיצה אחת כל 10 שניות'],'Not trained in rescue breaths. What do you do?',['Continuous chest compressions only, without stopping','Breaths only','Wait for the team without touching','One compression every 10 seconds'],'לא מיומנים? עיסויי חזה רצופים בלבד עד שמגיעה עזרה.','Not trained? Continuous chest compressions only until help arrives.'],
+['cpr','לא עברת הכשרה בהנשמות. מה עושים?',['עיסויים רצופים בלבד, בלי לעצור','רק הנשמות','מחכים לצוות בלי לגעת','לחיצה אחת כל 10 שניות'],'Not trained in rescue breaths. What do you do?',['Continuous chest compressions only, without stopping','Breaths only','Wait for the team without touching','One compression every 10 seconds'],'לא מיומנים? עיסויי חזה רצופים בלבד עד שמגיעה עזרה.','Not trained? Continuous chest compressions only until help arrives.','لا خبرة لديك في التنفس الاصطناعي. ما العمل؟',['ضغطات صدر متواصلة فقط، دون توقف','تنفس اصطناعي فقط','انتظار الطاقم دون لمس المصاب','ضغطة واحدة كل 10 ثوانٍ'],'بلا تدريب؟ ضغطات صدر متواصلة فقط حتى وصول المساعدة.'],
 ['cpr','הגיע דפיברילטור (AED). מה עושים?',['מדליקים ופועלים לפי ההנחיות הקוליות','מחכים לרופא שיפעיל','מפסיקים החייאה לגמרי','משאירים אותו סגור'],'An AED has arrived. What now?',['Turn it on and follow the voice prompts','Wait for a doctor to operate it','Stop CPR completely','Leave it closed'],'מדליקים את הדפיברילטור ופועלים לפי ההוראות הקוליות שלו.','Turn the AED on and follow its voice prompts.'],
 ['choke','מישהו נחנק אבל משתעל חזק. מה עושים?',['מעודדים להמשיך להשתעל, לא מתערבים','מכים מיד בגב','היימליך מיד','נותנים מים'],'Someone is choking but coughing hard. What do you do?',['Encourage them to keep coughing, do not intervene','Hit their back right away','Heimlich right away','Give them water'],'כל עוד משתעלים או מדברים - מעודדים שיעול חזק ולא מתערבים.','While they can cough or speak - encourage strong coughing, do not intervene.'],
-['choke','מבוגר לא מצליח להשתעל או לנשום. מה הצעד הראשון?',['להטות קדימה ולתת עד 5 מכות בין השכמות','לחפש באצבע בפה','לתת לשתות','להשכיב על הגב ולחכות'],'An adult cannot cough or breathe. First step?',['Lean them forward, up to 5 back blows between the shoulder blades','Sweep the mouth with a finger','Give a drink','Lay them down and wait'],'מטים קדימה, עד 5 מכות גב, ואם לא עזר - עד 5 לחיצות בטן, לסירוגין.','Lean forward, up to 5 back blows, then up to 5 abdominal thrusts, alternating.'],
+['choke','מבוגר לא מצליח להשתעל או לנשום. מה הצעד הראשון?',['להטות קדימה ולתת עד 5 מכות בין השכמות','לחפש באצבע בפה','לתת לשתות','להשכיב על הגב ולחכות'],'An adult cannot cough or breathe. First step?',['Lean them forward, up to 5 back blows between the shoulder blades','Sweep the mouth with a finger','Give a drink','Lay them down and wait'],'מטים קדימה, עד 5 מכות גב, ואם לא עזר - עד 5 לחיצות בטן, לסירוגין.','Lean forward, up to 5 back blows, then up to 5 abdominal thrusts, alternating.','شخص بالغ لا يستطيع السعال أو التنفس. ما الخطوة الأولى؟',['إمالته إلى الأمام وإعطاؤه حتى 5 ضربات بين لوحَي الكتف','إدخال إصبع في فمه','إعطاؤه ماء ليشرب','إضجاعه على ظهره والانتظار'],'إمالة إلى الأمام، حتى 5 ضربات على الظهر، ثم حتى 5 ضغطات على البطن، بالتناوب.'],
 ['choke','תינוק (מתחת לגיל שנה) נחנק. מה אסור?',['לחיצות בטן (היימליך)','מכות גב על האמה','לחיצות חזה בשתי אצבעות','להתקשר ל-101'],'An infant (under 1) is choking. What is forbidden?',['Abdominal thrusts (Heimlich)','Back blows along your forearm','Two-finger chest thrusts','Calling 101'],'בתינוק: 5 מכות גב ו-5 לחיצות חזה בשתי אצבעות - בלי לחיצות בטן.','Infant: 5 back blows and 5 two-finger chest thrusts - NO abdominal thrusts.'],
-['bleed','דימום חזק מפצע. מה עושים קודם?',['לחץ ישיר וחזק על הפצע','שוטפים במים','מחכים שיעצור לבד','מורחים משחה'],'Heavy bleeding from a wound. What first?',['Firm direct pressure on the wound','Rinse with water','Wait for it to stop','Apply ointment'],'לחץ ישיר וחזק בכף היד, ולהמשיך ללחוץ דרך תחבושת.','Firm direct pressure with your palm, and keep pressing through a bandage.'],
+['bleed','דימום חזק מפצע. מה עושים קודם?',['לחץ ישיר וחזק על הפצע','שוטפים במים','מחכים שיעצור לבד','מורחים משחה'],'Heavy bleeding from a wound. What first?',['Firm direct pressure on the wound','Rinse with water','Wait for it to stop','Apply ointment'],'לחץ ישיר וחזק בכף היד, ולהמשיך ללחוץ דרך תחבושת.','Firm direct pressure with your palm, and keep pressing through a bandage.','نزيف شديد من جرح. ما أول خطوة؟',['ضغط مباشر وقوي على الجرح','غسله بالماء','انتظار توقفه وحده','وضع مرهم'],'ضغط مباشر وقوي بكفّ اليد، مع الاستمرار في الضغط فوق الضمادة.'],
 ['bleed','התחבושת ספוגה בדם. מה עושים?',['מוסיפים תחבושת מעל ולא מורידים','מורידים ומחליפים','משחררים את הלחץ','שוטפים את הפצע'],'The dressing is soaked with blood. What now?',['Add more on top, do not remove it','Remove and replace it','Release the pressure','Wash the wound'],'לא מסירים תחבושת ספוגה - מוסיפים עוד מעליה.','Never remove a soaked dressing - add more on top.'],
-['bleed','הנחת חוסם עורקים. מה חשוב לעשות?',['לרשום את שעת ההנחה במקום בולט','לשחרר אותו כל כמה דקות','לכסות אותו כדי שלא יראו','להסיר אחרי 5 דקות'],'You applied a tourniquet. What is important?',['Write the time it was applied somewhere obvious','Loosen it every few minutes','Cover it so it is hidden','Remove it after 5 minutes'],'רושמים את השעה במקום בולט ולא משחררים חוסם שהונח.','Write the time somewhere obvious and never loosen an applied tourniquet.'],
-['bleed','חפץ נעוץ בפצע. מה עושים?',['לא מוציאים אותו, לוחצים סביבו ומתקשרים','מוציאים מהר','מסובבים אותו','שוטפים אותו החוצה'],'An object is embedded in a wound. What do you do?',['Do not pull it out - press around it and call','Pull it out fast','Twist it','Flush it out'],'במדריך: לא שולפים חפץ נעוץ.','Guide: do not pull out an embedded object.'],
+['bleed','הנחת חוסם עורקים. מה חשוב לעשות?',['לרשום את שעת ההנחה במקום בולט','לשחרר אותו כל כמה דקות','לכסות אותו כדי שלא יראו','להסיר אחרי 5 דקות'],'You applied a tourniquet. What is important?',['Write the time it was applied somewhere obvious','Loosen it every few minutes','Cover it so it is hidden','Remove it after 5 minutes'],'רושמים את השעה במקום בולט ולא משחררים חוסם שהונח.','Write the time somewhere obvious and never loosen an applied tourniquet.','بعد وضع العاصبة (تورنيكيه)، ما المهم؟',['كتابة وقت وضعها في مكان واضح','إرخاؤها كل بضع دقائق','تغطيتها كي لا تُرى','إزالتها بعد 5 دقائق'],'يُكتب الوقت في مكان واضح، ولا تُرخى العاصبة بعد وضعها أبداً.'],
+['bleed','חפץ נעוץ בפצע. מה עושים?',['לא מוציאים אותו, לוחצים סביבו ומתקשרים','מוציאים מהר','מסובבים אותו','שוטפים אותו החוצה'],'An object is embedded in a wound. What do you do?',['Do not pull it out - press around it and call','Pull it out fast','Twist it','Flush it out'],'במדריך: לא שולפים חפץ נעוץ.','Guide: do not pull out an embedded object.','جسم مغروس في الجرح. ما العمل؟',['عدم نزعه، والضغط حوله، والاتصال لطلب المساعدة','نزعه بسرعة','تدويره','غسله لإخراجه'],'حسب الدليل: لا يُنزع الجسم المغروس.'],
 ['burn','כוויה מחום. מה עושים?',['מקררים במים זורמים לפחות 20 דקות','שמים קרח','מורחים חמאה או יוגורט','מפוצצים שלפוחיות'],'A heat burn. What do you do?',['Cool under running water for at least 20 minutes','Put ice on it','Spread butter or yogurt','Pop the blisters'],'מים זורמים קרירים 20 דקות לפחות. בלי קרח, בלי תרופות סבתא.','Cool running water for at least 20 minutes. No ice, no home remedies.'],
 ['burn','במה מכסים כוויה אחרי הקירור?',['ניילון נצמד מונח ברפיון או שקית נקייה','בד רטוב','צמר גפן','פלסטר הדוק'],'What do you cover a burn with after cooling?',['Cling film laid loosely, or a clean plastic bag','A wet cloth','Cotton wool','A tight plaster'],'מכסים בניילון נצמד ברפיון (לא כורכים חזק) - לא בבד רטוב.','Cover loosely with cling film (not wrapped tight) - not a wet cloth.'],
 ['burn','כוויה מחשמל. מה קודם לכל?',['לוודא שהחשמל מנותק לפני שנוגעים','לשפוך מים על המכשיר','למשוך את האדם בידיים','למרוח משחה'],'An electrical burn. What comes first?',['Make sure the power is OFF before touching','Pour water on the device','Pull the person with your hands','Apply ointment'],'בכוויית חשמל - מוודאים שהחשמל כבוי לפני מגע.','Electrical burn - make sure the power is off before touching.'],
@@ -16955,21 +16963,21 @@ var DRILL_BANK=[
 ['heart','חשד להתקף לב. מה הצעד הראשון?',['להתקשר ל-101 מיד','לחפש אספירין קודם','לצאת להליכה','לחכות שעה'],'Suspected heart attack. First step?',['Call 101 immediately','Look for aspirin first','Go for a walk','Wait an hour'],'כל דקה חשובה - מתקשרים מיד ולא מעכבים בשביל אספירין.','Every minute matters - call now, never delay to find aspirin.'],
 ['heart','באיזו תנוחה כדאי להושיב חשוד להתקף לב?',['ישיבה חצי-שכיבה, ברכיים כפופות','עמידה','שכיבה על הבטן','הליכה איטית'],'How should a suspected heart-attack patient rest?',['Seated, semi-reclined, knees bent','Standing','Lying face down','Walking slowly'],'מנוחה בישיבה חצי-שכיבה עם ברכיים כפופות.','Rest seated, semi-reclined, knees bent.'],
 ['allergy','תגובה אלרגית קשה (אנפילקסיס) ויש מזרק אדרנלין. מתי מזריקים?',['מיד','רק אם מתעלפים','אחרי 20 דקות','רק בבית חולים'],'Severe allergic reaction (anaphylaxis) and an adrenaline pen is available. When to inject?',['Immediately','Only if they faint','After 20 minutes','Only at hospital'],'משתמשים במזרק מיד - לא מעכבים את האדרנלין.','Use the auto-injector immediately - never delay the adrenaline.'],
-['allergy','לאן מזריקים את מזרק האדרנלין?',['אמצע הירך החיצונית, אפשר דרך הבגד','לישבן','לזרוע העליונה בלבד','לבטן'],'Where do you inject the adrenaline pen?',['Middle of the outer thigh, through clothing is OK','The buttock','Upper arm only','The belly'],'אמצע הירך החיצונית, גם דרך בגדים, להחזיק כ-3 שניות. לא לישבן.','Middle of the outer thigh, works through clothing, hold ~3 seconds. Not the buttock.'],
+['allergy','לאן מזריקים את מזרק האדרנלין?',['אמצע הירך החיצונית, אפשר דרך הבגד','לישבן','לזרוע העליונה בלבד','לבטן'],'Where do you inject the adrenaline pen?',['Middle of the outer thigh, through clothing is OK','The buttock','Upper arm only','The belly'],'אמצע הירך החיצונית, גם דרך בגדים, להחזיק כ-3 שניות. לא לישבן.','Middle of the outer thigh, works through clothing, hold ~3 seconds. Not the buttock.','أين يُحقن قلم الأدرينالين؟',['منتصف الفخذ من الخارج، ويمكن عبر الملابس','الأرداف','أعلى الذراع فقط','البطن'],'منتصف الفخذ من الخارج، حتى عبر الملابس، مع التثبيت نحو 3 ثوانٍ. ليس في الأرداف.'],
 ['allergy','אחרי הזריקה המצב השתפר. האם עדיין מתקשרים ל-101?',['כן - התסמינים יכולים לחזור אחרי שעות','לא, הכל עבר','רק אם יש פריחה','רק למחרת'],'After the injection they feel better. Still call 101?',['Yes - symptoms can return hours later','No, it is over','Only if there is a rash','Only the next day'],'מתקשרים גם אם השתפר ואומרים "אנפילקסיס" - צריך השגחה רפואית.','Call even if better and say "anaphylaxis" - medical observation is needed.'],
-['seizure','מישהו בפרכוסים. מה אסור לעשות?',['להכניס משהו לפה','להגן על הראש','לפנות חפצים מסוכנים','למדוד כמה זמן זה נמשך'],'Someone is having a seizure. What must you NOT do?',['Put something in their mouth','Protect the head','Move dangerous objects away','Time how long it lasts'],'לא מכניסים כלום לפה ולא מרסנים. מגינים על הראש ומודדים זמן.','Nothing in the mouth, no restraining. Protect the head and time it.'],
+['seizure','מישהו בפרכוסים. מה אסור לעשות?',['להכניס משהו לפה','להגן על הראש','לפנות חפצים מסוכנים','למדוד כמה זמן זה נמשך'],'Someone is having a seizure. What must you NOT do?',['Put something in their mouth','Protect the head','Move dangerous objects away','Time how long it lasts'],'לא מכניסים כלום לפה ולא מרסנים. מגינים על הראש ומודדים זמן.','Nothing in the mouth, no restraining. Protect the head and time it.','شخص يعاني من نوبة تشنّج. ما الذي يُمنع فعله؟',['إدخال أي شيء في فمه','حماية رأسه','إبعاد الأشياء الخطرة','قياس مدة النوبة'],'لا شيء في الفم ولا تقييد للحركة. يُحمى الرأس ويُقاس الوقت.'],
 ['seizure','הפרכוסים נגמרו. מה עושים?',['משכיבים על הצד ונשארים עד התאוששות מלאה','נותנים לשתות מיד','מעמידים אותו','עוזבים'],'The convulsions stopped. What now?',['Turn them on their side and stay until fully recovered','Give a drink right away','Stand them up','Leave'],'תנוחת התאוששות על הצד, בלי אוכל ושתייה עד התאוששות מלאה.','Recovery position on the side; no food or drink until fully recovered.'],
 ['seizure','מתי חובה להתקשר ל-101 בפרכוס?',['אם זה נמשך יותר מ-5 דקות','אם זה נמשך 10 שניות','אף פעם','רק אם האדם מבקש'],'When must you call 101 for a seizure?',['If it lasts over 5 minutes','If it lasts 10 seconds','Never','Only if they ask'],'101 אם מעל 5 דקות, פרכוס ראשון, חוזר בלי התעוררות, פציעה או קושי נשימה.','101 if over 5 minutes, a first seizure, repeated without waking, injury or breathing trouble.'],
 ['drown','מישהו טובע ולא עברת הכשרת הצלה. מה נכון?',['להושיט או לזרוק משהו - לא להיכנס למים','לקפוץ מיד','לחכות שייצא לבד','לצעוק בלבד'],'Someone is drowning and you are not trained in rescue. What is right?',['Reach or throw something - do not go in','Jump in immediately','Wait for them to get out','Only shout'],'מגנים על עצמך: מושיטים או זורקים. לא נהיים נפגע שני.','Protect yourself: reach or throw. Do not become a second victim.'],
 ['drown','הוצאת טובע, לא מגיב ולא נושם. מה קודם?',['5 הנשמות ואז החייאה','רק עיסויים','לנער אותו','לכסות ולחכות'],'You pulled out a drowning person, unresponsive and not breathing. What first?',['5 rescue breaths, then CPR','Compressions only','Shake them','Cover and wait'],'בטביעה ההנשמות חיוניות: 5 הנשמות ואז החייאה.','In drowning the breaths are essential: 5 rescue breaths, then CPR.'],
-['shock','סימני הלם (עור חיוור וקר, חולשה). מה עושים?',['101, להשכיב, לחמם ולהרים רגליים אם אין פגיעה','לתת אוכל ושתייה','להושיב ולהליך','לשפוך מים קרים'],'Signs of shock (pale cold skin, weakness). What do you do?',['101, lay down, keep warm, raise legs if no injury','Give food and drink','Sit them up and walk','Pour cold water'],'הלם מסכן חיים: 101, להשכיב, לחמם, ולהרים רגליים - אלא אם יש חשד לפגיעת ראש/צוואר/גב.','Shock is life-threatening: 101, lay down, keep warm, raise legs unless head/neck/back injury is suspected.'],
-['shock','מתי לא מרימים רגליים לנפגע בהלם?',['בחשד לפגיעה בראש, צוואר או גב','כשקר לו','כשהוא מבוגר','אף פעם לא מרימים'],'When do you NOT raise the legs of someone in shock?',['When a head, neck or back injury is suspected','When they are cold','When they are elderly','Never raise them'],'לא מרימים רגליים אם יש חשד לפגיעת ראש/צוואר/גב או אם זה כואב.','Do not raise the legs if a head/neck/back injury is suspected, or if it hurts.'],
+['shock','סימני הלם (עור חיוור וקר, חולשה). מה עושים?',['101, להשכיב, לחמם ולהרים רגליים אם אין פגיעה','לתת אוכל ושתייה','להושיב ולהליך','לשפוך מים קרים'],'Signs of shock (pale cold skin, weakness). What do you do?',['101, lay down, keep warm, raise legs if no injury','Give food and drink','Sit them up and walk','Pour cold water'],'הלם מסכן חיים: 101, להשכיב, לחמם, ולהרים רגליים - אלא אם יש חשד לפגיעת ראש/צוואר/גב.','Shock is life-threatening: 101, lay down, keep warm, raise legs unless head/neck/back injury is suspected.','علامات صدمة (جلد شاحب وبارد، ضعف). ما العمل؟',['101، إضجاعه، تدفئته ورفع رجليه إن لم تكن هناك إصابة','إعطاؤه طعاماً وشراباً','إجلاسه وجعله يمشي','سكب ماء بارد عليه'],'الصدمة تهدد الحياة: 101، إضجاع المصاب، تدفئته ورفع رجليه - إلا عند الاشتباه بإصابة في الرأس أو الرقبة أو الظهر.'],
+['shock','מתי לא מרימים רגליים לנפגע בהלם?',['בחשד לפגיעה בראש, צוואר או גב','כשקר לו','כשהוא מבוגר','אף פעם לא מרימים'],'When do you NOT raise the legs of someone in shock?',['When a head, neck or back injury is suspected','When they are cold','When they are elderly','Never raise them'],'לא מרימים רגליים אם יש חשד לפגיעת ראש/צוואר/גב או אם זה כואב.','Do not raise the legs if a head/neck/back injury is suspected, or if it hurts.','متى لا تُرفع رجلا المصاب بالصدمة؟',['عند الاشتباه بإصابة في الرأس أو الرقبة أو الظهر','عندما يشعر بالبرد','عندما يكون مسنّاً','لا تُرفعان أبداً'],'لا تُرفع الرجلان عند الاشتباه بإصابة في الرأس أو الرقبة أو الظهر، أو إذا كان ذلك مؤلماً.'],
 ['faint','מרגישים שעומדים להתעלף. מה עושים?',['לשכב עם רגליים מורמות או לשבת עם ראש בין הברכיים','לקום מהר','לרוץ החוצה','לעצור נשימה'],'You feel faint. What do you do?',['Lie down with legs raised, or sit with head between knees','Stand up fast','Run outside','Hold your breath'],'שוכבים עם רגליים מורמות, או יושבים עם הראש בין הברכיים.','Lie down with legs raised, or sit with the head between the knees.'],
 ['faint','מתי התעלפות היא מצב חמור?',['לא מתעוררים תוך דקה או לא נושמים','אם הפנים חיוורות לרגע','אם האדם צמא','אף פעם'],'When is fainting serious?',['Not waking within a minute, or not breathing','If the face is pale for a moment','If they are thirsty','Never'],'חמור אם: לא מתעורר תוך דקה, לא נושם, כאב בחזה, התעלף במאמץ, נפצע או בהריון.','Serious if: not waking within a minute, not breathing, chest pain, fainted on exertion, injured or pregnant.'],
 ['faint','אישה בהריון התעלפה. איך משכיבים?',['על הצד','על הבטן','בישיבה זקופה','בעמידה'],'A pregnant woman fainted. How do you lay her?',['On her side','Face down','Sitting upright','Standing'],'במדריך: אישה בהריון - משכיבים על הצד.','Guide: a pregnant woman - lay her on her side.'],
 ['bone','חשד לשבר ביד. מה עושים?',['מקבעים במצב הנוכחי ולא מיישרים','מיישרים את העצם','מבקשים להזיז כדי לבדוק','שמים קרח ישירות על העור'],'Suspected broken arm. What do you do?',['Support it in its current position, do not straighten','Straighten the bone','Ask them to move it to test','Put ice directly on the skin'],'מקבעים כמו שהוא, לא מיישרים, קרח עטוף במגבת - לא ישירות.','Splint it as it is, never realign, ice wrapped in a towel - not directly.'],
 ['bone','נקע בקרסול - מה ראשי התיבות של הטיפול?',['מנוחה, קרח, חבישה, הרמה (RICE)','חום, עיסוי, הליכה','מתיחה וריצה','רק משכך כאבים'],'An ankle sprain - what is the treatment acronym?',['Rest, Ice, Compression, Elevation (RICE)','Heat, massage, walking','Stretch and run','Painkillers only'],'נקע: מנוחה · קרח · חבישה אלסטית נוחה · הרמה מעל גובה הלב.','Sprain: Rest · Ice · comfortable elastic Compression · Elevate above heart level.'],
-['ptsd','מישהו בהתקף חרדה. מה לא אומרים?',['"תירגע/י" או "זה לא נורא"','"אני כאן. את/ה בטוח/ה"','"נשום/נשמי איתי"','"מה את/ה רואה סביבך?"'],'Someone is in a panic attack. What should you NOT say?',['"Calm down" or "it is not a big deal"','"I am here. You are safe."','"Breathe with me"','"What can you see around you?"'],'"תירגע" מגביר מצוקה. מדברים לאט, משפטים קצרים, ונשארים.','"Calm down" increases distress. Speak slowly, short sentences, and stay.'],
+['ptsd','מישהו בהתקף חרדה. מה לא אומרים?',['"תירגע/י" או "זה לא נורא"','"אני כאן. את/ה בטוח/ה"','"נשום/נשמי איתי"','"מה את/ה רואה סביבך?"'],'Someone is in a panic attack. What should you NOT say?',['"Calm down" or "it is not a big deal"','"I am here. You are safe."','"Breathe with me"','"What can you see around you?"'],'"תירגע" מגביר מצוקה. מדברים לאט, משפטים קצרים, ונשארים.','"Calm down" increases distress. Speak slowly, short sentences, and stay.','شخص يمر بنوبة هلع. ما الذي لا يُقال؟',['"اهدأ" أو "الأمر ليس خطيراً"','"أنا هنا. أنت في أمان"','"تنفّس معي"','"ماذا ترى حولك؟"'],'كلمة "اهدأ" تزيد الضيق. الكلام ببطء وبجمل قصيرة، والبقاء بجانبه.'],
 ['ptsd','מה זה תרגיל הקרקוע 5-4-3-2-1?',['5 דברים שרואים, 4 נוגעים, 3 שומעים, 2 מריחים, 1 טועמים','לספור לאחור מ-5','5 נשימות עמוקות','לקפוץ 5 פעמים'],'What is the 5-4-3-2-1 grounding exercise?',['5 things you see, 4 touch, 3 hear, 2 smell, 1 taste','Counting back from 5','5 deep breaths','Jumping 5 times'],'קרקוע בחושים מחזיר לכאן ועכשיו.','Grounding through the senses brings them back to the here and now.'],
 ['ptsd','חשש למחשבות אובדניות. למי פונים?',['ער״ן 1201 או 101','102','רק לחבר','לא לשאול על זה'],'Concern about suicidal thoughts. Who do you call?',['ERAN 1201 or 101','102','Only a friend','Do not ask about it'],'שואלים ישירות - זה לא "מכניס רעיון". ער״ן 1201 או 101.','Ask directly - it does not plant the idea. ERAN 1201 or 101.'],
 ['app','לחצת SOS בטעות. מה קורה אם לוחצים "אני בטוח/ה - בטל" בזמן הספירה?',['זו אזעקת שווא - שום דבר לא משודר ולא מופיע במפה','השומרים מקבלים הודעה','המשטרה מוזעקת','צריך להזין קוד ביטול'],'You pressed SOS by mistake. What happens if you tap "I\'m safe - Cancel" during the countdown?',['It is a false alarm - nothing is broadcast, nothing on the map','Your SHOMERs get a message','Police are called','You must enter your cancel code'],'ביטול בזמן הספירה = אזעקת שווא. רק אחרי שהספירה נגמרת ה-SOS משודר.','Cancelling during the countdown = false alarm. The SOS is broadcast only after the countdown ends.'],
@@ -16977,7 +16985,7 @@ var DRILL_BANK=[
 ['app','למה SOS פעיל לא מבוטל בטביעת אצבע?',['כדי שאי אפשר יהיה לכבות אותו באצבע של אדם מחוסר הכרה','כי זה איטי','כי זה לא עובד באנדרואיד','זה דווקא אפשרי'],'Why can an active SOS not be cancelled with a fingerprint?',['So nobody can stop it with an unconscious person\'s finger','Because it is slow','It does not work on Android','Actually it can be'],'בכוונה: אדם מחוסר הכרה לא יכול לכבות את ההתראה שלו בעל כורחו.','By design: an unconscious person\'s alert can\'t be cancelled with their own finger.'],
 ['app','כמה זמן נמשכת ברירת המחדל של ספירת ה-SOS לפני השידור?',['10 שניות','שנייה אחת','דקה','אין ספירה'],'How long is the default SOS countdown before broadcast?',['10 seconds','1 second','1 minute','There is no countdown'],'ברירת מחדל 10 שניות (אפשר 5-15). האזעקה מתחילה מיד.','Default 10 seconds (5-15 allowed). The alarm starts immediately.'],
 ['app','שומר/ת מהמעגל שלך שלח/ה SOS. מה הצעד הכי מועיל?',['ללחוץ "אני בדרך" כדי שיידעו, לנווט או להתקשר','להתעלם עד שיגיע עוד מישהו','לבטל להם את ה-SOS','לפרסם ברשתות'],'A SHOMER in your circle sent an SOS. Most useful step?',['Tap "I am coming" so they know, then navigate or call','Ignore it until someone else comes','Cancel their SOS','Post it on social media'],'"אני בדרך" מראה להם שעזרה מגיעה. "נווט/י" מוביל למיקום, ו"התקשר/י" לשיחה.','"I am coming" shows them help is on the way. "Navigate" leads to them, "Call" phones them.'],
-['app','שומר/ת אחר/ת לחץ/ה "לא יכול/ה" ב-SOS שקיבל/ה. מה זה אומר?',['שהוא/היא לא יכול/ה להגיע - שאחרים יידעו','שה-SOS בוטל','שהאדם בטוח','שהטלפון כבוי'],'Another SHOMER tapped "Stand down" on an SOS. What does that mean?',['They cannot come - so others know','The SOS was cancelled','The person is safe','Their phone is off'],'"לא יכול/ה" מודיע שאת/ה לא בדרך. ה-SOS עצמו נשאר פעיל.','"Stand down" tells them you are not coming. The SOS itself stays active.'],
+['app','שומר/ת אחר/ת לחץ/ה "לא יכול/ה" ב-SOS שקיבל/ה. מה זה אומר?',['שהוא/היא לא יכול/ה להגיע - שאחרים יידעו','שה-SOS בוטל','שהאדם בטוח','שהטלפון כבוי'],'Another SHOMER tapped "Stand down" on an SOS. What does that mean?',['They cannot come - so others know','The SOS was cancelled','The person is safe','Their phone is off'],'"לא יכול/ה" מודיע שאת/ה לא בדרך. ה-SOS עצמו נשאר פעיל.','"Stand down" tells them you are not coming. The SOS itself stays active.','ضغط حارس آخر على "لا أستطيع" في نداء استغاثة وصله. ماذا يعني ذلك؟',['أنه لا يستطيع الحضور - ليعرف الآخرون','أن النداء أُلغي','أن الشخص بأمان','أن هاتفه مغلق'],'"لا أستطيع" يُعلم الآخرين أنه ليس في الطريق. نداء الاستغاثة نفسه يبقى فعّالاً.'],
 ['app','מה עושה הצ׳ק-אין ההדדי?',['שואל "הכל טוב?" ואם לא מאשרים בזמן - השומרים שבחרת מקבלים התראה','שולח SOS כל שעה','מראה את המיקום לכולם','מחייג למשטרה'],'What does mutual check-in do?',['Asks "Are you OK?" - if you do not confirm in time, your chosen SHOMERs are alerted','Sends an SOS every hour','Shows your location to everyone','Calls the police'],'הצ׳ק-אין שואל כל כמה זמן. לא אישרת בחלון הזמן - השומרים שבחרת מקבלים התראה.','Check-in asks every interval. No confirmation in the window - your chosen SHOMERs are alerted.'],
 ['app','מה עושה "השומר האוטומטי" (Dead-man switch)?',['שולח SOS אוטומטית אם לא אישרת בזמן','מכבה את הטלפון','מצלם תמונה','שולח מיקום כל דקה לכולם'],'What does the automatic guard (dead-man switch) do?',['Sends an SOS automatically if you do not confirm in time','Turns the phone off','Takes a photo','Sends location to everyone every minute'],'כשהזמן נגמר בלי אישור - SOS נשלח אוטומטית. דקה לפני מקבלים אזהרה.','When time runs out without confirmation - an SOS is sent automatically. You get a warning a minute before.'],
 ['app','השומר האוטומטי פועל. כמה זמן לפני הסוף מקבלים אזהרה?',['דקה אחת','שעה','אין אזהרה','5 שניות'],'The automatic guard is running. How long before the end do you get a warning?',['1 minute','1 hour','No warning','5 seconds'],'60 שניות לפני הסוף מגיעה אזהרה "הכל טוב?".','60 seconds before the end you get an "Are you OK?" warning.'],
@@ -16986,9 +16994,9 @@ var DRILL_BANK=[
 ['app','מי רואה את "השם שלי בהזמנות"?',['רק מי שהזמנת או אישרת','כל משתמשי SH✡MER','כל מי שליד','אף אחד'],'Who sees "my name in invites"?',['Only people you invited or approved','Every SH✡MER user','Anyone nearby','Nobody'],'השם הפרטי מוצג רק לשומרים שלך. לכל השאר את/ה אנונימי/ת.','The private name is shown only to your SHOMERs. Everyone else sees you as anonymous.'],
 ['app','אישרת שומר/ת. מה הם יכולים לראות?',['את המיקום שלך בזמן אמת ואת ה-SOS שלך','את ההודעות שלך','את אנשי הקשר שלך','את התמונות שלך'],'You approved a SHOMER. What can they see?',['Your live location and your SOS','Your messages','Your contacts','Your photos'],'באישור הם רואים את המיקום החי שלך ומקבלים את ה-SOS. אפשר לעצור בכל רגע.','Once approved they see your live location and get your SOS. You can stop anytime.'],
 ['app','דיווח על אירוע במפה - למי הוא מגיע קודם?',['לשומרים שלך; לכל האזור רק אחרי ששכנים מאשרים','לכל הארץ מיד','למשטרה','לאף אחד'],'You report an event on the map - who sees it first?',['Your SHOMERs; area-wide only after neighbours confirm','The whole country instantly','The police','Nobody'],'דיווח מגיע קודם לשומרים שלך ומתפרסם לאזור רק אחרי אישור שכנים.','A report goes to your SHOMERs first, area-wide only after neighbours confirm.'],
-['app','האם דיווח במפה מחליף התקשרות למשטרה?',['לא - בסכנה מתקשרים ל-100','כן','רק בלילה','רק בסוף שבוע'],'Does a map report replace calling the police?',['No - in danger, call 100','Yes','Only at night','Only on weekends'],'SH✡MER אינו תחליף לשירותי חירום. בסכנה: 100 / 101 / 102.','SH✡MER is not a substitute for emergency services. In danger: 100 / 101 / 102.'],
-['app','מה קורה אחרי 3 קודי ביטול שגויים כשהגנת הגנב פעילה?',['האפליקציה מצלמת את מי שמחזיק את הטלפון','הטלפון ננעל לשבוע','ה-SOS מבוטל','כלום'],'With theft protection on, what happens after 3 wrong cancel codes?',['The app snaps a photo of whoever holds the phone','The phone locks for a week','The SOS is cancelled','Nothing'],'הגנת הגנב מצלמת אחרי 3 קודים שגויים - הוכחה לבעלים.','Theft protection snaps a photo after 3 wrong codes - evidence for the owner.'],
-['app','הגעת למכסת ה-SOS היומית (3). מה קורה בלחיצה נוספת?',['האזעקה בטלפון עדיין פועלת, אבל השידור מושהה','שום דבר לא קורה','החשבון נחסם','ה-SOS נשלח לכולם'],'You hit the daily SOS limit (3). What happens on another press?',['The phone alarm still sounds, but the broadcast is paused','Nothing at all','Your account is blocked','It goes to everyone'],'האזעקה האישית לעולם לא נחסמת. רק השידור מושהה (מניעת שימוש לרעה).','The personal alarm is never blocked. Only the broadcast is paused (anti-abuse).'],
+['app','האם דיווח במפה מחליף התקשרות למשטרה?',['לא - בסכנה מתקשרים ל-100','כן','רק בלילה','רק בסוף שבוע'],'Does a map report replace calling the police?',['No - in danger, call 100','Yes','Only at night','Only on weekends'],'SH✡MER אינו תחליף לשירותי חירום. בסכנה: 100 / 101 / 102.','SH✡MER is not a substitute for emergency services. In danger: 100 / 101 / 102.','هل يُغني البلاغ على الخريطة عن الاتصال بالشرطة؟',['لا - عند الخطر يُتصل بـ 100','نعم','في الليل فقط','في نهاية الأسبوع فقط'],'شومير ليس بديلاً عن خدمات الطوارئ. عند الخطر: 100 / 101 / 102.'],
+['app','מה קורה אחרי 3 קודי ביטול שגויים כשהגנת הגנב פעילה?',['האפליקציה מצלמת את מי שמחזיק את הטלפון','הטלפון ננעל לשבוע','ה-SOS מבוטל','כלום'],'With theft protection on, what happens after 3 wrong cancel codes?',['The app snaps a photo of whoever holds the phone','The phone locks for a week','The SOS is cancelled','Nothing'],'הגנת הגנב מצלמת אחרי 3 קודים שגויים - הוכחה לבעלים.','Theft protection snaps a photo after 3 wrong codes - evidence for the owner.','عند تفعيل الحماية من السرقة، ماذا يحدث بعد 3 رموز إلغاء خاطئة؟',['يلتقط التطبيق صورة لمن يحمل الهاتف','يُقفل الهاتف لأسبوع','يُلغى نداء الاستغاثة','لا شيء'],'الحماية من السرقة تلتقط صورة بعد 3 رموز خاطئة - دليل لصاحب الهاتف.'],
+['app','הגעת למכסת ה-SOS היומית (3). מה קורה בלחיצה נוספת?',['האזעקה בטלפון עדיין פועלת, אבל השידור מושהה','שום דבר לא קורה','החשבון נחסם','ה-SOS נשלח לכולם'],'You hit the daily SOS limit (3). What happens on another press?',['The phone alarm still sounds, but the broadcast is paused','Nothing at all','Your account is blocked','It goes to everyone'],'האזעקה האישית לעולם לא נחסמת. רק השידור מושהה (מניעת שימוש לרעה).','The personal alarm is never blocked. Only the broadcast is paused (anti-abuse).','تم الوصول إلى الحد اليومي لنداءات الاستغاثة (3). ماذا يحدث عند الضغط مرة أخرى؟',['إنذار الهاتف يعمل، لكن البث يتوقف مؤقتاً','لا يحدث شيء','يُحظر الحساب','يُرسل النداء إلى الجميع'],'الإنذار الشخصي لا يُحظر أبداً. البث فقط يتوقف مؤقتاً (لمنع إساءة الاستخدام).'],
 ['app','איך מוודאים שהשומרים יקבלו SOS גם כשהאפליקציה שלהם סגורה?',['לאפשר התראות (ובאנדרואיד - מיקום "תמיד")','לא צריך כלום','לכבות את הטלפון','להפעיל מצב רפאים'],'How do you make sure SHOMERs get SOS even when their app is closed?',['Allow notifications (and "Always" location on Android)','Nothing is needed','Turn the phone off','Turn on ghost mode'],'בלי התראות, התראה מגיעה רק כשהאפליקציה פתוחה.','Without notifications, alerts only arrive while the app is open.'],
 ['app','מה עושות "התראות מיקום השומרים שלי" (הגעות)?',['מתריעות כששומר/ת מגיע/ה לכתובת שהגדרת (למשל הביתה)','שולחות SOS','מוחקות את המיקום','מחייגות הביתה'],'What do "my SHOMERs\' location alerts" (arrivals) do?',['Alert you when a SHOMER reaches an address you set (e.g. home)','Send an SOS','Delete the location','Call home'],'בוחרים שומר/ת וכתובת מאומתת - ומקבלים התראה כשהם מגיעים.','Pick a SHOMER and a verified address - and get alerted when they arrive.'],
 ['app','תג החיבור למעלה כתום "מתחבר מחדש…". מה כדאי לעשות?',['לחכות רגע או להקיש עליו לניסיון מיידי; בחירום - לחייג','למחוק את האפליקציה','לכבות את המיקום','שום דבר לא יעזור'],'The status badge shows amber "Reconnecting…". What should you do?',['Wait a moment or tap it to retry now; in an emergency - call','Delete the app','Turn off location','Nothing helps'],'הקשה על התג מנסה להתחבר מיד. בחירום אמיתי - 100/101/102.','Tapping the badge retries at once. In a real emergency - 100/101/102.'],
@@ -17028,9 +17036,9 @@ function drillQuestion(dt){
   var _abroad=false; try{ _abroad=!emIsIL(); }catch(e){}
   if(_abroad){ for(var k=0;k<N && (q[4]||[]).some(function(o){ return /^\s*(10[0-2]|1201)(?!\d)/.test(o)||/ERAN|1201/.test(o); });k++){ qi=drillOrder()[(base+k+1)%N]; q=DRILL_BANK[qi]; } }
   var lz=function(x){ try{ return _abroad?emLocalize(x):x; }catch(e){ return x; } };
-  var he=currentLang==='he', opts=(he?q[2]:q[4]).map(function(t,i){ return {t:lz(t),ok:i===0}; });
+  var he=currentLang==='he', ar=(currentLang==='ar' && !!q[7]), opts=(he?q[2]:(ar?q[8]:q[4])).map(function(t,i){ return {t:lz(t),ok:i===0}; });
   var r=_drRand(n+1000); for(var i=opts.length-1;i>0;i--){ var j=Math.floor(r()*(i+1)); var t=opts[i]; opts[i]=opts[j]; opts[j]=t; }
-  return {i:qi, topic:q[0], q:lz(he?q[1]:q[3]), opts:opts, why:lz(he?q[5]:q[6]), right:lz(he?q[2][0]:q[4][0])};
+  return {i:qi, topic:q[0], q:lz(he?q[1]:(ar?q[7]:q[3])), opts:opts, why:lz(he?q[5]:(ar?q[9]:q[6])), right:lz(he?q[2][0]:(ar?q[8][0]:q[4][0])), dir:(he||ar)?'rtl':'ltr'};
 }
 function drillIsShabbat(dt){ return (dt||new Date()).getDay()===6; }
 /* v267: Shabbat window from a sunset approximation (NOAA / standard sunrise equation) for
@@ -17146,7 +17154,7 @@ function pulseSend(btn){
   var d=drillState(), k=drillKey(); d.pulse=d.pulse||{}; d.pulse[k]=Date.now(); try{saveStore();}catch(e){}
   try{ if(FB.ready&&FB._authReady) fbRestWrite('PUT','pulse/'+FB.uid+'/'+k, Date.now()); }catch(e){}
   try{ statsLogEvent('pulse_done'); }catch(e){}
-  if(btn){ btn.disabled=true; btn.textContent=drT('✓ סימנת שאת/ה בסדר','✓ You checked in','✓ سجّلت أنك بخير'); }
+  if(btn){ btn.disabled=true; btn.textContent=drT('✓ סימנת שהכול בסדר','✓ You checked in','✓ سجّلت أنك بخير'); }
   pulseTower();
 }
 function pulseTower(){
@@ -17175,21 +17183,21 @@ function tpMaybeShow(){
 }
 function drillOpenCard(){
   var old=document.getElementById('tp-bar'); if(old) old.remove();
-  var he=currentLang==='he', t=tpState(), idx=tpDayIdx(), tester=(idx>=0&&idx<TP_DAYS), m=tester?TP_MISSIONS[idx]:null;
+  var he=currentLang==='he', ar=currentLang==='ar', rtl=(he||ar), t=tpState(), idx=tpDayIdx(), tester=(idx>=0&&idx<TP_DAYS), m=tester?TP_MISSIONS[idx]:null;
   var q=drillQuestion(), done=drillState().days[drillKey()], st=drillStreak();
   var bar=document.createElement('div'); bar.id='tp-bar'; bar.className='nudge-bar dr-card';
   var dots=''; if(tester){ for(var i=0;i<TP_DAYS;i++){ dots+='<span style="display:inline-block;width:7px;height:7px;border-radius:50%;margin:0 2px;background:'+(i<idx?'#F5C840':(i===idx?'#fff':'rgba(255,255,255,.18)'))+'"></span>'; } }
-  var hdr=tester?(he?('יום '+(idx+1)+' מתוך '+TP_DAYS):('DAY '+(idx+1)+' OF '+TP_DAYS)):(drT('השאלה היומית · דקה אחת','Today\'s question · one minute','سؤال اليوم · دقيقة واحدة')+(st.n?(' · '+drT('רצף ','streak ','سلسلة ')+st.n):''));
-  var qd=(currentLang==='he')?'rtl':'ltr';   // Arabic shows the English question text (Hebrew/English bank) - keep it LTR so punctuation reads right
-  var html='<div class="dr-hd" dir="'+(he?'rtl':'ltr')+'">'+ESC(hdr)+'</div>'+(tester?'<div style="direction:ltr;margin-top:2px">'+dots+'</div>':'')
+  var hdr=tester?(he?('יום '+(idx+1)+' מתוך '+TP_DAYS):(ar?('اليوم '+(idx+1)+' من '+TP_DAYS):('DAY '+(idx+1)+' OF '+TP_DAYS))):(drT('השאלה היומית · דקה אחת','Today\'s question · one minute','سؤال اليوم · دقيقة واحدة')+(st.n?(' · '+drT('רצף ','streak ','سلسلة ')+st.n):''));
+  var qd=q.dir;   // rtl for Hebrew, and for Arabic when the question has Arabic text; English fallback stays LTR
+  var html='<div class="dr-hd" dir="'+(rtl?'rtl':'ltr')+'">'+ESC(hdr)+'</div>'+(tester?'<div style="direction:ltr;margin-top:2px">'+dots+'</div>':'')
     +'<div class="dr-q" dir="'+qd+'">'+ESC(q.q)+'</div><div class="dr-opts" dir="'+qd+'">'
     +q.opts.map(function(o,i){ return '<button class="dr-opt" type="button" data-i="'+i+'">'+ESC(o.t)+'</button>'; }).join('')
     +'</div><div class="dr-res" dir="'+qd+'" style="display:none"></div>';
-  if(pulseEnabled()) html+='<div class="dr-pulse"><button class="dr-pulse-b" type="button">'+(pulseMine()?drT('✓ סימנת שאת/ה בסדר','✓ You checked in','✓ سجّلت أنك بخير'):drT('אני בסדר ✓','I am OK ✓','أنا بخير ✓'))+'</button><span id="dr-tower"></span></div>';
+  if(pulseEnabled()) html+='<div class="dr-pulse"><button class="dr-pulse-b" type="button">'+(pulseMine()?drT('✓ סימנת שהכול בסדר','✓ You checked in','✓ سجّلت أنك بخير'):drT('אני בסדר ✓','I am OK ✓','أنا بخير ✓'))+'</button><span id="dr-tower"></span></div>';
   if(tester){
-    var mtxt=(he?m.he:m.en);
-    if(idx===TP_DAYS-1) mtxt+=(he?' מחר מתחילה המשמרת שלך - שאלה אחת ביום, באותה שעה.':' Tomorrow your shift starts - one question a day, same time.');
-    html+='<div class="dr-mission" dir="'+(he?'rtl':'ltr')+'"><span class="nudge-tx">'+ESC(mtxt)+'</span><button class="nudge-cta dr-mcta" type="button">'+ESC(he?m.cta_he:m.cta_en)+'</button></div>';
+    var mtxt=(he?m.he:(ar?m.ar:m.en));
+    if(idx===TP_DAYS-1) mtxt+=(he?' מחר מתחילה המשמרת שלכם - שאלה אחת ביום, באותה שעה.':(ar?' غداً تبدأ مناوبتكم - سؤال واحد كل يوم، في الوقت نفسه.':' Tomorrow your shift starts - one question a day, same time.'));
+    html+='<div class="dr-mission" dir="'+(rtl?'rtl':'ltr')+'"><span class="nudge-tx">'+ESC(mtxt)+'</span><button class="nudge-cta dr-mcta" type="button">'+ESC(he?m.cta_he:(ar?m.cta_ar:m.cta_en))+'</button></div>';
   }
   html+='<button class="nudge-x" aria-label="dismiss">✕</button>';
   bar.innerHTML=html;
@@ -17208,7 +17216,7 @@ function drillOpenCard(){
 function tpScheduleReminders(){
  try{
   if(!_isNative()||!_ln) return;
-  var he=currentLang==='he', ids=[];
+  var he=currentLang==='he', ar=currentLang==='ar', ids=[];
   for(var i=0;i<TP_DAYS;i++) ids.push({id:92000+i});
   try{ _ln.cancel({notifications:ids}); }catch(e){}
   if(drillSuppressed()) return;
@@ -17225,7 +17233,7 @@ function tpScheduleReminders(){
    if(missed>=3 && (k%2)===1) continue;                    // protect the channel
    var tIdx=Math.round((new Date(drillKey(at)+'T00:00:00')-new Date(t.start+'T00:00:00'))/86400000);
    var body, title;
-   if(tIdx>=0 && tIdx<TP_DAYS){ var m=TP_MISSIONS[tIdx]; title=(he?'SH✡MER · יום ':'SH✡MER · Day ')+(tIdx+1)+'/'+TP_DAYS; body=(he?m.he:m.en)+(he?' · והשאלה היומית מחכה.':' · And today\'s question is waiting.'); }
+   if(tIdx>=0 && tIdx<TP_DAYS){ var m=TP_MISSIONS[tIdx]; title=(he?'SH✡MER · יום ':(ar?'SH✡MER · اليوم ':'SH✡MER · Day '))+(tIdx+1)+'/'+TP_DAYS; body=(he?m.he:(ar?m.ar:m.en))+(he?' · והשאלה היומית מחכה.':(ar?' · وسؤال اليوم بانتظاركم.':' · And today\'s question is waiting.')); }
    else { title='SH✡MER'; body=drT('המשמרת שלך מחכה · שאלה אחת, דקה אחת','Your shift is waiting · one question, one minute','مناوبتك بانتظارك · سؤال واحد، دقيقة واحدة'); }
    ns.push({id:92000+k,title:title,body:body,channelId:'shomer-updates',autoCancel:true,schedule:{at:at},extra:{tag:'daily-drill'}});
   }
