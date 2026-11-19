@@ -3628,7 +3628,10 @@ function saveRadius(v){SS.settings.radius=Number(v);setText('rad-v',String(v));s
 /* ── Shake settings handlers ── */
 function toggleShake(el){
  el.classList.toggle('on');
- SS.shake.enabled=el.classList.contains('on'); SS.shake.v=2;
+ /* v343: MUST be the current migration version. It used to write 2, which shakeMigrate reads as
+    "v337 forced this off, turn it back on" - so a user who switched shake OFF had it silently
+    switched back ON at the next app load. Writing 3 marks this as a deliberate user choice. */
+ SS.shake.enabled=el.classList.contains('on'); SS.shake.v=3;
  try{ el.setAttribute('aria-checked',String(SS.shake.enabled)); }catch(e){}
  saveStore();
  if(SS.shake.enabled){ try{ shakeArmPermission(); }catch(e){} }   // this tap is a user gesture → iOS motion permission
@@ -4867,7 +4870,10 @@ function checkSoftwareUpdate(){
     fetch('version.json?cb='+Date.now(),{cache:'no-store'}).then(function(r){ return r.ok?r.json():null; }).then(function(d){
       if(!d||d.v!==APP_VER) return;
       if(!updNotesFor(d.notes).length){ delete SS._notesPending; try{saveStore();}catch(e){} return; }
-      popupSchedule('update',0,function(){
+      /* v343: was 0, tied with the shake notice. Only one popup shows per session, so an
+         update nag could win the tie and a user would never learn that shake-to-SOS exists
+         or how to cancel it. Safety notices come first; a version nag can wait a session. */
+      popupSchedule('update',3,function(){
         if(SS._notesPending!==APP_VER||document.getElementById('upd-modal')) return false;
         updShowBanner(APP_VER,true,d.notes); delete SS._notesPending; try{saveStore();}catch(e){}
         return !!document.getElementById('upd-modal'); });
@@ -11332,7 +11338,7 @@ try{ hydrateIcons(document); }catch(e){}
 /* Loaded-build version - shown in the diagnostic panel so a phone can prove
    whether it's on the latest build or a STALE cached one. Keep in lock-step
    with sw.js SW_VERSION on every deploy. */
-var APP_VER='v342';
+var APP_VER='v343';
 var FB={ready:false,uid:null,db:null,_presTimer:null,connected:false,listening:false,pushState:'default',near:0,swVer:'?',
   authState:'connecting',sdkLoaded:false,persist:'',permErr:null,err:null,wsProbe:'',csp:''};
 /* Always log connection diagnostics to the console so the real failure can be SEEN in Chrome. */
