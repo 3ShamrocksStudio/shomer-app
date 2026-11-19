@@ -7,7 +7,7 @@ async def main():
         ctx = await b.new_context(viewport={"width":390,"height":844})
         pg = await ctx.new_page()
         await pg.route("**/*", lambda r: r.continue_() if r.request.url.startswith("http://127.0.0.1") else r.abort())
-        st={"onboarded":True,"lang":"he","ageAsked":1,"user":{"name":"Savta","phone":"","ageBand":"75p"},"consent":{"share":False,"tos":True,"ts":1,"ver":"2026-07-10-draft"},"_lastVerSeen":"v355",
+        st={"onboarded":True,"lang":"he","ageAsked":1,"user":{"name":"Savta","phone":"","ageBand":"75p"},"consent":{"share":False,"tos":True,"ts":1,"ver":"2026-07-10-draft"},"_lastVerSeen":"v356",
             "simple":{"on":True,"src":"age","hour":7,"okDay":"","missDay":"","since":"2000-01-01"},
             "circleMembers":[{"id":"m1","name":"Dana","partnerUid":"g1","phoneCanon":"972501112233"},{"id":"m2","name":"Pending","pending":True,"partnerUid":"g2"}]}
         await pg.add_init_script("window._sosPractice=true; localStorage.setItem('shomer_state_v1', %s);" % json.dumps(json.dumps(st)))

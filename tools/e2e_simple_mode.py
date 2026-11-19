@@ -47,7 +47,7 @@ window_writes = []
 
 def base_state(lang, **kw):
     s = {"onboarded": True, "lang": lang, "user": {"name": "Tester", "phone": ""},
-         "consent": {"share": False, "tos": True, "ts": 1, "ver": "2026-07-10-draft"}, "_lastVerSeen": "v355",
+         "consent": {"share": False, "tos": True, "ts": 1, "ver": "2026-07-10-draft"}, "_lastVerSeen": "v356",
          "shake": {"enabled": True, "sens": "medium", "v": 3}}
     s.update(kw)
     return s

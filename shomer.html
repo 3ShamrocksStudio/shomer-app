@@ -2226,7 +2226,7 @@ body.otp-active .ob-steps{display:none!important;}
  <div class="set-grp sm-keep">
   <div class="set-row"><div class="sr-l"><div class="sr-ic"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="7.5" r="3.5" fill="none" stroke="currentColor" stroke-width="2"/><path d="M5 20c.8-3.6 3.6-5.5 7-5.5s6.2 1.9 7 5.5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></div><div><div class="sr-nm" data-he="מצב פשוט" data-en="Simple mode" data-ar="الوضع البسيط">מצב פשוט</div><div class="sr-sb" data-he="כפתור עזרה גדול, טקסט גדול, „אני בסדר” יומי ושיחה בלחיצה אחת. בלי מפה." data-en="A big help button, large text, a daily “I'm OK” and one-tap calling. No map." data-ar="زر مساعدة كبير، نص كبير، «أنا بخير» يومي واتصال بلمسة واحدة. بدون خريطة.">כפתור עזרה גדול, טקסט גדול, „אני בסדר” יומי ושיחה בלחיצה אחת. בלי מפה.</div></div></div><div class="tog" id="smp-tog" onclick="simpleToggleFromSettings(this)" role="switch" aria-checked="false" aria-label="מצב פשוט"></div></div>
   <div class="set-row sm-only"><div class="sr-l"><div><div class="sr-nm" data-he="„אני בסדר” עד השעה" data-en="“I'm OK” by" data-ar="«أنا بخير» قبل الساعة">„אני בסדר” עד השעה</div><div class="sr-sb" data-he="אם לא לחצתם עד השעה הזו, השומרים שלכם יקבלו הודעה עדינה." data-en="If you have not tapped by then, your SHOMERs get a gentle message." data-ar="إن لم تضغطوا حتى هذه الساعة، يتلقى حُرّاسكم رسالة لطيفة.">אם לא לחצתם עד השעה הזו, השומרים שלכם יקבלו הודעה עדינה.</div></div></div><select id="smp-hour" class="smp-hour" dir="ltr" onchange="simpleSetHour(this.value)" aria-label="hour"></select></div>
-  <div class="set-row sm-only" onclick="cl('sh-set');simpleAddGuardian()" role="button" tabindex="0"><div class="sr-l"><div><div class="sr-nm" data-he="הוספת שומר/ת" data-en="Add a SHOMER" data-ar="إضافة حارس">הוספת שומר/ת</div><div class="sr-sb" data-he="בני המשפחה יכולים להוסיף את עצמם כאן, בטלפון הזה." data-en="Family members can add themselves here, on this phone." data-ar="يمكن لأفراد العائلة إضافة أنفسهم هنا، على هذا الهاتف.">בני המשפחה יכולים להוסיף את עצמם כאן, בטלפון הזה.</div></div></div><span style="color:var(--tx3);font-size:18px">›</span></div>
+  <div class="set-row sm-only" onclick="cl('sh-set');simpleAddGuardian()" role="button" tabindex="0"><div class="sr-l"><div><div class="sr-nm" data-he="הוספת שומרים" data-en="Add a SHOMER" data-ar="إضافة حارس">הוספת שומרים</div><div class="sr-sb" data-he="בני המשפחה יכולים להוסיף את עצמם כאן, בטלפון הזה." data-en="Family members can add themselves here, on this phone." data-ar="يمكن لأفراد العائلة إضافة أنفسهم هنا، على هذا الهاتف.">בני המשפחה יכולים להוסיף את עצמם כאן, בטלפון הזה.</div></div></div><span style="color:var(--tx3);font-size:18px">›</span></div>
   <div class="set-row sm-only" onclick="simpleOpenPlaces()" role="button" tabindex="0"><div class="sr-l"><div><div class="sr-nm" data-he="הבית והעבודה: קומה ודירה" data-en="Home and work: floor and apartment" data-ar="البيت والعمل: الطابق والشقة">הבית והעבודה: קומה ודירה</div><div class="sr-sb" data-he="בזמן SOS השומרים יראו באיזו קומה אתם." data-en="During an SOS your SHOMERs see which floor you are on." data-ar="أثناء SOS يرى حُرّاسكم في أي طابق أنتم.">בזמן SOS השומרים יראו באיזו קומה אתם.</div></div></div><span style="color:var(--tx3);font-size:18px">›</span></div>
   <div class="set-row" onclick="ageAskOpen(true)" role="button" tabindex="0"><div class="sr-l"><div><div class="sr-nm" data-he="הגיל שלי" data-en="My age" data-ar="عمري">הגיל שלי</div><div class="sr-sb" data-he="פרטי. רק אתם רואים." data-en="Private. Only you see it." data-ar="خاص. أنتم فقط ترونه.">פרטי. רק אתם רואים.</div></div></div><span id="smp-age-st" dir="ltr" style="font-size:15px;font-weight:800;color:var(--g3);white-space:nowrap"></span></div>
  </div>
@@ -4984,6 +4984,7 @@ function popupIdle(){
     var a=document.activeElement; if(a&&(a.tagName==='INPUT'||a.tagName==='TEXTAREA'||a.tagName==='SELECT'||a.isContentEditable)) return false;
     if(Date.now()-POPQ.typedAt<8000) return false;
     if(popupBusy()) return false;
+    if(document.body.classList.contains('simple-on')) return false;   /* v356: no tips or prompts over the Simple-mode buttons */
     if(document.body.classList.contains('evp-on')) return false;   /* v319: an event card is open - the tip waits */
     var ob=document.getElementById('ob'); if(ob && getComputedStyle(ob).display!=='none') return false;   /* onboarding on screen */
     if(document.body.classList.contains('otp-active')) return false;
@@ -7190,6 +7191,7 @@ function locBarShow(){
  if(userLat!=null || document.getElementById('loc-bar')) return;
  try{ if(typeof _emergencyBusy==='function' && _emergencyBusy()) return; }catch(e){}
  try{ if(popupTypingOrSetup()){ setTimeout(locBarShow, 3000); return; } }catch(e){}   /* v312: never mid-typing / onboarding */
+ try{ if(typeof ageAskIsOpen==='function' && ageAskIsOpen()){ window._locBarAfterAge=true; return; } }catch(e){}   /* v356: never over the age question - shown after the answer */
  var he=currentLang==='he', ar=currentLang==='ar';
  var b=document.createElement('div'); b.className='nudge-bar'; b.id='loc-bar';
  b.innerHTML='<span class="nudge-tx">'+(he?'המיקום כבוי - את/ה לא מופיע/ה במפה ולשומרים שלך':ar?'الموقع متوقف - أنت لا تظهر على الخريطة ولا لحُرّاسك':'Location is off - you are not on the map or visible to your SHOMERs')+'</span><button class="nudge-cta" id="loc-bar-go">'+(he?'הפעל/י מיקום':ar?'تفعيل الموقع':'Turn on location')+'</button><button class="nudge-x" aria-label="close">\u2715</button>';
@@ -11721,7 +11723,7 @@ try{ hydrateIcons(document); }catch(e){}
 /* Loaded-build version - shown in the diagnostic panel so a phone can prove
    whether it's on the latest build or a STALE cached one. Keep in lock-step
    with sw.js SW_VERSION on every deploy. */
-var APP_VER='v355';
+var APP_VER='v356';
 var FB={ready:false,uid:null,db:null,_presTimer:null,connected:false,listening:false,pushState:'default',near:0,swVer:'?',
   authState:'connecting',sdkLoaded:false,persist:'',permErr:null,err:null,wsProbe:'',csp:''};
 /* Always log connection diagnostics to the console so the real failure can be SEEN in Chrome. */
@@ -16944,6 +16946,9 @@ body.simple-on #simple-home{display:flex}
 body.simple-on .nav,body.simple-on .hdr,body.simple-on #map-legend,body.simple-on .loc-fab,body.simple-on .past-fab,body.simple-on .ff-fab,
 body.simple-on #tp-bar,body.simple-on #nudge-bar,body.simple-on #dyk-bar,body.simple-on .tour-ov,body.simple-on .tour-bub,body.simple-on .tour-card,
 body.simple-on .setup-ov{display:none!important}
+/* v356: nothing non-essential sits over the SOS, „I'm OK” and call buttons (SOS, invite and update cards stay) */
+body.simple-on #shake-v2-bar,body.simple-on #fsi-bar,body.simple-on #loc-bar,body.simple-on #community-nudge,body.simple-on .a2hs,
+body.simple-on .ios-install,body.simple-on .getapp-banner{display:none!important}
 .smp-top{display:flex;align-items:center;justify-content:space-between;gap:10px}
 .smp-brand{display:flex;align-items:center;gap:10px;font-weight:900;font-size:22px;letter-spacing:.3px;color:#fff}
 .smp-brand img{width:44px;height:44px;object-fit:contain}
@@ -17024,7 +17029,7 @@ body.simple-on #sh-set .sh-ttl{font-size:24px}
  </div>
  <div class="age-card" id="age-card-done" hidden>
   <h2 data-he="הפעלנו מצב פשוט" data-en="Simple mode is on" data-ar="شغّلنا الوضع البسيط">הפעלנו מצב פשוט</h2>
-  <p data-he="כפתור עזרה גדול, טקסט גדול, כפתור „אני בסדר” יומי ושיחה בלחיצה אחת לשומר/ת שלכם." data-en="A big help button, large text, a daily “I'm OK” button and one-tap calling to your SHOMER." data-ar="زر مساعدة كبير، نص كبير، زر «أنا بخير» يومي واتصال بلمسة واحدة بحارسكم.">כפתור עזרה גדול, טקסט גדול, כפתור „אני בסדר” יומי ושיחה בלחיצה אחת לשומר/ת שלכם.</p>
+  <p data-he="כפתור עזרה גדול, טקסט גדול, כפתור „אני בסדר” יומי ושיחה בלחיצה אחת לשומרים שלכם." data-en="A big help button, large text, a daily “I'm OK” button and one-tap calling to your SHOMER." data-ar="زر مساعدة كبير، نص كبير، زر «أنا بخير» يومي واتصال بلمسة واحدة بحارسكم.">כפתור עזרה גדול, טקסט גדול, כפתור „אני בסדר” יומי ושיחה בלחיצה אחת לשומרים שלכם.</p>
   <p class="age-note" data-he="אפשר לחזור למצב הרגיל בהגדרות" data-en="You can switch back to the regular mode in Settings" data-ar="يمكن العودة إلى الوضع العادي من الإعدادات">אפשר לחזור למצב הרגיל בהגדרות</p>
   <button type="button" class="age-ok" onclick="ageAskHide()" data-he="הבנתי" data-en="Got it" data-ar="فهمت">הבנתי</button>
  </div>
@@ -17043,6 +17048,15 @@ try{ (function(){ var app=document.getElementById('app'); ['simple-home','age-as
 function smpT(he,en,ar){ return currentLang==='he'?he:currentLang==='ar'?ar:en; }
 function smpEl(id){ return document.getElementById(id); }
 function smpTxt(id,t){ var e=smpEl(id); if(e) e.textContent=t; }
+/* v356: the same data-he/en/ar sweep as setLang, for these two screens - they are parsed after the boot setLang ran */
+function smpI18n(){
+  try{ var en=currentLang==='en', ar=currentLang==='ar';
+    ['simple-home','age-ask'].forEach(function(id){ var r=smpEl(id); if(!r) return;
+      r.querySelectorAll('[data-he]').forEach(function(el){ var he=el.getAttribute('data-he'), enV=el.getAttribute('data-en'), v;
+        if(ar){ var arV=el.getAttribute('data-ar'); v=(arV!=null)?arV:arTr(enV!=null?enV:he); } else if(en){ v=(enV!=null)?enV:he; } else { v=he; }
+        el.textContent=v; }); });
+  }catch(e){}
+}
 function smpState(){
   if(!SS.simple||typeof SS.simple!=='object') SS.simple={on:false,src:'',hour:10,okDay:'',missDay:'',since:''};
   var h=parseInt(SS.simple.hour,10); if(!(h>=7&&h<=20)) SS.simple.hour=10; else SS.simple.hour=h;
@@ -17073,11 +17087,14 @@ function ageAskOpen(fromSettings){
   var q=smpEl('age-card-q'), d=smpEl('age-card-done'); if(q) q.hidden=false; if(d) d.hidden=true;
   try{ var cur=(SS.user&&SS.user.ageBand)||''; a.querySelectorAll('.age-b').forEach(function(b){ var m=(b.getAttribute('onclick')||'').match(/'([^']+)'/); b.setAttribute('aria-pressed',String(!!(m&&m[1]===cur))); b.style.background=(m&&m[1]===cur)?'rgba(201,168,76,.28)':''; }); }catch(e){}
   try{ var x=a.querySelector('.age-x'); if(x) x.setAttribute('aria-label',smpT('סגירה','Close','إغلاق')); }catch(e){}
+  smpI18n();
+  try{ if(smpEl('loc-bar')){ locBarHide(); window._locBarAfterAge=true; } }catch(e){}   /* v356: the location bar waits until the question is answered */
   try{ document.querySelectorAll('#tp-bar,#nudge-bar,#dyk-bar').forEach(function(e){ e.remove(); }); }catch(e){}
   a.classList.add('on'); a.setAttribute('aria-hidden','false');
   setTimeout(function(){ try{ var b=a.querySelector('.age-b'); if(b) b.focus(); }catch(e){} },60);
 }
-function ageAskHide(){ var a=smpEl('age-ask'); if(a){ a.classList.remove('on'); a.setAttribute('aria-hidden','true'); } }
+function ageAskHide(){ var a=smpEl('age-ask'); if(a){ a.classList.remove('on'); a.setAttribute('aria-hidden','true'); }
+  if(window._locBarAfterAge){ window._locBarAfterAge=false; setTimeout(function(){ try{ locBarShow(); }catch(e){} },800); } }   /* v356: still relevant only if there is still no position (locBarShow checks) */
 function ageAskClose(){ if(!SS.ageAsked){ SS.ageAsked=Date.now(); try{ saveStore(); }catch(e){} } ageAskHide(); }   /* closing counts as asked - we never nag */
 function ageAnswer(b){
   if(b!=='x'&&!ageBandValid(b)) return;
@@ -17092,7 +17109,7 @@ function ageAnswer(b){
   /* 65+ → Simple mode ON by default - only when first asked; a later change keeps their own choice */
   if(first&&(b==='65_74'||b==='75p')&&!simpleOn()){
     simpleSet(true,'age');
-    var q=smpEl('age-card-q'), d=smpEl('age-card-done'); if(q) q.hidden=true; if(d) d.hidden=false;
+    smpI18n(); var q=smpEl('age-card-q'), d=smpEl('age-card-done'); if(q) q.hidden=true; if(d) d.hidden=false;
     setTimeout(function(){ try{ var o=d&&d.querySelector('.age-ok'); if(o) o.focus(); }catch(e){} },60);
     return;
   }
@@ -17130,6 +17147,7 @@ function simpleApply(){
   /* lives inside #app (its own stacking context): above the map and header, below the sheets, the SOS countdown and the PIN pad */
   try{ var app=smpEl('app'); if(h&&app&&h.parentNode!==app) app.appendChild(h); }catch(e){}
   simpleRenderSettings();
+  if(on) smpI18n();
   if(on){ try{ popupClearLow(); }catch(e){} try{ document.querySelectorAll('#tp-bar,#nudge-bar,#dyk-bar').forEach(function(e){ e.remove(); }); }catch(e){} simpleRender(); simpleTickStart(); }
   else { simpleTickStop(); try{ [60,300].forEach(function(ms){ setTimeout(function(){ if(typeof MAP!=='undefined'&&MAP) MAP.invalidateSize(false); },ms); }); }catch(e){} }
 }
@@ -17175,11 +17193,11 @@ function simpleRender(){
   smpTxt('smp-ok-st', done?smpT('סימנתם היום ב-'+smpHM(st.okTs||Date.now())+'. יום טוב!','Marked today at '+smpHM(st.okTs||Date.now())+'. Have a good day!','أكّدتم اليوم الساعة '+smpHM(st.okTs||Date.now())+'. يومًا سعيدًا!')
     :st.missDay===d?smpT('השומרים קיבלו הודעה עדינה. לחצו כדי להרגיע אותם.','Your SHOMERs got a gentle message. Tap to reassure them.','تلقّى حُرّاسكم رسالة لطيفة. اضغطوا لطمأنتهم.')
     :hasG?smpT('לחצו פעם ביום, עד '+hh+'. אם לא, השומרים יקבלו הודעה עדינה.','Tap once a day, by '+hh+'. If not, your SHOMERs get a gentle message.','اضغطوا مرة يوميًا قبل '+hh+'. وإلا يتلقى حُرّاسكم رسالة لطيفة.')
-    :smpT('הוסיפו שומר/ת כדי שיקבלו הודעה אם לא תלחצו.','Add a SHOMER so they hear from us if you do not tap.','أضيفوا حارسًا ليتلقى رسالة إن لم تضغطوا.'));
+    :smpT('הוסיפו שומרים כדי שיקבלו הודעה אם לא תלחצו.','Add a SHOMER so they hear from us if you do not tap.','أضيفوا حارسًا ليتلقى رسالة إن لم تضغطوا.'));
   var g=smpFirstCallable(), call=smpEl('smp-call');
   if(call){ var amb=''; try{ amb=ambulanceNum(); }catch(e){ amb='101'; }
-    call.textContent='📞 '+(g?smpT('להתקשר ל','Call ','اتصال بـ')+(g.name||smpT('השומר/ת','your SHOMER','حارسكم')):smpT('חיוג לאמבולנס ','Call an ambulance ','اتصال بالإسعاف ')+amb); }
-  var add=smpEl('smp-add'); if(add){ add.hidden=smpGuardians().length>0; add.textContent='+ '+smpT('הוספת שומר/ת (בן/בת משפחה)','Add a SHOMER (a family member)','إضافة حارس (من العائلة)'); }
+    call.textContent='📞 '+(g?smpT('להתקשר ל','Call ','اتصال بـ')+(g.name||smpT('שומרים שלכם','your SHOMER','حارسكم')):smpT('חיוג לאמבולנס ','Call an ambulance ','اتصال بالإسعاف ')+amb); }
+  var add=smpEl('smp-add'); if(add){ add.hidden=smpGuardians().length>0; add.textContent='+ '+smpT('הוספת שומרים (בני משפחה)','Add a SHOMER (a family member)','إضافة حارس (من العائلة)'); }
 }
 function simpleRenderSettings(){
   var on=simpleOn(), t=smpEl('smp-tog'); if(t){ t.classList.toggle('on',on); t.setAttribute('aria-checked',String(on)); }
@@ -17235,6 +17253,7 @@ function simpleHush(){ if(!simpleOn()) return; try{ fcHush(); }catch(e){} }
 /* boot: called from enterApp */
 function simpleBoot(){
   if(window._smpBooted) return; window._smpBooted=true;
+  smpI18n();
   try{ smpState(); simpleApply(); }catch(e){}
   try{ placeRender(); }catch(e){}
   try{ profileSyncFlush(); }catch(e){}
