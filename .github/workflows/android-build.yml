@@ -135,6 +135,17 @@ jobs:
             mkdir -p android/app/src/main/res/drawable
             cp -v "$DRW/ic_stat_shomer.xml" android/app/src/main/res/drawable/ || true
           fi
+          # google-services.json — WITHOUT this, app/build.gradle silently skips the
+          # google-services plugin and FCM never initialises, so PushNotifications.register()
+          # never fires 'registration', /tokens stays empty and no guardian is ever pushed to.
+          # That is exactly what happened: 30 users, 28 pairings, 26 SOS events, 0 tokens.
+          GS=android-config/google-services.json
+          if [ -f "$GS" ]; then
+            cp -v "$GS" android/app/google-services.json
+          else
+            echo "::error::android-config/google-services.json missing — push notifications will not work"
+            exit 1
+          fi
 
       - name: Merge Android manifest additions (permissions)
         working-directory: native
