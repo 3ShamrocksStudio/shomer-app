@@ -112,6 +112,11 @@ async function createAlert(uid, id, rec, subj) {
   await expect('SOS resolve still allowed', 'ALLOW', req('PATCH', 'sos/s1', 's1', {resolved: true, resolvedTs: now, safe: true}));
   await expect('SOS free-text / HTML type rejected', 'DENY', req('PATCH', 'sos/s1', 's1', {type: 'Call me <a href=x>'}));
   await expect('SOS for another account rejected', 'DENY', req('PUT', 'sos/s1', 'atk', {uid: 'atk', lat: 1, lng: 1, ts: now}));
+  /* theft alert map record (v349 client): sos/<ownUid>, type theft, no name */
+  await expect('theft map record (client v349 shape) allowed', 'ALLOW', req('PUT', 'sos/s1', 's1', {uid: 's1', id: 'theft1', lat: 31.9, lng: 34.8, type: 'theft', typeState: 'self', ts: now, resolved: false}));
+  await expect('old theft write (sos/<theftId> + name) still refused', 'DENY', req('PUT', 'sos/theft1', 's1', {uid: 's1', lat: 31.9, lng: 34.8, type: 'theft', typeState: 'self', ts: now, resolved: false, name: 'x'}));
+  await expect('theft photo under own theft/<uid> allowed', 'ALLOW', req('PUT', 'theft/s1/theft1', 's1', {ts: now, lat: 31.9, lng: 34.8, photo: 'data:image/jpeg;base64,AA', name: 'x'}));
+  await expect('theft photo of another account not readable', 'DENY', req('GET', 'theft/s1', 'atk'));
 
   console.log(`\n${pass} passed, ${fail} failed`);
   process.exit(fail ? 1 : 0);

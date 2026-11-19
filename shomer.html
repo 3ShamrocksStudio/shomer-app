@@ -6304,7 +6304,7 @@ function selfieGuardCancel(){ if(_selfieGuardT)clearInterval(_selfieGuardT); var
 function selfieTheftBroadcast(photo){
   var he=currentLang==='he';
   var id='theft'+Date.now();
-  var lat=userLat!=null?userLat:32.07, lng=userLng!=null?userLng:34.78;
+  var _p=_myPos(), lat=_p?_p.lat:null, lng=_p?_p.lng:null;   /* v349: no fix = no location (never a made-up spot) */
   // 1) OWNER's local documented proof (thief's face + where + when) - always saved.
   try{ if(!SS.theftEvents)SS.theftEvents=[]; SS.theftEvents.push({id:id,ts:Date.now(),lat:lat,lng:lng,photo:photo||''}); if(SS.theftEvents.length>30)SS.theftEvents=SS.theftEvents.slice(-30); saveStore(); reflectSelfieToggle(); }catch(e){}
   // 2) Broadcast the phone's LIVE LOCATION as a theft event → nearby SHOMERs + My SHOMER
@@ -6313,34 +6313,41 @@ function selfieTheftBroadcast(photo){
   // 3) Attach the selfie cross-device so SHOMERs can see the face (needs the /theft rule).
   try{ fbAttachTheftPhoto(id,lat,lng,photo); }catch(e){}
   // 4) Ping My SHOMER directly.
-  try{ fbAlertPairedTheft(); }catch(e){}
-  try{ toast(he?'🚨 התראת גניבה נשלחה - סלפי ומיקום נשמרו כראיה':'🚨 Theft alert sent - selfie + location saved as evidence','red'); }catch(e){}
+  try{ fbAlertPairedTheft(lat!=null); }catch(e){}
+  var ar=currentLang==='ar';   /* v349: say only what was really saved */
+  try{ toast(lat!=null?(he?'🚨 התראת גניבה נשלחה - סלפי ומיקום נשמרו כראיה':ar?'🚨 أُرسل تنبيه سرقة - حُفظت الصورة والموقع كدليل':'🚨 Theft alert sent - selfie + location saved as evidence'):(he?'🚨 התראת גניבה נשלחה - הסלפי נשמר כראיה (אין עדיין מיקום GPS)':ar?'🚨 أُرسل تنبيه سرقة - حُفظت الصورة كدليل (لا يوجد موقع GPS بعد)':'🚨 Theft alert sent - selfie saved as evidence (no GPS location yet)'),'red'); }catch(e){}
   try{ startGeoWatch(); }catch(e){}   // keep the phone location live for responders
 }
 function fbBroadcastTheft(id,lat,lng){
-  if(!FB.ready||!FB._authReady) return;
-  var nm=(SS.user&&SS.user.name)||'Shomer';
-  try{ FB.db.ref('sos/'+id).set({uid:FB.uid,lat:lat,lng:lng,type:'theft',typeState:'self',ts:Date.now(),resolved:false,name:nm}); }catch(e){}
+  if(!FB.ready||!FB._authReady||lat==null||lng==null) return;
+  try{ if(window._sosPractice||isReviewAccount()) return; }catch(e){}
+  /* v349: the rules accept only sos/<myUid> (one record per person, readable by me + my paired
+     SHOMERs) and never a name in it - the old sos/<theftId> + name write was always refused.
+     A live SOS keeps its id (same event, now typed theft) so SHOMERs are not alerted twice. */
+  var live=(sosPhase==='active'&&curSosId)?curSosId:null;
+  try{ FB.db.ref('sos/'+FB.uid).set({uid:FB.uid,id:live||id,lat:lat,lng:lng,type:'theft',typeState:'self',ts:Date.now(),resolved:false})
+    .catch(function(e){ fbLog('theft map record refused:',(e&&e.code)||e); }); }catch(e){}
 }
 function fbAttachTheftPhoto(id,lat,lng,photo){
   if(!FB.ready||!FB._authReady||!photo) return;
   var nm=(SS.user&&SS.user.name)||'Shomer';
   try{ FB.db.ref('theft/'+FB.uid+'/'+id).set({ts:Date.now(),lat:lat,lng:lng,photo:photo,name:nm}).catch(function(e){ fbLog('theft photo write (needs the /theft rule published):',(e&&e.code)||e); }); }catch(e){}
 }
-function fbAlertPairedTheft(){ try{ if(isReviewAccount()) return; }catch(_rv){}
+function fbAlertPairedTheft(hasLoc){ try{ if(isReviewAccount()||window._sosPractice) return; }catch(_rv){}
   if(!FB.ready||!FB._pairedUids) return;
-  var he=currentLang==='he', nm=(SS.user&&SS.user.name)||(he?'שומר/ת':'a SHOMER');
-  Object.keys(FB._pairedUids).forEach(function(uid){ try{ fbQueueAlarm(uid,(he?'🚨 חשד לגניבת טלפון - '+nm:'🚨 Possible phone theft - '+nm),(he?'סלפי ומיקום החי זמינים במפה':'Selfie + live location on the map'),'theft'); }catch(e){} });
+  var he=currentLang==='he', ar=currentLang==='ar', nm=(SS.user&&SS.user.name)||(he?'שומר/ת':ar?'حارس':'a SHOMER');
+  /* v349: the selfie stays with the owner (theft/<uid> is owner-only) - the SHOMERs get the location, when there is one */
+  Object.keys(FB._pairedUids).forEach(function(uid){ try{ fbQueueAlarm(uid,(he?'🚨 חשד לגניבת טלפון - '+nm:ar?'🚨 اشتباه بسرقة هاتف - '+nm:'🚨 Possible phone theft - '+nm),(hasLoc?(he?'המיקום החי זמין במפה':ar?'الموقع المباشر متاح على الخريطة':'Live location on the map'):(he?'עדיין אין מיקום - התקשר/י לבדוק':ar?'لا يوجد موقع بعد - اتصل للاطمئنان':'No location yet - call to check')),'theft'); }catch(e){} });
 }
 /* Owner's theft-evidence viewer (documented proof for police): captured selfies + map link. */
 function openTheftEvidence(){
   var he=currentLang==='he', ar=currentLang==='ar';
   var ov=document.getElementById('theft-ev'); if(!ov){ ov=document.createElement('div'); ov.id='theft-ev'; ov.className='selfie-ov'; document.body.appendChild(ov); }
   var evs=(SS.theftEvents||[]).slice().reverse();
-  var rows=evs.length? evs.map(function(e){ var when=new Date(e.ts).toLocaleString(); var maps='https://www.google.com/maps?q='+e.lat+','+e.lng;
+  var rows=evs.length? evs.map(function(e){ var when=new Date(e.ts).toLocaleString(); var hasLoc=typeof e.lat==='number'&&typeof e.lng==='number', maps='https://www.google.com/maps?q='+e.lat+','+e.lng;
       return '<div style="display:flex;gap:11px;align-items:center;background:var(--n3);border:1px solid var(--b2);border-radius:12px;padding:10px;margin-bottom:8px">'
         +(e.photo?('<img src="'+e.photo+'" style="width:56px;height:70px;object-fit:cover;border-radius:8px;border:1px solid var(--b3)" alt="">'):'<div style="width:56px;height:70px;border-radius:8px;background:var(--n4);display:grid;place-items:center;color:var(--tx3);font-size:10px">אין<br>תמונה</div>')
-        +'<div style="flex:1;min-width:0;text-align:start"><div style="font-size:12.5px;color:var(--tx1);font-weight:700">'+when+'</div><a href="'+maps+'" target="_blank" rel="noopener" style="font-size:12px;color:var(--g3)">'+(he?'פתח מיקום במפה ›':'Open location ›')+'</a></div></div>';
+        +'<div style="flex:1;min-width:0;text-align:start"><div style="font-size:12.5px;color:var(--tx1);font-weight:700">'+when+'</div>'+(hasLoc?('<a href="'+maps+'" target="_blank" rel="noopener" style="font-size:12px;color:var(--g3)">'+(he?'פתח מיקום במפה ›':ar?'افتح الموقع على الخريطة ›':'Open location ›')+'</a>'):('<span style="font-size:12px;color:var(--tx3)">'+(he?'לא היה מיקום GPS':ar?'لم يتوفّر موقع GPS':'No GPS location')+'</span>'))+'</div></div>';
     }).join('') : '<div style="color:var(--tx3);font-size:13px;padding:14px 4px;text-align:center">'+(he?'אין עדיין ראיות. מופיעות אוטומטית לאחר 3 קודים שגויים כשההגנה פעילה.':'No evidence yet. Captured automatically after 3 wrong codes when protection is on.')+'</div>';
   ov.innerHTML='<div class="selfie-card" style="background:linear-gradient(180deg,#16233e,#0d1830);border-color:var(--b3);max-width:400px;text-align:start;max-height:80vh;overflow:auto">'
     +'<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px"><h3 style="color:var(--tx0);margin:0">'+(he?'ראיות גניבה':ar?'أدلة السرقة':'Theft evidence')+'</h3><button onclick="document.getElementById(\'theft-ev\').classList.remove(\'on\')" style="background:var(--n3);border:1px solid var(--b2);border-radius:8px;color:var(--tx1);padding:6px 10px;cursor:pointer">'+(he?'סגור':'Close')+'</button></div>'
@@ -11486,7 +11493,7 @@ try{ hydrateIcons(document); }catch(e){}
 /* Loaded-build version - shown in the diagnostic panel so a phone can prove
    whether it's on the latest build or a STALE cached one. Keep in lock-step
    with sw.js SW_VERSION on every deploy. */
-var APP_VER='v348';
+var APP_VER='v349';
 var FB={ready:false,uid:null,db:null,_presTimer:null,connected:false,listening:false,pushState:'default',near:0,swVer:'?',
   authState:'connecting',sdkLoaded:false,persist:'',permErr:null,err:null,wsProbe:'',csp:''};
 /* Always log connection diagnostics to the console so the real failure can be SEEN in Chrome. */
