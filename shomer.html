@@ -6230,6 +6230,7 @@ function activateSOS(){
     notifies nobody. */
  try{ if(isReviewAccount()) window._sosPractice=true; }catch(e){}   /* v290: covers the silent SOS path too (it skips beginSOS) */
  const practice=!!window._sosPractice;
+ if(!practice){ try{ if(window.nativeSosTrackStart) nativeSosTrackStart(); }catch(e){} }   /* v351: Android background location - this live SOS only */
  const overLimit=!practice&&(sosRemainingToday()<=0||sosAbuseOver());
  window._sosRepeated=overLimit;
  curSosId='s'+Date.now();
@@ -6682,6 +6683,7 @@ function resolveSOS(skipPin,opt){
   clearInterval(sosTimer); sosGraceClear(); stopSosAlarm(); stopMaxAttention(); releaseWake();
   try{ if(curSosId){ FB.db&&FB.db.ref('responders/'+curSosId).off&&FB.db.ref('responders/'+curSosId).off(); delete fbRespStreams[curSosId]; } fbClearResponderMarkers(); }catch(e){}
   sosPhase='idle'; sosActive=false; window._sosSilent=false;
+  try{ if(window.nativeSosTrackStop) nativeSosTrackStop(); }catch(e){}   /* v351: SOS over - background location stops now */
   try{ SOSBUS._endedAt=Date.now(); SOSBUS._helpAck=0; Object.keys(SOSBUS.responders).forEach(function(k){ delete SOSBUS.responders[k]; }); sosPaintResponders(); sosPaintMyHelp(); }catch(e){}   /* v312: "help is coming" ends with the SOS, online or not */
   try{ var _cpb=document.getElementById('callpol-bar'); if(_cpb) _cpb.remove(); }catch(e){}   /* v293: the "call police?" offer ends with the SOS */
   var btn=document.getElementById('sos-btn');
@@ -11672,7 +11674,7 @@ try{ hydrateIcons(document); }catch(e){}
 /* Loaded-build version - shown in the diagnostic panel so a phone can prove
    whether it's on the latest build or a STALE cached one. Keep in lock-step
    with sw.js SW_VERSION on every deploy. */
-var APP_VER='v350';
+var APP_VER='v351';
 var FB={ready:false,uid:null,db:null,_presTimer:null,connected:false,listening:false,pushState:'default',near:0,swVer:'?',
   authState:'connecting',sdkLoaded:false,persist:'',permErr:null,err:null,wsProbe:'',csp:''};
 /* Always log connection diagnostics to the console so the real failure can be SEEN in Chrome. */
@@ -14088,6 +14090,7 @@ function sosRestore(id, ts){ try{ if(isReviewAccount()){ SS.sosLive=null; try{sa
   var he=currentLang==='he', ar=currentLang==='ar';
   curSosId=id; curSosType='unknown'; window._sosPractice=false;
   sosPhase='active'; sosActive=true;
+  try{ if(window.nativeSosTrackStart) nativeSosTrackStart(); }catch(e){}   /* v351: restored live SOS - background location again, for it only */
   var _fk=(SS.sosLive&&SS.sosLive.id===id&&SS.sosLive.fk)||null;
   var _sil=!!(SS.sosLive&&SS.sosLive.id===id&&SS.sosLive.silent);
   SS.sosLive={id:id, ts:ts||Date.now()}; if(_fk){ SS.sosLive.fk=_fk; FB._sosFeedKey=_fk; } if(_sil) SS.sosLive.silent=true; saveStore();

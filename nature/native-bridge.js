@@ -5,9 +5,9 @@
    PWA and a native app. One codebase, two shells.
 
    What native buys us (and what the PWA fundamentally cannot do):
-     • BACKGROUND LOCATION — the whole reason we went native. A web page can
-       only read GPS while visible; a service worker has no geolocation access
-       at all. The native plugin keeps publishing presence with the app closed.
+     • BACKGROUND LOCATION — during a live SOS only (v351). A web page can only
+       read GPS while visible; the native plugin keeps the SOS location going to
+       that SOS's SHOMERs with the screen off, and stops when the SOS ends.
      • Real push notifications when the app is closed.
      • A foreground service notification (Android requires this for "always"
        location — and it is the honest thing to show the user anyway).
@@ -26,62 +26,64 @@
 
   var watcherId = null;
 
-  /* Publish a position through the app's existing presence layer.
-     We deliberately reuse the SAME functions the web app uses, so there is one
-     source of truth and no divergence between platforms. */
+  /* v351 PRIVACY: background location runs ONLY while this phone has a live SOS, and only feeds
+     that SOS's channel (read by the paired SHOMERs). It never runs at any other time, never feeds
+     public presence, and stops the moment the SOS ends (hook from the app + a watchdog).
+     The old code checked window.SS - SS is a script-level let, never on window - so it never
+     started at all, and when it did it would have tracked 24/7. */
+  function sosLive() {
+    try { return typeof sosPhase !== 'undefined' && sosPhase === 'active' && !window._sosPractice &&
+                 !(typeof isReviewAccount === 'function' && isReviewAccount()); } catch (e) { return false; }
+  }
   function publish(loc) {
     try {
+      if (!sosLive()) { stopBackground(); return; }        // SOS over → no more location, not even one tick
       if (typeof userLat !== 'undefined') { userLat = loc.latitude; userLng = loc.longitude; }
-      if (typeof fbPublishPresence === 'function') fbPublishPresence();
-      if (typeof gdBroadcast === 'function') gdBroadcast();
+      if (typeof sosMaybeResendPos === 'function') sosMaybeResendPos();   // the SOS channel only
     } catch (e) { /* never let a location tick crash the app */ }
   }
+  function bgLang(he, ar, en) { try { return currentLang === 'he' ? he : currentLang === 'ar' ? ar : en; } catch (e) { return en; } }
 
-  /* Start background tracking. Gated on the user's consent — exactly like the
-     web app. Consent is not a formality here: this is a person's location. */
+  var watchdog = null;
   function startBackground() {
-    if (watcherId) return;
-    try {
-      if (!window.SS || !SS.consent || !SS.consent.share) return;  // no consent → no tracking
-      if (window.SS && SS.circleGhost) return;                     // ghost mode → paused
-    } catch (e) { return; }
-
+    if (watcherId || !BG || !sosLive()) return;           // no live SOS → no tracking
     BG.addWatcher(
       {
-        // Android shows this while tracking. Required by the OS, and the user
-        // deserves to see it — a safety app should never track invisibly.
-        backgroundMessage: 'SH\u2721MER is protecting you. Your guardians can see your location.',
-        backgroundTitle: 'SH\u2721MER — active',
+        // Android shows this while tracking - a safety app never tracks invisibly.
+        backgroundMessage: bgLang('SOS פעיל - השומרים שלך רואים את המיקום שלך עד סיום ה-SOS.', 'SOS نشط - يرى حُرّاسك موقعك حتى انتهاء SOS.', 'SOS active - your SHOMERs see your location until the SOS ends.'),
+        backgroundTitle: 'SH\u2721MER - SOS',
         requestPermissions: true,
         stale: false,
-        distanceFilter: 25   // metres — enough for safety, easy on the battery
+        distanceFilter: 25   // metres - enough to follow a person, easy on the battery
       },
       function (location, error) {
         if (error) {
           if (error.code === 'NOT_AUTHORIZED') {
-            try {
-              if (confirm(
-                (typeof currentLang !== 'undefined' && currentLang === 'he')
-                  ? 'כדי שהשומרים שלך יראו אותך גם כשהאפליקציה סגורה, צריך לאשר גישה למיקום "תמיד". לפתוח הגדרות?'
-                  : 'To let your guardians see you even when the app is closed, allow "Always" location access. Open settings?'
-              )) BG.openSettings();
-            } catch (e) {}
+            /* never a blocking confirm() during an SOS - it froze the alert flow (v287) */
+            try { if (typeof toast === 'function') toast(bgLang('כדי שהשומרים יראו אותך גם כשהמסך כבוי בזמן SOS - אשר/י מיקום "תמיד"', 'ليراك حُرّاسك والشاشة مطفأة أثناء SOS - اسمح بالموقع "دائماً"', 'To keep your SHOMERs updated with the screen off during an SOS, allow "Always" location'), 'amb', function () { try { BG.openSettings(); } catch (_) {} }); } catch (e) {}
           }
           return;
         }
         if (location) publish(location);
       }
-    ).then(function (id) { watcherId = id; })
-     .catch(function () {});
+    ).then(function (id) {
+      watcherId = id;
+      if (!sosLive()) { stopBackground(); return; }       // the SOS ended while we were starting
+      if (!watchdog) watchdog = setInterval(function () { if (!sosLive()) stopBackground(); }, 15000);
+    }).catch(function () {});
   }
 
   function stopBackground() {
+    if (watchdog) { clearInterval(watchdog); watchdog = null; }
     if (!watcherId) return;
-    BG.removeWatcher({ id: watcherId }).catch(function () {});
-    watcherId = null;
+    var id = watcherId; watcherId = null;
+    try { BG.removeWatcher({ id: id }).catch(function () {}); } catch (e) {}
   }
 
-  /* Expose so the app's consent/ghost toggles can drive native tracking too. */
+  /* The app calls these when an SOS goes live / ends. The older names (consent + ghost toggles)
+     can only ever START tracking while an SOS is live, and ghost mode stops it. */
+  window.nativeSosTrackStart = startBackground;
+  window.nativeSosTrackStop  = stopBackground;
   window.nativeStartTracking = startBackground;
   window.nativeStopTracking  = stopBackground;
 
@@ -118,10 +120,8 @@
   /* Boot */
   document.addEventListener('DOMContentLoaded', function () {
     initPush();
-    // Give the app a moment to restore its store, then honour existing consent.
-    setTimeout(function () {
-      try { if (window.SS && SS.consent && SS.consent.share) startBackground(); } catch (e) {}
-    }, 2500);
+    // v351: no tracking at boot. A live SOS restored after a restart starts it (sosRestore → nativeSosTrackStart).
+    setTimeout(function () { try { if (sosLive()) startBackground(); } catch (e) {} }, 2500);
   });
 
   /* Keep publishing when the app returns to the foreground. */

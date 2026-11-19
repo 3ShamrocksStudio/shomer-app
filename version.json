@@ -1,1 +1,1 @@
-{"v": "v350", "notes": {"he": ["ערבית: תורגמו כל התוויות וההודעות שהיו חסרות, כולל כרטיס ה-SOS הנכנס אצל השומר"], "en": ["Arabic: every missing label and message is translated, including the guardian's incoming SOS card"]}}
+{"v": "v351", "notes": {"he": ["אנדרואיד: מיקום ברקע פועל רק בזמן SOS פעיל, רק לשומרים של אותו SOS, ונעצר כשה-SOS נגמר"], "en": ["Android: background location runs only during a live SOS, only for that SOS's SHOMERs, and stops when the SOS ends"]}}
