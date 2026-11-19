@@ -1,5 +1,5 @@
 /* SH✡MER Cloud Functions (Blaze) — closed-app / background push via FCM.
-   - sosFanout:   on a new /sos event, push to nearby guardians' devices (even if app closed).
+   - sosFanout:   on a new /sos event, push to the sender's paired guardians (even if app closed).
    - alarmFanout: on a /alarms/{id} item {toUid,title,body}, push to that user's device (used by
                   the mutual check-in miss + geofence arrival), then delete the queue item.
    Deploy:  firebase deploy --only functions
@@ -20,41 +20,34 @@ function distM(aLat, aLng, bLat, bLng) {
   return 2 * R * Math.asin(Math.min(1, Math.sqrt(s)));
 }
 
-/* SOS fan-out → nearby guardians (≤5 km), excluding the sender.
+/* SOS fan-out → the sender's PAIRED guardians only.
    sos/<uid> is ONE record per person (v261+), overwritten by every new SOS, so this fires on
    any write and pushes only when a NEW SOS event starts (new id/ts, or re-opened after resolve).
-   Type / position / resolve updates on the same event do not re-push. */
+   Type / position / resolve updates on the same event do not re-push.
+   v344: tokens/<uid> carry no location since v313 (privacy), so the old "nearby (<=5 km)" test
+   matched EVERY device and would have pushed each SOS to every user. Paired guardians only. */
 exports.sosFanout = onValueWritten('/sos/{id}', async (event) => {
   const sos = event.data.after.val();
   const prev = event.data.before.val();
-  if (!sos || sos.resolved || sos.lat == null) return;
+  if (!sos || sos.resolved || !sos.uid) return;
   const isNew = !prev || prev.resolved || (sos.id || sos.ts) !== (prev.id || prev.ts);
   if (!isNew) return;
-  // Targets = every PAIRED guardian (always, any distance) + every NEARBY SHOMER (≤5 km).
-  const [toksSnap, pairsSnap] = await Promise.all([
-    db.ref('tokens').get(),
-    db.ref('pairs/' + sos.uid).get()
-  ]);
-  const toks = toksSnap.val() || {};
-  const paired = new Set(pairsSnap.val() ? Object.keys(pairsSnap.val()) : []);
+  const pairsSnap = await db.ref('pairs/' + sos.uid).get();
+  const paired = pairsSnap.val() ? Object.keys(pairsSnap.val()) : [];
   const tokenSet = new Set();
-  Object.keys(toks).forEach((uid) => {
-    if (uid === sos.uid) return;
-    const t = toks[uid];
-    if (!t || !t.token) return;
-    const isPaired = paired.has(uid);
-    const isNear = t.lat == null || distM(sos.lat, sos.lng, t.lat, t.lng) <= 5000;
-    if (isPaired || isNear) tokenSet.add(t.token);
-  });
+  await Promise.all(paired.filter((uid) => uid !== sos.uid).map(async (uid) => {
+    const t = (await db.ref('tokens/' + uid + '/token').get()).val();
+    if (t) tokenSet.add(t);
+  }));
   const tokens = [...tokenSet];
   if (!tokens.length) return;
-  const type = sos.type && sos.type !== 'unknown' ? ' · ' + sos.type : '';
   await admin.messaging().sendEachForMulticast({
     tokens: tokens.slice(0, 500),
-    notification: {title: '🚨 SH✡MER — SOS nearby', body: (sos.name || 'Someone') + ' needs help' + type},
+    notification: {title: '🆘 SH✡MER SOS', body: 'SOS מהשומר/ת שלך - פתחו את SH✡MER עכשיו · Your SHOMER sent an SOS - open the app'},
     data: {tag: 'sos-' + (sos.id || event.params.id), url: LINK},
     webpush: {fcmOptions: {link: LINK}, headers: {Urgency: 'high', TTL: '600'}},
-    android: {priority: 'high'}, apns: {headers: {'apns-priority': '10'}}
+    android: {priority: 'high', ttl: 600000, notification: {channelId: 'shomer-sos', sound: 'default', defaultVibrateTimings: true}},
+    apns: {headers: {'apns-priority': '10'}}
   });
 });
 
@@ -69,7 +62,9 @@ exports.alarmFanout = onValueCreated('/alarms/{id}', async (event) => {
           token,
           notification: {title: a.title || 'SH✡MER', body: a.body || ''},
           data: {tag: a.tag || 'shomer', url: LINK},
-          webpush: {fcmOptions: {link: LINK}, headers: {Urgency: 'high'}}
+          webpush: {fcmOptions: {link: LINK}, headers: {Urgency: 'high'}},
+          android: {priority: 'high', notification: {channelId: String(a.tag || '').indexOf('sos') === 0 ? 'shomer-sos' : 'shomer-alerts', sound: 'default'}},
+          apns: {headers: {'apns-priority': '10'}}
         });
       }
     }
