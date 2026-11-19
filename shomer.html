@@ -6084,9 +6084,10 @@ function activateSOS(){
  return;
  }
  if(overLimit){
- toast(he?'ה-SOS נשלח לשומרים שלך (מסומן כ-SOS חוזר). אם זו טעות - בטל/י עם קוד הביטול.':'SOS sent to your SHOMERs (marked as a repeated SOS). If it is a mistake, cancel it with your code.','amb');
+ toast(he?'ה-SOS נשלח עכשיו לשומרים שלך (מסומן כ-SOS חוזר). אם זו טעות - בטל/י עם קוד הביטול.':currentLang==='ar'?'يُرسَل SOS الآن إلى حُرّاسك (مُعلَّم كـ SOS متكرر). إن كان خطأً - ألغِه برمز الإلغاء.':'Sending SOS to your SHOMERs (marked as a repeated SOS). If it is a mistake, cancel it with your code.','amb');
  }
  // Within limit → broadcast simulation + pulsing map pin + feed card.
+ var _locPend=!_myPos();   /* v348: honest - no fix yet = "location pending" in the first toast */
  setText('ss-t',overLimit?(he?' SOS חוזר נשלח · מיקומך שותף':currentLang==='ar'?' أُرسل SOS متكرر · تمت مشاركة موقعك':' Repeated SOS sent · location shared'):(he?' SOS פעיל - אזעקה פועלת · מיקומך שותף':currentLang==='ar'?' SOS نشط - الإنذار يعمل · تمت مشاركة موقعك':' SOS active - alarm firing · location shared'));
  setText('ss-s',he?'ממתין לתגובה...':currentLang==='ar'?'بانتظار الاستجابة...':'Waiting for response...');
  addSOSPin();
@@ -6095,7 +6096,8 @@ function activateSOS(){
  try{ fbPublishSOS(); }catch(e){} // cross-device: broadcast this SOS over RTDB
  try{ fbAlertPairedSos(); }catch(e){} // targeted closed-app push to paired SHOMERs
  try{ if(curSosId) fbRespondersListen(curSosId); }catch(e){} // live "N שומרים בדרך" as responders commit
- toast(he?' SOS שודר - שומרים בקרבתך עודכנו':currentLang==='ar'?' تم بث SOS - تم إبلاغ الحُرّاس القريبين':' SOS broadcast - nearby SHOMERs notified','red',function(){try{openUpdates();}catch(e){}});
+ /* v348: the alert is still on its way here (sosBroadcast waits for sign-in + up to 4 s for GPS) - say "sending", and sosBroadcast says "sent" once it really left */
+ toast(_locPend?(he?' שולח SOS לשומרים שלך… מיקום ממתין':currentLang==='ar'?' جارٍ إرسال SOS إلى حُرّاسك… الموقع قيد الانتظار':' Sending SOS to your SHOMERs… location pending'):(he?' שולח SOS לשומרים שלך…':currentLang==='ar'?' جارٍ إرسال SOS إلى حُرّاسك…':' Sending SOS to your SHOMERs…'),'red',function(){try{openUpdates();}catch(e){}});
  // Auto-dial prompt (opens dialer; a native app could place the call directly).
  setTimeout(()=>{
  if(sosPhase!=='active')return;
@@ -11484,7 +11486,7 @@ try{ hydrateIcons(document); }catch(e){}
 /* Loaded-build version - shown in the diagnostic panel so a phone can prove
    whether it's on the latest build or a STALE cached one. Keep in lock-step
    with sw.js SW_VERSION on every deploy. */
-var APP_VER='v347';
+var APP_VER='v348';
 var FB={ready:false,uid:null,db:null,_presTimer:null,connected:false,listening:false,pushState:'default',near:0,swVer:'?',
   authState:'connecting',sdkLoaded:false,persist:'',permErr:null,err:null,wsProbe:'',csp:''};
 /* Always log connection diagnostics to the console so the real failure can be SEEN in Chrome. */
@@ -13802,8 +13804,10 @@ async function sosBroadcast(sosId, type){ try{ if(window._sosPractice||isReviewA
   if(ok){
     var n=(SS.circleMembers||[]).filter(function(m){return !m.pending;}).length;
     if(window._sosSilent){ /* silent SOS: nothing visible on this phone */ }
-    else if(n>0) toast(he?('\u2713 נשלחה התרעה ל'+n+(n===1?' שומר':' שומרים')):('\u2713 Alert sent to '+n+(n===1?' SHOMER':' SHOMERs')),'grn');
-    else toast(he?'\u26A0 אין לך עדיין שומרים שיקבלו את ההתרעה - התקשר/י 100. אחר כך הוסף/י שומרים':'\u26A0 You have no SHOMERs to receive this yet - call 100. Then add SHOMERs','amb',function(){ try{ openCircles(); }catch(e){} });
+    else if(n>0){ var _ar=currentLang==='ar';
+      toast((he?('\u2713 נשלחה התרעה ל'+n+(n===1?' שומר':' שומרים')):_ar?('\u2713 أُرسل التنبيه إلى '+n+(n===1?' حارس':' حُرّاس')):('\u2713 Alert sent to '+n+(n===1?' SHOMER':' SHOMERs')))
+        +(p?'':(he?' · המיקום ממתין לאות GPS ויתעדכן אצלם אוטומטית':_ar?' · الموقع بانتظار إشارة GPS وسيتحدّث لديهم تلقائيًا':' · location pending GPS, it updates for them automatically')),'grn'); }
+    else toast(he?'\u26A0 אין לך עדיין שומרים שיקבלו את ההתרעה - התקשר/י 100. אחר כך הוסף/י שומרים':currentLang==='ar'?'\u26A0 ليس لديك حُرّاس بعد لتلقّي التنبيه - اتصل بـ 100. ثم أضِف حُرّاسًا':'\u26A0 You have no SHOMERs to receive this yet - call 100. Then add SHOMERs','amb',function(){ try{ openCircles(); }catch(e){} });
     sosWatchMyResponders();
     try{ sosWatchStandDown(); }catch(e){}
   } else { /* Queue it, keep retrying, and tell the user to call 100 NOW. */ try{ sosQueuePush(sosChan(FB.uid, sosSalt()), payload); }catch(e){} if(!window._sosSilent) toast(he?'\u26A0 ההתרעה טרם נשלחה - ננסה שוב אוטומטית. התקשר/י 100 עכשיו':'\u26A0 Alert not sent yet - retrying automatically. Call 100 now','sos'); }
@@ -13818,8 +13822,11 @@ function sosMaybeResendPos(){
     var sp=SOSBUS.sentPos, now=Date.now();
     if(sp && (now-(SOSBUS.sentAt||0))<15000) return;
     if(sp && distMeters(sp.lat,sp.lng,p.lat,p.lng)<40) return;
-    SOSBUS.sentPos=p; SOSBUS.sentAt=now;
-    busWrite(sosChan(FB.uid, sosSalt()), {fromUid:FB.uid, ts:now, name:packSOS(true,invName()||(SS.user&&SS.user.name)||'',p.lat,p.lng,FB.uid)});
+    var _first=!sp; SOSBUS.sentPos=p; SOSBUS.sentAt=now;
+    var _w=busWrite(sosChan(FB.uid, sosSalt()), {fromUid:FB.uid, ts:now, name:packSOS(true,invName()||(SS.user&&SS.user.name)||'',p.lat,p.lng,FB.uid)});
+    /* v348: the SOS went out without GPS - say so plainly once the location really reached the SHOMERs */
+    if(_first && _w && _w.then) _w.then(function(ok){ if(!ok){ SOSBUS.sentPos=null; return; } if(window._sosSilent||sosPhase!=='active') return; var he=currentLang==='he', ar=currentLang==='ar';
+      try{ toast(he?'\u2713 המיקום שלך נשלח לשומרים':ar?'\u2713 أُرسل موقعك إلى الحُرّاس':'\u2713 Your location reached your SHOMERs','grn'); }catch(e){} });
     if(FB._sosNeedsLoc){ FB._sosNeedsLoc=false; try{ fbPublishSOS(); }catch(e){} }
   }catch(e){}
 }
@@ -13970,7 +13977,8 @@ function sosWatchPartners(){
 function onPartnerSOS(puid, v, src){
   SOSBUS.src=SOSBUS.src||{}; (SOSBUS.src[puid]=SOSBUS.src[puid]||{})[src||'bus']=1;
   SOSBUS.lastV=SOSBUS.lastV||{};
-  if(src!=='rec'||!SOSBUS.lastV[puid]) SOSBUS.lastV[puid]=v;   /* position updates while the alert is open (the bus has the freshest) */
+  if(src!=='rec'||!SOSBUS.lastV[puid]||(!isFinite(SOSBUS.lastV[puid].lat)&&isFinite(v.lat))) SOSBUS.lastV[puid]=v;   /* position updates while the alert is open (the bus has the freshest; a located record beats an unlocated one) */
+  try{ sosIncomingLocSync(puid); }catch(e){}   /* v348: "location pending" on the card turns into the route the moment a fix arrives */
   try{ var _lv=SOSBUS.lastV[puid]; if(_lv) respFollowTarget('sos:'+puid, _lv.lat, _lv.lng); }catch(e){}   /* v280: my route follows them */
   /* v266 AGE CUTOFF: the newest timestamp across both channels decides. Older than 30 min and
      not updated = most likely a phone that died mid-SOS: shown, but quietly - no siren. */
@@ -14000,6 +14008,20 @@ function onPartnerSOSClear(puid, src){
   try{ var _sc=document.getElementById('sh-circles'); if(_sc&&_sc.classList.contains('open')) renderCircles(); }catch(e){}
   var el=document.getElementById('in-sos-'+puid); if(el) el.remove();
   try{ if(respTarget&&respTarget.key==='sos:'+puid) stopResponderNav(); }catch(e){}   /* their SOS ended - route goes with it */
+}
+/* v348: an SOS sent before the sender had GPS reaches the guardian with no location. The card says
+   "location pending" (never a made-up spot) and updates itself - route + distance - when the fix lands. */
+function sosIncomingLocSync(puid, nm){
+  var c=document.getElementById('in-sos-'+puid); if(!c) return;
+  var lv=SOSBUS.lastV&&SOSBUS.lastV[puid], has=!!(lv&&isFinite(lv.lat)&&isFinite(lv.lng));
+  var d=c.querySelector('.in-sos-dist'), he=currentLang==='he', ar=currentLang==='ar';
+  if(!has){ c.classList.add('locpend'); if(d) d.textContent=he?'\u{1F4CD} המיקום ממתין - יתעדכן כאן אוטומטית. בינתיים התקשר/י אליהם':ar?'\u{1F4CD} الموقع قيد الانتظار - سيتحدّث هنا تلقائيًا. اتصل بهم في الأثناء':'\u{1F4CD} Location pending - it updates here automatically. Call them meanwhile'; return; }
+  if(!c.classList.contains('locpend')) return;
+  c.classList.remove('locpend');
+  if(d) d.textContent=he?'\u{1F4CD} המיקום התקבל':ar?'\u{1F4CD} وصل الموقع':'\u{1F4CD} Location received';
+  var who=nm||(memberByPair(puid)||{}).name||lv.name||'';
+  try{ respondToSOS(lv.lat,lv.lng,who,{key:'sos:'+puid,quiet:true}); }catch(e){}
+  try{ toast((he?'\u{1F4CD} המיקום של ':ar?'\u{1F4CD} وصل موقع ':'\u{1F4CD} Location received: ')+who+(he?' התקבל':''),'red'); }catch(e){}
 }
 function memberByPair(puid){
   return (SS.circleMembers||[]).filter(function(m){return m.partnerUid===puid;})[0]||null;
@@ -14032,6 +14054,7 @@ function showIncomingSOS(puid, nm, v, oldTs){
   /* v280: the route to them is ALWAYS drawn as soon as the alert opens (no opt-in) */
   function route(){ try{ var lv=(SOSBUS.lastV&&SOSBUS.lastV[puid])||v; if(isFinite(lv.lat)&&isFinite(lv.lng)) respondToSOS(lv.lat,lv.lng,nm,{key:'sos:'+puid,quiet:true}); }catch(e){} }
   route();
+  try{ sosIncomingLocSync(puid, nm); }catch(e){}
 
   function shrink(){
     /* Once you have committed, the banner must SHRINK and get out of the way - it used to
