@@ -118,6 +118,38 @@ async function createAlert(uid, id, rec, subj) {
   await expect('theft photo under own theft/<uid> allowed', 'ALLOW', req('PUT', 'theft/s1/theft1', 's1', {ts: now, lat: 31.9, lng: 34.8, photo: 'data:image/jpeg;base64,AA', name: 'x'}));
   await expect('theft photo of another account not readable', 'DENY', req('GET', 'theft/s1', 'atk'));
 
+  console.log('-- SOS floor (v355): only on sos/<uid>, readable only by paired SHOMERs');
+  const sosRec = (o) => Object.assign({uid: 'subj', id: 'sos_f1', lat: 31.9, lng: 34.8, type: 'unknown', typeState: 'self', ts: now, resolved: false}, o || {});
+  await expect('SOS with saved-place floor + apartment allowed', 'ALLOW', req('PUT', 'sos/subj', 'subj', sosRec({floor: 'f:3|a:12'})));
+  await expect('SOS with Hebrew floor text allowed', 'ALLOW', req('PATCH', 'sos/subj', 'subj', {floor: 'f:קרקע|a:4א'}));
+  await expect('SOS barometer estimate added after send allowed', 'ALLOW', req('PATCH', 'sos/subj', 'subj', {floor: '~3'}));
+  await expect('paired SHOMER can read the floor', 'ALLOW', req('GET', 'sos/subj/floor', 'guard'));
+  await expect('stranger cannot read the floor', 'DENY', req('GET', 'sos/subj/floor', 'atk'));
+  await expect('stranger cannot read the SOS', 'DENY', req('GET', 'sos/subj', 'atk'));
+  await expect('floor over 20 chars rejected', 'DENY', req('PATCH', 'sos/subj', 'subj', {floor: 'f:123456|a:123456789'}));
+  await expect('floor with HTML rejected', 'DENY', req('PATCH', 'sos/subj', 'subj', {floor: 'f:<b>|a:1'}));
+  await expect('floor free text (wrong format) rejected', 'DENY', req('PATCH', 'sos/subj', 'subj', {floor: 'call me'}));
+  await expect('floor as a number rejected', 'DENY', req('PATCH', 'sos/subj', 'subj', {floor: 3}));
+  await expect('floor estimate of 3 digits rejected', 'DENY', req('PATCH', 'sos/subj', 'subj', {floor: '~123'}));
+  await expect('someone else cannot write my floor', 'DENY', req('PATCH', 'sos/subj', 'guard', {floor: '~2'}));
+  await expect('floor cannot go into the public feed', 'DENY', (async () => { await req('PUT', 'events/e_00000000000000fl', 'u24', {by: 'u24', ts: now, type: 'med'}); return req('PUT', 'dashfeed/e_00000000000000fl', 'u24', {type: 'med', lat: 31.9, lng: 34.8, ts: now, status: 'active', floor: '~3'}); })());
+  await expect('age cannot go into the public feed', 'DENY', req('PUT', 'dashfeed/hb_00000000000000aa', 'u20', {type: 'presence', lat: 31.9, lng: 34.8, ts: now, status: 'v2', age: '75p'}));
+
+  console.log('-- private profile (v355): age range, owner only');
+  await expect('owner can save an age range', 'ALLOW', req('PUT', 'profile/subj', 'subj', {age: '75p', ts: now}));
+  await expect('owner can read it', 'ALLOW', req('GET', 'profile/subj', 'subj'));
+  await expect('paired SHOMER cannot read it', 'DENY', req('GET', 'profile/subj', 'guard'));
+  await expect('stranger cannot read it', 'DENY', req('GET', 'profile/subj', 'atk'));
+  await expect('nobody can list all profiles', 'DENY', req('GET', 'profile', 'atk'));
+  await expect('signed-out read denied', 'DENY', req('GET', 'profile/subj', null));
+  await expect('someone else cannot write my profile', 'DENY', req('PUT', 'profile/subj', 'atk', {age: '18_39', ts: now}));
+  await expect('age outside the 4 ranges rejected', 'DENY', req('PUT', 'profile/subj', 'subj', {age: '42', ts: now}));
+  await expect('HTML age rejected', 'DENY', req('PUT', 'profile/subj', 'subj', {age: '<b>', ts: now}));
+  await expect('extra field (e.g. name) rejected', 'DENY', req('PUT', 'profile/subj', 'subj', {age: '40_64', ts: now, name: 'x'}));
+  await expect('missing ts rejected', 'DENY', req('PUT', 'profile/subj', 'subj', {age: '40_64'}));
+  await expect('owner can change the range', 'ALLOW', req('PUT', 'profile/subj', 'subj', {age: '65_74', ts: now}));
+  await expect('owner can delete it ("prefer not to say")', 'ALLOW', req('DELETE', 'profile/subj', 'subj'));
+
   console.log(`\n${pass} passed, ${fail} failed`);
   process.exit(fail ? 1 : 0);
 })().catch((e) => { console.error(e); process.exit(2); });

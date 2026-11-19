@@ -74,6 +74,25 @@
         },
         "type": {
           ".validate": "newData.isString() && newData.val().matches(/^[a-z_]{1,16}$/)"
+        },
+        "floor": {
+          ".validate": "newData.isString() && newData.val().length >= 2 && newData.val().length <= 20 && newData.val().matches(/^(~-?[0-9]{1,2}|f:[^<>|&\"]{1,6}(\\|a:[^<>|&\"]{1,6})?|a:[^<>|&\"]{1,6})$/)"
+        }
+      }
+    },
+    "profile": {
+      "$uid": {
+        ".read": "auth != null && auth.uid === $uid",
+        ".write": "auth != null && auth.uid === $uid",
+        ".validate": "newData.hasChildren(['age','ts'])",
+        "age": {
+          ".validate": "newData.isString() && newData.val().matches(/^(18_39|40_64|65_74|75p)$/)"
+        },
+        "ts": {
+          ".validate": "newData.isNumber() && newData.val() <= now + 600000"
+        },
+        "$other": {
+          ".validate": false
         }
       }
     },
