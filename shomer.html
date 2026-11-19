@@ -2222,6 +2222,14 @@ body.otp-active .ob-steps{display:none!important;}
  <div class="sh-pill" aria-hidden="true"></div>
  <div class="sh-head"><span class="sh-ttl" id="set-ttl">הגדרות</span><button class="sh-x" onclick="cl('sh-set')" aria-label="סגור"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg></button></div>
  <div class="sh-body">
+ <div class="set-cat sm-keep"><div class="set-cat-ic"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="7.5" r="3.5" fill="none" stroke="currentColor" stroke-width="2"/><path d="M5 20c.8-3.6 3.6-5.5 7-5.5s6.2 1.9 7 5.5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></div><div class="set-cat-t" data-he="מצב פשוט" data-en="Simple mode" data-ar="الوضع البسيط">מצב פשוט</div></div>
+ <div class="set-grp sm-keep">
+  <div class="set-row"><div class="sr-l"><div class="sr-ic"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="7.5" r="3.5" fill="none" stroke="currentColor" stroke-width="2"/><path d="M5 20c.8-3.6 3.6-5.5 7-5.5s6.2 1.9 7 5.5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></div><div><div class="sr-nm" data-he="מצב פשוט" data-en="Simple mode" data-ar="الوضع البسيط">מצב פשוט</div><div class="sr-sb" data-he="כפתור עזרה גדול, טקסט גדול, „אני בסדר” יומי ושיחה בלחיצה אחת. בלי מפה." data-en="A big help button, large text, a daily “I'm OK” and one-tap calling. No map." data-ar="زر مساعدة كبير، نص كبير، «أنا بخير» يومي واتصال بلمسة واحدة. بدون خريطة.">כפתור עזרה גדול, טקסט גדול, „אני בסדר” יומי ושיחה בלחיצה אחת. בלי מפה.</div></div></div><div class="tog" id="smp-tog" onclick="simpleToggleFromSettings(this)" role="switch" aria-checked="false" aria-label="מצב פשוט"></div></div>
+  <div class="set-row sm-only"><div class="sr-l"><div><div class="sr-nm" data-he="„אני בסדר” עד השעה" data-en="“I'm OK” by" data-ar="«أنا بخير» قبل الساعة">„אני בסדר” עד השעה</div><div class="sr-sb" data-he="אם לא לחצתם עד השעה הזו, השומרים שלכם יקבלו הודעה עדינה." data-en="If you have not tapped by then, your SHOMERs get a gentle message." data-ar="إن لم تضغطوا حتى هذه الساعة، يتلقى حُرّاسكم رسالة لطيفة.">אם לא לחצתם עד השעה הזו, השומרים שלכם יקבלו הודעה עדינה.</div></div></div><select id="smp-hour" class="smp-hour" dir="ltr" onchange="simpleSetHour(this.value)" aria-label="hour"></select></div>
+  <div class="set-row sm-only" onclick="cl('sh-set');simpleAddGuardian()" role="button" tabindex="0"><div class="sr-l"><div><div class="sr-nm" data-he="הוספת שומר/ת" data-en="Add a SHOMER" data-ar="إضافة حارس">הוספת שומר/ת</div><div class="sr-sb" data-he="בני המשפחה יכולים להוסיף את עצמם כאן, בטלפון הזה." data-en="Family members can add themselves here, on this phone." data-ar="يمكن لأفراد العائلة إضافة أنفسهم هنا، على هذا الهاتف.">בני המשפחה יכולים להוסיף את עצמם כאן, בטלפון הזה.</div></div></div><span style="color:var(--tx3);font-size:18px">›</span></div>
+  <div class="set-row sm-only" onclick="simpleOpenPlaces()" role="button" tabindex="0"><div class="sr-l"><div><div class="sr-nm" data-he="הבית והעבודה: קומה ודירה" data-en="Home and work: floor and apartment" data-ar="البيت والعمل: الطابق والشقة">הבית והעבודה: קומה ודירה</div><div class="sr-sb" data-he="בזמן SOS השומרים יראו באיזו קומה אתם." data-en="During an SOS your SHOMERs see which floor you are on." data-ar="أثناء SOS يرى حُرّاسكم في أي طابق أنتم.">בזמן SOS השומרים יראו באיזו קומה אתם.</div></div></div><span style="color:var(--tx3);font-size:18px">›</span></div>
+  <div class="set-row" onclick="ageAskOpen(true)" role="button" tabindex="0"><div class="sr-l"><div><div class="sr-nm" data-he="הגיל שלי" data-en="My age" data-ar="عمري">הגיל שלי</div><div class="sr-sb" data-he="פרטי. רק אתם רואים." data-en="Private. Only you see it." data-ar="خاص. أنتم فقط ترونه.">פרטי. רק אתם רואים.</div></div></div><span id="smp-age-st" dir="ltr" style="font-size:15px;font-weight:800;color:var(--g3);white-space:nowrap"></span></div>
+ </div>
  <div class="set-cat"><div class="set-cat-ic"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M18 8a6 6 0 1 0-12 0c0 7-3 9-3 9h18s-3-2-3-9" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><path d="M13.7 21a2 2 0 0 1-3.4 0" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></div><div class="set-cat-t" data-he="התראות" data-en="Alerts &amp; Notifications">התראות</div></div>
  <div class="sec-cap mb12" id="set-radius-lbl">רדיוס התראה</div>
  <div class="sl-card mb20">
@@ -2285,8 +2293,8 @@ body.otp-active .ob-steps{display:none!important;}
  <div class="set-cat"><div class="set-cat-ic"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 4h3.5l1.5 4-2 1.5a11 11 0 0 0 5 5l1.5-2 4 1.5V19a2 2 0 0 1-2.2 2A16 16 0 0 1 4 6.2 2 2 0 0 1 5 4Z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></svg></div><div class="set-cat-t" id="set-contacts-lbl" data-he="אנשי קשר חירום" data-en="Emergency contacts">אנשי קשר חירום</div></div>
  <div class="set-grp"><div class="set-row" onclick="findShomerContacts()" role="button" tabindex="0"><div class="sr-l"><div class="sr-ic"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7" fill="none" stroke="currentColor" stroke-width="2"/><path d="M20 20l-3.2-3.2" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></div><div><div class="sr-nm" data-he="מצא אנשי קשר ב-SHOMER" data-en="Find contacts on SHOMER" data-ar="ابحث عن جهات في SHOMER">מצא אנשי קשר ב-SHOMER</div><div class="sr-sb" data-he="בודק מי מאנשי הקשר שלך כבר משתמש/ת ב-SHOMER — המספרים נבדקים מוצפנים ולא נחשפים." data-en="Checks which of your contacts already use SHOMER — numbers are hashed, never exposed." data-ar="يتحقق من جهاتك التي تستخدم SHOMER — تُشفَّر الأرقام ولا تُكشف.">בודק מי מאנשי הקשר שלך כבר משתמש/ת ב-SHOMER — מוצפן, לא נחשף.</div></div></div><span style="color:var(--tx3);font-size:18px">›</span></div></div><div class="set-grp" id="contacts-grp"><!-- rendered live from your paired SHOMERs (renderSetContacts) --></div>
  <button class="add-c mb20" onclick="cl('sh-set');openCircles()" data-he="+ חבר/י שומר/ת" data-en="+ Connect a SHOMER">+ חבר/י שומר/ת</button>
- <div class="set-cat"><div class="set-cat-ic"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="2"/><path d="M3 12h18" stroke="currentColor" stroke-width="2"/><path d="M12 3a15 15 0 0 1 0 18M12 3a15 15 0 0 0 0 18" fill="none" stroke="currentColor" stroke-width="2"/></svg></div><div class="set-cat-t" id="set-lang-lbl" data-he="שפה" data-en="Language">שפה</div></div>
- <div class="set-grp" style="padding:10px 0;border:0;background:none;">
+ <div class="set-cat sm-keep"><div class="set-cat-ic"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="2"/><path d="M3 12h18" stroke="currentColor" stroke-width="2"/><path d="M12 3a15 15 0 0 1 0 18M12 3a15 15 0 0 0 0 18" fill="none" stroke="currentColor" stroke-width="2"/></svg></div><div class="set-cat-t" id="set-lang-lbl" data-he="שפה" data-en="Language">שפה</div></div>
+ <div class="set-grp sm-keep" style="padding:10px 0;border:0;background:none;">
  <div style="display:flex;direction:ltr;gap:6px;flex-wrap:wrap;" id="set-lang-btns">
  <button class="olb" data-setlang="en" lang="en">🇬🇧 EN</button>
  <button class="olb" data-setlang="ar" lang="ar">🇦🇪 عر</button>
@@ -2308,11 +2316,11 @@ body.otp-active .ob-steps{display:none!important;}
  <div class="ai-row"><span class="ai-l" data-he="מוטו" data-en="Motto" data-ar="الشعار">מוטו</span><span class="ai-v">שׁוֹמֵר אָחִי אָנֹכִי</span></div>
  </div>
  <p class="set-help" id="set-upd-note" style="margin:8px 2px 0;display:flex;align-items:center;gap:7px"><svg class="ic" viewBox="0 0 24 24" width="15" height="15" aria-hidden="true" style="flex:0 0 auto"><path d="M20 11a8 8 0 1 0-.6 4" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M20 4v5h-5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg><span data-he="האפליקציה מתעדכנת אוטומטית דרך Google Play." data-en="This app updates automatically via Google Play." data-ar="يُحدَّث التطبيق تلقائيًا عبر Google Play.">האפליקציה מתעדכנת אוטומטית דרך Google Play.</span></p>
- <div class="sec-cap mb12" style="margin-top:18px" id="reset-cap" data-he="חשבון" data-en="Account" data-ar="الحساب">חשבון</div>
- <div class="set-grp" style="border-color:var(--b4);">
+ <div class="sec-cap mb12 sm-keep" style="margin-top:18px" id="reset-cap" data-he="חשבון" data-en="Account" data-ar="الحساب">חשבון</div>
+ <div class="set-grp sm-keep" style="border-color:var(--b4);">
  <button style="width:100%;padding:14px;background:var(--rb);border:none;font-size:14px;font-weight:800;color:#FF7080;display:flex;align-items:center;justify-content:center;gap:8px;cursor:pointer;" onclick="deleteAccount()" id="delete-account-btn"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 7h14M9 7V5.5A1.5 1.5 0 0 1 10.5 4h3A1.5 1.5 0 0 1 15 5.5V7M6.5 7l.8 12a2 2 0 0 0 2 1.9h5.4a2 2 0 0 0 2-1.9L17.5 7" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg><span data-he="מחיקת חשבון" data-en="Delete account" data-ar="حذف الحساب">מחיקת חשבון</span></button>
  </div>
- <div class="sr-sb" id="delete-hint" style="margin:8px 2px 16px;line-height:1.6" data-he="מחיקה מלאה וסופית: מוחק את כל הנתונים מהשרת (נוכחות, SOS, פרופיל, הגדרות), מסיר אותך ממעגלי השומרים המשויכים, ומבטל את שם המשתמש שנוצר אוטומטית. פתיחה מחדש יוצרת זהות חדשה לגמרי." data-en="Full, permanent erase: removes all your data from the server (presence, SOS, profile, settings), removes you from any paired SHOMERs' circles, and discards your auto-generated username. Reopening creates a brand-new identity.">מחיקה מלאה וסופית: מוחק את כל הנתונים מהשרת (נוכחות, SOS, פרופיל, הגדרות), מסיר אותך ממעגלי השומרים המשויכים, ומבטל את שם המשתמש שנוצר אוטומטית. פתיחה מחדש יוצרת זהות חדשה לגמרי.</div>
+ <div class="sr-sb sm-keep" id="delete-hint" style="margin:8px 2px 16px;line-height:1.6" data-he="מחיקה מלאה וסופית: מוחק את כל הנתונים מהשרת (נוכחות, SOS, פרופיל, הגדרות), מסיר אותך ממעגלי השומרים המשויכים, ומבטל את שם המשתמש שנוצר אוטומטית. פתיחה מחדש יוצרת זהות חדשה לגמרי." data-en="Full, permanent erase: removes all your data from the server (presence, SOS, profile, settings), removes you from any paired SHOMERs' circles, and discards your auto-generated username. Reopening creates a brand-new identity.">מחיקה מלאה וסופית: מוחק את כל הנתונים מהשרת (נוכחות, SOS, פרופיל, הגדרות), מסיר אותך ממעגלי השומרים המשויכים, ומבטל את שם המשתמש שנוצר אוטומטית. פתיחה מחדש יוצרת זהות חדשה לגמרי.</div>
  <div class="set-row" onclick="toggleUpdSms(this.querySelector('.tog'))" role="button" tabindex="0">
     <div class="sr-l">
      <div class="sr-ic"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5h16v11H7l-3 3Z"/><path d="M8 9h8M8 12.5h5"/></svg></div>
@@ -2321,7 +2329,7 @@ body.otp-active .ob-steps{display:none!important;}
     <div class="tog" role="switch" aria-checked="false"></div>
    </div>
 
-   <div class="legal-links" id="set-legal-links">
+   <div class="legal-links sm-keep" id="set-legal-links">
  <button onclick="openLegal('tos')" id="set-ll-tos">תנאי שימוש</button><span class="sep">·</span>
  <button onclick="openLegal('privacy')" id="set-ll-priv">מדיניות פרטיות</button><span class="legal-sep" aria-hidden="true"> · </span><button onclick="openLegal('a11y')" id="set-ll-a11y" data-he="הצהרת נגישות" data-en="Accessibility" data-ar="بيان الوصول">הצהרת נגישות</button><span class="sep">·</span>
  <button onclick="openLegal('disclaimer')" id="set-ll-disc">כתב ויתור חירום</button>
@@ -2467,6 +2475,22 @@ body.otp-active .ob-steps{display:none!important;}
  <div class="pf-sb">
  <input id="prof-invname" type="text" maxlength="24" autocomplete="name" placeholder="למשל: דוד מרקוביץ׳" oninput="invNameSave(this.value)" style="width:100%;box-sizing:border-box;padding:12px 14px;border-radius:12px;border:1px solid rgba(201,168,76,.35);background:rgba(255,255,255,.04);color:inherit;font:inherit;font-size:15px">
  <p class="sr-sb" style="margin:6px 2px 4px;line-height:1.6" data-he="רק מי שתזמין/י יראה את השם הזה. לכל שאר המשתמשים את/ה נשאר/ת אנונימי/ת." data-en="Only people you invite see this name. Everyone else sees you as anonymous." data-ar="فقط من تدعوهم يرون هذا الاسم. يراك الآخرون مجهول الهوية.">רק מי שתזמין/י יראה את השם הזה. לכל שאר המשתמשים את/ה נשאר/ת אנונימי/ת.</p>
+ </div></details>
+ <details class="pf-sec" id="pf-sec-places"><summary><span class="pf-st" data-he="הבית והעבודה שלי (קומה ודירה)" data-en="My home and work (floor and apartment)" data-ar="بيتي وعملي (الطابق والشقة)">הבית והעבודה שלי (קומה ודירה)</span><span class="pf-sm" id="pf-sec-places-sm"></span><svg class="pf-chev" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></summary>
+ <div class="pf-sb">
+  <div class="pf-note" data-he="אופציונלי. נשמר רק בטלפון שלכם. בזמן SOS ליד הבית או העבודה, רק השומרים שחיברתם יראו את הקומה והדירה." data-en="Optional. Kept only on your phone. During an SOS near home or work, only the SHOMERs you linked see the floor and apartment." data-ar="اختياري. يُحفظ في هاتفكم فقط. أثناء SOS قرب البيت أو العمل، يرى الطابق والشقة الحُرّاس الذين ربطتموهم فقط.">אופציונלי. נשמר רק בטלפון שלכם. בזמן SOS ליד הבית או העבודה, רק השומרים שחיברתם יראו את הקומה והדירה.</div>
+  <div class="smp-pl">
+   <div class="smp-pl-h"><b data-he="בית" data-en="Home" data-ar="البيت">בית</b><span class="smp-pl-st" id="pl-home-st"></span></div>
+   <button type="button" class="smp-pl-set" onclick="placeSetHere('home')" data-he="📍 שמירת המיקום הנוכחי" data-en="📍 Save my current location" data-ar="📍 حفظ موقعي الحالي">📍 שמירת המיקום הנוכחי</button>
+   <div class="smp-pl-in"><label><span data-he="קומה" data-en="Floor" data-ar="الطابق">קומה</span><input id="pl-home-floor" type="text" maxlength="6" autocomplete="off" oninput="placeSave('home')"></label><label><span data-he="דירה" data-en="Apartment" data-ar="الشقة">דירה</span><input id="pl-home-apt" type="text" maxlength="6" autocomplete="off" oninput="placeSave('home')"></label></div>
+   <button type="button" class="ob-back" style="margin-top:6px" onclick="placeClear('home')" data-he="מחיקה" data-en="Remove" data-ar="حذف">מחיקה</button>
+  </div>
+  <div class="smp-pl">
+   <div class="smp-pl-h"><b data-he="עבודה" data-en="Work" data-ar="العمل">עבודה</b><span class="smp-pl-st" id="pl-work-st"></span></div>
+   <button type="button" class="smp-pl-set" onclick="placeSetHere('work')" data-he="📍 שמירת המיקום הנוכחי" data-en="📍 Save my current location" data-ar="📍 حفظ موقعي الحالي">📍 שמירת המיקום הנוכחי</button>
+   <div class="smp-pl-in"><label><span data-he="קומה" data-en="Floor" data-ar="الطابق">קומה</span><input id="pl-work-floor" type="text" maxlength="6" autocomplete="off" oninput="placeSave('work')"></label><label><span data-he="דירה" data-en="Apartment" data-ar="الشقة">דירה</span><input id="pl-work-apt" type="text" maxlength="6" autocomplete="off" oninput="placeSave('work')"></label></div>
+   <button type="button" class="ob-back" style="margin-top:6px" onclick="placeClear('work')" data-he="מחיקה" data-en="Remove" data-ar="حذف">מחיקה</button>
+  </div>
  </div></details>
  <details class="pf-sec" id="pf-sec-data"><summary><span class="pf-st" data-he="נתוני פרופיל (אופציונלי)" data-en="Profile data (optional)" data-ar="بيانات الملف (اختياري)">נתוני פרופיל (אופציונלי)</span><span class="pf-sm" id="pf-sec-data-sm"></span><svg class="pf-chev" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></summary>
  <div class="pf-sb">
@@ -3896,7 +3920,7 @@ function deleteAccount(){
  try{
    if(FB&&FB.db&&uid){
      var db=FB.db;
-     ['presence/','positions/','tokens/','geo/','checkin/'].forEach(function(p){ try{ db.ref(p+uid).remove(); }catch(e){} });
+     ['presence/','positions/','tokens/','geo/','checkin/','profile/'].forEach(function(p){ try{ db.ref(p+uid).remove(); }catch(e){} });
      // remove my hashed-phone registry entry (so I'm no longer discoverable as a SHOMER)
      try{ if(FB._myPhoneHash) db.ref('registry/'+FB._myPhoneHash).remove(); }catch(e){}
      // TOMBSTONE - a durable "deleted" marker keyed on MY uid (a node I'm allowed to
@@ -4391,6 +4415,7 @@ function applyTranslations(){
  try{ gdApplyI18n(); gdRenderList(); gdRenderMarkers(); }catch(e){}
  try{ if(typeof guideApplyLang==='function'){ guideApplyLang(); guideFilter(); } }catch(e){}
  try{ legalApplyI18n(); }catch(e){}
+ try{ simpleRender(); simpleRenderSettings(); placeRender(); }catch(e){}   /* v355 */
  try{ reflectPinSetState(); }catch(e){} try{ reflectCheckin(); }catch(e){}   /* v350: these were rendered once in Hebrew and never followed a language change */
  try{ emApplyCountry(); }catch(e){}   /* v274: local emergency numbers after the data-he sweep */
  renderReportsList();renderSosHistory();
@@ -4834,6 +4859,7 @@ function _nudgeGeoNow(){
  try{ navigator.geolocation.getCurrentPosition(function(p){ userLat=p.coords.latitude; userLng=p.coords.longitude; try{ccSyncFromGeo&&ccSyncFromGeo();}catch(e){} try{moveUserDot(userLat,userLng);}catch(e){} try{startGeoWatch();}catch(e){} try{ if(MAP) MAP.setView([userLat,userLng], Math.max(MAP.getZoom?MAP.getZoom():16,16)); }catch(e){} }, function(){}, {enableHighAccuracy:true,timeout:15000,maximumAge:0}); }catch(e){}
 }
 function nudgeMaybeShow(){
+ try{ if(simpleBlocksCards()) return; }catch(e){}   /* v355 */
  return dykMaybeShow();   /* v312: one tip system - "הידעת?" (basics first), via the popup scheduler */
  try{
   if(!popupTurn('nudge',4,nudgeMaybeShow)) return;
@@ -4909,6 +4935,7 @@ function dykPick(){
 }
 function dykText(t){ var L=currentLang; return {tx:L==='he'?t.he:L==='ar'?t.ar:t.en, cta:t.cta[L==='he'?0:L==='ar'?1:2]}; }
 function dykMaybeShow(){
+ try{ if(simpleBlocksCards()) return; }catch(e){}   /* v355 */
  try{
   if(!popupTurn('dyk',6,dykMaybeShow)) return;
   var tip=dykPick(); if(!tip) return false;
@@ -5070,12 +5097,12 @@ function testNotifications(){ try{ if(typeof updShowBanner==='function') updShow
 }
 var PF_OPTS={
  gender:[['f','\u05d0\u05d9\u05e9\u05d4','Female'],['m','\u05d2\u05d1\u05e8','Male'],['o','\u05d0\u05d7\u05e8','Other'],['x','\u2014','Prefer not']],
- age:[['u18','<18','<18'],['18_29','18-29','18-29'],['30_49','30-49','30-49'],['50_64','50-64','50-64'],['65p','65+','65+']],
+ age:[['18_39','18–39','18–39'],['40_64','40–64','40–64'],['65_74','65–74','65–74'],['75p','75+','75+']],   /* v355: the same ranges as the one-time question */
  res:[['res','\u05ea\u05d5\u05e9\u05d1/\u05ea','Resident'],['vis','\u05de\u05d1\u05e7\u05e8/\u05ea','Visitor']]
 };
 function _pfKey(f){ return f==='gender'?'gender':f==='age'?'ageBand':'residency'; }
-function setProfileField2(f,val){ try{ if(!SS.user)SS.user={}; var k=_pfKey(f); SS.user[k]=(SS.user[k]===val?'':val); saveStore(); renderProfile2(); }catch(e){} }
-function renderProfile2(){ try{ drillRenderProfile(); }catch(e){} try{ var he=currentLang==='he'; try{ var _pi=document.getElementById('prof-invname'); if(_pi && document.activeElement!==_pi) _pi.value=invName(); }catch(e){}
+function setProfileField2(f,val){ try{ if(!SS.user)SS.user={}; var k=_pfKey(f); SS.user[k]=(SS.user[k]===val?'':val); saveStore(); renderProfile2(); if(f==='age'){ SS.ageAsked=SS.ageAsked||Date.now(); profileSync(); simpleRenderSettings(); } }catch(e){} }
+function renderProfile2(){ try{ drillRenderProfile(); }catch(e){} try{ placeRender(); }catch(e){} try{ var he=currentLang==='he'; try{ var _pi=document.getElementById('prof-invname'); if(_pi && document.activeElement!==_pi) _pi.value=invName(); }catch(e){}
   [['gender','pf-gender'],['age','pf-age'],['res','pf-res']].forEach(function(p){
    var box=document.getElementById(p[1]); if(!box)return; var k=_pfKey(p[0]); var cur=(SS.user&&SS.user[k])||'';
    box.innerHTML=PF_OPTS[p[0]].map(function(o){ return '<button type="button" class="prof2-b'+(cur===o[0]?' sel':'')+'" onclick="setProfileField2(\''+p[0]+'\',\''+o[0]+'\')">'+(he?o[1]:arTr(o[2]))+'</button>'; }).join('');
@@ -5160,6 +5187,7 @@ function enterApp(returning){
  setTimeout(function(){ try{ maybePromptInstall(); }catch(e){} }, 2500);
  setTimeout(function(){ try{ maybePromptBackgroundAlerts(); }catch(e){} }, 5000); // notification opt-in (Android/installed)
  try{ resumeDMS(); }catch(e){}
+ try{ simpleBoot(); }catch(e){}   /* v355: Simple mode + age range (asked once) */
  // Handle an incoming SHOMER invite link (?g=…) once the map is ready.
  setTimeout(()=>{ try{ gdCheckInviteParam(); }catch(e){} },900);
  if(!returning){
@@ -6041,6 +6069,8 @@ function beginSOS(trigger){
  try{ popupClearLow(); }catch(e){}   // nothing may sit on top of an emergency
  window._sosSilent=false;
  sosPhase='countdown'; sosActive=true; curSosTrigger=trigger||'manual';
+ try{ sosFloorPrepare(); }catch(e){}   /* v355: barometer floor estimate (Android app only) */
+ try{ if(ageAskIsOpen()) ageAskHide(); }catch(e){}   /* v355: the age question never sits on an emergency (asked again next open) */
  const btn=document.getElementById('sos-btn');
  if(btn){btn.classList.add('active');btn.setAttribute('aria-pressed','true');}
  /* v337: an AUTOMATIC trigger (shake, DMS) is an inference and can be wrong - fast walking set one off.
@@ -6065,6 +6095,7 @@ function sosPreStart(){
  try{ var wm=document.getElementById('sos-pre-wm'), src=document.getElementById('shm-logo-svg'); if(wm && src && !wm.firstChild){ var c=src.cloneNode(true); c.removeAttribute('id'); c.removeAttribute('class'); c.setAttribute('aria-hidden','true'); wm.appendChild(c); } }catch(e){}
  try{ var bar=document.getElementById('sos-pre-bar'); if(bar){ bar.style.transition='none'; bar.style.strokeDashoffset='0'; void bar.getBoundingClientRect(); bar.style.transition=''; } }catch(e){}
  sosPreRender(); sosPreBuzz();
+ try{ simpleSpeakCountdown(_sosPreLeft); }catch(e){}   /* v355: spoken in Simple mode */
  try{ acquireWake(); }catch(e){}
  try{ sosPreNotify(true); }catch(e){}
  clearInterval(_sosPreT);
@@ -6157,6 +6188,7 @@ function startCountdown(){
  const ov=document.getElementById('sos-cd');
  if(ov){ov.classList.add('on');ov.setAttribute('aria-hidden','false');}
  renderCountdown();
+ try{ simpleSpeakCountdown(sosCdLeft); }catch(e){}   /* v355: spoken in Simple mode */
  clearInterval(sosCdTimer);
  sosCdTimer=setInterval(()=>{
  sosCdLeft--;
@@ -6198,6 +6230,7 @@ function cancelCountdown(){
  var wasPre=!!window._sosPre;
  window._sosPre=false; clearInterval(_sosPreT); _sosPreT=null; try{ sosPreHide(); }catch(e){}
  window._sosPractice=false;
+ try{ simpleHush(); }catch(e){}
  clearInterval(sosCdTimer); sosGraceClear(); stopSosAlarm();
  sosPhase='idle'; sosActive=false; window._sosSilent=false;
  const ov=document.getElementById('sos-cd');
@@ -7134,6 +7167,7 @@ function _startGeoWatchNow(){
  pos=>{
  userLat=pos.coords.latitude; userLng=pos.coords.longitude;
  try{ccSyncFromGeo();}catch(e){}
+ try{ floorRefMaybe(pos.coords.accuracy); }catch(e){}   /* v355: barometer reference (Android app, accuracy <= 20 m) */
  moveUserDot(userLat,userLng);
  /* On every app open, center the map on the user's own location the first time we get a fix. */
  if(!_centeredOnOpen && MAP){ try{ MAP.setView([userLat,userLng], Math.max(MAP.getZoom(),15), {animate:true}); }catch(e){} _centeredOnOpen=true; }
@@ -11222,6 +11256,8 @@ function privacyHTML(){ const he=currentLang==='he';
  <li><strong>الاسم</strong> (اختياري؛ القيمة الافتراضية كنية عشوائية) و<strong>الهاتف</strong> (اختياري).</li>
  <li><strong>موقع الجهاز</strong> - فقط بعد منحك الإذن في المتصفّح.</li>
  <li><strong>البلاغات والصور</strong> التي تُنشئها، والتفضيلات (الإنذار، النطاق، اللغة).</li>
+ <li><strong>الفئة العمرية</strong> (اختياري) - لملاءمة التطبيق لكم (مثل الوضع البسيط). تُحفظ في هاتفكم وفي سجل خاص في حسابكم لا يقرؤه أحد غيركم. لا تُنشر أبدًا.</li>
+ <li><strong>الطابق والشقة</strong> (اختياري) - تُحفظ في هاتفكم فقط. أثناء SOS قرب البيت أو العمل (أو تقدير بالبارومتر في تطبيق Android) يُرفق الطابق بالـ SOS، ولا يراه إلا الحُرّاس الذين ربطتموهم. لا يُنشر أبدًا.</li>
  </ul>
  <h4>كيف يُستخدم الموقع</h4>
  <p>يُستخدم الموقع لإظهارك على خريطتك الخاصة، ولإرفاقه بنداء استغاثة/بلاغ ترسله، ولمشاركة موقعك المباشر مع الحُرّاس <strong>الذين تربطهم بموافقتك</strong>. مشاركة الموقع اختيارية.</p>
@@ -11248,6 +11284,8 @@ function privacyHTML(){ const he=currentLang==='he';
  <li><strong>שם</strong> (אופציונלי; ברירת המחדל היא כינוי אקראי) ו<strong>טלפון</strong> (אופציונלי).</li>
  <li><strong>מיקום המכשיר</strong> - רק לאחר שאישרת הרשאה בדפדפן.</li>
  <li><strong>דיווחים ותמונות</strong> שאת/ה יוצר/ת, והעדפות (אזעקה, רדיוס, שפה).</li>
+ <li><strong>טווח גיל</strong> (אופציונלי) - כדי להתאים את האפליקציה (למשל מצב פשוט). נשמר בטלפון וברשומה פרטית בחשבון שלכם שאף אחד אחר לא יכול לקרוא. אף פעם לא מתפרסם.</li>
+ <li><strong>קומה ודירה</strong> (אופציונלי) - נשמרות רק בטלפון. בזמן SOS ליד הבית או העבודה (או הערכה לפי ברומטר באפליקציית Android) הקומה מצורפת ל-SOS, ורק השומרים שחיברתם רואים אותה. אף פעם לא מתפרסמת.</li>
  </ul>
  <h4>איך נעשה שימוש במיקום</h4>
  <p>המיקום משמש כדי להציג אותך על המפה שלך, לצרף אותו ל-SOS/דיווח שאת/ה שולח/ת, ולשתף מיקום חי עם שומרים <strong>שאת/ה מחבר/ת בהסכמה</strong>. שיתוף מיקום הוא opt-in.</p>
@@ -11274,6 +11312,8 @@ function privacyHTML(){ const he=currentLang==='he';
  <li><strong>Name</strong> (optional; defaults to a random handle) and <strong>phone</strong> (optional).</li>
  <li><strong>Device location</strong> - only after you grant browser permission.</li>
  <li><strong>Reports and photos</strong> you create, and preferences (alarm, radius, language).</li>
+ <li><strong>Age range</strong> (optional) - to fit the app to you (e.g. Simple mode). Kept on your phone and in a private record in your account that no one else can read. Never made public.</li>
+ <li><strong>Floor and apartment</strong> (optional) - kept on your phone only. During an SOS near home or work (or a barometer estimate in the Android app) the floor is attached to the SOS, and only the SHOMERs you linked see it. Never made public.</li>
  </ul>
  <h4>How location is used</h4>
  <p>Location is used to show you on your own map, to attach to an SOS/report you send, and to share live location with SHOMERs <strong>you connect by consent</strong>. Location sharing is opt-in.</p>
@@ -11681,7 +11721,7 @@ try{ hydrateIcons(document); }catch(e){}
 /* Loaded-build version - shown in the diagnostic panel so a phone can prove
    whether it's on the latest build or a STALE cached one. Keep in lock-step
    with sw.js SW_VERSION on every deploy. */
-var APP_VER='v354';
+var APP_VER='v355';
 var FB={ready:false,uid:null,db:null,_presTimer:null,connected:false,listening:false,pushState:'default',near:0,swVer:'?',
   authState:'connecting',sdkLoaded:false,persist:'',permErr:null,err:null,wsProbe:'',csp:''};
 /* Always log connection diagnostics to the console so the real failure can be SEEN in Chrome. */
@@ -12338,6 +12378,7 @@ function fbOnAuthed(uid){
   try{ fbListenSOS(); }catch(e){}
   try{ fbListenPairs(); }catch(e){}
   try{ gaListen(); }catch(e){}   /* v308: guardian check-in / alerts */
+  try{ profileSyncFlush(); }catch(e){}   /* v355: owner-only age range */
   try{ purgeStalePositions(); }catch(e){}
   try{ essLoad(); essChipsBuild(); }catch(e){}
   /* v272: wait for a real GPS fix before asking for nearby services (it used to give up at 3.5s) */
@@ -12593,6 +12634,7 @@ function fbPublishSOS(){ if(!FB.ready||!curSosId)return; try{ if(window._sosPrac
      with (rules), and no name in it: my SHOMERs already know my private invite name. */
   var _rec={uid:FB.uid,id:curSosId,lat:userLat,lng:userLng,type:curSosType||'unknown',typeState:'self',ts:Date.now(),resolved:false};
   if(window._sosRepeated) _rec.repeated=true;
+  try{ var _fl=sosFloorValue(); if(_fl){ _rec.floor=_fl; window._sosFloorSent=_fl; } }catch(e){}   /* v355: floor / apartment - sos/<uid> only, never dashfeed */
   try{ FB.db.ref('sos/'+FB.uid).set(_rec).then(function(){ fbTriggerPush(curSosId); try{ fbDashSos(curSosType||'sos',(userLat!=null?userLat:null),(userLng!=null?userLng:null)); }catch(e){} },function(e){ FB.permErr=(e&&e.code)||'sos-denied'; fbLog('SOS write denied:', FB.permErr); renderFbStatus(); }); }catch(e){} }
 /* Fire the FREE background-push fan-out (Cloudflare Worker) for this SOS so paired /
    nearby SHOMERs get a notification even when their app is closed or the phone is
@@ -12666,7 +12708,7 @@ function fbSosProcess(baselineOnly){
     Object.keys(FB._sosPeer).forEach(function(puid){
       var r=FB._sosPeer[puid].rec;
       var live=r&&r.uid===puid&&!r.resolved&&r.lat!=null;   /* v266: an old one still shows - as "older SOS, check on them", no siren (onPartnerSOS) */
-      if(live) onPartnerSOS(puid,{active:true,name:'',lat:r.lat,lng:r.lng,ts:r.ts},'rec');
+      if(live) onPartnerSOS(puid,{active:true,name:'',lat:r.lat,lng:r.lng,ts:r.ts,floor:r.floor},'rec');
       else {
         /* v337: they pressed "Stop - I'm OK" - say so, once, if I saw this SOS live */
         try{ if(r&&r.uid===puid&&r.resolved&&r.safe&&r.id&&FB._alerted&&FB._alerted[r.id]&&(!r.resolvedTs||(Date.now()-r.resolvedTs)<15*60000)){
@@ -14175,6 +14217,7 @@ function onPartnerSOS(puid, v, src){
   SOSBUS.lastV=SOSBUS.lastV||{};
   if(src!=='rec'||!SOSBUS.lastV[puid]||(!isFinite(SOSBUS.lastV[puid].lat)&&isFinite(v.lat))) SOSBUS.lastV[puid]=v;   /* position updates while the alert is open (the bus has the freshest; a located record beats an unlocated one) */
   try{ sosIncomingLocSync(puid); }catch(e){}   /* v348: "location pending" on the card turns into the route the moment a fix arrives */
+  if(src==='rec'){ SOSBUS.floor=SOSBUS.floor||{}; SOSBUS.floor[puid]=(typeof v.floor==='string'&&v.floor.length<=20)?v.floor:''; try{ sosIncomingFloorSync(puid); }catch(e){} }   /* v355: floor / apartment */
   try{ var _lv=SOSBUS.lastV[puid]; if(_lv) respFollowTarget('sos:'+puid, _lv.lat, _lv.lng); }catch(e){}   /* v280: my route follows them */
   /* v266 AGE CUTOFF: the newest timestamp across both channels decides. Older than 30 min and
      not updated = most likely a phone that died mid-SOS: shown, but quietly - no siren. */
@@ -14238,6 +14281,7 @@ function showIncomingSOS(puid, nm, v, oldTs){
    +'<div class="in-sos-h">'+(oldTs?(he?'SOS ישן':ar?'SOS قديم':'OLDER SOS'):(he?'התרעת SOS':ar?'تنبيه SOS':'SOS ALERT'))+'</div>'
    +'<div class="in-sos-n">'+ESC(nm)+'</div>'
    +'<div class="in-sos-s">'+(oldTs?(he?('נשלח לפני '+_om+' דק׳ ולא עודכן - בדוק/י מה שלומם'):ar?('أُرسل قبل '+_om+' دقيقة ولم يُحدَّث - اطمئن عليه'):('sent '+_om+' min ago, not updated - check on them')):(he?'זקוק/ה לעזרה - עכשיו':ar?'بحاجة إلى مساعدة - الآن':'needs help - right now'))+'</div>'
+   +'<div class="in-sos-fl" hidden></div>'
    +'<div class="in-sos-btns">'
    +'<button class="in-b go">'+(he?'אני בדרך':ar?'أنا في الطريق':'I am coming')+'</button>'
    +'<button class="in-b map">'+(he?'נווט/י':ar?'ملاحة':'Navigate')+'</button>'
@@ -14252,6 +14296,7 @@ function showIncomingSOS(puid, nm, v, oldTs){
   function route(){ try{ var lv=(SOSBUS.lastV&&SOSBUS.lastV[puid])||v; if(isFinite(lv.lat)&&isFinite(lv.lng)) respondToSOS(lv.lat,lv.lng,nm,{key:'sos:'+puid,quiet:true}); }catch(e){} }
   route();
   try{ sosIncomingLocSync(puid, nm); }catch(e){}
+  try{ sosIncomingFloorSync(puid); }catch(e){}   /* v355 */
 
   function shrink(){
     /* Once you have committed, the banner must SHRINK and get out of the way - it used to
@@ -16886,6 +16931,417 @@ html[dir="rtl"] .sh-back svg{transform:scaleX(-1)}
 .cm-row.pending .cm-status{color:#E0A828;background:rgba(224,168,40,.10);}
 .cm-row.pending .cm-av{opacity:.6;}
 </style>
+<!-- ═══ v355 SIMPLE MODE (3rd generation) + AGE RANGE ASKED ONCE ═══
+     One switch, same app: a big SOS, shake-to-SOS, a daily "I'm OK", one-tap call.
+     The age range lives on this phone and in the owner-only profile/<uid> node - never in
+     dashfeed, never in the Command dashboard. -->
+<style id="smp-css">
+#simple-home{position:fixed;inset:0;z-index:610;display:none;flex-direction:column;align-items:stretch;gap:14px;
+  padding:calc(env(safe-area-inset-top,0px) + 12px) 16px calc(env(safe-area-inset-bottom,0px) + 18px);
+  background:radial-gradient(120% 70% at 50% 0%,#14284A 0%,var(--n1,#0A1628) 60%,var(--n0,#060F1E) 100%);
+  color:#fff;font-size:20px;line-height:1.45;overflow-y:auto;-webkit-overflow-scrolling:touch}
+body.simple-on #simple-home{display:flex}
+body.simple-on .nav,body.simple-on .hdr,body.simple-on #map-legend,body.simple-on .loc-fab,body.simple-on .past-fab,body.simple-on .ff-fab,
+body.simple-on #tp-bar,body.simple-on #nudge-bar,body.simple-on #dyk-bar,body.simple-on .tour-ov,body.simple-on .tour-bub,body.simple-on .tour-card,
+body.simple-on .setup-ov{display:none!important}
+.smp-top{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.smp-brand{display:flex;align-items:center;gap:10px;font-weight:900;font-size:22px;letter-spacing:.3px;color:#fff}
+.smp-brand img{width:44px;height:44px;object-fit:contain}
+.smp-set{min-height:52px;padding:0 18px;border-radius:14px;border:2px solid rgba(255,255,255,.55);background:transparent;color:#fff;font:inherit;font-size:20px;font-weight:800;cursor:pointer}
+.smp-sos{align-self:center;width:min(70vw,270px);height:min(70vw,270px);border-radius:50%;border:6px solid #fff;margin:6px 0 2px;
+  background:radial-gradient(circle at 50% 35%,#FF3B4E 0%,var(--r4,#E8182C) 45%,var(--r2,#B01220) 100%);color:#fff;font-family:inherit;cursor:pointer;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;box-shadow:0 0 0 10px rgba(232,24,44,.22),0 14px 40px rgba(0,0,0,.55)}
+.smp-sos b{font-size:68px;font-weight:900;line-height:1;letter-spacing:2px}
+.smp-sos span{font-size:22px;font-weight:800}
+.smp-sos.act{background:radial-gradient(circle at 50% 35%,#FF6A2B 0%,#E03A12 60%,#9E2408 100%)}
+.smp-line{text-align:center;font-size:20px;font-weight:700;color:#E8EEFA}
+.smp-ok{min-height:76px;border-radius:18px;border:0;background:#0E8840;color:#fff;font:inherit;font-size:28px;font-weight:900;cursor:pointer;box-shadow:0 8px 22px rgba(0,0,0,.35)}
+.smp-ok.done{background:#0B6B33}
+.smp-st{text-align:center;font-size:20px;color:#E8EEFA;margin-top:-4px}
+.smp-call{min-height:72px;border-radius:18px;border:0;background:var(--g4,#F5C840);color:#1B1203;font:inherit;font-size:24px;font-weight:900;cursor:pointer;padding:0 14px}
+.smp-add{min-height:62px;border-radius:18px;border:2px dashed rgba(255,255,255,.7);background:transparent;color:#fff;font:inherit;font-size:21px;font-weight:800;cursor:pointer;padding:0 14px}
+.smp-add[hidden]{display:none}
+#simple-home button:focus-visible,#age-ask button:focus-visible{outline:4px solid #FFE27A;outline-offset:3px}
+/* the age question - one simple screen */
+#age-ask{position:fixed;inset:0;z-index:9660;display:none;align-items:center;justify-content:center;padding:16px;background:rgba(4,10,22,.88)}
+#age-ask.on{display:flex}
+.age-card{position:relative;width:100%;max-width:440px;background:var(--n2,#101E34);border:1px solid rgba(201,168,76,.45);border-radius:22px;padding:22px 18px 18px;color:#fff;box-shadow:0 20px 60px rgba(0,0,0,.6)}
+.age-card[hidden]{display:none}
+.age-card h2{margin:0 0 6px;font-size:26px;font-weight:900;color:#fff}
+.age-card p{margin:0 0 14px;font-size:17px;line-height:1.55;color:#D6DEEE}
+.age-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.age-b{min-height:64px;border-radius:16px;border:2px solid rgba(201,168,76,.55);background:rgba(255,255,255,.05);color:#fff;font:inherit;font-size:24px;font-weight:900;cursor:pointer}
+.age-b.x{grid-column:1/-1;font-size:19px;font-weight:700;min-height:54px;border-color:rgba(255,255,255,.35)}
+.age-x{position:absolute;inset-inline-end:10px;top:10px;width:40px;height:40px;border-radius:50%;border:0;background:rgba(255,255,255,.12);color:#fff;font-size:18px;cursor:pointer}
+.age-ok{width:100%;min-height:60px;margin-top:6px;border-radius:16px;border:0;background:linear-gradient(135deg,var(--g2,#C09020),var(--g4,#F5C840));color:#1B1203;font:inherit;font-size:22px;font-weight:900;cursor:pointer}
+.age-note{background:rgba(245,200,64,.12);border:1px solid rgba(245,200,64,.5);border-radius:12px;padding:10px 12px;font-size:18px!important;color:#FFF3C8!important}
+/* settings while Simple mode is on: only the simple group, language and account */
+#sh-set .sm-only{display:none}
+body.simple-on #sh-set .sm-only{display:flex}
+body.simple-on #sh-set .sh-body>*:not(.sm-keep){display:none!important}
+body.simple-on #sh-set .sr-nm{font-size:20px!important}
+body.simple-on #sh-set .sr-sb{font-size:18px!important;line-height:1.5!important}
+body.simple-on #sh-set .sh-ttl{font-size:24px}
+.smp-hour{font:inherit;font-size:18px;font-weight:800;padding:8px 10px;border-radius:10px;background:var(--n4,#1B2B4A);color:var(--tx0,#F0F4FF);border:1px solid var(--b2,rgba(255,255,255,.18))}
+/* saved places (home / work) in the profile */
+.smp-pl{border:1px solid var(--b2,rgba(255,255,255,.14));border-radius:14px;padding:12px;margin-top:10px}
+.smp-pl-h{display:flex;justify-content:space-between;align-items:center;gap:8px;font-size:15px}
+.smp-pl-st{font-size:12.5px;color:var(--tx2,#8898B8)}
+.smp-pl-set{width:100%;margin-top:8px;min-height:44px;border-radius:11px;border:1px solid rgba(201,168,76,.5);background:rgba(201,168,76,.10);color:inherit;font:inherit;font-weight:800;cursor:pointer}
+.smp-pl-in{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px}
+.smp-pl-in label{display:flex;flex-direction:column;gap:4px;font-size:12.5px;color:var(--tx2,#8898B8)}
+.smp-pl-in input{width:100%;box-sizing:border-box;padding:10px 12px;border-radius:10px;border:1px solid rgba(201,168,76,.35);background:rgba(255,255,255,.04);color:inherit;font:inherit;font-size:16px}
+/* the guardian's SOS card: floor line */
+.in-sos-fl{display:inline-block;font-size:15px;font-weight:900;color:#fff;background:rgba(0,0,0,.28);border:1px solid rgba(255,255,255,.4);border-radius:10px;padding:5px 10px;margin:-4px 0 10px}
+.in-sos-fl[hidden]{display:none}
+</style>
+
+<div id="simple-home" role="main" aria-hidden="true" aria-label="SH✡MER">
+ <div class="smp-top">
+  <div class="smp-brand"><img src="SHOMER_logo_big.png" alt="" width="44" height="44"><span dir="ltr">SH✡MER</span></div>
+  <button type="button" class="smp-set" onclick="simpleOpenSettings()" data-he="הגדרות" data-en="Settings" data-ar="الإعدادات">הגדרות</button>
+ </div>
+ <button type="button" class="smp-sos" id="smp-sos" onclick="simpleSosTap()" aria-label="SOS"><b>SOS</b><span id="smp-sos-sub">לחצו לעזרה</span></button>
+ <div class="smp-line" id="smp-shake"></div>
+ <button type="button" class="smp-ok" id="smp-ok" onclick="simpleOkTap()">✓ אני בסדר</button>
+ <div class="smp-st" id="smp-ok-st" aria-live="polite"></div>
+ <button type="button" class="smp-call" id="smp-call" onclick="simpleCall()"></button>
+ <button type="button" class="smp-add" id="smp-add" onclick="simpleAddGuardian()" hidden></button>
+</div>
+
+<div id="age-ask" role="dialog" aria-modal="true" aria-labelledby="age-q" aria-hidden="true">
+ <div class="age-card" id="age-card-q">
+  <button type="button" class="age-x" onclick="ageAskClose()" aria-label="סגירה" data-al-he="סגירה">✕</button>
+  <h2 id="age-q" data-he="באיזה גיל אתם?" data-en="How old are you?" data-ar="كم أعماركم؟">באיזה גיל אתם?</h2>
+  <p data-he="כדי להתאים את האפליקציה אליכם. נשמר רק בטלפון ובחשבון הפרטי שלכם - אף אחד אחר לא רואה." data-en="So the app fits you. Kept only on your phone and in your private account - no one else sees it." data-ar="لنلائم التطبيق لكم. يُحفظ فقط في هاتفكم وفي حسابكم الخاص - لا يراه أحد غيركم.">כדי להתאים את האפליקציה אליכם. נשמר רק בטלפון ובחשבון הפרטי שלכם - אף אחד אחר לא רואה.</p>
+  <div class="age-grid">
+   <button type="button" class="age-b" onclick="ageAnswer('18_39')"><bdi>18–39</bdi></button>
+   <button type="button" class="age-b" onclick="ageAnswer('40_64')"><bdi>40–64</bdi></button>
+   <button type="button" class="age-b" onclick="ageAnswer('65_74')"><bdi>65–74</bdi></button>
+   <button type="button" class="age-b" onclick="ageAnswer('75p')"><bdi>75+</bdi></button>
+   <button type="button" class="age-b x" onclick="ageAnswer('x')" data-he="מעדיפים לא לענות" data-en="Prefer not to say" data-ar="نفضّل عدم الإجابة">מעדיפים לא לענות</button>
+  </div>
+ </div>
+ <div class="age-card" id="age-card-done" hidden>
+  <h2 data-he="הפעלנו מצב פשוט" data-en="Simple mode is on" data-ar="شغّلنا الوضع البسيط">הפעלנו מצב פשוט</h2>
+  <p data-he="כפתור עזרה גדול, טקסט גדול, כפתור „אני בסדר” יומי ושיחה בלחיצה אחת לשומר/ת שלכם." data-en="A big help button, large text, a daily “I'm OK” button and one-tap calling to your SHOMER." data-ar="زر مساعدة كبير، نص كبير، زر «أنا بخير» يومي واتصال بلمسة واحدة بحارسكم.">כפתור עזרה גדול, טקסט גדול, כפתור „אני בסדר” יומי ושיחה בלחיצה אחת לשומר/ת שלכם.</p>
+  <p class="age-note" data-he="אפשר לחזור למצב הרגיל בהגדרות" data-en="You can switch back to the regular mode in Settings" data-ar="يمكن العودة إلى الوضع العادي من الإعدادات">אפשר לחזור למצב הרגיל בהגדרות</p>
+  <button type="button" class="age-ok" onclick="ageAskHide()" data-he="הבנתי" data-en="Got it" data-ar="فهمت">הבנתי</button>
+ </div>
+</div>
+
+<script>
+/* ══ v355 SIMPLE MODE · AGE RANGE · FLOOR AT SOS ════════════════════════════════════════
+   Privacy (CLAUDE.md data policy): the age range is stored on this phone and in profile/<uid>
+   (owner-only read). Saved places (home / work, floor, apartment) never leave the phone. During
+   an SOS only a short `floor` string goes into sos/<uid> - readable by the paired SHOMERs only.
+   Nothing here touches dashfeed or the Command dashboard. */
+var SMP_AGES=['18_39','40_64','65_74','75p'];
+/* Both screens live inside #app (its own stacking context), so the SOS countdown, the pre-alarm, the PIN pad
+   and the sheets keep their order above them - an emergency screen is never covered. */
+try{ (function(){ var app=document.getElementById('app'); ['simple-home','age-ask'].forEach(function(id){ var e=document.getElementById(id); if(app&&e&&e.parentNode!==app) app.appendChild(e); }); })(); }catch(e){}
+function smpT(he,en,ar){ return currentLang==='he'?he:currentLang==='ar'?ar:en; }
+function smpEl(id){ return document.getElementById(id); }
+function smpTxt(id,t){ var e=smpEl(id); if(e) e.textContent=t; }
+function smpState(){
+  if(!SS.simple||typeof SS.simple!=='object') SS.simple={on:false,src:'',hour:10,okDay:'',missDay:'',since:''};
+  var h=parseInt(SS.simple.hour,10); if(!(h>=7&&h<=20)) SS.simple.hour=10; else SS.simple.hour=h;
+  return SS.simple;
+}
+function simpleOn(){ try{ return !!(SS&&SS.simple&&SS.simple.on); }catch(e){ return false; } }
+function ageAskIsOpen(){ var a=smpEl('age-ask'); return !!(a&&a.classList.contains('on')); }
+/* daily card, nudges and tips stay away while Simple mode is on or the age question is open */
+function simpleBlocksCards(){ return simpleOn()||ageAskIsOpen(); }
+function smpDay(){ var d=new Date(); return d.getFullYear()+'-'+('0'+(d.getMonth()+1)).slice(-2)+'-'+('0'+d.getDate()).slice(-2); }
+function smpHM(ts){ var d=new Date(ts); return ('0'+d.getHours()).slice(-2)+':'+('0'+d.getMinutes()).slice(-2); }
+
+/* ── age range: asked once ── */
+function ageBandValid(b){ return SMP_AGES.indexOf(b)>=0; }
+function ageBandLabel(b){ return b==='18_39'?'18–39':b==='40_64'?'40–64':b==='65_74'?'65–74':b==='75p'?'75+':''; }
+var _ageFromSettings=false;
+function ageAskMaybe(){
+  try{
+    if(!SS.onboarded||SS.ageAsked) return;
+    if(_emergencyBusy()||document.body.classList.contains('sheet-open')){ setTimeout(ageAskMaybe,20000); return; }   /* never on top of an emergency or an open sheet */
+    var ob=smpEl('ob-verify'); if(ob&&ob.classList.contains('on')){ setTimeout(ageAskMaybe,8000); return; }
+    ageAskOpen(false);
+  }catch(e){}
+}
+function ageAskOpen(fromSettings){
+  _ageFromSettings=!!fromSettings;
+  var a=smpEl('age-ask'); if(!a) return;
+  var q=smpEl('age-card-q'), d=smpEl('age-card-done'); if(q) q.hidden=false; if(d) d.hidden=true;
+  try{ var cur=(SS.user&&SS.user.ageBand)||''; a.querySelectorAll('.age-b').forEach(function(b){ var m=(b.getAttribute('onclick')||'').match(/'([^']+)'/); b.setAttribute('aria-pressed',String(!!(m&&m[1]===cur))); b.style.background=(m&&m[1]===cur)?'rgba(201,168,76,.28)':''; }); }catch(e){}
+  try{ var x=a.querySelector('.age-x'); if(x) x.setAttribute('aria-label',smpT('סגירה','Close','إغلاق')); }catch(e){}
+  try{ document.querySelectorAll('#tp-bar,#nudge-bar,#dyk-bar').forEach(function(e){ e.remove(); }); }catch(e){}
+  a.classList.add('on'); a.setAttribute('aria-hidden','false');
+  setTimeout(function(){ try{ var b=a.querySelector('.age-b'); if(b) b.focus(); }catch(e){} },60);
+}
+function ageAskHide(){ var a=smpEl('age-ask'); if(a){ a.classList.remove('on'); a.setAttribute('aria-hidden','true'); } }
+function ageAskClose(){ if(!SS.ageAsked){ SS.ageAsked=Date.now(); try{ saveStore(); }catch(e){} } ageAskHide(); }   /* closing counts as asked - we never nag */
+function ageAnswer(b){
+  if(b!=='x'&&!ageBandValid(b)) return;
+  if(!SS.user) SS.user={};
+  SS.user.ageBand=(b==='x')?'':b;
+  var first=!SS.ageAsked&&!_ageFromSettings;
+  SS.ageAsked=Date.now();
+  try{ saveStore(); }catch(e){}
+  try{ profileSync(); }catch(e){}
+  try{ renderProfile2(); }catch(e){}
+  try{ simpleRenderSettings(); }catch(e){}
+  /* 65+ → Simple mode ON by default - only when first asked; a later change keeps their own choice */
+  if(first&&(b==='65_74'||b==='75p')&&!simpleOn()){
+    simpleSet(true,'age');
+    var q=smpEl('age-card-q'), d=smpEl('age-card-done'); if(q) q.hidden=true; if(d) d.hidden=false;
+    setTimeout(function(){ try{ var o=d&&d.querySelector('.age-ok'); if(o) o.focus(); }catch(e){} },60);
+    return;
+  }
+  ageAskHide();
+  try{ toast(smpT('✓ נשמר','✓ Saved','✓ تم الحفظ'),'grn'); }catch(e){}
+}
+/* owner-only profile/<uid>: {age, ts}. "Prefer not to say" deletes it. */
+function profileSync(){
+  try{
+    SS.profileDirty=1; saveStore();
+    if(typeof FB==='undefined'||!FB.ready||!FB._authReady||!FB.uid) return;   /* flushed on sign-in (fbOnAuthed) */
+    if(window._sosPractice) return;
+    try{ if(isReviewAccount()) return; }catch(e){}
+    var b=(SS.user&&SS.user.ageBand)||'';
+    var pr=ageBandValid(b)?fbRestWrite('PUT','profile/'+FB.uid,{age:b,ts:Date.now()}):fbRestWrite('DELETE','profile/'+FB.uid);
+    pr.then(function(){ SS.profileDirty=0; try{ saveStore(); }catch(e){} }).catch(function(){});
+  }catch(e){}
+}
+function profileSyncFlush(){ try{ if(SS.profileDirty) profileSync(); }catch(e){} }
+
+/* ── Simple mode switch ── */
+function simpleSet(on,src){
+  var st=smpState(); st.on=!!on; st.src=src||'';
+  if(on){
+    st.since=smpDay();   /* the daily "I'm OK" check starts tomorrow - never a message on the first day */
+    try{ if(!(SS.shake&&SS.shake.enabled===true)){ var t=smpEl('shake-tog'); if(t&&!t.classList.contains('on')) toggleShake(t); } }catch(e){}   /* shake-to-SOS is part of Simple mode */
+  }
+  try{ saveStore(); }catch(e){}
+  simpleApply();
+}
+function simpleApply(){
+  var on=simpleOn();
+  document.body.classList.toggle('simple-on',on);
+  var h=smpEl('simple-home'); if(h) h.setAttribute('aria-hidden',on?'false':'true');
+  /* lives inside #app (its own stacking context): above the map and header, below the sheets, the SOS countdown and the PIN pad */
+  try{ var app=smpEl('app'); if(h&&app&&h.parentNode!==app) app.appendChild(h); }catch(e){}
+  simpleRenderSettings();
+  if(on){ try{ popupClearLow(); }catch(e){} try{ document.querySelectorAll('#tp-bar,#nudge-bar,#dyk-bar').forEach(function(e){ e.remove(); }); }catch(e){} simpleRender(); simpleTickStart(); }
+  else { simpleTickStop(); try{ [60,300].forEach(function(ms){ setTimeout(function(){ if(typeof MAP!=='undefined'&&MAP) MAP.invalidateSize(false); },ms); }); }catch(e){} }
+}
+function simpleToggleFromSettings(el){
+  var on=!simpleOn(); simpleSet(on,'settings');
+  try{ toast(on?smpT('✓ מצב פשוט פועל','✓ Simple mode on','✓ الوضع البسيط مفعّل'):smpT('חזרתם למצב הרגיל','Back to the regular mode','عدتم إلى الوضع العادي'),on?'grn':''); }catch(e){}
+  if(on){ try{ cl('sh-set'); }catch(e){} }
+}
+function simpleOpenSettings(){ try{ op('sh-set'); }catch(e){} try{ document.querySelectorAll('#sh-set .set-cat.sm-keep.collapsed').forEach(function(c){ setCatToggle(c); }); }catch(e){} simpleRenderSettings(); }   /* Simple mode: its few settings open unfolded */
+function simpleAddGuardian(){ try{ openCircles(); }catch(e){} }
+function simpleSetHour(v){ var st=smpState(); var h=parseInt(v,10); if(h>=7&&h<=20){ st.hour=h; try{ saveStore(); }catch(e){} } simpleRender(); }
+function simpleOpenPlaces(){
+  try{ opFrom('sh-prof','sh-set'); }catch(e){ try{ op('sh-prof'); }catch(_){} }
+  setTimeout(function(){ try{ placeRender(); var d=smpEl('pf-sec-places'); if(d){ d.open=true; d.scrollIntoView({block:'start',behavior:'smooth'}); } }catch(e){} },350);
+}
+
+/* ── people ── */
+function smpGuardians(){ return (SS.circleMembers||[]).filter(function(m){ return m&&!m.pending&&!m.demo; }); }
+function smpGuardianUids(){ var out=[]; smpGuardians().forEach(function(m){ if(m.partnerUid&&out.indexOf(m.partnerUid)<0) out.push(m.partnerUid); }); return out; }
+function smpFirstCallable(){ return smpGuardians().filter(function(m){ return !!(m.phoneCanon||m.ph); })[0]||null; }
+function simpleCall(){
+  var g=smpFirstCallable();
+  if(g){ var n=g.phoneCanon?('+'+String(g.phoneCanon).replace(/\D/g,'')):String(g.ph||'').replace(/[^\d+]/g,''); if(n.replace(/\D/g,'').length>=6){ location.href='tel:'+n; return; } }
+  try{ callNum(ambulanceNum()); }catch(e){}
+}
+
+/* ── the home screen ── */
+function simpleSosTap(){ try{ onSosTap(); }catch(e){} setTimeout(simpleRender,60); }
+function simpleRender(){
+  if(!smpEl('simple-home')) return;
+  var st=smpState(), d=smpDay();
+  var phase=(typeof sosPhase!=='undefined')?sosPhase:'idle';
+  var sb=smpEl('smp-sos'); if(sb) sb.classList.toggle('act',phase!=='idle');
+  smpTxt('smp-sos-sub', phase==='active'?smpT('העזרה בדרך · לחצו לסיום','Help is coming · tap to end','المساعدة في الطريق · اضغطوا للإنهاء')
+    :phase==='countdown'?smpT('לחצו לביטול','Tap to cancel','اضغطوا للإلغاء'):smpT('לחצו לעזרה','Tap for help','اضغطوا للمساعدة'));
+  if(sb) sb.setAttribute('aria-label','SOS - '+(smpEl('smp-sos-sub')||{}).textContent);
+  var shakeOn=!!(SS.shake&&SS.shake.enabled===true);
+  smpTxt('smp-shake', shakeOn?smpT('📳 ניעור חזק של הטלפון שולח גם SOS','📳 A strong shake of the phone also sends SOS','📳 هزّ الهاتف بقوة يرسل SOS أيضًا')
+    :smpT('ניעור ל-SOS כבוי','Shake-to-SOS is off','الهزّ لـ SOS متوقف'));
+  var done=st.okDay===d;
+  var ok=smpEl('smp-ok'); if(ok){ ok.classList.toggle('done',done); ok.textContent='✓ '+smpT('אני בסדר',"I'm OK",'أنا بخير'); }
+  var hh=('0'+st.hour).slice(-2)+':00', hasG=smpGuardianUids().length>0;
+  smpTxt('smp-ok-st', done?smpT('סימנתם היום ב-'+smpHM(st.okTs||Date.now())+'. יום טוב!','Marked today at '+smpHM(st.okTs||Date.now())+'. Have a good day!','أكّدتم اليوم الساعة '+smpHM(st.okTs||Date.now())+'. يومًا سعيدًا!')
+    :st.missDay===d?smpT('השומרים קיבלו הודעה עדינה. לחצו כדי להרגיע אותם.','Your SHOMERs got a gentle message. Tap to reassure them.','تلقّى حُرّاسكم رسالة لطيفة. اضغطوا لطمأنتهم.')
+    :hasG?smpT('לחצו פעם ביום, עד '+hh+'. אם לא, השומרים יקבלו הודעה עדינה.','Tap once a day, by '+hh+'. If not, your SHOMERs get a gentle message.','اضغطوا مرة يوميًا قبل '+hh+'. وإلا يتلقى حُرّاسكم رسالة لطيفة.')
+    :smpT('הוסיפו שומר/ת כדי שיקבלו הודעה אם לא תלחצו.','Add a SHOMER so they hear from us if you do not tap.','أضيفوا حارسًا ليتلقى رسالة إن لم تضغطوا.'));
+  var g=smpFirstCallable(), call=smpEl('smp-call');
+  if(call){ var amb=''; try{ amb=ambulanceNum(); }catch(e){ amb='101'; }
+    call.textContent='📞 '+(g?smpT('להתקשר ל','Call ','اتصال بـ')+(g.name||smpT('השומר/ת','your SHOMER','حارسكم')):smpT('חיוג לאמבולנס ','Call an ambulance ','اتصال بالإسعاف ')+amb); }
+  var add=smpEl('smp-add'); if(add){ add.hidden=smpGuardians().length>0; add.textContent='+ '+smpT('הוספת שומר/ת (בן/בת משפחה)','Add a SHOMER (a family member)','إضافة حارس (من العائلة)'); }
+}
+function simpleRenderSettings(){
+  var on=simpleOn(), t=smpEl('smp-tog'); if(t){ t.classList.toggle('on',on); t.setAttribute('aria-checked',String(on)); }
+  var s=smpEl('smp-hour'); if(s){ var st=smpState(); if(!s.options.length){ for(var h=7;h<=20;h++){ var o=document.createElement('option'); o.value=String(h); o.textContent=('0'+h).slice(-2)+':00'; s.appendChild(o); } } s.value=String(st.hour); }
+  var b=(SS.user&&SS.user.ageBand)||''; smpTxt('smp-age-st', ageBandValid(b)?ageBandLabel(b):smpT('לא צוין','Not set','غير محدد'));
+}
+/* the daily "I'm OK": reuses the check-in path - /alarms → alarmFanout push to each linked SHOMER */
+var _smpSending=false, _smpTick=null;
+function simpleOkTap(){
+  var st=smpState(), d=smpDay(), wasMiss=st.missDay===d;
+  st.okDay=d; st.okTs=Date.now(); try{ saveStore(); }catch(e){}
+  try{ toast(smpT('✓ תודה! סימנתם „אני בסדר” להיום','✓ Thanks! You marked “I\'m OK” for today','✓ شكرًا! أكّدتم «أنا بخير» لليوم'),'grn'); }catch(e){}
+  if(wasMiss){ try{ smpNotify('ok'); }catch(e){} }
+  simpleRender();
+}
+function smpNotify(kind){
+  if(typeof FB==='undefined'||!FB.ready||!FB._authReady||!FB.uid) return null;
+  if(window._sosPractice) return null;
+  try{ if(isReviewAccount()) return null; }catch(e){}
+  var uids=smpGuardianUids(); if(!uids.length) return null;
+  var nm=String((typeof invName==='function'&&invName())||(SS.user&&SS.user.name)||'').slice(0,40)||smpT('שומר','A SHOMER user','مستخدم شومير');
+  var body=kind==='miss'
+    ?smpT(nm+' עוד לא לחצו „אני בסדר” היום. כדאי להתקשר ולבדוק מה שלומם.',nm+' has not tapped “I\'m OK” today yet. A quick call to check in would be good.','لم يضغط '+nm+' «أنا بخير» اليوم بعد. يُستحسن الاتصال للاطمئنان.')
+    :smpT('✓ '+nm+' לחצו „אני בסדר”.','✓ '+nm+' tapped “I\'m OK”.','✓ ضغط '+nm+' «أنا بخير».');
+  return Promise.all(uids.map(function(u){ return fbRestWrite('POST','alarms',{fromUid:FB.uid,toUid:u,ts:Date.now(),tag:'daily-'+kind,title:'SH✡MER - '+nm,body:body}); }));
+}
+function simpleTick(){
+  if(!simpleOn()) return;
+  try{ simpleRender(); }catch(e){}
+  var st=smpState(), d=smpDay();
+  if(st.okDay===d||st.missDay===d||st.since===d||_smpSending) return;
+  if(new Date().getHours()<st.hour) return;
+  try{ if(_emergencyBusy()) return; }catch(e){}
+  var p=smpNotify('miss'); if(!p) return;
+  _smpSending=true;
+  p.then(function(){ _smpSending=false; st.missDay=d; try{ saveStore(); }catch(e){} simpleRender(); },function(){ _smpSending=false; });
+}
+function simpleTickStart(){ if(_smpTick) return; _smpTick=setInterval(simpleTick,60000); setTimeout(simpleTick,4000); }
+function simpleTickStop(){ if(_smpTick){ clearInterval(_smpTick); _smpTick=null; } }
+try{ document.addEventListener('visibilitychange',function(){ if(document.visibilityState==='visible'&&simpleOn()) setTimeout(simpleTick,1500); }); }catch(e){}
+try{ setInterval(function(){ if(simpleOn()&&document.visibilityState==='visible') simpleRender(); },1500); }catch(e){}   /* SOS state on the big button */
+
+/* the SOS countdown, spoken (Simple mode) - the same read-aloud voice as the guide (helpSay) */
+function simpleSpeakCountdown(n){
+  if(!simpleOn()) return;
+  n=Math.max(1,Math.round(+n||8));
+  var arU=(n>=3&&n<=10)?'ثوانٍ':'ثانية';
+  window._smpSpoken={n:n,ts:Date.now()};
+  try{ helpSay('שולחים עזרה בעוד '+n+' שניות, לחצו לביטול','Sending help in '+n+' seconds. Tap to cancel.','سنرسل المساعدة خلال '+n+' '+arU+'، اضغطوا للإلغاء'); }catch(e){}
+}
+function simpleHush(){ if(!simpleOn()) return; try{ fcHush(); }catch(e){} }
+
+/* boot: called from enterApp */
+function simpleBoot(){
+  if(window._smpBooted) return; window._smpBooted=true;
+  try{ smpState(); simpleApply(); }catch(e){}
+  try{ placeRender(); }catch(e){}
+  try{ profileSyncFlush(); }catch(e){}
+  setTimeout(ageAskMaybe, 1200);
+}
+/* a returning user's enterApp() runs from a setTimeout(0) that can fire before this block is parsed */
+try{ var _smpApp=document.getElementById('app'); if(_smpApp&&_smpApp.classList.contains('on')) simpleBoot(); }catch(e){}
+
+/* ══ FLOOR AT SOS TIME ══
+   1) Saved place: the fix is within ~80 m of Home / Work → that floor + apartment.
+   2) Android app only: barometer. Reference = pressure at the last good outdoor fix (accuracy ≤ 20 m);
+      floors above street = round(Δaltitude / 3). Shown as "קומה ~3 (±1)". No sensor → nothing.
+   3) Web: no estimate. */
+var SMP_FLOOR_R=80;
+function smpClean(v){ return String(v==null?'':v).replace(/[<>|&"'\\\u0000-\u001f]/g,'').trim().slice(0,6); }
+function smpPlace(k){ SS.places=SS.places||{}; var p=SS.places[k]; return (p&&typeof p==='object')?p:null; }
+function sosFloorSaved(lat,lng){
+  if(lat==null||lng==null||!isFinite(lat)||!isFinite(lng)) return '';
+  var best=null, bd=1e9;
+  ['home','work'].forEach(function(k){ var p=smpPlace(k); if(!p||!isFinite(p.lat)||!isFinite(p.lng)||!(p.floor||p.apt)) return;
+    var dd=distMeters(lat,lng,p.lat,p.lng); if(dd<=SMP_FLOOR_R&&dd<bd){ bd=dd; best=p; } });
+  if(!best) return '';
+  var f=smpClean(best.floor), a=smpClean(best.apt);
+  var s=(f?'f:'+f:'')+(a?((f?'|':'')+'a:'+a):'');
+  return (s.length>=3&&s.length<=20)?s:'';
+}
+function floorsFromPressure(p,p0){ if(!(p>300&&p<1100&&p0>300&&p0<1100)) return null; var dh=44330*(1-Math.pow(p/p0,0.190263)); return Math.round(dh/3); }
+var _floorRefBusy=false;
+function floorRefMaybe(acc){
+  try{
+    if(!shomerIsNative()||!(acc>0&&acc<=20)||userLat==null) return;
+    if(typeof sosPhase!=='undefined'&&sosPhase!=='idle') return;
+    var r=SS.floorRef; if(r&&(Date.now()-r.ts)<5*60000) return;
+    if(_floorRefBusy) return;
+    var np=shomerNativePlugin(); if(!np||typeof np.pressure!=='function') return;
+    _floorRefBusy=true; var la=userLat, ln=userLng;
+    np.pressure().then(function(x){ _floorRefBusy=false;
+      if(x&&x.ok&&x.hPa>300&&x.hPa<1100){ SS.floorRef={p:+(+x.hPa).toFixed(2),ts:Date.now(),lat:+(+la).toFixed(3),lng:+(+ln).toFixed(3)}; try{ saveStore(); }catch(e){} } })
+      .catch(function(){ _floorRefBusy=false; });
+  }catch(e){ _floorRefBusy=false; }
+}
+function sosFloorPrepare(){
+  window._sosFloorEst=''; window._sosFloorSent='';
+  try{
+    if(!shomerIsNative()) return;
+    var r=SS.floorRef; if(!r||!r.p||(Date.now()-r.ts)>3*3600000) return;   /* weather moves the pressure - an old reference is worse than none */
+    var np=shomerNativePlugin(); if(!np||typeof np.pressure!=='function') return;
+    np.pressure().then(function(x){
+      if(!x||!x.ok) return;
+      if(userLat!=null&&r.lat!=null&&distMeters(userLat,userLng,r.lat,r.lng)>400) return;
+      var n=floorsFromPressure(x.hPa,r.p); if(n==null||n<1||n>60) return;
+      window._sosFloorEst='~'+n; sosFloorPush();
+    }).catch(function(){});
+  }catch(e){}
+}
+function sosFloorValue(){ var s=''; try{ s=sosFloorSaved(userLat,userLng); }catch(e){} return s||window._sosFloorEst||''; }
+/* a barometer result that lands after the SOS record went out */
+function sosFloorPush(){
+  try{
+    if(typeof sosPhase==='undefined'||sosPhase!=='active'||window._sosPractice||!curSosId) return;
+    if(typeof FB==='undefined'||!FB.ready||!FB._authReady||!FB.uid) return;
+    try{ if(isReviewAccount()) return; }catch(e){}
+    var v=sosFloorValue(); if(!v||v===window._sosFloorSent) return;
+    FB.db.ref('sos/'+FB.uid).update({floor:v}).then(function(){ window._sosFloorSent=v; },function(){});
+  }catch(e){}
+}
+/* what the SHOMER sees on the SOS card */
+function sosFloorText(f){
+  if(typeof f!=='string'||!f||f.length>20) return '';
+  if(f.charAt(0)==='~'){ var n=f.slice(1); if(!/^-?\d{1,2}$/.test(n)) return ''; return smpT('קומה ~','Floor ~','الطابق ~')+n+' (±1)'; }
+  var fl='', ap='';
+  f.split('|').forEach(function(p){ if(p.indexOf('f:')===0) fl=p.slice(2); else if(p.indexOf('a:')===0) ap=p.slice(2); });
+  var out=[]; if(fl) out.push(smpT('קומה ','Floor ','الطابق ')+fl); if(ap) out.push(smpT('דירה ','Apt ','شقة ')+ap);
+  return out.join(' · ');
+}
+function sosIncomingFloorSync(puid){
+  var t=''; try{ t=sosFloorText(((typeof SOSBUS!=='undefined'&&SOSBUS.floor)||{})[puid]||''); }catch(e){}
+  try{ var c=document.getElementById('in-sos-'+puid), el=c&&c.querySelector('.in-sos-fl'); if(el){ el.textContent=t?('🏢 '+t):''; el.hidden=!t; } }catch(e){}
+  try{ var tk=document.getElementById('sos-tko'); if(tk&&tk.classList.contains('on')&&tk.getAttribute('data-key')==='p:'+puid){ var f=tk.querySelector('.tk-fl'); if(f){ f.textContent=t?('🏢 '+t):''; f.hidden=!t; } } }catch(e){}   /* the full-screen alert too */
+}
+
+/* ── Home / Work in the profile (device only) ── */
+function placeSetHere(k){
+  if(userLat==null||userLng==null){ try{ toast(smpT('המיקום עוד לא זמין. נסו שוב בעוד רגע.','Location is not available yet. Try again in a moment.','الموقع غير متاح بعد. حاولوا بعد قليل.'),'amb'); }catch(e){} return; }
+  SS.places=SS.places||{}; var p=smpPlace(k)||{}; p.lat=+(+userLat).toFixed(5); p.lng=+(+userLng).toFixed(5); SS.places[k]=p;
+  try{ saveStore(); }catch(e){} placeRender();
+  try{ toast(smpT('✓ המיקום נשמר','✓ Location saved','✓ تم حفظ الموقع'),'grn'); }catch(e){}
+}
+function placeSave(k){
+  SS.places=SS.places||{}; var p=smpPlace(k)||{};
+  var f=smpEl('pl-'+k+'-floor'), a=smpEl('pl-'+k+'-apt');
+  if(f){ var fv=smpClean(f.value); if(fv!==f.value) f.value=fv; p.floor=fv; }
+  if(a){ var av=smpClean(a.value); if(av!==a.value) a.value=av; p.apt=av; }
+  SS.places[k]=p; try{ saveStore(); }catch(e){} placeRender(true);
+}
+function placeClear(k){ SS.places=SS.places||{}; delete SS.places[k]; try{ saveStore(); }catch(e){} placeRender(); }
+function placeRender(keepInputs){
+  ['home','work'].forEach(function(k){
+    var p=smpPlace(k)||{}, st=smpEl('pl-'+k+'-st');
+    if(st) st.textContent=(isFinite(p.lat)&&isFinite(p.lng))?smpT('מיקום נשמר ✓','Location saved ✓','تم حفظ الموقع ✓'):smpT('עוד לא נשמר מיקום','No location saved yet','لم يُحفظ موقع بعد');
+    if(!keepInputs){ var f=smpEl('pl-'+k+'-floor'), a=smpEl('pl-'+k+'-apt'); if(f&&document.activeElement!==f) f.value=p.floor||''; if(a&&document.activeElement!==a) a.value=p.apt||''; }
+  });
+  var n=['home','work'].filter(function(k){ var p=smpPlace(k); return p&&isFinite(p.lat); }).length;
+  smpTxt('pf-sec-places-sm', n?(n+'/2'):smpT('אופציונלי','Optional','اختياري'));
+}
+</script>
+
 <script src="native-bridge.js?v=351"></script>
 
 <script>
@@ -17169,6 +17625,7 @@ function pulseTower(){
 /* THE DAILY CARD - one card a day: today's drill question (+ the tester mission while the
    14-day tester program runs). Shown once a day, only when the screen is clear. */
 function tpMaybeShow(){
+  try{ if(simpleBlocksCards()) return; }catch(e){}   /* v355 */
  try{
   if(drillSuppressed()) return;
   var day=drillKey(), d=drillState();
@@ -17457,10 +17914,12 @@ function drillRenderProfile(){
 #sos-tko .tk-s{font-size:16px;font-weight:700;opacity:.95;max-width:520px}
 #sos-tko .tk-b{min-height:58px;width:min(420px,100%);border-radius:999px;border:none;font-size:18px;font-weight:900;cursor:pointer;background:#fff;color:#B01220}
 #sos-tko .tk-b2{min-height:46px;width:min(420px,100%);border-radius:999px;border:1.5px solid rgba(255,255,255,.7);background:transparent;color:#fff;font-size:15px;font-weight:800;cursor:pointer}
+#sos-tko .tk-fl{font-size:20px;font-weight:900;background:rgba(0,0,0,.25);border:1.5px solid rgba(255,255,255,.6);border-radius:12px;padding:6px 14px}
+#sos-tko .tk-fl[hidden]{display:none}
 #sos-tko .tk-d{font-size:12px;font-weight:700;opacity:.88;max-width:420px}
 </style>
 <div id="sos-tko" role="alertdialog" aria-modal="true" aria-live="assertive" aria-labelledby="sos-tko-n" aria-hidden="true">
-  <div class="tk-h"></div><div class="tk-ring">SOS</div><div class="tk-n" id="sos-tko-n"></div><div class="tk-s"></div>
+  <div class="tk-h"></div><div class="tk-ring">SOS</div><div class="tk-n" id="sos-tko-n"></div><div class="tk-s"></div><div class="tk-fl" hidden></div>
   <button type="button" class="tk-b"></button><button type="button" class="tk-b2"></button><div class="tk-d"></div>
 </div>
 <script>
@@ -17513,6 +17972,8 @@ function drillRenderProfile(){
     q('.tk-b').textContent=o.paired?L('ראיתי - פתח/י את האירוע','I see it - open the event','رأيت - افتح الحدث'):L('ראיתי - הצג/י את האזור','I see it - show the area','رأيت - اعرض المنطقة');
     q('.tk-b2').textContent=L('השתק/י','Silence','إسكات');
     q('.tk-d').textContent=L('⚠ SH✡MER אינו תחליף לחיוג 100 / 101 / 102','⚠ SH✡MER is not a substitute for calling 100 / 101 / 102','⚠ SH✡MER ليس بديلاً عن الاتصال بـ 100 / 101 / 102');
+    try{ var _fl=q('.tk-fl'), _ft=(o.paired&&typeof sosFloorText==='function')?sosFloorText(o.floor||''):''; _fl.textContent=_ft?('🏢 '+_ft):''; _fl.hidden=!_ft; }catch(e){}   /* v355: floor - paired SOS only */
+    el.setAttribute('data-key',o.key);
     el.classList.add('on'); el.setAttribute('aria-hidden','false');
     var p=np(); if(p&&typeof p.sosSeen==='function'){ try{ p.sosSeen({sid:TKO.sid}); }catch(e){} }   /* push/poll will not ring this SOS again */
     ring(q('.tk-n').textContent, q('.tk-s').textContent);
@@ -17539,7 +18000,7 @@ function drillRenderProfile(){
       try{
         if(before!==1 && SOSBUS.mine[puid]===1){
           var rec=(FB&&FB._sosPeer&&FB._sosPeer[puid]&&FB._sosPeer[puid].rec)||null;
-          show({key:'p:'+puid, sid:rec?String(rec.id||rec.ts||''):'', name:(memberByPair(puid)||{}).name||'', paired:true});
+          show({key:'p:'+puid, sid:rec?String(rec.id||rec.ts||''):'', name:(memberByPair(puid)||{}).name||'', paired:true, floor:((SOSBUS.floor||{})[puid])||''});
         }
       }catch(e){}
       return r;
