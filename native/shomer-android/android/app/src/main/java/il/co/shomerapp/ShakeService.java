@@ -95,7 +95,7 @@ public class ShakeService extends Service implements SensorEventListener {
   }
 
   private void listen() {
-    det = new ShakeDetector(sens(this));   // (re)read the level on every start / config change
+    cLv = sens(this); det = new ShakeDetector(cLv);   // (re)read the level on every start / config change
     if (sm != null && acc != null) return;
     sm = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
     if (sm == null) return;
@@ -127,8 +127,28 @@ public class ShakeService extends Service implements SensorEventListener {
   public void onSensorChanged(SensorEvent e) {
     ShakeDetector d = det; if (d == null) return;
     long t = e.timestamp / 1000000L;   // sensor clock, ms
-    if (d.push(t, e.values[0], e.values[1], e.values[2])) fireSos();
+    boolean hit = d.push(t, e.values[0], e.values[1], e.values[2]);
+    // v347: the classic detector that worked until 16 Nov runs next to the new one (same as the web):
+    // 8 strong peaks (gravity removed) within 1.5 s, at least 120 ms apart. Either one fires; the 8 s
+    // countdown still guards every false start.
+    float a = 0.9f;
+    if (!cInit) { cgx = e.values[0]; cgy = e.values[1]; cgz = e.values[2]; cInit = true; }
+    else {
+      cgx = a * cgx + (1 - a) * e.values[0]; cgy = a * cgy + (1 - a) * e.values[1]; cgz = a * cgz + (1 - a) * e.values[2];
+      double dx = e.values[0] - cgx, dy = e.values[1] - cgy, dz = e.values[2] - cgz;
+      double mag = Math.sqrt(dx * dx + dy * dy + dz * dz);
+      String lv = cLv;
+      double thr = "low".equals(lv) ? 20.0 : ("high".equals(lv) ? 16.0 : 18.0);
+      long now = System.currentTimeMillis();
+      if (mag > thr && now - cLast > 120) {
+        if (cFirst == 0 || now - cFirst > 1500) { cFirst = now; cCount = 0; }
+        cCount++; cLast = now;
+        if (cCount >= 8) { cCount = 0; cFirst = 0; hit = true; }
+      }
+    }
+    if (hit) fireSos();
   }
+  private float cgx, cgy, cgz; private boolean cInit; private int cCount; private long cFirst, cLast; private String cLv = "medium";
 
   private void fireSos() {
     long now = System.currentTimeMillis();

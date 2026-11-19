@@ -5220,6 +5220,7 @@ function shakeArmPermission(cb){
 }
 /* v337: the listener runs while Shake-to-SOS is ON or the shake test is open. A detected shake
    NEVER fires the SOS directly: shakeFired() starts the 8 s warning countdown (sosPreStart). */
+var _shakeClassic={g:null,n:0,first:0,last:0};
 function startShakeDetection(){
  if(!window.DeviceMotionEvent||shakeStarted) return;
  if(typeof DeviceMotionEvent.requestPermission==='function' && window._motionPerm!=='granted') return;
@@ -5232,7 +5233,22 @@ function startShakeDetection(){
    const lvl=shakeSens();
    if(!_shakeDet || _shakeDet.level()!==lvl) _shakeDet=ShakeDetector(lvl);
    const t=(window.performance&&performance.now)?performance.now():Date.now();
-   if(_shakeDet.push(t, +ag.x||0, +ag.y||0, +ag.z||0, noG)){
+   var hit=_shakeDet.push(t, +ag.x||0, +ag.y||0, +ag.z||0, noG);
+   /* v347: the CLASSIC detector that worked until 16 Nov runs next to the new one: 8 strong peaks
+      (gravity removed) inside 1.5 s, at least 120 ms apart. A stride cannot make 8 peaks that fast,
+      a shake does, and the 8 s countdown still guards every false start. Either one fires. */
+   var C=_shakeClassic, A=0.9, x=+ag.x||0, y=+ag.y||0, z=+ag.z||0;
+   if(!C.g){ C.g={x:x,y:y,z:z}; } else {
+     if(!noG){ C.g.x=A*C.g.x+(1-A)*x; C.g.y=A*C.g.y+(1-A)*y; C.g.z=A*C.g.z+(1-A)*z; }
+     var dx=noG?x:x-C.g.x, dy=noG?y:y-C.g.y, dz=noG?z:z-C.g.z, mag=Math.sqrt(dx*dx+dy*dy+dz*dz);
+     var thr=lvl==='low'?20:(lvl==='high'?16:18), now=Date.now();
+     if(mag>thr && now-C.last>120){
+       if(!C.first || now-C.first>1500){ C.first=now; C.n=0; }
+       C.n++; C.last=now;
+       if(C.n>=8){ C.n=0; C.first=0; hit=true; }
+     }
+   }
+   if(hit){
      if(testing){ try{ shakeTestHit(); }catch(_){} return; }
      shakeFired('web');
    }
@@ -5734,7 +5750,7 @@ function nativeAlarmStop(){ try{ var p=shomerNativePlugin(); if(p&&p.stopAlarm) 
 window.__shomerNativeSOS=function(reason){ try{
   /* v337: a native shake goes through the same gate as the in-app one: switch on, no running SOS, 8 s apart,
      and it only ever starts the 8 s warning countdown */
-  if((reason||'shake')==='shake'){ if(window._nativeShakeOld===true) return 'ok'; return shakeFired('native')||'wait'; }   /* pre-v337 app build: old detector - ignored */
+  if((reason||'shake')==='shake'){ return shakeFired('native')||'wait'; }   /* v347: shakes from EVERY app build count again. v337 ignored the pre-v337 builds (the Play test build is one), which silently killed locked-phone shake for testers; the 8 s countdown guards false starts */
   if(typeof sosPhase!=='undefined' && sosPhase!=='idle') return 'ok';
   if(typeof triggerSOS!=='function') return 'wait';              /* v340: page still booting - tell native to retry */
   triggerSOS(reason); return 'ok'; }catch(e){ return 'wait'; } };
@@ -11468,7 +11484,7 @@ try{ hydrateIcons(document); }catch(e){}
 /* Loaded-build version - shown in the diagnostic panel so a phone can prove
    whether it's on the latest build or a STALE cached one. Keep in lock-step
    with sw.js SW_VERSION on every deploy. */
-var APP_VER='v346';
+var APP_VER='v347';
 var FB={ready:false,uid:null,db:null,_presTimer:null,connected:false,listening:false,pushState:'default',near:0,swVer:'?',
   authState:'connecting',sdkLoaded:false,persist:'',permErr:null,err:null,wsProbe:'',csp:''};
 /* Always log connection diagnostics to the console so the real failure can be SEEN in Chrome. */

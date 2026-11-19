@@ -1,1 +1,1 @@
-{"v": "v346", "notes": {"he": ["קישור לשומר שנשמר רק בצד אחד מתוקן אוטומטית בפתיחת האפליקציה, כדי שהתראות SOS יגיעו"], "en": ["A SHOMER link that was saved on one side only now repairs itself when the app opens, so SOS alerts get through"]}}
+{"v": "v347", "notes": {"he": ["ניעור ל-SOS: חזר גם מנגנון הזיהוי שעבד עד 16 בנובמבר, כך שניעור חזק ומהיר מפעיל את הספירה לאחור"], "en": ["Shake-to-SOS: the detector that worked until 16 Nov is back alongside the new one, so a strong fast shake starts the countdown"]}}
