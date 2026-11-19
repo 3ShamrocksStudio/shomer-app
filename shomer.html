@@ -7795,19 +7795,145 @@ function gSpeakable(t,L){
   t=t.replace(/\s*·\s*/g,'. ').replace(/[⇄⛔📞📍•→]/g,' ').replace(/[„”“"״]/g,'').replace(/\s*\/\s*/g,', ').replace(/\s{2,}/g,' ').trim();
   return t;
 }
+/* v345 SPOKEN HEBREW for "read instructions aloud". The on-screen text uses slash forms (חייג/י, את/ה),
+   and turning those into speech mixed masculine and feminine forms and produced wrong words (ואמר, אל תבדק).
+   These are the same instructions written for the ear: plural imperative throughout (חייגו, עצרו - the
+   gender-neutral form Magen David Adom uses), the injured person is "הוא" / "האדם", and numbers that
+   need gender agreement are written as words. One entry per step, in the same order as the screen. */
+var GUIDE_SAY_HE={
+ ptsd:{steps:[
+  'זהו את הסימנים: נשימה מהירה ורדודה, רעד, הזעה, מבט קפוא, בלבול, ניתוק, בכי שאי אפשר לעצור, או תחושה שזה קורה עכשיו שוב.',
+  'גשו בשקט, והציגו את עצמכם בשם. אל תיגעו בלי לבקש רשות. מגע פתאומי עלול להחמיר.',
+  'דברו לאט, במשפטים קצרים: אני כאן. אתה בטוח. זה יעבור.',
+  'עזרו לו לחזור לכאן ועכשיו: בקשו ממנו לומר חמישה דברים שהוא רואה, ארבעה שהוא נוגע בהם, שלושה שהוא שומע, שניים שהוא מריח, ואחד שהוא טועם.',
+  'ויסות נשימה: שאיפה ארבע שניות, החזקה ארבע, נשיפה שש. נשמו יחד איתו. הקצב מדבק.',
+  'הרחיקו גירויים: אורות, רעש וקהל. הציעו מקום שקט לשבת.',
+  'אל תתווכחו עם מה שהוא מרגיש, ואל תגידו לו להירגע. זה מגביר את המצוקה.',
+  'שאלו ישירות: יש לך מחשבות לפגוע בעצמך? השאלה לא מכניסה רעיון לראש. היא מצילה חיים.',
+  'הישארו איתו עד שהמצוקה נרגעת, או עד שמגיע איש מקצוע.'],
+  dont:'אל תגידו לו להירגע, או שזה לא נורא. אל תיגעו בלי רשות. אל תשאירו אדם במצוקה קשה לבד. אם יש מחשבות אובדניות, חייגו 1201, ער"ן, או 101.'},
+ cpr:{steps:[
+  'ודאו שהאדם לא מגיב ולא נושם כרגיל, או נושם רק נשימות בודדות.',
+  'חייגו 101 מיד והפעילו רמקול. שלחו מישהו להביא דפיברילטור. אל תחכו לו, התחילו לחיצות עכשיו.',
+  'הניחו כף יד אחת במרכז בית החזה, על החצי התחתון של עצם החזה, ואת היד השנייה מעליה.',
+  'לחצו חזק ומהר: מאה עד מאה ועשרים לחיצות בדקה, לעומק של חמישה עד שישה סנטימטרים.',
+  'תנו לחזה לחזור למקומו בין הלחיצות. אל תישענו עליו.',
+  'אם עברתם הכשרה: שלושים לחיצות ואחריהן שתי הנשמות. הטו את הראש, הרימו את הסנטר, סגרו את האף, ונשפו עד שהחזה עולה.',
+  'לא עברתם הכשרה? בצעו רק לחיצות חזה, ברצף, בלי הפסקה.',
+  'כשמגיע דפיברילטור, הפעילו אותו ועשו מה שהוא אומר.',
+  'המשיכו עד שמגיע צוות רפואי, או עד שהאדם מתעורר.'],
+  dont:'אל תפסיקו את הלחיצות בלי צורך. אל תבדקו דופק לפני שמתחילים. אל תלחצו עמוק יותר משישה סנטימטרים.'},
+ choke:{steps:[
+  'שאלו: אתה נחנק? אם הוא משתעל או מדבר, עודדו אותו להשתעל חזק, ואל תתערבו.',
+  'הוא לא יכול להשתעל, לדבר או לנשום? בקשו ממישהו לחייג 101. הטו אותו קדימה ותנו עד חמש מכות גב חזקות בין השכמות.',
+  'עדיין חסום? בצעו עד חמש לחיצות בטן: אגרוף מעל הטבור, היד השנייה אוחזת בו, ומשיכה חדה פנימה ולמעלה.',
+  'עברו לסירוגין בין חמש מכות גב לחמש לחיצות בטן, עד שהחפץ יוצא.',
+  'תינוק מתחת לגיל שנה: חמש מכות גב כשהוא שוכב על הבטן על האמה שלכם, ואחר כך חמש לחיצות חזה בשתי אצבעות. בלי לחיצות בטן.',
+  'הוא איבד הכרה? חייגו 101 והתחילו החייאה, לחיצות חזה.'],
+  dont:'אל תתערבו כל עוד הוא משתעל. אסור לעשות לחיצות בטן לתינוק. לאישה בהריון או לאדם גדול מאוד, לחצו על החזה במקום על הבטן. אל תחפשו באצבע בתוך הפה בלי לראות.'},
+ bleed:{steps:[
+  'חייגו 101, או בקשו ממישהו לחייג, על רמקול.',
+  'לחצו חזק וישירות על הפצע עם בד נקי או תחבושת, ואל תרפו.',
+  'קשרו תחבושת הדוקה כדי לשמור על הלחץ. התחבושת נספגה בדם? הוסיפו עוד אחת מעליה.',
+  'דימום חזק ביד או ברגל שלא נעצר בלחץ, או קטיעה: הניחו חוסם עורקים כמה סנטימטרים מעל הפצע, לא על מפרק, והדקו עד שהדימום נעצר.',
+  'רשמו את השעה שבה הנחתם את החוסם.',
+  'השכיבו אותו, שמרו עליו חם, והשגיחו עליו עד שהצוות מגיע.'],
+  dont:'אל תסירו תחבושת ספוגה בדם, הוסיפו עוד אחת מעליה. אל תוציאו חפץ שנעוץ בגוף. אל תשחררו חוסם עורקים שכבר הונח.'},
+ burn:{steps:[
+  'עצרו את הכוויה: התרחקו ממקור החום. בגד בוער? עצרו, שכבו והתגלגלו. כוויה כימית: נערו אבקה יבשה, ואז שטפו במים ברצף. כוויה חשמלית: ודאו שהחשמל מנותק לפני שנוגעים.',
+  'קררו במים זורמים קרירים לפחות עשרים דקות. זה עוזר אם מתחילים עד שלוש שעות אחרי הכוויה.',
+  'הסירו תכשיטים ובגדים מהאזור כמה שיותר מהר, אלא אם הם דבוקים לעור.',
+  'כסו בניילון נצמד, מונח ברפיון ולא הדוק סביב האיבר, או בשקית ניילון נקייה. לא בבד רטוב.',
+  'בזמן הקירור: בכוויה קשה, בשטח גדול, בפנים, בצוואר, בידיים או במפרק, או בכל כוויה חשמלית, חייגו 101.'],
+  dont:'אל תשימו קרח על העור. אל תפוצצו שלפוחיות. בלי משחות ותרופות בית כמו יוגורט או חמאה. אל תקרעו בגד שדבוק לעור.'},
+ stroke:{steps:[
+  'פנים: בקשו ממנו לחייך. צד אחד של הפנים צונח?',
+  'ידיים: בקשו ממנו להרים את שתי הידיים. יד אחת צונחת או חלשה?',
+  'דיבור: הדיבור מעורפל או מבולבל? בקשו ממנו לחזור על משפט פשוט.',
+  'זמן: חייגו 101 מיד, גם אם הסימנים חולפים. רשמו מתי הסימנים התחילו. זה קריטי לטיפול.',
+  'הישארו לידו, ואל תתנו לו לאכול או לשתות.',
+  'הוא איבד הכרה ונושם? השכיבו אותו על הצד. הוא לא נושם? התחילו החייאה.'],
+  dont:'אל תחכו שזה יעבור. אל תתנו לו אספירין, כי חלק מהשבצים הם דימום במוח.'},
+ heart:{steps:[
+  'זהו את הסימנים: לחץ או כאב במרכז החזה, שאולי מתפשט לזרוע, ללסת או לגב. קוצר נשימה, זיעה קרה ובחילה.',
+  'אצל נשים, לפעמים יש בעיקר קוצר נשימה, בחילה ועייפות, בלי כאב חזק בחזה.',
+  'חייגו 101 מיד. כל דקה חשובה.',
+  'עזרו לו לנוח בישיבה נוחה, חצי שכיבה, עם ברכיים כפופות.',
+  'אם הוא לא רגיש לאספירין, הוא יכול ללעוס כדור אספירין אחד, בערך שלוש מאות מיליגרם.',
+  'הוא איבד הכרה ולא נושם? התחילו החייאה.'],
+  dont:'אל תתנו אספירין למי שאלרגי לאספירין. אל תעכבו את החיוג כדי לחפש אספירין. אם יש ספק, חכו לצוות.'},
+ allergy:{steps:[
+  'השתמשו מיד במזרק אדרנלין, אפיפן. ההוראות כתובות על המזרק.',
+  'הזריקו לאמצע הירך מבחוץ. אפשר דרך הבגד. החזיקו עשר שניות.',
+  'חייגו 101 מיד ואמרו: תגובה אנפילקטית. גם אם יש שיפור.',
+  'השכיבו אותו עם רגליים מורמות. אם קשה לו לנשום, אפשר לשבת. שמרו על שקט ומנוחה.',
+  'אין שיפור תוך חמש דקות? הזריקו מנה שנייה.',
+  'שימו לב: הסימנים יכולים לחזור אחרי כמה שעות, ולכן צריך השגחה רפואית.',
+  'הוא איבד הכרה ולא נושם? התחילו החייאה.'],
+  dont:'אל תתנו לו לעמוד או ללכת, גם אם יש שיפור. אל תעכבו את האדרנלין. אל תזריקו לישבן.'},
+ seizure:{steps:[
+  'הישארו רגועים. הזיזו אותו רק אם הוא בסכנה, למשל בכביש, במים או על משטח חם.',
+  'רפדו והגנו על הראש, עם כרית, בגד או הידיים שלכם.',
+  'הרחיקו חפצים מסוכנים, ושחררו בגד צמוד מהצוואר.',
+  'מדדו כמה זמן נמשך ההתקף.',
+  'כשהרעידות נפסקות, בדקו נשימה והפכו אותו על הצד, לתנוחת התאוששות. הוא לא נושם? חייגו 101 והתחילו החייאה.',
+  'הישארו איתו עד שהוא מתאושש לגמרי.'],
+  call:'חייגו 101 אם ההתקף נמשך יותר מחמש דקות, אם זה התקף ראשון, אם ההתקפים חוזרים בלי שהוא מתעורר ביניהם, אם הוא נפצע, או אם קשה לו לנשום.',
+  dont:'אל תכניסו שום דבר לפה. אל תחזיקו אותו בכוח. אל תתנו לו לאכול או לשתות עד שהוא מתאושש לגמרי.'},
+ drown:{steps:[
+  'שמרו על עצמכם: הושיטו לו משהו או זרקו לו משהו שצף. אם אתם לא שחיינים מיומנים, אל תיכנסו למים. אל תהפכו לנפגע שני.',
+  'הוציאו את האדם מהמים מהר ובזהירות.',
+  'חייגו 101, על רמקול.',
+  'הוא לא מגיב ולא נושם? תנו חמש הנשמות קודם, ואז התחילו החייאה.',
+  'הוא נושם? השכיבו אותו על הצד, בתנוחת התאוששות, והשגיחו עליו.',
+  'המשיכו שלושים לחיצות ושתי הנשמות, עד שמגיעה עזרה או שהוא מראה סימני חיים.'],
+  dont:'אל תיכנסו למים בלי הכשרה. בטביעה ההנשמות חיוניות, אל תסתפקו רק בלחיצות.'},
+ shock:{steps:[
+  'חייגו 101. הלם מסכן חיים.',
+  'עצרו דימום שרואים בלחץ חזק.',
+  'השכיבו את האדם.',
+  'הרימו את הרגליים מעל גובה הלב, אלא אם יש כאב, חשד לפגיעה בראש, בצוואר, בגב או ברגל, או קושי בנשימה.',
+  'שמרו עליו חם. כסו אותו במעיל או בשמיכה.',
+  'שחררו בגדים צמודים. הרגיעו אותו והשגיחו עליו.'],
+  dont:'אל תתנו לו לאכול או לשתות. אל תזיזו אותו בלי צורך. אל תרימו את הרגליים אם יש חשד לפגיעה בראש, בצוואר או בגב.'},
+ faint:{steps:[
+  'מרגישים שעומדים להתעלף? שכבו עם רגליים מורמות, או שבו עם הראש בין הברכיים.',
+  'מישהו התעלף? השכיבו אותו על הגב והרימו את הרגליים, בערך שלושים סנטימטרים.',
+  'שחררו בגדים צמודים. אישה בהריון, השכיבו על הצד.',
+  'בדקו נשימה. הוא לא נושם? חייגו 101 והתחילו החייאה.',
+  'כשהוא מתאושש, עזרו לו לקום לאט, כדי שלא יתעלף שוב.'],
+  call:'חייגו 101 אם הוא לא מתעורר תוך דקה, לא נושם, יש לו כאב בחזה, הוא התעלף במאמץ או בשכיבה, נפצע, או אם זו אישה בהריון.'},
+ bone:{steps:[
+  'עצרו דימום בלחץ סביב הפצע. כסו פצע פתוח בבד נקי.',
+  'אל תתנו לאיבר הפגוע לזוז.',
+  'קבעו את האיבר בדיוק במצב שבו הוא נמצא.',
+  'הניחו קרח עטוף במגבת, לא ישירות על העור, כדי להפחית נפיחות.',
+  'פנו לטיפול רפואי. חייגו 101 בפציעה קשה, בדימום חזק, או בחשד לפגיעה בעמוד השדרה.',
+  'נקע: מנוחה, קרח, חבישה אלסטית נוחה, והרמה מעל גובה הלב.'],
+  dont:'אל תנסו ליישר עצם או להחזיר פריקה. אל תזיזו את האיבר בלי צורך. אל תשימו קרח ישירות על העור.'},
+ call:{steps:[
+  'חייגו 101, מגן דוד אדום, למצב רפואי. 100, משטרה, לסכנה או לאלימות. 102, כבאות, לשריפה או לחילוץ.',
+  'ענו על כל השאלות של המוקד, במלואן ובדיוק. הן חשובות.',
+  'מסרו מספר טלפון, כתובת מלאה, מה קרה, כמה נפגעים יש ובאיזה מצב.',
+  'עשו מה שהמוקד אומר, והישארו על הקו.',
+  'אם אפשר, שלחו מישהו לכוון את הצוות למקום.',
+  'שימו את הטלפון על רמקול, כדי שתוכלו לפעול תוך כדי השיחה.']}
+};
 function gReadBuild(){
   var L=currentLang==='ar'?'ar':currentLang==='en'?'en':'he', he=L==='he', ar=L==='ar';
   var g=EMERGENCY_GUIDE.find(function(x){return x.id===gRead.id;}); if(!g) return [];
   var it=[{k:'t',tx:g.t[L]}];
-  g.steps[L].forEach(function(st,i){ it.push({k:'s',i:i,tx:(he?'שלב ':ar?'الخطوة ':'Step ')+(i+1)+'. '+st}); });
-  if(g.call&&g.call[L]) it.push({k:'c',tx:(he?'מתי לחייג ':ar?'متى تتصل بـ':'When to call ')+ambulanceNum()+'. '+g.call[L]});
-  if(g.dont&&g.dont[L]) it.push({k:'d',tx:(he?'אסור. ':ar?'ممنوع. ':'Do not. ')+g.dont[L]});
-  it.forEach(function(x){ x.say=gSpeakable(x.tx,L); });
+  var sp=he&&GUIDE_SAY_HE[g.id]; if(sp&&sp.steps.length!==g.steps.he.length) sp=null;   /* v345: spoken Hebrew script (plural, one gender) - only if it matches the screen step for step */
+  var ln=function(t){ try{ return ambulanceNum()==='101'?t:t.replace(/\b101\b/g,ambulanceNum()); }catch(e){ return t; } };
+  g.steps[L].forEach(function(st,i){ var x={k:'s',i:i,tx:(he?'שלב ':ar?'الخطوة ':'Step ')+(i+1)+'. '+st}; if(sp) x.sp='שלב '+(i+1)+'. '+ln(sp.steps[i]); it.push(x); });
+  if(g.call&&g.call[L]){ var xc={k:'c',tx:(he?'מתי לחייג ':ar?'متى تتصل بـ':'When to call ')+ambulanceNum()+'. '+g.call[L]}; if(sp&&sp.call) xc.sp=ln(sp.call); it.push(xc); }
+  if(g.dont&&g.dont[L]){ var xd={k:'d',tx:(he?'אסור. ':ar?'ممنوع. ':'Do not. ')+g.dont[L]}; if(sp&&sp.dont) xd.sp='חשוב לא לעשות: '+ln(sp.dont); it.push(xd); }
+  it.forEach(function(x){ x.say=gSpeakable(x.sp||x.tx,L); });
   return it;
 }
 function gReadLang(){ return currentLang==='ar'?'ar-SA':currentLang==='en'?'en-US':'he-IL'; }
 function gReadSay(text){
-  var rate=gRead.slow?0.72:0.9, lang=gReadLang();
+  var rate=gRead.slow?0.8:1.0, lang=gReadLang();   /* v345: was 0.72 / 0.9 - testers found the normal speed too slow */
   return new Promise(function(res){
     var done=false, end=function(){ if(!done){ done=true; res(); } };
     setTimeout(end, 6000+text.length*(gRead.slow?170:140));   /* never hang on a silent engine (generous: never cut a slow voice off) */
@@ -7842,7 +7968,7 @@ async function gReadRun(){
     gReadMark(); gReadUi();
     await gReadSay(gRead.items[gRead.i].say);
     if(!gRead.playing||tok!==gRead.tok) return;
-    await new Promise(function(r){ setTimeout(r, gRead.slow?1600:1100); });   /* a breath between steps */
+    await new Promise(function(r){ setTimeout(r, gRead.slow?1300:700); });   /* a breath between steps */
     if(!gRead.playing||tok!==gRead.tok) return;
     gRead.i++;
   }
@@ -11342,7 +11468,7 @@ try{ hydrateIcons(document); }catch(e){}
 /* Loaded-build version - shown in the diagnostic panel so a phone can prove
    whether it's on the latest build or a STALE cached one. Keep in lock-step
    with sw.js SW_VERSION on every deploy. */
-var APP_VER='v344';
+var APP_VER='v345';
 var FB={ready:false,uid:null,db:null,_presTimer:null,connected:false,listening:false,pushState:'default',near:0,swVer:'?',
   authState:'connecting',sdkLoaded:false,persist:'',permErr:null,err:null,wsProbe:'',csp:''};
 /* Always log connection diagnostics to the console so the real failure can be SEEN in Chrome. */
@@ -13989,10 +14115,15 @@ function helpNearestM(){
   return best;
 }
 function helpBand(d){ if(d==null) return 0; if(d<100) return 4; if(d<300) return 3; if(d<700) return 2; if(d<1500) return 1; return 0; }
-function helpSay(txtHe,txtEn){
+function helpSay(txtHe,txtEn,txtAr){
+  /* v345: Arabic gets Arabic (it used to read the English line with an Arabic voice), and the Android app
+     speaks through native TTS - its WebView has no speechSynthesis, so the line was silent there. */
+  var he=currentLang==='he', ar=currentLang==='ar', tx=he?txtHe:(ar&&txtAr)?txtAr:txtEn, lang=he?'he-IL':(ar&&txtAr)?'ar-SA':'en-US';
+  try{ var T=window.Capacitor&&window.Capacitor.Plugins&&window.Capacitor.Plugins.TextToSpeech;
+    if(T&&T.speak){ try{ T.stop&&T.stop(); }catch(_){} T.speak({text:tx,lang:lang,rate:1.0,pitch:1.0,volume:1.0,category:'playback'}).catch(function(){}); return; } }catch(e){}
   try{ if(!window.speechSynthesis||!window.SpeechSynthesisUtterance) return;
-    var he=currentLang==='he', u=new SpeechSynthesisUtterance(he?txtHe:txtEn);
-    u.lang=he?'he-IL':(currentLang==='ar'?'ar':'en-US'); u.volume=1; u.rate=1.05;
+    var u=new SpeechSynthesisUtterance(tx);
+    u.lang=lang; u.volume=1; u.rate=1.05;
     window.speechSynthesis.cancel(); window.speechSynthesis.speak(u); }catch(e){}
 }
 function helpMotif(band){
@@ -14018,8 +14149,8 @@ function helpLayerUpdate(){
   var on=(typeof sosActive!=='undefined'&&sosActive)&&n>0&&!!_alarmLoopTimer;   /* not after a stand-down silenced the alarm */
   if(!on){ helpLayerStop(); return; }
   var band=helpBand(helpNearestM());
-  if(n>_helpLastN) helpSay('עזרה בדרך. שומר בדרך אליך.','Help is coming. A SHOMER is on the way.');
-  else if(_helpLastBand!=null && band>=3 && band>_helpLastBand) helpSay('השומר כמעט כאן.','Your SHOMER is almost here.');
+  if(n>_helpLastN) helpSay('עזרה בדרך. שומר בדרך אליך.','Help is coming. A SHOMER is on the way.','المساعدة في الطريق. حارس في طريقه إليك.');
+  else if(_helpLastBand!=null && band>=3 && band>_helpLastBand) helpSay('השומר כמעט כאן.','Your SHOMER is almost here.','حارسك على وشك الوصول.');
   _helpLastN=n; _helpLastBand=band;
   if(_helpT) return;
   (function tick(){
