@@ -587,7 +587,6 @@
       <label>אימייל ארגוני</label><input id="email" type="email" dir="ltr" placeholder="you@municipality.gov.il">
       <label>סיסמה</label><input id="pass" type="password" dir="ltr" placeholder="••••••••">
       <button class="btn" id="login-btn">כניסה</button>
-      <button class="btn" id="live-btn" style="background:linear-gradient(135deg,#0f7a4a,#16a06a 60%,#2ecc71);color:#042016;margin-top:10px;font-weight:800">🟢  תצוגה חיה · נתוני רשת אמת (PoC)</button>
       <button class="btn" id="demo-btn" style="background:transparent;border:1px solid var(--gold);color:var(--gold);margin-top:8px">👁  כניסה לדמו · See a live demo</button>
       <button class="lnk" id="to-signup">אין לך גישה עדיין? <b>בקשת גישת לקוח</b></button>
     </div>
@@ -716,7 +715,7 @@ document.getElementById('signup-btn').onclick=async function(){
   else { gerr('✓ נוצרה גישה. בדוק/י את האימייל לאישור, ואז היכנס/י.'); document.getElementById('to-login').click(); }
 };
 document.getElementById('signout').onclick=async function(){ try{ if(!(CLIENT&&CLIENT.demo)) await sb.auth.signOut(); }catch(e){} location.reload(); };
-document.getElementById('demo-btn').onclick=function(){ demoBoot(); };
+document.getElementById('demo-btn').onclick=function(){ location.href='shomer-command/'; };   /* D2/D3: the demo lives on the sample-data-only page */
 (function(){ var lb=document.getElementById('live-btn'); if(lb) lb.onclick=function(){ liveBoot(); }; })();
 (function(){var ex=document.getElementById('export-btn'); if(ex) ex.onclick=function(){ try{exportReport();}catch(e){window.print();} };
  var ac=document.getElementById('acct-btn'); if(ac) ac.onclick=function(){ try{openSettings();}catch(e){} };})();
@@ -776,7 +775,7 @@ async function boot(){
   await loadData();
   if(!document.getElementById('su-terr').options.length) fillTerr(document.getElementById('su-terr'));
   var u=(await sb.auth.getUser()).data.user;
-  if(!u){ liveBoot(); return; }
+  if(!u){ if(!/[?&]login=1\b/.test(location.search)) location.replace('shomer-command/'+location.search); return; }   /* D2: signed out = the demo, never the real network view; ?login=1 shows the sign-in gate */
   var md=u.user_metadata||{};
   CLIENT={org:md.org||'',territory:md.territory||'',email:u.email};
   try{ if(teamLS('on')) setTimeout(function(){ teamInit().catch(function(){}); },1500); }catch(e){}   /* v310: a manager with a team hears leaders' alerts as soon as they log in */
