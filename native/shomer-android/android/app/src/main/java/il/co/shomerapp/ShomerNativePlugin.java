@@ -183,6 +183,27 @@ public class ShomerNativePlugin extends Plugin {
     call.resolve();
   }
 
+  /** v355: one barometer reading for the floor estimate at SOS time. Always resolves:
+   *  {ok:true, hPa, n} or {ok:false, reason} - never rejects, so a phone with no sensor just sends no floor. */
+  @PluginMethod
+  public void pressure(final PluginCall call) {
+    try {
+      PressureReader.read(getContext(), 2500L, new PressureReader.Result() {
+        @Override public void done(boolean ok, double hPa, int samples, String reason) {
+          JSObject r = new JSObject();
+          r.put("ok", ok);
+          if (ok) { r.put("hPa", hPa); r.put("n", samples); } else { r.put("reason", reason); }
+          call.resolve(r);
+        }
+      });
+    } catch (Throwable e) {
+      JSObject r = new JSObject();
+      r.put("ok", false);
+      r.put("reason", "error");
+      call.resolve(r);
+    }
+  }
+
   @PluginMethod
   public void requestNotifications(PluginCall call) {
     if (Build.VERSION.SDK_INT >= 33 && getPermissionState("notifications") != com.getcapacitor.PermissionState.GRANTED) {
