@@ -117,8 +117,11 @@ public class ShakeService extends Service implements SensorEventListener {
         wl.acquire();
       } catch (Exception e) {}
     }
-    if (acc != null) sm.registerListener(this, acc, SensorManager.SENSOR_DELAY_GAME);
-    sListening = (acc != null);   // v366: real liveness, reported back to the web layer
+    // v367: believe registerListener's ANSWER. Taking acc != null as liveness meant a failed
+    // registration still claimed the detector was running - and with the button gate on, the web
+    // layer stands its own detector down on that claim. The one place this design could fail
+    // CLOSED instead of open.
+    sListening = (acc != null) && sm.registerListener(this, acc, SensorManager.SENSOR_DELAY_GAME);
   }
 
   private void unlisten() {
