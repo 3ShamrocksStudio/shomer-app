@@ -101,7 +101,11 @@ public class ShakeService extends Service implements SensorEventListener {
   private void listen() {
     cLv = sens(this); det = new ShakeDetector(cLv);   // (re)read the level on every start / config change
     if (btnGate(this)) startButtonWatch(); else stopButtonWatch();   // v359: only watch buttons when the gate is on
-    if (sm != null && acc != null) return;
+    // v368: ...and only skip the setup if we are actually LISTENING. A registerListener that
+    // returned false left sm and acc non-null, so every later start returned here without trying
+    // again - background shake dead for the life of the service, which is exactly the locked-screen
+    // case this service exists for. Re-registering a listener already attached is harmless.
+    if (sListening && sm != null && acc != null) return;
     sm = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
     if (sm == null) return;
     // With the screen off the CPU sleeps and an ordinary accelerometer stops reporting -
