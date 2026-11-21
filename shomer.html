@@ -3842,9 +3842,9 @@ function toggleShakeGate(el){
  try{ el.setAttribute('aria-checked',String(SS.shake.btnGate)); }catch(e){}
  saveStore();
  try{ shakeNativeSync(); }catch(e){}
- var he=currentLang==='he';
- try{ toast(SS.shake.btnGate ? (he?'לחצו על כפתור עוצמה, ואז נערו - תוך 10 שניות':'Press a volume key, then shake - within 10 seconds')
-                             : (he?'ניעור בלבד מפעיל SOS':'A shake alone starts an SOS'),'ok'); }catch(e){}
+ var he=currentLang==='he', ar=currentLang==='ar';
+ try{ toast(SS.shake.btnGate ? (he?'לחצו על כפתור עוצמה, ואז נערו - תוך 10 שניות':ar?'اضغطوا زرّ الصوت ثم هزّوا الهاتف - خلال 10 ثوانٍ':'Press a volume key, then shake - within 10 seconds')
+                             : (he?'ניעור בלבד מפעיל SOS':ar?'الهزّ وحده يبدأ الاستغاثة':'A shake alone starts an SOS'),'ok'); }catch(e){}
 }
 
 function toggleShake(el){
@@ -5481,8 +5481,12 @@ function startShakeDetection(){
      /* v360: with the button gate on, the IN-APP detector must not fire on its own - a WebView
         never sees volume or power keys, so it cannot honour the gate. Inside the app the native
         service detects the same shake and enforces the gate there, so suppressing here is what
-        makes "button + shake" true in the foreground too, and keeps the test honest. */
-     if(SS.shake && SS.shake.btnGate && shomerNativePlugin()) return;
+        makes "button + shake" true in the foreground too, and keeps the test honest.
+        v361: ...but only while Shake-to-SOS is actually ON. With the switch off the native
+        service unregisters its accelerometer, so standing down here too would leave the shake
+        TEST with no detector at all - and the test is the one place a user confirms the gesture
+        works. The test sends nothing, so running it ungated is safe. */
+     if(SS.shake && SS.shake.btnGate && SS.shake.enabled===true && shomerNativePlugin()) return;
      if(testing){ try{ shakeTestHit(); }catch(_){} return; }
      shakeFired('web');
    }
@@ -5499,7 +5503,13 @@ function shakeFired(src){
    /* v360: a shake the NATIVE service detected has already armed the 8 s native countdown
       (armNativeAlarm, v342). In test mode nothing else cancels it, so the siren would sound
       8 s into a test that is meant to send nothing. Stop it here. */
-   if(window._shakeTest){ try{ nativeAlarmStop(); }catch(e){} shakeTestHit(); return 'ok'; }
+   /* v361: and ONLY while nothing real is running. The test card is not modal, so an SOS can
+      start under it (SOS button, DMS, check-in); without this guard a shake during that SOS
+      would take the test branch and stopAlarm() the live siren. Nothing silences a real alarm
+      except the real cancel. */
+   if(window._shakeTest && (typeof sosPhase==='undefined' || sosPhase==='idle')){
+     try{ nativeAlarmStop(); }catch(e){} shakeTestHit(); return 'ok';
+   }
    /* v344: SS is a top-level `let`, so window.SS is ALWAYS undefined - this line returned 'wait' on every
       shake since v340 and no shake (web or native) ever started the SOS. Test the binding itself. */
    if(typeof SS==='undefined' || !SS || !SS.shake) return 'wait';   /* settings not loaded yet - the cold-start race: retry */
@@ -6072,6 +6082,9 @@ function trustLabel(){
  triggerSOS() directly (automatic triggers bypass hold-to-arm by design, but still
  get the cancel countdown so an accidental auto-fire leaves no trace). */
 function triggerSOS(trigger){
+ /* v361: a real SOS closes the shake-test card. The card is not modal, so it could otherwise
+    stay open over a live emergency and swallow shakes into the test path. */
+ try{ if(window._shakeTest) shakeTestClose(); }catch(e){}
  if(sosPhase==='countdown'){cancelCountdown('repress');return;}
  if(sosPhase==='active'&&window._sosSilent){ sosGoLoud(); return; }   /* v279: pressing SOS during a silent SOS turns it LOUD (never asks for a PIN first) */
  if(sosPhase==='active'){resolveSOS();return;}
@@ -11777,7 +11790,7 @@ try{ hydrateIcons(document); }catch(e){}
 /* Loaded-build version - shown in the diagnostic panel so a phone can prove
    whether it's on the latest build or a STALE cached one. Keep in lock-step
    with sw.js SW_VERSION on every deploy. */
-var APP_VER='v360';
+var APP_VER='v361';
 var FB={ready:false,uid:null,db:null,_presTimer:null,connected:false,listening:false,pushState:'default',near:0,swVer:'?',
   authState:'connecting',sdkLoaded:false,persist:'',permErr:null,err:null,wsProbe:'',csp:''};
 /* Always log connection diagnostics to the console so the real failure can be SEEN in Chrome. */
