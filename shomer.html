@@ -9540,8 +9540,30 @@ async function addGuardian(){
  if(!name){ name=(he?'\u05e9\u05d5\u05de\u05e8':'SHOMER'); }
  if(go){go.disabled=true;go.style.opacity='.6';}
  if(validPhone){
-   var dup=(SS.circleMembers||[]).find(function(m){return m.phoneCanon===canon;});
-   if(dup){ toast(he?(name+' \u05db\u05d1\u05e8 \u05d1\u05de\u05e2\u05d2\u05dc'):'Already in your circle','amb'); if(go){go.disabled=false;go.style.opacity='';} return; }
+   /* v358: was an exact phoneCanon string match against circleMembers only. Two gaps:
+      "+972-52-123" and "052-123" are the same person but never matched, and a pair slot that
+      exists WITHOUT a circleMember (the half-linked case) was invisible - so you could invite
+      someone you are already connected to and end up with them listed twice.
+      Now keyed on the last 9 digits and checked across BOTH lists. */
+   var _k=function(v){ var d=String(v||'').replace(/\D/g,''); return d.length>=9?d.slice(-9):''; };
+   var _ck=_k(canon);
+   var dupM=_ck&&(SS.circleMembers||[]).find(function(m){ return _k(m.phoneCanon||m.ph)===_ck; });
+   var dupP=_ck&&((gdState().pairs)||[]).find(function(p){ return _k(p.ph||p.phoneCanon)===_ck; });
+   var linked=(dupM&&!dupM.pending)||(dupP&&dupP.linked&&!dupP.pending);
+   if(linked){
+     /* already connected - block, and say who */
+     toast(he?((dupM&&dupM.name||dupP&&dupP.name||name)+' \u05db\u05d1\u05e8 \u05d1\u05de\u05e2\u05d2\u05dc \u05e9\u05dc\u05da - \u05d0\u05d9\u05df \u05e6\u05d5\u05e8\u05da \u05dc\u05d4\u05d6\u05de\u05d9\u05df \u05e9\u05d5\u05d1')
+          :currentLang==='ar'?'\u0645\u0648\u062c\u0648\u062f \u0628\u0627\u0644\u0641\u0639\u0644 \u0641\u064a \u062f\u0627\u0626\u0631\u062a\u0643'
+          :((dupM&&dupM.name||dupP&&dupP.name||name)+' is already in your circle - no need to invite again'),'amb');
+     if(go){go.disabled=false;go.style.opacity='';} return;
+   }
+   if(dupM||dupP){
+     /* an earlier invite to this number is still waiting. Let it go out again - that is the
+        legitimate repair when the first one never arrived - but say so, so nobody thinks the
+        first one vanished and keeps re-sending. */
+     toast(he?('\u05db\u05d1\u05e8 \u05e9\u05dc\u05d7\u05ea \u05d4\u05d6\u05de\u05e0\u05d4 \u05dc\u05de\u05e1\u05e4\u05e8 \u05d4\u05d6\u05d4 \u05d5\u05d4\u05d9\u05d0 \u05e2\u05d3\u05d9\u05d9\u05df \u05de\u05de\u05ea\u05d9\u05e0\u05d4 - \u05e9\u05d5\u05dc\u05d7 \u05e9\u05d5\u05d1')
+          :'You already invited this number and it is still pending - sending again','amb');
+   }
  }
  var palette=['#C9A84C','#2962FF','#00C853','#E91E8C','#9C27B0','#FF6A00'];
  var off=function(){return (Math.random()-0.5)*0.02;};
@@ -11724,7 +11746,7 @@ try{ hydrateIcons(document); }catch(e){}
 /* Loaded-build version - shown in the diagnostic panel so a phone can prove
    whether it's on the latest build or a STALE cached one. Keep in lock-step
    with sw.js SW_VERSION on every deploy. */
-var APP_VER='v357';
+var APP_VER='v358';
 var FB={ready:false,uid:null,db:null,_presTimer:null,connected:false,listening:false,pushState:'default',near:0,swVer:'?',
   authState:'connecting',sdkLoaded:false,persist:'',permErr:null,err:null,wsProbe:'',csp:''};
 /* Always log connection diagnostics to the console so the real failure can be SEEN in Chrome. */
