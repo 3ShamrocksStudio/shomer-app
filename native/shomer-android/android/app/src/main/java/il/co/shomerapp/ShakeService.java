@@ -53,7 +53,10 @@ public class ShakeService extends Service implements SensorEventListener {
    * is awake; whichever cancel happens first stops this one too. */
   static final long PRE_ALARM_MS = 8000;   // must match SOS_PRE_S (8) in shomer.html
   private static final android.os.Handler PRE = new android.os.Handler(android.os.Looper.getMainLooper());
-  private static Runnable preTask;
+  /* v371: volatile. These are written on the main looper (the sensor callback) and read from the
+     Capacitor task thread (stopAlarm). A stale preTask read means removeCallbacks is skipped and
+     the siren starts 8 s AFTER a cancel - the one thing the cancel exists to prevent. */
+  private static volatile Runnable preTask;
 
   /** v370: a Handler delay runs on uptimeMillis, which does NOT advance while the CPU is in deep
    *  sleep and does not wake it. On a phone with a wake-up accelerometer nothing else holds a wake
@@ -61,11 +64,22 @@ public class ShakeService extends Service implements SensorEventListener {
    *  again the moment that returns. So the siren could arrive late or not at all on a locked phone:
    *  the very case v342 moved this countdown out of the WebView to fix. Hold the CPU for the
    *  countdown, with a timeout so the OS reclaims it even if this process dies. */
-  private static PowerManager.WakeLock preWl;
+  private static volatile PowerManager.WakeLock preWl;   // v371: volatile, same race as preTask
+
+  /** v371: drop a pending countdown and its wake lock. NOT the same thing as a user cancel - see
+   *  cancelNativeAlarm, which also clears the re-fire stamp. Arming must not clear that stamp:
+   *  armNativeAlarm used to call cancelNativeAlarm, so every fire wiped its own dedupe and a user
+   *  who kept shaking pushed the native countdown back 8 s at a time - on a locked phone, where
+   *  that countdown is the only siren, indefinitely. */
+  private static void clearPending() {
+    try { if (preTask != null) { PRE.removeCallbacks(preTask); preTask = null; } } catch (Throwable e) {}
+    try { if (preWl != null && preWl.isHeld()) preWl.release(); } catch (Throwable e) {}
+    preWl = null;
+  }
 
   static void armNativeAlarm(Context c) {
     final Context app = c.getApplicationContext();
-    cancelNativeAlarm(app);
+    clearPending();
     try {
       PowerManager pm = (PowerManager) app.getSystemService(Context.POWER_SERVICE);
       preWl = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "shomer:prealarm");
@@ -81,6 +95,10 @@ public class ShakeService extends Service implements SensorEventListener {
           if (Build.VERSION.SDK_INT >= 26) app.startForegroundService(a);
           else app.startService(a);
         } catch (Throwable e) {}
+        /* v371: the siren holds its own wake lock from here, so hand ours back instead of sitting
+           on the CPU until the acquire timeout runs out. */
+        try { if (preWl != null && preWl.isHeld()) preWl.release(); } catch (Throwable e) {}
+        preWl = null;
       }
     };
     PRE.postDelayed(preTask, PRE_ALARM_MS);
@@ -89,9 +107,7 @@ public class ShakeService extends Service implements SensorEventListener {
   /** Any cancel - the notification STOP, or "ביטול - אני בסדר" in the app - must kill this too,
    *  or a cancelled SOS would still start screaming 8 seconds later. */
   static void cancelNativeAlarm(Context c) {
-    try { if (preTask != null) { PRE.removeCallbacks(preTask); preTask = null; } } catch (Throwable e) {}
-    try { if (preWl != null && preWl.isHeld()) preWl.release(); } catch (Throwable e) {}
-    preWl = null;
+    clearPending();
     /* v370: a cancel means the user decided this one was false. The 8 s re-fire guard must not
        then swallow a DELIBERATE second shake - the situation can turn real between the cancel and
        the next shake, and before this the phone answered that shake with nothing at all. */
@@ -261,10 +277,15 @@ public class ShakeService extends Service implements SensorEventListener {
         // make the gate block nothing at all.
         String[] keys = { "volume_music", "volume_ring", "volume_alarm",
                           "volume_notification", "volume_system", "volume_voice_call" };
+        boolean obsOk = false;
         for (String k : keys) {
-          try { getContentResolver().registerContentObserver(Settings.System.getUriFor(k), false, volObs); }
+          try { getContentResolver().registerContentObserver(Settings.System.getUriFor(k), false, volObs); obsOk = true; }
           catch (Throwable e) {}
         }
+        /* v371: a constructed observer is not a registered one. Claiming it would report the gate
+           as armed with nothing feeding btnMs - every shake refused, and the web layer standing
+           its own detector down on the strength of that report. */
+        if (!obsOk) volObs = null;
       } catch (Throwable e) { volObs = null; }
     }
     sGateArmed = (btnRx != null || volObs != null);   // v370
