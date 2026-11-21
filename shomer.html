@@ -3844,7 +3844,14 @@ function toggleShakeGate(el){
  try{ shakeNativeSync(); }catch(e){}
  var he=currentLang==='he', ar=currentLang==='ar';
  try{ toast(SS.shake.btnGate ? (he?'לחצו על כפתור עוצמה, ואז נערו - תוך 10 שניות':ar?'اضغطوا زرّ الصوت ثم هزّوا الهاتف - خلال 10 ثوانٍ':'Press a volume key, then shake - within 10 seconds')
-                             : (he?'ניעור בלבד מפעיל SOS':ar?'الهزّ وحده يبدأ الاستغاثة':'A shake alone starts an SOS'),'ok'); }catch(e){}
+                             : (he?'ניעור בלבד מפעיל SOS':ar?'الهزّ وحده يبدأ الاستغاثة':'A shake alone starts an SOS'),'grn'); }catch(e){}
+ /* v365: this page updates itself; the app around it only changes on reinstall. If this APK is
+    too old to know the setting, say so rather than letting the switch promise something the
+    phone will not do. The setting is kept - it starts working when the app updates. */
+ if(SS.shake.btnGate) setTimeout(function(){ try{
+   if(window._nativeGateSupported===false) toast(he?'צריך לעדכן את האפליקציה כדי שזה יעבוד - עד אז ניעור לבד עדיין מפעיל SOS'
+     :ar?'يجب تحديث التطبيق ليعمل هذا - حتى ذلك الحين الهزّ وحده يبدأ الاستغاثة':'Update the app for this to work - until then a shake alone still starts an SOS','amb');
+ }catch(e){} }, 1200);
 }
 
 function toggleShake(el){
@@ -5485,8 +5492,12 @@ function startShakeDetection(){
         v361: ...but only while Shake-to-SOS is actually ON. With the switch off the native
         service unregisters its accelerometer, so standing down here too would leave the shake
         TEST with no detector at all - and the test is the one place a user confirms the gesture
-        works. The test sends nothing, so running it ungated is safe. */
-     if(SS.shake && SS.shake.btnGate && SS.shake.enabled===true && shomerNativePlugin()) return;
+        works. The test sends nothing, so running it ungated is safe.
+        v365: and only once the APP ITSELF has confirmed the gate is on (_nativeGateOk). Keying
+        this on the plugin merely existing meant a dead or killed ShakeService, or an APK too old
+        to know the setting, left NO detector running at all - shake silently dead with the gate
+        on. Unconfirmed now means the in-app detector keeps working: fail open, never silent. */
+     if(SS.shake && SS.shake.btnGate && SS.shake.enabled===true && window._nativeGateOk===true) return;
      /* v364: the test branch only while nothing real is running. Three separate places now close
         the test card when an SOS starts, so this cannot trigger today - but a shake must never be
         swallowed into the test path during an emergency on the strength of an invariant held
@@ -5984,12 +5995,23 @@ function shakeNativeSync(){ try{ var p=shomerNativePlugin(); if(!p) return;
   var on=!!(SS.shake && SS.shake.enabled===true);
   var en=function(){ try{ p.enableBackgroundShake && p.enableBackgroundShake(); }catch(e){} };
   var off=function(){ try{ p.disableBackgroundShake && p.disableBackgroundShake(); }catch(e){} };
-  var old=function(){ window._nativeShakeOld=true; if(on) en(); else off(); };
+  var old=function(){ window._nativeShakeOld=true; window._nativeGateOk=false; window._nativeGateSupported=false; if(on) en(); else off(); };
   /* v359: btnGate - when on, the background detector only fires if a hardware button (volume or
      power) was pressed in the last 10 s. Stops a pocket, a jog or a dance floor starting an SOS. */
   var r=null; try{ r=p.setShakeConfig ? p.setShakeConfig({enabled:on, sens:shakeSens(), btnGate:!!(SS.shake&&SS.shake.btnGate)}) : null; }catch(e){ r=null; }
   if(!r || typeof r.then!=='function'){ old(); return; }
-  r.then(function(){ window._nativeShakeOld=false; en(); }, old);
+  /* v365: trust the ANSWER, not the presence of the plugin. The web layer updates itself from the
+     website while the APK only changes on reinstall, so this page can be newer than the app around
+     it. A pre-v359 plugin resolves this call happily and ignores btnGate - believing it would stand
+     the in-app detector down (see the devicemotion handler) while nothing gated the native one.
+     _nativeGateOk is set only when the app itself confirms the gate is on; _nativeGateSupported
+     tells the settings row whether this APK knows the setting at all. */
+  r.then(function(v){
+    window._nativeShakeOld=false;
+    window._nativeGateSupported = !!(v && typeof v.btnGate!=='undefined');
+    window._nativeGateOk = !!(v && v.btnGate===true);
+    en();
+  }, old);
 }catch(e){} }
 /* A STOP tapped in the Android notification while the web layer was not running: act on it now. */
 function shakeNativePendingStop(){ try{ var p=shomerNativePlugin(); if(!p||!p.takeStopPending) return;
@@ -11614,6 +11636,11 @@ _checkForUpdate();
 try{
   document.addEventListener('visibilitychange', function(){ if(!document.hidden) _checkForUpdate(); });
   window.addEventListener('focus', function(){ _checkForUpdate(); });
+  /* v365: re-arm the native shake service on every return to the app. It used to be configured
+     once per page load, so an OEM battery manager or a force-stop that killed ShakeService left
+     shake dead for the rest of the session - and with the button gate on, silently so. This
+     restarts it and re-confirms the gate; both calls are idempotent. */
+  document.addEventListener('visibilitychange', function(){ if(!document.hidden){ try{ shakeNativeSync(); }catch(e){} } });
 }catch(e){}
 applyStoredSettings();
 /* First launch: detect the device language (he/ar/en); fall back to Hebrew (primary
@@ -11803,7 +11830,7 @@ try{ hydrateIcons(document); }catch(e){}
 /* Loaded-build version - shown in the diagnostic panel so a phone can prove
    whether it's on the latest build or a STALE cached one. Keep in lock-step
    with sw.js SW_VERSION on every deploy. */
-var APP_VER='v364';
+var APP_VER='v365';
 var FB={ready:false,uid:null,db:null,_presTimer:null,connected:false,listening:false,pushState:'default',near:0,swVer:'?',
   authState:'connecting',sdkLoaded:false,persist:'',permErr:null,err:null,wsProbe:'',csp:''};
 /* Always log connection diagnostics to the console so the real failure can be SEEN in Chrome. */
