@@ -118,9 +118,11 @@ public class ShakeService extends Service implements SensorEventListener {
       } catch (Exception e) {}
     }
     if (acc != null) sm.registerListener(this, acc, SensorManager.SENSOR_DELAY_GAME);
+    sListening = (acc != null);   // v366: real liveness, reported back to the web layer
   }
 
   private void unlisten() {
+    sListening = false;   // v366
     det = null;
     stopButtonWatch();   // v359
     try { if (sm != null) sm.unregisterListener(this); } catch (Exception e) {}
@@ -173,6 +175,10 @@ public class ShakeService extends Service implements SensorEventListener {
    *   - volume -> VOLUME_CHANGED_ACTION, plus a ContentObserver on the volume_* keys only
    * Default OFF: with the gate on, a two-handed gesture is impossible for someone whose arm
    * is held or whose phone is in a coat pocket, which is the case shake exists for. */
+  /** v366: true while the accelerometer is actually registered. Read by the plugin so the web
+   *  layer can tell "the app is enforcing the gate" from "the plugin merely exists". A process
+   *  death resets it to false, which is the safe direction - the web detector then stays on. */
+  static volatile boolean sListening = false;
   static final long BTN_WINDOW_MS = 10000;
   private volatile long btnMs = 0;
   private BroadcastReceiver btnRx;
@@ -328,7 +334,11 @@ public class ShakeService extends Service implements SensorEventListener {
   @Override
   public void onDestroy() {
     unlisten();
-    try { AlarmPlayer.stop(this); } catch (Exception e) {}
+    // v366: NEVER silence a sounding alarm on the way out. On a locked phone AlarmPlayer IS the
+    // siren (startForegroundService throws there, so the plugin falls back to it), and this
+    // service is torn down by disableBackgroundShake - which the web layer now calls on every
+    // return to the app. Stopping the player here silenced a live emergency.
+    try { if (!AlarmPlayer.isPlaying() && !AlarmForegroundService.isPlaying()) AlarmPlayer.stop(this); } catch (Exception e) {}
     try { BeatTask.stop(); } catch (Throwable e) {}
     super.onDestroy();
   }

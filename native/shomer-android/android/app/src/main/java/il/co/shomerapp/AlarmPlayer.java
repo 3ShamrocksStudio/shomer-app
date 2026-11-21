@@ -16,6 +16,10 @@ import android.os.Vibrator;
  */
 final class AlarmPlayer {
   private static MediaPlayer mp;
+
+  /** v366: is the fallback siren sounding right now? Anything that tears down a service must
+   *  ask this before stopping it - a live alarm is only ever silenced by the real cancel. */
+  static boolean isPlaying() { return mp != null; }
   private static int prevVol = -1;
 
   static synchronized void start(Context c) {

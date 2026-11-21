@@ -3888,7 +3888,11 @@ function shakeTestOpen(){
  try{ startShakeDetection(); }catch(e){}
  var d=document.createElement('div'); d.className='shk-test'; d.id='shk-test'; d.setAttribute('role','dialog'); d.setAttribute('aria-live','polite');
  d.innerHTML='<div class="shk-hd"><img src="SHOMER_logo_big.png" alt="" width="40" height="40"><h3>'+(he?'בדיקת ניעור':ar?'اختبار الهزّ':'Shake test')+'</h3></div>'
-   +'<p>'+(he?'נערו את הטלפון חזק, הלוך-חזור. שום דבר לא נשלח ואין אזעקה.':ar?'هزّ الهاتف بقوة ذهابًا وإيابًا. لا يُرسل شيء ولا يوجد إنذار.':'Shake the phone hard, back and forth. Nothing is sent and there is no siren.')+'</p>'
+   /* v366: with the button gate on, a bare shake is SUPPOSED to do nothing here - say so, or the
+      user shakes for 60 s, sees nothing and concludes the whole feature is broken. */
+   +'<p>'+((SS.shake&&SS.shake.btnGate)
+      ?(he?'לחצו על כפתור עוצמה, ואז נערו את הטלפון חזק, הלוך-חזור - תוך 10 שניות. בלי לחיצה על כפתור, ניעור לא נחשב. שום דבר לא נשלח ואין אזעקה.':ar?'اضغطوا زرّ الصوت ثم هزّوا الهاتف بقوة ذهابًا وإيابًا خلال 10 ثوانٍ. بدون ضغط الزرّ لا يُحتسب الهزّ. لا يُرسل شيء ولا يوجد إنذار.':'Press a volume key, then shake the phone hard, back and forth - within 10 seconds. Without a button press a shake does not count. Nothing is sent and there is no siren.')
+      :(he?'נערו את הטלפון חזק, הלוך-חזור. שום דבר לא נשלח ואין אזעקה.':ar?'هزّ الهاتف بقوة ذهابًا وإيابًا. لا يُرسل شيء ولا يوجد إنذار.':'Shake the phone hard, back and forth. Nothing is sent and there is no siren.'))+'</p>'
    +'<div class="shk-st" id="shk-st">'+SHK_IC_PHONE+'<span id="shk-st-tx">'+(he?'מחכה לניעור…':ar?'بانتظار الهزّ…':'Waiting for a shake…')+'</span></div>'
    +'<button type="button" class="shk-done" id="shk-done">'+(he?'סיום':ar?'إنهاء':'Done')+'</button>';
  document.body.appendChild(d);
@@ -5987,14 +5991,17 @@ function shomerIsNative(){ try{ return !!(window.Capacitor && window.Capacitor.i
 /* v288: arm the locked-phone shake detector only when the user's switch is on (called once settings are loaded) */
 /* v337: the native service gets the user's switch + level. It keeps running either way (it also carries
    locked-phone alerts from my SHOMERs); only its accelerometer follows the switch.
-   An app build from before v337 has no setShakeConfig (the call rejects). Its background detector is the
-   old one that fired on fast walking, so its shake triggers are IGNORED (window._nativeShakeOld) - the
-   service itself stays as the user's switch says, so locked-phone SHOMER alerts keep working until the
-   app updates. The in-app detector still works while the app is open. */
+   An app build from before v337 has no setShakeConfig (the call rejects); the service itself still
+   follows the user's switch, so locked-phone SHOMER alerts keep working until the app updates, and
+   the in-app detector works while the app is open. (v347 stopped ignoring old builds' shakes, so
+   _nativeShakeOld is written but no longer read - the 8 s countdown guards a false start instead.) */
 function shakeNativeSync(){ try{ var p=shomerNativePlugin(); if(!p) return;
   var on=!!(SS.shake && SS.shake.enabled===true);
   var en=function(){ try{ p.enableBackgroundShake && p.enableBackgroundShake(); }catch(e){} };
-  var off=function(){ try{ p.disableBackgroundShake && p.disableBackgroundShake(); }catch(e){} };
+  /* v366: NEVER tear the service down while an emergency is running. Stopping it reaches
+     ShakeService.onDestroy, which on a locked phone is holding the siren itself. */
+  var off=function(){ try{ if(typeof sosPhase!=='undefined' && sosPhase!=='idle') return;
+                           p.disableBackgroundShake && p.disableBackgroundShake(); }catch(e){} };
   var old=function(){ window._nativeShakeOld=true; window._nativeGateOk=false; window._nativeGateSupported=false; if(on) en(); else off(); };
   /* v359: btnGate - when on, the background detector only fires if a hardware button (volume or
      power) was pressed in the last 10 s. Stops a pocket, a jog or a dance floor starting an SOS. */
@@ -6006,11 +6013,21 @@ function shakeNativeSync(){ try{ var p=shomerNativePlugin(); if(!p) return;
      the in-app detector down (see the devicemotion handler) while nothing gated the native one.
      _nativeGateOk is set only when the app itself confirms the gate is on; _nativeGateSupported
      tells the settings row whether this APK knows the setting at all. */
+  /* v366: and it must be LISTENING, not merely configured. The pref survives a service the OS
+     killed, so "gate on" alone could stand the in-app detector down while nothing was watching.
+     Start the service first, then ask again and believe only btnGate && listening. Until that
+     second answer comes back the flag stays false, so the in-app detector covers the gap. */
   r.then(function(v){
     window._nativeShakeOld=false;
     window._nativeGateSupported = !!(v && typeof v.btnGate!=='undefined');
-    window._nativeGateOk = !!(v && v.btnGate===true);
+    window._nativeGateOk=false;
     en();
+    if(!(v && v.btnGate===true)) return;              /* gate off or unsupported - nothing to confirm */
+    setTimeout(function(){ try{
+      var r2=p.setShakeConfig({enabled:on, sens:shakeSens(), btnGate:!!(SS.shake&&SS.shake.btnGate)});
+      if(r2 && r2.then) r2.then(function(v2){ window._nativeGateOk = !!(v2 && v2.btnGate===true && v2.listening===true); },
+                                function(){ window._nativeGateOk=false; });
+    }catch(e){ window._nativeGateOk=false; } }, 800);
   }, old);
 }catch(e){} }
 /* A STOP tapped in the Android notification while the web layer was not running: act on it now. */
@@ -11830,7 +11847,7 @@ try{ hydrateIcons(document); }catch(e){}
 /* Loaded-build version - shown in the diagnostic panel so a phone can prove
    whether it's on the latest build or a STALE cached one. Keep in lock-step
    with sw.js SW_VERSION on every deploy. */
-var APP_VER='v365';
+var APP_VER='v366';
 var FB={ready:false,uid:null,db:null,_presTimer:null,connected:false,listening:false,pushState:'default',near:0,swVer:'?',
   authState:'connecting',sdkLoaded:false,persist:'',permErr:null,err:null,wsProbe:'',csp:''};
 /* Always log connection diagnostics to the console so the real failure can be SEEN in Chrome. */
