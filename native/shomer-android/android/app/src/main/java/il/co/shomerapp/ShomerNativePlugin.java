@@ -45,7 +45,7 @@ public class ShomerNativePlugin extends Plugin {
     } catch (Exception e) {
       // Locked / backgrounded phone: Android won't start a new foreground service here.
       // ShakeService is already running in the foreground - sound the alarm from it.
-      AlarmPlayer.start(getContext());
+      AlarmPlayer.start(getContext(), true);   // v375: this fallback IS the user's own SOS siren
     }
     call.resolve();
   }
@@ -103,7 +103,7 @@ public class ShomerNativePlugin extends Plugin {
     c.getSharedPreferences(ShakeService.PREFS, Context.MODE_PRIVATE).edit()
         .putBoolean("shake_enabled", on != null && on).putString("shake_sens", sens)
         .putBoolean("shake_btn_gate", gate != null && gate).commit();
-    JSObject r = new JSObject(); r.put("ok", true); r.put("version", 374); r.put("btnGate", gate != null && gate);
+    JSObject r = new JSObject(); r.put("ok", true); r.put("version", 375); r.put("btnGate", gate != null && gate);
     r.put("listening", ShakeService.sListening);   // v366: is the detector really running?
     r.put("gateArmed", ShakeService.sGateArmed);   // v370: and is the button signal really registered?
     call.resolve(r);

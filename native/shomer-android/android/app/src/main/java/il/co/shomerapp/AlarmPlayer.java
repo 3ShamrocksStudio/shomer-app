@@ -20,12 +20,21 @@ final class AlarmPlayer {
   /** v366: is the fallback siren sounding right now? Anything that tears down a service must
    *  ask this before stopping it - a live alarm is only ever silenced by the real cancel. */
   static boolean isPlaying() { return mp != null; }
+  /** v375: ...and is it sounding for THIS user's own SOS, or for a linked SHOMER's alert? This
+   *  player serves both. Treating a guardian's alert as "the siren is already up" meant the
+   *  user's own countdown ended in silence, and clearing that alert then left the phone quiet
+   *  over a live SOS. Only the SOS cause means "no second siren needed". */
+  private static volatile boolean sosCause = false;
+  static boolean isPlayingSos() { return mp != null && sosCause; }
   private static int prevVol = -1;
 
-  static synchronized void start(Context c) {
+  static void start(Context c) { start(c, false); }
+
+  static synchronized void start(Context c, boolean forSos) {
     try {
       AudioManager am = (AudioManager) c.getSystemService(Context.AUDIO_SERVICE);
-      if (mp != null) return;
+      if (mp != null) { if (forSos) sosCause = true; return; }   // v375: an SOS outranks a guard alert
+      sosCause = forSos;
       prevVol = am.getStreamVolume(AudioManager.STREAM_ALARM);
       am.setStreamVolume(AudioManager.STREAM_ALARM, am.getStreamMaxVolume(AudioManager.STREAM_ALARM), 0);
       mp = new MediaPlayer();
@@ -44,7 +53,7 @@ final class AlarmPlayer {
         if (android.os.Build.VERSION.SDK_INT >= 26) v.vibrate(VibrationEffect.createWaveform(new long[]{0, 500, 140, 500, 140, 500, 320}, new int[]{0, 255, 0, 255, 0, 255, 0}, 1));
         else v.vibrate(new long[]{0, 500, 140, 500, 140, 500, 320}, 1);
       }
-    } catch (Throwable e) { try { if (mp != null) mp.release(); } catch (Throwable t) {} mp = null; }
+    } catch (Throwable e) { try { if (mp != null) mp.release(); } catch (Throwable t) {} mp = null; sosCause = false; }   // v375
   }
 
   /** The "עצור – אני בסדר" notification for the fallback alarm (id 3). */
@@ -74,7 +83,7 @@ final class AlarmPlayer {
   static synchronized void stop(Context c) {
     try { ((android.app.NotificationManager) c.getSystemService(Context.NOTIFICATION_SERVICE)).cancel(3); } catch (Throwable e) {}
     try { if (mp != null) { mp.stop(); mp.release(); } } catch (Exception e) {}
-    mp = null;
+    mp = null; sosCause = false;   // v375
     try {
       AudioManager am = (AudioManager) c.getSystemService(Context.AUDIO_SERVICE);
       if (prevVol >= 0) am.setStreamVolume(AudioManager.STREAM_ALARM, prevVol, 0);

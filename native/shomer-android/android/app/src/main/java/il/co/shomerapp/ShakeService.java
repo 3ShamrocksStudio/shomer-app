@@ -102,22 +102,31 @@ public class ShakeService extends Service implements SensorEventListener {
            not begun - and then this started it. Holding the lock across the start forces that
            cancel to queue behind it, so its stop lands after the siren exists and works. Only the
            main looper waits here, and only on itself, so there is no new way to hang. */
+        /* v375: hold OUR wake lock by value. Read from the field later it could already belong
+           to a newer countdown, and releasing that one would leave the fresh countdown running
+           with nothing holding the CPU awake. */
+        PowerManager.WakeLock mine;
         synchronized (ShakeService.class) {
           if (preTask != this) return;   // a cancel got here first - this countdown is void
           preTask = null;
+          mine = preWl;
           try {
-            /* AlarmPlayer too: on a locked phone the web layer's siren IS AlarmPlayer, and
-               checking only the foreground service meant starting a second one on top of it. */
-            if (AlarmForegroundService.isPlaying() || AlarmPlayer.isPlaying()) return;
-            Intent a = new Intent(app, AlarmForegroundService.class);
-            if (Build.VERSION.SDK_INT >= 26) app.startForegroundService(a);
-            else app.startService(a);
+            /* The web layer's own siren may already be up. On a locked phone that siren IS
+               AlarmPlayer - but AlarmPlayer also carries a linked SHOMER's alert, and treating
+               someone else's alert as "already sounding" would end this user's own countdown in
+               silence. Only an SOS cause counts. */
+            if (!AlarmForegroundService.isPlaying() && !AlarmPlayer.isPlayingSos()) {
+              Intent a = new Intent(app, AlarmForegroundService.class);
+              if (Build.VERSION.SDK_INT >= 26) app.startForegroundService(a);
+              else app.startService(a);
+            }
           } catch (Throwable e) {}
         }
         /* v371: the siren holds its own wake lock from here, so hand ours back instead of sitting
-           on the CPU until the acquire timeout runs out. */
-        try { if (preWl != null && preWl.isHeld()) preWl.release(); } catch (Throwable e) {}
-        preWl = null;
+           on the CPU until the acquire timeout runs out. v375: ours by value, and also on the
+           already-sounding path, which used to leave it held until the acquire timeout. */
+        try { if (mine != null && mine.isHeld()) mine.release(); } catch (Throwable e) {}
+        synchronized (ShakeService.class) { if (preWl == mine) preWl = null; }
       }
     };
     PRE.postDelayed(preTask, PRE_ALARM_MS);
