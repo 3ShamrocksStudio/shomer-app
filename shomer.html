@@ -5487,7 +5487,11 @@ function startShakeDetection(){
         TEST with no detector at all - and the test is the one place a user confirms the gesture
         works. The test sends nothing, so running it ungated is safe. */
      if(SS.shake && SS.shake.btnGate && SS.shake.enabled===true && shomerNativePlugin()) return;
-     if(testing){ try{ shakeTestHit(); }catch(_){} return; }
+     /* v364: the test branch only while nothing real is running. Three separate places now close
+        the test card when an SOS starts, so this cannot trigger today - but a shake must never be
+        swallowed into the test path during an emergency on the strength of an invariant held
+        elsewhere. Falling through to shakeFired is the correct real handling. */
+     if(testing && (typeof sosPhase==='undefined' || sosPhase==='idle')){ try{ shakeTestHit(); }catch(_){} return; }
      shakeFired('web');
    }
  };
@@ -11799,7 +11803,7 @@ try{ hydrateIcons(document); }catch(e){}
 /* Loaded-build version - shown in the diagnostic panel so a phone can prove
    whether it's on the latest build or a STALE cached one. Keep in lock-step
    with sw.js SW_VERSION on every deploy. */
-var APP_VER='v363';
+var APP_VER='v364';
 var FB={ready:false,uid:null,db:null,_presTimer:null,connected:false,listening:false,pushState:'default',near:0,swVer:'?',
   authState:'connecting',sdkLoaded:false,persist:'',permErr:null,err:null,wsProbe:'',csp:''};
 /* Always log connection diagnostics to the console so the real failure can be SEEN in Chrome. */
