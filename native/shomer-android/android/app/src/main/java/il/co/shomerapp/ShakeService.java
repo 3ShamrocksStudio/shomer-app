@@ -115,10 +115,17 @@ public class ShakeService extends Service implements SensorEventListener {
     if (acc == null) {
       acc = sm.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
       try {
-        PowerManager pm = (PowerManager) getSystemService(Context.POWER_SERVICE);
-        wl = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "shomer:shake");
-        wl.setReferenceCounted(false);
-        wl.acquire();
+        // v369: only when there is a sensor to keep awake FOR, and never a second lock object
+        // while the first is still held. setReferenceCounted(false) makes repeat acquires on one
+        // object idempotent; it does nothing for a fresh object, and unlisten() can only release
+        // whatever wl points at - so a retry used to leave the previous lock held and orphaned.
+        if (acc != null) {
+          if (wl != null && wl.isHeld()) wl.release();
+          PowerManager pm = (PowerManager) getSystemService(Context.POWER_SERVICE);
+          wl = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "shomer:shake");
+          wl.setReferenceCounted(false);
+          wl.acquire();
+        }
       } catch (Exception e) {}
     }
     // v367: believe registerListener's ANSWER. Taking acc != null as liveness meant a failed
