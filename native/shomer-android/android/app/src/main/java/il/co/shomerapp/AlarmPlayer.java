@@ -15,7 +15,7 @@ import android.os.Vibrator;
  * started, the alarm still sounds through here.
  */
 final class AlarmPlayer {
-  private static MediaPlayer mp;
+  private static volatile MediaPlayer mp;   // v376: read without the monitor by isPlaying/isPlayingSos
 
   /** v366: is the fallback siren sounding right now? Anything that tears down a service must
    *  ask this before stopping it - a live alarm is only ever silenced by the real cancel. */
@@ -31,29 +31,48 @@ final class AlarmPlayer {
   static void start(Context c) { start(c, false); }
 
   static synchronized void start(Context c, boolean forSos) {
+    MediaPlayer p = null;   // v376: declared out here so the catch can release a half-built player
     try {
       AudioManager am = (AudioManager) c.getSystemService(Context.AUDIO_SERVICE);
       if (mp != null) { if (forSos) sosCause = true; return; }   // v375: an SOS outranks a guard alert
       sosCause = forSos;
       prevVol = am.getStreamVolume(AudioManager.STREAM_ALARM);
       am.setStreamVolume(AudioManager.STREAM_ALARM, am.getStreamMaxVolume(AudioManager.STREAM_ALARM), 0);
-      mp = new MediaPlayer();
-      mp.setAudioAttributes(new AudioAttributes.Builder().setUsage(AudioAttributes.USAGE_ALARM)
+      /* v376: build it in a LOCAL and publish to mp only once it is actually sounding. Published
+         first, a failed prepare() left a window where isPlayingSos() said yes - long enough for
+         the native countdown, which ends at the same instant this fallback starts, to skip its
+         own siren and leave the phone silent. */
+      p = new MediaPlayer();
+      p.setAudioAttributes(new AudioAttributes.Builder().setUsage(AudioAttributes.USAGE_ALARM)
           .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION).build());
       AssetFileDescriptor afd = c.getResources().openRawResourceFd(R.raw.sos_alarm);
-      mp.setDataSource(afd.getFileDescriptor(), afd.getStartOffset(), afd.getLength());
+      p.setDataSource(afd.getFileDescriptor(), afd.getStartOffset(), afd.getLength());
       afd.close();
-      mp.setLooping(true);
-      mp.prepare();
-      mp.start();
-      try { ((android.app.NotificationManager) c.getSystemService(Context.NOTIFICATION_SERVICE)).cancel(7); } catch (Throwable e) {}
-      notifyStop(c);   // v337: this path had no notification at all - so no STOP button on a locked phone
-      Vibrator v = (Vibrator) c.getSystemService(Context.VIBRATOR_SERVICE);
-      if (v != null) {
-        if (android.os.Build.VERSION.SDK_INT >= 26) v.vibrate(VibrationEffect.createWaveform(new long[]{0, 500, 140, 500, 140, 500, 320}, new int[]{0, 255, 0, 255, 0, 255, 0}, 1));
-        else v.vibrate(new long[]{0, 500, 140, 500, 140, 500, 320}, 1);
-      }
-    } catch (Throwable e) { try { if (mp != null) mp.release(); } catch (Throwable t) {} mp = null; sosCause = false; }   // v375
+      p.setLooping(true);
+      p.prepare();
+      p.start();
+      mp = p;
+      /* v376: the siren is SOUNDING from here. Everything below is the notification and the buzz,
+         and it gets its own catch - a throw in any of it must never reach the handler below and
+         tear down a siren that is already playing. */
+      try {
+        try { ((android.app.NotificationManager) c.getSystemService(Context.NOTIFICATION_SERVICE)).cancel(7); } catch (Throwable e) {}
+        notifyStop(c);   // v337: this path had no notification at all - so no STOP button on a locked phone
+        Vibrator v = (Vibrator) c.getSystemService(Context.VIBRATOR_SERVICE);
+        if (v != null) {
+          if (android.os.Build.VERSION.SDK_INT >= 26) v.vibrate(VibrationEffect.createWaveform(new long[]{0, 500, 140, 500, 140, 500, 320}, new int[]{0, 255, 0, 255, 0, 255, 0}, 1));
+          else v.vibrate(new long[]{0, 500, 140, 500, 140, 500, 320}, 1);
+        }
+      } catch (Throwable e) {}
+      return;
+    } catch (Throwable e) {
+      /* v376: release whichever we are holding - the half-built local on a prepare/start failure,
+         or mp if we got far enough to publish it. Leaving a MediaPlayer unreleased holds an audio
+         focus/codec handle for the life of the process. */
+      try { if (p != null) p.release(); } catch (Throwable t) {}
+      try { if (mp != null && mp != p) mp.release(); } catch (Throwable t) {}
+      mp = null; sosCause = false;
+    }
   }
 
   /** The "עצור – אני בסדר" notification for the fallback alarm (id 3). */

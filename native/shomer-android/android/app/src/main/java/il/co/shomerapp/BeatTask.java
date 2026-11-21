@@ -165,7 +165,10 @@ final class BeatTask {
     if (id.equals(ringingId)) clearGuardAlert(c);
   }
   static void clearGuardAlert(Context c) {
-    try { AlarmPlayer.stop(c); } catch (Throwable e) {}
+    /* v376: a linked SHOMER's alert and this user's own fallback SOS siren share one player. If
+       the user's own SOS took it over, clearing the guard alert must NOT silence it - that is a
+       live emergency going quiet because somebody else's alert was handled. */
+    try { if (!AlarmPlayer.isPlayingSos()) AlarmPlayer.stop(c); } catch (Throwable e) {}
     ringingId = null;
     try { ((android.app.NotificationManager) c.getSystemService(Context.NOTIFICATION_SERVICE)).cancel(11); } catch (Throwable e) {}
   }

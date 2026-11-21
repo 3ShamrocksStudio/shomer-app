@@ -431,6 +431,10 @@ public class ShakeService extends Service implements SensorEventListener {
     // siren (startForegroundService throws there, so the plugin falls back to it), and this
     // service is torn down by disableBackgroundShake - which the web layer now calls on every
     // return to the app. Stopping the player here silenced a live emergency.
+    /* v376: this is CLEANUP, not a silencer - AlarmPlayer.stop also cancels the STOP notification,
+       the pre-alarm vibration and restores the alarm volume. The condition reads inverted on
+       purpose: only run it when nothing is sounding. Do not "simplify" it into an unconditional
+       stop; that silences a live siren on the way out of the service. */
     try { if (!AlarmPlayer.isPlaying() && !AlarmForegroundService.isPlaying()) AlarmPlayer.stop(this); } catch (Exception e) {}
     try { BeatTask.stop(); } catch (Throwable e) {}
     super.onDestroy();
