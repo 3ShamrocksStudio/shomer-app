@@ -5,8 +5,12 @@ import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
+import android.database.ContentObserver;
+import android.provider.Settings;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
@@ -96,6 +100,7 @@ public class ShakeService extends Service implements SensorEventListener {
 
   private void listen() {
     cLv = sens(this); det = new ShakeDetector(cLv);   // (re)read the level on every start / config change
+    if (btnGate(this)) startButtonWatch(); else stopButtonWatch();   // v359: only watch buttons when the gate is on
     if (sm != null && acc != null) return;
     sm = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
     if (sm == null) return;
@@ -117,6 +122,7 @@ public class ShakeService extends Service implements SensorEventListener {
 
   private void unlisten() {
     det = null;
+    stopButtonWatch();   // v359
     try { if (sm != null) sm.unregisterListener(this); } catch (Exception e) {}
     sm = null; acc = null;
     try { if (wl != null && wl.isHeld()) wl.release(); } catch (Exception e) {}
@@ -146,9 +152,63 @@ public class ShakeService extends Service implements SensorEventListener {
         if (cCount >= 8) { cCount = 0; cFirst = 0; hit = true; }
       }
     }
-    if (hit) fireSos();
+    if (!hit) return;
+    // v359: with the button gate on, a shake only counts if a hardware button was pressed in
+    // the last few seconds. Reset the counters so the gated shake does not leave a primed
+    // detector that fires on the next stray jolt.
+    if (btnGate(this) && System.currentTimeMillis() - btnMs > BTN_WINDOW_MS) {
+      cCount = 0; cFirst = 0;
+      return;
+    }
+    fireSos();
   }
   private float cgx, cgy, cgz; private boolean cInit; private int cCount; private long cFirst, cLast; private String cLv = "medium";
+
+  /* ── v359: BUTTON + SHAKE gate ──────────────────────────────────────────────────────────
+   * When the user switches this on, a shake alone does nothing: they must press a hardware
+   * button (volume up/down or power) and shake within BTN_WINDOW_MS. That is what stops a
+   * pocket, a jog or a dance floor from starting an SOS.
+   * Both signals reach us with the screen off because this is a foreground service:
+   *   - power  -> ACTION_SCREEN_ON / ACTION_SCREEN_OFF broadcasts
+   *   - volume -> a ContentObserver on Settings.System (the key changes the stream volume)
+   * Default OFF: with the gate on, a two-handed gesture is impossible for someone whose arm
+   * is held or whose phone is in a coat pocket, which is the case shake exists for. */
+  static final long BTN_WINDOW_MS = 10000;
+  private volatile long btnMs = 0;
+  private BroadcastReceiver btnRx;
+  private ContentObserver volObs;
+
+  static boolean btnGate(Context c) {
+    try { return c.getSharedPreferences(PREFS, MODE_PRIVATE).getBoolean("shake_btn_gate", false); }
+    catch (Throwable e) { return false; }
+  }
+
+  private void startButtonWatch() {
+    if (btnRx == null) {
+      btnRx = new BroadcastReceiver() {
+        @Override public void onReceive(Context c, Intent i) { btnMs = System.currentTimeMillis(); }
+      };
+      IntentFilter f = new IntentFilter();
+      f.addAction(Intent.ACTION_SCREEN_ON);
+      f.addAction(Intent.ACTION_SCREEN_OFF);
+      try { registerReceiver(btnRx, f); } catch (Throwable e) { btnRx = null; }
+    }
+    if (volObs == null) {
+      try {
+        volObs = new ContentObserver(new android.os.Handler(android.os.Looper.getMainLooper())) {
+          @Override public void onChange(boolean self) { btnMs = System.currentTimeMillis(); }
+        };
+        getContentResolver().registerContentObserver(Settings.System.CONTENT_URI, true, volObs);
+      } catch (Throwable e) { volObs = null; }
+    }
+  }
+
+  private void stopButtonWatch() {
+    try { if (btnRx != null) unregisterReceiver(btnRx); } catch (Throwable e) {}
+    btnRx = null;
+    try { if (volObs != null) getContentResolver().unregisterContentObserver(volObs); } catch (Throwable e) {}
+    volObs = null;
+  }
 
   private void fireSos() {
     long now = System.currentTimeMillis();

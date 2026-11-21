@@ -99,9 +99,11 @@ public class ShomerNativePlugin extends Plugin {
     Boolean on = call.getBoolean("enabled", false);
     String sens = call.getString("sens", "medium");
     if (!"low".equals(sens) && !"high".equals(sens)) sens = "medium";
+    Boolean gate = call.getBoolean("btnGate", false);   // v359: require a hardware button press with the shake
     c.getSharedPreferences(ShakeService.PREFS, Context.MODE_PRIVATE).edit()
-        .putBoolean("shake_enabled", on != null && on).putString("shake_sens", sens).commit();
-    JSObject r = new JSObject(); r.put("ok", true); r.put("version", 337);
+        .putBoolean("shake_enabled", on != null && on).putString("shake_sens", sens)
+        .putBoolean("shake_btn_gate", gate != null && gate).commit();
+    JSObject r = new JSObject(); r.put("ok", true); r.put("version", 359); r.put("btnGate", gate != null && gate);
     call.resolve(r);
   }
 

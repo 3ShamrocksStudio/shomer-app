@@ -2256,6 +2256,7 @@ body.otp-active .ob-steps{display:none!important;}
  <div class="sec-cap mb12" id="shake-set-lbl">Shake-to-SOS</div>
  <div class="set-grp">
  <div class="set-row"><div class="sr-l"><div class="sr-ic"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M13 2L4 14h6l-1 8 9-12h-6Z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></svg></div><div><div class="sr-nm" id="shake-tog-lbl">ניעור ל-SOS</div><div class="sr-sb" id="shake-tog-sub">ניעור חזק הלוך-חזור פותח ספירה של 8 שניות. תמיד אפשר לבטל.</div></div></div><div class="tog" id="shake-tog" onclick="toggleShake(this)" role="switch" aria-checked="false"></div></div>
+ <div class="set-row"><div class="sr-l"><div class="sr-ic"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><rect x="6" y="2" width="12" height="20" rx="3" fill="none" stroke="currentColor" stroke-width="2"/><path d="M20 9v4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></div><div><div class="sr-nm" id="shake-gate-lbl">גם לחיצה על כפתור</div><div class="sr-sb" id="shake-gate-sub">כדי להפעיל SOS צריך ללחוץ על כפתור עוצמה או הפעלה, ואז לנער. מונע הפעלה בכיס, בריצה או בריקוד.</div></div></div><div class="tog" id="shake-gate-tog" onclick="toggleShakeGate(this)" role="switch" aria-checked="false"></div></div>
  </div>
  <div class="sl-card mb20">
  <div class="vol-row"><span class="vol-lbl" id="shake-sens-lbl">רגישות</span><span class="vol-val" id="shake-sens-v">בינונית</span></div>
@@ -3739,6 +3740,7 @@ function applyStoredSettings(){
  });
  // Shake UI
  const st=document.getElementById('shake-tog');if(st){st.classList.toggle('on',SS.shake.enabled===true);st.setAttribute('aria-checked',String(SS.shake.enabled===true));}
+ const sg=document.getElementById('shake-gate-tog');if(sg){const _g=!!(SS.shake&&SS.shake.btnGate);sg.classList.toggle('on',_g);sg.setAttribute('aria-checked',String(_g));}   /* v359 */
  updateShakeSensLabel();
  // Settings toggles
  document.querySelectorAll('.tog[data-skey]').forEach(t=>{
@@ -3828,6 +3830,20 @@ function saveToggle(el){
 function saveRadius(v){SS.settings.radius=Number(v);setText('rad-v',String(v));saveStore();}
 
 /* ── Shake settings handlers ── */
+/* v359: require a hardware button press (volume or power) within 10 s before a shake counts.
+   Off by default - with it on, a two-handed gesture is impossible for someone whose arm is
+   held or whose phone is deep in a coat pocket, which is the case shake exists for. */
+function toggleShakeGate(el){
+ el.classList.toggle('on');
+ SS.shake=SS.shake||{}; SS.shake.btnGate=el.classList.contains('on');
+ try{ el.setAttribute('aria-checked',String(SS.shake.btnGate)); }catch(e){}
+ saveStore();
+ try{ shakeNativeSync(); }catch(e){}
+ var he=currentLang==='he';
+ try{ toast(SS.shake.btnGate ? (he?'צריך ללחוץ על כפתור עוצמה או הפעלה, ואז לנער':'Press a volume or power button, then shake')
+                             : (he?'ניעור בלבד מפעיל SOS':'A shake alone starts an SOS'),'ok'); }catch(e){}
+}
+
 function toggleShake(el){
  el.classList.toggle('on');
  /* v343: MUST be the current migration version. It used to write 2, which shakeMigrate reads as
@@ -5942,7 +5958,9 @@ function shakeNativeSync(){ try{ var p=shomerNativePlugin(); if(!p) return;
   var en=function(){ try{ p.enableBackgroundShake && p.enableBackgroundShake(); }catch(e){} };
   var off=function(){ try{ p.disableBackgroundShake && p.disableBackgroundShake(); }catch(e){} };
   var old=function(){ window._nativeShakeOld=true; if(on) en(); else off(); };
-  var r=null; try{ r=p.setShakeConfig ? p.setShakeConfig({enabled:on, sens:shakeSens()}) : null; }catch(e){ r=null; }
+  /* v359: btnGate - when on, the background detector only fires if a hardware button (volume or
+     power) was pressed in the last 10 s. Stops a pocket, a jog or a dance floor starting an SOS. */
+  var r=null; try{ r=p.setShakeConfig ? p.setShakeConfig({enabled:on, sens:shakeSens(), btnGate:!!(SS.shake&&SS.shake.btnGate)}) : null; }catch(e){ r=null; }
   if(!r || typeof r.then!=='function'){ old(); return; }
   r.then(function(){ window._nativeShakeOld=false; en(); }, old);
 }catch(e){} }
@@ -11746,7 +11764,7 @@ try{ hydrateIcons(document); }catch(e){}
 /* Loaded-build version - shown in the diagnostic panel so a phone can prove
    whether it's on the latest build or a STALE cached one. Keep in lock-step
    with sw.js SW_VERSION on every deploy. */
-var APP_VER='v358';
+var APP_VER='v359';
 var FB={ready:false,uid:null,db:null,_presTimer:null,connected:false,listening:false,pushState:'default',near:0,swVer:'?',
   authState:'connecting',sdkLoaded:false,persist:'',permErr:null,err:null,wsProbe:'',csp:''};
 /* Always log connection diagnostics to the console so the real failure can be SEEN in Chrome. */
