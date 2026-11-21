@@ -11493,6 +11493,7 @@ document.addEventListener('keydown',e=>{
 // Load persisted state, apply settings, then language.
 loadStore();
 shakeMigrate();   /* v337: Shake-to-SOS off by default; existing users keep it at the safe level */
+dedupeCircleMembers();   /* v357: one guardian, one entry - merges the duplicates already in people's circles */
 /* AUTO-UPDATE - the concrete fix for "stuck on an old cached build" (the real cause of
    recurring login bugs once a fix is shipped): fetch the PUBLISHED version, bypassing
    the service worker AND the HTTP cache. If this running build is OLDER than what's
@@ -11723,7 +11724,7 @@ try{ hydrateIcons(document); }catch(e){}
 /* Loaded-build version - shown in the diagnostic panel so a phone can prove
    whether it's on the latest build or a STALE cached one. Keep in lock-step
    with sw.js SW_VERSION on every deploy. */
-var APP_VER='v356';
+var APP_VER='v357';
 var FB={ready:false,uid:null,db:null,_presTimer:null,connected:false,listening:false,pushState:'default',near:0,swVer:'?',
   authState:'connecting',sdkLoaded:false,persist:'',permErr:null,err:null,wsProbe:'',csp:''};
 /* Always log connection diagnostics to the console so the real failure can be SEEN in Chrome. */
@@ -13136,11 +13137,54 @@ function gdWatchMyAcceptance(p){
 /* ══ ONE PERSON, ONE RECORD ══
    Connected people used to live only in gd.pairs, so they appeared in NO circle
    (family showed 0) and could not be managed. Every linked pair now has a member. */
+/* v357: merge guardians that are the same person listed twice. Existing users already have
+   these (one linked entry + one stuck on "ממתין לאישור"), created before the phone match above.
+   Keeps the LINKED entry, takes the live partnerUid, and drops the leftover. Phone-keyed only -
+   two different people who share a name are never merged. Runs once per load; cheap and idempotent. */
+function dedupeCircleMembers(){
+  try{
+    var arr=SS.circleMembers; if(!Array.isArray(arr)||arr.length<2) return 0;
+    var key=function(m){ var d=String(m.phoneCanon||m.ph||'').replace(/\D/g,''); return d.length>=9?d.slice(-9):''; };
+    var seen={}, drop=[];
+    arr.forEach(function(m){
+      var k=key(m); if(!k) return;                       // no phone = cannot prove same person, leave alone
+      var first=seen[k];
+      if(!first){ seen[k]=m; return; }
+      /* prefer the entry that is actually linked */
+      var keep=first, lose=m;
+      if(first.pending && !m.pending){ keep=m; lose=first; seen[k]=m; }
+      if(!keep.name && lose.name) keep.name=lose.name;
+      if(lose.partnerUid && !keep.pending) keep.partnerUid=keep.partnerUid||lose.partnerUid;
+      if(!keep.pairId && lose.pairId) keep.pairId=lose.pairId;
+      if(!keep.phoneCanon && lose.phoneCanon) keep.phoneCanon=lose.phoneCanon;
+      drop.push(lose);
+    });
+    if(!drop.length) return 0;
+    SS.circleMembers=arr.filter(function(m){ return drop.indexOf(m)<0; });
+    saveStore();
+    return drop.length;
+  }catch(e){ return 0; }
+}
+
 function ensureMemberForPair(p, cid){
   if(!p) return null;
   var arr=(SS.circleMembers=SS.circleMembers||[]);
-  var m=arr.find(function(x){ return x.pairId===p.id || (p.partnerUid && x.partnerUid===p.partnerUid); });
-  if(m){ if(cid) m.cid=cid; m.registered=true; m.pending=!!p.pending; m.awaitConfirm=!!p.awaitConfirm; if(p.partnerUid&&!m.partnerUid) m.partnerUid=p.partnerUid; if(p.name&&!m.name) m.name=p.name; if(!m.pairId) m.pairId=p.id; return m; }
+  /* v357: match on the PHONE as well as pairId/partnerUid. Identity in SH✡MER is the phone
+     number, not the install: someone who accepts an invite from a second device, or who
+     reinstalls, gets a brand new anonymous uid. Matching only on pairId/partnerUid therefore
+     created a SECOND member for the same human - which is how one guardian showed up twice,
+     once linked and once still "ממתין לאישור". Compared on the last 9 digits so +972-5x and
+     05x resolve to the same person. */
+  var _phKey=function(v){ var d=String(v||'').replace(/\D/g,''); return d.length>=9?d.slice(-9):''; };
+  var _pk=_phKey(p.ph||p.phoneCanon);
+  var m=arr.find(function(x){ return x.pairId===p.id || (p.partnerUid && x.partnerUid===p.partnerUid)
+                                 || (_pk && _phKey(x.phoneCanon||x.ph)===_pk); });
+  if(m){ if(cid) m.cid=cid; m.registered=true; m.pending=!!p.pending; m.awaitConfirm=!!p.awaitConfirm;
+         /* the newest session is the live one - adopt its uid so alerts go to the device they actually use */
+         if(p.partnerUid) m.partnerUid=p.partnerUid;
+         if(p.name&&!m.name) m.name=p.name; if(!m.pairId) m.pairId=p.id;
+         if(_pk&&!m.phoneCanon&&p.ph) m.phoneCanon=p.ph;
+         return m; }
   var palette=['#C9A84C','#2962FF','#00C853','#E91E8C','#9C27B0','#FF6A00'];
   var list=circlesList();
   if(!list.length) return null;                       // circles not seeded yet - retry later
