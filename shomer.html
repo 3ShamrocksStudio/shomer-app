@@ -6112,6 +6112,11 @@ function beginSOS(trigger){
  /* Guard: DMS-triggered SOS only fires if DMS is actually running this session */
  if(trigger==='dms'&&!dmsActive)return;
  try{ popupClearLow(); }catch(e){}   // nothing may sit on top of an emergency
+ /* v362: ...and the shake-test card is one of those things. beginSOS is the real chokepoint -
+    onSosTap, hold-to-arm, practice and a guardian check-in all come here without triggerSOS.
+    Left open it would cover the countdown and its Cancel (z-index 100040 over 9700) and swallow
+    an in-app shake into the test path, which skips the silent-SOS-turns-loud rule. */
+ try{ if(window._shakeTest) shakeTestClose(); }catch(e){}
  window._sosSilent=false;
  sosPhase='countdown'; sosActive=true; curSosTrigger=trigger||'manual';
  try{ sosFloorPrepare(); }catch(e){}   /* v355: barometer floor estimate (Android app only) */
@@ -11790,7 +11795,7 @@ try{ hydrateIcons(document); }catch(e){}
 /* Loaded-build version - shown in the diagnostic panel so a phone can prove
    whether it's on the latest build or a STALE cached one. Keep in lock-step
    with sw.js SW_VERSION on every deploy. */
-var APP_VER='v361';
+var APP_VER='v362';
 var FB={ready:false,uid:null,db:null,_presTimer:null,connected:false,listening:false,pushState:'default',near:0,swVer:'?',
   authState:'connecting',sdkLoaded:false,persist:'',permErr:null,err:null,wsProbe:'',csp:''};
 /* Always log connection diagnostics to the console so the real failure can be SEEN in Chrome. */
@@ -14250,6 +14255,7 @@ function sosRestore(id, ts){ try{ if(isReviewAccount()){ SS.sosLive=null; try{sa
   if(sosPhase!=='idle') return;
   var he=currentLang==='he', ar=currentLang==='ar';
   curSosId=id; curSosType='unknown'; window._sosPractice=false;
+  try{ if(window._shakeTest) shakeTestClose(); }catch(e){}   /* v362: a restored live SOS clears the test card too */
   sosPhase='active'; sosActive=true;
   try{ if(window.nativeSosTrackStart) nativeSosTrackStart(); }catch(e){}   /* v351: restored live SOS - background location again, for it only */
   var _fk=(SS.sosLive&&SS.sosLive.id===id&&SS.sosLive.fk)||null;
