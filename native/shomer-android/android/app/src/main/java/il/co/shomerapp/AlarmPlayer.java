@@ -30,11 +30,20 @@ final class AlarmPlayer {
 
   static void start(Context c) { start(c, false); }
 
+  /** v377: decide and act under the monitor start() already holds. BeatTask read isPlayingSos()
+   *  and then called stop(), and an SOS taking the player over between those two lines was
+   *  silenced - the very bug v376 was for, surviving in a sub-millisecond window. */
+  static synchronized void stopUnlessSos(Context c) {
+    if (!isPlayingSos()) stop(c);
+  }
+
   static synchronized void start(Context c, boolean forSos) {
     MediaPlayer p = null;   // v376: declared out here so the catch can release a half-built player
     try {
-      AudioManager am = (AudioManager) c.getSystemService(Context.AUDIO_SERVICE);
       if (mp != null) { if (forSos) sosCause = true; return; }   // v375: an SOS outranks a guard alert
+      /* v377: the AudioManager lookup belongs BELOW that guard. Above it, a throw here while a
+         siren was playing fell into the handler and released the live player. */
+      AudioManager am = (AudioManager) c.getSystemService(Context.AUDIO_SERVICE);
       sosCause = forSos;
       prevVol = am.getStreamVolume(AudioManager.STREAM_ALARM);
       am.setStreamVolume(AudioManager.STREAM_ALARM, am.getStreamMaxVolume(AudioManager.STREAM_ALARM), 0);
@@ -70,8 +79,17 @@ final class AlarmPlayer {
          or mp if we got far enough to publish it. Leaving a MediaPlayer unreleased holds an audio
          focus/codec handle for the life of the process. */
       try { if (p != null) p.release(); } catch (Throwable t) {}
-      try { if (mp != null && mp != p) mp.release(); } catch (Throwable t) {}
       mp = null; sosCause = false;
+      /* v377: hand the alarm volume back. Without this a failed start left STREAM_ALARM pinned at
+         maximum - so no siren, and the user's next alarm clock screams - and a second failed start
+         re-snapshotted that maximum as prevVol, losing their real setting for good. */
+      try {
+        if (prevVol >= 0) {
+          AudioManager am2 = (AudioManager) c.getSystemService(Context.AUDIO_SERVICE);
+          if (am2 != null) am2.setStreamVolume(AudioManager.STREAM_ALARM, prevVol, 0);
+        }
+      } catch (Throwable t) {}
+      prevVol = -1;
     }
   }
 
