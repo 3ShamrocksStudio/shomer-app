@@ -2256,7 +2256,7 @@ body.otp-active .ob-steps{display:none!important;}
  <div class="sec-cap mb12" id="shake-set-lbl">Shake-to-SOS</div>
  <div class="set-grp">
  <div class="set-row"><div class="sr-l"><div class="sr-ic"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M13 2L4 14h6l-1 8 9-12h-6Z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></svg></div><div><div class="sr-nm" id="shake-tog-lbl">ניעור ל-SOS</div><div class="sr-sb" id="shake-tog-sub">ניעור חזק הלוך-חזור פותח ספירה של 8 שניות. תמיד אפשר לבטל.</div></div></div><div class="tog" id="shake-tog" onclick="toggleShake(this)" role="switch" aria-checked="false"></div></div>
- <div class="set-row"><div class="sr-l"><div class="sr-ic"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><rect x="6" y="2" width="12" height="20" rx="3" fill="none" stroke="currentColor" stroke-width="2"/><path d="M20 9v4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></div><div><div class="sr-nm" id="shake-gate-lbl">גם לחיצה על כפתור</div><div class="sr-sb" id="shake-gate-sub">כדי להפעיל SOS צריך ללחוץ על כפתור עוצמה או הפעלה, ואז לנער. מונע הפעלה בכיס, בריצה או בריקוד.</div></div></div><div class="tog" id="shake-gate-tog" onclick="toggleShakeGate(this)" role="switch" aria-checked="false"></div></div>
+ <div class="set-row" id="shake-gate-row"><div class="sr-l"><div class="sr-ic"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><rect x="6" y="2" width="12" height="20" rx="3" fill="none" stroke="currentColor" stroke-width="2"/><path d="M20 9v4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></div><div><div class="sr-nm" id="shake-gate-lbl">גם לחיצה על כפתור</div><div class="sr-sb" id="shake-gate-sub">כדי להפעיל SOS צריך ללחוץ על כפתור עוצמה (או על כפתור ההפעלה, להדלקת המסך) ואז לנער, תוך 10 שניות. מונע הפעלה בכיס, בריצה או בריקוד.</div></div></div><div class="tog" id="shake-gate-tog" onclick="toggleShakeGate(this)" role="switch" aria-checked="false"></div></div>
  </div>
  <div class="sl-card mb20">
  <div class="vol-row"><span class="vol-lbl" id="shake-sens-lbl">רגישות</span><span class="vol-val" id="shake-sens-v">בינונית</span></div>
@@ -3741,6 +3741,9 @@ function applyStoredSettings(){
  // Shake UI
  const st=document.getElementById('shake-tog');if(st){st.classList.toggle('on',SS.shake.enabled===true);st.setAttribute('aria-checked',String(SS.shake.enabled===true));}
  const sg=document.getElementById('shake-gate-tog');if(sg){const _g=!!(SS.shake&&SS.shake.btnGate);sg.classList.toggle('on',_g);sg.setAttribute('aria-checked',String(_g));}   /* v359 */
+ /* v360: only the Android app can see volume / power keys. In a browser the gate is unenforceable,
+    so the row is not offered there rather than lying about what it does. */
+ const sgr=document.getElementById('shake-gate-row');if(sgr){ sgr.style.display=shomerNativePlugin()?'':'none'; }
  updateShakeSensLabel();
  // Settings toggles
  document.querySelectorAll('.tog[data-skey]').forEach(t=>{
@@ -3840,7 +3843,7 @@ function toggleShakeGate(el){
  saveStore();
  try{ shakeNativeSync(); }catch(e){}
  var he=currentLang==='he';
- try{ toast(SS.shake.btnGate ? (he?'צריך ללחוץ על כפתור עוצמה או הפעלה, ואז לנער':'Press a volume or power button, then shake')
+ try{ toast(SS.shake.btnGate ? (he?'לחצו על כפתור עוצמה, ואז נערו - תוך 10 שניות':'Press a volume key, then shake - within 10 seconds')
                              : (he?'ניעור בלבד מפעיל SOS':'A shake alone starts an SOS'),'ok'); }catch(e){}
 }
 
@@ -4381,6 +4384,8 @@ function applyTranslations(){
  setText('shake-set-lbl',he?'ניעור ל-SOS':ar?'الهزّ للاستغاثة':'Shake-to-SOS');
  setText('shake-tog-lbl',he?'ניעור ל-SOS':ar?'الهزّ للاستغاثة':'Shake-to-SOS');
  setText('shake-tog-sub',he?'ניעור חזק הלוך-חזור פותח ספירה של 8 שניות. תמיד אפשר לבטל.':ar?'هزّ قوي ذهابًا وإيابًا يبدأ عدًّا 8 ثوانٍ. يمكنك الإلغاء دائمًا.':'A strong back-and-forth shake starts an 8-second countdown. You can always cancel.');
+ setText('shake-gate-lbl',he?'גם לחיצה על כפתור':ar?'مع ضغط زرّ أيضًا':'Button press too');
+ setText('shake-gate-sub',he?'כדי להפעיל SOS צריך ללחוץ על כפתור עוצמה (או על כפתור ההפעלה, להדלקת המסך) ואז לנער, תוך 10 שניות. מונע הפעלה בכיס, בריצה או בריקוד.':ar?'لبدء الاستغاثة اضغط زرّ الصوت (أو زرّ التشغيل لإضاءة الشاشة) ثم هزّ الهاتف خلال 10 ثوانٍ. يمنع البدء داخل الجيب أو أثناء الجري أو الرقص.':'To start an SOS, press a volume key (or the power button to wake the screen) and shake within 10 seconds. Stops it starting in a pocket, while running or dancing.');
  setText('shake-sens-lbl',he?'רגישות':ar?'الحساسية':'Sensitivity');
  setText('sim-shake-lbl',he?'בדיקת ניעור – לא נשלח כלום':ar?'اختبار الهزّ – لا يُرسل شيء':'Test your shake – nothing is sent');
  setText('set-radius-lbl',he?'רדיוס התראה':'Alert radius');
@@ -5473,6 +5478,11 @@ function startShakeDetection(){
      }
    }
    if(hit){
+     /* v360: with the button gate on, the IN-APP detector must not fire on its own - a WebView
+        never sees volume or power keys, so it cannot honour the gate. Inside the app the native
+        service detects the same shake and enforces the gate there, so suppressing here is what
+        makes "button + shake" true in the foreground too, and keeps the test honest. */
+     if(SS.shake && SS.shake.btnGate && shomerNativePlugin()) return;
      if(testing){ try{ shakeTestHit(); }catch(_){} return; }
      shakeFired('web');
    }
@@ -5486,7 +5496,10 @@ function shakeFired(src){
       The native background service retries on 'wait'. Before v340 every path returned
       nothing and the native side hard-coded 'ok', so a shake that arrived while the
       settings were still loading (cold start, phone locked) was dropped for good. */
-   if(window._shakeTest){ shakeTestHit(); return 'ok'; }
+   /* v360: a shake the NATIVE service detected has already armed the 8 s native countdown
+      (armNativeAlarm, v342). In test mode nothing else cancels it, so the siren would sound
+      8 s into a test that is meant to send nothing. Stop it here. */
+   if(window._shakeTest){ try{ nativeAlarmStop(); }catch(e){} shakeTestHit(); return 'ok'; }
    /* v344: SS is a top-level `let`, so window.SS is ALWAYS undefined - this line returned 'wait' on every
       shake since v340 and no shake (web or native) ever started the SOS. Test the binding itself. */
    if(typeof SS==='undefined' || !SS || !SS.shake) return 'wait';   /* settings not loaded yet - the cold-start race: retry */
@@ -11764,7 +11777,7 @@ try{ hydrateIcons(document); }catch(e){}
 /* Loaded-build version - shown in the diagnostic panel so a phone can prove
    whether it's on the latest build or a STALE cached one. Keep in lock-step
    with sw.js SW_VERSION on every deploy. */
-var APP_VER='v359';
+var APP_VER='v360';
 var FB={ready:false,uid:null,db:null,_presTimer:null,connected:false,listening:false,pushState:'default',near:0,swVer:'?',
   authState:'connecting',sdkLoaded:false,persist:'',permErr:null,err:null,wsProbe:'',csp:''};
 /* Always log connection diagnostics to the console so the real failure can be SEEN in Chrome. */
@@ -17269,7 +17282,11 @@ function simpleRender(){
     :phase==='countdown'?smpT('לחצו לביטול','Tap to cancel','اضغطوا للإلغاء'):smpT('לחצו לעזרה','Tap for help','اضغطوا للمساعدة'));
   if(sb) sb.setAttribute('aria-label','SOS - '+(smpEl('smp-sos-sub')||{}).textContent);
   var shakeOn=!!(SS.shake&&SS.shake.enabled===true);
-  smpTxt('smp-shake', shakeOn?smpT('📳 ניעור חזק של הטלפון שולח גם SOS','📳 A strong shake of the phone also sends SOS','📳 هزّ الهاتف بقوة يرسل SOS أيضًا')
+  /* v360: with the button gate on, a shake alone does nothing - say so here too, or Simple mode
+     promises something the phone will not do. */
+  var shakeGate=!!(SS.shake&&SS.shake.btnGate);
+  smpTxt('smp-shake', shakeOn?(shakeGate?smpT('📳 לחיצה על כפתור עוצמה ואז ניעור חזק שולחת גם SOS','📳 A volume-key press then a strong shake also sends SOS','📳 ضغط زرّ الصوت ثم هزّ قوي يرسل SOS أيضًا')
+      :smpT('📳 ניעור חזק של הטלפון שולח גם SOS','📳 A strong shake of the phone also sends SOS','📳 هزّ الهاتف بقوة يرسل SOS أيضًا'))
     :smpT('ניעור ל-SOS כבוי','Shake-to-SOS is off','الهزّ لـ SOS متوقف'));
   var done=st.okDay===d;
   var ok=smpEl('smp-ok'); if(ok){ ok.classList.toggle('done',done); ok.textContent='✓ '+smpT('אני בסדר',"I'm OK",'أنا بخير'); }

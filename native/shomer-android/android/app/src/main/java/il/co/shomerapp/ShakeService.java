@@ -169,8 +169,8 @@ public class ShakeService extends Service implements SensorEventListener {
    * button (volume up/down or power) and shake within BTN_WINDOW_MS. That is what stops a
    * pocket, a jog or a dance floor from starting an SOS.
    * Both signals reach us with the screen off because this is a foreground service:
-   *   - power  -> ACTION_SCREEN_ON / ACTION_SCREEN_OFF broadcasts
-   *   - volume -> a ContentObserver on Settings.System (the key changes the stream volume)
+   *   - power  -> ACTION_SCREEN_ON (a wake). NOT screen-off: that also fires on a timeout.
+   *   - volume -> VOLUME_CHANGED_ACTION, plus a ContentObserver on the volume_* keys only
    * Default OFF: with the gate on, a two-handed gesture is impossible for someone whose arm
    * is held or whose phone is in a coat pocket, which is the case shake exists for. */
   static final long BTN_WINDOW_MS = 10000;
@@ -189,16 +189,34 @@ public class ShakeService extends Service implements SensorEventListener {
         @Override public void onReceive(Context c, Intent i) { btnMs = System.currentTimeMillis(); }
       };
       IntentFilter f = new IntentFilter();
+      // Power: ACTION_SCREEN_ON only. ACTION_SCREEN_OFF also fires on a screen TIMEOUT, which
+      // would prime the gate every time the phone falls asleep in a pocket - the exact accident
+      // this gate exists to stop. So the power gesture is "wake the screen, then shake".
       f.addAction(Intent.ACTION_SCREEN_ON);
-      f.addAction(Intent.ACTION_SCREEN_OFF);
-      try { registerReceiver(btnRx, f); } catch (Throwable e) { btnRx = null; }
+      f.addAction("android.media.VOLUME_CHANGED_ACTION");          // volume key, every recent Android
+      f.addAction("android.media.MASTER_VOLUME_CHANGED_ACTION");
+      try {
+        // Android 13+ demands an export flag on a runtime receiver. These are system broadcasts,
+        // so NOT_EXPORTED still receives them and nothing else can forge one.
+        if (Build.VERSION.SDK_INT >= 33) registerReceiver(btnRx, f, Context.RECEIVER_NOT_EXPORTED);
+        else registerReceiver(btnRx, f);
+      } catch (Throwable e) { btnRx = null; }
     }
     if (volObs == null) {
       try {
         volObs = new ContentObserver(new android.os.Handler(android.os.Looper.getMainLooper())) {
           @Override public void onChange(boolean self) { btnMs = System.currentTimeMillis(); }
         };
-        getContentResolver().registerContentObserver(Settings.System.CONTENT_URI, true, volObs);
+        // ONE URI PER STREAM, notifyForDescendants = false. Observing Settings.System as a whole
+        // fires on any system write - on a phone with adaptive brightness, screen_brightness is
+        // rewritten as the light changes, which would hold the 10 s window permanently open and
+        // make the gate block nothing at all.
+        String[] keys = { "volume_music", "volume_ring", "volume_alarm",
+                          "volume_notification", "volume_system", "volume_voice_call" };
+        for (String k : keys) {
+          try { getContentResolver().registerContentObserver(Settings.System.getUriFor(k), false, volObs); }
+          catch (Throwable e) {}
+        }
       } catch (Throwable e) { volObs = null; }
     }
   }
