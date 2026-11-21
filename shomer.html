@@ -6025,7 +6025,10 @@ function shakeNativeSync(){ try{ var p=shomerNativePlugin(); if(!p) return;
     if(!(v && v.btnGate===true)) return;              /* gate off or unsupported - nothing to confirm */
     setTimeout(function(){ try{
       var r2=p.setShakeConfig({enabled:on, sens:shakeSens(), btnGate:!!(SS.shake&&SS.shake.btnGate)});
-      if(r2 && r2.then) r2.then(function(v2){ window._nativeGateOk = !!(v2 && v2.btnGate===true && v2.listening===true); },
+      /* v370: gateArmed too - the accelerometer being live says nothing about whether the button
+         signal is registered. An app too old to report it leaves this false, which keeps the
+         in-app detector running rather than standing it down on an unverified claim. */
+      if(r2 && r2.then) r2.then(function(v2){ window._nativeGateOk = !!(v2 && v2.btnGate===true && v2.listening===true && v2.gateArmed===true); },
                                 function(){ window._nativeGateOk=false; });
     }catch(e){ window._nativeGateOk=false; } }, 800);
   }, old);
@@ -11847,7 +11850,7 @@ try{ hydrateIcons(document); }catch(e){}
 /* Loaded-build version - shown in the diagnostic panel so a phone can prove
    whether it's on the latest build or a STALE cached one. Keep in lock-step
    with sw.js SW_VERSION on every deploy. */
-var APP_VER='v369';
+var APP_VER='v370';
 var FB={ready:false,uid:null,db:null,_presTimer:null,connected:false,listening:false,pushState:'default',near:0,swVer:'?',
   authState:'connecting',sdkLoaded:false,persist:'',permErr:null,err:null,wsProbe:'',csp:''};
 /* Always log connection diagnostics to the console so the real failure can be SEEN in Chrome. */

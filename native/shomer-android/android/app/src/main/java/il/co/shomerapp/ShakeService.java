@@ -41,7 +41,7 @@ public class ShakeService extends Service implements SensorEventListener {
   private SensorManager sm;
   private Sensor acc;
   private PowerManager.WakeLock wl;
-  private long lastFire;
+  private static volatile long sLastFire;   // v370: static, so cancelNativeAlarm can clear it
   private ShakeDetector det;
   /* ── v342: NATIVE pre-alarm countdown ────────────────────────────────────────────────────
    * The siren and the 8-second countdown used to live entirely in the WebView's JavaScript
@@ -55,9 +55,23 @@ public class ShakeService extends Service implements SensorEventListener {
   private static final android.os.Handler PRE = new android.os.Handler(android.os.Looper.getMainLooper());
   private static Runnable preTask;
 
+  /** v370: a Handler delay runs on uptimeMillis, which does NOT advance while the CPU is in deep
+   *  sleep and does not wake it. On a phone with a wake-up accelerometer nothing else holds a wake
+   *  lock across these 8 seconds - the sensor wakes the CPU for onSensorChanged and it can suspend
+   *  again the moment that returns. So the siren could arrive late or not at all on a locked phone:
+   *  the very case v342 moved this countdown out of the WebView to fix. Hold the CPU for the
+   *  countdown, with a timeout so the OS reclaims it even if this process dies. */
+  private static PowerManager.WakeLock preWl;
+
   static void armNativeAlarm(Context c) {
     final Context app = c.getApplicationContext();
     cancelNativeAlarm(app);
+    try {
+      PowerManager pm = (PowerManager) app.getSystemService(Context.POWER_SERVICE);
+      preWl = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "shomer:prealarm");
+      preWl.setReferenceCounted(false);
+      preWl.acquire(PRE_ALARM_MS + 4000);
+    } catch (Throwable e) {}
     preTask = new Runnable() {
       @Override public void run() {
         preTask = null;
@@ -76,6 +90,12 @@ public class ShakeService extends Service implements SensorEventListener {
    *  or a cancelled SOS would still start screaming 8 seconds later. */
   static void cancelNativeAlarm(Context c) {
     try { if (preTask != null) { PRE.removeCallbacks(preTask); preTask = null; } } catch (Throwable e) {}
+    try { if (preWl != null && preWl.isHeld()) preWl.release(); } catch (Throwable e) {}
+    preWl = null;
+    /* v370: a cancel means the user decided this one was false. The 8 s re-fire guard must not
+       then swallow a DELIBERATE second shake - the situation can turn real between the cancel and
+       the next shake, and before this the phone answered that shake with nothing at all. */
+    sLastFire = 0;
   }
 
   static final String PREFS = "shomer_native";
@@ -133,6 +153,9 @@ public class ShakeService extends Service implements SensorEventListener {
     // layer stands its own detector down on that claim. The one place this design could fail
     // CLOSED instead of open.
     sListening = (acc != null) && sm.registerListener(this, acc, SensorManager.SENSOR_DELAY_GAME);
+    /* v370: registration failed - do not sit on a partial wake lock for a detector that is not
+       running. Shake is already dead here; a flat battery on top of it sends no SOS either. */
+    if (!sListening) { try { if (wl != null && wl.isHeld()) wl.release(); } catch (Throwable e) {} wl = null; }
   }
 
   private void unlisten() {
@@ -193,6 +216,11 @@ public class ShakeService extends Service implements SensorEventListener {
    *  layer can tell "the app is enforcing the gate" from "the plugin merely exists". A process
    *  death resets it to false, which is the safe direction - the web detector then stays on. */
   static volatile boolean sListening = false;
+  /** v370: is at least one button signal actually registered? The accelerometer being live says
+   *  nothing about the gate's INPUT. If both the receiver and the observers failed, btnMs would
+   *  never update, every shake would be refused forever, and the web layer - which stands its own
+   *  detector down on a healthy report - would leave nothing watching at all. */
+  static volatile boolean sGateArmed = false;
   static final long BTN_WINDOW_MS = 10000;
   private volatile long btnMs = 0;
   private BroadcastReceiver btnRx;
@@ -239,9 +267,11 @@ public class ShakeService extends Service implements SensorEventListener {
         }
       } catch (Throwable e) { volObs = null; }
     }
+    sGateArmed = (btnRx != null || volObs != null);   // v370
   }
 
   private void stopButtonWatch() {
+    sGateArmed = false;   // v370
     try { if (btnRx != null) unregisterReceiver(btnRx); } catch (Throwable e) {}
     btnRx = null;
     try { if (volObs != null) getContentResolver().unregisterContentObserver(volObs); } catch (Throwable e) {}
@@ -250,8 +280,8 @@ public class ShakeService extends Service implements SensorEventListener {
 
   private void fireSos() {
     long now = System.currentTimeMillis();
-    if (now - lastFire < 8000) return;   // still shaking after it fired - not a second press
-    lastFire = now;
+    if (sLastFire != 0 && now - sLastFire < 8000) return;   // still shaking after it fired - not a second press
+    sLastFire = now;
     // The 8 s pre-alarm, felt in the pocket: a strong buzz every second, no sound. Cancel (web or
     // notification) stops it through AlarmPlayer.stop(), which cancels the vibrator.
     try {
