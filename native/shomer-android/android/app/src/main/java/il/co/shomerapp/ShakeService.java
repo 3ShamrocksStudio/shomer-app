@@ -97,16 +97,23 @@ public class ShakeService extends Service implements SensorEventListener {
            microseconds found nothing pending, stopped a siren that had not started, and then this
            runnable started it - an alarm sounding AFTER the user said they were fine, with the
            notification STOP the only way out. Exactly the thing a cancel exists to prevent. */
+        /* v374: the START goes inside the monitor too. Claiming alone left a window where a
+           cancel that arrived a moment later found nothing to cancel and stopped a siren that had
+           not begun - and then this started it. Holding the lock across the start forces that
+           cancel to queue behind it, so its stop lands after the siren exists and works. Only the
+           main looper waits here, and only on itself, so there is no new way to hang. */
         synchronized (ShakeService.class) {
           if (preTask != this) return;   // a cancel got here first - this countdown is void
           preTask = null;
+          try {
+            /* AlarmPlayer too: on a locked phone the web layer's siren IS AlarmPlayer, and
+               checking only the foreground service meant starting a second one on top of it. */
+            if (AlarmForegroundService.isPlaying() || AlarmPlayer.isPlaying()) return;
+            Intent a = new Intent(app, AlarmForegroundService.class);
+            if (Build.VERSION.SDK_INT >= 26) app.startForegroundService(a);
+            else app.startService(a);
+          } catch (Throwable e) {}
         }
-        try {
-          if (AlarmForegroundService.isPlaying()) return;   // the web layer got there first
-          Intent a = new Intent(app, AlarmForegroundService.class);
-          if (Build.VERSION.SDK_INT >= 26) app.startForegroundService(a);
-          else app.startService(a);
-        } catch (Throwable e) {}
         /* v371: the siren holds its own wake lock from here, so hand ours back instead of sitting
            on the CPU until the acquire timeout runs out. */
         try { if (preWl != null && preWl.isHeld()) preWl.release(); } catch (Throwable e) {}
