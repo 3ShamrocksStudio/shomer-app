@@ -71,13 +71,17 @@ public class ShakeService extends Service implements SensorEventListener {
    *  armNativeAlarm used to call cancelNativeAlarm, so every fire wiped its own dedupe and a user
    *  who kept shaking pushed the native countdown back 8 s at a time - on a locked phone, where
    *  that countdown is the only siren, indefinitely. */
-  private static void clearPending() {
+  /* v372: synchronized, together with armNativeAlarm. volatile fixed the stale READ; this fixes
+     the lost UPDATE. A cancel landing inside the microseconds of a fresh arm could read the old
+     task, have it replaced underneath, then null the field - orphaning a posted countdown that no
+     later cancel could reach. The siren would start 8 s after the user said they were fine. */
+  private static synchronized void clearPending() {
     try { if (preTask != null) { PRE.removeCallbacks(preTask); preTask = null; } } catch (Throwable e) {}
     try { if (preWl != null && preWl.isHeld()) preWl.release(); } catch (Throwable e) {}
     preWl = null;
   }
 
-  static void armNativeAlarm(Context c) {
+  static synchronized void armNativeAlarm(Context c) {
     final Context app = c.getApplicationContext();
     clearPending();
     try {
@@ -106,7 +110,7 @@ public class ShakeService extends Service implements SensorEventListener {
 
   /** Any cancel - the notification STOP, or "ביטול - אני בסדר" in the app - must kill this too,
    *  or a cancelled SOS would still start screaming 8 seconds later. */
-  static void cancelNativeAlarm(Context c) {
+  static synchronized void cancelNativeAlarm(Context c) {
     clearPending();
     /* v370: a cancel means the user decided this one was false. The 8 s re-fire guard must not
        then swallow a DELIBERATE second shake - the situation can turn real between the cancel and
