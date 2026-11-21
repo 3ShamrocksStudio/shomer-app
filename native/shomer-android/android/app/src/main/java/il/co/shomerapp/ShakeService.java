@@ -92,7 +92,15 @@ public class ShakeService extends Service implements SensorEventListener {
     } catch (Throwable e) {}
     preTask = new Runnable() {
       @Override public void run() {
-        preTask = null;
+        /* v373: claim this countdown under the same lock the cancel uses, or lose the last race
+           in this path: the old code nulled preTask first, so a cancel arriving in the next few
+           microseconds found nothing pending, stopped a siren that had not started, and then this
+           runnable started it - an alarm sounding AFTER the user said they were fine, with the
+           notification STOP the only way out. Exactly the thing a cancel exists to prevent. */
+        synchronized (ShakeService.class) {
+          if (preTask != this) return;   // a cancel got here first - this countdown is void
+          preTask = null;
+        }
         try {
           if (AlarmForegroundService.isPlaying()) return;   // the web layer got there first
           Intent a = new Intent(app, AlarmForegroundService.class);
