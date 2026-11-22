@@ -2780,7 +2780,7 @@ body.otp-active .ob-steps{display:none!important;}
  <div class="ghost-row" id="ghost-row">
  <div class="ghost-l">
  <div class="ghost-ic" aria-hidden="true"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 4l16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M9.5 9.6A3 3 0 0 0 14.4 14M6.3 6.7C3.7 8.3 2 12 2 12s3.6 6.5 10 6.5c1.6 0 3-.4 4.3-1M10 5.6c.6-.1 1.3-.1 2-.1 6.4 0 10 6.5 10 6.5a18 18 0 0 1-2.4 3.2" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
- <div><div class="ghost-nm" id="ghost-nm">מצב רפאים - השהה שיתוף</div><div class="ghost-sb" id="ghost-sb">אף אחד לא יראה את מיקומך</div></div>
+ <div><div class="ghost-nm" id="ghost-nm">מצב רפאים - השהה שיתוף</div><div class="ghost-sb" id="ghost-sb">השומרים מפסיקים לראות איפה את/ה · SOS עדיין משדר</div></div>
  </div>
  <div class="tog" id="ghost-tog" onclick="toggleGhost()" role="switch" aria-label="מצב רפאים"></div>
  </div>
@@ -3275,7 +3275,7 @@ const AR={
  // ── Profile extras ──
  'Points':'نقاط','SHOMER level':'مستوى الحارس',
  // ── My SHOMERs / circles sheet ──
- 'No one sees your location':'لا أحد يرى موقعك','Find a friend':'ابحث عن صديق','✓ New circle created':'✓ تم إنشاء دائرة جديدة',
+ 'Your SHOMERs stop seeing where you are - an SOS still sends it':'يتوقف حُرّاسك عن رؤية مكانك - والاستغاثة تُرسله رغم ذلك','Find a friend':'ابحث عن صديق','✓ New circle created':'✓ تم إنشاء دائرة جديدة',
  'Add someone you trust to your "My SHOMERs". They\'ll see your live location and you\'ll see theirs - by invite and mutual accept. You can stop anytime.':'أضِف شخصاً تثق به إلى قائمة „حُرّاسي". سيرى موقعك المباشر وسترى موقعه - عبر دعوة وقبول متبادل. يمكنك الإيقاف في أي وقت.',
  'Ghost mode - pause sharing':'وضع التخفّي - إيقاف المشاركة مؤقتاً','Pair invite':'دعوة ربط','Connected':'مُرتبط','Pending':'قيد الانتظار',
  // ── v350: 19 Nov Arabic fill - labels without data-ar + toasts that had only he/en (MSA; SHOMER role = حارس) ──
@@ -4342,7 +4342,7 @@ function applyTranslations(){
  {const he=currentLang==='he';
  setText('circ-ttl',he?'השומרים שלי':'My SHOMERs');
  setText('ghost-nm',he?'מצב רפאים - השהה שיתוף':'Ghost mode - pause sharing');
- setText('ghost-sb',he?'אף אחד לא יראה את מיקומך':'No one sees your location');
+ setText('ghost-sb',he?'השומרים מפסיקים לראות איפה את/ה · SOS עדיין משדר':'Your SHOMERs stop seeing where you are - an SOS still sends it');
  setText('ag-go-lbl',he?'שלח/י בקשה':currentLang==='ar'?'إرسال طلب':'Send request');
  setText('circ-find-lbl',he?'מצא חבר/ה':'Find a friend');
  setText('cm-add-save',he?'הוסף למעגל':'Add to circle');
@@ -11630,7 +11630,7 @@ function privacyHTML(){ const he=currentLang==='he';
  <h4>איך נעשה שימוש במיקום</h4>
  <p>המיקום משמש כדי להציג אותך על המפה שלך, לצרף אותו ל-SOS/דיווח שאת/ה שולח/ת, ולשתף מיקום חי עם שומרים <strong>שאת/ה מחבר/ת בהסכמה</strong>. שיתוף מיקום הוא opt-in.</p>
  <h4>היכן המידע נשמר</h4>
- <p><strong>רוב המידע נשמר במכשירך</strong> (אחסון מקומי בדפדפן). כדי להציג אותך לשומרים שחיברת ולשדר SOS, המיקום מסונכרן דרך שירות זמן-אמת מאובטח: מיקום מדויק רק לשומרים שחיברת בהסכמה, ומיקום מקורב (כ-1 ק"מ) בלבד לכל השאר. צוות SH✡MER רשאי לגשת לנתוני מיקום רק לצורכי בטיחות ומניעת שימוש לרעה. שאר המידע אינו עוזב את מכשירך, למעט קישור הזמנה שאת/ה בוחר/ת לשתף.</p>
+ <p><strong>רוב המידע נשמר במכשירך</strong> (אחסון מקומי בדפדפן). כדי להציג אותך לשומרים שחיברת ולשדר SOS, המיקום מסונכרן דרך שירות זמן-אמת מאובטח: מיקום מדויק רק לשומרים שחיברת בהסכמה, ומיקום מקורב (כ-1 ק"מ) בפיד הציבורי. דיווח חטיפה/נעדר - גם כזה שאדם אחר מגיש עליך - מפרסם מיקום אחרון מעוגל (כ-110 מ') לכל משתמשי האפליקציה המחוברים. צוות SH✡MER רשאי לגשת לנתוני מיקום רק לצורכי בטיחות ומניעת שימוש לרעה. שאר המידע אינו עוזב את מכשירך, למעט קישור הזמנה שאת/ה בוחר/ת לשתף.</p>
  <h4>שיתוף ומכירה</h4>
  <p><strong>איננו מוכרים את המידע שלך ואיננו משתפים אותו עם צדדים שלישיים.</strong> אין פרסומות ואין כלי מעקב/אנליטיקה.</p>
  <h4>השליטה שלך</h4>
@@ -11658,7 +11658,7 @@ function privacyHTML(){ const he=currentLang==='he';
  <h4>How location is used</h4>
  <p>Location is used to show you on your own map, to attach to an SOS/report you send, and to share live location with SHOMERs <strong>you connect by consent</strong>. Location sharing is opt-in.</p>
  <h4>Where data is stored</h4>
- <p><strong>Most data is stored on your device</strong> (browser local storage). To show you to the SHOMERs you connected and to broadcast an SOS, your location is synced through a secure realtime service: precise only for SHOMERs you connected by consent, coarse (~1 km) for everyone else. The SH✡MER team may access location data only for safety operations and abuse prevention. The rest never leaves your device, except an invite link you choose to share.</p>
+ <p><strong>Most data is stored on your device</strong> (browser local storage). To show you to the SHOMERs you connected and to broadcast an SOS, your location is synced through a secure realtime service: precise only for SHOMERs you connected by consent, and a coarse (~1 km) point in the public feed. An abduction / missing-person report - including one someone else files about you - publishes a rounded last-known location (~110 m) to all signed-in app users. The SH✡MER team may access location data only for safety operations and abuse prevention. The rest never leaves your device, except an invite link you choose to share.</p>
  <h4>Sharing & selling</h4>
  <p><strong>We do not sell your data and do not share it with third parties.</strong> There are no ads and no tracking/analytics tools.</p>
  <h4>Your controls</h4>
@@ -12078,7 +12078,7 @@ try{ hydrateIcons(document); }catch(e){}
 /* Loaded-build version - shown in the diagnostic panel so a phone can prove
    whether it's on the latest build or a STALE cached one. Keep in lock-step
    with sw.js SW_VERSION on every deploy. */
-var APP_VER='v396';
+var APP_VER='v397';
 var FB={ready:false,uid:null,db:null,_presTimer:null,connected:false,listening:false,pushState:'default',near:0,swVer:'?',
   authState:'connecting',sdkLoaded:false,persist:'',permErr:null,err:null,wsProbe:'',csp:''};
 /* Always log connection diagnostics to the console so the real failure can be SEEN in Chrome. */
