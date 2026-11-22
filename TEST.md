@@ -22,7 +22,7 @@ For the full SOS / false-alarm / onboarding test pass, see [TEST_AUDIT.md](TEST_
 | **Shareable invite link** | "Invite a guardian" mints a real link (`…/shomer.html?g=<token>#n=<name>`) and shares it via the native share sheet (`navigator.share`) or clipboard. |
 | **Accept flow** | Opening an invite link shows a real accept dialog and creates the pairing locally; the URL is cleaned so a reload won't re-prompt. |
 | **Live-location transport** | A real `BroadcastChannel` + `localStorage` relay carries your **actual GPS position** between **windows/tabs of the app on the same browser**, keyed by each pair's token. Each tab has its own sender id (`sessionStorage`), so two windows genuinely act as two people exchanging live coordinates → the guardian flips to a green **LIVE** marker using real coordinates. |
-| **Who-sees-whom** | Per-guardian "Share my location" / "See their location" toggles, applied to both the transport and the map. |
+| **Who-sees-whom** | Per-guardian **"I see"** switch, which controls whether that SHOMER appears on YOUR map. There is no per-guardian "stop sharing MY location": presence is one record read by every approved SHOMER, so the only real controls are ghost mode (everyone) and removing that SHOMER. |
 | **Ghost / pause** | One switch pauses all outgoing sharing instantly. |
 | **Disconnect** | One tap removes a pairing and its marker. |
 | **Privacy posture** | Everything is stored on-device in `localStorage`; nothing leaves the device except via the link you choose to share. |
@@ -62,7 +62,7 @@ is complete — it never pretends to be the real person's live location.
    **Expected:** in **both** windows the guardian flips to a green **LIVE** marker and tracks the **real** device position in real time — proof the live transport is genuine. (Both windows report the same device GPS, so the markers sit together; *two separate devices* moving independently is the cross-device backend phase.)
 
 ### D. Privacy controls
-1. Tap a guardian row to expand it. Toggle **See their location** off → their marker disappears. Toggle **Share my location** off → you stop broadcasting to them.
+1. On a guardian's card, tap **"I see"** off → their marker disappears and Find refuses to locate them. An SOS always overrides it. There is no per-guardian share switch - see Who-sees-whom above.
 2. Flip **Ghost mode** → all outgoing sharing pauses.
 3. **Disconnect** → the pairing and marker are removed.
 

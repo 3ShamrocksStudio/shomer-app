@@ -10565,10 +10565,25 @@ function findFriendClose(){const p=document.getElementById('ff-pick');if(p){p.cl
 function flyToMember(id){
  const m=memberById(id);if(!m){return;}
  const he=currentLang==='he';
+ /* v394: if „רואה” is off for this person the map deliberately does not show them, so Find must
+    not show them either - otherwise the switch means nothing and the toast that says they are
+    hidden is false. An SOS overrides it, exactly as it overrides the pin. */
+ if(m.seeThem===false && !m.sos && !gdSosNow(m)){
+   toast(he?('„רואה” כבוי עבור '+(m.name||'')+' - הפעל/י כדי לאתר')
+        :currentLang==='ar'?('«أرى» مُطفأ لـ'+(m.name||'')+' - فعِّله للتحديد')
+        :('"I see" is off for '+(m.name||'')+' - turn it on to locate'),'amb');
+   return; }
  /* v280: a linked SHOMER is located by their OWN presence pin; no recent own fix = say so, no pin */
  const _pp=m.pairId&&gdPairById(m.pairId);
  if(!m.sos){ if(_pp&&!_pp.pending&&gdPos(_pp)){ gdFlyTo(_pp.id); return; }
    if(_pp||!posShowable(m.lat,m.lng,m.ts)){ toast(notSharingTxt(m.name||'',(_pp&&_pp.ts)||m.ts,he,(_pp||m).lat,(_pp||m).lng),'amb'); return; } }
+ /* v394: an SOS row can reach here with no position at all (Report abduction on someone whose
+    location never arrived). L.marker([null,null]) throws out of the tap handler - say it plainly. */
+ if(m.lat==null||m.lng==null){
+   toast(he?('אין עדיין מיקום עבור '+(m.name||''))
+        :currentLang==='ar'?('لا يوجد موقع بعد لـ'+(m.name||''))
+        :('No location yet for '+(m.name||'')),'amb');
+   return; }
  // make sure this member is rendered (force-show even if normally hidden)
  mapCircleId=m.cid; renderCircleMarkers();
  if(!mapLayers.circle[m.id]&&MAP){mapLayers.circle[m.id]=window.L.marker([m.lat,m.lng],{icon:circleIcon(m),zIndexOffset:800,alt:m.name}).addTo(MAP);}
@@ -11586,7 +11601,7 @@ function privacyHTML(){ const he=currentLang==='he';
  <p><strong>لا نبيع بياناتك ولا نشاركها مع أطراف ثالثة.</strong> لا توجد إعلانات ولا أدوات تتبّع/تحليلات.</p>
  <h4>أدوات تحكّمك</h4>
  <ul>
- <li><strong>إيقاف المشاركة</strong> - وضع التخفّي، أو إيقاف „شارك موقعي"، أو فصل حارس.</li>
+ <li><strong>إيقاف المشاركة</strong> - وضع التخفّي (يوقفها مع كل الحُرّاس)، أو إزالة حارس من قائمتك.</li>
  <li><strong>حذف كل شيء</strong> - الإعدادات ← إعادة ضبط التطبيق.</li>
  <li>إلغاء إذن الموقع عبر متصفّحك في أي وقت.</li>
  </ul>
@@ -12057,7 +12072,7 @@ try{ hydrateIcons(document); }catch(e){}
 /* Loaded-build version - shown in the diagnostic panel so a phone can prove
    whether it's on the latest build or a STALE cached one. Keep in lock-step
    with sw.js SW_VERSION on every deploy. */
-var APP_VER='v393';
+var APP_VER='v394';
 var FB={ready:false,uid:null,db:null,_presTimer:null,connected:false,listening:false,pushState:'default',near:0,swVer:'?',
   authState:'connecting',sdkLoaded:false,persist:'',permErr:null,err:null,wsProbe:'',csp:''};
 /* Always log connection diagnostics to the console so the real failure can be SEEN in Chrome. */
