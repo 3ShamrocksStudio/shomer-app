@@ -9165,7 +9165,7 @@ function buildMemberRow(m,he){
  /* _mn is for dialogs and toasts (plain text); _mnH is for HTML attributes only */
  const seeOn = !!m.seeThem, _mn=memberLabel(m,he,true), _mnH=ESC(_mn);
  acts.innerHTML=`
-  ${m.pending ? '' : `<button class="cm-act ${seeOn?'on':''}" data-a="see" role="switch" aria-checked="${seeOn}" title="${he?'ראה/י את המיקום של '+_mnH:currentLang==='ar'?'شاهد موقع '+_mnH:"See "+_mnH+"'s location"}">
+  ${m.pending ? '' : `<button class="cm-act ${seeOn?'on':''}" data-a="see" role="switch" aria-checked="${seeOn}" title="${he?('הצג/י את '+_mnH+' על המפה שלך'):currentLang==='ar'?('أظهِر '+_mnH+' على خريطتك'):('Show '+_mnH+' on your map')}">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3.6-6.5 10-6.5S22 12 22 12s-3.6 6.5-10 6.5S2 12 2 12Z"/><circle cx="12" cy="12" r="2.6"/></svg>
     <span>${he?'רואה':currentLang==='ar'?'أرى':'I see'}</span></button>
   <button class="cm-act on" data-a="ping">
@@ -12078,7 +12078,7 @@ try{ hydrateIcons(document); }catch(e){}
 /* Loaded-build version - shown in the diagnostic panel so a phone can prove
    whether it's on the latest build or a STALE cached one. Keep in lock-step
    with sw.js SW_VERSION on every deploy. */
-var APP_VER='v395';
+var APP_VER='v396';
 var FB={ready:false,uid:null,db:null,_presTimer:null,connected:false,listening:false,pushState:'default',near:0,swVer:'?',
   authState:'connecting',sdkLoaded:false,persist:'',permErr:null,err:null,wsProbe:'',csp:''};
 /* Always log connection diagnostics to the console so the real failure can be SEEN in Chrome. */
