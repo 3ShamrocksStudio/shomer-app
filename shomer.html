@@ -9150,18 +9150,24 @@ function buildMemberRow(m,he){
    return '<div class="cm-av cm-st-'+k+'" data-mid="'+ESC(String(m.id))+'" role="img" aria-label="'+t+'" title="'+t+'"></div>'; })()}
  <div class="cm-main">
  <div class="cm-nm">${ESC(memberLabel(m,he))}${(typeof m.rk==='number'&&m.partnerUid)?(' '+drillRankBadge(m.rk)):''}</div>
- <div class="cm-rel">${ESC(m.rel||'')}</div>
+ <div class="cm-rel">${(function(){ var bits=[]; if(m.rel) bits.push(String(m.rel));
+   try{ var _cl2=circlesList(); if(_cl2.length>1){ var cc2=_cl2.filter(function(x){ return x.id===m.cid; })[0]; var cn2=cc2&&_circName(cc2); if(cn2) bits.push(cn2); } }catch(e){}
+   return ESC(bits.join(' · ')); })()}</div>
  <span class="cm-status ${st.cls}">${st.txt}</span>
  ${(m.partnerUid&&gaStatusText(m.partnerUid))?`<span class="cm-ga">${ESC(gaStatusText(m.partnerUid))}</span>`:''}
  </div>
  <button class="cm-find" aria-label="${he?'אתר/י':'Locate'}" style="display:none"></button>`;
- /* ── clean action row: four clear buttons, no toggle-soup ── */
+ /* ── v391: one visible row of actions - share / see / all-good / find / circle. Nothing hidden. ── */
  const acts=document.createElement('div'); acts.className='cm-acts';
- const shareOn = m.shareTo!==false, pingOn = m.ping!==false;
+ /* _mn is for dialogs and toasts (plain text); _mnH is for HTML attributes only */
+ const shareOn = !!m.shareTo, seeOn = !!m.seeThem, _mn=memberLabel(m,he,true), _mnH=ESC(_mn);
  acts.innerHTML=`
-  ${m.pending ? '' : `<button class="cm-act ${shareOn?'on':''}" data-a="share">
+  ${m.pending ? '' : `<button class="cm-act ${shareOn?'on':''}" data-a="share" role="switch" aria-checked="${shareOn}" title="${he?'שתף/י את מיקומי עם '+_mnH:currentLang==='ar'?'شارك موقعي مع '+_mnH:'Share my location with '+_mnH}">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s7-6.2 7-11a7 7 0 1 0-14 0c0 4.8 7 11 7 11Z"/><circle cx="12" cy="10" r="2.4"/></svg>
-    <span>${he?'שיתוף מיקום':currentLang==='ar'?'الموقع':'Location'}</span></button>
+    <span>${he?'משתף/ת':currentLang==='ar'?'أشارك':'I share'}</span></button>
+  <button class="cm-act ${seeOn?'on':''}" data-a="see" role="switch" aria-checked="${seeOn}" title="${he?'ראה/י את המיקום של '+_mnH:currentLang==='ar'?'شاهد موقع '+_mnH:"See "+_mnH+"'s location"}">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3.6-6.5 10-6.5S22 12 22 12s-3.6 6.5-10 6.5S2 12 2 12Z"/><circle cx="12" cy="12" r="2.6"/></svg>
+    <span>${he?'רואה':currentLang==='ar'?'أرى':'I see'}</span></button>
   <button class="cm-act on" data-a="ping">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 8a6 6 0 1 0-12 0c0 7-3 8-3 8h18s-3-1-3-8"/><path d="M10.3 21a2 2 0 0 0 3.4 0"/></svg>
     <span>${he?'הכל טוב?':currentLang==='ar'?'هل أنت بخير؟':'All good?'}</span></button>
@@ -9170,7 +9176,7 @@ function buildMemberRow(m,he){
     <span>${he?'אתר/י':currentLang==='ar'?'تحديد':'Find'}</span></button>`}
   ${circlesList().length>1 ? `<button class="cm-act" data-a="move" aria-expanded="false">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8h13M13 4l4 4-4 4"/><path d="M20 16H7M11 12l-4 4 4 4"/></svg>
-    <span>${he?'העבר למעגל':currentLang==='ar'?'نقل لدائرة':'Move circle'}</span></button>` : ''}
+    <span>${he?'מעגל':currentLang==='ar'?'دائرة':'Circle'}</span></button>` : ''}
   ${m.pending ? `<button class="cm-act warn" data-a="resend">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 2L11 13"/><path d="M22 2l-7 20-4-9-9-4Z"/></svg>
     <span>${(m.via||(_pairOf(m)||{}).via)==='link'?(he?'שלח/י שוב':'Send again'):(he?'שלח/י בקשה':'Send request')}</span></button>
@@ -9182,9 +9188,21 @@ function buildMemberRow(m,he){
    b.onclick=function(ev){
      ev.stopPropagation();
      const a=b.getAttribute('data-a');
-     if(a==='share'){ m.shareTo=!(m.shareTo!==false); b.classList.toggle('on',m.shareTo!==false); saveStore();
-       toast(he?((m.shareTo!==false?'משתף/ת מיקום עם ':'הפסקת לשתף מיקום עם ')+ESC(m.name)):'Updated', m.shareTo!==false?'grn':'amb');
-       try{ gdRenderMarkers(); }catch(e){} return; }
+     if(a==='share'||a==='see'){   /* v391: the two directions are buttons on the card - nothing hidden */
+       var k=(a==='share')?'shareTo':'seeThem';
+       m[k]=!m[k]; b.classList.toggle('on',!!m[k]); b.setAttribute('aria-checked',String(!!m[k])); saveStore();
+       var _ar2=currentLang==='ar';
+       toast(a==='share'
+         ? (m[k] ? (he?('משתף/ת מיקום עם '+_mn):_ar2?('تشارك الموقع مع '+_mn):('Sharing your location with '+_mn))
+                 : (he?('הפסקת לשתף מיקום עם '+_mn):_ar2?('توقفت عن مشاركة الموقع مع '+_mn):('Stopped sharing your location with '+_mn)))
+         : (m[k] ? (he?('רואה את המיקום של '+_mn):_ar2?('ترى موقع '+_mn):('You can see '+_mn+"'s location"))
+                 : (he?('לא רואה את המיקום של '+_mn):_ar2?('لا ترى موقع '+_mn):("You can't see "+_mn+"'s location"))),
+         m[k]?'grn':'amb');
+       try{ var _sp=row.querySelector('.cm-status'), _s2=statusOf(m,he);
+            if(_sp){ _sp.className='cm-status '+_s2.cls; _sp.textContent=_s2.txt; } }catch(e){}
+       try{ gdRenderMarkers(); }catch(e){}
+       try{ if(mapCircleId===activeCircleId) renderCircleMarkers(); }catch(e){}
+       return; }
      if(a==='ping'){ gaOpen(m.id); return; }   /* v308: "All good?" now really asks - plus Alert / Alarm */
      if(a==='resend'){ resendInvite(m.id); return; }
      if(a==='cancel'){ if(confirm(he?'לבטל את ההזמנה? גם אם הקישור ייפתח - לא תחוברו.':'Cancel this invite? Even if the link is opened, you will not be connected.')) removeMember(m.id); return; }
@@ -9206,33 +9224,35 @@ function buildMemberRow(m,he){
    };
  });
  row.querySelector('.cm-main').appendChild(acts);
- // tapping the row body toggles the privacy panel
- const priv=document.createElement('div');
- priv.className='cm-priv'; priv.style.display='none';
- priv.innerHTML=`
- <div class="pv-row"><div><div class="pv-l">${he?'שתף/י את מיקומי עם '+ESC(m.name):'Share my location with '+ESC(m.name)}</div><div class="pv-s">${he?'הם יוכלו לראות אותך':'They can see you'}</div></div><div class="tog ${m.shareTo?'on':''}" data-k="shareTo" role="switch"></div></div>
- <div class="pv-row"><div><div class="pv-l">${he?'ראה/י את המיקום של '+ESC(m.name):'See '+ESC(m.name)+"'s location"}</div><div class="pv-s">${he?'יופיע/תופיע על המפה שלך':'Shows on your map'}</div></div><div class="tog ${m.seeThem?'on':''}" data-k="seeThem" role="switch"></div></div>
- <div class="pv-row" style="align-items:flex-start;flex-direction:column;gap:8px">
-  <div class="pv-l">${he?'מעגל אמון:':'Circle of trust:'}</div>
-  <div class="cm-circ-move">${circlesList().filter(cc=>_circName(cc)).length
-    ? circlesList().filter(cc=>_circName(cc)).map(cc=>`<button class="circ-chip${cc.id===m.cid?' cur':''}" data-mv="${cc.id}">${ESC(_circName(cc))}</button>`).join('')
-    : `<span class="circ-none">${he?'עדיין אין מעגלים':'No circles yet'}</span>`}</div>
- </div>
- <div class="cm-actions">
-  <button class="btn-secondary" data-a="rename">${he?'שנה/י שם':'Rename'}</button>
-  <button class="btn-danger" data-a="remove">${he?'הסר/י שומר':'Remove SHOMER'}</button>
- </div>
- ${(m.partnerUid&&!m.pending)?`<button class="cm-palert" data-a="palert">${he?'🚨 דווח/י: חטיפה / אדם נעדר':currentLang==='ar'?'🚨 إبلاغ: اختطاف / شخص مفقود':'🚨 Report: Abduction / Missing'}</button>`:''}`;
- priv.querySelectorAll('.tog').forEach(t=>{
- t.onclick=(e)=>{e.stopPropagation();const k=t.getAttribute('data-k');m[k]=!m[k];t.classList.toggle('on',m[k]);saveStore();renderCircles();};
+ /* v391: no hidden drawer behind the name. Rename / Remove / Report sit on the card itself -
+    quiet, but visible. Nothing in this screen is reachable only by guessing that a name is tappable. */
+ const _ar3=currentLang==='ar';
+ const more=document.createElement('div'); more.className='cm-more';
+ more.innerHTML=`
+  <button class="cm-mb" data-a="rename">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20h4L19 9a2.1 2.1 0 0 0-3-3L5 17v3Z"/><path d="M14.5 7.5l2 2"/></svg>
+    <span>${he?'שנה/י שם':_ar3?'تغيير الاسم':'Rename'}</span></button>
+  ${m.pending ? '' : `<button class="cm-mb" data-a="remove">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>
+    <span>${he?'הסר/י':_ar3?'إزالة':'Remove'}</span></button>`}
+  ${(m.partnerUid&&!m.pending)?`<button class="cm-mb rep" data-a="palert">
+    <span>${he?'🚨 דווח/י: חטיפה / נעדר':_ar3?'🚨 إبلاغ: اختطاف / مفقود':'🚨 Report: Abduction / Missing'}</span></button>`:''}`;
+ more.querySelectorAll('.cm-mb').forEach(function(b){
+   b.onclick=function(e){
+     e.stopPropagation();
+     var a=b.getAttribute('data-a');
+     if(a==='rename'){ var nn=prompt(he?('שם חדש עבור '+_mn+':'):_ar3?('اسم جديد لـ'+_mn+':'):('New name for '+_mn+':'), m.name||'');
+       if(nn&&nn.trim()){ m.name=nn.trim().substring(0,40); saveStore(); renderCircles(); toast(he?'✓ השם עודכן':_ar3?'✓ تم تحديث الاسم':'✓ Renamed','grn'); } return; }
+     if(a==='remove'){ /* this cuts the pair both ways - never one accidental tap */
+       if(confirm(he?('להסיר את '+_mn+' מהשומרים שלך?\nהם יפסיקו לראות אותך ואת/ה אותם.')
+                 :_ar3?('إزالة '+_mn+' من حُرّاسك؟\nلن يعودوا يرون موقعك ولن ترى موقعهم.')
+                 :('Remove '+_mn+" from your SHOMERs?\nThey will stop seeing you, and you will stop seeing them."))) removeMember(m.id);
+       return; }
+     if(a==='palert'){ openPersonAlert(m.id); return; }
+   };
  });
- priv.querySelector('[data-a="rename"]').onclick=(e)=>{e.stopPropagation();const nn=prompt(he?'שם חדש עבור '+m.name+':':'New name for '+m.name+':',m.name);if(nn&&nn.trim()){m.name=nn.trim().substring(0,40);saveStore();renderCircles();toast(he?'✓ השם עודכן':'✓ Renamed','grn');}};
- priv.querySelectorAll('[data-mv]').forEach(b=>{b.onclick=(e)=>{e.stopPropagation();const tc=b.getAttribute('data-mv');if(tc===m.cid)return;m.cid=tc;dykUsed('move');saveStore();renderCircles();toast(he?'✓ הועבר/ה למעגל אחר':'✓ Moved to another circle','grn');};});
- priv.querySelector('[data-a="remove"]').onclick=(e)=>{e.stopPropagation();removeMember(m.id);};
- var _pab=priv.querySelector('[data-a="palert"]'); if(_pab) _pab.onclick=(e)=>{e.stopPropagation(); openPersonAlert(m.id);};
- row.querySelector('.cm-main').onclick=()=>{priv.style.display=priv.style.display==='none'?'block':'none';};
- row.querySelector('.cm-main').style.cursor='pointer';
- wrap.appendChild(row); wrap.appendChild(priv);
+ row.querySelector('.cm-main').appendChild(more);
+ wrap.appendChild(row);
  return wrap;
 }
 function toggleAddMember(){const f=document.getElementById('cm-add-form');if(f)f.style.display=f.style.display==='none'?'block':'none';}
@@ -12023,7 +12043,7 @@ try{ hydrateIcons(document); }catch(e){}
 /* Loaded-build version - shown in the diagnostic panel so a phone can prove
    whether it's on the latest build or a STALE cached one. Keep in lock-step
    with sw.js SW_VERSION on every deploy. */
-var APP_VER='v390';
+var APP_VER='v391';
 var FB={ready:false,uid:null,db:null,_presTimer:null,connected:false,listening:false,pushState:'default',near:0,swVer:'?',
   authState:'connecting',sdkLoaded:false,persist:'',permErr:null,err:null,wsProbe:'',csp:''};
 /* Always log connection diagnostics to the console so the real failure can be SEEN in Chrome. */
@@ -17047,6 +17067,26 @@ html[dir="rtl"] .sh-back svg{transform:scaleX(-1)}
 .circ-none{font-size:12px;color:var(--tx3)}
 .cm-mvpick{margin-top:10px;justify-content:center}
 .cm-actions{display:flex;flex-direction:column;gap:8px;margin-top:12px}
+
+/* ══ v391 · השומרים שלי - everything on the card, nothing behind a guess ══
+   Five equal action columns (share / see / all-good / find / circle), then a quiet manage row.
+   The old tap-the-name drawer is gone, so no control depends on knowing a name is tappable. */
+.cm-acts{gap:4px!important;justify-content:space-between!important}
+.cm-act{flex:1 1 0!important;min-width:0!important}
+.cm-act span{display:block;width:100%;text-align:center;line-height:1.15}
+.cm-more{display:flex;align-items:center;gap:6px;flex-wrap:wrap;
+  margin-top:10px;padding-top:9px;border-top:1px solid var(--b2)}
+.cm-mb{display:inline-flex;align-items:center;gap:5px;padding:6px 10px;border-radius:999px;
+  border:1px solid var(--b2);background:transparent;color:var(--tx3);
+  font-family:inherit;font-weight:700;font-size:10.5px;cursor:pointer;transition:.12s}
+.cm-mb svg{width:13px;height:13px;flex:0 0 13px;stroke-width:2}
+.cm-mb:active{transform:scale(.96)}
+.cm-mb.rep{flex:1 0 100%;justify-content:center;margin-top:2px;padding:8px 10px;color:#FF8089;
+  border-color:rgba(209,0,41,.45);background:rgba(209,0,41,.10)}
+/* the status dot belongs beside the NAME, not floating in the middle of a tall card */
+#circ-members .cm-row{align-items:flex-start!important}
+#circ-members .cm-av.cm-st-off,#circ-members .cm-av.cm-st-live,#circ-members .cm-av.cm-st-sos{
+  align-self:flex-start!important;margin-top:6px!important}
 
 /* ══ SETTINGS - compact. Every row smaller, less scrolling, no wasted vertical space. ══ */
 #sh-set .set-row{padding:10px 12px!important;margin-bottom:6px!important;border-radius:11px!important;
