@@ -164,7 +164,7 @@ public class ShakeService extends Service implements SensorEventListener {
 
   private void listen() {
     cLv = sens(this); det = new ShakeDetector(cLv);   // (re)read the level on every start / config change
-    if (btnGate(this)) startButtonWatch(); else stopButtonWatch();   // v359: only watch buttons when the gate is on
+    startButtonWatch();   // v381: the gate is unconditional, so the button watch always runs
     // v368: ...and only skip the setup if we are actually LISTENING. A registerListener that
     // returned false left sm and acc non-null, so every later start returned here without trying
     // again - background shake dead for the life of the service, which is exactly the locked-screen
@@ -239,7 +239,7 @@ public class ShakeService extends Service implements SensorEventListener {
     // v359: with the button gate on, a shake only counts if a hardware button was pressed in
     // the last few seconds. Reset the counters so the gated shake does not leave a primed
     // detector that fires on the next stray jolt.
-    if (btnGate(this) && System.currentTimeMillis() - btnMs > BTN_WINDOW_MS) {
+    if (System.currentTimeMillis() - btnMs > BTN_WINDOW_MS) {   // v381: always - see btnGate
       cCount = 0; cFirst = 0;
       return;
     }
@@ -270,12 +270,15 @@ public class ShakeService extends Service implements SensorEventListener {
   private BroadcastReceiver btnRx;
   private ContentObserver volObs;
 
-  static boolean btnGate(Context c) {
-    /* v378: default ON. A shake alone must never start an SOS, so the gate holds even before the
-       web layer has had a chance to configure it. */
-    try { return c.getSharedPreferences(PREFS, MODE_PRIVATE).getBoolean("shake_btn_gate", true); }
-    catch (Throwable e) { return true; }   // v379: a prefs failure must not re-open shake-only
-  }
+  /** v381: UNCONDITIONAL. This used to read a preference, and that was the last hole: a web layer
+   *  older than v378 wrote shake_btn_gate=false into every install that existed, so the service
+   *  ran ungated until the web layer next configured it - which does not happen before a cold
+   *  start, mid-onboarding, or after a reboot, when BootReceiver starts the service with no web
+   *  layer involved at all. A bare shake was then detected and handed up, and the web layer had
+   *  no way to know the gate had not been applied to THAT detection. A shake alone must never
+   *  start an SOS, so the rule lives here, below any preference, any stale write and any ordering.
+   *  If it ever becomes a user choice again, this is the one line to change. */
+  static boolean btnGate(Context c) { return true; }
 
   private void startButtonWatch() {
     if (btnRx == null) {

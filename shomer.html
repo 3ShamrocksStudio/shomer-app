@@ -3691,7 +3691,9 @@ function purgeStalePositions(){
 }
 function saveStore(){try{
  // Strip transient fields (_detIdx) before persisting.
- const clean={...SS,reports:SS.reports.map(r=>{const c={...r};delete c._detIdx;return c;})};
+ /* v381: reports can be missing or not an array in storage written by an older build, and an
+    unguarded .map() threw - taking the whole save with it, including the shake gate. */
+ const clean={...SS,reports:(Array.isArray(SS.reports)?SS.reports:[]).map(r=>{const c={...r};delete c._detIdx;return c;})};
  localStorage.setItem(SKEY,JSON.stringify(clean));
 }catch(e){}}
 
@@ -6025,11 +6027,18 @@ function shakeNativeSync(){ try{ var p=shomerNativePlugin(); if(!p) return;
      ShakeService.onDestroy, which on a locked phone is holding the siren itself. */
   var off=function(){ try{ if(typeof sosPhase!=='undefined' && sosPhase!=='idle') return;
                            p.disableBackgroundShake && p.disableBackgroundShake(); }catch(e){} };
-  var old=function(){ window._nativeShakeOld=true; window._nativeGateOk=false; window._nativeGateSupported=false; if(on) en(); else off(); };
+  /* v381: "this app is too old to gate" and "the call happened to fail" are different facts, and
+     latching both to false meant a transient bridge error made shakeFired refuse every genuine
+     button+shake until the app was next foregrounded - a dropped emergency. Only a MISSING
+     setShakeConfig proves the app is too old; a rejection leaves the flag unknown, so the shake
+     path waits and retries instead of refusing. */
+  var old=function(hard){ window._nativeShakeOld=true; window._nativeGateOk=false;
+    window._nativeGateSupported = hard===true ? false : undefined;
+    if(on) en(); else off(); };
   /* v359: btnGate - when on, the background detector only fires if a hardware button (volume or
      power) was pressed in the last 10 s. Stops a pocket, a jog or a dance floor starting an SOS. */
   var r=null; try{ r=p.setShakeConfig ? p.setShakeConfig({enabled:on, sens:shakeSens(), btnGate:!!(SS.shake&&SS.shake.btnGate)}) : null; }catch(e){ r=null; }
-  if(!r || typeof r.then!=='function'){ old(); return; }
+  if(!r || typeof r.then!=='function'){ old(!p.setShakeConfig); return; }   /* v381: hard only when the method itself is absent */
   /* v365: trust the ANSWER, not the presence of the plugin. The web layer updates itself from the
      website while the APK only changes on reinstall, so this page can be newer than the app around
      it. A pre-v359 plugin resolves this call happily and ignores btnGate - believing it would stand
@@ -6054,7 +6063,7 @@ function shakeNativeSync(){ try{ var p=shomerNativePlugin(); if(!p) return;
       if(r2 && r2.then) r2.then(function(v2){ window._nativeGateOk = !!(v2 && v2.btnGate===true && v2.listening===true && v2.gateArmed===true); },
                                 function(){ window._nativeGateOk=false; });
     }catch(e){ window._nativeGateOk=false; } }, 800);
-  }, old);
+  }, function(){ old(false); });   /* v381: a rejection leaves the gate UNKNOWN, not unsupported */
 }catch(e){} }
 /* A STOP tapped in the Android notification while the web layer was not running: act on it now. */
 function shakeNativePendingStop(){ try{ var p=shomerNativePlugin(); if(!p||!p.takeStopPending) return;
@@ -11878,7 +11887,7 @@ try{ hydrateIcons(document); }catch(e){}
 /* Loaded-build version - shown in the diagnostic panel so a phone can prove
    whether it's on the latest build or a STALE cached one. Keep in lock-step
    with sw.js SW_VERSION on every deploy. */
-var APP_VER='v380';
+var APP_VER='v381';
 var FB={ready:false,uid:null,db:null,_presTimer:null,connected:false,listening:false,pushState:'default',near:0,swVer:'?',
   authState:'connecting',sdkLoaded:false,persist:'',permErr:null,err:null,wsProbe:'',csp:''};
 /* Always log connection diagnostics to the console so the real failure can be SEEN in Chrome. */
