@@ -10989,9 +10989,18 @@ function guardianIcon(p,live){
  html:`<div class="mk-circle mk-oth${live?' live':''}">${live?'<div class="tag">LIVE</div>':(p.ts?'<div class="tag stale">'+ESC((currentLang==='he'?'נראה ':'seen ')+agoTxt(p.ts,currentLang==='he'))+'</div>':'')}<div class="oth-dot"></div><div class="nm">${ESC(p.name||(currentLang==='he'?'שומר/ת':'SHOMER'))}</div></div>`,
  iconSize:[38,38],iconAnchor:[19,19],popupAnchor:[0,-20]});
 }
+/* v393: find the SHOMERs-list member behind a pair, so the card's switch and the map agree. */
+function memberForPair(p){ if(!p) return null;
+ return (SS.circleMembers||[]).find(function(x){ return x.pairId===p.id || (p.partnerUid && x.partnerUid===p.partnerUid); })||null; }
+function gdSosNow(mm){ try{ return !!(mm && (mm.sos || (mm.partnerUid && SOSBUS && SOSBUS.mine && SOSBUS.mine[mm.partnerUid]))); }catch(e){ return false; } }
 function gdUpdateMarker(p){
  if(!MAP||!window.L) return;
- const show=p.seeThem&&!p.pending&&gdPos(p);
+ /* v393: „רואה” on that SHOMER's card is what decides this pin. This used to read p.seeThem,
+    a legacy flag with no switch anywhere - so turning „רואה” off changed nothing on the map.
+    An SOS is always drawn, whatever the switch says. */
+ var _mm=memberForPair(p);
+ var _vis=_mm ? (_mm.seeThem!==false || gdSosNow(_mm)) : (p.seeThem!==false);
+ const show=_vis&&!p.pending&&gdPos(p);
  if(!show){ if(mapLayers.SHOMER[p.id]){ MAP.removeLayer(mapLayers.SHOMER[p.id]); delete mapLayers.SHOMER[p.id]; } return; }
  const ll=gdPos(p), live=gdIsLive(p);
  if(mapLayers.SHOMER[p.id]){ mapLayers.SHOMER[p.id].setLatLng(ll); mapLayers.SHOMER[p.id].setIcon(guardianIcon(p,live)); }
@@ -11605,7 +11614,7 @@ function privacyHTML(){ const he=currentLang==='he';
  <p><strong>איננו מוכרים את המידע שלך ואיננו משתפים אותו עם צדדים שלישיים.</strong> אין פרסומות ואין כלי מעקב/אנליטיקה.</p>
  <h4>השליטה שלך</h4>
  <ul>
- <li><strong>להפסיק שיתוף</strong> - מצב רפאים, כיבוי „שתף מיקום", או ניתוק שומר.</li>
+ <li><strong>להפסיק שיתוף</strong> - מצב רפאים (מפסיק מול כל השומרים), או הסרת שומר/ת מהרשימה.</li>
  <li><strong>למחוק הכל</strong> - הגדרות → איפוס האפליקציה.</li>
  <li>לבטל הרשאת מיקום דרך הדפדפן בכל עת.</li>
  </ul>
@@ -11633,7 +11642,7 @@ function privacyHTML(){ const he=currentLang==='he';
  <p><strong>We do not sell your data and do not share it with third parties.</strong> There are no ads and no tracking/analytics tools.</p>
  <h4>Your controls</h4>
  <ul>
- <li><strong>Stop sharing</strong> - ghost mode, turn off "Share my location", or disconnect a SHOMER.</li>
+ <li><strong>Stop sharing</strong> - ghost mode (stops it with every SHOMER), or remove a SHOMER from your list.</li>
  <li><strong>Delete everything</strong> - Settings → Reset app.</li>
  <li>Revoke location permission via your browser anytime.</li>
  </ul>
@@ -11707,12 +11716,12 @@ function renderConsentPoints(){
  const ul=document.getElementById('consent-points'); if(!ul)return; const he=currentLang==='he';
  const pts=he?[
  ['','המיקום החי שלך ישותף עם השומרים שאת/ה מחבר/ת - ורק איתם.'],
- ['','ניתן להפסיק בכל רגע: מצב רפאים, כיבוי השיתוף, או ניתוק.'],
+ ['','ניתן להפסיק בכל רגע: מצב רפאים (מול כל השומרים), או הסרת שומר/ת.'],
  ['','המיקום משותף רק לאחר אישור, ורק עם מי שבחרת. התראות ברקע מוגבלות בגרסת הדפדפן.'],
  ['','איננו מוכרים את המידע שלך ואיננו משתפים אותו עם צדדים שלישיים.']
  ]:[
  ['','Your live location is shared with SHOMERs you connect - and only them.'],
- ['','You can stop anytime: ghost mode, turn off sharing, or disconnect.'],
+ ['','You can stop anytime: ghost mode (stops it with every SHOMER), or remove a SHOMER.'],
  ['','Location is shared only after they accept, and only with people you choose. Background alerts are limited in the web version.'],
  ['','We do not sell your data or share it with third parties.']
  ];
@@ -11806,6 +11815,12 @@ shakeMigrate();   /* v337: Shake-to-SOS off by default; existing users keep it a
    v:4, which the migration then skipped - and v379 removed the toggle, so there was no way back.
    Unconditional beats versioned for something that must never be false. */
 try{ if(SS.shake && SS.shake.btnGate!==true){ SS.shake.btnGate=true; saveStore(); } }catch(e){}
+/* v393: clear a stale shareTo:false left by the per-person "stop sharing" switch removed in v392.
+   It never stopped anything, and leaving it would label those rows "No sharing" forever while the
+   presence record still reaches that SHOMER. The honest states are: paired (sharing), ghost mode
+   (paused for everyone), or removed. */
+try{ var _fx=0; (SS.circleMembers||[]).forEach(function(m){ if(m && m.shareTo===false){ delete m.shareTo; _fx++; } });
+     if(_fx) saveStore(); }catch(e){}
 dedupeCircleMembers();   /* v357: one guardian, one entry - merges the duplicates already in people's circles */
 /* AUTO-UPDATE - the concrete fix for "stuck on an old cached build" (the real cause of
    recurring login bugs once a fix is shipped): fetch the PUBLISHED version, bypassing
@@ -12042,7 +12057,7 @@ try{ hydrateIcons(document); }catch(e){}
 /* Loaded-build version - shown in the diagnostic panel so a phone can prove
    whether it's on the latest build or a STALE cached one. Keep in lock-step
    with sw.js SW_VERSION on every deploy. */
-var APP_VER='v392';
+var APP_VER='v393';
 var FB={ready:false,uid:null,db:null,_presTimer:null,connected:false,listening:false,pushState:'default',near:0,swVer:'?',
   authState:'connecting',sdkLoaded:false,persist:'',permErr:null,err:null,wsProbe:'',csp:''};
 /* Always log connection diagnostics to the console so the real failure can be SEEN in Chrome. */
