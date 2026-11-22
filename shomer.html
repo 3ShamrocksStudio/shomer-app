@@ -9194,8 +9194,10 @@ function buildMemberRow(m,he){
         promise. The controls that genuinely stop sharing are ghost mode (everyone) and Remove. */
        m.seeThem=!m.seeThem; b.classList.toggle('on',!!m.seeThem); b.setAttribute('aria-checked',String(!!m.seeThem)); saveStore();
        var _ar2=currentLang==='ar';
-       toast(m.seeThem ? (he?('רואה את המיקום של '+_mn):_ar2?('ترى موقع '+_mn):('You can see '+_mn+"'s location"))
-                       : (he?('לא רואה את המיקום של '+_mn):_ar2?('لا ترى موقع '+_mn):("You can't see "+_mn+"'s location")),
+       /* v395: say exactly what it does. An SOS, and an abduction report you file yourself,
+          still show a last-known position - so never promise "you can't see them" outright. */
+       toast(m.seeThem ? (he?(_mn+' יופיע/תופיע על המפה שלך'):_ar2?(_mn+' سيظهر على خريطتك'):(_mn+' will show on your map'))
+                       : (he?(_mn+' לא יופיע/תופיע על המפה שלך'):_ar2?(_mn+' لن يظهر على خريطتك'):(_mn+' will not show on your map')),
          m.seeThem?'grn':'amb');
        try{ var _sp=row.querySelector('.cm-status'), _s2=statusOf(m,he);
             if(_sp){ _sp.className='cm-status '+_s2.cls; _sp.textContent=_s2.txt; } }catch(e){}
@@ -10311,6 +10313,10 @@ function renderGeoReminders(){
 function checkGeoReminders(){
  var list=SS.geoReminders||[]; if(!list.length)return; var he=currentLang==='he', changed=false;
  list.forEach(function(r){ if(r.done)return; var m=memberById(r.memberId); if(!m)return;
+  /* v395: a reminder set BEFORE „רואה” was switched off would still announce where that person
+     is - by toast, by notification, and by closed-app push. If they are off your map they are off
+     your arrivals too. An SOS still comes through, like everywhere else. */
+  if(m.seeThem===false && !m.sos && !gdSosNow(m)) return;
   if(distMeters(m.lat,m.lng,r.lat,r.lng)<=r.radius){ r.done=true; changed=true;
    var body=r.memberName+(he?' הגיע/ה ל':' arrived at ')+(r.label||'');
    toast(r.memberName+(he?' הגיע/ה ל':' arrived at ')+(r.label||(he?'היעד':'destination')),'grn');
@@ -12072,7 +12078,7 @@ try{ hydrateIcons(document); }catch(e){}
 /* Loaded-build version - shown in the diagnostic panel so a phone can prove
    whether it's on the latest build or a STALE cached one. Keep in lock-step
    with sw.js SW_VERSION on every deploy. */
-var APP_VER='v394';
+var APP_VER='v395';
 var FB={ready:false,uid:null,db:null,_presTimer:null,connected:false,listening:false,pushState:'default',near:0,swVer:'?',
   authState:'connecting',sdkLoaded:false,persist:'',permErr:null,err:null,wsProbe:'',csp:''};
 /* Always log connection diagnostics to the console so the real failure can be SEEN in Chrome. */
