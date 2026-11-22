@@ -6062,7 +6062,7 @@ function shakeNativeSync(){ try{ var p=shomerNativePlugin(); if(!p) return;
        preference, and a web layer older than v378 wrote that preference false into every install
        that existed - so such an app can still report "I know the gate" while running ungated
        after a reboot or a cold start. Only v382+ cannot. */
-    window._nativeGateHard = !!(v && v.version >= 382);
+    window._nativeGateHard = !!(v && v.version >= 383);
     window._nativeGateOk=false;
     en();
     if(!(v && v.btnGate===true)) return;              /* gate off or unsupported - nothing to confirm */
@@ -11898,7 +11898,7 @@ try{ hydrateIcons(document); }catch(e){}
 /* Loaded-build version - shown in the diagnostic panel so a phone can prove
    whether it's on the latest build or a STALE cached one. Keep in lock-step
    with sw.js SW_VERSION on every deploy. */
-var APP_VER='v382';
+var APP_VER='v383';
 var FB={ready:false,uid:null,db:null,_presTimer:null,connected:false,listening:false,pushState:'default',near:0,swVer:'?',
   authState:'connecting',sdkLoaded:false,persist:'',permErr:null,err:null,wsProbe:'',csp:''};
 /* Always log connection diagnostics to the console so the real failure can be SEEN in Chrome. */

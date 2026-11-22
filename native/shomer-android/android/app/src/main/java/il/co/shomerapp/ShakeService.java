@@ -325,7 +325,11 @@ public class ShakeService extends Service implements SensorEventListener {
         // fires on any system write - on a phone with adaptive brightness, screen_brightness is
         // rewritten as the light changes, which would hold the 10 s window permanently open and
         // make the gate block nothing at all.
-        String[] keys = { "volume_music", "volume_ring", "volume_alarm",
+        /* v383: NOT volume_alarm. The receiver above already refuses alarm-stream broadcasts,
+           but a programmatic setStreamVolume writes this settings key too - so the observer was
+           still priming the gate from SHOMER's own siren start and stop. Nothing a user presses
+           before an SOS lands on the alarm stream, so dropping it costs nothing. */
+        String[] keys = { "volume_music", "volume_ring",
                           "volume_notification", "volume_system", "volume_voice_call" };
         boolean obsOk = false;
         for (String k : keys) {
