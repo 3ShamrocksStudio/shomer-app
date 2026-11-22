@@ -8059,17 +8059,17 @@ var HOWTO=[
   en:['The SOS button','Press the big red button. A 10-second countdown starts and one tap cancels it. The siren begins a few seconds in; your SHOMERs are alerted at the end of the countdown.'],
   ar:['زر الاستغاثة','اضغط الزر الأحمر الكبير. يبدأ عدّ من 10 ثوانٍ ويمكن إلغاؤه بضغطة واحدة. تبدأ الصفّارة بعد ثوانٍ قليلة، ويصل التنبيه إلى حُرّاسك في نهاية العدّ.']},
  {ic:'shake',
-  he:['כפתור + ניעור','כשהטלפון בכיס: לוחצים על כפתור העוצמה ומנערים חזק יחד. ניעור לבד לא מפעיל כלום - כך זה לא קורה בטעות. גם כאן יש 10 שניות לבטל.'],
-  en:['Button + shake','With the phone in your pocket: press the volume key and shake hard, together. A shake on its own does nothing, so it cannot happen by accident. You still get 10 seconds to cancel.'],
-  ar:['زر + هزّ','والهاتف في جيبك: اضغط زرّ الصوت وهزّ بقوة معًا. الهزّ وحده لا يفعل شيئًا، فلا يحدث بالخطأ. ولديك 10 ثوانٍ للإلغاء.']},
+  he:['כפתור + ניעור','כשהטלפון בכיס: לוחצים על כפתור העוצמה ומנערים חזק יחד. ניעור לבד לא מפעיל כלום - כך זה לא קורה בטעות. גם כאן יש 10 שניות לבטל. עובד באפליקציה לאנדרואיד בלבד, כי רק היא רואה לחיצות על כפתורים.'],
+  en:['Button + shake','With the phone in your pocket: press the volume key and shake hard, together. A shake on its own does nothing, so it cannot happen by accident. You still get 10 seconds to cancel. This works in the Android app only, because only it can see button presses.'],
+  ar:['زر + هزّ','والهاتف في جيبك: اضغط زرّ الصوت وهزّ بقوة معًا. الهزّ وحده لا يفعل شيئًا، فلا يحدث بالخطأ. ولديك 10 ثوانٍ للإلغاء. يعمل في تطبيق أندرويد فقط، لأنه الوحيد الذي يرى ضغطات الأزرار.']},
  {ic:'people',
   he:['השומרים שלכם','הוסיפו את מי שתרצו שיקבל התראה - משפחה, חברים, שכנים. בלי שומרים, SOS לא מגיע לאף אחד. זה הדבר הראשון שכדאי להגדיר.'],
   en:['Your SHOMERs','Add the people you want alerted - family, friends, neighbours. With no SHOMERs an SOS reaches nobody. Set this up first.'],
   ar:['حُرّاسك','أضف من تريد أن يصله التنبيه - العائلة، الأصدقاء، الجيران. بدون حُرّاس لا يصل الاستغاثة لأحد. ابدأ بهذا.']},
  {ic:'clock',
-  he:['צ׳ק-אין','יוצאים לדרך? קובעים זמן. אם לא מאשרים בסוף הזמן, השומרים שלכם מקבלים התראה אוטומטית.'],
-  en:['Check-in','Heading somewhere? Set a time. If you do not confirm when it runs out, your SHOMERs are alerted automatically.'],
-  ar:['تسجيل الوصول','ذاهب في طريق؟ حدّد وقتًا. إن لم تؤكّد عند انتهائه يصل التنبيه إلى حُرّاسك تلقائيًا.']},
+  he:['צ׳ק-אין','בוחרים כל כמה זמן האפליקציה תשאל „הכול בסדר?". אם לא מאשרים תוך שתי דקות, השומרים המקושרים שלכם מקבלים התראה. בלי שומרים מקושרים אין למי לשלוח.'],
+  en:['Check-in','You choose how often the app asks "All OK?". If you do not confirm within two minutes, your linked SHOMERs are alerted. With nobody linked, there is nobody to alert.'],
+  ar:['تسجيل الوصول','تختار كل كم وقت يسأل التطبيق „هل كل شيء بخير؟". إن لم تؤكّد خلال دقيقتين يصل التنبيه إلى حُرّاسك المرتبطين. وبدون حُرّاس مرتبطين لا يوجد من يُنبَّه.']},
  {ic:'test',
   he:['בדיקה בלי להפעיל','בהגדרות יש „בדיקת ניעור" - מרגישים איך זה עובד בלי לשלוח כלום ובלי צופר. כדאי לנסות פעם אחת, לפני שצריך.'],
   en:['Try it without sending anything','Settings has a shake test - you feel how it works with nothing sent and no siren. Worth doing once, before you need it.'],
@@ -8127,7 +8127,6 @@ function importantShow(it){
  document.body.appendChild(ov);
  var close=function(){ try{ ov.remove(); }catch(e){}
    try{ var seen=importantSeen(); if(seen.indexOf(it.id)<0){ seen.push(it.id); SS._impSeen=seen.slice(-20).join(','); saveStore(); } }catch(e){} };
- window._impClose=close;   /* v389: so the emergency clear and the Back handler can dismiss it */
  try{ document.getElementById('imp-ok').onclick=close;
       document.getElementById('imp-howto').onclick=function(){ close(); openHowTo(); };
       ov.addEventListener('click',function(e){ if(e.target===ov) close(); }); }catch(e){}
@@ -12024,7 +12023,7 @@ try{ hydrateIcons(document); }catch(e){}
 /* Loaded-build version - shown in the diagnostic panel so a phone can prove
    whether it's on the latest build or a STALE cached one. Keep in lock-step
    with sw.js SW_VERSION on every deploy. */
-var APP_VER='v389';
+var APP_VER='v390';
 var FB={ready:false,uid:null,db:null,_presTimer:null,connected:false,listening:false,pushState:'default',near:0,swVer:'?',
   authState:'connecting',sdkLoaded:false,persist:'',permErr:null,err:null,wsProbe:'',csp:''};
 /* Always log connection diagnostics to the console so the real failure can be SEEN in Chrome. */
@@ -15664,6 +15663,9 @@ function updNotesFor(notes){
 }
 function updShowBanner(pubV,done,notes){
   if(document.getElementById('upd-modal')) return;
+  /* v390: nor on top of the important notice - both sit at z-index 99998, so the later one
+     simply paints over the earlier and the user loses whichever mattered more. */
+  if(document.getElementById('imp-modal')) return;
   if(!done && window._updLaterV===pubV) return;   // "Later" means later - don't re-pop every 60s poll this session
   try{ if(popupTypingOrSetup()){ setTimeout(function(){ updShowBanner(pubV,done,notes); }, 4000); return; } }catch(e){}   /* v312: never mid-typing / onboarding */
   var he=currentLang==='he', ar=currentLang==='ar';
