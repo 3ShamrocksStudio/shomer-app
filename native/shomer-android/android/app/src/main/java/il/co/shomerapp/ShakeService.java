@@ -7,6 +7,7 @@ import android.app.PendingIntent;
 import android.app.Service;
 import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.media.AudioManager;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.database.ContentObserver;
@@ -140,6 +141,7 @@ public class ShakeService extends Service implements SensorEventListener {
        then swallow a DELIBERATE second shake - the situation can turn real between the cancel and
        the next shake, and before this the phone answered that shake with nothing at all. */
     sLastFire = 0;
+    btnMs = 0;   // v382: a cancel closes the button window too
   }
 
   static final String PREFS = "shomer_native";
@@ -266,7 +268,10 @@ public class ShakeService extends Service implements SensorEventListener {
    *  detector down on a healthy report - would leave nothing watching at all. */
   static volatile boolean sGateArmed = false;
   static final long BTN_WINDOW_MS = 10000;
-  private volatile long btnMs = 0;
+  /* v382: static, so a cancel can close it. A cancel already clears the re-fire stamp; it must
+     also close the button window, or "I'm fine" leaves ten seconds in which a bare shake starts
+     a fresh SOS - and the volume restore that the cancel itself triggers used to prime it. */
+  private static volatile long btnMs = 0;
   private BroadcastReceiver btnRx;
   private ContentObserver volObs;
 
@@ -283,13 +288,25 @@ public class ShakeService extends Service implements SensorEventListener {
   private void startButtonWatch() {
     if (btnRx == null) {
       btnRx = new BroadcastReceiver() {
-        @Override public void onReceive(Context c, Intent i) { btnMs = System.currentTimeMillis(); }
+        @Override public void onReceive(Context c, Intent i) {
+          /* v382: NOT the alarm stream. VOLUME_CHANGED_ACTION is broadcast for programmatic
+             setStreamVolume too, and SHOMER raises the alarm stream to maximum whenever a siren
+             starts and restores it whenever one stops - so the app was priming its own gate.
+             After a cancel, or while a linked SHOMER's alert rang, a bare shake was inside the
+             window and started a real SOS. The gate must only ever open for a human. */
+          try {
+            if (i != null && "android.media.VOLUME_CHANGED_ACTION".equals(i.getAction())
+                && i.getIntExtra("android.media.EXTRA_VOLUME_STREAM_TYPE", -1) == AudioManager.STREAM_ALARM) return;
+          } catch (Throwable e) {}
+          btnMs = System.currentTimeMillis();
+        }
       };
       IntentFilter f = new IntentFilter();
-      // Power: ACTION_SCREEN_ON only. ACTION_SCREEN_OFF also fires on a screen TIMEOUT, which
-      // would prime the gate every time the phone falls asleep in a pocket - the exact accident
-      // this gate exists to stop. So the power gesture is "wake the screen, then shake".
-      f.addAction(Intent.ACTION_SCREEN_ON);
+      /* v382: volume keys only. ACTION_SCREEN_ON fires on lift-to-wake, on an incoming
+         notification waking the display and on always-on-display transitions - none of which is
+         a button press, and each of which opened the gate for ten seconds. Screen-off was
+         already excluded because a screen timeout fires it. So the gesture is a volume key, and
+         the copy says exactly that. */
       f.addAction("android.media.VOLUME_CHANGED_ACTION");          // volume key, every recent Android
       f.addAction("android.media.MASTER_VOLUME_CHANGED_ACTION");
       try {
@@ -430,7 +447,7 @@ public class ShakeService extends Service implements SensorEventListener {
              the old behaviour - that a shake on its own opens the countdown. Someone who believed
              it would shake without pressing anything in a real emergency and nothing would
              happen. */
-        .setContentText(on ? ("לחיצה על כפתור עוצמה או הפעלה יחד עם ניעור חזק פותחת ספירה של " + (PRE_ALARM_MS / 1000) + " שניות לביטול. ניעור לבד לא מפעיל כלום.")
+        .setContentText(on ? ("לחיצה על כפתור העוצמה יחד עם ניעור חזק פותחת ספירה של " + (PRE_ALARM_MS / 1000) + " שניות לביטול. ניעור לבד לא מפעיל כלום.")
                            : "כדי שהתראות מהשומרים שלך יגיעו גם כשהטלפון נעול")
         .setSmallIcon(R.drawable.ic_stat_shomer)
         .setOngoing(true)

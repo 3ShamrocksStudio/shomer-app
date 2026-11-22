@@ -59,6 +59,16 @@ public class ShomerNativePlugin extends Plugin {
     call.resolve();
   }
 
+  /** v382: cancel ONLY the native pre-alarm countdown. stopAlarm also stops AlarmPlayer, which
+   *  carries a linked SHOMER's alert - so the web layer cannot use it to clean up after a shake
+   *  it refused without risking silencing someone else's live emergency. */
+  @PluginMethod
+  public void cancelPreAlarm(PluginCall call) {
+    try { ShakeService.cancelNativeAlarm(getContext()); } catch (Throwable e) {}
+    try { ((android.app.NotificationManager) getContext().getSystemService(Context.NOTIFICATION_SERVICE)).cancel(7); } catch (Throwable e) {}
+    call.resolve();
+  }
+
   @PluginMethod
   public void enableBackgroundShake(PluginCall call) {
     Intent i = new Intent(getContext(), ShakeService.class);
@@ -106,7 +116,7 @@ public class ShomerNativePlugin extends Plugin {
     c.getSharedPreferences(ShakeService.PREFS, Context.MODE_PRIVATE).edit()
         .putBoolean("shake_enabled", on != null && on).putString("shake_sens", sens)
         .putBoolean("shake_btn_gate", gate != null && gate).commit();
-    JSObject r = new JSObject(); r.put("ok", true); r.put("version", 381); r.put("btnGate", gate != null && gate);
+    JSObject r = new JSObject(); r.put("ok", true); r.put("version", 382); r.put("btnGate", gate != null && gate);
     r.put("listening", ShakeService.sListening);   // v366: is the detector really running?
     r.put("gateArmed", ShakeService.sGateArmed);   // v370: and is the button signal really registered?
     call.resolve(r);
