@@ -2255,7 +2255,7 @@ body.otp-active .ob-steps{display:none!important;}
  <div class="set-grp"><div class="set-row" onclick="opFrom('sh-checkin','sh-set');try{reflectCheckin()}catch(e){}" role="button" tabindex="0"><div class="sr-l"><div class="sr-ic"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3l7 3v5c0 5-3.4 8.5-7 10-3.6-1.5-7-5-7-10V6Z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><path d="M9 12l2 2 4-4" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div><div class="sr-nm" data-he="צ׳ק-אין הדדי (עם שומר/ת)" data-en="Mutual check-in (with a SHOMER)">צ׳ק-אין הדדי</div><div class="sr-sb" data-he="„הכל טוב??” תקופתי - אם לא תאשר/י, השומר/ת מקבל/ה אזעקה." data-en="Periodic 'Are you OK?' - if you don't confirm, your SHOMER is alerted.">„הכל טוב??” תקופתי.</div></div></div><span id="ci-set-state" style="font-size:12px;font-weight:700;color:var(--tx3);white-space:nowrap">כבוי</span></div></div>
  <div class="sec-cap mb12" id="shake-set-lbl">Shake-to-SOS</div>
  <div class="set-grp">
- <div class="set-row"><div class="sr-l"><div class="sr-ic"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M13 2L4 14h6l-1 8 9-12h-6Z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></svg></div><div><div class="sr-nm" id="shake-tog-lbl">ניעור ל-SOS</div><div class="sr-sb" id="shake-tog-sub">ניעור חזק הלוך-חזור פותח ספירה של 8 שניות. תמיד אפשר לבטל.</div></div></div><div class="tog" id="shake-tog" onclick="toggleShake(this)" role="switch" aria-checked="false"></div></div>
+ <div class="set-row"><div class="sr-l"><div class="sr-ic"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M13 2L4 14h6l-1 8 9-12h-6Z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></svg></div><div><div class="sr-nm" id="shake-tog-lbl">ניעור ל-SOS</div><div class="sr-sb" id="shake-tog-sub">לחיצה על כפתור יחד עם ניעור חזק פותחת ספירה של 10 שניות. תמיד אפשר לבטל.</div></div></div><div class="tog" id="shake-tog" onclick="toggleShake(this)" role="switch" aria-checked="false"></div></div>
  <div class="set-row" id="shake-gate-row"><div class="sr-l"><div class="sr-ic"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><rect x="6" y="2" width="12" height="20" rx="3" fill="none" stroke="currentColor" stroke-width="2"/><path d="M20 9v4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></div><div><div class="sr-nm" id="shake-gate-lbl">גם לחיצה על כפתור</div><div class="sr-sb" id="shake-gate-sub">כדי להפעיל SOS צריך ללחוץ על כפתור עוצמה (או על כפתור ההפעלה, להדלקת המסך) ואז לנער, תוך 10 שניות. מונע הפעלה בכיס, בריצה או בריקוד.</div></div></div><div class="tog" id="shake-gate-tog" onclick="toggleShakeGate(this)" role="switch" aria-checked="false"></div></div>
  </div>
  <div class="sl-card mb20">
@@ -2516,10 +2516,10 @@ body.otp-active .ob-steps{display:none!important;}
  <button class="call-btn" onclick="callNum('1202')"><div class="cc-ic"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3l7 3v5c0 5-3.4 8.5-7 10-3.6-1.5-7-5-7-10V6Z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></svg></div><div><div class="cc-nm" data-he="1202 - שב&quot;כ" data-en="1202 - Shin Bet">1202 - שב"כ</div><div class="cc-sb" data-he="אירוע ביטחוני" data-en="Security incident">אירוע ביטחוני</div></div></button>
  <div class="lock-card">
  <div class="lc-t"><svg class="ic" style="color:var(--g3)" viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="11" width="14" height="9" rx="2" fill="none" stroke="currentColor" stroke-width="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3" fill="none" stroke="currentColor" stroke-width="2"/></svg> <span data-he="SOS מנעילת מסך - ללא פתיחת אפליקציה" data-en="SOS from the lock screen - no need to open the app">SOS מנעילת מסך - ללא פתיחת אפליקציה</span></div>
- <div class="lc-b" data-i18n-html="1" data-he="<strong>iPhone:</strong> לחץ 3× על כפתור הצד → Emergency SOS.<br><strong>Android:</strong> לחץ 5× על כפתור ההפעלה → Emergency SOS.<br><strong>ניעור ל-SOS:</strong> כבוי כברירת מחדל. אפשר להפעיל בהגדרות. תמיד יש 8 שניות לבטל.<br>הגדר 100 כאיש קשר חירום ראשון בטלפון." data-en="<strong>iPhone:</strong> press the side button 3× → Emergency SOS.<br><strong>Android:</strong> press the power button 5× → Emergency SOS.<br><strong>Shake-to-SOS:</strong> off by default. Turn it on in Settings. You always get 8 seconds to cancel.<br>Set 100 as your phone's primary emergency contact.">
+ <div class="lc-b" data-i18n-html="1" data-he="<strong>iPhone:</strong> לחץ 3× על כפתור הצד → Emergency SOS.<br><strong>Android:</strong> לחץ 5× על כפתור ההפעלה → Emergency SOS.<br><strong>ניעור ל-SOS:</strong> צריך לחיצה על כפתור יחד עם ניעור חזק. תמיד יש 10 שניות לבטל.<br>הגדר 100 כאיש קשר חירום ראשון בטלפון." data-en="<strong>iPhone:</strong> press the side button 3× → Emergency SOS.<br><strong>Android:</strong> press the power button 5× → Emergency SOS.<br><strong>Shake-to-SOS:</strong> press a button (volume or power) while you shake. A shake alone does nothing. You always get 10 seconds to cancel.<br>Set 100 as your phone's primary emergency contact.">
  <strong>iPhone:</strong> לחץ 3× על כפתור הצד → Emergency SOS.<br>
  <strong>Android:</strong> לחץ 5× על כפתור ההפעלה → Emergency SOS.<br>
- <strong>ניעור ל-SOS:</strong> כבוי כברירת מחדל. אפשר להפעיל בהגדרות. תמיד יש 8 שניות לבטל.<br>
+ <strong>ניעור ל-SOS:</strong> צריך לחיצה על כפתור יחד עם ניעור חזק. תמיד יש 10 שניות לבטל.<br>
  הגדר 100 כאיש קשר חירום ראשון בטלפון.
  </div>
  </div>
@@ -2966,7 +2966,7 @@ const LANGS={
  geo_allow:'שתף מיקום',geo_next:'← כניסה למפה',geo_retry:' נסה שוב',geo_skip:'דלג – המשך בלי שיתוף מיקום',
  al1:'אזעקת SOS · שומר',al1d:'צליל החירום הייחודי - סירנה מתגברת, דיסוננטית ובלתי-נשכחת',al2:'',al2d:'',al3:'',al3d:'',
  vol:'עוצמת קול',test:'בדוק אזעקה',finish:'✓ כניסה לשומר',back:'← חזרה',
- shake:'<strong>ניעור ל-SOS:</strong> כבוי כברירת מחדל. כשמופעל, ניעור חזק מתחיל ספירה של 8 שניות שאפשר לבטל.',
+ shake:'<strong>ניעור ל-SOS:</strong> לחיצה על כפתור (עוצמה או הפעלה) יחד עם ניעור חזק מתחילה ספירה של 10 שניות שאפשר לבטל. ניעור לבד לא מפעיל כלום.',
  dms_ob:'<strong>Dead Man\'s Switch:</strong> אם לא אישרת "הכל טוב?" תוך X דק׳ - SOS אוטומטי.',
  nav_map:'מפה',nav_sos:'חירום מיידי',nav_upd:'באזור שלי',
  dd_rep:'דיווח אירוע',dd_dms:"שומר אוטומטי",dd_alarm:'הגדרות אזעקה',dd_prof:'פרופיל',dd_set:'הגדרות',dd_em:'מספרי חירום',
@@ -2999,7 +2999,7 @@ const LANGS={
  geo_allow:'Share location',geo_next:'Enter the map →',geo_retry:' Retry',geo_skip:'Skip – continue without sharing',
  al1:'SHOMER SOS alarm',al1d:'Our signature emergency sound - escalating, dissonant, unmistakable',al2:'',al2d:'',al3:'',al3d:'',
  vol:'Volume',test:'Test alarm',finish:'✓ Enter Shomer',back:'← Back',
- shake:'<strong>Shake-to-SOS:</strong> off by default. When on, a strong shake starts an 8-second countdown you can cancel.',
+ shake:'<strong>Shake-to-SOS:</strong> a button press (volume or power) together with a strong shake starts a 10-second countdown you can cancel. A shake alone does nothing.',
  dms_ob:"<strong>Auto-SHOMER:</strong> We ask 'All good?' every X min. No answer - we alert your SHOMERs.",
  nav_map:'Map',nav_sos:'Emergency',nav_upd:'Around me',
  dd_rep:'Report incident',dd_dms:"שומר אוטומטי",dd_alarm:'Alarm settings',dd_prof:'Profile',dd_set:'Settings',dd_em:'Emergency numbers',
@@ -3032,7 +3032,7 @@ const LANGS={
  geo_allow:'شارك الموقع',geo_next:'ادخل إلى الخريطة ←',geo_retry:' أعد المحاولة',geo_skip:'تخطّي - المتابعة بدون مشاركة الموقع',
  al1:'إنذار SOS · شومير',al1d:'صوت الطوارئ المميّز - تصاعدي، نشاز، لا يُنسى',al2:'',al2d:'',al3:'',al3d:'',
  vol:'مستوى الصوت',test:'اختبار الإنذار',finish:'✓ الدخول لشومير',back:'← رجوع',
- shake:'<strong>هز للاستغاثة:</strong> مُطفأ افتراضيًا. عند تشغيله، الهز القوي يبدأ عدًّا تنازليًا 8 ثوانٍ يمكن إلغاؤه.',
+ shake:'<strong>هز للاستغاثة:</strong> ضغط زرّ (الصوت أو التشغيل) مع هزّ قوي يبدأ عدًّا تنازليًا من 10 ثوانٍ يمكن إلغاؤه. الهزّ وحده لا يفعل شيئًا.',
  dms_ob:'<strong>مفتاح الأمان الميت:</strong> إذا لم تؤكد خلال X دقائق - إرسال تلقائي لنداء الاستغاثة.',
  nav_map:'الخريطة',nav_sos:'طوارئ',nav_upd:'في منطقتي',
  dd_rep:'الإبلاغ عن حادثة',dd_dms:'مفتاح الأمان الميت',dd_alarm:'إعدادات الإنذار',dd_prof:'الملف الشخصي',dd_set:'الإعدادات',dd_em:'أرقام الطوارئ',
@@ -3098,7 +3098,7 @@ const LANGS={
  geo_allow:'የቦታ ፍቃድ ፍቀድ',geo_next:'ቀጣይ →',geo_retry:' እንደገና ሞክር',geo_skip:'ዝለል',
  al1:'የፖሊስ ሳይረን',al1d:'440→1800Hz - በቀላሉ ይታወቃል',al2:'አደጋ ጊዜ ቀንድ',al2d:'1200Hz - ትኩረት ይስባል',al3:'ፈጣን ምቶች',al3d:'2800Hz - በጣም ጎርጓሪ',
  vol:'ድምፅ ደረጃ',test:'ማንቂያ ሙከራ',finish:'✓ ወደ Shomer ግባ',back:'← ተመለስ',
- shake:'<strong>Shake-to-SOS:</strong> off by default. When on, a strong shake starts an 8-second countdown you can cancel.',
+ shake:'<strong>Shake-to-SOS:</strong> a button press (volume or power) together with a strong shake starts a 10-second countdown you can cancel. A shake alone does nothing.',
  dms_ob:'<strong>שומר אוטומטי:</strong> X ደቂቃ ውስጥ ካልተረጋገጠ - SOS ይላካል።',
  nav_map:'ካርታ',nav_sos:'አደጋ',nav_upd:'ዜናዎች',
  dd_rep:'ክስተት ሪፖርት',dd_dms:'שומר אוטומטי',dd_alarm:'የማንቂያ ቅንጅቶች',dd_prof:'መገለጫ',dd_set:'ቅንጅቶች',dd_em:'አደጋ ጊዜ ቁጥሮች',
@@ -3246,7 +3246,7 @@ const AR={
  '102 - Fire & Rescue':'102 - الإطفاء والإنقاذ'/*SAFETY*/,'Fire / rescue':'حريق / إنقاذ'/*SAFETY*/,
  '1201 - ZAKA':'1201 - زاكا'/*SAFETY*/,'Accidents & disasters':'حوادث وكوارث'/*SAFETY*/,'1202 - Shin Bet':'1202 - الشاباك'/*SAFETY*/,'Security incident':'حادث أمني'/*SAFETY*/,
  'SOS from the lock screen - no need to open the app':'استغاثة من شاشة القفل - دون فتح التطبيق'/*SAFETY*/,
- '<strong>iPhone:</strong> press the side button 3× → Emergency SOS.<br><strong>Android:</strong> press the power button 5× → Emergency SOS.<br><strong>Shake-to-SOS:</strong> off by default. Turn it on in Settings. You always get 8 seconds to cancel.<br>Set 100 as your phone\'s primary emergency contact.':'<strong>آيفون:</strong> اضغط الزر الجانبي 3 مرات ← استغاثة طارئة.<br><strong>أندرويد:</strong> اضغط زر التشغيل 5 مرات ← استغاثة طارئة.<br><strong>الهزّ للاستغاثة:</strong> مُطفأ افتراضيًا. يمكن تشغيله من الإعدادات. لديك دائمًا 8 ثوانٍ للإلغاء.<br>اجعل 100 جهة الطوارئ الأساسية في هاتفك.'/*SAFETY*/,
+ '<strong>iPhone:</strong> press the side button 3× → Emergency SOS.<br><strong>Android:</strong> press the power button 5× → Emergency SOS.<br><strong>Shake-to-SOS:</strong> press a button (volume or power) while you shake. A shake alone does nothing. You always get 10 seconds to cancel.<br>Set 100 as your phone\'s primary emergency contact.':'<strong>آيفون:</strong> اضغط الزر الجانبي 3 مرات ← استغاثة طارئة.<br><strong>أندرويد:</strong> اضغط زر التشغيل 5 مرات ← استغاثة طارئة.<br><strong>الهزّ للاستغاثة:</strong> اضغط زرًّا (الصوت أو التشغيل) أثناء الهزّ. الهزّ وحده لا يفعل شيئًا. لديك دائمًا 10 ثوانٍ للإلغاء.<br>اجعل 100 جهة الطوارئ الأساسية في هاتفك.'/*SAFETY*/,
  // ── Settings long-tail (deep labels) ──
  'Dead Man\'s Switch':'مفتاح الأمان الميت',
  'Show a live route + distance when responding to an SOS. For verified responders/SHOMERs - not a replacement for 100/101/102.':'أظهر مساراً مباشراً + المسافة عند الاستجابة لنداء استغاثة. للمستجيبين/الحُرّاس المُوثَّقين - وليس بديلاً عن 100/101/102.'/*SAFETY*/,
@@ -3610,7 +3610,7 @@ let SS={
  lang:'he',
  user:{name:'',phone:'',profession:'',gender:'',ageBand:'',residency:''},
  alarm:{type:'shomer',vol:0.6},
- shake:{enabled:true,sens:'medium',v:2},    /* v341: ON by default again. v337 switched it off after a false alarm, but
+ shake:{enabled:true,sens:'medium',btnGate:true,v:2},   /* v378: gate ON - a shake alone must never start an SOS */    /* v341: ON by default again. v337 switched it off after a false alarm, but
                                                v338's 8-second countdown + big cancel made a false shake cost one tap
                                                instead of a siren in public. A guardian feature nobody can find is a
                                                feature that does not exist. Anyone who switched it OFF on purpose keeps
@@ -3789,7 +3789,7 @@ function updateShakeSensLabel(){
 function shakeMigrate(){
  try{
    var raw=null; try{ raw=JSON.parse(localStorage.getItem(SKEY)||'null'); }catch(e){}
-   if(raw && raw.shake && raw.shake.v>=3) return;
+   if(raw && raw.shake && raw.shake.v>=4) return;
    var existing=!!(raw && raw.onboarded);
    /* v341: v337 wrote enabled:false onto EVERY existing phone, so a stored false at v2 does not
       mean the user chose it - almost nobody ever saw the switch. Shake is back on by default now
@@ -3799,7 +3799,10 @@ function shakeMigrate(){
    var wasOn = !existing ? true
              : cameFromV337 ? true
              : !(raw.shake && raw.shake.enabled===false);
-   SS.shake={enabled:wasOn, sens:(raw&&raw.shake&&raw.shake.sens)||'medium', v:3};
+   /* v378: the button gate goes ON for everyone, new phones and existing ones. A shake on its own
+      must never start an SOS: press a button and shake together, then ten seconds to cancel.
+      Forced rather than defaulted, so nobody is left behind on shake-only. */
+   SS.shake={enabled:wasOn, sens:(raw&&raw.shake&&raw.shake.sens)||'medium', btnGate:true, v:4};
    if(existing && wasOn) SS.shake.notice=1;
    saveStore();
  }catch(e){}
@@ -3813,7 +3816,7 @@ function shakeNoticeMaybe(){
      SS.shake.notice=0; saveStore();
      var bar=document.createElement('div'); bar.className='nudge-bar'; bar.id='shake-v2-bar';
      bar.innerHTML='<span class="nudge-tx" style="font-weight:800">'+(he?'עדכון: ניעור ל-SOS בטוח יותר':ar?'تحديث: الهزّ للاستغاثة أصبح أكثر أمانًا':'Update: Shake-to-SOS is safer')+'</span>'
-       +'<span class="nudge-tx" style="font-size:14px">'+(he?'הליכה מהירה כבר לא אמורה להפעיל אותו. אחרי ניעור יש 8 שניות לבטל, לפני שמשהו נשלח.':ar?'المشي السريع لم يعد يشغّله. بعد الهزّ لديك 8 ثوانٍ للإلغاء قبل إرسال أي شيء.':'Fast walking should no longer set it off. After a shake you get 8 seconds to cancel before anything is sent.')+'</span>'
+       +'<span class="nudge-tx" style="font-size:14px">'+(he?'ניעור לבד לא מפעיל כלום - צריך גם לחיצה על כפתור. אחרי זה יש 10 שניות לבטל, לפני שמשהו נשלח.':ar?'الهزّ وحده لا يفعل شيئًا - يلزم ضغط زرّ أيضًا. بعد ذلك لديك 10 ثوانٍ للإلغاء قبل إرسال أي شيء.':'A shake alone does nothing now - it needs a button press too. After that you get 10 seconds to cancel before anything is sent.')+'</span>'
        +'<button class="nudge-cta" id="shake-v2-try">'+(he?'לבדוק עכשיו':ar?'جرّب الآن':'Try it now')+'</button><button class="nudge-x" aria-label="close">✕</button>';
      document.body.appendChild(bar);
      bar.querySelector('.nudge-x').onclick=function(){ bar.remove(); };
@@ -3844,7 +3847,8 @@ function toggleShakeGate(el){
  try{ shakeNativeSync(); }catch(e){}
  var he=currentLang==='he', ar=currentLang==='ar';
  try{ toast(SS.shake.btnGate ? (he?'לחצו על כפתור עוצמה, ואז נערו - תוך 10 שניות':ar?'اضغطوا زرّ الصوت ثم هزّوا الهاتف - خلال 10 ثوانٍ':'Press a volume key, then shake - within 10 seconds')
-                             : (he?'ניעור בלבד מפעיל SOS':ar?'الهزّ وحده يبدأ الاستغاثة':'A shake alone starts an SOS'),'grn'); }catch(e){}
+                             : (he?'זהירות: מעכשיו ניעור לבד מפעיל SOS':ar?'تنبيه: من الآن الهزّ وحده يبدأ الاستغاثة':'Careful: a shake alone will now start an SOS'),
+             SS.shake.btnGate?'grn':'amb'); }catch(e){}
  /* v365: this page updates itself; the app around it only changes on reinstall. If this APK is
     too old to know the setting, say so rather than letting the switch promise something the
     phone will not do. The setting is kept - it starts working when the app updates. */
@@ -3907,7 +3911,7 @@ function shakeTestHit(){
  var st=document.getElementById('shk-st'); if(!st) return;
  st.classList.add('hit');
  st.innerHTML=SHK_IC_OK+'<span id="shk-st-tx"></span>';
- setText('shk-st-tx',(he?'זוהה! במצב אמיתי עכשיו מתחילה ספירה של 8 שניות לביטול.':ar?'تم الرصد! في الوضع الحقيقي يبدأ الآن عدّ 8 ثوانٍ للإلغاء.':'Detected! For real, an 8-second cancel countdown would start now.')+(window._shakeTestHits>1?' ('+window._shakeTestHits+')':''));
+ setText('shk-st-tx',(he?'זוהה! במצב אמיתי עכשיו מתחילה ספירה של 10 שניות לביטול.':ar?'تم الرصد! في الوضع الحقيقي يبدأ الآن عدّ 10 ثوانٍ للإلغاء.':'Detected! For real, a 10-second cancel countdown would start now.')+(window._shakeTestHits>1?' ('+window._shakeTestHits+')':''));
 }
 function shakeTestClose(){
  if(_shakeTestT){ clearTimeout(_shakeTestT); _shakeTestT=null; }
@@ -4394,7 +4398,12 @@ function applyTranslations(){
  const he=currentLang==='he', ar=currentLang==='ar';
  setText('shake-set-lbl',he?'ניעור ל-SOS':ar?'الهزّ للاستغاثة':'Shake-to-SOS');
  setText('shake-tog-lbl',he?'ניעור ל-SOS':ar?'الهزّ للاستغاثة':'Shake-to-SOS');
- setText('shake-tog-sub',he?'ניעור חזק הלוך-חזור פותח ספירה של 8 שניות. תמיד אפשר לבטל.':ar?'هزّ قوي ذهابًا وإيابًا يبدأ عدًّا 8 ثوانٍ. يمكنك الإلغاء دائمًا.':'A strong back-and-forth shake starts an 8-second countdown. You can always cancel.');
+ /* v378: a button press and a shake together, then ten seconds. Only the Android app can tell
+    that apart from a shake alone, so in a browser the feature cannot run - say so on the switch
+    instead of leaving a control that quietly does nothing. */
+ setText('shake-tog-sub', !shomerNativePlugin()
+   ? (he?'עובד באפליקציה לאנדרואיד בלבד - צריך לחיצה על כפתור יחד עם הניעור, ודפדפן לא רואה כפתורים':ar?'يعمل في تطبيق أندرويد فقط - يلزم ضغط زرّ مع الهزّ، والمتصفّح لا يرى الأزرار':'Works in the Android app only - it needs a button press with the shake, and a browser cannot see buttons')
+   : (he?'לחיצה על כפתור יחד עם ניעור חזק פותחת ספירה של 10 שניות. תמיד אפשר לבטל.':ar?'ضغط زرّ مع هزّ قوي يبدأ عدًّا من 10 ثوانٍ. يمكنك الإلغاء دائمًا.':'A button press together with a strong shake starts a 10-second countdown. You can always cancel.'));
  setText('shake-gate-lbl',he?'גם לחיצה על כפתור':ar?'مع ضغط زرّ أيضًا':'Button press too');
  setText('shake-gate-sub',he?'כדי להפעיל SOS צריך ללחוץ על כפתור עוצמה (או על כפתור ההפעלה, להדלקת המסך) ואז לנער, תוך 10 שניות. מונע הפעלה בכיס, בריצה או בריקוד.':ar?'لبدء الاستغاثة اضغط زرّ الصوت (أو زرّ التشغيل لإضاءة الشاشة) ثم هزّ الهاتف خلال 10 ثوانٍ. يمنع البدء داخل الجيب أو أثناء الجري أو الرقص.':'To start an SOS, press a volume key (or the power button to wake the screen) and shake within 10 seconds. Stops it starting in a pocket, while running or dancing.');
  setText('shake-sens-lbl',he?'רגישות':ar?'الحساسية':'Sensitivity');
@@ -5500,8 +5509,14 @@ function startShakeDetection(){
         v365: and only once the APP ITSELF has confirmed the gate is on (_nativeGateOk). Keying
         this on the plugin merely existing meant a dead or killed ShakeService, or an APK too old
         to know the setting, left NO detector running at all - shake silently dead with the gate
-        on. Unconfirmed now means the in-app detector keeps working: fail open, never silent. */
-     if(SS.shake && SS.shake.btnGate && SS.shake.enabled===true && window._nativeGateOk===true) return;
+        on. Unconfirmed meant the in-app detector kept working: fail open, never silent.
+        v378: that fail-open is deliberately gone, and the condition is unconditional. A WebView
+        cannot see a volume or power key under any circumstance, so any shake THIS handler sees is
+        a shake ALONE - which must never start an SOS. Only the native service can tell the two
+        apart, so only it may fire. The cost is that shake-to-SOS does not work in a browser, and
+        does not work while the service is dead. For a trigger whose false positives go off in
+        someone's pocket, that is the direction to fail in. */
+     if(SS.shake && SS.shake.btnGate && SS.shake.enabled===true) return;
      /* v364: the test branch only while nothing real is running. Three separate places now close
         the test card when an SOS starts, so this cannot trigger today - but a shake must never be
         swallowed into the test path during an emergency on the strength of an invariant held
@@ -5537,7 +5552,9 @@ function shakeFired(src){
      if(sosPhase==='active' && window._sosSilent && src!=='native'){ try{ sosGoLoud(); }catch(_){} }   /* a silent SOS still turns loud on a shake */
      return 'ok';                                                /* never let a shake cancel or restart a running countdown */
    }
-   var now=Date.now(); if(now-(window._shakeFiredAt||0)<8000) return 'ok';  /* duplicate of the one just handled */
+   /* v378: this guard must OUTLAST the countdown. At 8 s each, it expired exactly when the siren
+      was due, so a shake a moment later started a second countdown and pushed the siren back. */
+   var now=Date.now(); if(now-(window._shakeFiredAt||0)<(SOS_PRE_S*1000+2000)) return 'ok';  /* duplicate of the one just handled */
    if(typeof triggerSOS!=='function') return 'wait';             /* page still booting */
    window._shakeFiredAt=now;
    triggerSOS('shake');
@@ -6183,7 +6200,7 @@ let curSosTrigger='manual';
    8 s full screen: vibration + soft beeps, "Sending SOS in 8…", one huge "Cancel - I'm OK" button.
    Nothing is sent and nothing is loud until it runs out; then the siren and the alerts go together.
    sosPhase is already 'countdown', so every existing guard (no second trigger, no DMS re-fire) holds. */
-var SOS_PRE_S=8, _sosPreT=null, _sosPreLeft=0;
+var SOS_PRE_S=10, _sosPreT=null, _sosPreLeft=0;   /* v378: ten seconds to cancel. MUST match PRE_ALARM_MS in ShakeService.java */
 function sosIsAuto(tr){ return tr==='shake'||tr==='dms'; }
 function sosPreStart(){
  window._sosPre=true; _sosPreLeft=SOS_PRE_S;
@@ -6236,7 +6253,7 @@ function sosPreNotify(on){
    if(!on){ reg.getNotifications({tag:'shomer-sos-pre'}).then(function(ns){ ns.forEach(function(n){ try{n.close();}catch(e){} }); }).catch(function(){}); return; }
    if(!document.hidden) return;
    var he=currentLang==='he', ar=currentLang==='ar';
-   reg.showNotification(he?'SH✡MER – שולח SOS בעוד 8 שניות':ar?'SH✡MER – إرسال SOS خلال 8 ثوانٍ':'SH✡MER – sending SOS in 8 seconds',
+   reg.showNotification(he?'SH✡MER – שולח SOS בעוד 10 שניות':ar?'SH✡MER – إرسال SOS خلال 10 ثوانٍ':'SH✡MER – sending SOS in 10 seconds',
      {body:he?'לא צריך עזרה? לחצו "ביטול – אני בסדר".':ar?'لا تحتاج مساعدة؟ اضغط "إلغاء – أنا بخير".':'No help needed? Tap "Cancel – I\'m OK".',
       tag:'shomer-sos-pre', requireInteraction:true, icon:'logo-192.png', badge:'logo-192.png', vibrate:[350,120,350],
       actions:[{action:'sos-stop', title:he?'ביטול – אני בסדר':ar?'إلغاء – أنا بخير':"Cancel – I'm OK"}], data:{sosStop:1}}).catch(function(){});
@@ -11850,7 +11867,7 @@ try{ hydrateIcons(document); }catch(e){}
 /* Loaded-build version - shown in the diagnostic panel so a phone can prove
    whether it's on the latest build or a STALE cached one. Keep in lock-step
    with sw.js SW_VERSION on every deploy. */
-var APP_VER='v377';
+var APP_VER='v378';
 var FB={ready:false,uid:null,db:null,_presTimer:null,connected:false,listening:false,pushState:'default',near:0,swVer:'?',
   authState:'connecting',sdkLoaded:false,persist:'',permErr:null,err:null,wsProbe:'',csp:''};
 /* Always log connection diagnostics to the console so the real failure can be SEEN in Chrome. */

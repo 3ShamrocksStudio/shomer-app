@@ -51,7 +51,7 @@ public class ShakeService extends Service implements SensorEventListener {
    * This service is a foreground service and keeps running with the screen off, so the
    * countdown belongs here. The web layer still runs its own countdown and cancel UI when it
    * is awake; whichever cancel happens first stops this one too. */
-  static final long PRE_ALARM_MS = 8000;   // must match SOS_PRE_S (8) in shomer.html
+  static final long PRE_ALARM_MS = 10000;   // v378: must match SOS_PRE_S (10) in shomer.html
   private static final android.os.Handler PRE = new android.os.Handler(android.os.Looper.getMainLooper());
   /* v371: volatile. These are written on the main looper (the sensor callback) and read from the
      Capacitor task thread (stopAlarm). A stale preTask read means removeCallbacks is skipped and
@@ -271,7 +271,9 @@ public class ShakeService extends Service implements SensorEventListener {
   private ContentObserver volObs;
 
   static boolean btnGate(Context c) {
-    try { return c.getSharedPreferences(PREFS, MODE_PRIVATE).getBoolean("shake_btn_gate", false); }
+    /* v378: default ON. A shake alone must never start an SOS, so the gate holds even before the
+       web layer has had a chance to configure it. */
+    try { return c.getSharedPreferences(PREFS, MODE_PRIVATE).getBoolean("shake_btn_gate", true); }
     catch (Throwable e) { return false; }
   }
 
@@ -329,7 +331,9 @@ public class ShakeService extends Service implements SensorEventListener {
 
   private void fireSos() {
     long now = System.currentTimeMillis();
-    if (sLastFire != 0 && now - sLastFire < 8000) return;   // still shaking after it fired - not a second press
+    /* v378: the guard must OUTLAST the countdown. At 8 s each it expired exactly when the siren
+       was due, so a shake a moment later re-armed a fresh countdown and pushed the siren back. */
+    if (sLastFire != 0 && now - sLastFire < PRE_ALARM_MS + 2000) return;   // still shaking after it fired
     sLastFire = now;
     // The 8 s pre-alarm, felt in the pocket: a strong buzz every second, no sound. Cancel (web or
     // notification) stops it through AlarmPlayer.stop(), which cancels the vibrator.
