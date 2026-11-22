@@ -2256,7 +2256,7 @@ body.otp-active .ob-steps{display:none!important;}
  <div class="sec-cap mb12" id="shake-set-lbl">Shake-to-SOS</div>
  <div class="set-grp">
  <div class="set-row"><div class="sr-l"><div class="sr-ic"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M13 2L4 14h6l-1 8 9-12h-6Z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></svg></div><div><div class="sr-nm" id="shake-tog-lbl">ניעור ל-SOS</div><div class="sr-sb" id="shake-tog-sub">לחיצה על כפתור יחד עם ניעור חזק פותחת ספירה של 10 שניות. תמיד אפשר לבטל.</div></div></div><div class="tog" id="shake-tog" onclick="toggleShake(this)" role="switch" aria-checked="false"></div></div>
- <div class="set-row" id="shake-gate-row"><div class="sr-l"><div class="sr-ic"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><rect x="6" y="2" width="12" height="20" rx="3" fill="none" stroke="currentColor" stroke-width="2"/><path d="M20 9v4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></div><div><div class="sr-nm" id="shake-gate-lbl">איך מפעילים</div><div class="sr-sb" id="shake-gate-sub">כדי להפעיל SOS צריך ללחוץ על כפתור עוצמה (או על כפתור ההפעלה, להדלקת המסך) ואז לנער, תוך 10 שניות. מונע הפעלה בכיס, בריצה או בריקוד.</div></div></div></div>
+ <div class="set-row" id="shake-gate-row" style="cursor:default;background:transparent"><div class="sr-l"><div class="sr-ic"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><rect x="6" y="2" width="12" height="20" rx="3" fill="none" stroke="currentColor" stroke-width="2"/><path d="M20 9v4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></div><div><div class="sr-nm" id="shake-gate-lbl">איך מפעילים</div><div class="sr-sb" id="shake-gate-sub">כדי להפעיל SOS צריך ללחוץ על כפתור עוצמה (או על כפתור ההפעלה, להדלקת המסך) ואז לנער, תוך 10 שניות. מונע הפעלה בכיס, בריצה או בריקוד.</div></div></div></div>
  </div>
  <div class="sl-card mb20">
  <div class="vol-row"><span class="vol-lbl" id="shake-sens-lbl">רגישות</span><span class="vol-val" id="shake-sens-v">בינונית</span></div>
@@ -3740,7 +3740,7 @@ function applyStoredSettings(){
  });
  // Shake UI
  const st=document.getElementById('shake-tog');if(st){st.classList.toggle('on',SS.shake.enabled===true);st.setAttribute('aria-checked',String(SS.shake.enabled===true));}
- const sg=document.getElementById('shake-gate-tog');if(sg){const _g=!!(SS.shake&&SS.shake.btnGate);sg.classList.toggle('on',_g);sg.setAttribute('aria-checked',String(_g));}   /* v359 */
+ /* v380: the shake-gate toggle element is gone - nothing to restore. */
  /* v360: only the Android app can see volume / power keys. In a browser the gate is unenforceable,
     so the row is not offered there rather than lying about what it does. */
  const sgr=document.getElementById('shake-gate-row');if(sgr){ sgr.style.display=shomerNativePlugin()?'':'none'; }
@@ -3839,24 +3839,8 @@ function saveRadius(v){SS.settings.radius=Number(v);setText('rad-v',String(v));s
 /* v359: require a hardware button press (volume or power) within 10 s before a shake counts.
    Off by default - with it on, a two-handed gesture is impossible for someone whose arm is
    held or whose phone is deep in a coat pocket, which is the case shake exists for. */
-function toggleShakeGate(el){
- el.classList.toggle('on');
- SS.shake=SS.shake||{}; SS.shake.btnGate=el.classList.contains('on');
- try{ el.setAttribute('aria-checked',String(SS.shake.btnGate)); }catch(e){}
- saveStore();
- try{ shakeNativeSync(); }catch(e){}
- var he=currentLang==='he', ar=currentLang==='ar';
- try{ toast(SS.shake.btnGate ? (he?'לחצו על כפתור עוצמה, ואז נערו - תוך 10 שניות':ar?'اضغطوا زرّ الصوت ثم هزّوا الهاتف - خلال 10 ثوانٍ':'Press a volume key, then shake - within 10 seconds')
-                             : (he?'זהירות: מעכשיו ניעור לבד מפעיל SOS':ar?'تنبيه: من الآن الهزّ وحده يبدأ الاستغاثة':'Careful: a shake alone will now start an SOS'),
-             SS.shake.btnGate?'grn':'amb'); }catch(e){}
- /* v365: this page updates itself; the app around it only changes on reinstall. If this APK is
-    too old to know the setting, say so rather than letting the switch promise something the
-    phone will not do. The setting is kept - it starts working when the app updates. */
- if(SS.shake.btnGate) setTimeout(function(){ try{
-   if(window._nativeGateSupported===false) toast(he?'צריך לעדכן את האפליקציה כדי שזה יעבוד - עד אז ניעור לבד עדיין מפעיל SOS'
-     :ar?'يجب تحديث التطبيق ليعمل هذا - حتى ذلك الحين الهزّ وحده يبدأ الاستغاثة':'Update the app for this to work - until then a shake alone still starts an SOS','amb');
- }catch(e){} }, 1200);
-}
+/* v380: toggleShakeGate removed. The gate is a rule, not a setting - there is no control
+   for it any more, and its old toasts promised that a shake alone would start an SOS. */
 
 function toggleShake(el){
  el.classList.toggle('on');
@@ -3901,7 +3885,11 @@ function shakeTestOpen(){
       :(SS.shake&&SS.shake.btnGate)
       ?(he?'לחצו על כפתור עוצמה, ואז נערו את הטלפון חזק, הלוך-חזור - תוך 10 שניות. בלי לחיצה על כפתור, ניעור לא נחשב. שום דבר לא נשלח ואין אזעקה.':ar?'اضغطوا زرّ الصوت ثم هزّوا الهاتف بقوة ذهابًا وإيابًا خلال 10 ثوانٍ. بدون ضغط الزرّ لا يُحتسب الهزّ. لا يُرسل شيء ولا يوجد إنذار.':'Press a volume key, then shake the phone hard, back and forth - within 10 seconds. Without a button press a shake does not count. Nothing is sent and there is no siren.')
       :(he?'נערו את הטלפון חזק, הלוך-חזור. שום דבר לא נשלח ואין אזעקה.':ar?'هزّ الهاتف بقوة ذهابًا وإيابًا. لا يُرسل شيء ولا يوجد إنذار.':'Shake the phone hard, back and forth. Nothing is sent and there is no siren.'))+'</p>'
-   +'<div class="shk-st" id="shk-st">'+SHK_IC_PHONE+'<span id="shk-st-tx">'+(he?'מחכה לניעור…':ar?'بانتظار الهزّ…':'Waiting for a shake…')+'</span></div>'
+   /* v380: in a browser nothing can ever resolve this, so show a static state instead of a
+      spinner that waits a minute and then times out. */
+   +'<div class="shk-st" id="shk-st">'+SHK_IC_PHONE+'<span id="shk-st-tx">'+((SS.shake&&SS.shake.btnGate&&!shomerNativePlugin())
+      ?(he?'לא זמין בדפדפן':ar?'غير متاح في المتصفّح':'Not available in a browser')
+      :(he?'מחכה לניעור…':ar?'بانتظار الهزّ…':'Waiting for a shake…'))+'</span></div>'
    +'<button type="button" class="shk-done" id="shk-done">'+(he?'סיום':ar?'إنهاء':'Done')+'</button>';
  document.body.appendChild(d);
  d.querySelector('#shk-done').onclick=function(){ shakeTestClose(); };
@@ -5557,7 +5545,15 @@ function shakeFired(src){
       this function never asked where the report came from. The web layer cannot see the buttons,
       so it cannot approve such a shake - it can only refuse it. _nativeGateSupported is false only
       once the app has answered without a btnGate field, i.e. it is provably too old to gate. */
-   if(src==='native' && SS.shake.btnGate && window._nativeGateSupported===false) return 'ok';
+   if(src==='native' && SS.shake.btnGate){
+     if(window._nativeGateSupported===false) return 'ok';          /* provably too old to gate: refuse */
+     /* v380: and while it is still UNKNOWN, wait rather than fire. The flag is undefined from page
+        load until the first setShakeConfig settles, and a native shake can land inside that window
+        on a cold start - which is exactly the locked-phone case. 'wait' makes the native side keep
+        retrying for 45 s instead of firing on an unverified gate, and the sync kick guarantees
+        something is resolving the flag even if enterApp has not run yet. */
+     if(window._nativeGateSupported!==true){ try{ shakeNativeSync(); }catch(_){} return 'wait'; }
+   }
    if(typeof sosPhase!=='undefined' && sosPhase!=='idle'){
      if(sosPhase==='active' && window._sosSilent && src!=='native'){ try{ sosGoLoud(); }catch(_){} }   /* a silent SOS still turns loud on a shake */
      return 'ok';                                                /* never let a shake cancel or restart a running countdown */
@@ -11641,6 +11637,11 @@ document.addEventListener('keydown',e=>{
 // Load persisted state, apply settings, then language.
 loadStore();
 shakeMigrate();   /* v337: Shake-to-SOS off by default; existing users keep it at the safe level */
+/* v380: the gate is a rule, not a setting, so it is re-asserted on every boot and not left to a
+   one-shot migration. A phone that ran v378 and tapped the old toggle off kept btnGate:false at
+   v:4, which the migration then skipped - and v379 removed the toggle, so there was no way back.
+   Unconditional beats versioned for something that must never be false. */
+try{ if(SS.shake && SS.shake.btnGate!==true){ SS.shake.btnGate=true; saveStore(); } }catch(e){}
 dedupeCircleMembers();   /* v357: one guardian, one entry - merges the duplicates already in people's circles */
 /* AUTO-UPDATE - the concrete fix for "stuck on an old cached build" (the real cause of
    recurring login bugs once a fix is shipped): fetch the PUBLISHED version, bypassing
@@ -11877,7 +11878,7 @@ try{ hydrateIcons(document); }catch(e){}
 /* Loaded-build version - shown in the diagnostic panel so a phone can prove
    whether it's on the latest build or a STALE cached one. Keep in lock-step
    with sw.js SW_VERSION on every deploy. */
-var APP_VER='v379';
+var APP_VER='v380';
 var FB={ready:false,uid:null,db:null,_presTimer:null,connected:false,listening:false,pushState:'default',near:0,swVer:'?',
   authState:'connecting',sdkLoaded:false,persist:'',permErr:null,err:null,wsProbe:'',csp:''};
 /* Always log connection diagnostics to the console so the real failure can be SEEN in Chrome. */
