@@ -272,6 +272,13 @@ public class ShakeService extends Service implements SensorEventListener {
    *  never update, every shake would be refused forever, and the web layer - which stands its own
    *  detector down on a healthy report - would leave nothing watching at all. */
   static volatile boolean sGateArmed = false;
+  /** v386: when WE last wrote the alarm volume. Refusing the alarm stream outright closed the
+   *  self-priming hole but also made the gesture unusable in the case it matters most: while a
+   *  linked SHOMER's alert is ringing, Android routes the volume keys to the alarm stream, so a
+   *  real press was refused and the user could not start their own SOS. Our own writes are
+   *  stamped here, so an alarm-stream change that is not ours still counts as a press. */
+  static volatile long sSelfVolMs = 0;
+  static void markSelfVolume() { sSelfVolMs = System.currentTimeMillis(); }
   static final long BTN_WINDOW_MS = 10000;
   /* v382: static, so a cancel can close it. A cancel already clears the re-fire stamp; it must
      also close the button window, or "I'm fine" leaves ten seconds in which a bare shake starts
@@ -299,15 +306,19 @@ public class ShakeService extends Service implements SensorEventListener {
              starts and restores it whenever one stops - so the app was priming its own gate.
              After a cancel, or while a linked SHOMER's alert rang, a bare shake was inside the
              window and started a real SOS. The gate must only ever open for a human. */
-          /* v385: an ALLOWLIST, not a denylist. Reading the stream and refusing only STREAM_ALARM
-             meant an OEM that omits the extra (-1) primed the gate from our own siren again. Now
-             a volume broadcast primes only when the extra is present and is not the alarm stream;
-             anything we cannot identify is refused. */
+          /* v385: an ALLOWLIST, not a denylist - a stream we cannot identify is refused, so an
+             OEM that omits the extra cannot let our own siren prime the gate.
+             v386: and the alarm stream is refused only when the change was OURS. Android routes
+             the volume keys to the alarm stream while any alarm audio plays, so a blanket refusal
+             made the gesture impossible exactly when a linked SHOMER's alert was ringing - the
+             case where the user most needs to start their own SOS. */
           try {
             String act = i == null ? null : i.getAction();
-            if ("android.media.VOLUME_CHANGED_ACTION".equals(act) || "android.media.MASTER_VOLUME_CHANGED_ACTION".equals(act)) {
+            if ("android.media.VOLUME_CHANGED_ACTION".equals(act)) {   // v386: the only action in the filter
               int st = i.getIntExtra("android.media.EXTRA_VOLUME_STREAM_TYPE", -1);
-              if (st < 0 || st == AudioManager.STREAM_ALARM) return;
+              if (st < 0) return;                                   // cannot identify it: refuse
+              if (st == AudioManager.STREAM_ALARM
+                  && System.currentTimeMillis() - sSelfVolMs < 2000) return;   // that one was ours
             }
           } catch (Throwable e) { return; }   /* v384: a malformed intent must not prime the gate */
           btnMs = System.currentTimeMillis();
@@ -320,7 +331,6 @@ public class ShakeService extends Service implements SensorEventListener {
          already excluded because a screen timeout fires it. So the gesture is a volume key, and
          the copy says exactly that. */
       f.addAction("android.media.VOLUME_CHANGED_ACTION");          // volume key, every recent Android
-      f.addAction("android.media.MASTER_VOLUME_CHANGED_ACTION");
       try {
         // Android 13+ demands an export flag on a runtime receiver. These are system broadcasts,
         // so NOT_EXPORTED still receives them and nothing else can forge one.

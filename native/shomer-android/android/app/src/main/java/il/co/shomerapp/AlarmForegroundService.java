@@ -27,6 +27,11 @@ import androidx.core.app.NotificationCompat;
  * vibration going. So volume-down / mute / the ringer switch can't kill it.
  */
 public class AlarmForegroundService extends Service {
+
+  /* v386: tell ShakeService this volume change was ours, so it does not count as a
+     button press. See ShakeService.sSelfVolMs. */
+  private static void markSelf() { try { ShakeService.markSelfVolume(); } catch (Throwable e) {} }
+
   private static final String CH = "shomer_sos";
   private static MediaPlayer mp;
   private AudioManager am;
@@ -60,7 +65,7 @@ public class AlarmForegroundService extends Service {
       am = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
       // Max the ALARM stream (ignores ringer/silent/DND) — remember to restore on stop.
       prevAlarmVol = am.getStreamVolume(AudioManager.STREAM_ALARM);
-      am.setStreamVolume(AudioManager.STREAM_ALARM, am.getStreamMaxVolume(AudioManager.STREAM_ALARM), 0);
+      markSelf(); am.setStreamVolume(AudioManager.STREAM_ALARM, am.getStreamMaxVolume(AudioManager.STREAM_ALARM), 0);
 
       if (mp != null) { try { mp.stop(); mp.release(); } catch (Exception e) {} mp = null; }
       mp = new MediaPlayer();
@@ -142,7 +147,7 @@ public class AlarmForegroundService extends Service {
   @Override
   public void onDestroy() {
     try { if (mp != null) { mp.stop(); mp.release(); mp = null; } } catch (Exception e) {}
-    try { if (am != null && prevAlarmVol >= 0) am.setStreamVolume(AudioManager.STREAM_ALARM, prevAlarmVol, 0); } catch (Exception e) {}
+    try { if (am != null && prevAlarmVol >= 0) markSelf(); am.setStreamVolume(AudioManager.STREAM_ALARM, prevAlarmVol, 0); } catch (Exception e) {}
     try { if (wl != null && wl.isHeld()) wl.release(); } catch (Exception e) {}
     try { Vibrator v = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE); if (v != null) v.cancel(); } catch (Exception e) {}
     super.onDestroy();

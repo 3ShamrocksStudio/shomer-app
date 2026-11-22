@@ -15,6 +15,11 @@ import android.os.Vibrator;
  * started, the alarm still sounds through here.
  */
 final class AlarmPlayer {
+
+  /* v386: tell ShakeService this volume change was ours, so it does not count as a
+     button press. See ShakeService.sSelfVolMs. */
+  private static void markSelf() { try { ShakeService.markSelfVolume(); } catch (Throwable e) {} }
+
   private static volatile MediaPlayer mp;   // v376: read without the monitor by isPlaying/isPlayingSos
 
   /** v366: is the fallback siren sounding right now? Anything that tears down a service must
@@ -46,7 +51,7 @@ final class AlarmPlayer {
       AudioManager am = (AudioManager) c.getSystemService(Context.AUDIO_SERVICE);
       sosCause = forSos;
       prevVol = am.getStreamVolume(AudioManager.STREAM_ALARM);
-      am.setStreamVolume(AudioManager.STREAM_ALARM, am.getStreamMaxVolume(AudioManager.STREAM_ALARM), 0);
+      markSelf(); am.setStreamVolume(AudioManager.STREAM_ALARM, am.getStreamMaxVolume(AudioManager.STREAM_ALARM), 0);
       /* v376: build it in a LOCAL and publish to mp only once it is actually sounding. Published
          first, a failed prepare() left a window where isPlayingSos() said yes - long enough for
          the native countdown, which ends at the same instant this fallback starts, to skip its
@@ -86,7 +91,7 @@ final class AlarmPlayer {
       try {
         if (prevVol >= 0) {
           AudioManager am2 = (AudioManager) c.getSystemService(Context.AUDIO_SERVICE);
-          if (am2 != null) am2.setStreamVolume(AudioManager.STREAM_ALARM, prevVol, 0);
+          if (am2 != null) markSelf(); am2.setStreamVolume(AudioManager.STREAM_ALARM, prevVol, 0);
         }
       } catch (Throwable t) {}
       prevVol = -1;
@@ -123,7 +128,7 @@ final class AlarmPlayer {
     mp = null; sosCause = false;   // v375
     try {
       AudioManager am = (AudioManager) c.getSystemService(Context.AUDIO_SERVICE);
-      if (prevVol >= 0) am.setStreamVolume(AudioManager.STREAM_ALARM, prevVol, 0);
+      if (prevVol >= 0) markSelf(); am.setStreamVolume(AudioManager.STREAM_ALARM, prevVol, 0);
     } catch (Exception e) {}
     prevVol = -1;
     try { Vibrator v = (Vibrator) c.getSystemService(Context.VIBRATOR_SERVICE); if (v != null) v.cancel(); } catch (Exception e) {}

@@ -6070,7 +6070,7 @@ function shakeNativeSync(){ try{ var p=shomerNativePlugin(); if(!p) return;
        preference, and a web layer older than v378 wrote that preference false into every install
        that existed - so such an app can still report "I know the gate" while running ungated
        after a reboot or a cold start. Only v382+ cannot. */
-    window._nativeGateHard = !!(v && v.version >= 385);
+    window._nativeGateHard = !!(v && v.version >= 386);
     window._nativeGateOk=false;
     en();
     if(!(v && v.btnGate===true)) return;              /* gate off or unsupported - nothing to confirm */
@@ -6380,6 +6380,11 @@ function cancelCountdown(){
  try{ simpleHush(); }catch(e){}
  clearInterval(sosCdTimer); sosGraceClear(); stopSosAlarm();
  sosPhase='idle'; sosActive=false; window._sosSilent=false;
+ /* v386: and clear the shake re-fire stamp. The native side deliberately clears its own on a
+    cancel, so that a situation turning real right after a false alarm still sends - and the web
+    side then dropped that report for twelve seconds, returning 'ok' so the native retry stopped
+    too. Siren screaming, nobody notified. The mirror of the v370 fix, one layer up. */
+ window._shakeFiredAt=0;
  const ov=document.getElementById('sos-cd');
  if(ov){ov.classList.remove('on');ov.setAttribute('aria-hidden','true');}
  const btn=document.getElementById('sos-btn');
@@ -6866,6 +6871,7 @@ function resolveSOS(skipPin,opt){
   if(opt.safe && !window._sosPractice){ try{ fbAlertPairedSafe(); }catch(e){} }   // v337: "false alarm - I'm OK" to my SHOMERs
   clearInterval(sosTimer); sosGraceClear(); stopSosAlarm(); stopMaxAttention(); releaseWake();
   try{ if(curSosId){ FB.db&&FB.db.ref('responders/'+curSosId).off&&FB.db.ref('responders/'+curSosId).off(); delete fbRespStreams[curSosId]; } fbClearResponderMarkers(); }catch(e){}
+  window._shakeFiredAt=0;   /* v386: a resolved SOS must not block the next gesture either */
   sosPhase='idle'; sosActive=false; window._sosSilent=false;
   try{ if(window.nativeSosTrackStop) nativeSosTrackStop(); }catch(e){}   /* v351: SOS over - background location stops now */
   try{ SOSBUS._endedAt=Date.now(); SOSBUS._helpAck=0; Object.keys(SOSBUS.responders).forEach(function(k){ delete SOSBUS.responders[k]; }); sosPaintResponders(); sosPaintMyHelp(); }catch(e){}   /* v312: "help is coming" ends with the SOS, online or not */
@@ -11906,7 +11912,7 @@ try{ hydrateIcons(document); }catch(e){}
 /* Loaded-build version - shown in the diagnostic panel so a phone can prove
    whether it's on the latest build or a STALE cached one. Keep in lock-step
    with sw.js SW_VERSION on every deploy. */
-var APP_VER='v385';
+var APP_VER='v386';
 var FB={ready:false,uid:null,db:null,_presTimer:null,connected:false,listening:false,pushState:'default',near:0,swVer:'?',
   authState:'connecting',sdkLoaded:false,persist:'',permErr:null,err:null,wsProbe:'',csp:''};
 /* Always log connection diagnostics to the console so the real failure can be SEEN in Chrome. */
