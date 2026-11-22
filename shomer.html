@@ -4460,6 +4460,8 @@ function applyTranslations(){
  }catch(e){}
  try{ gdApplyI18n(); gdRenderList(); gdRenderMarkers(); }catch(e){}
  try{ if(typeof guideApplyLang==='function'){ guideApplyLang(); guideFilter(); } }catch(e){}
+ /* v389: the how-to is a dynamic view too - without this it keeps the old language on screen. */
+ try{ if(typeof howtoRender==='function') howtoRender(); }catch(e){}
  try{ legalApplyI18n(); }catch(e){}
  try{ simpleRender(); simpleRenderSettings(); placeRender(); }catch(e){}   /* v355 */
  try{ reflectPinSetState(); }catch(e){} try{ reflectCheckin(); }catch(e){}   /* v350: these were rendered once in Hebrew and never followed a language change */
@@ -5008,7 +5010,7 @@ function dykMaybeShow(){
    community nudges all used to fire on their own timers and stack on top of each other - and
    on top of an invite waiting for approval. Rule: emergencies and invites come first; any
    lower-priority card waits until the screen is clear, and is removed when an invite opens. */
-var POPUP_LOW_IDS=['tp-bar','nudge-bar','dyk-bar','community-nudge','fsi-bar'], POPUP_LOW_SEL='.a2hs,.ios-install,.getapp-banner';
+var POPUP_LOW_IDS=['tp-bar','nudge-bar','dyk-bar','community-nudge','fsi-bar','imp-modal'],   /* v389: imp-modal must clear when an emergency starts */ POPUP_LOW_SEL='.a2hs,.ios-install,.getapp-banner';
 /* ══ v312 POPUP SCHEDULER - ONE gate for every nudge, tip and prompt (Dave, 3 Nov) ══
    The shake-to-SOS card used to pop up while the person was typing a code. Now every nudge/tip
    is queued here and shown only at an idle moment:
@@ -5123,7 +5125,7 @@ function checkSoftwareUpdate(){
      or who already dismissed this version's notes, still needs to be told. Check it on its own. */
   if(SS._notesPending!==APP_VER){
     fetch('version.json?cb='+Date.now(),{cache:'no-store'}).then(function(r){ return r.ok?r.json():null; })
-      .then(function(d){ if(d&&d.notes) importantCheck(d.notes); }).catch(function(){});
+      .then(function(d){ if(d&&d.v===APP_VER&&d.notes) importantCheck(d.notes); }).catch(function(){});   /* v389: match the running build */
   }
   if(SS._notesPending===APP_VER){
     fetch('version.json?cb='+Date.now(),{cache:'no-store'}).then(function(r){ return r.ok?r.json():null; }).then(function(d){
@@ -8053,9 +8055,9 @@ var EMERGENCY_GUIDE=[
    people who need it most are the ones reading it for the first time in a hurry. */
 var HOWTO=[
  {ic:'sos',
-  he:['כפתור ה-SOS','לוחצים על הכפתור האדום הגדול. מתחילה ספירה של 10 שניות, ואפשר לבטל בלחיצה אחת. בסוף הספירה נשלחת התראה לשומרים שלכם ונשמע צופר.'],
-  en:['The SOS button','Press the big red button. A 10-second countdown starts and one tap cancels it. At the end your SHOMERs are alerted and a siren sounds.'],
-  ar:['زر الاستغاثة','اضغط الزر الأحمر الكبير. يبدأ عدّ من 10 ثوانٍ ويمكن إلغاؤه بضغطة واحدة. في النهاية يصل تنبيه إلى حُرّاسك ويُطلق صفّارة.']},
+  he:['כפתור ה-SOS','לוחצים על הכפתור האדום הגדול. מתחילה ספירה של 10 שניות ואפשר לבטל בלחיצה אחת. הצופר מתחיל אחרי כמה שניות, וההתראה לשומרים שלכם נשלחת בסוף הספירה.'],
+  en:['The SOS button','Press the big red button. A 10-second countdown starts and one tap cancels it. The siren begins a few seconds in; your SHOMERs are alerted at the end of the countdown.'],
+  ar:['زر الاستغاثة','اضغط الزر الأحمر الكبير. يبدأ عدّ من 10 ثوانٍ ويمكن إلغاؤه بضغطة واحدة. تبدأ الصفّارة بعد ثوانٍ قليلة، ويصل التنبيه إلى حُرّاسك في نهاية العدّ.']},
  {ic:'shake',
   he:['כפתור + ניעור','כשהטלפון בכיס: לוחצים על כפתור העוצמה ומנערים חזק יחד. ניעור לבד לא מפעיל כלום - כך זה לא קורה בטעות. גם כאן יש 10 שניות לבטל.'],
   en:['Button + shake','With the phone in your pocket: press the volume key and shake hard, together. A shake on its own does nothing, so it cannot happen by accident. You still get 10 seconds to cancel.'],
@@ -8102,21 +8104,33 @@ function openHowTo(){ try{ howtoRender(); }catch(e){} op('sh-howto'); }
 function importantSeen(){ try{ return (SS._impSeen||'').split(','); }catch(e){ return []; } }
 function importantShow(it){
  var L=currentLang==='ar'?'ar':currentLang==='en'?'en':'he', he=L==='he';
- if(document.getElementById('imp-modal')) return false;
+ if(document.getElementById('imp-modal')||document.getElementById('upd-modal')) return false;
+ try{ if(popupTypingOrSetup()) return false; }catch(e){}
  var txt=it[L]||it.he||''; if(!txt) return false;
- var d=document.createElement('div'); d.id='imp-modal'; d.className='scrim on'; d.setAttribute('role','dialog'); d.setAttribute('aria-modal','true');
- d.innerHTML='<div class="sheet on" style="max-width:520px">'
-  +'<div class="sh-head"><span class="sh-ttl">'+(he?'חשוב לדעת':L==='ar'?'مهم أن تعرف':'Important to know')+'</span></div>'
-  +'<div class="sh-body"><div class="lc-b">'+txt+'</div></div>'
-  +'<div style="display:flex;gap:10px;padding:0 16px 16px">'
-  +'<button class="btn" id="imp-howto" style="flex:1">'+(he?'איך משתמשים':L==='ar'?'كيف نستخدم':'How to use')+'</button>'
-  +'<button class="btn btn-pri" id="imp-ok" style="flex:1">'+(he?'הבנתי':L==='ar'?'فهمت':'Got it')+'</button>'
+ /* v389: inline fixed styling, mirroring updShowBanner. The first version used class="scrim on"
+    and class="sheet on" - a pattern from a different app in another repo. There is no .scrim here
+    and .sheet defaults to translateY(100%), so the panel rendered below the viewport, invisible
+    and unreachable - while still reporting success, which burned the session's single popup slot
+    and silently suppressed the what's-new popup behind it. */
+ var ov=document.createElement('div'); ov.id='imp-modal';
+ ov.setAttribute('style','position:fixed;inset:0;z-index:99998;display:flex;align-items:center;justify-content:center;padding:22px;background:rgba(6,11,22,.74);font-family:Rubik,system-ui,-apple-system,Segoe UI,Roboto,sans-serif');
+ ov.setAttribute('role','dialog'); ov.setAttribute('aria-modal','true'); ov.dir = he||L==='ar' ? 'rtl':'ltr';
+ ov.innerHTML='<div style="width:100%;max-width:340px;max-height:calc(100dvh - 44px);overflow-y:auto;background:linear-gradient(180deg,#141a27,#0f1218);border:1px solid rgba(224,168,40,.34);border-radius:20px;padding:22px;color:#E8EDF6;box-shadow:0 18px 48px rgba(0,0,0,.5)">'
+  +'<div style="display:flex;align-items:center;gap:9px;margin-bottom:12px">'
+  +'<svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true" style="flex:0 0 auto"><circle cx="12" cy="12" r="9" fill="none" stroke="#E0A828" stroke-width="2"/><path d="M12 7.6v5" stroke="#E0A828" stroke-width="2" stroke-linecap="round"/><path d="M12 16.2h.01" stroke="#E0A828" stroke-width="2" stroke-linecap="round"/></svg>'
+  +'<div style="font-weight:700;font-size:17px;color:#E0A828">'+(he?'חשוב לדעת':L==='ar'?'مهم أن تعرف':'Important to know')+'</div></div>'
+  +'<div style="font-size:15px;line-height:1.6;margin-bottom:18px">'+txt+'</div>'
+  +'<div style="display:flex;gap:10px">'
+  +'<button type="button" id="imp-howto" style="flex:1;padding:12px;border-radius:12px;border:1px solid rgba(232,237,246,.26);background:transparent;color:#E8EDF6;font:inherit;font-weight:600;cursor:pointer">'+(he?'איך משתמשים':L==='ar'?'كيف نستخدم':'How to use')+'</button>'
+  +'<button type="button" id="imp-ok" style="flex:1;padding:12px;border-radius:12px;border:0;background:#E0A828;color:#101722;font:inherit;font-weight:700;cursor:pointer">'+(he?'הבנתי':L==='ar'?'فهمت':'Got it')+'</button>'
   +'</div></div>';
- document.body.appendChild(d);
- var close=function(){ try{ d.remove(); }catch(e){}
+ document.body.appendChild(ov);
+ var close=function(){ try{ ov.remove(); }catch(e){}
    try{ var seen=importantSeen(); if(seen.indexOf(it.id)<0){ seen.push(it.id); SS._impSeen=seen.slice(-20).join(','); saveStore(); } }catch(e){} };
+ window._impClose=close;   /* v389: so the emergency clear and the Back handler can dismiss it */
  try{ document.getElementById('imp-ok').onclick=close;
-      document.getElementById('imp-howto').onclick=function(){ close(); openHowTo(); }; }catch(e){}
+      document.getElementById('imp-howto').onclick=function(){ close(); openHowTo(); };
+      ov.addEventListener('click',function(e){ if(e.target===ov) close(); }); }catch(e){}
  return true;
 }
 function importantCheck(notes){
@@ -12010,7 +12024,7 @@ try{ hydrateIcons(document); }catch(e){}
 /* Loaded-build version - shown in the diagnostic panel so a phone can prove
    whether it's on the latest build or a STALE cached one. Keep in lock-step
    with sw.js SW_VERSION on every deploy. */
-var APP_VER='v388';
+var APP_VER='v389';
 var FB={ready:false,uid:null,db:null,_presTimer:null,connected:false,listening:false,pushState:'default',near:0,swVer:'?',
   authState:'connecting',sdkLoaded:false,persist:'',permErr:null,err:null,wsProbe:'',csp:''};
 /* Always log connection diagnostics to the console so the real failure can be SEEN in Chrome. */
