@@ -241,7 +241,11 @@ public class ShakeService extends Service implements SensorEventListener {
     // v359: with the button gate on, a shake only counts if a hardware button was pressed in
     // the last few seconds. Reset the counters so the gated shake does not leave a primed
     // detector that fires on the next stray jolt.
-    if (System.currentTimeMillis() - btnMs > BTN_WINDOW_MS) {   // v381: always - see btnGate
+    /* v385: and a NEGATIVE age is refused too. currentTimeMillis is wall-clock, so an NTP or
+       timezone correction after a press could leave the difference negative - permanently inside
+       the window, which is the gate wide open. */
+    long age = System.currentTimeMillis() - btnMs;
+    if (age < 0 || age > BTN_WINDOW_MS) {   // v381: always - see btnGate
       cCount = 0; cFirst = 0;
       return;
     }
@@ -295,9 +299,16 @@ public class ShakeService extends Service implements SensorEventListener {
              starts and restores it whenever one stops - so the app was priming its own gate.
              After a cancel, or while a linked SHOMER's alert rang, a bare shake was inside the
              window and started a real SOS. The gate must only ever open for a human. */
+          /* v385: an ALLOWLIST, not a denylist. Reading the stream and refusing only STREAM_ALARM
+             meant an OEM that omits the extra (-1) primed the gate from our own siren again. Now
+             a volume broadcast primes only when the extra is present and is not the alarm stream;
+             anything we cannot identify is refused. */
           try {
-            if (i != null && "android.media.VOLUME_CHANGED_ACTION".equals(i.getAction())
-                && i.getIntExtra("android.media.EXTRA_VOLUME_STREAM_TYPE", -1) == AudioManager.STREAM_ALARM) return;
+            String act = i == null ? null : i.getAction();
+            if ("android.media.VOLUME_CHANGED_ACTION".equals(act) || "android.media.MASTER_VOLUME_CHANGED_ACTION".equals(act)) {
+              int st = i.getIntExtra("android.media.EXTRA_VOLUME_STREAM_TYPE", -1);
+              if (st < 0 || st == AudioManager.STREAM_ALARM) return;
+            }
           } catch (Throwable e) { return; }   /* v384: a malformed intent must not prime the gate */
           btnMs = System.currentTimeMillis();
         }
@@ -330,8 +341,11 @@ public class ShakeService extends Service implements SensorEventListener {
            but a programmatic setStreamVolume writes this settings key too - so the observer was
            still priming the gate from SHOMER's own siren start and stop. Nothing a user presses
            before an SOS lands on the alarm stream, so dropping it costs nothing. */
-        String[] keys = { "volume_music", "volume_ring",
-                          "volume_notification", "volume_system", "volume_voice_call" };
+        /* v385: and fewer keys. volume_notification, volume_system and volume_voice_call are
+           rewritten by Do-Not-Disturb schedules and other apps, each of which opened a ten-second
+           window with nobody touching the phone. The broadcast above is the real signal; these
+           two are the fallback for devices that do not send it. */
+        String[] keys = { "volume_music", "volume_ring" };
         boolean obsOk = false;
         for (String k : keys) {
           try { getContentResolver().registerContentObserver(Settings.System.getUriFor(k), false, volObs); obsOk = true; }

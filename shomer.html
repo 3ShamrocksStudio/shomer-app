@@ -5552,7 +5552,10 @@ function shakeFired(src){
         otherwise the siren sounds ten seconds after a shake we just declined. cancelPreAlarm
         touches only that countdown, never AlarmPlayer, which may be carrying a linked SHOMER's
         alert. An app too old to have it keeps its own behaviour; updating is the fix there. */
-     var refuse=function(){ try{ var pp=shomerNativePlugin(); if(pp && pp.cancelPreAlarm) pp.cancelPreAlarm(); }catch(_){} return 'ok'; };
+     /* v385: a refusal also re-syncs. Without it a latched refusal persisted until the app was
+        next foregrounded; now the next shake can be judged on fresh facts. */
+     var refuse=function(){ try{ var pp=shomerNativePlugin(); if(pp && pp.cancelPreAlarm) pp.cancelPreAlarm(); }catch(_){}
+                            try{ shakeNativeSync(); }catch(_){} return 'ok'; };
      if(window._nativeGateSupported===false) return refuse();      /* provably too old to gate */
      if(window._nativeGateHard===false) return refuse();           /* gates on a preference we cannot trust */
      /* v380: and while it is still UNKNOWN, wait rather than fire. The flag is undefined from page
@@ -6038,7 +6041,12 @@ function shakeNativeSync(){ try{ var p=shomerNativePlugin(); if(!p) return;
      button+shake until the app was next foregrounded - a dropped emergency. Only a MISSING
      setShakeConfig proves the app is too old; a rejection leaves the flag unknown, so the shake
      path waits and retries instead of refusing. */
-  var old=function(hard){ window._nativeShakeOld=true; window._nativeGateOk=false; window._nativeGateHard=false;
+  var old=function(hard){ window._nativeShakeOld=true; window._nativeGateOk=false;
+    /* v385: _nativeGateHard must follow the same rule as _nativeGateSupported. Latching it false
+       on a mere rejection meant one transient bridge failure hard-refused every CORRECT button +
+       shake from then on - cancelling the armed countdown and telling the native side to stop
+       retrying. A rejection leaves BOTH unknown, so the shake waits and retries. */
+    window._nativeGateHard = hard===true ? false : undefined;
     window._nativeGateSupported = hard===true ? false : undefined;
     if(on) en(); else off(); };
   /* v359: btnGate - when on, the background detector only fires if a hardware button (volume or
@@ -6062,7 +6070,7 @@ function shakeNativeSync(){ try{ var p=shomerNativePlugin(); if(!p) return;
        preference, and a web layer older than v378 wrote that preference false into every install
        that existed - so such an app can still report "I know the gate" while running ungated
        after a reboot or a cold start. Only v382+ cannot. */
-    window._nativeGateHard = !!(v && v.version >= 384);
+    window._nativeGateHard = !!(v && v.version >= 385);
     window._nativeGateOk=false;
     en();
     if(!(v && v.btnGate===true)) return;              /* gate off or unsupported - nothing to confirm */
@@ -11898,7 +11906,7 @@ try{ hydrateIcons(document); }catch(e){}
 /* Loaded-build version - shown in the diagnostic panel so a phone can prove
    whether it's on the latest build or a STALE cached one. Keep in lock-step
    with sw.js SW_VERSION on every deploy. */
-var APP_VER='v384';
+var APP_VER='v385';
 var FB={ready:false,uid:null,db:null,_presTimer:null,connected:false,listening:false,pushState:'default',near:0,swVer:'?',
   authState:'connecting',sdkLoaded:false,persist:'',permErr:null,err:null,wsProbe:'',csp:''};
 /* Always log connection diagnostics to the console so the real failure can be SEEN in Chrome. */

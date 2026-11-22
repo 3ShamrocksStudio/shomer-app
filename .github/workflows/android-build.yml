@@ -22,6 +22,8 @@ on:
 # pushed its APK last - so the website served a build whose native version was behind the web
 # layer, which then refused every shake because it demands a minimum plugin version. Queue
 # instead of cancelling: each run publishes an APK, and dropping one mid-flight loses that build.
+# GitHub keeps only ONE pending run per group, so a middle commit's APK can still be dropped -
+# the newest always wins, which is what matters here, but it is not "every build publishes".
 concurrency:
   group: android-build
   cancel-in-progress: false
@@ -202,8 +204,14 @@ jobs:
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git add SHOMER.apk
           git commit -m "Auto-publish SHOMER.apk to website (build ${GITHUB_RUN_NUMBER}, v1.0.${GITHUB_RUN_NUMBER})" || { echo "no APK change"; exit 0; }
-          git pull --rebase --autostash origin main || true
-          git push origin HEAD:main
+          # v385: retry the push. A lost push leaves the website on an older APK, and the web
+          # layer refuses a shake from an app older than it - so a dropped push is not cosmetic.
+          for i in 1 2 3 4 5; do
+            git pull --rebase --autostash origin main || true
+            git push origin HEAD:main && exit 0
+            echo "push attempt $i failed, retrying"; sleep 5
+          done
+          echo "could not publish the APK after 5 attempts"; exit 1
 
       - name: Play build only - strip background permissions that need Play policy declarations
         # The website APK above keeps every native feature. The Play bundle still drops background

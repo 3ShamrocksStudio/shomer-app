@@ -116,7 +116,7 @@ public class ShomerNativePlugin extends Plugin {
     c.getSharedPreferences(ShakeService.PREFS, Context.MODE_PRIVATE).edit()
         .putBoolean("shake_enabled", on != null && on).putString("shake_sens", sens)
         .putBoolean("shake_btn_gate", gate != null && gate).commit();
-    JSObject r = new JSObject(); r.put("ok", true); r.put("version", 384); r.put("btnGate", gate != null && gate);
+    JSObject r = new JSObject(); r.put("ok", true); r.put("version", 385); r.put("btnGate", gate != null && gate);
     r.put("listening", ShakeService.sListening);   // v366: is the detector really running?
     r.put("gateArmed", ShakeService.sGateArmed);   // v370: and is the button signal really registered?
     call.resolve(r);
