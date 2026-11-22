@@ -254,7 +254,8 @@ public class ShakeService extends Service implements SensorEventListener {
    * button (volume up/down or power) and shake within BTN_WINDOW_MS. That is what stops a
    * pocket, a jog or a dance floor from starting an SOS.
    * Both signals reach us with the screen off because this is a foreground service:
-   *   - power  -> ACTION_SCREEN_ON (a wake). NOT screen-off: that also fires on a timeout.
+   *   - v384: no power/screen signal at all. ACTION_SCREEN_ON fires on lift-to-wake and on a
+   *     notification waking the display, neither of which is a button press.
    *   - volume -> VOLUME_CHANGED_ACTION, plus a ContentObserver on the volume_* keys only
    * Default OFF: with the gate on, a two-handed gesture is impossible for someone whose arm
    * is held or whose phone is in a coat pocket, which is the case shake exists for. */
@@ -297,7 +298,7 @@ public class ShakeService extends Service implements SensorEventListener {
           try {
             if (i != null && "android.media.VOLUME_CHANGED_ACTION".equals(i.getAction())
                 && i.getIntExtra("android.media.EXTRA_VOLUME_STREAM_TYPE", -1) == AudioManager.STREAM_ALARM) return;
-          } catch (Throwable e) {}
+          } catch (Throwable e) { return; }   /* v384: a malformed intent must not prime the gate */
           btnMs = System.currentTimeMillis();
         }
       };

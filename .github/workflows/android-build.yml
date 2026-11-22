@@ -18,6 +18,14 @@ on:
       - 'version.json'
       - 'native/**'
 
+# One build at a time. Two runs raced here and the SLOWER one, built from the older commit,
+# pushed its APK last - so the website served a build whose native version was behind the web
+# layer, which then refused every shake because it demands a minimum plugin version. Queue
+# instead of cancelling: each run publishes an APK, and dropping one mid-flight loses that build.
+concurrency:
+  group: android-build
+  cancel-in-progress: false
+
 jobs:
   build-android:
     runs-on: ubuntu-latest

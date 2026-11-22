@@ -4399,7 +4399,7 @@ function applyTranslations(){
    ? (he?'עובד באפליקציה לאנדרואיד בלבד - צריך לחיצה על כפתור יחד עם הניעור, ודפדפן לא רואה כפתורים':ar?'يعمل في تطبيق أندرويد فقط - يلزم ضغط زرّ مع الهزّ، والمتصفّح لا يرى الأزرار':'Works in the Android app only - it needs a button press with the shake, and a browser cannot see buttons')
    : (he?'לחיצה על כפתור העוצמה יחד עם ניעור חזק פותחת ספירה של 10 שניות. תמיד אפשר לבטל.':ar?'ضغط زرّ الصوت مع هزّ قوي يبدأ عدًّا من 10 ثوانٍ. يمكنك الإلغاء دائمًا.':'A volume-key press together with a strong shake starts a 10-second countdown. You can always cancel.'));
  setText('shake-gate-lbl',he?'איך מפעילים':ar?'كيف يبدأ':'How it starts');
- setText('shake-gate-sub',he?'כדי להפעיל SOS לוחצים על כפתור העוצמה ומנערים חזק - תוך 10 שניות. ניעור לבד לא מפעיל כלום. מונע הפעלה בכיס, בריצה או בריקוד.':ar?'لبدء الاستغاثة اضغط زرّ الصوت (أو زرّ التشغيل لإضاءة الشاشة) ثم هزّ الهاتف خلال 10 ثوانٍ. يمنع البدء داخل الجيب أو أثناء الجري أو الرقص.':'To start an SOS, press a volume key (or the power button to wake the screen) and shake within 10 seconds. Stops it starting in a pocket, while running or dancing.');
+ setText('shake-gate-sub',he?'כדי להפעיל SOS לוחצים על כפתור העוצמה ומנערים חזק - תוך 10 שניות. ניעור לבד לא מפעיל כלום. מונע הפעלה בכיס, בריצה או בריקוד.':ar?'لبدء الاستغاثة اضغط زرّ الصوت وهزّ الهاتف بقوة خلال 10 ثوانٍ. الهزّ وحده لا يفعل شيئًا. يمنع البدء داخل الجيب أو أثناء الجري أو الرقص.':'To start an SOS, press a volume key and shake hard within 10 seconds. A shake alone does nothing. Stops it starting in a pocket, while running or dancing.');
  setText('shake-sens-lbl',he?'רגישות':ar?'الحساسية':'Sensitivity');
  setText('sim-shake-lbl',he?'בדיקת ניעור – לא נשלח כלום':ar?'اختبار الهزّ – لا يُرسل شيء':'Test your shake – nothing is sent');
  setText('set-radius-lbl',he?'רדיוס התראה':'Alert radius');
@@ -6062,7 +6062,7 @@ function shakeNativeSync(){ try{ var p=shomerNativePlugin(); if(!p) return;
        preference, and a web layer older than v378 wrote that preference false into every install
        that existed - so such an app can still report "I know the gate" while running ungated
        after a reboot or a cold start. Only v382+ cannot. */
-    window._nativeGateHard = !!(v && v.version >= 383);
+    window._nativeGateHard = !!(v && v.version >= 384);
     window._nativeGateOk=false;
     en();
     if(!(v && v.btnGate===true)) return;              /* gate off or unsupported - nothing to confirm */
@@ -11898,7 +11898,7 @@ try{ hydrateIcons(document); }catch(e){}
 /* Loaded-build version - shown in the diagnostic panel so a phone can prove
    whether it's on the latest build or a STALE cached one. Keep in lock-step
    with sw.js SW_VERSION on every deploy. */
-var APP_VER='v383';
+var APP_VER='v384';
 var FB={ready:false,uid:null,db:null,_presTimer:null,connected:false,listening:false,pushState:'default',near:0,swVer:'?',
   authState:'connecting',sdkLoaded:false,persist:'',permErr:null,err:null,wsProbe:'',csp:''};
 /* Always log connection diagnostics to the console so the real failure can be SEEN in Chrome. */
