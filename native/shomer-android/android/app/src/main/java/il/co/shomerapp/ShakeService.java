@@ -317,8 +317,16 @@ public class ShakeService extends Service implements SensorEventListener {
             if ("android.media.VOLUME_CHANGED_ACTION".equals(act)) {   // v386: the only action in the filter
               int st = i.getIntExtra("android.media.EXTRA_VOLUME_STREAM_TYPE", -1);
               if (st < 0) return;                                   // cannot identify it: refuse
-              if (st == AudioManager.STREAM_ALARM
-                  && System.currentTimeMillis() - sSelfVolMs < 2000) return;   // that one was ours
+              if (st == AudioManager.STREAM_ALARM) {
+                /* v387: an alarm-stream change counts as a press ONLY while alarm audio is
+                   actually sounding, which is the only state in which Android routes the volume
+                   keys there. Otherwise a Bedtime or Do-Not-Disturb schedule, an OEM profile or
+                   any clock app muting alarms would open the gate with nobody near the phone. */
+                boolean sounding = false;
+                try { sounding = AlarmForegroundService.isPlaying() || AlarmPlayer.isPlaying(); } catch (Throwable e) {}
+                if (!sounding) return;
+                if (System.currentTimeMillis() - sSelfVolMs < 2000) return;   // that one was ours
+              }
             }
           } catch (Throwable e) { return; }   /* v384: a malformed intent must not prime the gate */
           btnMs = System.currentTimeMillis();

@@ -91,7 +91,7 @@ final class AlarmPlayer {
       try {
         if (prevVol >= 0) {
           AudioManager am2 = (AudioManager) c.getSystemService(Context.AUDIO_SERVICE);
-          if (am2 != null) markSelf(); am2.setStreamVolume(AudioManager.STREAM_ALARM, prevVol, 0);
+          if (am2 != null) { markSelf(); am2.setStreamVolume(AudioManager.STREAM_ALARM, prevVol, 0); }
         }
       } catch (Throwable t) {}
       prevVol = -1;
@@ -128,7 +128,7 @@ final class AlarmPlayer {
     mp = null; sosCause = false;   // v375
     try {
       AudioManager am = (AudioManager) c.getSystemService(Context.AUDIO_SERVICE);
-      if (prevVol >= 0) markSelf(); am.setStreamVolume(AudioManager.STREAM_ALARM, prevVol, 0);
+      if (prevVol >= 0) { markSelf(); am.setStreamVolume(AudioManager.STREAM_ALARM, prevVol, 0); }
     } catch (Exception e) {}
     prevVol = -1;
     try { Vibrator v = (Vibrator) c.getSystemService(Context.VIBRATOR_SERVICE); if (v != null) v.cancel(); } catch (Exception e) {}

@@ -5573,8 +5573,10 @@ function shakeFired(src){
       was due, so a shake a moment later started a second countdown and pushed the siren back. */
    var now=Date.now(); if(now-(window._shakeFiredAt||0)<(SOS_PRE_S*1000+2000)) return 'ok';  /* duplicate of the one just handled */
    if(typeof triggerSOS!=='function') return 'wait';             /* page still booting */
+   /* v387: stamp AFTER the handoff succeeds. Set first, a throw inside triggerSOS left the phase
+      idle with the stamp set - so the next correct gesture was dropped for twelve seconds. */
+   try{ triggerSOS('shake'); }catch(e){ return 'wait'; }
    window._shakeFiredAt=now;
-   triggerSOS('shake');
    return 'ok';
  }catch(e){ return 'wait'; }
 }
@@ -6070,7 +6072,7 @@ function shakeNativeSync(){ try{ var p=shomerNativePlugin(); if(!p) return;
        preference, and a web layer older than v378 wrote that preference false into every install
        that existed - so such an app can still report "I know the gate" while running ungated
        after a reboot or a cold start. Only v382+ cannot. */
-    window._nativeGateHard = !!(v && v.version >= 386);
+    window._nativeGateHard = !!(v && v.version >= 387);
     window._nativeGateOk=false;
     en();
     if(!(v && v.btnGate===true)) return;              /* gate off or unsupported - nothing to confirm */
@@ -11912,7 +11914,7 @@ try{ hydrateIcons(document); }catch(e){}
 /* Loaded-build version - shown in the diagnostic panel so a phone can prove
    whether it's on the latest build or a STALE cached one. Keep in lock-step
    with sw.js SW_VERSION on every deploy. */
-var APP_VER='v386';
+var APP_VER='v387';
 var FB={ready:false,uid:null,db:null,_presTimer:null,connected:false,listening:false,pushState:'default',near:0,swVer:'?',
   authState:'connecting',sdkLoaded:false,persist:'',permErr:null,err:null,wsProbe:'',csp:''};
 /* Always log connection diagnostics to the console so the real failure can be SEEN in Chrome. */

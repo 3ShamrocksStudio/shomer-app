@@ -147,7 +147,7 @@ public class AlarmForegroundService extends Service {
   @Override
   public void onDestroy() {
     try { if (mp != null) { mp.stop(); mp.release(); mp = null; } } catch (Exception e) {}
-    try { if (am != null && prevAlarmVol >= 0) markSelf(); am.setStreamVolume(AudioManager.STREAM_ALARM, prevAlarmVol, 0); } catch (Exception e) {}
+    try { if (am != null && prevAlarmVol >= 0) { markSelf(); am.setStreamVolume(AudioManager.STREAM_ALARM, prevAlarmVol, 0); } } catch (Exception e) {}
     try { if (wl != null && wl.isHeld()) wl.release(); } catch (Exception e) {}
     try { Vibrator v = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE); if (v != null) v.cancel(); } catch (Exception e) {}
     super.onDestroy();
