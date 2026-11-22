@@ -2256,7 +2256,7 @@ body.otp-active .ob-steps{display:none!important;}
  <div class="sec-cap mb12" id="shake-set-lbl">Shake-to-SOS</div>
  <div class="set-grp">
  <div class="set-row"><div class="sr-l"><div class="sr-ic"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M13 2L4 14h6l-1 8 9-12h-6Z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></svg></div><div><div class="sr-nm" id="shake-tog-lbl">ניעור ל-SOS</div><div class="sr-sb" id="shake-tog-sub">לחיצה על כפתור יחד עם ניעור חזק פותחת ספירה של 10 שניות. תמיד אפשר לבטל.</div></div></div><div class="tog" id="shake-tog" onclick="toggleShake(this)" role="switch" aria-checked="false"></div></div>
- <div class="set-row" id="shake-gate-row"><div class="sr-l"><div class="sr-ic"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><rect x="6" y="2" width="12" height="20" rx="3" fill="none" stroke="currentColor" stroke-width="2"/><path d="M20 9v4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></div><div><div class="sr-nm" id="shake-gate-lbl">גם לחיצה על כפתור</div><div class="sr-sb" id="shake-gate-sub">כדי להפעיל SOS צריך ללחוץ על כפתור עוצמה (או על כפתור ההפעלה, להדלקת המסך) ואז לנער, תוך 10 שניות. מונע הפעלה בכיס, בריצה או בריקוד.</div></div></div><div class="tog" id="shake-gate-tog" onclick="toggleShakeGate(this)" role="switch" aria-checked="false"></div></div>
+ <div class="set-row" id="shake-gate-row"><div class="sr-l"><div class="sr-ic"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><rect x="6" y="2" width="12" height="20" rx="3" fill="none" stroke="currentColor" stroke-width="2"/><path d="M20 9v4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></div><div><div class="sr-nm" id="shake-gate-lbl">איך מפעילים</div><div class="sr-sb" id="shake-gate-sub">כדי להפעיל SOS צריך ללחוץ על כפתור עוצמה (או על כפתור ההפעלה, להדלקת המסך) ואז לנער, תוך 10 שניות. מונע הפעלה בכיס, בריצה או בריקוד.</div></div></div></div>
  </div>
  <div class="sl-card mb20">
  <div class="vol-row"><span class="vol-lbl" id="shake-sens-lbl">רגישות</span><span class="vol-val" id="shake-sens-v">בינונית</span></div>
@@ -3894,7 +3894,11 @@ function shakeTestOpen(){
  d.innerHTML='<div class="shk-hd"><img src="SHOMER_logo_big.png" alt="" width="40" height="40"><h3>'+(he?'בדיקת ניעור':ar?'اختبار الهزّ':'Shake test')+'</h3></div>'
    /* v366: with the button gate on, a bare shake is SUPPOSED to do nothing here - say so, or the
       user shakes for 60 s, sees nothing and concludes the whole feature is broken. */
-   +'<p>'+((SS.shake&&SS.shake.btnGate)
+   +'<p>'+((SS.shake&&SS.shake.btnGate&&!shomerNativePlugin())
+      /* v379: the gate needs hardware buttons, which only the Android app can see - so in a
+         browser this test has no detector at all and would just time out after a minute. */
+      ?(he?'הבדיקה הזו עובדת באפליקציה לאנדרואיד בלבד: צריך לחיצה על כפתור יחד עם הניעור, ודפדפן לא רואה לחיצות על כפתורים.':ar?'هذا الاختبار يعمل في تطبيق أندرويد فقط: يلزم ضغط زرّ مع الهزّ، والمتصفّح لا يرى الأزرار.':'This test works in the Android app only: it needs a button press with the shake, and a browser cannot see button presses.')
+      :(SS.shake&&SS.shake.btnGate)
       ?(he?'לחצו על כפתור עוצמה, ואז נערו את הטלפון חזק, הלוך-חזור - תוך 10 שניות. בלי לחיצה על כפתור, ניעור לא נחשב. שום דבר לא נשלח ואין אזעקה.':ar?'اضغطوا زرّ الصوت ثم هزّوا الهاتف بقوة ذهابًا وإيابًا خلال 10 ثوانٍ. بدون ضغط الزرّ لا يُحتسب الهزّ. لا يُرسل شيء ولا يوجد إنذار.':'Press a volume key, then shake the phone hard, back and forth - within 10 seconds. Without a button press a shake does not count. Nothing is sent and there is no siren.')
       :(he?'נערו את הטלפון חזק, הלוך-חזור. שום דבר לא נשלח ואין אזעקה.':ar?'هزّ الهاتف بقوة ذهابًا وإيابًا. لا يُرسل شيء ولا يوجد إنذار.':'Shake the phone hard, back and forth. Nothing is sent and there is no siren.'))+'</p>'
    +'<div class="shk-st" id="shk-st">'+SHK_IC_PHONE+'<span id="shk-st-tx">'+(he?'מחכה לניעור…':ar?'بانتظار الهزّ…':'Waiting for a shake…')+'</span></div>'
@@ -4404,7 +4408,7 @@ function applyTranslations(){
  setText('shake-tog-sub', !shomerNativePlugin()
    ? (he?'עובד באפליקציה לאנדרואיד בלבד - צריך לחיצה על כפתור יחד עם הניעור, ודפדפן לא רואה כפתורים':ar?'يعمل في تطبيق أندرويد فقط - يلزم ضغط زرّ مع الهزّ، والمتصفّح لا يرى الأزرار':'Works in the Android app only - it needs a button press with the shake, and a browser cannot see buttons')
    : (he?'לחיצה על כפתור יחד עם ניעור חזק פותחת ספירה של 10 שניות. תמיד אפשר לבטל.':ar?'ضغط زرّ مع هزّ قوي يبدأ عدًّا من 10 ثوانٍ. يمكنك الإلغاء دائمًا.':'A button press together with a strong shake starts a 10-second countdown. You can always cancel.'));
- setText('shake-gate-lbl',he?'גם לחיצה על כפתור':ar?'مع ضغط زرّ أيضًا':'Button press too');
+ setText('shake-gate-lbl',he?'איך מפעילים':ar?'كيف يبدأ':'How it starts');
  setText('shake-gate-sub',he?'כדי להפעיל SOS צריך ללחוץ על כפתור עוצמה (או על כפתור ההפעלה, להדלקת המסך) ואז לנער, תוך 10 שניות. מונע הפעלה בכיס, בריצה או בריקוד.':ar?'لبدء الاستغاثة اضغط زرّ الصوت (أو زرّ التشغيل لإضاءة الشاشة) ثم هزّ الهاتف خلال 10 ثوانٍ. يمنع البدء داخل الجيب أو أثناء الجري أو الرقص.':'To start an SOS, press a volume key (or the power button to wake the screen) and shake within 10 seconds. Stops it starting in a pocket, while running or dancing.');
  setText('shake-sens-lbl',he?'רגישות':ar?'الحساسية':'Sensitivity');
  setText('sim-shake-lbl',he?'בדיקת ניעור – לא נשלח כלום':ar?'اختبار الهزّ – لا يُرسل شيء':'Test your shake – nothing is sent');
@@ -5548,6 +5552,12 @@ function shakeFired(src){
       shake since v340 and no shake (web or native) ever started the SOS. Test the binding itself. */
    if(typeof SS==='undefined' || !SS || !SS.shake) return 'wait';   /* settings not loaded yet - the cold-start race: retry */
    if(SS.shake.enabled!==true) return 'ok';                      /* switched off on purpose - nothing to retry */
+   /* v379: the last way a shake ALONE could still start an SOS. An app build older than the gate
+      has no button check in its service at all: it detects a bare shake and reports it here, and
+      this function never asked where the report came from. The web layer cannot see the buttons,
+      so it cannot approve such a shake - it can only refuse it. _nativeGateSupported is false only
+      once the app has answered without a btnGate field, i.e. it is provably too old to gate. */
+   if(src==='native' && SS.shake.btnGate && window._nativeGateSupported===false) return 'ok';
    if(typeof sosPhase!=='undefined' && sosPhase!=='idle'){
      if(sosPhase==='active' && window._sosSilent && src!=='native'){ try{ sosGoLoud(); }catch(_){} }   /* a silent SOS still turns loud on a shake */
      return 'ok';                                                /* never let a shake cancel or restart a running countdown */
@@ -11867,7 +11877,7 @@ try{ hydrateIcons(document); }catch(e){}
 /* Loaded-build version - shown in the diagnostic panel so a phone can prove
    whether it's on the latest build or a STALE cached one. Keep in lock-step
    with sw.js SW_VERSION on every deploy. */
-var APP_VER='v378';
+var APP_VER='v379';
 var FB={ready:false,uid:null,db:null,_presTimer:null,connected:false,listening:false,pushState:'default',near:0,swVer:'?',
   authState:'connecting',sdkLoaded:false,persist:'',permErr:null,err:null,wsProbe:'',csp:''};
 /* Always log connection diagnostics to the console so the real failure can be SEEN in Chrome. */
@@ -17372,7 +17382,8 @@ function simpleRender(){
   smpTxt('smp-sos-sub', phase==='active'?smpT('העזרה בדרך · לחצו לסיום','Help is coming · tap to end','المساعدة في الطريق · اضغطوا للإنهاء')
     :phase==='countdown'?smpT('לחצו לביטול','Tap to cancel','اضغطوا للإلغاء'):smpT('לחצו לעזרה','Tap for help','اضغطوا للمساعدة'));
   if(sb) sb.setAttribute('aria-label','SOS - '+(smpEl('smp-sos-sub')||{}).textContent);
-  var shakeOn=!!(SS.shake&&SS.shake.enabled===true);
+  /* v379: and only where it can actually run - the gate needs the Android app's button signals. */
+  var shakeOn=!!(SS.shake&&SS.shake.enabled===true) && !(SS.shake&&SS.shake.btnGate&&!shomerNativePlugin());
   /* v360: with the button gate on, a shake alone does nothing - say so here too, or Simple mode
      promises something the phone will not do. */
   var shakeGate=!!(SS.shake&&SS.shake.btnGate);

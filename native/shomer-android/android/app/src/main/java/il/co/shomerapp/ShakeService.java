@@ -26,7 +26,7 @@ import androidx.core.app.NotificationCompat;
 /**
  * v337: detection = ShakeDetector (deliberate back-and-forth jerks, gait rejected; same code as the web).
  * Runs only while the user's switch is on (prefs shomer_native/shake_enabled, set by the web app through
- * setShakeConfig). A detection never sounds the siren: it buzzes for the 8 s pre-alarm, shows a notification
+ * setShakeConfig). A detection never sounds the siren: it buzzes for the pre-alarm (PRE_ALARM_MS), shows a notification
  * with "ביטול – אני בסדר", and hands the web app the trigger, which runs the cancellable countdown.
  *
  * BACKGROUND SHAKE-TO-SOS — the capability a pure PWA cannot have.
@@ -274,7 +274,7 @@ public class ShakeService extends Service implements SensorEventListener {
     /* v378: default ON. A shake alone must never start an SOS, so the gate holds even before the
        web layer has had a chance to configure it. */
     try { return c.getSharedPreferences(PREFS, MODE_PRIVATE).getBoolean("shake_btn_gate", true); }
-    catch (Throwable e) { return false; }
+    catch (Throwable e) { return true; }   // v379: a prefs failure must not re-open shake-only
   }
 
   private void startButtonWatch() {
@@ -331,17 +331,20 @@ public class ShakeService extends Service implements SensorEventListener {
 
   private void fireSos() {
     long now = System.currentTimeMillis();
-    /* v378: the guard must OUTLAST the countdown. At 8 s each it expired exactly when the siren
+    /* v378: the guard must OUTLAST the countdown. At 8 s each (now 10) it expired exactly when the siren
        was due, so a shake a moment later re-armed a fresh countdown and pushed the siren back. */
     if (sLastFire != 0 && now - sLastFire < PRE_ALARM_MS + 2000) return;   // still shaking after it fired
     sLastFire = now;
-    // The 8 s pre-alarm, felt in the pocket: a strong buzz every second, no sound. Cancel (web or
+    // The pre-alarm, felt in the pocket: a strong buzz every second, no sound. Cancel (web or
     // notification) stops it through AlarmPlayer.stop(), which cancels the vibrator.
     try {
       Vibrator v = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
       if (v != null) {
-        long[] pat = new long[17]; pat[0] = 0;
-        for (int i = 1; i < 17; i += 2) { pat[i] = 450; pat[i + 1] = 550; }
+        /* v379: derived from PRE_ALARM_MS. Hard-coded at 8 s it stopped two seconds before the
+           siren once the countdown became 10 s - in a pocket that reads as "it cancelled". */
+        int beats = (int) (PRE_ALARM_MS / 1000);
+        long[] pat = new long[beats * 2 + 1]; pat[0] = 0;
+        for (int i = 1; i < pat.length - 1; i += 2) { pat[i] = 450; pat[i + 1] = 550; }
         if (Build.VERSION.SDK_INT >= 26) v.vibrate(VibrationEffect.createWaveform(pat, -1));
         else v.vibrate(pat, -1);
       }
@@ -390,7 +393,7 @@ public class ShakeService extends Service implements SensorEventListener {
     }
     Notification fire = new NotificationCompat.Builder(this, "shomer_shake_fire")
         .setContentTitle("SH\u2721MER – זוהה ניעור")
-        .setContentText("SOS יישלח בעוד 8 שניות. לא צריך? הקישו ביטול.")
+        .setContentText("SOS יישלח בעוד " + (PRE_ALARM_MS / 1000) + " שניות. לא צריך? הקישו ביטול.")   // v379: derived, never a hard-coded number that drifts
         .setSmallIcon(R.drawable.ic_stat_shomer)
         .addAction(0, "ביטול – אני בסדר", AlarmForegroundService.stopIntent(this))
         .setTimeoutAfter(10 * 60 * 1000L)
@@ -420,7 +423,12 @@ public class ShakeService extends Service implements SensorEventListener {
     PendingIntent pi = PendingIntent.getActivity(this, 0, open, PendingIntent.FLAG_IMMUTABLE);
     return new NotificationCompat.Builder(this, CH)
         .setContentTitle(on ? "SH\u2721MER – ניעור ל-SOS פעיל" : "SH\u2721MER פועל ברקע")
-        .setContentText(on ? "ניעור חזק הלוך-חזור פותח ספירה של 8 שניות לביטול" : "כדי שהתראות מהשומרים שלך יגיעו גם כשהטלפון נעול")
+        /* v379: this is the one line visible the entire time shake is armed, and it still promised
+             the old behaviour - that a shake on its own opens the countdown. Someone who believed
+             it would shake without pressing anything in a real emergency and nothing would
+             happen. */
+        .setContentText(on ? ("לחיצה על כפתור עוצמה או הפעלה יחד עם ניעור חזק פותחת ספירה של " + (PRE_ALARM_MS / 1000) + " שניות לביטול. ניעור לבד לא מפעיל כלום.")
+                           : "כדי שהתראות מהשומרים שלך יגיעו גם כשהטלפון נעול")
         .setSmallIcon(R.drawable.ic_stat_shomer)
         .setOngoing(true)
         .setContentIntent(pi)
