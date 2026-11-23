@@ -71,15 +71,37 @@ public class AlarmForegroundService extends Service {
        so press+shake buzzed, raised the notification, opened the app, and then went silent.
        onDestroy could not clear it either: mp.stop() on an unprepared player throws, and it ran
        first in a shared try, so mp = null never executed. A permanent lie, per process. */
+    /* v401: raising the volume is an OPTIMISATION, never a precondition. It sat in the same try
+       as the player, so a SecurityException from setStreamVolume - which Android throws when a
+       Do-Not-Disturb policy owns the alarm stream and the app holds no policy-access permission -
+       aborted the whole siren start before a player was ever built. That reproduces on the same
+       device every time and survives a reboot, which matches the field report better than the
+       stale-handle fault fixed in v398. A quiet siren beats no siren: the volume is tried, and
+       whatever happens the player is still built and started. */
     MediaPlayer p = null;
     try {
-      am = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
-      // Max the ALARM stream (ignores ringer/silent/DND) — remember to restore on stop.
-      prevAlarmVol = am.getStreamVolume(AudioManager.STREAM_ALARM);
-      markSelf(); am.setStreamVolume(AudioManager.STREAM_ALARM, am.getStreamMaxVolume(AudioManager.STREAM_ALARM), 0);
+      try {
+        am = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
+        /* Do NOT re-snapshot while a siren is already up, or the second start records the maximum
+           WE set as the user's own setting and pins their alarm volume to max for good. */
+        if (am != null && mp == null && prevAlarmVol < 0) prevAlarmVol = am.getStreamVolume(AudioManager.STREAM_ALARM);
+        if (am != null) { markSelf(); am.setStreamVolume(AudioManager.STREAM_ALARM, am.getStreamMaxVolume(AudioManager.STREAM_ALARM), 0); }
+      } catch (Throwable e) { note(e, "volume"); }
 
       if (mp != null) { try { mp.stop(); } catch (Exception e) {} try { mp.release(); } catch (Exception e) {} mp = null; }
       p = new MediaPlayer();
+      /* v401: a player can also die mid-playback (MEDIA_ERROR_SERVER_DIED resets it to Idle).
+         Without this, mp stayed non-null and silent and the pre-alarm went on believing a siren
+         was up - the v398 bug by another route. */
+      final MediaPlayer self = p;
+      p.setOnErrorListener(new MediaPlayer.OnErrorListener() {
+        @Override public boolean onError(MediaPlayer m, int what, int extra) {
+          note(new RuntimeException("mp onError " + what + "/" + extra), "play");
+          if (mp == self) mp = null;
+          try { AlarmPlayer.start(getApplicationContext(), true); } catch (Throwable t) {}
+          return true;
+        }
+      });
       AudioAttributes aa = new AudioAttributes.Builder()
           .setUsage(AudioAttributes.USAGE_ALARM)
           .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION)
@@ -109,20 +131,38 @@ public class AlarmForegroundService extends Service {
         }
       } catch (Throwable e) {}
     } catch (Throwable e) {
-      /* The siren did not start. Say so, release the half-built player, and hand the alarm volume
-         back - left pinned at maximum it would mean no siren AND the user's next alarm clock
-         screaming, and a second failed start would re-snapshot that maximum as prevAlarmVol and
-         lose their real setting for good. */
+      /* This player did not start. Record why, release the half-built one, and hand the alarm
+         volume back - left pinned at maximum it would mean no siren AND the user's next alarm
+         clock screaming. */
+      note(e, "start");
       try { if (p != null) p.release(); } catch (Throwable t) {}
-      mp = null;
-      try {
-        if (am != null && prevAlarmVol >= 0) { markSelf(); am.setStreamVolume(AudioManager.STREAM_ALARM, prevAlarmVol, 0); }
-      } catch (Throwable t) {}
-      prevAlarmVol = -1;
-      /* Last resort: the siren is the whole product. Try the fallback player, which runs inside
-         ShakeService's already-running foreground service. */
-      try { AlarmPlayer.start(getApplicationContext(), true); } catch (Throwable t) {}
+      /* v401: only if the dead player is the one we published. Clearing unconditionally could
+         deny a siren that IS sounding from an earlier start, which would hand the pre-alarm the
+         same false answer in the opposite direction. */
+      if (mp == p) mp = null;
+      if (mp == null) {
+        try {
+          if (am != null && prevAlarmVol >= 0) { markSelf(); am.setStreamVolume(AudioManager.STREAM_ALARM, prevAlarmVol, 0); }
+        } catch (Throwable t) {}
+        prevAlarmVol = -1;
+        /* Last resort: the siren is the whole product. Try the fallback player, which runs inside
+           ShakeService's already-running foreground service. */
+        try { AlarmPlayer.start(getApplicationContext(), true); } catch (Throwable t) {}
+      }
     }
+  }
+
+  /** v401: the siren used to fail in total silence - every throw swallowed, and not one Log call
+   *  in this package, so a phone that never screamed could not be told from one that was never
+   *  asked to. The last few failures are kept where the web layer can read them back
+   *  (ShomerNativePlugin.getAlarmFaults), so a tester's device can say what actually went wrong. */
+  static final java.util.List<String> FAULTS = java.util.Collections.synchronizedList(new java.util.ArrayList<String>());
+  static void note(Throwable e, String where) {
+    try {
+      String s = System.currentTimeMillis() + " " + where + ": " + (e == null ? "?" : (e.getClass().getSimpleName() + " " + e.getMessage()));
+      android.util.Log.e("SHOMER", s, e);
+      synchronized (FAULTS) { FAULTS.add(s); while (FAULTS.size() > 10) FAULTS.remove(0); }
+    } catch (Throwable t) {}
   }
 
   private Notification buildNotification() {

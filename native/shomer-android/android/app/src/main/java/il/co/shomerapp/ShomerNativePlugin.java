@@ -62,6 +62,23 @@ public class ShomerNativePlugin extends Plugin {
   /** v382: cancel ONLY the native pre-alarm countdown. stopAlarm also stops AlarmPlayer, which
    *  carries a linked SHOMER's alert - so the web layer cannot use it to clean up after a shake
    *  it refused without risking silencing someone else's live emergency. */
+  /** v401: why the siren did not sound. Every failure in the alarm path used to be swallowed in
+   *  silence, so a phone that never screamed could not be told from one that was never asked to.
+   *  The web layer can read the last few back off a tester's own device. */
+  @PluginMethod
+  public void getAlarmFaults(PluginCall call) {
+    JSObject r = new JSObject();
+    try {
+      com.getcapacitor.JSArray a = new com.getcapacitor.JSArray();
+      synchronized (AlarmForegroundService.FAULTS) {
+        for (String s : AlarmForegroundService.FAULTS) a.put(s);
+      }
+      r.put("faults", a);
+    } catch (Throwable e) { r.put("faults", new com.getcapacitor.JSArray()); }
+    try { r.put("playing", AlarmForegroundService.isPlaying() || AlarmPlayer.isPlaying()); } catch (Throwable e) {}
+    call.resolve(r);
+  }
+
   @PluginMethod
   public void cancelPreAlarm(PluginCall call) {
     try { ShakeService.cancelNativeAlarm(getContext()); } catch (Throwable e) {}

@@ -50,8 +50,15 @@ final class AlarmPlayer {
          siren was playing fell into the handler and released the live player. */
       AudioManager am = (AudioManager) c.getSystemService(Context.AUDIO_SERVICE);
       sosCause = forSos;
-      prevVol = am.getStreamVolume(AudioManager.STREAM_ALARM);
-      markSelf(); am.setStreamVolume(AudioManager.STREAM_ALARM, am.getStreamMaxVolume(AudioManager.STREAM_ALARM), 0);
+      /* v401: the volume is an optimisation, not a precondition - exactly as in
+         AlarmForegroundService. A Do-Not-Disturb policy that owns the alarm stream makes
+         setStreamVolume throw, and in the same try that throw killed the fallback siren too,
+         so BOTH paths went silent on the same device for the same reason. A quiet siren beats
+         no siren. */
+      try {
+        prevVol = am.getStreamVolume(AudioManager.STREAM_ALARM);
+        markSelf(); am.setStreamVolume(AudioManager.STREAM_ALARM, am.getStreamMaxVolume(AudioManager.STREAM_ALARM), 0);
+      } catch (Throwable ve) { AlarmForegroundService.note(ve, "fallback-volume"); }
       /* v376: build it in a LOCAL and publish to mp only once it is actually sounding. Published
          first, a failed prepare() left a window where isPlayingSos() said yes - long enough for
          the native countdown, which ends at the same instant this fallback starts, to skip its
@@ -63,6 +70,16 @@ final class AlarmPlayer {
       p.setDataSource(afd.getFileDescriptor(), afd.getStartOffset(), afd.getLength());
       afd.close();
       p.setLooping(true);
+      /* v401: a mid-playback death must clear mp, or isPlaying()/isPlayingSos() keep claiming a
+         siren that is not there and the native countdown skips its own. */
+      final MediaPlayer self = p;
+      p.setOnErrorListener(new MediaPlayer.OnErrorListener() {
+        @Override public boolean onError(MediaPlayer m, int what, int extra) {
+          AlarmForegroundService.note(new RuntimeException("fallback onError " + what + "/" + extra), "fallback-play");
+          if (mp == self) { mp = null; sosCause = false; }
+          return true;
+        }
+      });
       p.prepare();
       p.start();
       mp = p;
