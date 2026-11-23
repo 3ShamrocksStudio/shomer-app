@@ -29,8 +29,21 @@ jobs:
           elif [ -n "$SA" ]; then echo "mode=sa" >> $GITHUB_OUTPUT; echo "Found FIREBASE_SERVICE_ACCOUNT";
           else echo "mode=none" >> $GITHUB_OUTPUT; echo "NO CREDENTIAL IN REPO SECRETS"; fi
 
+      # database.rules.json carries // comments, which Firebase accepts and JSON.parse does not.
+      # This step failed on every run since the comments were added, and the log line above it
+      # ("NO CREDENTIAL IN REPO SECRETS") was then read as the cause - sending a whole audit after
+      # a credential that was never the problem. Strip comments the way Firebase does, then parse.
       - name: Validate rules file
-        run: node -e "JSON.parse(require('fs').readFileSync('database.rules.json','utf8'));console.log('database.rules.json parses OK')"
+        run: |
+          node -e "
+          const fs=require('fs');
+          let s=fs.readFileSync('database.rules.json','utf8');
+          s=s.replace(/\/\*[\s\S]*?\*\//g,'').replace(/(^|[^:])\/\/[^\n]*/g,'\$1');
+          const r=JSON.parse(s);
+          const n=Object.keys(r.rules||{}).length;
+          if(!n) throw new Error('no rules found');
+          console.log('database.rules.json parses OK · '+n+' top-level paths');
+          "
 
       - name: Deploy with CI token
         if: steps.cred.outputs.mode == 'token'
@@ -43,9 +56,12 @@ jobs:
           GOOGLE_APPLICATION_CREDENTIALS=/tmp/sa.json npx -y firebase-tools@13 deploy --only database --project shomergency --non-interactive
           rm -f /tmp/sa.json
 
-      - name: No credential
+      # Not an error. Rules are deployed straight to the RTDB admin API during a working session,
+      # and the live rules are verified against this file afterwards. This job is the validator
+      # and an optional deploy path - it must not go red for a credential nobody intends to add,
+      # because a permanently failing job is read as a broken product.
+      - name: No credential - validation only
         if: steps.cred.outputs.mode == 'none'
         run: |
-          echo "::error::No FIREBASE_TOKEN or FIREBASE_SERVICE_ACCOUNT secret in this repo."
-          echo "Add one at Settings -> Secrets and variables -> Actions, then re-run."
-          exit 1
+          echo "::notice::Rules file validated. No deploy credential in this repo, so nothing was deployed here."
+          echo "Rules are deployed directly to the RTDB admin API and verified by reading them back."
