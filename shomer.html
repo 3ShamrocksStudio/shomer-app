@@ -2066,13 +2066,13 @@ body.otp-active .ob-steps{display:none!important;}
  <button class="sos-btn" id="sos-btn" onclick="onSosTap()" aria-label="שלח SOS חירום" aria-pressed="false">
  <span class="sos-txt">SOS</span>
  </button>
- </div>
- <!-- v410: the quiet one. Deliberately small, amber and beside the SOS, never instead of it -
-      the point is that reaching for help should not cost a siren. -->
+ <!-- v411: inside .sos-wrap, which is what re-enables pointer events inside the nav, and
+      positioned above the SOS circle rather than across it. -->
  <button class="assist-btn" id="assist-btn" type="button" onclick="assistAsk()" aria-label="בקשת עזרה - לא חירום">
  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 21s-7-4.6-7-9.6A4.4 4.4 0 0 1 12 8a4.4 4.4 0 0 1 7 3.4c0 5-7 9.6-7 9.6Z"/></svg>
  <span id="assist-lbl">צריך/ה עזרה</span>
  </button>
+ </div>
  </nav>
 
  <!-- ═══ UPDATES ═══ -->
@@ -4356,6 +4356,10 @@ function applyTranslations(){
  setText('ghost-nm',he?'מצב רפאים - השהה שיתוף':'Ghost mode - pause sharing');
  setText('ghost-sb',he?'השומרים מפסיקים לראות איפה את/ה · SOS עדיין משדר':'Your SHOMERs stop seeing where you are - an SOS still sends it');
  setText('assist-lbl',he?'צריך/ה עזרה':currentLang==='ar'?'أحتاج مساعدة':'Need a hand');   /* v410 */
+ /* v411: an aria-label overrides the visible text, so a hardcoded Hebrew one read Hebrew to
+    every screen-reader user whatever language they chose. */
+ try{ var _ab=document.getElementById('assist-btn'); if(_ab) _ab.setAttribute('aria-label',
+   he?'בקשת עזרה - לא חירום':currentLang==='ar'?'طلب مساعدة - ليست حالة طوارئ':'Ask for a hand - not an emergency'); }catch(e){}
  setText('ag-go-lbl',he?'שלח/י בקשה':currentLang==='ar'?'إرسال طلب':'Send request');
  setText('circ-find-lbl',he?'מצא חבר/ה':'Find a friend');
  setText('cm-add-save',he?'הוסף למעגל':'Add to circle');
@@ -5369,7 +5373,15 @@ async function initNativeAlerts(){
       try{ SS._pushErr={ ts:Date.now(), msg:String((e&&(e.error||e.message))||e||'unknown').slice(0,160) }; saveStore(); }catch(_){ }
     });
     _pn.addListener('pushNotificationReceived',function(n){
-      try{ pushNotify((n&&n.title)||'SH\u2721MER',(n&&n.body)||'','fcm'); }catch(e){}
+      /* v411: this re-posted EVERY incoming push on the SOS channel (max importance, alarm
+         sound), so a deliberately quiet "needs a hand" arrived as loudly as an emergency and
+         undid the quiet channel the server had already chosen. Read the tag and match it. */
+      try{
+        var tg=''; try{ tg=String((n&&n.data&&(n.data.tag||n.data.Tag))||''); }catch(_){}
+        var quiet = tg && tg.indexOf('sos')!==0;
+        if(quiet) pushNotifyQuiet((n&&n.title)||'SH\u2721MER',(n&&n.body)||'',tg||'fcm');
+        else pushNotify((n&&n.title)||'SH\u2721MER',(n&&n.body)||'','fcm');
+      }catch(e){}
     });
     try{ await _pn.register(); }catch(e){}
    }
@@ -6265,6 +6277,7 @@ function beginSOS(trigger){
  try{ if(window._shakeTest) shakeTestClose(); }catch(e){}
  window._sosSilent=false;
  sosPhase='countdown'; sosActive=true; curSosTrigger=trigger||'manual';
+ try{ document.body.classList.add('sos-live'); }catch(e){}   /* v411: the quiet button steps aside */
  try{ sosFloorPrepare(); }catch(e){}   /* v355: barometer floor estimate (Android app only) */
  try{ if(ageAskIsOpen()) ageAskHide(); }catch(e){}   /* v355: the age question never sits on an emergency (asked again next open) */
  const btn=document.getElementById('sos-btn');
@@ -6429,6 +6442,7 @@ function cancelCountdown(){
  try{ simpleHush(); }catch(e){}
  clearInterval(sosCdTimer); sosGraceClear(); stopSosAlarm();
  sosPhase='idle'; sosActive=false; window._sosSilent=false;
+ try{ document.body.classList.remove('sos-live'); }catch(e){}   /* v411 */
  /* v386: and clear the shake re-fire stamp. The native side deliberately clears its own on a
     cancel, so that a situation turning real right after a false alarm still sends - and the web
     side then dropped that report for twelve seconds, returning 'ok' so the native retry stopped
@@ -6935,6 +6949,7 @@ function resolveSOS(skipPin,opt){
   try{ if(curSosId){ FB.db&&FB.db.ref('responders/'+curSosId).off&&FB.db.ref('responders/'+curSosId).off(); delete fbRespStreams[curSosId]; } fbClearResponderMarkers(); }catch(e){}
   window._shakeFiredAt=0;   /* v386: a resolved SOS must not block the next gesture either */
   sosPhase='idle'; sosActive=false; window._sosSilent=false;
+ try{ document.body.classList.remove('sos-live'); }catch(e){}   /* v411 */
   try{ if(window.nativeSosTrackStop) nativeSosTrackStop(); }catch(e){}   /* v351: SOS over - background location stops now */
   try{ SOSBUS._endedAt=Date.now(); SOSBUS._helpAck=0; Object.keys(SOSBUS.responders).forEach(function(k){ delete SOSBUS.responders[k]; }); sosPaintResponders(); sosPaintMyHelp(); }catch(e){}   /* v312: "help is coming" ends with the SOS, online or not */
   try{ var _cpb=document.getElementById('callpol-bar'); if(_cpb) _cpb.remove(); }catch(e){}   /* v293: the "call police?" offer ends with the SOS */
@@ -10182,7 +10197,7 @@ var gaCur=null, _gaBeepT=null;
      - carried on ping/<to>/<me>, the same consent-gated channel as the check-in, which the
        rules already accept a 'help' level on - no new path for user data
      - NOT published to the public dashboard feed: this is a personal ask, not an incident
-     - expires by itself, and one tap turns it into a real SOS if it stops being small
+     - expires by itself; if it stops being small the SOS button is right there, untouched
    If nobody is near, the user is told that plainly and offered the wider send - never widened
    behind their back, because "only people nearby" is the promise the button makes. */
 var ASSIST_KM=3, ASSIST_TTL=60*60000;
@@ -10194,9 +10209,11 @@ function assistNearby(){
       if(!m||m.pending||!m.partnerUid) return;
       var p=null; try{ p=_pairOf(m); }catch(e){}
       var pos=null; try{ pos=p&&gdPos(p); }catch(e){}
-      if(!pos && m.lat!=null && m.lng!=null) pos=[m.lat,m.lng];
+      /* v411: NO last-known fallback. m.lat/m.lng are deliberately kept after a position goes
+         stale, so using them would call someone "nearby" on an hours-old fix - the opposite of
+         what this button promises. gdPos already enforces the freshness gate; trust it. */
       if(!pos) return;
-      var d=distMeters(me[0],me[1],pos[0],pos[1]);
+      var d=distMeters(me.lat,me.lng,pos[0],pos[1]);   /* v411: _myPos is {lat,lng} - me[0] was NaN, so NOBODY was ever near */
       if(d!=null&&isFinite(d)&&d<=ASSIST_KM*1000) out.push({m:m,d:d});
     });
     out.sort(function(a,b){ return a.d-b.d; });
@@ -10222,28 +10239,47 @@ function assistAsk(wide){
     }
     toast(gaT('אין שומרים לשלוח אליהם','لا يوجد حُرّاس للإرسال إليهم','No SHOMERs to send to'),'amb'); return;
   }
-  var id=fbDashKey('as'), now=Date.now(), nm=gaMyName(), sent=0;
+  /* v411: one ask at a time. Without this, a double tap - or an impatient second press - sends
+     a fresh push to every guardian again. */
+  try{ var _prev=SS.assistOut; if(_prev&&_prev.id&&(Date.now()-_prev.ts)<90000){
+        toast(gaT('בקשה כבר נשלחה לפני רגע','تم إرسال الطلب قبل قليل','Already asked a moment ago'),'amb'); return; } }catch(e){}
+  var id=fbDashKey('as'), now=Date.now(), nm=gaMyName(), sent=0, done=0, total=list.length;
+  /* v411: say what actually LEFT, not what we intended to send. Every write swallowed its own
+     failure, so an offline phone still told the user help had been asked for. */
+  var _report=function(){
+    if(done<total) return;
+    if(!sent){ toast(gaT('הבקשה לא נשלחה - אין חיבור. נסה/י שוב, או התקשר/י.','لم يُرسل الطلب - لا اتصال. حاول مجددًا أو اتصل.','Not sent - no connection. Try again, or call.'),'red'); 
+      try{ delete SS.assistOut; saveStore(); }catch(e){} return; }
+    toast(gaT('✓ נשלחה בקשת עזרה ל-'+sent+(wide?' שומרים':' שומרים בקרבת מקום')+' · בלי אזעקה',
+              '✓ أُرسل طلب مساعدة إلى '+sent+(wide?' حُرّاس':' حُرّاس قريبين')+' · بلا إنذار',
+              '✓ Asked '+sent+(wide?' SHOMER(s)':' nearby SHOMER(s)')+' for a hand · no alarm'),'grn');
+  };
   list.forEach(function(m){
     try{
-      gaWrite(m.partnerUid,{name:nm,ts:now,level:'help',id:id}).then(function(){ sent++; }).catch(function(){});
+      gaWrite(m.partnerUid,{name:nm,ts:now,level:'help',id:id})
+        .then(function(){ sent++; done++; _report(); })
+        .catch(function(){ done++; _report(); });
       /* tag 'assist' - the fanout picks the quiet channel for anything not starting with 'sos' */
       fbRestWrite('POST','alarms',{fromUid:FB.uid,toUid:m.partnerUid,ts:now,tag:'assist',
         title:'SH✡MER - '+(nm||gaT('שומר/ת','حارس','a SHOMER')),
         body:gaT('מבקש/ת עזרה - לא חירום','يطلب مساعدة - ليست حالة طوارئ','needs a hand - not an emergency')}).catch(function(){});
     }catch(e){}
-    try{ gaOut()[m.partnerUid]={id:id,level:'assist',ts:now,st:'sent',name:m.name||''}; }catch(e){}
+    /* v411: never overwrite a pending check - and above all never an outstanding alert/alarm,
+       because gaStopRemote sends the stop with whatever id is in this slot, and the native ringer
+       only accepts a stop whose id matches. Clobbering it left the sender unable to cancel. */
+    try{ var _o=gaOut()[m.partnerUid];
+         if(!(_o && (_o.level==='alert'||_o.level==='alarm'||_o.level==='check') && _o.st==='sent'))
+           gaOut()[m.partnerUid]={id:id,level:'assist',ts:now,st:'sent',name:m.name||''}; }catch(e){}
   });
   try{ SS.assistOut={id:id,ts:now,n:list.length,wide:!!wide}; saveStore(); }catch(e){}
-  toast(gaT('✓ נשלחה בקשת עזרה ל-'+list.length+(wide?' שומרים':' שומרים בקרבת מקום')+' · בלי אזעקה',
-            '✓ أُرسل طلب مساعدة إلى '+list.length+(wide?' حُرّاس':' حُرّاس قريبين')+' · بلا إنذار',
-            '✓ Asked '+list.length+(wide?' SHOMER(s)':' nearby SHOMER(s)')+' for a hand · no alarm'),'grn');
   try{ renderCircles(); }catch(e){}
 }
 /* receiver side - deliberately undramatic */
 function assistShow(from,v){
   try{ gaMarkSeen(v.id); }catch(e){}
   var he=currentLang==='he', ar=currentLang==='ar';
-  var nm=ESC(v.name||gaT('שומר/ת שלך','حارسك','Your SHOMER'));
+  /* v411: no ESC - both sinks below set textContent, so escaping only mangles an apostrophe */
+  var nm=(v.name||gaT('שומר/ת שלך','حارسك','Your SHOMER'));
   var msg=gaT(nm+' מבקש/ת עזרה - לא חירום',nm+' يطلب مساعدة - ليست حالة طوارئ',nm+' needs a hand - not an emergency');
   try{ pushNotifyQuiet('SH✡MER',msg,'assist'); }catch(e){}
   try{ if(navigator.vibrate) navigator.vibrate(180); }catch(e){}   /* one short buzz, nothing more */
@@ -12234,7 +12270,7 @@ try{ hydrateIcons(document); }catch(e){}
 /* Loaded-build version - shown in the diagnostic panel so a phone can prove
    whether it's on the latest build or a STALE cached one. Keep in lock-step
    with sw.js SW_VERSION on every deploy. */
-var APP_VER='v410';
+var APP_VER='v411';
 var FB={ready:false,uid:null,db:null,_presTimer:null,connected:false,listening:false,pushState:'default',near:0,swVer:'?',
   authState:'connecting',sdkLoaded:false,persist:'',permErr:null,err:null,wsProbe:'',csp:''};
 /* Always log connection diagnostics to the console so the real failure can be SEEN in Chrome. */
@@ -17322,15 +17358,24 @@ html[dir="rtl"] .sh-back svg{transform:scaleX(-1)}
 /* ══ v410 · ask for a hand - the non-emergency button ══
    Small, amber, outlined. It must read as "this is not the big red one" at a glance, and it
    must never be mistaken for SOS by someone in a hurry. */
-.assist-btn{position:absolute;left:50%;transform:translateX(-50%);bottom:6px;
-  display:inline-flex;align-items:center;gap:6px;padding:7px 14px;border-radius:999px;
-  border:1px solid rgba(224,168,40,.55);background:rgba(224,168,40,.12);color:#E8C05A;
-  font-family:inherit;font-weight:800;font-size:11.5px;letter-spacing:.2px;cursor:pointer;
+/* v411: .nav sets pointer-events:none and re-enables it only on .sos-wrap, so this button
+   inherited "none" and every tap fell straight through it - it was decorative. And it sat
+   centred at the bottom of .nav, overlapping the lower third of the 90px SOS circle at a higher
+   z-index: restoring pointer events alone would have carved a dead zone out of the emergency
+   button. So it gets its own row ABOVE the SOS, clear of it, and its own pointer events. */
+.assist-btn{position:absolute;left:50%;transform:translateX(-50%);bottom:calc(100% + 10px);
+  pointer-events:auto;
+  display:inline-flex;align-items:center;gap:6px;padding:8px 16px;border-radius:999px;
+  border:1px solid rgba(224,168,40,.55);background:rgba(10,22,40,.82);color:#E8C05A;
+  backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);
+  font-family:inherit;font-weight:800;font-size:12px;letter-spacing:.2px;cursor:pointer;
   white-space:nowrap;z-index:21;-webkit-tap-highlight-color:transparent;transition:.14s}
-.assist-btn svg{width:14px;height:14px;flex:0 0 14px}
-.assist-btn:active{transform:translateX(-50%) scale(.95);background:rgba(224,168,40,.2)}
-body.simple-on .assist-btn{font-size:14px;padding:11px 20px}
-body.sos-on .assist-btn{display:none}
+.assist-btn svg{width:15px;height:15px;flex:0 0 15px}
+.assist-btn:active{transform:translateX(-50%) scale(.95);background:rgba(224,168,40,.22)}
+.assist-btn:focus-visible{outline:2px solid var(--gold);outline-offset:3px}
+body.simple-on .assist-btn{font-size:15px;padding:12px 22px}
+/* hidden while an SOS is running - an emergency screen offers one action, not two */
+body.sos-live .assist-btn{display:none}
 
 /* ══ v399 · השומרים שלי - one compact line per person, controls open underneath ══
    A long list used to be one long scroll because every card carried its whole control set.
