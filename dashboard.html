@@ -273,6 +273,23 @@
 .sos-pop-card p{color:#9aa6bd;font-size:13px;margin:0 0 16px}
 .sos-pop-go{width:100%;height:48px;border:0;border-radius:12px;background:linear-gradient(135deg,#e5484d,#2f6bff);color:#fff;font-weight:800;font-size:15px;cursor:pointer;font-family:inherit}
 .sos-pop-x{margin-top:9px;background:none;border:0;color:#8a93a6;font-size:13px;cursor:pointer;font-family:inherit}
+/* ══════════ v412 · EMERGENCY MODE ══════════
+   A duty officer with a live SOS does not need the crime-mix donut, the 12-month graph, the
+   coverage KPIs or the league table. They were all still on screen, and the incident panel was
+   a 380px drawer competing with them - which is why the response centre "disappeared into the
+   noise". In an emergency the screen now answers one question: this incident. Everything that
+   is not the map or the incident is removed, fast, and comes straight back on close. */
+body.emg-out .card:not(.c-map){opacity:0;transform:scale(.97);transition:opacity .15s ease,transform .15s ease}
+body.emg .card:not(.c-map){display:none!important}
+body.emg .cmd-grid{grid-template-columns:minmax(0,1fr)!important;grid-template-rows:minmax(0,1fr)!important;
+  grid-template-areas:"map"!important;padding-inline-start:calc(380px + 20px)!important}
+body.emg .c-map{animation:emgIn .22s cubic-bezier(.2,.8,.3,1)}
+@keyframes emgIn{from{opacity:.35;transform:scale(.985)}to{opacity:1;transform:none}}
+/* a thin standing reminder that the board is in emergency mode and what will come back */
+/* The "where did my dashboard go" answer lives at the foot of the panel, in the scroll flow.
+   As an overlay it covered either the header clock or the map's own layer toggles. */
+.remg{margin-top:4px;text-align:center;font-size:10.5px;color:#6d7893;line-height:1.5}
+@media (max-width:1100px){ body.emg .cmd-grid{padding-inline-start:16px!important} }
 .resp{position:fixed;top:0;inset-inline-start:0;height:100vh;width:380px;max-width:92vw;z-index:99991;background:linear-gradient(180deg,#141a27,#0f1218);border-inline-end:1px solid #2a3450;box-shadow:0 0 50px rgba(0,0,0,.55);display:flex;flex-direction:column;transform:translateX(-102%);transition:transform .28s ease;font-family:Alef,system-ui,sans-serif}
 [dir=rtl] .resp{inset-inline-start:auto;inset-inline-end:0;border-inline-end:0;border-inline-start:1px solid #2a3450;transform:translateX(102%)}
 .resp.on{transform:none!important}
@@ -302,6 +319,48 @@
 .rsec-n{display:inline-flex;align-items:center;justify-content:center;width:20px;height:20px;border-radius:50%;background:linear-gradient(135deg,#C09020,#E0A828 60%,#F5C840);color:#23170a;font-size:11px;font-weight:900;flex:0 0 auto}
 .rsec-v{margin-inline-start:auto;font-size:11px;font-weight:700;color:#4fc3e8;letter-spacing:0}
 .rsec-hint{font-size:11px;color:#8a93a6;margin:0 0 9px;line-height:1.5}
+/* ══════════ v412 · STEPPED INCIDENT WORKFLOW ══════════
+   The panel held 6+ numbered sections, all expanded at once, in no particular order of use:
+   location, a reading list of "proven responses", radius, dispatch, a static list of national
+   emergency numbers, the log, and a legal evidence-handoff form. A duty officer with a live SOS
+   had to scroll past guidance literature and a legal consent form to reach the dispatch button.
+   It is now four steps in the order the job is actually done - WHERE, DISPATCH, TRACK, CLOSE -
+   one open at a time, advancing itself. The radius folded into dispatch (it IS a dispatch
+   parameter), the national numbers became tap-to-call buttons in step 1 instead of decorative
+   text, the guidance became a fold inside dispatch, and the legal handoff moved to step 4 where
+   it belongs - out of the way of the first sixty seconds. */
+.rkey{position:sticky;top:-14px;z-index:3;margin:-14px -16px 0;padding:11px 16px 12px;
+  background:linear-gradient(180deg,#0e1420 72%,rgba(14,20,32,.92));border-bottom:1px solid #232c40}
+.rkey-l{font-size:9.5px;font-weight:800;letter-spacing:.1em;color:#7d879b;margin-bottom:3px}
+.rkey-a{font-size:16px;font-weight:800;color:#fff;line-height:1.25}
+.rkey-m{font-size:11px;color:#8a93a6;margin-top:3px}
+.rstep{border:1px solid #232c40;border-radius:13px;background:rgba(255,255,255,.015);overflow:hidden}
+.rstep.on{border-color:#2f3d5c;background:rgba(79,195,232,.035)}
+.rstep-h{display:flex;align-items:center;gap:8px;font-size:13px;font-weight:800;color:#8e99ad;
+  padding:12px 13px;cursor:pointer;user-select:none;transition:color .15s}
+.rstep.on>.rstep-h{color:#eef1f7}
+.rstep-h:hover{color:#dfe5f0}
+.rstep-n{display:inline-flex;align-items:center;justify-content:center;width:21px;height:21px;
+  border-radius:50%;background:#1b2334;color:#7d879b;font-size:11px;font-weight:900;flex:0 0 auto;
+  border:1px solid #2a3450;transition:background .15s,color .15s}
+.rstep.on>.rstep-h>.rstep-n{background:linear-gradient(135deg,#C09020,#E0A828 60%,#F5C840);color:#23170a;border-color:transparent}
+.rstep.done>.rstep-h>.rstep-n{background:#1d4d33;color:#8fe0b0;border-color:#2e7d4f}
+.rstep-v{margin-inline-start:auto;font-size:11px;font-weight:700;color:#4fc3e8}
+.rstep-b{display:none;padding:0 13px 13px}
+.rstep.on>.rstep-b{display:block}
+/* the national emergency numbers, as buttons instead of a paragraph */
+.rcall{display:flex;gap:6px;margin-top:9px}
+.rcall a{flex:1;text-align:center;text-decoration:none;padding:9px 4px;border-radius:10px;
+  background:#15202f;border:1px solid #2a3450;color:#eef1f7;font-size:11.5px;font-weight:800;line-height:1.3}
+.rcall a:hover{background:#1b293c;border-color:#3a4a6e}
+.rcall a b{display:block;font-size:14px;color:#ff8a8a;font-weight:900}
+/* guidance, folded away until asked for */
+.rfold{margin-top:10px;border-top:1px solid #1e2636;padding-top:9px}
+.rfold>summary{cursor:pointer;font-size:11.5px;font-weight:700;color:#8a93a6;list-style:none;outline:none}
+.rfold>summary::-webkit-details-marker{display:none}
+.rfold>summary::before{content:'▸ ';color:#4fc3e8}
+.rfold[open]>summary::before{content:'▾ '}
+.rfold>summary:hover{color:#cdd6e8}
 .rloc{background:rgba(79,195,232,.06);border:1px solid #27425a;border-radius:11px;padding:11px 12px}
 .rloc-a{font-size:14px;color:#f2f5fb;line-height:1.45;min-height:20px;display:flex;flex-direction:column;gap:2px}
 .rloc-a b{font-size:15px;font-weight:800}
@@ -454,8 +513,20 @@
 .live-strip .ls-beacon{flex:0 0 auto;display:flex;align-items:center}
 .live-strip .ls-live{display:inline-flex;align-items:center;gap:5px;background:rgba(10,16,30,.55);color:#fff;font-weight:900;font-size:12px;letter-spacing:.08em;padding:7px 12px;border-radius:999px;border:1px solid rgba(255,255,255,.5);white-space:nowrap}
 .live-strip.attended .ls-live{opacity:.6}
-.ls-silence{margin-inline-start:9px;background:rgba(10,16,30,.6);color:#fff;font-weight:800;font-size:12px;border:1px solid rgba(255,255,255,.55);border-radius:999px;padding:8px 13px;cursor:pointer;font-family:inherit;white-space:nowrap;transition:background .15s}
-.ls-silence:hover{background:rgba(10,16,30,.85)}
+.ls-silence{margin-inline-start:10px;display:inline-flex;align-items:center;gap:8px;
+  background:#fff;color:#0A1428;font-weight:800;font-size:12.5px;border:0;
+  border-radius:10px;padding:8px 14px;cursor:pointer;font-family:inherit;white-space:nowrap;
+  box-shadow:0 2px 10px rgba(0,0,0,.35);transition:transform .12s,box-shadow .15s}
+.ls-silence:hover{box-shadow:0 4px 16px rgba(0,0,0,.45)}
+.ls-silence:active{transform:scale(.96)}
+/* The old control was a dim outline on a red strip that strobes - it read as decoration, and
+   nobody could tell whether silencing also closed the incident. Solid white reverses the
+   contrast so it is the one solid object on a moving background, and the second line answers
+   the question that stopped people pressing it. */
+.ls-silence .lsx{display:flex;flex-direction:column;align-items:flex-start;line-height:1.15}
+.ls-silence .lsx b{font-size:12.5px}
+.ls-silence .lsx i{font-style:normal;font-size:10px;font-weight:700;color:#5A6B86}
+.ls-silence.done .lsx i{color:#8FA0BA}
 .ls-silence.done{background:rgba(60,72,96,.5);border-color:rgba(255,255,255,.2);color:#aeb7c7;cursor:default}
 .live-strip .ls-dot{position:absolute;inset:0;margin:auto;width:20px;height:20px;border-radius:50%;background:#fff;box-shadow:0 0 0 0 rgba(255,255,255,.85);animation:lsdot 1s ease-out infinite}
 @keyframes lsdot{0%{box-shadow:0 0 0 0 rgba(255,255,255,.85)}70%{box-shadow:0 0 0 18px rgba(255,255,255,0)}100%{box-shadow:0 0 0 0 rgba(255,255,255,0)}}
@@ -587,6 +658,7 @@
       <label>אימייל ארגוני</label><input id="email" type="email" dir="ltr" placeholder="you@municipality.gov.il">
       <label>סיסמה</label><input id="pass" type="password" dir="ltr" placeholder="••••••••">
       <button class="btn" id="login-btn">כניסה</button>
+      <button class="btn" id="live-btn" style="background:linear-gradient(135deg,#0f7a4a,#16a06a 60%,#2ecc71);color:#042016;margin-top:10px;font-weight:800">🟢  תצוגה חיה · נתוני רשת אמת (PoC)</button>
       <button class="btn" id="demo-btn" style="background:transparent;border:1px solid var(--gold);color:var(--gold);margin-top:8px">👁  כניסה לדמו · See a live demo</button>
       <button class="lnk" id="to-signup">אין לך גישה עדיין? <b>בקשת גישת לקוח</b></button>
     </div>
@@ -1066,19 +1138,34 @@ function respDispatch(id){
  var names=sel.map(function(k){var gg=groups.filter(function(x){return x.k===k;})[0];return gg?gg.t:k;}).join(' · ');
  if(!confirm('לסמן לשיגור: '+names+' · רדיוס '+_respRadius.toFixed(1)+' ק"מ?\nשיגור אוטומטי טרם חובר — לא תישלח התראה לאף אחד. יש ליצור קשר ישיר עם הכוחות.')) return;
  respLog(id,'סומן לשיגור: '+names+' (שיגור אוטומטי טרם חובר — יש ליצור קשר ישיר)');
+ try{ respStep(3); }catch(e){}   /* v412: dispatch done -> straight to tracking */
 }
 function bigSosAlert(id){
  try{ if(document.getElementById('sos-pop'))return; var o=_liveEvents[id]; var area=''; var ov=document.createElement('div'); ov.id='sos-pop'; ov.className='sos-pop';
-  ov.innerHTML='<div class="sos-pop-card"><div class="sos-pop-ring">🆘</div><h3>SOS חדש בטריטוריה</h3><p>קריאת מצוקה חיה · לחצו לפתיחת מרכז תגובה</p><button class="sos-pop-go" id="sos-pop-go">פתח מרכז תגובה ←</button><button class="sos-pop-x" id="sos-pop-x">סגור</button></div>';
+  ov.innerHTML='<div class="sos-pop-card"><div class="sos-pop-ring">🆘</div><h3>SOS חדש בטריטוריה</h3><p>קריאת מצוקה חיה · פתחו את ניהול האירוע</p><button class="sos-pop-go" id="sos-pop-go">ניהול אירוע ←</button><button class="sos-pop-x" id="sos-pop-x">סגור</button></div>';
   document.body.appendChild(ov);
   document.getElementById('sos-pop-go').onclick=function(){ ov.remove(); openResponse(id); };
   document.getElementById('sos-pop-x').onclick=function(){ ov.remove(); };
   setTimeout(function(){ if(document.getElementById('sos-pop'))ov.remove(); },12000);
  }catch(e){}
 }
-function closeResponse(){ var p=document.getElementById('resp'); if(p){ p.classList.remove('on'); setTimeout(function(){try{p.remove();}catch(e){}},300); } try{ if(_respCircle){MAP.removeLayer(_respCircle);_respCircle=null;} }catch(e){} try{ var _rc=document.getElementById('rad-chip'); if(_rc)_rc.remove(); }catch(e){} }
+/* v412: one step open at a time. The step a dispatch or a close completes is marked done, so a
+   returning officer can see at a glance how far the event got. */
+function respStep(n){
+  try{
+    for(var k=1;k<=4;k++){
+      var el=document.getElementById('rstep'+k); if(!el) continue;
+      if(k===n) el.classList.add('on'); else el.classList.remove('on');
+      if(k<n) el.classList.add('done');
+    }
+    var t=document.getElementById('rstep'+n);
+    if(t&&t.scrollIntoView) t.scrollIntoView({block:'nearest',behavior:'smooth'});
+  }catch(e){}
+}
+function closeResponse(){ try{ emgLeave(); }catch(_){} var p=document.getElementById('resp'); if(p){ p.classList.remove('on'); setTimeout(function(){try{p.remove();}catch(e){}},300); } try{ if(_respCircle){MAP.removeLayer(_respCircle);_respCircle=null;} }catch(e){} try{ var _rc=document.getElementById('rad-chip'); if(_rc)_rc.remove(); }catch(e){} }
 function stripGeocode(lat,lng){
  var box=document.getElementById('ls-addr-txt'); if(!box)return;
+ if(CLIENT&&CLIENT.demo){ box.textContent='כתובת לדוגמה · '+lat.toFixed(3)+', '+lng.toFixed(3); return; }   /* demo: no outside geocoder call */
  try{
   fetch('https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat='+lat+'&lon='+lng+'&zoom=17&addressdetails=1&accept-language=he')
    .then(function(r){return r.ok?r.json():null;})
@@ -1090,34 +1177,58 @@ function _playAlertTone(){
  try{ var AC=window.AudioContext||window.webkitAudioContext; if(!AC)return; var ctx=_playAlertTone._c||(_playAlertTone._c=new AC()); if(ctx.state==='suspended')ctx.resume();
   if(window._alarmMuted) return;
   var t0=ctx.currentTime;
-  // Harsh dissonant klaxon — a rapid tritone alternation (max-dissonance interval) on a
-  // sawtooth, with a second slightly-detuned oscillator per note so the two beat against
-  // each other and produce a grating, ear-nagging roughness. Deliberately irritating.
-  var seq=[[1760,0],[1245,0.1],[1760,0.2],[1245,0.3],[1760,0.4],[1245,0.5]];
-  seq.forEach(function(p){
-    [0,9].forEach(function(det){
-      var o=ctx.createOscillator(),g=ctx.createGain(),f=ctx.createBiquadFilter();
-      o.type='sawtooth'; o.frequency.value=p[0]+det;
-      f.type='bandpass'; f.frequency.value=2100; f.Q.value=0.9;
-      var t=t0+p[1];
+  /* The previous tone was a 1760/1245 Hz sawtooth tritone - its own comment called it
+     "deliberately irritating". Irritating is the wrong instrument for a control room: the
+     operator cannot turn it off without losing the alert, so it trains them to silence the
+     alarm first and read second, and it makes a municipal product sound like a toy.
+
+     This is a measured two-tone in a low register: an authoritative fourth (A3 -> E3), clean
+     triangle with a touch of sine for body, gently low-passed, with a short sub thump under
+     the first note for weight. It carries across a room and reads as serious, which is what a
+     duty officer needs - presence, not panic. Slow enough to repeat indefinitely without
+     fraying nerves. */
+  var notes=[[220,0,0.42],[164.81,0.46,0.52]];
+  notes.forEach(function(n,i){
+    var f0=n[0], t=t0+n[1], dur=n[2];
+    [['triangle',1,0.115],['sine',2,0.05]].forEach(function(v){
+      var o=ctx.createOscillator(), g=ctx.createGain(), lp=ctx.createBiquadFilter();
+      o.type=v[0]; o.frequency.setValueAtTime(f0*v[1],t);
+      lp.type='lowpass'; lp.frequency.value=1800; lp.Q.value=0.6;
       g.gain.setValueAtTime(0.0001,t);
-      g.gain.linearRampToValueAtTime(0.085,t+0.006);
-      g.gain.setValueAtTime(0.085,t+0.08);
-      g.gain.exponentialRampToValueAtTime(0.0006,t+0.1);
-      o.connect(f); f.connect(g); g.connect(ctx.destination);
-      o.start(t); o.stop(t+0.105);
+      g.gain.linearRampToValueAtTime(v[2],t+0.035);          /* soft attack - no click */
+      g.gain.setValueAtTime(v[2],t+dur-0.14);
+      g.gain.exponentialRampToValueAtTime(0.0008,t+dur);     /* unhurried release */
+      o.connect(lp); lp.connect(g); g.connect(ctx.destination);
+      o.start(t); o.stop(t+dur+0.02);
     });
+    if(i===0){                                               /* weight under the first note */
+      var sb=ctx.createOscillator(), sg=ctx.createGain();
+      sb.type='sine'; sb.frequency.setValueAtTime(82,t);
+      sg.gain.setValueAtTime(0.0001,t);
+      sg.gain.linearRampToValueAtTime(0.1,t+0.03);
+      sg.gain.exponentialRampToValueAtTime(0.0008,t+0.3);
+      sb.connect(sg); sg.connect(ctx.destination); sb.start(t); sb.stop(t+0.32);
+    }
   });
  }catch(e){}
 }
 var _alarmTimer=null, _alarmId=null, _alarmSilenced=false;
-function startAlarm(){ if(_alarmTimer)return; try{_playAlertTone();}catch(e){} var _a0=Date.now(); _alarmTimer=setInterval(function(){ var st=document.getElementById('live-strip'); if(!st||st.style.display==='none'||_alarmSilenced){ stopAlarm(); return; } if(window._keepAlarm===false && Date.now()-_a0>60000){ stopAlarm(); return; }   /* v293: "keep alarm until acknowledged" off = the sound stops by itself after 1 minute */ try{_playAlertTone();}catch(e){} },2300); }
+function startAlarm(){ if(_alarmTimer)return; try{_playAlertTone();}catch(e){} var _a0=Date.now(); _alarmTimer=setInterval(function(){ var st=document.getElementById('live-strip'); if(!st||st.style.display==='none'||_alarmSilenced){ stopAlarm(); return; } if(window._keepAlarm===false && Date.now()-_a0>60000){ stopAlarm(); return; }   /* v293: "keep alarm until acknowledged" off = the sound stops by itself after 1 minute */ try{_playAlertTone();}catch(e){} },2800); }
 function stopAlarm(){ if(_alarmTimer){clearInterval(_alarmTimer);_alarmTimer=null;} }
-function silenceAlarm(){ _alarmSilenced=true; stopAlarm(); var st=document.getElementById('live-strip'); if(st){ st.style.animation='none'; st.style.background='linear-gradient(90deg,rgba(60,72,96,.6),rgba(36,46,66,.6))'; st.style.boxShadow='0 6px 20px rgba(0,0,0,.4),0 0 0 1px rgba(255,255,255,.12) inset'; st.classList.add('attended'); } var b=document.getElementById('ls-silence'); if(b){ b.textContent='🔕 הושתק'; b.classList.add('done'); } }
+function silenceAlarm(){ _alarmSilenced=true; stopAlarm(); var st=document.getElementById('live-strip'); if(st){ st.style.animation='none'; st.style.background='linear-gradient(90deg,rgba(60,72,96,.6),rgba(36,46,66,.6))'; st.style.boxShadow='0 6px 20px rgba(0,0,0,.4),0 0 0 1px rgba(255,255,255,.12) inset'; st.classList.add('attended'); } var b=document.getElementById('ls-silence'); if(b){ b.innerHTML='<svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 9v6h4l5 4V5L8 9H4Z"/><path d="M17 9l4 6M21 9l-4 6"/></svg><span class="lsx"><b>הותרעה הושתקה</b><i>האירוע עדיין פתוח</i></span>'; b.classList.add('done'); } }
 /* openResponse does NOT stop the alarm — only the user clicking "השתק אזעקה" silences it. */
+function emgEnter(){ try{ if(document.body.classList.contains('emg')) return;
+  document.body.classList.add('emg-out');
+  setTimeout(function(){ try{ document.body.classList.add('emg'); document.body.classList.remove('emg-out');
+    if(window.MAP&&MAP.invalidateSize) setTimeout(function(){ try{MAP.invalidateSize(true);}catch(_){} },60); }catch(_){} },150);
+ }catch(e){} }
+function emgLeave(){ try{ document.body.classList.remove('emg','emg-out');
+  if(window.MAP&&MAP.invalidateSize) setTimeout(function(){ try{MAP.invalidateSize(true);}catch(_){} },60);
+ }catch(e){} }
 function openResponse(id){
  try{
-  var o=_liveEvents[id]; if(!o){ return; } var e=o.e, m=o.m; _respSel={}; _respRadius=1.5;
+  var o=_liveEvents[id]; if(!o){ return; }
+  try{ emgEnter(); }catch(_){} var e=o.e, m=o.m; _respSel={}; _respRadius=1.5;
   var lat=+e.lat, lng=+e.lng;
   try{ flyToLive(lat,lng,id); }catch(_){}
   try{ if(_respCircle){MAP.removeLayer(_respCircle);} _respLatLng=[lat,lng]; _respCircle=L.circle(_respLatLng,{radius:_respRadius*1000,color:'#4fc3e8',weight:2,fillColor:'#4fc3e8',fillOpacity:.08,dashArray:'7 6'}).addTo(MAP); _radChip(); }catch(_e){}
@@ -1129,40 +1240,52 @@ function openResponse(id){
   var coord=lat.toFixed(4)+', '+lng.toFixed(4);
   var accTxt=o.demo?'מיקום מקורב · נתוני הדגמה':'מיקום מרשת שומרים · קואורדינטות מעובדות';
   var p=document.createElement('div'); p.id='resp'; p.className='resp';
+  var natBtns = isIntl(curC())
+    ? '<div class="rcall"><a href="tel:112"><b>112</b>חירום</a><a href="tel:911"><b>911</b>חירום (ארה״ב)</a></div>'
+    : '<div class="rcall"><a href="tel:101"><b>101</b>מד״א</a><a href="tel:100"><b>100</b>משטרה</a><a href="tel:102"><b>102</b>כבאות</a></div>';
   p.innerHTML=''
-   +'<div class="resp-h"><span class="ic">'+m.i+'</span><div class="tt"><b>'+ESC(m.t)+'</b><span><span class="resp-live">● חי</span> · '+ago+' · '+(o.demo?'נתוני הדגמה':'רשת שומרים')+'</span></div><button class="resp-x" onclick="closeResponse()">✕</button></div>'
+   +'<div class="resp-h"><span class="ic">'+m.i+'</span><div class="tt"><b>'+ESC(m.t)+'</b><span><span class="resp-live">● חי</span> · '+ago+' · '+(o.demo?'נתוני הדגמה':'רשת שומרים')+'</span></div><button class="resp-x" onclick="closeResponse()" title="סגירת האירוע ומעבר חזרה ללוח הנתונים">✕</button></div>'
    +'<div class="resp-b">'
-   // 1 — LOCATION
-   +'  <div class="rsec"><div class="rsec-h"><span class="rsec-n">1</span>מיקום האירוע</div>'
-   +'    <div class="rloc">'
-   +'      <div class="rloc-a" id="resp-addr"><span class="rloc-sp"></span>מאתר כתובת מדויקת…</div>'
-   +'      <div class="rloc-c">🧭 <span dir="ltr">'+coord+'</span></div>'
-   +'      <div class="rloc-c">🕒 נרשם <span dir="ltr">'+ilFull(e.ts||now)+'</span> · שעון ישראל</div>'
-   +'      <div class="rloc-acc">'+accTxt+'</div>'
+   /* the one fact that must never scroll away */
+   +'  <div class="rkey"><div class="rkey-l">מקום האירוע</div>'
+   +'    <div class="rkey-a" id="resp-addr"><span class="rloc-sp"></span>מאתר כתובת מדויקת…</div>'
+   +'    <div class="rkey-m"><span dir="ltr">'+coord+'</span> · נרשם <span dir="ltr">'+hh+'</span> · '+accTxt+'</div></div>'
+
+   /* ── STEP 1 · WHERE ─────────────────────────────── */
+   +'  <div class="rstep on" id="rstep1"><div class="rstep-h" onclick="respStep(1)"><span class="rstep-n">1</span>אימות מקום וקריאה לשירותי חירום</div>'
+   +'    <div class="rstep-b">'
    +'      <div class="rloc-btns"><button class="rlb rlb-p" onclick="flyToLive('+lat+','+lng+',\''+id+'\')">🗺️ זום לרחוב</button><button class="rlb" onclick="respShareLoc('+lat+','+lng+',\''+id+'\')">📤 שתף מיקום אירוע</button></div>'
+   +'      '+natBtns
+   +'      <div class="rsec-hint" style="margin:9px 0 0">פרטי האירוע מוכנים להעברה ידנית ע״י המוקדן. אין שיגור אוטומטי לשירותי החירום.</div>'
+   +'      <button class="resp-send" style="margin-top:10px" onclick="respStep(2)">המשך לשיגור ←</button>'
    +'    </div></div>'
-   // מענים מוכחים — specific to this event
-   +'  <div class="rsec"><div class="rsec-h"><span class="rsec-n">✓</span>מענים מוכחים · לאירוע זה</div>'
-   +'    '+_respMenim(e,m)+'</div>'
-   // 2 — ALERT RADIUS
-   +'  <div class="rsec"><div class="rsec-h"><span class="rsec-n">2</span>טווח התראה <span class="rsec-v" id="resp-rv">1.5 ק"מ</span></div>'
-   +'    <input class="resp-slider" type="range" min="0.2" max="5" step="0.1" value="1.5" oninput="respSetRadius(this.value)" onchange="respFitRadius()"><div class="resp-reach" id="resp-reach"></div>'
-   +'    <div class="rsec-hint">הרדיוס מסומן על המפה בעיגול מקווקו.</div></div>'
-   // 3 — DISPATCH
-   +'  <div class="rsec"><div class="rsec-h"><span class="rsec-n">3</span>שיגור לכוחות</div>'
-   +'    <div class="rsec-hint">בחר/י למי לשגר, ואז שלח/י לאישור:</div>'
-   +'    <div class="rg">'+gHtml+'</div>'
-   +'    <div class="resp-two"><div class="resp-esc" onclick="respReinforce(\''+id+'\')" title="מרחיב את טווח ההתראה (עדכון אוטומטי לשומרים/למוקד טרם חובר)">⬆️ בקש תגבור</div><div class="resp-bc" onclick="respLog(\''+id+'\',\'הודעה לקבוצה — לא נשלחה (שליחה מהדשבורד טרם חוברה)\')">📢 הודעה לקבוצה</div></div>'
-   +'    <button class="resp-send" onclick="respDispatch(\''+id+'\')">⚡ סמן לשיגור · שיגור אוטומטי טרם חובר</button></div>'
-   // 4 — NATIONAL
-   +'  <div class="rsec"><div class="rsec-h"><span class="rsec-n">4</span>שירותים ארציים</div>'
-   +'    <div class="resp-nat">'+(isIntl(curC())?'🚨 מספר החירום המקומי (112 / 911 — לפי המדינה)':'🚑 מד"א 101 · 🚔 משטרה 100 · 🚒 כבאות 102')+'<br><span style="color:#f0c75a">פרטי האירוע מוכנים להעברה ידנית ע״י המוקדן. אין שיגור אוטומטי לשירותי החירום.</span></div></div>'
-   // 5 — LOG
-   +'  <div class="rsec"><div class="rsec-h"><span class="rsec-n">5</span>יומן תגובה <span class="rsec-v">מתועד</span></div>'
-   +'    <div class="resp-log" id="resp-log"><div>• '+hh+' — אותר ע״י רשת שומרים</div></div></div>'
-   +'  <div class="rsec"><div class="rsec-h"><span class="rsec-n">6</span>ראיות והעברה חוקית</div>'
-   +'    <div id="resp-evid">'+_evidenceHtml(o,id)+'</div>'
-   +'    <div class="resp-nat" style="margin-top:9px">⚖️ העברת ראיות לאכיפה ('+(isIntl(curC())?'רשויות האכיפה המקומיות':'משטרה 100 / פרקליטות')+') מתבצעת ידנית ע״י הרשות, עם בסיס חוקי ותיעוד מלא. <span style="color:#f0c75a">אין שיגור אוטומטי.</span> העברה לגורמי ביטחון לאומי — בערוצים משפטיים פורמליים בלבד, לא דרך כלי זה.</span></div></div>'
+
+   /* ── STEP 2 · DISPATCH ──────────────────────────── */
+   +'  <div class="rstep" id="rstep2"><div class="rstep-h" onclick="respStep(2)"><span class="rstep-n">2</span>שיגור לכוחות<span class="rstep-v" id="resp-rv">1.5 ק"מ</span></div>'
+   +'    <div class="rstep-b">'
+   +'      <div class="rsec-hint">1 · טווח ההתראה — מסומן על המפה בעיגול מקווקו:</div>'
+   +'      <input class="resp-slider" type="range" min="0.2" max="5" step="0.1" value="1.5" oninput="respSetRadius(this.value)" onchange="respFitRadius()"><div class="resp-reach" id="resp-reach"></div>'
+   +'      <div class="rsec-hint" style="margin-top:11px">2 · למי לשגר:</div>'
+   +'      <div class="rg">'+gHtml+'</div>'
+   +'      <button class="resp-send" onclick="respDispatch(\''+id+'\')">⚡ סמן לשיגור · שיגור אוטומטי טרם חובר</button>'
+   +'      <div class="resp-two" style="margin-top:9px"><div class="resp-esc" onclick="respReinforce(\''+id+'\')" title="מרחיב את טווח ההתראה (עדכון אוטומטי לשומרים/למוקד טרם חובר)">⬆️ בקש תגבור</div><div class="resp-bc" onclick="respLog(\''+id+'\',\'הודעה לקבוצה — לא נשלחה (שליחה מהדשבורד טרם חוברה)\')">📢 הודעה לקבוצה</div></div>'
+   +'      <details class="rfold"><summary>מענה מוכח לסוג אירוע זה</summary>'+_respMenim(e,m)+'</details>'
+   +'    </div></div>'
+
+   /* ── STEP 3 · TRACK ─────────────────────────────── */
+   +'  <div class="rstep" id="rstep3"><div class="rstep-h" onclick="respStep(3)"><span class="rstep-n">3</span>מעקב אירוע<span class="rstep-v">מתועד</span></div>'
+   +'    <div class="rstep-b">'
+   +'      <div class="resp-log" id="resp-log"><div>• '+hh+' — אותר ע״י רשת שומרים</div></div>'
+   +'      <button class="resp-send" style="margin-top:10px;background:#15202f;border:1px solid #2a3450;color:#cdd6e8" onclick="respStep(4)">סיום טיפול ←</button>'
+   +'    </div></div>'
+
+   /* ── STEP 4 · CLOSE ─────────────────────────────── */
+   +'  <div class="rstep" id="rstep4"><div class="rstep-h" onclick="respStep(4)"><span class="rstep-n">4</span>סגירה והעברה חוקית</div>'
+   +'    <div class="rstep-b">'
+   +'      <div id="resp-evid">'+_evidenceHtml(o,id)+'</div>'
+   +'      <div class="resp-nat" style="margin-top:9px">⚖️ העברת ראיות לאכיפה ('+(isIntl(curC())?'רשויות האכיפה המקומיות':'משטרה 100 / פרקליטות')+') מתבצעת ידנית ע״י הרשות, עם בסיס חוקי ותיעוד מלא. <span style="color:#f0c75a">אין שיגור אוטומטי.</span> העברה לגורמי ביטחון לאומי — בערוצים משפטיים פורמליים בלבד, לא דרך כלי זה.</div>'
+   +'    </div></div>'
+   +'  <div class="remg">מצב אירוע · לוח הנתונים המלא חוזר עם סגירת האירוע</div>'
    +'</div>';
   document.body.appendChild(p);
   setTimeout(function(){ p.classList.add('on'); respSetRadius(1.5); try{respGeocode(lat,lng,o.demo);}catch(e){} },20);
@@ -1259,6 +1382,7 @@ function respReinforce(id){
 }
 function respGeocode(lat,lng,demo){
  var box=document.getElementById('resp-addr'); if(!box) return;
+ if(demo){ box.innerHTML='<b>📍 כתובת לדוגמה</b><span class="rloc-sub" style="color:#6d7893">בהדגמה לא נשלחת בקשה לשירות כתובות · '+lat.toFixed(3)+', '+lng.toFixed(3)+'</span>'; return; }
  try{
   fetch('https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat='+lat+'&lon='+lng+'&zoom=17&addressdetails=1&accept-language=he',{headers:{'Accept':'application/json'}})
    .then(function(r){ return r.ok?r.json():null; })
@@ -1421,13 +1545,13 @@ function renderLive(c,list,opts){
        strip.style.display='flex';
        var _chip=function(col,n,lbl){return '<span class="ls-chip"><i style="background:'+col+'"></i><b>'+n+'</b> '+lbl+'</span>';};
        strip.innerHTML=''
-         +'<div class="ls-beacon"><span class="ls-live">● LIVE</span><button id="ls-silence" class="ls-silence" onclick="event.stopPropagation();silenceAlarm()">🔇 השתק אזעקה</button></div>'
+         +'<div class="ls-beacon"><span class="ls-live">● אירוע חי</span><button id="ls-silence" class="ls-silence" onclick="event.stopPropagation();silenceAlarm()" aria-label="השתקת ההתרעה הקולית - האירוע נשאר פתוח"><svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 9v6h4l5 4V5L8 9H4Z"/><path d="M17 9l4 6M21 9l-4 6"/></svg><span class="lsx"><b>השתקת התרעה</b><i>האירוע נשאר פתוח</i></span></button></div>'
          +'<div class="ls-main">'
          +'<div class="ls-t">'+m0.i+' '+ESC(m0.t)+'</div>'
          +'<div class="ls-addr"><span id="ls-addr-txt">מאתר כתובת…</span></div>'
          +'<div class="ls-resp">'+_chip('#E0A828',g,'שומרים זמינים')+_chip('#4fc3e8',(demo?(pol+med+fire):'—'),'מתנדבי חירום')+(demo?'<span class="ls-demo">נתוני הדגמה</span>':'')+'</div>'
          +'</div>'
-         +'<div class="ls-go"><button onclick="event.stopPropagation();openResponse(\''+_jsq(id0)+'\')">פתח מרכז תגובה ←</button></div>';
+         +'<div class="ls-go"><button onclick="event.stopPropagation();openResponse(\''+_jsq(id0)+'\')">ניהול אירוע ←</button></div>';
        try{ stripGeocode(+e0.lat,+e0.lng); }catch(e){}
        strip.onclick=function(){ try{ openResponse(id0); }catch(e){} };
        _sosFocusLock=true;
@@ -2003,7 +2127,7 @@ function openAccount(){
  if(document.getElementById('acct-ov'))return;
  var rows=[
   ['טריטוריות','הטריטוריה שלך','כל 60 הערים · השוואה'],
-  ['מרכז תגובה (שיגור)','—','✓'],
+  ['ניהול אירוע ושיגור','—','✓'],
   ['רדיוס התראה','עד 2 ק"מ','ללא הגבלה'],
   ['תובנות ומענים מוכחים','בסיסי','מלא · חוצה-טריטוריות'],
   ['ייצוא דוחות','—','✓ PDF'],
