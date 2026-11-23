@@ -12101,7 +12101,7 @@ try{ hydrateIcons(document); }catch(e){}
 /* Loaded-build version - shown in the diagnostic panel so a phone can prove
    whether it's on the latest build or a STALE cached one. Keep in lock-step
    with sw.js SW_VERSION on every deploy. */
-var APP_VER='v402';
+var APP_VER='v403';
 var FB={ready:false,uid:null,db:null,_presTimer:null,connected:false,listening:false,pushState:'default',near:0,swVer:'?',
   authState:'connecting',sdkLoaded:false,persist:'',permErr:null,err:null,wsProbe:'',csp:''};
 /* Always log connection diagnostics to the console so the real failure can be SEEN in Chrome. */
@@ -15915,10 +15915,8 @@ function statsOpen(){
    +'<div style="font-size:13px;font-weight:800;letter-spacing:.4px;color:#f5cb45">SH✡MER · '+TT('מדדי שימוש','مؤشرات الاستخدام','USAGE')+'</div>'
    +'<button id="stats-x" style="background:none;border:1px solid #8c9bbd55;color:#c8d4e8;border-radius:9px;padding:5px 11px;font-size:13px;font-weight:700">✕</button></div>'
    +'<div id="stats-updated" style="font-size:11px;color:#8c9bbd;margin-bottom:16px;direction:ltr;text-align:'+(rtl?'right':'left')+'">…</div>'
-   +statsCard('stats-active-now', TT('פעילים עכשיו','نشطون الآن','Active right now'), TT('נראו ב-'+STATS_ACTIVE_MIN+' הדקות האחרונות','شوهدوا خلال آخر '+STATS_ACTIVE_MIN+' دقائق','seen in the last '+STATS_ACTIVE_MIN+' min'),'#3ad29f')
    +statsCard('stats-today', TT('פעילים היום','نشطون اليوم','Active today'), TT('משתמשים ייחודיים היום (DAU)','مستخدمون فريدون اليوم (DAU)','distinct users today (DAU)'),'#f5cb45')
    +statsCard('stats-installs', TT('התקנות','التثبيتات','Installs'), TT('סה"כ התקנות (הורדות)','إجمالي التثبيتات (التنزيلات)','total app installs ("downloads")'),'#5aa9ff')
-   +statsCard('stats-registered', TT('משתמשים רשומים','المستخدمون المسجّلون','Registered users'), TT('סה"כ חשבונות במרשם','إجمالي الحسابات في السجل','total accounts in the registry'),'#c9a0ff')
    +'<button id="stats-refresh" style="width:100%;margin-top:8px;padding:12px;border:1px solid #8c9bbd44;border-radius:12px;background:#122850;color:#f5cb45;font-size:14px;font-weight:800">'+TT('רענון','تحديث','Refresh')+'</button>'
    +'<div style="font-size:10.5px;color:#6b7a9c;margin-top:14px;line-height:1.6;text-align:center">'+TT('מתעדכן כל 15 שניות · מספרים חיים מ-Firebase','يتحدّث كل 15 ثانية · أرقام حيّة من Firebase','auto-refreshes every 15s · live numbers from Firebase')+'</div>'
    +'</div>';
@@ -15937,16 +15935,22 @@ async function statsRefresh(){
     if(!FB.ready||!FB._authReady){ statsSet('stats-updated', he?'מתחבר…':ar?'جارٍ الاتصال…':'connecting…'); return; }
     var now=Date.now(), day=statsToday();
     function rd(p){ return FB.db.ref(p).once('value').then(function(s){ return s.val()||{}; }).catch(function(){ return null; }); }
-    var res=await Promise.all([ rd('presence'), rd('analytics/installs'), rd('registry'), rd('analytics/seen/'+day) ]);
+    /* v403: this used to read the whole presence and registry collections - every user's ~11m
+       position, and the full phone-hash-to-account map - to show two counts. Those reads are
+       closed now: no count is worth a founder account being able to locate every user. The same
+       questions are answered from the pseudonymous analytics counters, which carry a uid and a
+       timestamp and nothing else. "Active right now" and "registered users" are gone rather
+       than relabelled: the first cannot be answered without reading everyone's live position,
+       and the second only ever meant "rows in the phone-hash registry". What is left is what
+       can be measured honestly - opened today, and installs. */
+    var res=await Promise.all([ rd('analytics/installs'), rd('analytics/seen/'+day) ]);
     /* A denied read returns null. Never coerce that to {} - it renders as a confident
        "0", which is a fabricated number, not a measurement. Show '-' for unreadable. */
-    var pres=res[0], inst=res[1], reg=res[2], act=res[3];
-    statsSet('stats-active-now', pres===null?'\u2013':Object.keys(pres).filter(function(k){ var p=pres[k]; return p&&p.ts&&(now-p.ts)<STATS_ACTIVE_MIN*60000; }).length);
-    statsSet('stats-registered', reg===null?'\u2013':Object.keys(reg).length);
-    statsSet('stats-installs', inst===null?'–':Object.keys(inst).length);      // '–' = analytics rule not published yet
-    statsSet('stats-today',    act ===null?'–':Object.keys(act).length);
-    var pend=(inst===null||act===null||reg===null||pres===null);
-    statsSet('stats-updated', (he?'עודכן ':ar?'حُدّث ':'updated ')+new Date().toLocaleTimeString()+(pend?(he?'  ·  חסרים (–): צריך לפרסם את כללי הקריאה':ar?'  ·  الناقص (–): انشر قواعد القراءة':'  ·  the – values need the read rules published'):''));
+    var inst=res[0], act=res[1];
+    statsSet('stats-installs', inst===null?'\u2013':Object.keys(inst).length);
+    statsSet('stats-today',    act ===null?'\u2013':Object.keys(act).length);
+    var pend=(inst===null||act===null);
+    statsSet('stats-updated', (he?'עודכן ':ar?'حُدّث ':'updated ')+new Date().toLocaleTimeString()+(pend?(he?'  ·  חסרים: הקריאה נדחתה':ar?'  ·  الناقص: رُفضت القراءة':'  ·  missing values were denied'):''));
   }catch(e){ fbLog('stats refresh err',e); }
 }
 try{ if(document.readyState!=='loading'){ statsGateCheck(); } else { document.addEventListener('DOMContentLoaded',function(){ try{statsGateCheck();}catch(e){} }); } }catch(e){}
@@ -17620,7 +17624,12 @@ function simpleSet(on,src){
   var st=smpState(); st.on=!!on; st.src=src||'';
   if(on){
     st.since=smpDay();   /* the daily "I'm OK" check starts tomorrow - never a message on the first day */
-    try{ if(!(SS.shake&&SS.shake.enabled===true)){ var t=smpEl('shake-tog'); if(t&&!t.classList.contains('on')) toggleShake(t); } }catch(e){}   /* shake-to-SOS is part of Simple mode */
+    /* v403: Simple mode no longer arms shake-to-SOS behind the user's back. It used to, and the
+       confirmation card never said so - it lists the big button, the large text, the daily check-in
+       and one-tap calling, and nothing else. v402 widened the trigger so updating your age in
+       Settings could switch it on, which meant an older user could have an emergency gesture armed
+       on their phone without ever being told. Shake-to-SOS stays opt-in, in Settings, where the
+       screen explains what it does. */
   }
   try{ saveStore(); }catch(e){}
   simpleApply();
