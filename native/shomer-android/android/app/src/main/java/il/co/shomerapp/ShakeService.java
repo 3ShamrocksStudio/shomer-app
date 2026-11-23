@@ -147,6 +147,7 @@ public class ShakeService extends Service implements SensorEventListener {
    *  or a cancelled SOS would still start screaming 8 seconds later. */
   static synchronized void cancelNativeAlarm(Context c) {
     clearPending();
+    try { TorchMorse.stop(); } catch (Throwable e) {}   /* v409: the light goes out with the alarm */
     /* v370: a cancel means the user decided this one was false. The 8 s re-fire guard must not
        then swallow a DELIBERATE second shake - the situation can turn real between the cancel and
        the next shake, and before this the phone answered that shake with nothing at all. */

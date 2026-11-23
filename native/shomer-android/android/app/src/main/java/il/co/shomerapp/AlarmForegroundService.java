@@ -155,6 +155,11 @@ public class AlarmForegroundService extends Service {
         }
       } catch (Throwable e) {}
 
+      /* v409: the flashlight joins the siren. Light carries where sound does not - across a
+         street, through a closed car window, to someone who is deaf or wearing headphones - and
+         on a locked phone the web layer's torch code is not running at all. */
+      try { TorchMorse.start(getApplicationContext()); } catch (Throwable e) { note(e, "torch-hook"); }
+
       /* Everything below is the wake lock and the buzz. It gets its own catch: a throw in any of
          it must never reach the handler and tear down a siren that is already playing. */
       try {
@@ -259,6 +264,7 @@ public class AlarmForegroundService extends Service {
     /* v398: one try per step. Sharing a try meant a throwing stop() skipped release() AND
        mp = null, so isPlaying() kept answering yes after the service was gone - and the next
        press+shake never started a siren. mp is cleared whatever happens. */
+    try { TorchMorse.stop(); } catch (Throwable e) {}   /* v409: a light nobody can switch off is its own emergency */
     MediaPlayer p = mp; mp = null;
     try { if (p != null) p.stop(); } catch (Exception e) {}
     try { if (p != null) p.release(); } catch (Exception e) {}

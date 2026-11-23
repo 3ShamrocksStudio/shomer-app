@@ -109,6 +109,8 @@ final class AlarmPlayer {
       p.prepare();
       p.start();
       mp = p;
+      /* v409: this is the siren on a locked phone - it gets the flashlight too */
+      if (forSos) { try { TorchMorse.start(c.getApplicationContext()); } catch (Throwable e) {} }
       /* v376: the siren is SOUNDING from here. Everything below is the notification and the buzz,
          and it gets its own catch - a throw in any of it must never reach the handler below and
          tear down a siren that is already playing. */
@@ -167,6 +169,7 @@ final class AlarmPlayer {
   }
 
   static synchronized void stop(Context c) {
+    try { TorchMorse.stop(); } catch (Throwable e) {}   /* v409 */
     try { ((android.app.NotificationManager) c.getSystemService(Context.NOTIFICATION_SERVICE)).cancel(3); } catch (Throwable e) {}
     try { if (mp != null) { mp.stop(); mp.release(); } } catch (Exception e) {}
     mp = null; sosCause = false;   // v375
