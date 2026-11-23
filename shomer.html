@@ -5349,7 +5349,12 @@ async function initNativeAlerts(){
     _pn.addListener('registration',function(t){
       try{ fcmToken=(t&&t.value)||null; if(fcmToken){ SS.fcmToken=fcmToken; saveStore(); fbRegisterToken(fcmToken); } }catch(e){}
     });
-    _pn.addListener('registrationError',function(){});
+    /* v404: a registration failure used to vanish. If the device cannot get a push token the app
+       cannot reach its user with the app closed, which is the whole promise - record it so a
+       tester's phone can say so instead of just staying quiet. */
+    _pn.addListener('registrationError',function(e){
+      try{ SS._pushErr={ ts:Date.now(), msg:String((e&&(e.error||e.message))||e||'unknown').slice(0,160) }; saveStore(); }catch(_){ }
+    });
     _pn.addListener('pushNotificationReceived',function(n){
       try{ pushNotify((n&&n.title)||'SH\u2721MER',(n&&n.body)||'','fcm'); }catch(e){}
     });
@@ -12101,7 +12106,7 @@ try{ hydrateIcons(document); }catch(e){}
 /* Loaded-build version - shown in the diagnostic panel so a phone can prove
    whether it's on the latest build or a STALE cached one. Keep in lock-step
    with sw.js SW_VERSION on every deploy. */
-var APP_VER='v403';
+var APP_VER='v404';
 var FB={ready:false,uid:null,db:null,_presTimer:null,connected:false,listening:false,pushState:'default',near:0,swVer:'?',
   authState:'connecting',sdkLoaded:false,persist:'',permErr:null,err:null,wsProbe:'',csp:''};
 /* Always log connection diagnostics to the console so the real failure can be SEEN in Chrome. */
@@ -12754,6 +12759,14 @@ function fbOnAuthed(uid){
   if(FB._authReady && FB.uid===uid){ return; } // already running on this uid
   FB.uid=uid; FB._authReady=true; try{ founderWatchList(); }catch(e){} setTimeout(function(){ try{ evpMaybeLoad(); }catch(e){} },2500);
   fbLog('AUTH READY · secure uid =', uid, '· ID token acquired · opening SSE data layer');
+  /* v404: replay the push token now that there is a uid to file it under.
+     fbRegisterToken() returns silently when FB.ready is false, and the native push
+     'registration' callback almost always wins the race against anonymous auth - it is a local
+     callback, auth is a network round trip. The token was saved to SS.fcmToken and then never
+     written anywhere, with no retry, so tokens/<uid> stayed empty across every account and
+     alarmFanout had nothing to push to. That is why an SOS never reached a phone whose app had
+     been closed. Re-filing here costs one write and closes the race from the other side. */
+  try{ if(SS.fcmToken) fbRegisterToken(SS.fcmToken); }catch(e){}
   try{ fbStartPresence(); }catch(e){}
   try{ fbListenSOS(); }catch(e){}
   try{ fbListenPairs(); }catch(e){}
