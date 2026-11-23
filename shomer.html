@@ -6227,7 +6227,12 @@ function sosGoLoud(){
  try{ document.getElementById('sos-strip').classList.add('on'); }catch(e){}
  try{ acquireWake(); }catch(e){} try{ startMaxAttention(); }catch(e){}
  try{ addSOSPin(); }catch(e){} try{ sosPaintResponders(); sosPaintMyHelp(); }catch(e){}
- setText('ss-t',he?' SOS פעיל - אזעקה פועלת · מיקומך שותף':currentLang==='ar'?' SOS نشط - الإنذار يعمل · تمت مشاركة موقعك':' SOS active - alarm firing · location shared');
+ /* v407: the escalation path asserted "location shared" with no check at all - the same
+    defect just fixed on the main strip, one function over. */
+ var _lp2=!_myPos();
+ setText('ss-t',(he?' SOS פעיל - אזעקה פועלת':currentLang==='ar'?' SOS نشط - الإنذار يعمل':' SOS active - alarm firing')
+   +(_lp2?(he?' · מחפש מיקום':currentLang==='ar'?' · جارٍ تحديد الموقع':' · finding location')
+         :(he?' · מיקומך שותף':currentLang==='ar'?' · تمت مشاركة موقعك':' · location shared')));
 }
 /* PHASE 1 - alarm immediately, then the cancel countdown. No broadcast yet. */
 /* Anti-abuse: repeated SOS broadcasts add friction (hold-to-arm) and pause community fanout,
@@ -6541,7 +6546,11 @@ function sosImOk(){
 /* Tell my SHOMERs' phones (closed app too) that it was a false alarm. */
 function fbAlertPairedSafe(){
  try{ if(window._sosPractice||isReviewAccount()) return; }catch(e){}
- if(!FB.ready||!FB._pairedUids) return;
+ /* v407: a cold start could send the all-clear to nobody, leaving guardians believing the SOS
+     was still running. Wait for the pairs listener, same as fbAlertPairedSos. */
+  if(!FB.ready||!FB._pairedUids||!Object.keys(FB._pairedUids).length){
+    var _n2=(arguments[0]|0); if(_n2<10) setTimeout(function(){ try{ fbAlertPairedSafe(_n2+1); }catch(e){} },1500);
+    return; }
  var he=currentLang==='he', ar=currentLang==='ar', nm=(SS.user&&SS.user.name)||(he?'שומר/ת':ar?'حارس':'a SHOMER');
  Object.keys(FB._pairedUids).forEach(function(uid){
    fbQueueAlarm(uid, he?('✓ '+nm+': אזעקת שווא – אני בסדר'):ar?('✓ '+nm+': إنذار كاذب – أنا بخير'):('✓ '+nm+': false alarm – I\'m OK'),
@@ -7596,7 +7605,7 @@ function injectSOSCard(){
  const bdg=document.createElement('span');bdg.className='ubdg';bdg.textContent='';
  top.appendChild(hd);top.appendChild(bdg);
  const meta=document.createElement('div');meta.className='uc-meta';meta.textContent=currentLang==='he'?'עכשיו · מיקומך':'Now · your location';
- const desc=document.createElement('div');desc.className='uc-desc';desc.textContent=currentLang==='he'?'SOS נשלח. מיקומך שותף. אזעקה פועלת.':'SOS sent. Location shared. Alarm active.';
+ const desc=document.createElement('div');desc.className='uc-desc';desc.textContent=currentLang==='he'?(_myPos()?'SOS נשלח. מיקומך שותף. אזעקה פועלת.':'SOS נשלח. אזעקה פועלת. מחפש מיקום.'):(_myPos()?'SOS sent. Location shared. Alarm active.':'SOS sent. Alarm active. Finding location.');
  inner.appendChild(top);inner.appendChild(meta);inner.appendChild(desc);
  div.appendChild(inner);
  l.insertBefore(div,l.firstChild);
@@ -12116,7 +12125,7 @@ try{ hydrateIcons(document); }catch(e){}
 /* Loaded-build version - shown in the diagnostic panel so a phone can prove
    whether it's on the latest build or a STALE cached one. Keep in lock-step
    with sw.js SW_VERSION on every deploy. */
-var APP_VER='v406';
+var APP_VER='v407';
 var FB={ready:false,uid:null,db:null,_presTimer:null,connected:false,listening:false,pushState:'default',near:0,swVer:'?',
   authState:'connecting',sdkLoaded:false,persist:'',permErr:null,err:null,wsProbe:'',csp:''};
 /* Always log connection diagnostics to the console so the real failure can be SEEN in Chrome. */
@@ -13292,6 +13301,7 @@ function fbRegisterToken(token){
     return; }
   var rec={token:token,ts:Date.now()};   /* v313: no location in the push token (it was a precise point, kept forever, used by nothing). set() also overwrites an old one. */   try{
     var _uid=FB.uid, _try=function(n){
+      if(FB.uid!==_uid) return;   /* v407: the account changed under us - that write is not ours to make */
       try{
         var pr=FB.db.ref('tokens/'+_uid).set(rec);
         if(pr&&pr.catch) pr.catch(function(e){

@@ -36,6 +36,7 @@ public class AlarmForegroundService extends Service {
   private static volatile MediaPlayer mp;   // v398: read without the monitor by isPlaying()
   private AudioManager am;
   private int prevAlarmVol = -1;
+  private int prevMusicVol = -1;   // v407: only set when the siren had to reroute to media
   private PowerManager.WakeLock wl;
 
   @Override
@@ -88,6 +89,30 @@ public class AlarmForegroundService extends Service {
         if (am != null) { markSelf(); am.setStreamVolume(AudioManager.STREAM_ALARM, am.getStreamMaxVolume(AudioManager.STREAM_ALARM), 0); }
       } catch (Throwable e) { note(e, "volume"); }
 
+      /* v407: decide the ROUTE before building the player. If a Do-Not-Disturb policy owns the
+         alarm stream it stays at 0 however hard we push, and an alarm-usage player is then
+         inaudible no matter what - which is the one case v405 could only write into a log while
+         the release notes promised the siren always sounds. A phone that will not play an alarm
+         will usually still play media, so take that route rather than be silent. Alarm usage is
+         always preferred: it is the one that ignores the ringer and survives silent mode. */
+      int usage = AudioAttributes.USAGE_ALARM;
+      int focusStream = AudioManager.STREAM_ALARM;
+      try {
+        if (am != null && am.getStreamVolume(AudioManager.STREAM_ALARM) == 0) {
+          note(new RuntimeException("alarm stream pinned at 0 - rerouting the siren to media"), "muted");
+          try {
+            if (prevMusicVol < 0) prevMusicVol = am.getStreamVolume(AudioManager.STREAM_MUSIC);
+            am.setStreamVolume(AudioManager.STREAM_MUSIC, am.getStreamMaxVolume(AudioManager.STREAM_MUSIC), 0);
+          } catch (Throwable e) { note(e, "music-volume"); }
+          if (am.getStreamVolume(AudioManager.STREAM_MUSIC) > 0) {
+            usage = AudioAttributes.USAGE_MEDIA;
+            focusStream = AudioManager.STREAM_MUSIC;
+          } else {
+            note(new RuntimeException("media stream is at 0 too - the phone is fully muted"), "muted-all");
+          }
+        }
+      } catch (Throwable e) { note(e, "route"); }
+
       if (mp != null) { try { mp.stop(); } catch (Exception e) {} try { mp.release(); } catch (Exception e) {} mp = null; }
       p = new MediaPlayer();
       /* v401: a player can also die mid-playback (MEDIA_ERROR_SERVER_DIED resets it to Idle).
@@ -103,7 +128,7 @@ public class AlarmForegroundService extends Service {
         }
       });
       AudioAttributes aa = new AudioAttributes.Builder()
-          .setUsage(AudioAttributes.USAGE_ALARM)
+          .setUsage(usage)
           .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION)
           .build();
       p.setAudioAttributes(aa);
@@ -114,7 +139,7 @@ public class AlarmForegroundService extends Service {
       /* v405: audio focus is an optimisation too, and it sat outside the volume try - a null
          AudioManager does not throw where am is assigned, it throws HERE and took the primary
          player down with it. Same rule as the volume: never a precondition for the siren. */
-      try { if (am != null) am.requestAudioFocus(null, AudioManager.STREAM_ALARM, AudioManager.AUDIOFOCUS_GAIN); }
+      try { if (am != null) am.requestAudioFocus(null, focusStream, AudioManager.AUDIOFOCUS_GAIN); }
       catch (Throwable e) { note(e, "focus"); }
       p.prepare();
       p.start();
@@ -124,8 +149,8 @@ public class AlarmForegroundService extends Service {
          getAlarmFaults, the only readout a tester has, repeats that. Read the level back and
          record it, so a muted device can be told apart from a working one. */
       try {
-        if (am != null && am.getStreamVolume(AudioManager.STREAM_ALARM) == 0) {
-          note(new RuntimeException("alarm stream is at 0 - siren started but inaudible"), "muted");
+        if (am != null && am.getStreamVolume(focusStream) == 0) {
+          note(new RuntimeException("stream " + focusStream + " is at 0 - siren started but inaudible"), "inaudible");
         }
       } catch (Throwable e) {}
 
@@ -156,6 +181,7 @@ public class AlarmForegroundService extends Service {
       if (mp == null) {
         try {
           if (am != null && prevAlarmVol >= 0) { markSelf(); am.setStreamVolume(AudioManager.STREAM_ALARM, prevAlarmVol, 0); }
+          if (am != null && prevMusicVol >= 0) { markSelf(); am.setStreamVolume(AudioManager.STREAM_MUSIC, prevMusicVol, 0); prevMusicVol = -1; }
         } catch (Throwable t) {}
         prevAlarmVol = -1;
         /* Last resort: the siren is the whole product. Try the fallback player, which runs inside
@@ -236,6 +262,8 @@ public class AlarmForegroundService extends Service {
     try { if (p != null) p.stop(); } catch (Exception e) {}
     try { if (p != null) p.release(); } catch (Exception e) {}
     try { if (am != null && prevAlarmVol >= 0) { markSelf(); am.setStreamVolume(AudioManager.STREAM_ALARM, prevAlarmVol, 0); } } catch (Exception e) {}
+    /* v407: hand the media volume back too, if the siren had to borrow it. */
+    try { if (am != null && prevMusicVol >= 0) { markSelf(); am.setStreamVolume(AudioManager.STREAM_MUSIC, prevMusicVol, 0); prevMusicVol = -1; } } catch (Exception e) {}
     try { if (wl != null && wl.isHeld()) wl.release(); } catch (Exception e) {}
     try { Vibrator v = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE); if (v != null) v.cancel(); } catch (Exception e) {}
     super.onDestroy();
