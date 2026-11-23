@@ -12101,7 +12101,7 @@ try{ hydrateIcons(document); }catch(e){}
 /* Loaded-build version - shown in the diagnostic panel so a phone can prove
    whether it's on the latest build or a STALE cached one. Keep in lock-step
    with sw.js SW_VERSION on every deploy. */
-var APP_VER='v400';
+var APP_VER='v402';
 var FB={ready:false,uid:null,db:null,_presTimer:null,connected:false,listening:false,pushState:'default',near:0,swVer:'?',
   authState:'connecting',sdkLoaded:false,persist:'',permErr:null,err:null,wsProbe:'',csp:''};
 /* Always log connection diagnostics to the console so the real failure can be SEEN in Chrome. */
@@ -17584,8 +17584,15 @@ function ageAnswer(b){
   try{ profileSync(); }catch(e){}
   try{ renderProfile2(); }catch(e){}
   try{ simpleRenderSettings(); }catch(e){}
-  /* 65+ → Simple mode ON by default - only when first asked; a later change keeps their own choice */
-  if(first&&(b==='65_74'||b==='75p')&&!simpleOn()){
+  /* v402: 65+ → Simple mode. This used to fire ONLY on the very first ask, so anyone who skipped
+     the question and set their age later in Settings - the likeliest path for an older user who
+     was handed the phone already set up - silently got nothing. Now it is offered whenever the
+     band is set to 65+ and Simple mode is off, and once offered it is never raised again, so a
+     deliberate "no" stays a no. */
+  try{ SS.simple=SS.simple||{}; }catch(e){}
+  var _offer = (b==='65_74'||b==='75p') && !simpleOn() && !(SS.simple&&SS.simple.offered);
+  if(_offer){ try{ SS.simple.offered=Date.now(); saveStore(); }catch(e){} }
+  if((first||_offer)&&(b==='65_74'||b==='75p')&&!simpleOn()){
     simpleSet(true,'age');
     smpI18n(); var q=smpEl('age-card-q'), d=smpEl('age-card-done'); if(q) q.hidden=true; if(d) d.hidden=false;
     setTimeout(function(){ try{ var o=d&&d.querySelector('.age-ok'); if(o) o.focus(); }catch(e){} },60);
@@ -17993,8 +18000,35 @@ function drillDayNum(dt){ var d=dt||new Date(); return Math.floor((Date.UTC(d.ge
 function _drRand(seed){ var x=(seed*2654435761)>>>0; return function(){ x^=x<<13; x>>>=0; x^=x>>17; x^=x<<5; x>>>=0; return x/4294967296; }; }
 /* Same question for everyone on a given day; the bank is walked in a fixed shuffled order. */
 function drillOrder(){ if(drillOrder._o) return drillOrder._o; var o=DRILL_BANK.map(function(_,i){return i;}), r=_drRand(77); for(var i=o.length-1;i>0;i--){ var j=Math.floor(r()*(i+1)); var t=o[i]; o[i]=o[j]; o[j]=t; } return (drillOrder._o=o); }
+/* ══ v402: the daily question follows the life you actually live ══
+   Until now every band got the identical question, and 18-39 and 40-64 got no age-aware anything
+   at all - the band was collected for municipal statistics and read by nothing but Simple mode.
+   Each band now draws from the topics most likely to be the one that matters to them, and the
+   rules-and-limits questions reach everyone. Still deterministic by day, and still shared WITHIN
+   a band, so a family can compare answers; a band with no match falls back to the whole bank. */
+var DRILL_AGE_TOPICS={
+  '18_39': ['choke','bleed','cpr','drown','shock','ptsd','call','bone','law','app'],
+  '40_64': ['heart','stroke','cpr','bleed','allergy','seizure','burn','call','law','app'],
+  '65_74': ['stroke','heart','faint','bone','cpr','call','burn','law','app'],
+  '75p':   ['stroke','heart','faint','bone','call','choke','law','app']
+};
+function drillBandPool(){
+  try{
+    var b=(SS.user&&SS.user.ageBand)||'', want=DRILL_AGE_TOPICS[b];
+    if(!want) return null;
+    var pool=[]; for(var i=0;i<DRILL_BANK.length;i++){ if(want.indexOf(DRILL_BANK[i][0])>=0) pool.push(i); }
+    return pool.length>=8 ? pool : null;   /* too few to vary - use the whole bank instead */
+  }catch(e){ return null; }
+}
 function drillQuestion(dt){
   var n=drillDayNum(dt), N=DRILL_BANK.length, base=((n%N)+N)%N, qi=drillOrder()[base], q=DRILL_BANK[qi];
+  /* v402: narrow to this person's band, keeping the same day-seeded walk so it stays stable */
+  try{
+    var _pool=drillBandPool();
+    if(_pool){ var _r=_drRand(99), _o=_pool.slice();
+      for(var _i=_o.length-1;_i>0;_i--){ var _j=Math.floor(_r()*(_i+1)); var _t=_o[_i]; _o[_i]=_o[_j]; _o[_j]=_t; }
+      qi=_o[((n%_o.length)+_o.length)%_o.length]; q=DRILL_BANK[qi]; N=DRILL_BANK.length; }
+  }catch(e){}
   /* v274 GLOBAL: outside Israel, skip the "which Israeli number" questions (their answers are
      100/101/102/1201 and would all collapse to one local number); other texts get local numbers. */
   var _abroad=false; try{ _abroad=!emIsIL(); }catch(e){}
