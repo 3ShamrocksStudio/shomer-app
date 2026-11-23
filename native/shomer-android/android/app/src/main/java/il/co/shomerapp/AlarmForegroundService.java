@@ -33,7 +33,7 @@ public class AlarmForegroundService extends Service {
   private static void markSelf() { try { ShakeService.markSelfVolume(); } catch (Throwable e) {} }
 
   private static final String CH = "shomer_sos";
-  private static MediaPlayer mp;
+  private static volatile MediaPlayer mp;   // v398: read without the monitor by isPlaying()
   private AudioManager am;
   private int prevAlarmVol = -1;
   private PowerManager.WakeLock wl;
@@ -61,38 +61,68 @@ public class AlarmForegroundService extends Service {
   }
 
   private void startAlarm() {
+    /* v398: build the player in a LOCAL and publish it to mp only once it is actually SOUNDING -
+       the same shape AlarmPlayer was given in v376, which this class never got.
+       Published first, any throw between `new MediaPlayer()` and start() - openRawResourceFd,
+       setDataSource, a prepare() that fails on a busy codec - left mp non-null with nothing
+       playing, and the catch swallowed it. isPlaying() is `mp != null`, so from that moment the
+       phone claimed a siren was up for the life of the process. ShakeService's pre-alarm asks
+       exactly that question before it fires (ShakeService:119) and skipped starting the siren -
+       so press+shake buzzed, raised the notification, opened the app, and then went silent.
+       onDestroy could not clear it either: mp.stop() on an unprepared player throws, and it ran
+       first in a shared try, so mp = null never executed. A permanent lie, per process. */
+    MediaPlayer p = null;
     try {
       am = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
       // Max the ALARM stream (ignores ringer/silent/DND) — remember to restore on stop.
       prevAlarmVol = am.getStreamVolume(AudioManager.STREAM_ALARM);
       markSelf(); am.setStreamVolume(AudioManager.STREAM_ALARM, am.getStreamMaxVolume(AudioManager.STREAM_ALARM), 0);
 
-      if (mp != null) { try { mp.stop(); mp.release(); } catch (Exception e) {} mp = null; }
-      mp = new MediaPlayer();
+      if (mp != null) { try { mp.stop(); } catch (Exception e) {} try { mp.release(); } catch (Exception e) {} mp = null; }
+      p = new MediaPlayer();
       AudioAttributes aa = new AudioAttributes.Builder()
           .setUsage(AudioAttributes.USAGE_ALARM)
           .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION)
           .build();
-      mp.setAudioAttributes(aa);
+      p.setAudioAttributes(aa);
       AssetFileDescriptor afd = getResources().openRawResourceFd(R.raw.sos_alarm);
-      mp.setDataSource(afd.getFileDescriptor(), afd.getStartOffset(), afd.getLength());
+      p.setDataSource(afd.getFileDescriptor(), afd.getStartOffset(), afd.getLength());
       afd.close();
-      mp.setLooping(true);
+      p.setLooping(true);
       am.requestAudioFocus(null, AudioManager.STREAM_ALARM, AudioManager.AUDIOFOCUS_GAIN);
-      mp.prepare();
-      mp.start();
+      p.prepare();
+      p.start();
+      mp = p;   // SOUNDING from here, and only from here
 
-      PowerManager pm = (PowerManager) getSystemService(Context.POWER_SERVICE);
-      wl = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "shomer:sos");
-      wl.acquire(10 * 60 * 1000L);
+      /* Everything below is the wake lock and the buzz. It gets its own catch: a throw in any of
+         it must never reach the handler and tear down a siren that is already playing. */
+      try {
+        PowerManager pm = (PowerManager) getSystemService(Context.POWER_SERVICE);
+        wl = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "shomer:sos");
+        wl.acquire(10 * 60 * 1000L);
 
-      Vibrator v = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
-      if (v != null) {
-        long[] pat = {0, 500, 140, 500, 140, 500, 320};
-        int[] amp = {0, 255, 0, 255, 0, 255, 0};
-        v.vibrate(VibrationEffect.createWaveform(pat, amp, 1)); // repeat from index 1
-      }
-    } catch (Exception e) { /* never crash the alarm */ }
+        Vibrator v = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
+        if (v != null) {
+          long[] pat = {0, 500, 140, 500, 140, 500, 320};
+          int[] amp = {0, 255, 0, 255, 0, 255, 0};
+          v.vibrate(VibrationEffect.createWaveform(pat, amp, 1)); // repeat from index 1
+        }
+      } catch (Throwable e) {}
+    } catch (Throwable e) {
+      /* The siren did not start. Say so, release the half-built player, and hand the alarm volume
+         back - left pinned at maximum it would mean no siren AND the user's next alarm clock
+         screaming, and a second failed start would re-snapshot that maximum as prevAlarmVol and
+         lose their real setting for good. */
+      try { if (p != null) p.release(); } catch (Throwable t) {}
+      mp = null;
+      try {
+        if (am != null && prevAlarmVol >= 0) { markSelf(); am.setStreamVolume(AudioManager.STREAM_ALARM, prevAlarmVol, 0); }
+      } catch (Throwable t) {}
+      prevAlarmVol = -1;
+      /* Last resort: the siren is the whole product. Try the fallback player, which runs inside
+         ShakeService's already-running foreground service. */
+      try { AlarmPlayer.start(getApplicationContext(), true); } catch (Throwable t) {}
+    }
   }
 
   private Notification buildNotification() {
@@ -146,7 +176,12 @@ public class AlarmForegroundService extends Service {
 
   @Override
   public void onDestroy() {
-    try { if (mp != null) { mp.stop(); mp.release(); mp = null; } } catch (Exception e) {}
+    /* v398: one try per step. Sharing a try meant a throwing stop() skipped release() AND
+       mp = null, so isPlaying() kept answering yes after the service was gone - and the next
+       press+shake never started a siren. mp is cleared whatever happens. */
+    MediaPlayer p = mp; mp = null;
+    try { if (p != null) p.stop(); } catch (Exception e) {}
+    try { if (p != null) p.release(); } catch (Exception e) {}
     try { if (am != null && prevAlarmVol >= 0) { markSelf(); am.setStreamVolume(AudioManager.STREAM_ALARM, prevAlarmVol, 0); } } catch (Exception e) {}
     try { if (wl != null && wl.isHeld()) wl.release(); } catch (Exception e) {}
     try { Vibrator v = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE); if (v != null) v.cancel(); } catch (Exception e) {}
