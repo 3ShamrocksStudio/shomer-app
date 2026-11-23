@@ -9159,7 +9159,7 @@ function buildMemberRow(m,he){
  <span class="cm-status ${st.cls}">${st.txt}</span>
  ${(m.partnerUid&&gaStatusText(m.partnerUid))?`<span class="cm-ga">${ESC(gaStatusText(m.partnerUid))}</span>`:''}
  </div>
- <button class="cm-find" aria-label="${he?'אתר/י':'Locate'}" style="display:none"></button>`;
+ <span class="cm-chev" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg></span>`;
  /* ── v391: one visible row of actions - share / see / all-good / find / circle. Nothing hidden. ── */
  const acts=document.createElement('div'); acts.className='cm-acts';
  /* _mn is for dialogs and toasts (plain text); _mnH is for HTML attributes only */
@@ -9224,7 +9224,6 @@ function buildMemberRow(m,he){
      if(a==='del'){ if(confirm(he?('להסיר את '+(m.name||'')+' מהמעגל?'):('Remove '+(m.name||'')+'?'))) removeMember(m.id); return; }
    };
  });
- row.querySelector('.cm-main').appendChild(acts);
  /* v391: no hidden drawer behind the name. Rename / Remove / Report sit on the card itself -
     quiet, but visible. Nothing in this screen is reachable only by guessing that a name is tappable. */
  const _ar3=currentLang==='ar';
@@ -9236,8 +9235,8 @@ function buildMemberRow(m,he){
   ${m.pending ? '' : `<button class="cm-mb" data-a="remove">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>
     <span>${he?'הסר/י':_ar3?'إزالة':'Remove'}</span></button>`}
-  ${(m.partnerUid&&!m.pending)?`<button class="cm-mb rep" data-a="palert">
-    <span>${he?'🚨 דווח/י: חטיפה / נעדר':_ar3?'🚨 إبلاغ: اختطاف / مفقود':'🚨 Report: Abduction / Missing'}</span></button>`:''}`;
+  ${(m.partnerUid&&!m.pending)?`<button class="cm-mb rep" data-a="palert" title="${he?'דווח/י: חטיפה / אדם נעדר':_ar3?'إبلاغ: اختطاف / شخص مفقود':'Report: Abduction / Missing person'}">
+    <span>${he?'🚨 חטיפה / נעדר':_ar3?'🚨 اختطاف / مفقود':'🚨 Abduction / Missing'}</span></button>`:''}`;
  more.querySelectorAll('.cm-mb').forEach(function(b){
    b.onclick=function(e){
      e.stopPropagation();
@@ -9252,8 +9251,32 @@ function buildMemberRow(m,he){
      if(a==='palert'){ openPersonAlert(m.id); return; }
    };
  });
- row.querySelector('.cm-main').appendChild(more);
- wrap.appendChild(row);
+ /* ── v399: the card collapses. A long SHOMERs list was one long scroll because every card
+    carried its full control set. Now each person is one compact line and the controls open
+    underneath, one card at a time. The chevron is the affordance - the mistake this screen made
+    before was a tap target with nothing to say it was there, and that is not repeated: the whole
+    header is a keyboard-reachable button, it carries aria-expanded, and the chevron turns.
+    Someone in SOS is never collapsed. ── */
+ const body=document.createElement('div'); body.className='cm-body';
+ body.appendChild(acts); body.appendChild(more);
+ const openNow=!!m.sos;
+ wrap.className='cm-card'+(openNow?' open':'');
+ row.setAttribute('tabindex','0'); row.setAttribute('aria-expanded',String(openNow));
+ row.setAttribute('aria-label',(he?'פרטים ופעולות עבור ':currentLang==='ar'?'تفاصيل وإجراءات لـ':'Details and actions for ')+_mn);
+ var _toggle=function(ev){
+   if(ev) ev.stopPropagation();
+   if(m.sos) return;                       /* a live SOS stays open */
+   var isOpen=wrap.classList.contains('open');
+   if(!isOpen){ try{ /* accordion: one at a time, so the list never grows under your thumb */
+       var host=wrap.parentNode; if(host) host.querySelectorAll('.cm-card.open').forEach(function(o){
+         if(o!==wrap){ o.classList.remove('open'); var r2=o.querySelector('.cm-row'); if(r2) r2.setAttribute('aria-expanded','false'); } });
+     }catch(_){ } }
+   wrap.classList.toggle('open', !isOpen);
+   row.setAttribute('aria-expanded', String(!isOpen));
+ };
+ row.onclick=_toggle;
+ row.onkeydown=function(ev){ if(ev.key==='Enter'||ev.key===' '||ev.key==='Spacebar'){ ev.preventDefault(); _toggle(ev); } };
+ wrap.appendChild(row); wrap.appendChild(body);
  return wrap;
 }
 function toggleAddMember(){const f=document.getElementById('cm-add-form');if(f)f.style.display=f.style.display==='none'?'block':'none';}
@@ -12078,7 +12101,7 @@ try{ hydrateIcons(document); }catch(e){}
 /* Loaded-build version - shown in the diagnostic panel so a phone can prove
    whether it's on the latest build or a STALE cached one. Keep in lock-step
    with sw.js SW_VERSION on every deploy. */
-var APP_VER='v398';
+var APP_VER='v399';
 var FB={ready:false,uid:null,db:null,_presTimer:null,connected:false,listening:false,pushState:'default',near:0,swVer:'?',
   authState:'connecting',sdkLoaded:false,persist:'',permErr:null,err:null,wsProbe:'',csp:''};
 /* Always log connection diagnostics to the console so the real failure can be SEEN in Chrome. */
@@ -17116,12 +17139,45 @@ html[dir="rtl"] .sh-back svg{transform:scaleX(-1)}
   font-family:inherit;font-weight:700;font-size:10.5px;cursor:pointer;transition:.12s}
 .cm-mb svg{width:13px;height:13px;flex:0 0 13px;stroke-width:2}
 .cm-mb:active{transform:scale(.96)}
-.cm-mb.rep{flex:1 0 100%;justify-content:center;margin-top:2px;padding:8px 10px;color:#FF8089;
-  border-color:rgba(209,0,41,.45);background:rgba(209,0,41,.10)}
-/* the status dot belongs beside the NAME, not floating in the middle of a tall card */
-#circ-members .cm-row{align-items:flex-start!important}
+.cm-mb.rep{color:#FF8089;border-color:rgba(209,0,41,.45);background:rgba(209,0,41,.10)}
+
+/* ══ v399 · השומרים שלי - one compact line per person, controls open underneath ══
+   A long list used to be one long scroll because every card carried its whole control set.
+   Now the card is a line you can read at a glance and it opens on tap, one at a time, so the
+   list never grows under your thumb. The chevron is the affordance: this screen's old mistake
+   was a tap target with nothing to announce it, and that is not repeated - the header is
+   keyboard-reachable, carries aria-expanded, and the chevron turns. SOS is never collapsed. */
+#circ-members .cm-card{border:1px solid var(--b2);border-radius:16px;margin-bottom:10px;
+  background:rgba(255,255,255,.02);overflow:hidden;transition:border-color .15s,background .15s}
+#circ-members .cm-card.open{border-color:rgba(224,168,40,.40);background:rgba(255,255,255,.045)}
+#circ-members .cm-card .cm-row{align-items:center!important;padding:12px 14px!important;
+  margin:0!important;border:0!important;border-radius:0!important;background:transparent!important;
+  cursor:pointer;-webkit-tap-highlight-color:transparent}
+#circ-members .cm-card .cm-row:focus-visible{outline:2px solid var(--gold);outline-offset:-3px}
 #circ-members .cm-av.cm-st-off,#circ-members .cm-av.cm-st-live,#circ-members .cm-av.cm-st-sos{
-  align-self:flex-start!important;margin-top:6px!important}
+  align-self:center!important;margin-top:0!important}
+/* the collapsed header reads as a single line: name, then its status */
+#circ-members .cm-main{display:flex;align-items:center;gap:8px;flex-wrap:nowrap;min-width:0;overflow:hidden}
+#circ-members .cm-nm{margin:0!important;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
+#circ-members .cm-rel:empty{display:none}
+/* collapsed, the line carries the name and the one status word; the circle of trust and the
+   check-in note belong to the open card, where there is room to read them */
+#circ-members .cm-card:not(.open) .cm-rel,
+#circ-members .cm-card:not(.open) .cm-ga{display:none}
+#circ-members .cm-status{flex:0 1 auto;max-width:46%;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#circ-members .cm-card.open .cm-main{flex-wrap:wrap}
+#circ-members .cm-card.open .cm-status{max-width:100%}
+#circ-members .cm-chev{flex:0 0 auto;display:inline-flex;align-items:center;color:var(--tx3);
+  transition:transform .18s ease,color .18s ease}
+#circ-members .cm-chev svg{width:18px;height:18px}
+#circ-members .cm-card.open .cm-chev{transform:rotate(180deg);color:var(--gold)}
+#circ-members .cm-body{display:none;padding:2px 14px 12px}
+#circ-members .cm-card.open .cm-body{display:block}
+/* the three manage pills sit on one line, the report widest - it is the one that matters */
+#circ-members .cm-more{flex-wrap:nowrap;gap:8px;margin-top:12px;padding-top:11px}
+#circ-members .cm-mb{flex:1 1 0;min-width:0;justify-content:center;padding:9px 8px;
+  white-space:nowrap;overflow:hidden}
+#circ-members .cm-mb.rep{flex:1.45 1 0}
 
 /* ══ SETTINGS - compact. Every row smaller, less scrolling, no wasted vertical space. ══ */
 #sh-set .set-row{padding:10px 12px!important;margin-bottom:6px!important;border-radius:11px!important;
