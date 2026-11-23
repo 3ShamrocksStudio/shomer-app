@@ -327,6 +327,15 @@ public class ShakeService extends Service implements SensorEventListener {
             if ("android.media.VOLUME_CHANGED_ACTION".equals(act)) {   // v386: the only action in the filter
               int st = i.getIntExtra("android.media.EXTRA_VOLUME_STREAM_TYPE", -1);
               if (st < 0) return;                                   // cannot identify it: refuse
+              /* v408: OUR OWN volume writes never count as a button press, whichever stream they
+                 land on. This check used to sit inside the alarm branch only. v407 taught the
+                 siren to borrow STREAM_MUSIC when Do-Not-Disturb pins the alarm stream at 0, and
+                 that write - and the restore on stop - fell straight through to btnMs, re-opening
+                 the gate with nobody touching the phone. Worse, the restore runs AFTER the cancel
+                 has zeroed btnMs, so for ten seconds after cancelling a rerouted siren a bare
+                 shake could start a real SOS. That is the v382 failure, reproduced on a new
+                 stream, and it is exactly what the button gate exists to prevent. */
+              if (System.currentTimeMillis() - sSelfVolMs < 2000) return;   // that one was ours
               if (st == AudioManager.STREAM_ALARM) {
                 /* v387: an alarm-stream change counts as a press ONLY while alarm audio is
                    actually sounding, which is the only state in which Android routes the volume
@@ -359,7 +368,12 @@ public class ShakeService extends Service implements SensorEventListener {
     if (volObs == null) {
       try {
         volObs = new ContentObserver(new android.os.Handler(android.os.Looper.getMainLooper())) {
-          @Override public void onChange(boolean self) { btnMs = System.currentTimeMillis(); }
+          @Override public void onChange(boolean self) {
+            /* v408: the observer had no self-check whatsoever, so SHOMER's own volume writes
+               primed the gate through this path even when the broadcast above refused them. */
+            if (System.currentTimeMillis() - sSelfVolMs < 2000) return;
+            btnMs = System.currentTimeMillis();
+          }
         };
         // ONE URI PER STREAM, notifyForDescendants = false. Observing Settings.System as a whole
         // fires on any system write - on a phone with adaptive brightness, screen_brightness is

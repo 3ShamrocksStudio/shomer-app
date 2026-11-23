@@ -1904,7 +1904,7 @@ body.otp-active .ob-steps{display:none!important;}
  </div>
  <div class="ss-row">
  <div class="ss-main">
- <div class="ss-t" id="ss-t">SOS פעיל - אזעקה פועלת · מיקומך שותף</div>
+ <div class="ss-t" id="ss-t">SOS פעיל - אזעקה פועלת</div>
  <div class="ss-s" id="ss-s">ממתין לתגובה...</div>
  </div>
  <button class="ss-x" onclick="sosImOk()" id="ss-cancel">✓ <span id="ss-cancel-lbl">עצור – אני בסדר</span></button>
@@ -3547,7 +3547,13 @@ function reflectSosType(){
   const he=currentLang==='he', ar=currentLang==='ar';
   const known=curSosType&&curSosType!=='unknown';
   const tt=document.getElementById('ss-t');
-  if(tt)tt.textContent=(he?'SOS פעיל - ':ar?'SOS نشط - ':'SOS active - ')+(known?sosTypeLabel(curSosType):(he?'סוג לא ידוע':ar?'النوع غير معروف':'type unknown'));
+  /* v408: this is the LAST writer of the strip on the main SOS path - it runs four lines after
+     activateSOS sets the honest location text and overwrote it, so the v405/v407 fix never
+     reached the screen. Carry the location state through here, where it actually shows. */
+  var _lp3=false; try{ _lp3=!_myPos(); }catch(e){}
+  var _loc3=_lp3?(he?' · מחפש מיקום':ar?' · جارٍ تحديد الموقع':' · finding location')
+                :(he?' · מיקומך שותף':ar?' · تمت مشاركة موقعك':' · location shared');
+  if(tt)tt.textContent=(he?'SOS פעיל - ':ar?'SOS نشط - ':'SOS active - ')+(known?sosTypeLabel(curSosType):(he?'סוג לא ידוע':ar?'النوع غير معروف':'type unknown'))+(sosPhase==='active'?_loc3:'');
   const lb=document.getElementById('ss-typebar-lbl');
   if(lb)lb.textContent=known?(he?'סוג: '+sosTypeLabel(curSosType)+' - אפשר לשנות':ar?'النوع: '+sosTypeLabel(curSosType)+' - اضغط للتغيير':'Type: '+sosTypeLabel(curSosType)+' - tap to change')
                             :(he?'סוג האירוע - הקש/י לסיווג':ar?'نوع الحالة - اضغط للتصنيف':'Emergency type - tap to classify');
@@ -6549,7 +6555,10 @@ function fbAlertPairedSafe(){
  /* v407: a cold start could send the all-clear to nobody, leaving guardians believing the SOS
      was still running. Wait for the pairs listener, same as fbAlertPairedSos. */
   if(!FB.ready||!FB._pairedUids||!Object.keys(FB._pairedUids).length){
-    var _n2=(arguments[0]|0); if(_n2<10) setTimeout(function(){ try{ fbAlertPairedSafe(_n2+1); }catch(e){} },1500);
+    /* v408: stop retrying the moment a NEW SOS is running, or a slow pairs listener delivers
+       "false alarm - I'm OK" AFTER the live alert for the next emergency, and nobody comes. */
+    var _n2=(arguments[0]|0);
+    if(_n2<10 && (typeof sosPhase==='undefined'||sosPhase==='idle')) setTimeout(function(){ try{ fbAlertPairedSafe(_n2+1); }catch(e){} },1500);
     return; }
  var he=currentLang==='he', ar=currentLang==='ar', nm=(SS.user&&SS.user.name)||(he?'שומר/ת':ar?'حارس':'a SHOMER');
  Object.keys(FB._pairedUids).forEach(function(uid){
@@ -12125,7 +12134,7 @@ try{ hydrateIcons(document); }catch(e){}
 /* Loaded-build version - shown in the diagnostic panel so a phone can prove
    whether it's on the latest build or a STALE cached one. Keep in lock-step
    with sw.js SW_VERSION on every deploy. */
-var APP_VER='v407';
+var APP_VER='v408';
 var FB={ready:false,uid:null,db:null,_presTimer:null,connected:false,listening:false,pushState:'default',near:0,swVer:'?',
   authState:'connecting',sdkLoaded:false,persist:'',permErr:null,err:null,wsProbe:'',csp:''};
 /* Always log connection diagnostics to the console so the real failure can be SEEN in Chrome. */

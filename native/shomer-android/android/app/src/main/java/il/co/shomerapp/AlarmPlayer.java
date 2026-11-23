@@ -32,6 +32,7 @@ final class AlarmPlayer {
   private static volatile boolean sosCause = false;
   static boolean isPlayingSos() { return mp != null && sosCause; }
   private static int prevVol = -1;
+  private static int prevMusicVol = -1;   // v408: only set when the fallback had to reroute
 
   static void start(Context c) { start(c, false); }
 
@@ -56,15 +57,40 @@ final class AlarmPlayer {
          so BOTH paths went silent on the same device for the same reason. A quiet siren beats
          no siren. */
       try {
-        prevVol = am.getStreamVolume(AudioManager.STREAM_ALARM);
+        /* v408: only snapshot when we do not already hold one, or a second start records the
+           maximum WE set as the user's own level and pins their alarm volume to max for good.
+           An onError clears mp without restoring, so a second start really does happen. */
+        if (prevVol < 0) prevVol = am.getStreamVolume(AudioManager.STREAM_ALARM);
         markSelf(); am.setStreamVolume(AudioManager.STREAM_ALARM, am.getStreamMaxVolume(AudioManager.STREAM_ALARM), 0);
       } catch (Throwable ve) { AlarmForegroundService.note(ve, "fallback-volume"); }
+
+      /* v408: THIS is the siren on a locked phone - every fallback path lands here. v407 taught
+         the foreground service to reroute around a Do-Not-Disturb policy that pins the alarm
+         stream at 0, and left this one hard-wired to USAGE_ALARM, so on exactly the device the
+         reroute exists for the fallback was still silent while the release note said otherwise.
+         Same decision, same order: alarm first, media only when alarm is provably dead. */
+      int usage = AudioAttributes.USAGE_ALARM;
+      int focusStream = AudioManager.STREAM_ALARM;
+      try {
+        if (am.getStreamVolume(AudioManager.STREAM_ALARM) == 0) {
+          AlarmForegroundService.note(new RuntimeException("fallback: alarm stream pinned at 0 - rerouting to media"), "muted");
+          try {
+            if (prevMusicVol < 0) prevMusicVol = am.getStreamVolume(AudioManager.STREAM_MUSIC);
+            markSelf(); am.setStreamVolume(AudioManager.STREAM_MUSIC, am.getStreamMaxVolume(AudioManager.STREAM_MUSIC), 0);
+          } catch (Throwable e) { AlarmForegroundService.note(e, "fallback-music-volume"); }
+          if (am.getStreamVolume(AudioManager.STREAM_MUSIC) > 0) {
+            usage = AudioAttributes.USAGE_MEDIA; focusStream = AudioManager.STREAM_MUSIC;
+          } else {
+            AlarmForegroundService.note(new RuntimeException("fallback: media stream is at 0 too"), "muted-all");
+          }
+        }
+      } catch (Throwable e) { AlarmForegroundService.note(e, "fallback-route"); }
       /* v376: build it in a LOCAL and publish to mp only once it is actually sounding. Published
          first, a failed prepare() left a window where isPlayingSos() said yes - long enough for
          the native countdown, which ends at the same instant this fallback starts, to skip its
          own siren and leave the phone silent. */
       p = new MediaPlayer();
-      p.setAudioAttributes(new AudioAttributes.Builder().setUsage(AudioAttributes.USAGE_ALARM)
+      p.setAudioAttributes(new AudioAttributes.Builder().setUsage(usage)
           .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION).build());
       AssetFileDescriptor afd = c.getResources().openRawResourceFd(R.raw.sos_alarm);
       p.setDataSource(afd.getFileDescriptor(), afd.getStartOffset(), afd.getLength());
@@ -109,9 +135,10 @@ final class AlarmPlayer {
         if (prevVol >= 0) {
           AudioManager am2 = (AudioManager) c.getSystemService(Context.AUDIO_SERVICE);
           if (am2 != null) { markSelf(); am2.setStreamVolume(AudioManager.STREAM_ALARM, prevVol, 0); }
+          if (am2 != null && prevMusicVol >= 0) { markSelf(); am2.setStreamVolume(AudioManager.STREAM_MUSIC, prevMusicVol, 0); }   // v408
         }
       } catch (Throwable t) {}
-      prevVol = -1;
+      prevVol = -1; prevMusicVol = -1;
     }
   }
 
@@ -146,8 +173,9 @@ final class AlarmPlayer {
     try {
       AudioManager am = (AudioManager) c.getSystemService(Context.AUDIO_SERVICE);
       if (prevVol >= 0) { markSelf(); am.setStreamVolume(AudioManager.STREAM_ALARM, prevVol, 0); }
+      if (prevMusicVol >= 0) { markSelf(); am.setStreamVolume(AudioManager.STREAM_MUSIC, prevMusicVol, 0); }   // v408
     } catch (Exception e) {}
-    prevVol = -1;
+    prevVol = -1; prevMusicVol = -1;
     try { Vibrator v = (Vibrator) c.getSystemService(Context.VIBRATOR_SERVICE); if (v != null) v.cancel(); } catch (Exception e) {}
   }
 }

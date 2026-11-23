@@ -102,6 +102,7 @@ public class AlarmForegroundService extends Service {
           note(new RuntimeException("alarm stream pinned at 0 - rerouting the siren to media"), "muted");
           try {
             if (prevMusicVol < 0) prevMusicVol = am.getStreamVolume(AudioManager.STREAM_MUSIC);
+            markSelf();   /* v408: stamp it, or ShakeService counts our own write as a button press */
             am.setStreamVolume(AudioManager.STREAM_MUSIC, am.getStreamMaxVolume(AudioManager.STREAM_MUSIC), 0);
           } catch (Throwable e) { note(e, "music-volume"); }
           if (am.getStreamVolume(AudioManager.STREAM_MUSIC) > 0) {
@@ -261,6 +262,7 @@ public class AlarmForegroundService extends Service {
     MediaPlayer p = mp; mp = null;
     try { if (p != null) p.stop(); } catch (Exception e) {}
     try { if (p != null) p.release(); } catch (Exception e) {}
+    try { if (am != null) am.abandonAudioFocus(null); } catch (Throwable e) {}   /* v408: we took GAIN; give it back */
     try { if (am != null && prevAlarmVol >= 0) { markSelf(); am.setStreamVolume(AudioManager.STREAM_ALARM, prevAlarmVol, 0); } } catch (Exception e) {}
     /* v407: hand the media volume back too, if the siren had to borrow it. */
     try { if (am != null && prevMusicVol >= 0) { markSelf(); am.setStreamVolume(AudioManager.STREAM_MUSIC, prevMusicVol, 0); prevMusicVol = -1; } } catch (Exception e) {}
