@@ -2067,6 +2067,12 @@ body.otp-active .ob-steps{display:none!important;}
  <span class="sos-txt">SOS</span>
  </button>
  </div>
+ <!-- v410: the quiet one. Deliberately small, amber and beside the SOS, never instead of it -
+      the point is that reaching for help should not cost a siren. -->
+ <button class="assist-btn" id="assist-btn" type="button" onclick="assistAsk()" aria-label="בקשת עזרה - לא חירום">
+ <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 21s-7-4.6-7-9.6A4.4 4.4 0 0 1 12 8a4.4 4.4 0 0 1 7 3.4c0 5-7 9.6-7 9.6Z"/></svg>
+ <span id="assist-lbl">צריך/ה עזרה</span>
+ </button>
  </nav>
 
  <!-- ═══ UPDATES ═══ -->
@@ -4349,6 +4355,7 @@ function applyTranslations(){
  setText('circ-ttl',he?'השומרים שלי':'My SHOMERs');
  setText('ghost-nm',he?'מצב רפאים - השהה שיתוף':'Ghost mode - pause sharing');
  setText('ghost-sb',he?'השומרים מפסיקים לראות איפה את/ה · SOS עדיין משדר':'Your SHOMERs stop seeing where you are - an SOS still sends it');
+ setText('assist-lbl',he?'צריך/ה עזרה':currentLang==='ar'?'أحتاج مساعدة':'Need a hand');   /* v410 */
  setText('ag-go-lbl',he?'שלח/י בקשה':currentLang==='ar'?'إرسال طلب':'Send request');
  setText('circ-find-lbl',he?'מצא חבר/ה':'Find a friend');
  setText('cm-add-save',he?'הוסף למעגל':'Add to circle');
@@ -10162,6 +10169,93 @@ function gReadIcon2(k){ var P={check:'<path d="M12 21s7-6.2 7-11a7 7 0 1 0-14 0c
   return '<svg viewBox="0 0 24 24" width="24" height="24" aria-hidden="true">'+P[k]+'</svg>'; }
 /* ── receiver ── */
 var gaCur=null, _gaBeepT=null;
+/* ══ v410 - ASK FOR A HAND (not an emergency) ══
+   SHOMER had exactly one outbound signal: SOS. Siren, flashlight, every SHOMER, a public
+   marker. Most of the moments people actually feel unsafe are not that - walking home uneasy,
+   a stranger following, a car that will not start, feeling unwell, lost, a fall with no injury.
+   Faced with only a siren, people send nothing at all, and the app is silent on exactly the
+   occasions it could help most.
+
+   So: quiet, local, cancellable.
+     - no siren, no flashlight, no countdown, nothing loud on anyone's phone
+     - only linked SHOMERs who are near enough to actually come (ASSIST_KM)
+     - carried on ping/<to>/<me>, the same consent-gated channel as the check-in, which the
+       rules already accept a 'help' level on - no new path for user data
+     - NOT published to the public dashboard feed: this is a personal ask, not an incident
+     - expires by itself, and one tap turns it into a real SOS if it stops being small
+   If nobody is near, the user is told that plainly and offered the wider send - never widened
+   behind their back, because "only people nearby" is the promise the button makes. */
+var ASSIST_KM=3, ASSIST_TTL=60*60000;
+function assistNearby(){
+  var out=[];
+  try{
+    var me=_myPos(); if(!me) return out;
+    (SS.circleMembers||[]).forEach(function(m){
+      if(!m||m.pending||!m.partnerUid) return;
+      var p=null; try{ p=_pairOf(m); }catch(e){}
+      var pos=null; try{ pos=p&&gdPos(p); }catch(e){}
+      if(!pos && m.lat!=null && m.lng!=null) pos=[m.lat,m.lng];
+      if(!pos) return;
+      var d=distMeters(me[0],me[1],pos[0],pos[1]);
+      if(d!=null&&isFinite(d)&&d<=ASSIST_KM*1000) out.push({m:m,d:d});
+    });
+    out.sort(function(a,b){ return a.d-b.d; });
+  }catch(e){}
+  return out;
+}
+function assistAsk(wide){
+  var he=currentLang==='he', ar=currentLang==='ar';
+  if(typeof FB==='undefined'||!FB.ready||!FB.uid){ toast(gaT('אין חיבור - נסה/י שוב','لا اتصال - حاول مجددًا','No connection - try again'),'amb'); return; }
+  try{ if(isReviewAccount()){ toast(gaT('חשבון בדיקה - לא נשלח','حساب تجريبي - لم يُرسل','Test account - not sent'),'amb'); return; } }catch(e){}
+  var near=assistNearby(), list;
+  if(wide){ list=(SS.circleMembers||[]).filter(function(m){ return m&&!m.pending&&m.partnerUid; }); }
+  else { list=near.map(function(x){ return x.m; }); }
+  if(!list.length){
+    if(!wide){
+      var any=(SS.circleMembers||[]).filter(function(m){ return m&&!m.pending&&m.partnerUid; }).length;
+      if(!any){ toast(gaT('אין עדיין שומרים מקושרים','لا يوجد حُرّاس مرتبطون بعد','No linked SHOMERs yet'),'amb'); return; }
+      /* honest about the trade before widening: nearby was the promise */
+      if(confirm(gaT('אף שומר/ת לא נמצא/ת ברדיוס של '+ASSIST_KM+' ק״מ, או שהמיקום שלהם לא ידוע.\n\nלשלוח לכל השומרים שלך בכל זאת?',
+                     'لا يوجد حارس ضمن '+ASSIST_KM+' كم، أو أن موقعهم غير معروف.\n\nهل نرسل إلى كل حُرّاسك رغم ذلك؟',
+                     'No SHOMER is within '+ASSIST_KM+' km, or their location is unknown.\n\nSend to all your SHOMERs anyway?'))) assistAsk(true);
+      return;
+    }
+    toast(gaT('אין שומרים לשלוח אליהם','لا يوجد حُرّاس للإرسال إليهم','No SHOMERs to send to'),'amb'); return;
+  }
+  var id=fbDashKey('as'), now=Date.now(), nm=gaMyName(), sent=0;
+  list.forEach(function(m){
+    try{
+      gaWrite(m.partnerUid,{name:nm,ts:now,level:'help',id:id}).then(function(){ sent++; }).catch(function(){});
+      /* tag 'assist' - the fanout picks the quiet channel for anything not starting with 'sos' */
+      fbRestWrite('POST','alarms',{fromUid:FB.uid,toUid:m.partnerUid,ts:now,tag:'assist',
+        title:'SH✡MER - '+(nm||gaT('שומר/ת','حارس','a SHOMER')),
+        body:gaT('מבקש/ת עזרה - לא חירום','يطلب مساعدة - ليست حالة طوارئ','needs a hand - not an emergency')}).catch(function(){});
+    }catch(e){}
+    try{ gaOut()[m.partnerUid]={id:id,level:'assist',ts:now,st:'sent',name:m.name||''}; }catch(e){}
+  });
+  try{ SS.assistOut={id:id,ts:now,n:list.length,wide:!!wide}; saveStore(); }catch(e){}
+  toast(gaT('✓ נשלחה בקשת עזרה ל-'+list.length+(wide?' שומרים':' שומרים בקרבת מקום')+' · בלי אזעקה',
+            '✓ أُرسل طلب مساعدة إلى '+list.length+(wide?' حُرّاس':' حُرّاس قريبين')+' · بلا إنذار',
+            '✓ Asked '+list.length+(wide?' SHOMER(s)':' nearby SHOMER(s)')+' for a hand · no alarm'),'grn');
+  try{ renderCircles(); }catch(e){}
+}
+/* receiver side - deliberately undramatic */
+function assistShow(from,v){
+  try{ gaMarkSeen(v.id); }catch(e){}
+  var he=currentLang==='he', ar=currentLang==='ar';
+  var nm=ESC(v.name||gaT('שומר/ת שלך','حارسك','Your SHOMER'));
+  var msg=gaT(nm+' מבקש/ת עזרה - לא חירום',nm+' يطلب مساعدة - ليست حالة طوارئ',nm+' needs a hand - not an emergency');
+  try{ pushNotifyQuiet('SH✡MER',msg,'assist'); }catch(e){}
+  try{ if(navigator.vibrate) navigator.vibrate(180); }catch(e){}   /* one short buzz, nothing more */
+  toast(msg,'amb',function(){
+    try{
+      gaWrite(from,{name:gaMyName(),ts:Date.now(),level:'ok',id:fbDashKey('as'),re:v.id}).catch(function(){});
+      toast(gaT('✓ נאמר להם שאת/ה בדרך','✓ تم إبلاغهم أنك في الطريق','✓ They have been told you are on the way'),'grn');
+      var mm=null; try{ (SS.circleMembers||[]).forEach(function(m){ if(m&&m.partnerUid===from) mm=m; }); }catch(e){}
+      if(mm){ try{ flyToMember(mm.id); }catch(e){} }
+    }catch(e){}
+  });
+}
 function gaListen(){
   if(FB._gaListen||!FB.ready||!FB.uid) return; FB._gaListen=true;
   try{ FB.db.ref('ping/'+FB.uid).on('value',function(snap){ var all=(snap&&snap.val&&snap.val())||{}; Object.keys(all).forEach(function(from){ try{ gaHandle(from,all[from]); }catch(e){} }); }); }catch(e){}
@@ -10169,6 +10263,11 @@ function gaListen(){
 function gaHandle(from,v){
   if(!v||typeof v!=='object'||!v.id) return;
   if(!gaLinked(from)){ if(v.id) gaNativeHandled(v.id); return; }   /* only people I chose to link with (and never leave a background ring from anyone else) */
+  /* v410 ASSIST: a 'help' with no 're' is nobody's answer - it is someone asking for a hand.
+     Until now gaHandle dropped it, because help existed only as a reply to a check. */
+  if(v.level==='help'&&!v.re){ if(gaSeen(v.id)) return;
+    if(Date.now()-(v.ts||0)>ASSIST_TTL){ gaNativeHandled(v.id); return; }
+    assistShow(from,v); return; }
   if(v.level==='ok'||v.level==='help'||v.level==='coded'){        /* an answer to something I sent */
     var o=gaOut()[from]; if(!o||o.id!==v.re||o.st===v.level) return;
     o.st=v.level; o.ats=v.ts||Date.now(); try{saveStore();}catch(e){}
@@ -10176,6 +10275,7 @@ function gaHandle(from,v){
     var nm=o.name||v.name||'';
     var msg=v.level==='help'?gaT('🆘 '+nm+' ביקש/ה עזרה!','🆘 '+nm+' طلب المساعدة!','🆘 '+nm+' asked for help!')
       :v.level==='coded'?gaT('✓ '+nm+' עצר/ה את ההתראה בקוד הביטול - הכל בסדר','✓ أوقف '+nm+' التنبيه برمز الإلغاء - كل شيء بخير','✓ '+nm+' stopped the alert with their code - all good')
+      :o.level==='assist'?gaT('✓ '+nm+' בדרך אליך','✓ '+nm+' في الطريق إليك','✓ '+nm+' is on the way')
       :gaT('✓ '+nm+': הכל טוב','✓ '+nm+': كل شيء بخير','✓ '+nm+': all good');
     toast(msg,v.level==='help'?'red':'grn'); try{ pushNotify('SH✡MER',msg,'ga-ans'); }catch(e){}
     if(v.level==='help'){ try{ playCue('join'); if(navigator.vibrate) navigator.vibrate([400,150,400]); }catch(e){} }
@@ -12134,7 +12234,7 @@ try{ hydrateIcons(document); }catch(e){}
 /* Loaded-build version - shown in the diagnostic panel so a phone can prove
    whether it's on the latest build or a STALE cached one. Keep in lock-step
    with sw.js SW_VERSION on every deploy. */
-var APP_VER='v409';
+var APP_VER='v410';
 var FB={ready:false,uid:null,db:null,_presTimer:null,connected:false,listening:false,pushState:'default',near:0,swVer:'?',
   authState:'connecting',sdkLoaded:false,persist:'',permErr:null,err:null,wsProbe:'',csp:''};
 /* Always log connection diagnostics to the console so the real failure can be SEEN in Chrome. */
@@ -17218,6 +17318,19 @@ html[dir="rtl"] .sh-back svg{transform:scaleX(-1)}
 .cm-mb svg{width:13px;height:13px;flex:0 0 13px;stroke-width:2}
 .cm-mb:active{transform:scale(.96)}
 .cm-mb.rep{color:#FF8089;border-color:rgba(209,0,41,.45);background:rgba(209,0,41,.10)}
+
+/* ══ v410 · ask for a hand - the non-emergency button ══
+   Small, amber, outlined. It must read as "this is not the big red one" at a glance, and it
+   must never be mistaken for SOS by someone in a hurry. */
+.assist-btn{position:absolute;left:50%;transform:translateX(-50%);bottom:6px;
+  display:inline-flex;align-items:center;gap:6px;padding:7px 14px;border-radius:999px;
+  border:1px solid rgba(224,168,40,.55);background:rgba(224,168,40,.12);color:#E8C05A;
+  font-family:inherit;font-weight:800;font-size:11.5px;letter-spacing:.2px;cursor:pointer;
+  white-space:nowrap;z-index:21;-webkit-tap-highlight-color:transparent;transition:.14s}
+.assist-btn svg{width:14px;height:14px;flex:0 0 14px}
+.assist-btn:active{transform:translateX(-50%) scale(.95);background:rgba(224,168,40,.2)}
+body.simple-on .assist-btn{font-size:14px;padding:11px 20px}
+body.sos-on .assist-btn{display:none}
 
 /* ══ v399 · השומרים שלי - one compact line per person, controls open underneath ══
    A long list used to be one long scroll because every card carried its whole control set.
