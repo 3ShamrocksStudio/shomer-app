@@ -5535,7 +5535,11 @@ function startShakeDetection(){
         apart, so only it may fire. The cost is that shake-to-SOS does not work in a browser, and
         does not work while the service is dead. For a trigger whose false positives go off in
         someone's pocket, that is the direction to fail in. */
-     if(SS.shake && SS.shake.btnGate && SS.shake.enabled===true) return;
+     /* v405: unconditional. The native side made this a literal (ShakeService.btnGate returns
+        true) precisely so no stored value can reopen it; the web side still read SS.shake.btnGate,
+        so one bad migration or a hand-edited store could let a bare shake fire an SOS. Button+shake
+        is a rule, not a setting, and the in-app detector never fires on its own. */
+     return;
      /* v364: the test branch only while nothing real is running. Three separate places now close
         the test card when an SOS starts, so this cannot trigger today - but a shake must never be
         swallowed into the test path during an emergency on the strength of an invariant held
@@ -6484,7 +6488,13 @@ function activateSOS(){
  }
  // Within limit → broadcast simulation + pulsing map pin + feed card.
  var _locPend=!_myPos();   /* v348: honest - no fix yet = "location pending" in the first toast */
- setText('ss-t',overLimit?(he?' SOS חוזר נשלח · מיקומך שותף':currentLang==='ar'?' أُرسل SOS متكرر · تمت مشاركة موقعك':' Repeated SOS sent · location shared'):(he?' SOS פעיל - אזעקה פועלת · מיקומך שותף':currentLang==='ar'?' SOS نشط - الإنذار يعمل · تمت مشاركة موقعك':' SOS active - alarm firing · location shared'));
+ /* v405: _locPend is computed one line up and was then ignored - the strip said "location
+    shared" at the very moment fbPublishSOS had refused to publish for want of a fix. Say which
+    it is. Every number and statement on a product surface has to be true when it is shown. */
+ var _locTxt=_locPend?(he?' · מחפש מיקום':currentLang==='ar'?' · جارٍ تحديد الموقع':' · finding location')
+                     :(he?' · מיקומך שותף':currentLang==='ar'?' · تمت مشاركة موقعك':' · location shared');
+ setText('ss-t',(overLimit?(he?' SOS חוזר נשלח':currentLang==='ar'?' أُرسل SOS متكرر':' Repeated SOS sent')
+                          :(he?' SOS פעיל - אזעקה פועלת':currentLang==='ar'?' SOS نشط - الإنذار يعمل':' SOS active - alarm firing'))+_locTxt);
  setText('ss-s',he?'ממתין לתגובה...':currentLang==='ar'?'بانتظار الاستجابة...':'Waiting for response...');
  addSOSPin();
  injectSOSCard();
@@ -12106,7 +12116,7 @@ try{ hydrateIcons(document); }catch(e){}
 /* Loaded-build version - shown in the diagnostic panel so a phone can prove
    whether it's on the latest build or a STALE cached one. Keep in lock-step
    with sw.js SW_VERSION on every deploy. */
-var APP_VER='v404';
+var APP_VER='v405';
 var FB={ready:false,uid:null,db:null,_presTimer:null,connected:false,listening:false,pushState:'default',near:0,swVer:'?',
   authState:'connecting',sdkLoaded:false,persist:'',permErr:null,err:null,wsProbe:'',csp:''};
 /* Always log connection diagnostics to the console so the real failure can be SEEN in Chrome. */
@@ -12759,13 +12769,14 @@ function fbOnAuthed(uid){
   if(FB._authReady && FB.uid===uid){ return; } // already running on this uid
   FB.uid=uid; FB._authReady=true; try{ founderWatchList(); }catch(e){} setTimeout(function(){ try{ evpMaybeLoad(); }catch(e){} },2500);
   fbLog('AUTH READY · secure uid =', uid, '· ID token acquired · opening SSE data layer');
-  /* v404: replay the push token now that there is a uid to file it under.
-     fbRegisterToken() returns silently when FB.ready is false, and the native push
-     'registration' callback almost always wins the race against anonymous auth - it is a local
-     callback, auth is a network round trip. The token was saved to SS.fcmToken and then never
-     written anywhere, with no retry, so tokens/<uid> stayed empty across every account and
-     alarmFanout had nothing to push to. That is why an SOS never reached a phone whose app had
-     been closed. Re-filing here costs one write and closes the race from the other side. */
+  /* v404/v405: file the push token now that there is a real signed-in uid to file it under.
+     Correction to what v404 claimed: FB.ready was NOT the gate that closed. fbInit sets it true
+     before it bootstraps auth, with FB.uid still the local cid- device id - so a pre-auth
+     registration did not return early, it wrote tokens/cid-xxxx with no bearer token, the rule
+     refused it 403, and the only handler logged it. Either way tokens/ stayed empty across every
+     account and the fanout had nothing to push to, which is why an SOS never reached a phone
+     whose app was closed. fbRegisterToken now refuses the doomed pre-auth write outright; this
+     is where the real one happens. */
   try{ if(SS.fcmToken) fbRegisterToken(SS.fcmToken); }catch(e){}
   try{ fbStartPresence(); }catch(e){}
   try{ fbListenSOS(); }catch(e){}
@@ -13269,7 +13280,32 @@ function showRespToPerson(n){
 }
 function fbClearResponderMarkers(){ try{ Object.keys(fbResponderMarkers).forEach(function(uid){ try{MAP&&MAP.removeLayer(fbResponderMarkers[uid]);}catch(e){} }); }catch(e){} fbResponderMarkers={}; }
 /* Register this device's FCM token + location so the Cloud Function can target it for push. */
-function fbRegisterToken(token){ if(!FB.ready||!token)return; var rec={token:token,ts:Date.now()};   /* v313: no location in the push token (it was a precise point, kept forever, used by nothing). set() also overwrites an old one. */ try{ FB.db.ref('tokens/'+FB.uid).set(rec); }catch(e){} }
+function fbRegisterToken(token){
+  /* v405: the guard was FB.ready, which fbInit sets BEFORE it bootstraps auth, while FB.uid is
+     still the local cid- device id. So a pre-auth call did NOT return early - it wrote to
+     tokens/cid-xxxx with no bearer token, the rule refused it 403, the only handler logged it,
+     and tokens/ stayed empty. v404 re-filed at auth-ready and fixed the symptom; this fixes the
+     cause. Require a real signed-in uid, and retry rather than lose it to one blip. */
+  if(!token) return;
+  if(!FB.ready||!FB._authReady||!FB.uid||FB.uid===FB.cid){
+    try{ SS.fcmToken=token; saveStore(); }catch(e){}   /* re-filed by fbOnAuthed */
+    return; }
+  var rec={token:token,ts:Date.now()};   /* v313: no location in the push token (it was a precise point, kept forever, used by nothing). set() also overwrites an old one. */   try{
+    var _uid=FB.uid, _try=function(n){
+      try{
+        var pr=FB.db.ref('tokens/'+_uid).set(rec);
+        if(pr&&pr.catch) pr.catch(function(e){
+          /* one 403 or network blip used to leave this account unreachable for the whole
+             session, silently. Record it, and try again - this is the only thing standing
+             between an SOS and a phone whose app is closed. */
+          try{ SS._pushErr={ ts:Date.now(), msg:'token write: '+String((e&&e.message)||e).slice(0,120) }; saveStore(); }catch(_){}
+          if(n<4) setTimeout(function(){ _try(n+1); }, 4000*(n+1));
+        });
+      }catch(e){ if(n<4) setTimeout(function(){ _try(n+1); }, 4000*(n+1)); }
+    };
+    _try(0);
+  }catch(e){}
+}
 /* Queue a targeted alarm - alarmFanout Cloud Function pushes it to the recipient even when their
    app is CLOSED (used by geofence arrival; check-in cross-device needs SHOMER-uid pairing). */
 function fbQueueAlarm(toUid,title,body,tag){ if(!FB.ready||!toUid)return; try{ FB.db.ref('alarms').push({fromUid:FB.uid,toUid:toUid,title:title,body:body,tag:tag||'shomer',ts:Date.now()}); }catch(e){} }
@@ -15549,9 +15585,15 @@ function fbPrunePairsByTombstone(){
   }catch(e){}
 }
 /* Targeted closed-app push to every paired SHOMER (alarmFanout Cloud Function delivers it). */
-function fbAlertPairedSos(){
+function fbAlertPairedSos(_n){
  try{ if(window._sosPractice||isReviewAccount()) return; }catch(e){}
-  if(!FB.ready||!FB._pairedUids)return;
+  /* v405: on a cold start the pairs listener has not answered yet, so this returned with NOT ONE
+     guardian pushed - during an emergency, silently, with the strip already saying the alert was
+     sent. Wait for the pairs to land instead of giving up on them. */
+  if(!FB.ready||!FB._pairedUids||!Object.keys(FB._pairedUids).length){
+    var n=_n||0;
+    if(n<10 && (typeof sosPhase==='undefined' || sosPhase!=='idle')) setTimeout(function(){ try{ fbAlertPairedSos(n+1); }catch(e){} }, 1500);
+    return; }
   var he=currentLang==='he', nm=(SS.user&&SS.user.name)||(he?'שומר/ת':'a SHOMER');
   Object.keys(FB._pairedUids).forEach(function(uid){
     fbQueueAlarm(uid, (he?'🆘 SOS מ'+nm:'🆘 SOS from '+nm), (he?'הפעיל/ה SOS - פתח/י את האפליקציה':'sent an SOS - open the app'), 'sos');

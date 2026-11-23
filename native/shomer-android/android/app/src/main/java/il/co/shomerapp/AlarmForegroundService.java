@@ -111,10 +111,23 @@ public class AlarmForegroundService extends Service {
       p.setDataSource(afd.getFileDescriptor(), afd.getStartOffset(), afd.getLength());
       afd.close();
       p.setLooping(true);
-      am.requestAudioFocus(null, AudioManager.STREAM_ALARM, AudioManager.AUDIOFOCUS_GAIN);
+      /* v405: audio focus is an optimisation too, and it sat outside the volume try - a null
+         AudioManager does not throw where am is assigned, it throws HERE and took the primary
+         player down with it. Same rule as the volume: never a precondition for the siren. */
+      try { if (am != null) am.requestAudioFocus(null, AudioManager.STREAM_ALARM, AudioManager.AUDIOFOCUS_GAIN); }
+      catch (Throwable e) { note(e, "focus"); }
       p.prepare();
       p.start();
       mp = p;   // SOUNDING from here, and only from here
+      /* v405: started is not the same as audible. If a Do-Not-Disturb policy owns the alarm
+         stream the player runs at volume 0 and isPlaying() says yes over a silent phone - and
+         getAlarmFaults, the only readout a tester has, repeats that. Read the level back and
+         record it, so a muted device can be told apart from a working one. */
+      try {
+        if (am != null && am.getStreamVolume(AudioManager.STREAM_ALARM) == 0) {
+          note(new RuntimeException("alarm stream is at 0 - siren started but inaudible"), "muted");
+        }
+      } catch (Throwable e) {}
 
       /* Everything below is the wake lock and the buzz. It gets its own catch: a throw in any of
          it must never reach the handler and tear down a siren that is already playing. */

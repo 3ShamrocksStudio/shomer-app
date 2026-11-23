@@ -121,7 +121,17 @@ public class ShakeService extends Service implements SensorEventListener {
               if (Build.VERSION.SDK_INT >= 26) app.startForegroundService(a);
               else app.startService(a);
             }
-          } catch (Throwable e) {}
+          } catch (Throwable e) {
+            /* v405: this was a bare swallow - the ONE siren start in the whole app without a
+               fallback. On Android 12+ a backgrounded process gets
+               ForegroundServiceStartNotAllowedException here, and a locked phone is exactly the
+               case this native countdown exists to rescue: the user got ten seconds of pocket
+               buzz, a notification, and then silence. Every other start site already falls back
+               to AlarmPlayer, which runs inside THIS service and is therefore always startable.
+               Now so does this one, and the throw is recorded instead of vanishing. */
+            AlarmForegroundService.note(e, "prealarm-start");
+            try { AlarmPlayer.start(app, true); } catch (Throwable t) { AlarmForegroundService.note(t, "prealarm-fallback"); }
+          }
         }
         /* v371: the siren holds its own wake lock from here, so hand ours back instead of sitting
            on the CPU until the acquire timeout runs out. v375: ours by value, and also on the
