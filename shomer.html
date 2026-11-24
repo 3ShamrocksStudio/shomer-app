@@ -4655,8 +4655,8 @@ function applyTranslations(){
  /* v411: an aria-label overrides the visible text, so a hardcoded Hebrew one read Hebrew to
     every screen-reader user whatever language they chose. */
  try{ var _ab=document.getElementById('assist-btn'); if(_ab) _ab.setAttribute('aria-label',
- try{ var _ab2=document.getElementById('assist-btn'); if(_ab2) _ab2.title=_ab2.getAttribute('aria-label')||''; }catch(e){}   /* v414: icon-only now, so the tooltip carries the name */
    he?'בקשת עזרה - לא חירום':currentLang==='ar'?'طلب مساعدة - ليست حالة طوارئ':'Ask for a hand - not an emergency'); }catch(e){}
+ try{ var _ab2=document.getElementById('assist-btn'); if(_ab2) _ab2.title=_ab2.getAttribute('aria-label')||''; }catch(e){}   /* v414: icon-only now, so the tooltip carries the name */
  setText('ag-go-lbl',he?'שלח/י בקשה':currentLang==='ar'?'إرسال طلب':'Send request');
  setText('circ-find-lbl',he?'מצא חבר/ה':'Find a friend');
  setText('cm-add-save',he?'הוסף למעגל':'Add to circle');
