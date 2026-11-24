@@ -754,10 +754,15 @@ body.rd .legal-body p, body.rd .legal-body li, body.rd .sr-sb, body.rd .dr-why, 
   text-align:start!important;
 }
 body.rd .sh-body{ zoom:var(--rd-zoom); }
+body.rd #tp-bar.dr-card{ zoom:var(--rd-zoom); }   /* the daily question lives on #app, not in a sheet */
 /* a floor for the smallest text, so the setting that exists to enlarge text actually does */
 body.rd #sh-set .sr-sb, body.rd .sr-sb, body.rd .rd-sl label, body.rd .legal-body small,
 body.rd .cr, body.rd .dms-iv-l, body.rd .legal-links button, body.rd .sec-cap,
-body.rd .mini-credit, body.rd .legal-3s{ font-size:12.5px!important; }
+body.rd .mini-credit, body.rd .legal-3s, body.rd .legal-meta, body.rd .legal-draft,
+body.rd .legal-3s span, body.rd .sh-body span[style*="font-size"], body.rd .sh-body p[style*="font-size"]{ font-size:12.5px!important; }
+/* the same id-level weight for line-height, or every row name and description in Settings stays
+   pinned at 1.25/1.35 - tighter than the app's own default - at every slider position */
+body.rd #sh-set .sr-nm, body.rd #sh-set .sr-sb{ line-height:var(--rd-lh)!important; }
 /* uppercase is harder to decode - word shape is part of how a word is recognised */
 body.rd .sh-body [style*="uppercase"], body.rd .sh-ttl{ text-transform:none!important; }
 /* a softer page reduces the visual stress some readers get from maximum contrast, without
@@ -771,13 +776,28 @@ body.rd.rd-soft .sheet:not(.light-sheet) .legal-body{ color:#C8C2B6; }
   letter-spacing:var(--rd-ls,0);word-spacing:var(--rd-ws,0);line-height:var(--rd-lh,1.5);font-size:14px;color:var(--tx0)}
 .rd-sl{display:flex;align-items:center;gap:10px;margin:8px 0}
 .rd-sl label{flex:0 0 88px;font-size:12px;color:var(--tx2)}
-.rd-sl input[type=range]{flex:1}
+.rd-sl input[type=range]{flex:1;height:44px;min-height:44px}
+.rd-sl input[type=range]::-webkit-slider-thumb{width:28px;height:28px}
+body.rd .tog, .rd-sl+.set-row .tog{min-height:44px}
+#rd-toggle,#rd-soft,#rd-aloud{width:52px;height:30px;padding:11px 0;background-clip:content-box;box-sizing:content-box}
 .rd-sl b{flex:0 0 38px;text-align:end;font-size:12px;color:var(--g3);font-weight:700}
-.rd-say{width:34px;height:34px;border-radius:50%;border:1px solid var(--b2);background:rgba(255,255,255,.04);
+.rd-say{width:44px;height:44px;border-radius:50%;border:1px solid var(--b2);background:rgba(255,255,255,.04);
   color:var(--g3);display:inline-flex;align-items:center;justify-content:center;cursor:pointer;margin-inline-end:6px;flex:0 0 auto}
 .rd-say:hover{background:rgba(255,255,255,.08)}
 .rd-say.on{background:var(--g3);color:#1a1205;border-color:transparent}
 .rd-say .ic{width:18px;height:18px}
+/* the main-screen speaker rides the existing FAB column on the map edge - clear of the wordmark,
+   clear of the SOS button, and it survives Simple mode, which hides the header entirely */
+.rd-say-fab{position:absolute;left:12px;bottom:calc(var(--nav) + 70px);z-index:400;width:48px;height:48px;
+  background:rgba(12,18,32,.92);border:1px solid var(--b2);box-shadow:0 4px 14px rgba(0,0,0,.4)}
+.rd-say-fab .ic{width:22px;height:22px}
+body.sheet-open .rd-say-fab{opacity:0;pointer-events:none}
+/* Hidden during a live alarm. The countdown card is built by the SOS flow at runtime, so its
+   geometry cannot be measured without firing a real SOS - and an unverified control next to the
+   cancel button is not a risk worth taking to save a sentence. The consequence is real and is
+   NOT solved here: a user who cannot read the countdown gets nothing read to them. Giving the
+   countdown screen its own speaker is a change to the SOS screen itself. NEEDS YOUR EYES. */
+body.sos-live .rd-say-fab{display:none}
 /* section label */
 .sec-cap{font-size:11px;font-weight:700;letter-spacing:.3px;color:var(--g2);margin-bottom:9px;display:flex;align-items:center;gap:7px;}
 /* Settings category band - groups sub-sections into clear, scannable categories */
@@ -3825,11 +3845,27 @@ function readAloudText(sheet){
     var t=sheet.querySelector('.sh-ttl'); if(t) push(t.textContent);
     var body=sheet.querySelector('.sh-body'); if(!body) return out.join('. ');
     var nodes=body.querySelectorAll('.sr-nm,.sr-sb,.legal-h,.legal-body p,.legal-body li,.gd-step,.set-cat-t,h2,h3,p');
+    var took=0;
     for(var i=0;i<nodes.length;i++){
       var el=nodes[i];
       if(el.closest && el.closest('[aria-hidden="true"]')) continue;
       if(el.offsetParent===null) continue;            /* collapsed or hidden - not on screen */
       if(push(el.textContent)===false) break;        /* a screen summary, not an audiobook */
+      took++;
+    }
+    if(took<2){
+      /* this sheet names its text with classes of its own. Read the leaves instead - works on
+         any screen, present or future, without a list to keep in step. */
+      var leaves=body.querySelectorAll('*');
+      for(var j=0;j<leaves.length;j++){
+        var n=leaves[j];
+        if(n.children.length) continue;               /* leaf text only, no double-reading */
+        if(n.offsetParent===null) continue;
+        if(n.closest('[aria-hidden="true"]')) continue;
+        var tag=n.tagName;
+        if(tag==='SVG'||tag==='PATH'||tag==='CIRCLE'||tag==='INPUT'||tag==='TEXTAREA') continue;
+        if(push(n.textContent)===false) break;
+      }
     }
   }catch(e){}
   return out.join('. ');
@@ -3855,6 +3891,9 @@ function readAloudMainText(){
        status text ("connection state", "in your area") which is not something you can do. */
     document.querySelectorAll('.hdr button[aria-label], .nav button[aria-label], .assist-btn, #sos-btn').forEach(function(el){
       if(el.offsetParent===null) return;
+      if(el.id==='rd-say-main') return;                      /* do not offer yourself as an action */
+      if(el.id==='fb-status'||el.getAttribute('aria-live')) return;   /* status, not something you can do */
+      if(el.classList.contains('hdr-bell')) return;
       var t=(el.getAttribute('aria-label')||el.textContent||'').replace(/\s+/g,' ').trim().replace(/[.\u00b7]+$/,'');
       if(t.length<2||seen[t]) return; seen[t]=1; parts.push(t);
     });
@@ -3864,18 +3903,29 @@ function readAloudMainText(){
 }
 function readAloudMainGo(){
   if(_rdSpeaking){ readAloudStop(); return; }
-  var btn=document.getElementById('rd-say-main'), txt=readAloudMainText();
+  var btn=document.getElementById('rd-say-main');
+  var txt=readAloudMainText();
   _rdSpeaking=true; if(btn){ btn.classList.add('on'); btn.setAttribute('aria-pressed','true'); }
   try{ gReadSay(txt).then(readAloudStop, readAloudStop); }catch(e){ readAloudStop(); }
 }
+/* the main speaker is created once and then outlives language changes, so its name is set
+   here rather than only at birth */
+function readAloudRelabel(){
+  try{
+    var lbl = currentLang==='en'?'Read this screen aloud':currentLang==='ar'?'اقرأ هذه الشاشة بصوت':'הקראת המסך';
+    document.querySelectorAll('.rd-say').forEach(function(b){ b.setAttribute('aria-label',lbl); b.title=lbl; });
+  }catch(e){}
+}
 function readAloudMainMount(){
   try{
-    var host=document.querySelector('.hdr .hdr-left'); if(!host) return;
+    /* NOT .hdr-left: it grows leftward into the absolutely-centred wordmark and the button
+       disappeared behind it on every width under 430px. */
+    var host=document.querySelector('#app'); if(!host) return;
     var on=readCfg().on && readCfg().aloud, ex=document.getElementById('rd-say-main');
     if(!on){ if(ex) ex.remove(); return; }
-    if(ex) return;
+    if(ex){ readAloudRelabel(); return; }
     var b=document.createElement('button');
-    b.className='rd-say'; b.id='rd-say-main'; b.type='button'; b.setAttribute('aria-pressed','false');
+    b.className='rd-say rd-say-fab'; b.id='rd-say-main'; b.type='button'; b.setAttribute('aria-pressed','false');
     b.setAttribute('aria-label', currentLang==='en'?'Read this screen aloud':currentLang==='ar'?'اقرأ هذه الشاشة بصوت':'הקראת המסך');
     b.title=b.getAttribute('aria-label');
     b.innerHTML='<svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9.5h3.5L12 5.5v13L7.5 14.5H4z" fill="currentColor"/><path d="M16 8.5a5 5 0 0 1 0 7" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M18.5 5.5a8.5 8.5 0 0 1 0 13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>';
@@ -3890,7 +3940,7 @@ function readAloudMount(id){
     var on=readCfg().on && readCfg().aloud;
     var ex=head.querySelector('.rd-say');
     if(!on){ if(ex) ex.remove(); return; }
-    if(ex) return;
+    if(ex){ readAloudRelabel(); return; }
     var b=document.createElement('button');
     b.className='rd-say'; b.type='button'; b.setAttribute('aria-pressed','false');
     b.setAttribute('aria-label', currentLang==='en'?'Read this screen aloud':currentLang==='ar'?'اقرأ هذه الشاشة بصوت':'הקראת המסך');
@@ -3927,6 +3977,15 @@ function readSyncUI(){
     if(sz) sz.setAttribute('aria-valuetext',Math.round(r.size*100)+'%');
     if(sp) sp.setAttribute('aria-valuetext',Math.round(r.space*100)+'%');
     var box=document.getElementById('rd-opts'); if(box) box.style.display=r.on?'':'none';
+    /* accessible names follow the language, like the visible ones do */
+    var L=function(he,en,ar){ return currentLang==='en'?en:currentLang==='ar'?ar:he; };
+    [['rd-toggle',L('קריאה נוחה','Easy reading','قراءة مريحة')],
+     ['rd-soft',  L('רקע רך','Softer background','خلفية أهدأ')],
+     ['rd-aloud', L('הקראה','Read aloud','قراءة بصوت')],
+     ['rd-size',  L('גודל טקסט','Text size','حجم النص')],
+     ['rd-space', L('ריווח אותיות ומילים','Letter and word spacing','تباعد الحروف والكلمات')]
+    ].forEach(function(q){ var e=document.getElementById(q[0]); if(e) e.setAttribute('aria-label',q[1]); });
+    try{ readAloudRelabel(); }catch(e){}
   }catch(e){}
 }
 /* ══ MIGRATION (v105): purge stale/simulated positions ══
@@ -8219,7 +8278,7 @@ try{ window.addEventListener('popstate',function(){
   }catch(e){}
 }); }catch(e){}
 function op(id){ if(id==='sh-dms'||id==='sh-checkin'){ try{ dykUsed(id==='sh-dms'?'dms':'checkin'); }catch(e){} } if(id==='sh-checkin'||id==='sh-dms'){ setTimeout(function(){ try{ fcMountSettings(); }catch(e){} },0); } closeAll();const el=document.getElementById(id);try{ if(typeof emApplyCountry==='function') emApplyCountry(); }catch(_e){}if(el)el.classList.add('open');syncSheetState(); if(el) shHistPush();
- if(id==='sh-set'){try{renderSetContacts();}catch(e){} try{setCatInit();}catch(e){} try{readSyncUI();}catch(e){}}
+ if(id==='sh-set'){try{renderSetContacts();}catch(e){} try{setCatInit();}catch(e){} try{readOnSettingsOpen();}catch(e){}}
  try{ readAloudMount(id); }catch(e){}   /* v412 */
  if(id==='sh-rep'){ try{ var _sn=!!(SS.settings&&SS.settings.toggles&&SS.settings.toggles.p_showname); var _at=document.querySelector('#sh-rep .tog'); if(_at){ _at.classList.toggle('on',!_sn); _at.setAttribute('aria-checked',String(!_sn)); } }catch(e){} }   /* v293: Settings "show name on reports" sets the report's anonymous switch */   /* v284: sections fold/unfold from EVERY way into settings, not only the menu */
  if(id==='sh-circles'){ try{syncPairsToCircles();}catch(e){} try{renderCircles();}catch(e){} try{gdRenderList();}catch(e){} }   // was never re-rendered → circles list + toggles appeared empty
