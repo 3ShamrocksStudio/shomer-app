@@ -1,20 +1,17 @@
 {
-"v": "v415",
+"v": "v416",
 "notes": {
 "he": [
-"צריכת סוללה: ה-GPS עובר לדיוק גבוה רק כשיש SOS או שיתוף מיקום פעיל - לא כל הזמן",
-"פעמון ההתראות סופר עכשיו רק מה שבאמת ברשימה",
-"כפתור ה-back יוצא מהאפליקציה כשאין חלון פתוח"
+"סימן השאלה במפה הוא עכשיו כפתור עזרה - מסביר ומקריא מה יש במסך, ולא שולח כלום",
+"בקשת עזרה (לא חירום) קיבלה סמל של כף יד, כדי שלא יתבלבל עם עזרה"
 ],
 "en": [
-"Battery: GPS switches to high accuracy only during an SOS or active sharing - not all the time",
-"The bell now counts only what the list actually holds",
-"The back button leaves the app when nothing is open"
+"The question mark on the map is now a help button - it explains and reads out what is on the screen, and sends nothing",
+"\"Need a hand\" (non-emergency) now has a raised-hand icon so it cannot be mistaken for help"
 ],
 "ar": [
-"البطارية: ينتقل GPS إلى الدقة العالية فقط أثناء استغاثة أو مشاركة نشطة - لا طوال الوقت",
-"يَعُدّ الجرس الآن ما تحتويه القائمة فعليًا فقط",
-"زر الرجوع يخرج من التطبيق عندما لا تكون هناك نافذة مفتوحة"
+"علامة الاستفهام على الخريطة صارت زر مساعدة - تشرح وتقرأ ما في الشاشة، ولا ترسل شيئًا",
+"«أحتاج مساعدة» (غير طارئ) صار له أيقونة يد مرفوعة كي لا يختلط بزر المساعدة"
 ]
 }
 }

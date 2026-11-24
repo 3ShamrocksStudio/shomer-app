@@ -1835,7 +1835,7 @@ body.otp-active .ob-steps{display:none!important;}
  <button class="loc-fab" id="loc-fab" onclick="locMe()" aria-label="מיקומי על המפה" title="מיקומי"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="3.4" fill="currentColor"/><circle cx="12" cy="12" r="7" fill="none" stroke="currentColor" stroke-width="2"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></button>
 <button class="past-fab" id="past-fab" onclick="togglePastEvents()" aria-pressed="false" aria-label="אירועי עבר" title="אירועי עבר · למודעות בלבד"><span id="past-fab-ic"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5Z"/><line x1="8" y1="10" x2="16" y2="10"/><line x1="8" y1="14" x2="13" y2="14"/></svg></span><span class="past-fab-lbl">עבר</span></button>
  <button class="assist-btn" id="assist-btn" type="button" onclick="assistAsk()" aria-label="בקשת עזרה - לא חירום" title="בקשת עזרה - לא חירום">
- <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M9.3 9.2a2.8 2.8 0 0 1 5.4.9c0 1.9-2.7 2.3-2.7 4"/><path d="M12 17.4h.01"/></svg>
+ <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 11V5.5a1.5 1.5 0 0 1 3 0V11"/><path d="M12 11V4.5a1.5 1.5 0 0 1 3 0V11"/><path d="M15 11V6.5a1.5 1.5 0 0 1 3 0V13c0 4-2.6 7-6.5 7S5 17.2 5 13.6v-2a1.5 1.5 0 0 1 3 0V13"/></svg>
  <span id="assist-lbl">צריך/ה עזרה</span>
  </button>
  <button class="ff-fab" id="ff-fab" onclick="findFriendOpen()" aria-label="מצא חבר/ה" title="מצא חבר/ה"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7" fill="none" stroke="currentColor" stroke-width="2"/><path d="M16.5 16.5L21 21" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></button>
@@ -3906,13 +3906,26 @@ function readAloudMainGo(){
   var btn=document.getElementById('rd-say-main');
   var txt=readAloudMainText();
   _rdSpeaking=true; if(btn){ btn.classList.add('on'); btn.setAttribute('aria-pressed','true'); }
-  try{ gReadSay(txt).then(readAloudStop, readAloudStop); }catch(e){ readAloudStop(); }
+  /* v416: plenty of phones have no Hebrew or Arabic voice installed, and on those this button
+     would look broken. Speak if we can; if speech does not happen, show the words instead.
+     Not the "important to know" modal - that header is a lie on a help explanation. */
+  var spoke=false, fellBack=false;
+  function helpFallback(){
+    if(spoke||fellBack) return; fellBack=true;
+    try{ toast(txt,'amb',9000); }catch(e){ try{ toast(txt,'amb'); }catch(_){} }
+  }
+  try{
+    var pr=gReadSay(txt);
+    if(pr&&pr.then){ pr.then(function(){ spoke=true; readAloudStop(); }, function(){ helpFallback(); readAloudStop(); }); }
+    else { helpFallback(); readAloudStop(); }
+    setTimeout(function(){ if(!spoke) helpFallback(); },1200);   /* silent engine: say it on screen */
+  }catch(e){ helpFallback(); readAloudStop(); }
 }
 /* the main speaker is created once and then outlives language changes, so its name is set
    here rather than only at birth */
 function readAloudRelabel(){
   try{
-    var lbl = currentLang==='en'?'Read this screen aloud':currentLang==='ar'?'اقرأ هذه الشاشة بصوت':'הקראת המסך';
+    var lbl = currentLang==='en'?'Help - read this screen aloud':currentLang==='ar'?'مساعدة - اقرأ هذه الشاشة بصوت':'עזרה - הקראת המסך';
     document.querySelectorAll('.rd-say').forEach(function(b){ b.setAttribute('aria-label',lbl); b.title=lbl; });
   }catch(e){}
 }
@@ -3922,14 +3935,15 @@ function readAloudMainMount(){
        disappeared behind it on every width under 430px. */
     /* the same parent as the other map-edge FABs, or it sits 6px off the column */
     var host=document.querySelector('.map-wrap')||document.getElementById('app'); if(!host) return;
-    var on=readCfg().on && readCfg().aloud, ex=document.getElementById('rd-say-main');
-    if(!on){ if(ex) ex.remove(); return; }
+    /* v416: always present. This is the help button, not a setting's satellite. */
+    var ex=document.getElementById('rd-say-main');
     if(ex){ readAloudRelabel(); return; }
     var b=document.createElement('button');
     b.className='rd-say rd-say-fab'; b.id='rd-say-main'; b.type='button'; b.setAttribute('aria-pressed','false');
-    b.setAttribute('aria-label', currentLang==='en'?'Read this screen aloud':currentLang==='ar'?'اقرأ هذه الشاشة بصوت':'הקראת המסך');
+    b.setAttribute('aria-label', currentLang==='en'?'Help - read this screen aloud':currentLang==='ar'?'مساعدة - اقرأ هذه الشاشة بصوت':'עזרה - הקראת המסך');
     b.title=b.getAttribute('aria-label');
-    b.innerHTML='<svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9.5h3.5L12 5.5v13L7.5 14.5H4z" fill="currentColor"/><path d="M16 8.5a5 5 0 0 1 0 7" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M18.5 5.5a8.5 8.5 0 0 1 0 13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>';
+    /* a question mark: "explain this screen to me" - and it does, out loud */
+    b.innerHTML='<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M9.3 9.2a2.8 2.8 0 0 1 5.4.9c0 1.9-2.7 2.3-2.7 4"/><path d="M12 17.4h.01"/></svg>';
     b.onclick=function(ev){ ev.stopPropagation(); readAloudMainGo(); };
     host.appendChild(b);
   }catch(e){}
@@ -3944,7 +3958,7 @@ function readAloudMount(id){
     if(ex){ readAloudRelabel(); return; }
     var b=document.createElement('button');
     b.className='rd-say'; b.type='button'; b.setAttribute('aria-pressed','false');
-    b.setAttribute('aria-label', currentLang==='en'?'Read this screen aloud':currentLang==='ar'?'اقرأ هذه الشاشة بصوت':'הקראת המסך');
+    b.setAttribute('aria-label', currentLang==='en'?'Help - read this screen aloud':currentLang==='ar'?'مساعدة - اقرأ هذه الشاشة بصوت':'עזרה - הקראת המסך');
     b.title=b.getAttribute('aria-label');
     b.innerHTML='<svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9.5h3.5L12 5.5v13L7.5 14.5H4z" fill="currentColor"/><path d="M16 8.5a5 5 0 0 1 0 7" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M18.5 5.5a8.5 8.5 0 0 1 0 13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>';
     b.onclick=function(ev){ ev.stopPropagation(); readAloudGo(id); };
@@ -12689,7 +12703,7 @@ try{ hydrateIcons(document); }catch(e){}
 /* Loaded-build version - shown in the diagnostic panel so a phone can prove
    whether it's on the latest build or a STALE cached one. Keep in lock-step
    with sw.js SW_VERSION on every deploy. */
-var APP_VER='v415';
+var APP_VER='v416';
 var FB={ready:false,uid:null,db:null,_presTimer:null,connected:false,listening:false,pushState:'default',near:0,swVer:'?',
   authState:'connecting',sdkLoaded:false,persist:'',permErr:null,err:null,wsProbe:'',csp:''};
 /* Always log connection diagnostics to the console so the real failure can be SEEN in Chrome. */
