@@ -720,12 +720,14 @@ body.sheet-open .ff-fab{opacity:0;pointer-events:none;}
 .sh-x{width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,#C09020,#E0A828 60%,#F5C840);border:0;display:flex;align-items:center;justify-content:center;font-size:17px;color:#23170a;font-weight:800;transition:transform .12s,filter .12s;box-shadow:0 4px 12px rgba(224,168,40,.35);}.sh-x:active{transform:scale(.92)}
 .sh-x:hover{background:var(--n5);}
 .sh-body{overflow-y:auto;-webkit-overflow-scrolling:touch;flex:1;padding:14px 16px 36px;}
-/* ══════════ v415 · EASY READING (קריאה נוחה) ══════════
+/* ══════════ v412 · EASY READING (קריאה נוחה) ══════════
    Dave, 24.11: a tester is dyslexic and struggles with orientation and with what the app is for.
    What the evidence actually says, which is not what you would guess:
      · SPACING is the strongest lever. Zorzi et al. 2012 (PNAS): extra-large letter spacing
-       improved reading speed and accuracy in dyslexic children on first exposure, regardless of
-       typeface. That is why spacing here goes further than any style guide would suggest.
+       improved reading speed and accuracy in dyslexic children on first exposure, with no training -
+       74 children, tested in one typeface. That spacing rather than letterform is what carries the
+       effect comes from Marinus 2016, below. That is why spacing here goes further than any style
+       guide would suggest.
      · Dyslexia-specific fonts do NOT work. Wery & Diliberto 2017 found OpenDyslexic no better
        than Arial or Times, with nobody preferring it; Azzarello et al. 2026, a meta-analysis of
        15 studies and 688 children, found an effect near zero. Marinus et al. 2016 found
@@ -742,19 +744,21 @@ body.sheet-open .ff-fab{opacity:0;pointer-events:none;}
 body.rd{ --rd-ls:0.055em; --rd-ws:0.17em; --rd-lh:1.65; --rd-zoom:1; }
 /* the levers, on text the user reads rather than taps in a hurry */
 body.rd .sh-body, body.rd .sh-body *:not(svg):not(path):not(circle),
-body.rd .gd-step, body.rd .dr-q, body.rd .dr-opt, body.rd .dr-why, body.rd .legal-b, body.rd .legal-b *{
+body.rd .gd-step, body.rd .dr-q, body.rd .dr-opt, body.rd .dr-why, body.rd .legal-body, body.rd .legal-body *{
   letter-spacing:var(--rd-ls)!important; word-spacing:var(--rd-ws)!important;
   line-height:var(--rd-lh)!important; text-align:start!important;
 }
 body.rd .sh-body{ zoom:var(--rd-zoom); }
-body.rd .gd-wrap, body.rd .drill-wrap{ zoom:var(--rd-zoom); }
+/* a floor for the smallest text, so the setting that exists to enlarge text actually does */
+body.rd #sh-set .sr-sb, body.rd .sr-sb, body.rd .rd-sl label, body.rd .legal-body small{ font-size:12.5px!important; }
 /* uppercase is harder to decode - word shape is part of how a word is recognised */
 body.rd .sh-body [style*="uppercase"], body.rd .sh-ttl{ text-transform:none!important; }
 /* a softer page reduces the visual stress some readers get from maximum contrast, without
    dropping below the 4.5:1 the guidelines require */
-body.rd.rd-soft .sheet{ background:#12161f; }
-body.rd.rd-soft .sh-body{ color:#EDE6D8; }
-body.rd.rd-soft .sr-sb, body.rd.rd-soft .legal-b{ color:#C8C2B6; }
+body.rd.rd-soft .sheet:not(.light-sheet){ background:#12161f; }
+body.rd.rd-soft .sheet:not(.light-sheet) .sh-body{ color:#EDE6D8; }
+body.rd.rd-soft .sheet:not(.light-sheet) .sr-sb,
+body.rd.rd-soft .sheet:not(.light-sheet) .legal-body{ color:#C8C2B6; }
 /* the control itself */
 .rd-pv{margin:10px 0 2px;padding:12px 13px;border:1px solid var(--b2);border-radius:12px;background:rgba(255,255,255,.03);
   letter-spacing:var(--rd-ls,0);word-spacing:var(--rd-ws,0);line-height:var(--rd-lh,1.5);font-size:14px;color:var(--tx0)}
@@ -2287,17 +2291,17 @@ body.otp-active .ob-steps{display:none!important;}
   <div class="set-row sm-only" onclick="simpleOpenPlaces()" role="button" tabindex="0"><div class="sr-l"><div><div class="sr-nm" data-he="הבית והעבודה: קומה ודירה" data-en="Home and work: floor and apartment" data-ar="البيت والعمل: الطابق والشقة">הבית והעבודה: קומה ודירה</div><div class="sr-sb" data-he="בזמן SOS השומרים יראו באיזו קומה אתם." data-en="During an SOS your SHOMERs see which floor you are on." data-ar="أثناء SOS يرى حُرّاسكم في أي طابق أنتم.">בזמן SOS השומרים יראו באיזו קומה אתם.</div></div></div><span style="color:var(--tx3);font-size:18px">›</span></div>
   <div class="set-row" onclick="ageAskOpen(true)" role="button" tabindex="0"><div class="sr-l"><div><div class="sr-nm" data-he="הגיל שלי" data-en="My age" data-ar="عمري">הגיל שלי</div><div class="sr-sb" data-he="פרטי. רק אתם רואים." data-en="Private. Only you see it." data-ar="خاص. أنتم فقط ترونه.">פרטי. רק אתם רואים.</div></div></div><span id="smp-age-st" dir="ltr" style="font-size:15px;font-weight:800;color:var(--g3);white-space:nowrap"></span></div>
  </div>
- <!-- v415 · Easy reading. Its own category, above notifications: a reader who needs it should
+ <!-- v412 · Easy reading. Its own category, above notifications: a reader who needs it should
       not have to read through four groups of settings to find the setting that helps them read. -->
  <div class="set-cat"><div class="set-cat-ic"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5.5h7a2.5 2.5 0 0 1 2.5 2.5v11A2 2 0 0 0 11.5 17H4z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><path d="M20 5.5h-7A2.5 2.5 0 0 0 10.5 8v11a2 2 0 0 1 2-2H20z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></svg></div><div class="set-cat-t" data-he="קריאה נוחה" data-en="Easy reading" data-ar="قراءة مريحة">קריאה נוחה</div></div>
  <div class="set-grp">
-  <div class="set-row"><div class="sr-l"><div><div class="sr-nm" data-he="קריאה נוחה" data-en="Easy reading" data-ar="قراءة مريحة">קריאה נוחה</div><div class="sr-sb" data-he="ריווח גדול יותר בין אותיות ומילים, שורות מרווחות וטקסט גדול יותר. לא משנה את כפתור ה-SOS ולא את המפה." data-en="Wider spacing between letters and words, roomier lines and larger text. Does not change the SOS button or the map." data-ar="تباعد أوسع بين الحروف والكلمات، وأسطر أرحب ونص أكبر. لا يغيّر زر الاستغاثة ولا الخريطة.">ריווח גדול יותר בין אותיות ומילים, שורות מרווחות וטקסט גדול יותר. לא משנה את כפתור ה-SOS ולא את המפה.</div></div></div><div class="tog" id="rd-toggle" onclick="readSet('on',!readOn())" role="switch" aria-checked="false" aria-label="קריאה נוחה" tabindex="0"></div></div>
+  <div class="set-row"><div class="sr-l"><div><div class="sr-nm" data-he="קריאה נוחה" data-en="Easy reading" data-ar="قراءة مريحة">קריאה נוחה</div><div class="sr-sb" data-he="ריווח גדול יותר בין אותיות ומילים, שורות מרווחות וטקסט גדול יותר. לא משנה את כפתור ה-SOS ולא את המפה." data-en="Wider spacing between letters and words, roomier lines and larger text. Does not change the SOS button or the map." data-ar="تباعد أوسع بين الحروف والكلمات، وأسطر أرحب ونص أكبر. لا يغيّر زر الاستغاثة ولا الخريطة.">ריווח גדול יותר בין אותיות ומילים, שורות מרווחות וטקסט גדול יותר. לא משנה את כפתור ה-SOS ולא את המפה.</div></div></div><div class="tog" id="rd-toggle" onclick="readSet('on',!readOn())" role="switch" aria-checked="false" aria-label="קריאה נוחה" tabindex="0" onkeydown="readKey(event,'on')"></div></div>
   <div id="rd-opts" style="display:none">
    <div class="rd-sl"><label data-he="גודל" data-en="Size" data-ar="الحجم">גודל</label><input type="range" id="rd-size" min="100" max="135" step="5" aria-label="גודל טקסט" oninput="readSet('size',this.value/100)"><b id="rd-size-v">100%</b></div>
    <div class="rd-sl"><label data-he="ריווח" data-en="Spacing" data-ar="التباعد">ריווח</label><input type="range" id="rd-space" min="0" max="220" step="10" aria-label="ריווח אותיות ומילים" oninput="readSet('space',this.value/100)"><b id="rd-space-v">100%</b></div>
    <div class="rd-pv" id="rd-preview" data-he="כך ייראה הטקסט באפליקציה. גררו עד שנוח לכם לקרוא." data-en="This is how text will look in the app. Drag until it is comfortable to read." data-ar="هكذا سيبدو النص في التطبيق. اسحب حتى تصبح القراءة مريحة.">כך ייראה הטקסט באפליקציה. גררו עד שנוח לכם לקרוא.</div>
-   <div class="set-row"><div class="sr-l"><div><div class="sr-nm" data-he="רקע רך" data-en="Softer background" data-ar="خلفية أهدأ">רקע רך</div><div class="sr-sb" data-he="פחות ניגודיות חדה. עוזר למי שהטקסט „קופץ” לו." data-en="Less harsh contrast. Helps if text seems to jump." data-ar="تباين أقل حدة. يساعد إذا بدا النص يقفز.">פחות ניגודיות חדה. עוזר למי שהטקסט „קופץ” לו.</div></div></div><div class="tog" id="rd-soft" onclick="readSet('soft',!readCfg().soft)" role="switch" aria-checked="false" aria-label="רקע רך" tabindex="0"></div></div>
-   <div class="set-row"><div class="sr-l"><div><div class="sr-nm" data-he="הקראה" data-en="Read aloud" data-ar="قراءة بصوت">הקראה</div><div class="sr-sb" data-he="כפתור רמקול בכל מסך מוקרא. מקריא מה המסך הזה ומה אפשר לעשות בו." data-en="A speaker button on every readable screen. It reads out what the screen is for and what you can do there." data-ar="زر مكبّر صوت في كل شاشة قابلة للقراءة. يقرأ ما هذه الشاشة وما يمكنك فعله فيها.">כפתור רמקול בכל מסך מוקרא. מקריא מה המסך הזה ומה אפשר לעשות בו.</div></div></div><div class="tog" id="rd-aloud" onclick="readSet('aloud',!readCfg().aloud)" role="switch" aria-checked="false" aria-label="הקראה" tabindex="0"></div></div>
+   <div class="set-row"><div class="sr-l"><div><div class="sr-nm" data-he="רקע רך" data-en="Softer background" data-ar="خلفية أهدأ">רקע רך</div><div class="sr-sb" data-he="פחות ניגודיות חדה. עוזר למי שהטקסט „קופץ” לו." data-en="Less harsh contrast. Helps if text seems to jump." data-ar="تباين أقل حدة. يساعد إذا بدا النص يقفز.">פחות ניגודיות חדה. עוזר למי שהטקסט „קופץ” לו.</div></div></div><div class="tog" id="rd-soft" onclick="readSet('soft',!readCfg().soft)" role="switch" aria-checked="false" aria-label="רקע רך" tabindex="0" onkeydown="readKey(event,'soft')"></div></div>
+   <div class="set-row"><div class="sr-l"><div><div class="sr-nm" data-he="הקראה" data-en="Read aloud" data-ar="قراءة بصوت">הקראה</div><div class="sr-sb" data-he="כפתור רמקול בכל מסך מוקרא. מקריא מה המסך הזה ומה אפשר לעשות בו." data-en="A speaker button on every readable screen. It reads out what the screen is for and what you can do there." data-ar="زر مكبّر صوت في كل شاشة قابلة للقراءة. يقرأ ما هذه الشاشة وما يمكنك فعله فيها.">כפתור רמקול בכל מסך מוקרא. מקריא מה המסך הזה ומה אפשר לעשות בו.</div></div></div><div class="tog" id="rd-aloud" onclick="readSet('aloud',!readCfg().aloud)" role="switch" aria-checked="false" aria-label="הקראה" tabindex="0" onkeydown="readKey(event,'aloud')"></div></div>
   </div>
  </div>
  <div class="set-cat"><div class="set-cat-ic"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M18 8a6 6 0 1 0-12 0c0 7-3 9-3 9h18s-3-2-3-9" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><path d="M13.7 21a2 2 0 0 1-3.4 0" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></div><div class="set-cat-t" data-he="התראות" data-en="Alerts &amp; Notifications">התראות</div></div>
@@ -3753,7 +3757,7 @@ function deepMerge(base,o){
  return out;
 }
 function loadStore(){try{const r=localStorage.getItem(SKEY);if(r)SS=deepMerge(SS,JSON.parse(r));}catch(e){}}
-/* ── v415 · Easy reading (קריאה נוחה) ──────────────────────────────────────────────
+/* ── v412 · Easy reading (קריאה נוחה) ──────────────────────────────────────────────
    Off by default, available to every age band - dyslexia is not an age. Spacing is the lever
    with the real evidence behind it (Zorzi 2012), so it is the one with the widest range here.
    Never touches the map, the nav or the SOS button: a panic control must not move because a
@@ -3784,7 +3788,7 @@ function readApply(){
     }
   }catch(e){}
 }
-/* ── v415 · Read aloud ────────────────────────────────────────────────────────────
+/* ── v412 · Read aloud ────────────────────────────────────────────────────────────
    For the half of Dave's note that typography cannot fix: a reader who cannot tell what a
    screen is for. The speaker reads the screen's OWN text - title, row names, row subtitles, body
    paragraphs, in the order they appear. Deliberately NOT a hand-written script per screen: a
@@ -3801,20 +3805,22 @@ function readAloudStop(){
 }
 function readAloudText(sheet){
   var out=[], seen={};
+  var LIMIT=700, len=0;
   function push(t){
     if(!t) return; t=String(t).replace(/\s+/g,' ').trim().replace(/[.\u00b7\u2022]+$/,'').trim();
-    if(t.length<2 || seen[t]) return; seen[t]=1; out.push(t);
+    if(t.length<2 || seen[t]) return;
+    if(len && len+2+t.length>LIMIT) return false;   /* would overshoot - stop before, not after */
+    seen[t]=1; out.push(t); len+=(len?2:0)+t.length; return true;
   }
   try{
     var t=sheet.querySelector('.sh-ttl'); if(t) push(t.textContent);
     var body=sheet.querySelector('.sh-body'); if(!body) return out.join('. ');
-    var nodes=body.querySelectorAll('.sr-nm,.sr-sb,.legal-h,.legal-b p,.legal-b li,.gd-step,.set-cat-t,h2,h3,p');
+    var nodes=body.querySelectorAll('.sr-nm,.sr-sb,.legal-h,.legal-body p,.legal-body li,.gd-step,.set-cat-t,h2,h3,p');
     for(var i=0;i<nodes.length;i++){
       var el=nodes[i];
       if(el.closest && el.closest('[aria-hidden="true"]')) continue;
       if(el.offsetParent===null) continue;            /* collapsed or hidden - not on screen */
-      push(el.textContent);
-      if(out.join('. ').length>700) break;            /* a screen summary, not an audiobook */
+      if(push(el.textContent)===false) break;        /* a screen summary, not an audiobook */
     }
   }catch(e){}
   return out.join('. ');
@@ -3846,7 +3852,18 @@ function readAloudMount(id){
     if(x&&x.parentNode===head) head.insertBefore(b,x); else head.appendChild(b);
   }catch(e){}
 }
-function readSet(k,v){ try{ var r=readCfg(); r[k]=v; SS.read=r; saveStore(); readApply(); readSyncUI(); }catch(e){} }
+function readSet(k,v){ try{ var r=readCfg(); r[k]=v; SS.read=r; saveStore(); readApply(); readSyncUI();
+  /* the speaker button appears and disappears with this setting, so remount every open sheet now
+     rather than waiting for the next op() - the toggle looked dead with settings still open */
+  try{ document.querySelectorAll('.sheet').forEach(function(sh){ if(sh.id) readAloudMount(sh.id); }); }catch(e){}
+}catch(e){} }
+/* these three .tog divs carry tabindex, so they must answer the keyboard. Same handler the
+   category headers use two functions down. */
+function readKey(ev,k){
+  try{ if(ev.key!=='Enter'&&ev.key!==' '&&ev.key!=='Spacebar') return;
+    ev.preventDefault(); var r=readCfg(); readSet(k,!r[k]);
+  }catch(e){}
+}
 function readSyncUI(){
   try{
     var r=readCfg();
@@ -8152,7 +8169,7 @@ try{ window.addEventListener('popstate',function(){
 }); }catch(e){}
 function op(id){ if(id==='sh-dms'||id==='sh-checkin'){ try{ dykUsed(id==='sh-dms'?'dms':'checkin'); }catch(e){} } if(id==='sh-checkin'||id==='sh-dms'){ setTimeout(function(){ try{ fcMountSettings(); }catch(e){} },0); } closeAll();const el=document.getElementById(id);try{ if(typeof emApplyCountry==='function') emApplyCountry(); }catch(_e){}if(el)el.classList.add('open');syncSheetState(); if(el) shHistPush();
  if(id==='sh-set'){try{renderSetContacts();}catch(e){} try{setCatInit();}catch(e){} try{readSyncUI();}catch(e){}}
- try{ readAloudMount(id); }catch(e){}   /* v415 */
+ try{ readAloudMount(id); }catch(e){}   /* v412 */
  if(id==='sh-rep'){ try{ var _sn=!!(SS.settings&&SS.settings.toggles&&SS.settings.toggles.p_showname); var _at=document.querySelector('#sh-rep .tog'); if(_at){ _at.classList.toggle('on',!_sn); _at.setAttribute('aria-checked',String(!_sn)); } }catch(e){} }   /* v293: Settings "show name on reports" sets the report's anonymous switch */   /* v284: sections fold/unfold from EVERY way into settings, not only the menu */
  if(id==='sh-circles'){ try{syncPairsToCircles();}catch(e){} try{renderCircles();}catch(e){} try{gdRenderList();}catch(e){} }   // was never re-rendered → circles list + toggles appeared empty
  if(id==='sh-prof'){ try{syncPairsToCircles();}catch(e){} try{renderProfile();}catch(e){} try{renderProfile2();}catch(e){} try{renderCircles();}catch(e){} }
@@ -12206,7 +12223,7 @@ document.addEventListener('keydown',e=>{
  // Escape closes open sheet
  if(e.key==='Escape'){
  const open=document.querySelector('.sheet.open');
- if(open)open.classList.remove('open');
+ if(open)(function(){ try{ readAloudStop(); }catch(e){} })(), open.classList.remove('open');
  closeDD();
  }
 });
@@ -12216,7 +12233,7 @@ document.addEventListener('keydown',e=>{
 ═══════════════════════════════════ */
 // Load persisted state, apply settings, then language.
 loadStore();
-try{ readApply(); }catch(e){}   /* v415: reading settings before the first paint, so nothing reflows under the user */
+try{ readApply(); }catch(e){}   /* v412: reading settings before the first paint, so nothing reflows under the user */
 shakeMigrate();   /* v337: Shake-to-SOS off by default; existing users keep it at the safe level */
 /* v380: the gate is a rule, not a setting, so it is re-asserted on every boot and not left to a
    one-shot migration. A phone that ran v378 and tapped the old toggle off kept btnGate:false at
@@ -18424,7 +18441,7 @@ var DRILL_BANK=[
 ['law','שלחת דיווח ואז הסתבר שטעית. מה עושים?',['מבטלים מיד ומעדכנים את מי שקיבל - דיווח כוזב ביודעין לרשויות הוא עבירה פלילית','משאירים, ליתר ביטחון','מוחקים את האפליקציה','לא עושים כלום, זה יתבטל לבד'],'You sent a report and then realised you were wrong. What now?',['Cancel it at once and tell whoever received it - knowingly filing a false report to the authorities is a criminal offence','Leave it, just in case','Delete the app','Do nothing, it will expire by itself'],'ביטול מהיר שומר על אמינות המערכת ועל אנשים שגויסו לחינם. טעות בתום לב היא לא עבירה. להשאיר אותה ביודעין שולח אנשים לחינם ופוגע באמון - ודיווח כוזב ביודעין לרשויות הוא עבירה.','A quick cancel protects the system and the people who turned out for nothing. An honest mistake is not an offence. Knowingly leaving it up sends people out for nothing and costs you their trust - and a knowingly false report to the authorities is an offence.','أرسلت بلاغا ثم تبين أنك كنت مخطئا. ماذا تفعل؟',['ألغه فورا وأبلغ من تلقاه - تقديم بلاغ كاذب عن قصد إلى السلطات جريمة','اتركه احتياطا','احذف التطبيق','لا تفعل شيئا، سينتهي وحده'],'الإلغاء السريع يحمي مصداقية النظام والناس الذين استُنفروا بلا داع. الخطأ بحسن نية ليس جريمة. وتركه عن علم يستنفر الناس بلا داع ويضر بالثقة - والبلاغ الكاذب عن علم إلى السلطات جريمة.'],
 ['law','מתי מותר להשתמש בכוח?',['רק כוח סביר ומיידי כדי להגן על עצמך או על אדם אחר מפני סכנה ממשית - לא ענישה ולא נקמה','כשברור שהאדם אשם','כשהוא ניסה לברוח','כשהוא העליב אותך'],'When may you use force?',['Only reasonable, immediate force to protect yourself or someone else from a real danger - never as punishment or revenge','When it is obvious the person is guilty','When they tried to run away','When they insulted you'],'הגנה עצמית מוגבלת לסכנה מיידית ולכוח סביר. מעבר לכך זו עבירה, גם אם צדקת בחשד. וברוב המקרים עדיף לא להתערב פיזית בכלל - לתעד, לשמור מרחק ולהזעיק 100.','Self-defence is limited to immediate danger and reasonable force. Beyond that it is an offence, even if your suspicion was right. And in most cases it is better not to step in physically at all - document, keep your distance and call 100.','متى يجوز استخدام القوة؟',['فقط قوة معقولة وفورية لحماية نفسك أو غيرك من خطر حقيقي - لا عقابا ولا انتقاما','عندما يكون واضحا أن الشخص مذنب','عندما يحاول الهرب','عندما يهينك'],'الدفاع عن النفس محدود بالخطر الفوري والقوة المعقولة. ما عدا ذلك جريمة، حتى لو كانت شبهتك صحيحة. وفي معظم الحالات الأفضل عدم التدخل جسديا إطلاقا - التوثيق والابتعاد والاتصال بـ100.'],
 ['law','מה SHOMER הוא, ומה הוא לא?',['כלי שמזעיק אנשים שאת/ה בוחר/ת ומוסיף מידע - הוא לא שירות חירום, לא מוקד, ולא מקנה סמכות','תחליף למשטרה ולמד"א','שירות אבטחה שמגיע אליך','גוף שמאשר פעולות אכיפה'],'What is SHOMER, and what is it not?',['A tool that alerts people you chose and adds information - it is not an emergency service, not a dispatch centre, and it grants no authority','A replacement for police and ambulance','A security service that comes to you','A body that authorises enforcement'],'בכל אירוע אמיתי מתקשרים 100 / 101 / 102. SHOMER עוזר להם להגיע מהר יותר - ולא מחליף אותם.','In any real incident call 100 / 101 / 102. SHOMER helps them arrive faster - it does not replace them.','ما هو شومير وما ليس هو؟',['أداة تنبه أشخاصا اخترتهم وتضيف معلومات - ليس خدمة طوارئ ولا مركز استدعاء ولا يمنح أي صلاحية','بديل عن الشرطة والإسعاف','خدمة حراسة تأتي إليك','جهة تصادق على إجراءات إنفاذ'],'في أي حادث حقيقي اتصل بـ 100 / 101 / 102. شومير يساعدها على الوصول أسرع ولا يحل محلها.'],
-/* v415 - Dave, 23.11, asked for legal dos and don'ts. v413 answered with five cards teaching
+/* v412 - Dave, 23.11, asked for legal dos and don'ts. v413 answered with five cards teaching
    when a civilian may detain under s.75, how much force, and what to do afterwards. That
    contradicted our own terms of service, which say in all three languages: do not confront
    anyone, do not physically intervene, and do not attempt to detain any person. Six review
