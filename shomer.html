@@ -6192,7 +6192,7 @@ var FC_LINES={
 };
 function silentSOS(trigger){
   if(typeof sosPhase!=='undefined' && sosPhase!=='idle') return false;
-  window._sosSilent=true; sosActive=true; curSosTrigger=trigger||'duress';
+  window._sosSilent=true; sosActive=true; try{ geoRetune(); }catch(e){} curSosTrigger=trigger||'duress';
   try{ activateSOS(); }catch(e){}
   return true;
 }
@@ -6784,7 +6784,7 @@ function cancelCountdown(){
  window._sosPractice=false;
  try{ simpleHush(); }catch(e){}
  clearInterval(sosCdTimer); sosGraceClear(); stopSosAlarm();
- sosPhase='idle'; sosActive=false; window._sosSilent=false;
+ sosPhase='idle'; sosActive=false; try{ geoRetune(); }catch(e){} window._sosSilent=false;
  try{ document.body.classList.remove('sos-live'); }catch(e){}   /* v411 */
  /* v386: and clear the shake re-fire stamp. The native side deliberately clears its own on a
     cancel, so that a situation turning real right after a false alarm still sends - and the web
@@ -7733,6 +7733,24 @@ function locMe(){ try{ setTimeout(essRefreshNear, 900); }catch(e){}
 }
 /* Live tracking - the blue "me" dot follows the real device position. */
 let geoWatchId=null;
+/* v415: does anything need a precise fix right now? */
+function geoWantsAccurate(){
+  try{
+    if(typeof sosActive!=='undefined' && sosActive) return true;
+    if(window.SOSBUS&&SOSBUS.mine&&Object.keys(SOSBUS.mine).some(function(k){return SOSBUS.mine[k]===1;})) return true;
+    if(SS&&SS.settings&&SS.settings.toggles&&SS.settings.toggles.liveshare) return true;
+  }catch(e){}
+  return false;
+}
+var _geoAcc=null;
+function geoRetune(){
+  try{
+    var want=geoWantsAccurate();
+    if(want===_geoAcc) return;            /* never restart the watch for nothing */
+    _geoAcc=want;
+    if(geoWatchId!=null){ try{ navigator.geolocation.clearWatch(geoWatchId); }catch(e){} geoWatchId=null; startGeoWatch(); }
+  }catch(e){}
+}
 function startGeoWatch(){
  if(!navigator.geolocation||geoWatchId!==null) return;
  try{ ensureNativeGeo().then(function(){ _startGeoWatchNow(); }); }catch(e){ _startGeoWatchNow(); }
@@ -7754,7 +7772,10 @@ function _startGeoWatchNow(){
  locBarHide();
  },
  err=>{ if(err&&err.code===1){ try{ navigator.geolocation.clearWatch(geoWatchId); }catch(_e){} geoWatchId=null; locBarShow(); } },   /* v297: no permission = say so, and allow a retry (it used to fail silently forever) */
- {enableHighAccuracy:true,timeout:20000,maximumAge:5000}
+ /* v415: coarse while idle, precise the moment it matters. A network fix keeps the map honest
+    at ~50m and leaves the GPS radio off; geoWantsAccurate() turns it back on for a live SOS or
+    while actively sharing, and geoRetune() restarts the watch so the change takes effect. */
+ {enableHighAccuracy:geoWantsAccurate(),timeout:20000,maximumAge:geoWantsAccurate()?5000:60000}
  );
  }catch(e){}
  /* still no position after 40s (GPS off / no permission) - tell the user they are invisible */
@@ -7983,7 +8004,7 @@ function injectSOSCard(){
  inner.appendChild(top);inner.appendChild(meta);inner.appendChild(desc);
  div.appendChild(inner);
  l.insertBefore(div,l.firstChild);
- newUpd++;updBdg();
+ updBdg();   /* v415: the badge counts what the list holds, not arrivals */
 }
 function injectCard(d,silent){
  const l=document.getElementById('upd-list');
@@ -8011,7 +8032,7 @@ function injectCard(d,silent){
  inner.appendChild(top);inner.appendChild(meta);inner.appendChild(desc);inner.appendChild(hint);
  div.appendChild(inner);
  l.insertBefore(div,l.firstChild);
- if(!silent){newUpd++;updBdg();}
+ if(!silent){updBdg();}
 }
 var UPD_FILTER='all';
 function chipOn(btn){
@@ -8092,12 +8113,26 @@ function applyUpdFilter(){
     box.appendChild(r);
   });
 }
+function updSeenInit(){
+  /* v415: a new install has seen nothing, which is not the same as everything being new. Anchor
+     the "seen" mark at first run so the bell starts quiet. */
+  try{ if(!localStorage.getItem('shomerEvSeen')) localStorage.setItem('shomerEvSeen',String(Date.now())); }catch(e){}
+}
+function updUnseen(){
+  /* v415: derived from updItems() - the same call that builds the list. A badge counted anywhere
+     else promises items the list cannot show, which is exactly what a tester reported. */
+  try{
+    var seen=0; try{ seen=+(localStorage.getItem('shomerEvSeen')||0)||0; }catch(e){}
+    return updItems().filter(function(it){ return it.ts && it.ts>seen; }).length;
+  }catch(e){ return 0; }
+}
 function updBdg(){
  const b=document.getElementById('bell-dot'), btn=b&&b.closest('.hdr-bell');
  let sos=false; try{ var _m=(window.SOSBUS&&SOSBUS.mine)||{}; sos=Object.keys(_m).some(function(k){return _m[k]===1}); }catch(e){}   /* an active SOS in your circle keeps the bell red until it ends */
- const on=newUpd>0||sos;
- if(b){b.classList.toggle('on',on); b.textContent=newUpd>0?(newUpd>9?'9+':String(newUpd)):(sos?'SOS':'');}
- if(btn){btn.classList.toggle('has-new',newUpd>0&&!sos); btn.classList.toggle('has-sos',sos);}
+ var n=updUnseen(); newUpd=n;          /* keep the old counter in step for anything still reading it */
+ const on=n>0||sos;
+ if(b){b.classList.toggle('on',on); b.textContent=n>0?(n>9?'9+':String(n)):(sos?'SOS':'');}
+ if(btn){btn.classList.toggle('has-new',n>0&&!sos); btn.classList.toggle('has-sos',sos);}
 }
 
 /* ═══════════════════════════════════
@@ -8296,6 +8331,28 @@ var _shPopSkip=false;
 function shHistPush(){ try{ if(!(history.state&&history.state.shSheet)) history.pushState({shSheet:1},''); }catch(e){} }
 var _SH_LAYERS='.sheet.open, .ff-pick.on, #rep-sheet';   /* v293: phone Back also closes pop-up windows, not only full screens */
 function shHistDrop(){ try{ if(history.state&&history.state.shSheet&&!document.querySelector(_SH_LAYERS)){ _shPopSkip=true; history.back(); } }catch(e){} }
+/* v415: Android Back, handled explicitly. Close whatever is open; when nothing is, leave the
+   app the way every other Android app does rather than silently swallowing the press. */
+try{
+  var _A=(window.Capacitor&&Capacitor.Plugins&&Capacitor.Plugins.App)||null;
+  if(_A&&_A.addListener){
+    _A.addListener('backButton',function(){
+      try{
+        var r=document.getElementById('rep-sheet'),
+            f=document.querySelector('.ff-pick.on'),
+            o=document.querySelector('.sheet.open'),
+            d=document.querySelector('.dd.open, .menu.open');
+        if(r){ r.remove(); return; }
+        if(f){ if(f.id==='gd-consent'&&typeof gdConsentCancel==='function') gdConsentCancel(); else gdClose(f.id); return; }
+        if(o){ if(SCR_STACK.length && o.querySelector('.sh-back')) goBack(o.id); else { SCR_STACK.length=0; cl(o.id); } return; }
+        if(d&&typeof closeDD==='function'){ closeDD(); return; }
+        /* nothing open. Never exit out from under a live alarm. */
+        if(typeof sosActive!=='undefined' && sosActive){ try{ toast(currentLang==='en'?'An SOS is running. Cancel it first.':currentLang==='ar'?'هناك نداء استغاثة جارٍ. ألغه أولا.':'יש SOS פעיל. בטלו אותו קודם.','amb'); }catch(e){} return; }
+        if(_A.minimizeApp) _A.minimizeApp(); else if(_A.exitApp) _A.exitApp();
+      }catch(e){ try{ _A.exitApp&&_A.exitApp(); }catch(_){} }
+    });
+  }
+}catch(e){}
 try{ window.addEventListener('popstate',function(){
   if(_shPopSkip){ _shPopSkip=false; return; }
   try{
@@ -12383,7 +12440,7 @@ document.addEventListener('keydown',e=>{
 ═══════════════════════════════════ */
 // Load persisted state, apply settings, then language.
 loadStore();
-try{ readApply(); }catch(e){} try{ readAloudMainMount(); }catch(e){}   /* v412: reading settings before the first paint, so nothing reflows under the user */
+try{ updSeenInit(); }catch(e){} try{ readApply(); }catch(e){} try{ readAloudMainMount(); }catch(e){}   /* v412: reading settings before the first paint, so nothing reflows under the user */
 shakeMigrate();   /* v337: Shake-to-SOS off by default; existing users keep it at the safe level */
 /* v380: the gate is a rule, not a setting, so it is re-asserted on every boot and not left to a
    one-shot migration. A phone that ran v378 and tapped the old toggle off kept btnGate:false at
@@ -12632,7 +12689,7 @@ try{ hydrateIcons(document); }catch(e){}
 /* Loaded-build version - shown in the diagnostic panel so a phone can prove
    whether it's on the latest build or a STALE cached one. Keep in lock-step
    with sw.js SW_VERSION on every deploy. */
-var APP_VER='v414';
+var APP_VER='v415';
 var FB={ready:false,uid:null,db:null,_presTimer:null,connected:false,listening:false,pushState:'default',near:0,swVer:'?',
   authState:'connecting',sdkLoaded:false,persist:'',permErr:null,err:null,wsProbe:'',csp:''};
 /* Always log connection diagnostics to the console so the real failure can be SEEN in Chrome. */

@@ -1,17 +1,20 @@
 {
-"v": "v414",
+"v": "v415",
 "notes": {
 "he": [
-"כפתור „צריך/ה עזרה” ירד מעל כפתור ה-SOS - עכשיו סמל של סימן שאלה בעמודה השמאלית, מעל הזכוכית המגדלת",
-"שום דבר שאינו חירום לא יושב יותר ליד כפתור ה-SOS"
+"צריכת סוללה: ה-GPS עובר לדיוק גבוה רק כשיש SOS או שיתוף מיקום פעיל - לא כל הזמן",
+"פעמון ההתראות סופר עכשיו רק מה שבאמת ברשימה",
+"כפתור ה-back יוצא מהאפליקציה כשאין חלון פתוח"
 ],
 "en": [
-"The \"need a hand\" button is no longer above the SOS button - it is now a question-mark icon in the left column, above the magnifier",
-"Nothing non-urgent sits next to the SOS button any more"
+"Battery: GPS switches to high accuracy only during an SOS or active sharing - not all the time",
+"The bell now counts only what the list actually holds",
+"The back button leaves the app when nothing is open"
 ],
 "ar": [
-"لم يعد زر «أحتاج مساعدة» فوق زر الاستغاثة - صار أيقونة علامة استفهام في العمود الأيسر، فوق العدسة",
-"لم يعد أي شيء غير طارئ بجوار زر الاستغاثة"
+"البطارية: ينتقل GPS إلى الدقة العالية فقط أثناء استغاثة أو مشاركة نشطة - لا طوال الوقت",
+"يَعُدّ الجرس الآن ما تحتويه القائمة فعليًا فقط",
+"زر الرجوع يخرج من التطبيق عندما لا تكون هناك نافذة مفتوحة"
 ]
 }
 }
