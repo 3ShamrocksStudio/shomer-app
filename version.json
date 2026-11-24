@@ -1,20 +1,23 @@
 {
-"v": "v412",
+"v": "v413",
 "notes": {
 "he": [
-"קריאה נוחה: ריווח גדול יותר בין אותיות ומילים, שורות מרווחות, טקסט גדול יותר ורקע רך - בהגדרות, לכל גיל",
-"הקראה: כפתור רמקול שמקריא מה יש במסך ומה אפשר לעשות בו",
-"כפתור ה-SOS והמפה לא משתנים מההגדרות האלה בכלל"
+"זיהוי גרסת אנדרואיד ישנה - האפליקציה אומרת עכשיו במפורש כשהשכבה הנייטיבית מיושנת מכדי להשמיע צפירה",
+"קריאה נוחה והקראה - בהגדרות"
 ],
 "en": [
-"Easy reading: wider spacing between letters and words, roomier lines, larger text and a softer background - in Settings, at any age",
-"Read aloud: a speaker button that reads out what is on the screen and what you can do there",
-"The SOS button and the map are not changed by any of these settings"
+"Detects an out-of-date Android build - the app now says so plainly when the native layer is too old to sound the siren",
+"Easy reading and read-aloud - in Settings"
 ],
 "ar": [
-"قراءة مريحة: تباعد أوسع بين الحروف والكلمات، وأسطر أرحب، ونص أكبر، وخلفية أهدأ - في الإعدادات، لكل الأعمار",
-"قراءة بصوت: زر مكبّر صوت يقرأ ما في الشاشة وما يمكنك فعله فيها",
-"زر الاستغاثة والخريطة لا يتغيّران بأي من هذه الإعدادات"
-]
+"يكتشف إصدار أندرويد قديمًا - يقول التطبيق الآن بوضوح عندما تكون الطبقة الأصلية أقدم من أن تُشغّل الصفّارة",
+"قراءة مريحة وقراءة بصوت - في الإعدادات"
+],
+"important": {
+"id": "native-stale-2026-11-24",
+"he": "חשוב: עדכנו את SHOMER.\n\nאם גרסת האנדרואיד שלכם ישנה, ניעור לבד עלול להפעיל SOS, ולחיצה+ניעור שולחת הודעה בלי צפירה ובלי להתריע לשומרים.\n\nעדכנו מגוגל פליי, או התקינו מ-shomer-app.co.il/SHOMER.apk",
+"en": "Important: update SHOMER.\n\nIf your Android build is out of date, a shake alone can start an SOS, and a button + shake sends a message with no siren and no alert to your SHOMERs.\n\nUpdate from Google Play, or install from shomer-app.co.il/SHOMER.apk",
+"ar": "مهم: حدِّث شومير.\n\nإذا كان إصدار أندرويد لديك قديمًا، فقد يُطلق الهزّ وحده استغاثة، ويرسل مفتاح+هزّ رسالة بلا صفّارة وبلا تنبيه لحُرّاسك.\n\nحدِّث من Google Play أو ثبّت من shomer-app.co.il/SHOMER.apk"
+}
 }
 }

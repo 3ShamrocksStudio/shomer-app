@@ -6380,6 +6380,27 @@ var NATIVE_MIN=387;
 /* true only when we KNOW the shell is too old: inside the app, with a version it reported.
    null/undefined means not asked yet or not native - never claim "too old" on a guess. */
 function nativeTooOld(){ try{ return shomerIsNative() && typeof window._nativePluginVer==='number' && window._nativePluginVer < NATIVE_MIN; }catch(e){ return false; } }
+/* v413: a stale native layer is not a version nag - on that build a shake alone can fire an SOS,
+   and button+shake produces a message with no siren and nobody alerted. Say so once, plainly,
+   and keep saying it until the shell is current. */
+var _staleShown=false;
+function nativeStaleNotice(){
+  try{
+    if(_staleShown || !nativeTooOld()) return;
+    _staleShown=true;
+    var he='גרסת האנדרואיד שלכם ישנה.\n\nבגרסה הזו: ניעור לבד עלול להפעיל SOS, ולחיצה+ניעור שולחת הודעה בלי צפירה ובלי להתריע לשומרים.\n\nעדכנו מגוגל פליי, או התקינו מ-shomer-app.co.il/SHOMER.apk';
+    var en='Your Android build is out of date.\n\nOn this build a shake alone can start an SOS, and a button + shake sends a message with no siren and no alert to your SHOMERs.\n\nUpdate from Google Play, or install from shomer-app.co.il/SHOMER.apk';
+    var ar='إصدار أندرويد لديك قديم.\n\nفي هذا الإصدار: الهزّ وحده قد يُطلق استغاثة، ومفتاح+هزّ يرسل رسالة بلا صفّارة وبلا تنبيه لحُرّاسك.\n\nحدِّث من Google Play أو ثبّت من shomer-app.co.il/SHOMER.apk';
+    var msg=currentLang==='en'?en:currentLang==='ar'?ar:he;
+    var shown=false;
+    try{ if(typeof importantShow==='function') shown=!!importantShow({he:he,en:en,ar:ar}); }catch(e){}
+    /* the modal takes the session's single popup slot and can decline. A refused warning about a
+       build that cannot sound its siren must not vanish, so fall back to a toast, and leave the
+       version row amber either way. */
+    if(!shown){ try{ toast(msg.split('\n')[0],'amb'); }catch(e){} _staleShown=false; }
+    try{ console.warn('[SHOMER] native build too old:',window._nativePluginVer,'<',NATIVE_MIN); }catch(e){}
+  }catch(e){}
+}
 function shomerIsNative(){ try{ return !!(window.Capacitor && window.Capacitor.isNativePlatform && window.Capacitor.isNativePlatform()); }catch(e){ return false; } }
 /* v288: arm the locked-phone shake detector only when the user's switch is on (called once settings are loaded) */
 /* v337: the native service gets the user's switch + level. It keeps running either way (it also carries
@@ -6415,7 +6436,8 @@ function shakeNativeSync(){ try{ var p=shomerNativePlugin(); if(!p) return;
     /* v414: a shell with no setShakeConfig is PROOF of an old build, not a guess - without this
        the oldest shells, the ones that most need the warning, still showed a green "up to date". */
     try{ if(!p.setShakeConfig){ window._nativePluginVer=0;
-      if(typeof window._verBadgeTxt==='string') updSetBadge(window._verBadgeTxt, window._verBadgeStale); } }catch(e){}
+      if(typeof window._verBadgeTxt==='string') updSetBadge(window._verBadgeTxt, window._verBadgeStale);
+      nativeStaleNotice(); } }catch(e){}
     old(!p.setShakeConfig); return; }   /* v381: hard only when the method itself is absent */
   /* v365: trust the ANSWER, not the presence of the plugin. The web layer updates itself from the
      website while the APK only changes on reinstall, so this page can be newer than the app around
@@ -6437,9 +6459,14 @@ function shakeNativeSync(){ try{ var p=shomerNativePlugin(); if(!p) return;
     /* v414: remember what the Android shell actually reports. Dave, 23.11: two phones, build 57
        and build 60, BOTH saying "up to date" - true of the web layer and useless about the part
        that decides whether button+shake fires. The number was on screen and meant nothing. */
-    window._nativePluginVer = (v && typeof v.version==='number') ? v.version : null;
+    /* v413: a plugin that answers but reports no version PREDATES version reporting (build 69),
+       so it is provably below the floor. Treating it as unknown is what left 10 testers on an
+       October native layer being told they were up to date - no siren, no fan-out, and a bare
+       shake firing an SOS, none of which this code does. */
+    window._nativePluginVer = (v && typeof v.version==='number') ? v.version : 0;
     /* the badge is painted before this answer arrives, so repaint it now that we know */
     try{ if(nativeTooOld() && typeof window._verBadgeTxt==='string') updSetBadge(window._verBadgeTxt, window._verBadgeStale); }catch(e){}
+    try{ nativeStaleNotice(); }catch(e){}
     window._nativeGateHard = !!(v && v.version >= NATIVE_MIN);
     window._nativeGateOk=false;
     en();
@@ -12603,7 +12630,7 @@ try{ hydrateIcons(document); }catch(e){}
 /* Loaded-build version - shown in the diagnostic panel so a phone can prove
    whether it's on the latest build or a STALE cached one. Keep in lock-step
    with sw.js SW_VERSION on every deploy. */
-var APP_VER='v412';
+var APP_VER='v413';
 var FB={ready:false,uid:null,db:null,_presTimer:null,connected:false,listening:false,pushState:'default',near:0,swVer:'?',
   authState:'connecting',sdkLoaded:false,persist:'',permErr:null,err:null,wsProbe:'',csp:''};
 /* Always log connection diagnostics to the console so the real failure can be SEEN in Chrome. */
