@@ -1,17 +1,14 @@
 {
-"v": "v416",
+"v": "v417",
 "notes": {
 "he": [
-"סימן השאלה במפה הוא עכשיו כפתור עזרה - מסביר ומקריא מה יש במסך, ולא שולח כלום",
-"בקשת עזרה (לא חירום) קיבלה סמל של כף יד, כדי שלא יתבלבל עם עזרה"
+"כפתור „צריך/ה עזרה” חזר להיות עם כיתוב - במקום החדש והבטוח, הרחק מכפתור ה-SOS"
 ],
 "en": [
-"The question mark on the map is now a help button - it explains and reads out what is on the screen, and sends nothing",
-"\"Need a hand\" (non-emergency) now has a raised-hand icon so it cannot be mistaken for help"
+"The \"need a hand\" button has its label back - in its new, safe spot, well away from the SOS button"
 ],
 "ar": [
-"علامة الاستفهام على الخريطة صارت زر مساعدة - تشرح وتقرأ ما في الشاشة، ولا ترسل شيئًا",
-"«أحتاج مساعدة» (غير طارئ) صار له أيقونة يد مرفوعة كي لا يختلط بزر المساعدة"
+"عاد زر «أحتاج مساعدة» بنصّه - في مكانه الجديد الآمن، بعيدًا عن زر الاستغاثة"
 ]
 }
 }

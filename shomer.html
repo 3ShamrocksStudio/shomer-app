@@ -12703,7 +12703,7 @@ try{ hydrateIcons(document); }catch(e){}
 /* Loaded-build version - shown in the diagnostic panel so a phone can prove
    whether it's on the latest build or a STALE cached one. Keep in lock-step
    with sw.js SW_VERSION on every deploy. */
-var APP_VER='v416';
+var APP_VER='v417';
 var FB={ready:false,uid:null,db:null,_presTimer:null,connected:false,listening:false,pushState:'default',near:0,swVer:'?',
   authState:'connecting',sdkLoaded:false,persist:'',permErr:null,err:null,wsProbe:'',csp:''};
 /* Always log connection diagnostics to the console so the real failure can be SEEN in Chrome. */
@@ -17813,18 +17813,20 @@ html[dir="rtl"] .sh-back svg{transform:scaleX(-1)}
    z-index: restoring pointer events alone would have carved a dead zone out of the emergency
    button. So it gets its own row ABOVE the SOS, clear of it, and its own pointer events. */
 /* v414: the left FAB column, bottom to top - locate(+14), magnifier(+70), ask for a hand(+126),
-   read aloud(+182). Nothing non-urgent goes near the SOS circle again. */
+   help(+182). Nothing non-urgent goes near the SOS circle again.
+   v417: this one keeps its words. The round icons beside it are map controls with conventions
+   everyone knows; this one contacts actual people, so it says so. */
 .assist-btn{position:absolute;left:12px;bottom:calc(var(--nav) + 126px);
-  width:48px;height:48px;border-radius:50%;box-shadow:0 4px 14px rgba(0,0,0,.4);
+  height:48px;border-radius:999px;padding:0 15px 0 13px;gap:8px;box-shadow:0 4px 14px rgba(0,0,0,.4);
   pointer-events:auto;
   display:inline-flex;align-items:center;justify-content:center;
   border:1px solid rgba(224,168,40,.55);background:rgba(10,22,40,.92);color:#E8C05A;
   backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);
   cursor:pointer;z-index:400;-webkit-tap-highlight-color:transparent;transition:.14s}
-.assist-btn svg{width:24px;height:24px;flex:0 0 24px}
+.assist-btn svg{width:22px;height:22px;flex:0 0 22px}
 .assist-btn:active{background:rgba(224,168,40,.22)}
 .assist-btn:focus-visible{outline:2px solid var(--gold);outline-offset:3px}
-.assist-btn #assist-lbl{display:none}   /* icon only: the name lives in aria-label and title */
+.assist-btn #assist-lbl{font:800 12px/1 inherit;letter-spacing:.2px;white-space:nowrap}
 /* hidden while an SOS is running - an emergency screen offers one action, not two */
 body.sos-live .assist-btn{display:none}
 
