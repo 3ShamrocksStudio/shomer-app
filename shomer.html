@@ -720,6 +720,53 @@ body.sheet-open .ff-fab{opacity:0;pointer-events:none;}
 .sh-x{width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,#C09020,#E0A828 60%,#F5C840);border:0;display:flex;align-items:center;justify-content:center;font-size:17px;color:#23170a;font-weight:800;transition:transform .12s,filter .12s;box-shadow:0 4px 12px rgba(224,168,40,.35);}.sh-x:active{transform:scale(.92)}
 .sh-x:hover{background:var(--n5);}
 .sh-body{overflow-y:auto;-webkit-overflow-scrolling:touch;flex:1;padding:14px 16px 36px;}
+/* ══════════ v415 · EASY READING (קריאה נוחה) ══════════
+   Dave, 24.11: a tester is dyslexic and struggles with orientation and with what the app is for.
+   What the evidence actually says, which is not what you would guess:
+     · SPACING is the strongest lever. Zorzi et al. 2012 (PNAS): extra-large letter spacing
+       improved reading speed and accuracy in dyslexic children on first exposure, regardless of
+       typeface. That is why spacing here goes further than any style guide would suggest.
+     · Dyslexia-specific fonts do NOT work. Wery & Diliberto 2017 found OpenDyslexic no better
+       than Arial or Times, with nobody preferring it; Azzarello et al. 2026, a meta-analysis of
+       15 studies and 688 children, found an effect near zero. Marinus et al. 2016 found
+       Dyslexie's apparent gain vanished once Arial was given the same spacing - the spacing was
+       doing the work, not the letterforms. So no novelty font ships here, and none is offered as
+       a fix. The app's own sans-serif stays.
+     · Rello & Baeza-Yates 2013 (eye-tracking): ordinary sans-serifs read best.
+     · Line height ~1.5, body text 16px+, left-aligned and never justified (British Dyslexia
+       Association), contrast >= 4.5:1 (WCAG 1.4.3).
+   The one principle every source agrees on is USER CONTROL, so all of it is adjustable and off
+   by default.
+   Scope: reading surfaces only. The map, the nav and the SOS button are deliberately untouched -
+   a panic control must never move or resize because a reading setting changed. */
+body.rd{ --rd-ls:0.055em; --rd-ws:0.17em; --rd-lh:1.65; --rd-zoom:1; }
+/* the levers, on text the user reads rather than taps in a hurry */
+body.rd .sh-body, body.rd .sh-body *:not(svg):not(path):not(circle),
+body.rd .gd-step, body.rd .dr-q, body.rd .dr-opt, body.rd .dr-why, body.rd .legal-b, body.rd .legal-b *{
+  letter-spacing:var(--rd-ls)!important; word-spacing:var(--rd-ws)!important;
+  line-height:var(--rd-lh)!important; text-align:start!important;
+}
+body.rd .sh-body{ zoom:var(--rd-zoom); }
+body.rd .gd-wrap, body.rd .drill-wrap{ zoom:var(--rd-zoom); }
+/* uppercase is harder to decode - word shape is part of how a word is recognised */
+body.rd .sh-body [style*="uppercase"], body.rd .sh-ttl{ text-transform:none!important; }
+/* a softer page reduces the visual stress some readers get from maximum contrast, without
+   dropping below the 4.5:1 the guidelines require */
+body.rd.rd-soft .sheet{ background:#12161f; }
+body.rd.rd-soft .sh-body{ color:#EDE6D8; }
+body.rd.rd-soft .sr-sb, body.rd.rd-soft .legal-b{ color:#C8C2B6; }
+/* the control itself */
+.rd-pv{margin:10px 0 2px;padding:12px 13px;border:1px solid var(--b2);border-radius:12px;background:rgba(255,255,255,.03);
+  letter-spacing:var(--rd-ls,0);word-spacing:var(--rd-ws,0);line-height:var(--rd-lh,1.5);font-size:14px;color:var(--tx0)}
+.rd-sl{display:flex;align-items:center;gap:10px;margin:8px 0}
+.rd-sl label{flex:0 0 88px;font-size:12px;color:var(--tx2)}
+.rd-sl input[type=range]{flex:1}
+.rd-sl b{flex:0 0 38px;text-align:end;font-size:12px;color:var(--g3);font-weight:700}
+.rd-say{width:34px;height:34px;border-radius:50%;border:1px solid var(--b2);background:rgba(255,255,255,.04);
+  color:var(--g3);display:inline-flex;align-items:center;justify-content:center;cursor:pointer;margin-inline-end:6px;flex:0 0 auto}
+.rd-say:hover{background:rgba(255,255,255,.08)}
+.rd-say.on{background:var(--g3);color:#1a1205;border-color:transparent}
+.rd-say .ic{width:18px;height:18px}
 /* section label */
 .sec-cap{font-size:11px;font-weight:700;letter-spacing:.3px;color:var(--g2);margin-bottom:9px;display:flex;align-items:center;gap:7px;}
 /* Settings category band - groups sub-sections into clear, scannable categories */
@@ -1879,7 +1926,7 @@ body.otp-active .ob-steps{display:none!important;}
   <div class="dd-ic c-prof" aria-hidden="true"><svg class="ic" viewBox="0 0 24 24"><circle cx="12" cy="8" r="3.7" fill="none" stroke="currentColor" stroke-width="2"/><path d="M5.5 20a6.5 6.5 0 0 1 13 0" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></div>
   <span id="dd-prof" data-he="פרופיל SH✡MER" data-en="SH✡MER Profile">פרופיל SH✡MER</span>
  </button>
- <button class="ddr" onclick="op('sh-set');closeDD();setTimeout(setCatInit,30)" role="menuitem">
+ <button class="ddr" onclick="op('sh-set');closeDD();setTimeout(function(){setCatInit();readOnSettingsOpen();},30)" role="menuitem">
   <div class="dd-ic c-set" aria-hidden="true"><svg class="ic" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3" fill="none" stroke="currentColor" stroke-width="2"/><path d="M12 2.5l1.3 2.3 2.6-.4.5 2.6 2.3 1.3-1 2.4 1 2.4-2.3 1.3-.5 2.6-2.6-.4L12 21.5l-1.3-2.3-2.6.4-.5-2.6L5.3 15.7l1-2.4-1-2.4 2.3-1.3.5-2.6 2.6.4Z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></svg></div>
   <span id="dd-set" data-he="הגדרות" data-en="Settings">הגדרות</span>
  </button>
@@ -2239,6 +2286,19 @@ body.otp-active .ob-steps{display:none!important;}
   <div class="set-row sm-only" onclick="cl('sh-set');simpleAddGuardian()" role="button" tabindex="0"><div class="sr-l"><div><div class="sr-nm" data-he="הוספת שומרים" data-en="Add a SHOMER" data-ar="إضافة حارس">הוספת שומרים</div><div class="sr-sb" data-he="בני המשפחה יכולים להוסיף את עצמם כאן, בטלפון הזה." data-en="Family members can add themselves here, on this phone." data-ar="يمكن لأفراد العائلة إضافة أنفسهم هنا، على هذا الهاتف.">בני המשפחה יכולים להוסיף את עצמם כאן, בטלפון הזה.</div></div></div><span style="color:var(--tx3);font-size:18px">›</span></div>
   <div class="set-row sm-only" onclick="simpleOpenPlaces()" role="button" tabindex="0"><div class="sr-l"><div><div class="sr-nm" data-he="הבית והעבודה: קומה ודירה" data-en="Home and work: floor and apartment" data-ar="البيت والعمل: الطابق والشقة">הבית והעבודה: קומה ודירה</div><div class="sr-sb" data-he="בזמן SOS השומרים יראו באיזו קומה אתם." data-en="During an SOS your SHOMERs see which floor you are on." data-ar="أثناء SOS يرى حُرّاسكم في أي طابق أنتم.">בזמן SOS השומרים יראו באיזו קומה אתם.</div></div></div><span style="color:var(--tx3);font-size:18px">›</span></div>
   <div class="set-row" onclick="ageAskOpen(true)" role="button" tabindex="0"><div class="sr-l"><div><div class="sr-nm" data-he="הגיל שלי" data-en="My age" data-ar="عمري">הגיל שלי</div><div class="sr-sb" data-he="פרטי. רק אתם רואים." data-en="Private. Only you see it." data-ar="خاص. أنتم فقط ترونه.">פרטי. רק אתם רואים.</div></div></div><span id="smp-age-st" dir="ltr" style="font-size:15px;font-weight:800;color:var(--g3);white-space:nowrap"></span></div>
+ </div>
+ <!-- v415 · Easy reading. Its own category, above notifications: a reader who needs it should
+      not have to read through four groups of settings to find the setting that helps them read. -->
+ <div class="set-cat"><div class="set-cat-ic"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5.5h7a2.5 2.5 0 0 1 2.5 2.5v11A2 2 0 0 0 11.5 17H4z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><path d="M20 5.5h-7A2.5 2.5 0 0 0 10.5 8v11a2 2 0 0 1 2-2H20z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></svg></div><div class="set-cat-t" data-he="קריאה נוחה" data-en="Easy reading" data-ar="قراءة مريحة">קריאה נוחה</div></div>
+ <div class="set-grp">
+  <div class="set-row"><div class="sr-l"><div><div class="sr-nm" data-he="קריאה נוחה" data-en="Easy reading" data-ar="قراءة مريحة">קריאה נוחה</div><div class="sr-sb" data-he="ריווח גדול יותר בין אותיות ומילים, שורות מרווחות וטקסט גדול יותר. לא משנה את כפתור ה-SOS ולא את המפה." data-en="Wider spacing between letters and words, roomier lines and larger text. Does not change the SOS button or the map." data-ar="تباعد أوسع بين الحروف والكلمات، وأسطر أرحب ونص أكبر. لا يغيّر زر الاستغاثة ولا الخريطة.">ריווח גדול יותר בין אותיות ומילים, שורות מרווחות וטקסט גדול יותר. לא משנה את כפתור ה-SOS ולא את המפה.</div></div></div><div class="tog" id="rd-toggle" onclick="readSet('on',!readOn())" role="switch" aria-checked="false" aria-label="קריאה נוחה" tabindex="0"></div></div>
+  <div id="rd-opts" style="display:none">
+   <div class="rd-sl"><label data-he="גודל" data-en="Size" data-ar="الحجم">גודל</label><input type="range" id="rd-size" min="100" max="135" step="5" aria-label="גודל טקסט" oninput="readSet('size',this.value/100)"><b id="rd-size-v">100%</b></div>
+   <div class="rd-sl"><label data-he="ריווח" data-en="Spacing" data-ar="التباعد">ריווח</label><input type="range" id="rd-space" min="0" max="220" step="10" aria-label="ריווח אותיות ומילים" oninput="readSet('space',this.value/100)"><b id="rd-space-v">100%</b></div>
+   <div class="rd-pv" id="rd-preview" data-he="כך ייראה הטקסט באפליקציה. גררו עד שנוח לכם לקרוא." data-en="This is how text will look in the app. Drag until it is comfortable to read." data-ar="هكذا سيبدو النص في التطبيق. اسحب حتى تصبح القراءة مريحة.">כך ייראה הטקסט באפליקציה. גררו עד שנוח לכם לקרוא.</div>
+   <div class="set-row"><div class="sr-l"><div><div class="sr-nm" data-he="רקע רך" data-en="Softer background" data-ar="خلفية أهدأ">רקע רך</div><div class="sr-sb" data-he="פחות ניגודיות חדה. עוזר למי שהטקסט „קופץ” לו." data-en="Less harsh contrast. Helps if text seems to jump." data-ar="تباين أقل حدة. يساعد إذا بدا النص يقفز.">פחות ניגודיות חדה. עוזר למי שהטקסט „קופץ” לו.</div></div></div><div class="tog" id="rd-soft" onclick="readSet('soft',!readCfg().soft)" role="switch" aria-checked="false" aria-label="רקע רך" tabindex="0"></div></div>
+   <div class="set-row"><div class="sr-l"><div><div class="sr-nm" data-he="הקראה" data-en="Read aloud" data-ar="قراءة بصوت">הקראה</div><div class="sr-sb" data-he="כפתור רמקול בכל מסך מוקרא. מקריא מה המסך הזה ומה אפשר לעשות בו." data-en="A speaker button on every readable screen. It reads out what the screen is for and what you can do there." data-ar="زر مكبّر صوت في كل شاشة قابلة للقراءة. يقرأ ما هذه الشاشة وما يمكنك فعله فيها.">כפתור רמקול בכל מסך מוקרא. מקריא מה המסך הזה ומה אפשר לעשות בו.</div></div></div><div class="tog" id="rd-aloud" onclick="readSet('aloud',!readCfg().aloud)" role="switch" aria-checked="false" aria-label="הקראה" tabindex="0"></div></div>
+  </div>
  </div>
  <div class="set-cat"><div class="set-cat-ic"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M18 8a6 6 0 1 0-12 0c0 7-3 9-3 9h18s-3-2-3-9" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><path d="M13.7 21a2 2 0 0 1-3.4 0" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></div><div class="set-cat-t" data-he="התראות" data-en="Alerts &amp; Notifications">התראות</div></div>
  <div class="sec-cap mb12" id="set-radius-lbl">רדיוס התראה</div>
@@ -3693,6 +3753,114 @@ function deepMerge(base,o){
  return out;
 }
 function loadStore(){try{const r=localStorage.getItem(SKEY);if(r)SS=deepMerge(SS,JSON.parse(r));}catch(e){}}
+/* ── v415 · Easy reading (קריאה נוחה) ──────────────────────────────────────────────
+   Off by default, available to every age band - dyslexia is not an age. Spacing is the lever
+   with the real evidence behind it (Zorzi 2012), so it is the one with the widest range here.
+   Never touches the map, the nav or the SOS button: a panic control must not move because a
+   reading setting changed. */
+var RD_MAX={size:1.35,space:2.2};
+function readCfg(){
+  if(!SS.read||typeof SS.read!=='object') SS.read={on:false,size:1,space:1,soft:false,aloud:false};
+  var r=SS.read;
+  r.size=Math.min(RD_MAX.size,Math.max(1,parseFloat(r.size)||1));
+  r.space=Math.min(RD_MAX.space,Math.max(0,parseFloat(r.space)||0));
+  r.on=!!r.on; r.soft=!!r.soft; r.aloud=!!r.aloud;
+  return r;
+}
+function readOn(){ try{ return !!(SS&&SS.read&&SS.read.on); }catch(e){ return false; } }
+function readApply(){
+  try{
+    var r=readCfg(), b=document.body; if(!b) return;
+    b.classList.toggle('rd', r.on);
+    b.classList.toggle('rd-soft', r.on && r.soft);
+    if(r.on){
+      /* base values are already generous; the slider scales from there */
+      b.style.setProperty('--rd-ls',(0.035*r.space).toFixed(3)+'em');
+      b.style.setProperty('--rd-ws',(0.11 *r.space).toFixed(3)+'em');
+      b.style.setProperty('--rd-lh',(1.45+0.22*Math.min(1,r.space)).toFixed(2));
+      b.style.setProperty('--rd-zoom',r.size.toFixed(2));
+    } else {
+      ['--rd-ls','--rd-ws','--rd-lh','--rd-zoom'].forEach(function(k){ b.style.removeProperty(k); });
+    }
+  }catch(e){}
+}
+/* ── v415 · Read aloud ────────────────────────────────────────────────────────────
+   For the half of Dave's note that typography cannot fix: a reader who cannot tell what a
+   screen is for. The speaker reads the screen's OWN text - title, row names, row subtitles, body
+   paragraphs, in the order they appear. Deliberately NOT a hand-written script per screen: a
+   parallel script drifts from the UI the first time someone edits a label, and then the app
+   says one thing and reads another. Reading the DOM cannot drift.
+   Reuses gReadSay, which already prefers native TTS and falls back to speechSynthesis - the
+   Android WebView has no speechSynthesis of its own. */
+var _rdSpeaking=false;
+function readAloudStop(){
+  _rdSpeaking=false;
+  try{ window.speechSynthesis&&speechSynthesis.cancel(); }catch(e){}
+  try{ var T=window.Capacitor&&window.Capacitor.Plugins&&window.Capacitor.Plugins.TextToSpeech; if(T&&T.stop) T.stop(); }catch(e){}
+  try{ document.querySelectorAll('.rd-say.on').forEach(function(b){ b.classList.remove('on'); }); }catch(e){}
+}
+function readAloudText(sheet){
+  var out=[], seen={};
+  function push(t){
+    if(!t) return; t=String(t).replace(/\s+/g,' ').trim().replace(/[.\u00b7\u2022]+$/,'').trim();
+    if(t.length<2 || seen[t]) return; seen[t]=1; out.push(t);
+  }
+  try{
+    var t=sheet.querySelector('.sh-ttl'); if(t) push(t.textContent);
+    var body=sheet.querySelector('.sh-body'); if(!body) return out.join('. ');
+    var nodes=body.querySelectorAll('.sr-nm,.sr-sb,.legal-h,.legal-b p,.legal-b li,.gd-step,.set-cat-t,h2,h3,p');
+    for(var i=0;i<nodes.length;i++){
+      var el=nodes[i];
+      if(el.closest && el.closest('[aria-hidden="true"]')) continue;
+      if(el.offsetParent===null) continue;            /* collapsed or hidden - not on screen */
+      push(el.textContent);
+      if(out.join('. ').length>700) break;            /* a screen summary, not an audiobook */
+    }
+  }catch(e){}
+  return out.join('. ');
+}
+function readAloudGo(id){
+  var sheet=document.getElementById(id); if(!sheet) return;
+  var btn=sheet.querySelector('.rd-say');
+  if(_rdSpeaking){ readAloudStop(); return; }
+  var txt=readAloudText(sheet); if(!txt) return;
+  _rdSpeaking=true; if(btn) btn.classList.add('on');
+  try{ gReadSay(txt).then(function(){ readAloudStop(); }, function(){ readAloudStop(); }); }
+  catch(e){ readAloudStop(); }
+}
+function readAloudMount(id){
+  try{
+    var sheet=document.getElementById(id); if(!sheet) return;
+    var head=sheet.querySelector('.sh-head'); if(!head) return;
+    var on=readCfg().on && readCfg().aloud;
+    var ex=head.querySelector('.rd-say');
+    if(!on){ if(ex) ex.remove(); return; }
+    if(ex) return;
+    var b=document.createElement('button');
+    b.className='rd-say'; b.type='button';
+    b.setAttribute('aria-label', currentLang==='en'?'Read this screen aloud':currentLang==='ar'?'اقرأ هذه الشاشة بصوت':'הקראת המסך');
+    b.title=b.getAttribute('aria-label');
+    b.innerHTML='<svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9.5h3.5L12 5.5v13L7.5 14.5H4z" fill="currentColor"/><path d="M16 8.5a5 5 0 0 1 0 7" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M18.5 5.5a8.5 8.5 0 0 1 0 13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>';
+    b.onclick=function(ev){ ev.stopPropagation(); readAloudGo(id); };
+    var x=head.querySelector('.sh-x');
+    if(x&&x.parentNode===head) head.insertBefore(b,x); else head.appendChild(b);
+  }catch(e){}
+}
+function readSet(k,v){ try{ var r=readCfg(); r[k]=v; SS.read=r; saveStore(); readApply(); readSyncUI(); }catch(e){} }
+function readSyncUI(){
+  try{
+    var r=readCfg();
+    [['rd-toggle',r.on],['rd-soft',r.soft],['rd-aloud',r.aloud]].forEach(function(p){
+      var e=document.getElementById(p[0]); if(!e) return;
+      e.classList.toggle('on',!!p[1]); e.setAttribute('aria-checked',p[1]?'true':'false');
+    });
+    var sz=document.getElementById('rd-size'); if(sz) sz.value=Math.round(r.size*100);
+    var sp=document.getElementById('rd-space'); if(sp) sp.value=Math.round(r.space*100);
+    var szv=document.getElementById('rd-size-v'); if(szv) szv.textContent=Math.round(r.size*100)+'%';
+    var spv=document.getElementById('rd-space-v'); if(spv) spv.textContent=Math.round(r.space*100)+'%';
+    var box=document.getElementById('rd-opts'); if(box) box.style.display=r.on?'':'none';
+  }catch(e){}
+}
 /* ══ MIGRATION (v105): purge stale/simulated positions ══
    Members added before v103 still carry fake Tel Aviv coordinates in localStorage, so the
    map kept pinning them there. A SHOMER's position may ONLY come from live presence. */
@@ -7983,7 +8151,8 @@ try{ window.addEventListener('popstate',function(){
   }catch(e){}
 }); }catch(e){}
 function op(id){ if(id==='sh-dms'||id==='sh-checkin'){ try{ dykUsed(id==='sh-dms'?'dms':'checkin'); }catch(e){} } if(id==='sh-checkin'||id==='sh-dms'){ setTimeout(function(){ try{ fcMountSettings(); }catch(e){} },0); } closeAll();const el=document.getElementById(id);try{ if(typeof emApplyCountry==='function') emApplyCountry(); }catch(_e){}if(el)el.classList.add('open');syncSheetState(); if(el) shHistPush();
- if(id==='sh-set'){try{renderSetContacts();}catch(e){} try{setCatInit();}catch(e){}}
+ if(id==='sh-set'){try{renderSetContacts();}catch(e){} try{setCatInit();}catch(e){} try{readSyncUI();}catch(e){}}
+ try{ readAloudMount(id); }catch(e){}   /* v415 */
  if(id==='sh-rep'){ try{ var _sn=!!(SS.settings&&SS.settings.toggles&&SS.settings.toggles.p_showname); var _at=document.querySelector('#sh-rep .tog'); if(_at){ _at.classList.toggle('on',!_sn); _at.setAttribute('aria-checked',String(!_sn)); } }catch(e){} }   /* v293: Settings "show name on reports" sets the report's anonymous switch */   /* v284: sections fold/unfold from EVERY way into settings, not only the menu */
  if(id==='sh-circles'){ try{syncPairsToCircles();}catch(e){} try{renderCircles();}catch(e){} try{gdRenderList();}catch(e){} }   // was never re-rendered → circles list + toggles appeared empty
  if(id==='sh-prof'){ try{syncPairsToCircles();}catch(e){} try{renderProfile();}catch(e){} try{renderProfile2();}catch(e){} try{renderCircles();}catch(e){} }
@@ -8070,6 +8239,12 @@ function setReveal(sel){
   (el.closest('.set-row')||el).scrollIntoView({block:'center'});
  }catch(e){} }, 120);
 }
+var _rdCloseHook=false;
+(function(){ try{ if(_rdCloseHook) return; _rdCloseHook=true;
+  var _cl=window.cl;
+  if(typeof _cl==='function'){ window.cl=function(id){ try{ readAloudStop(); }catch(e){} return _cl.apply(this,arguments); }; }
+}catch(e){} })();
+function readOnSettingsOpen(){ try{ readSyncUI(); }catch(e){} }
 function setCatInit(){
  var cats=document.querySelectorAll("#sh-set .set-cat");
  cats.forEach(function(cat){
@@ -12041,6 +12216,7 @@ document.addEventListener('keydown',e=>{
 ═══════════════════════════════════ */
 // Load persisted state, apply settings, then language.
 loadStore();
+try{ readApply(); }catch(e){}   /* v415: reading settings before the first paint, so nothing reflows under the user */
 shakeMigrate();   /* v337: Shake-to-SOS off by default; existing users keep it at the safe level */
 /* v380: the gate is a rule, not a setting, so it is re-asserted on every boot and not left to a
    one-shot migration. A phone that ran v378 and tapped the old toggle off kept btnGate:false at
@@ -12289,7 +12465,7 @@ try{ hydrateIcons(document); }catch(e){}
 /* Loaded-build version - shown in the diagnostic panel so a phone can prove
    whether it's on the latest build or a STALE cached one. Keep in lock-step
    with sw.js SW_VERSION on every deploy. */
-var APP_VER='v411';
+var APP_VER='v412';
 var FB={ready:false,uid:null,db:null,_presTimer:null,connected:false,listening:false,pushState:'default',near:0,swVer:'?',
   authState:'connecting',sdkLoaded:false,persist:'',permErr:null,err:null,wsProbe:'',csp:''};
 /* Always log connection diagnostics to the console so the real failure can be SEEN in Chrome. */
