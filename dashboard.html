@@ -405,7 +405,9 @@ body.emg .c-map{animation:emgIn .22s cubic-bezier(.2,.8,.3,1)}
 .rloc-acc{font-size:10.5px;color:#6d7893;margin-top:3px}
 .rloc-btns{display:flex;gap:8px;margin-top:11px}
 .rlb{flex:1;border:1px solid #2a3450;background:#101826;color:#cdd6e8;border-radius:9px;padding:9px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit}
-.rlb-p{background:linear-gradient(135deg,#1d6fd6,#3f8ae0);border-color:#3f8ae0;color:#fff}
+/* v430: this one is not in the gold !important list above, so unlike the other blue buttons it
+   really did paint - the זום לרחוב button sat in cornflower blue inside the incident panel. */
+.rlb-p{background:linear-gradient(135deg,#E0A828,#C98F1E);border-color:#E0A828;color:#1a1204;font-weight:800}
 .rlb:active{transform:translateY(1px)}
 .rloc-sp{width:13px;height:13px;border:2px solid #4fc3e8;border-top-color:transparent;border-radius:50%;display:inline-block;margin-inline-end:7px;vertical-align:-2px;animation:rspin .7s linear infinite}
 @keyframes rspin{to{transform:rotate(360deg)}}
@@ -1466,7 +1468,8 @@ function _scLiveBanner(on){ try{
 function respFinish(id){
   try{
     var o=_liveEvents&&_liveEvents[id];
-    try{ respLog(id,'האירוע נסגר ע״י המוקדן · הועבר ליומן'); }catch(e){}
+    try{ respLog(id,'האירוע נסגר ע״י המוקדן · נרשם ביומן הלוח בדפדפן זה');  /* v430: said "הועבר ליומן", which a security officer reads as a record. The board journal
+     is localStorage on this machine only - no remote write exists - so the line says where it went. */ }catch(e){}
     try{ if(o) o.closed=true; }catch(e){}
     /* v430: the close was cosmetic. It set o.closed in memory, but the signal bar filters on
        B.reviews[id].status, which only saveEvEdit ever wrote. So 12s later the feed poll still
@@ -1688,7 +1691,7 @@ function _evidenceHtml(o,id){
   var items=demo?[{i:"📷",t:"תמונת זירה",meta:"הוגשה ע״י אזרח · הסכמה לשיתוף ✓"},{i:"📝",t:"עדות טקסט",meta:"הוגשה ע״י אזרח · הסכמה לשיתוף ✓"}]:[];
   if(!items.length){ return '<div class="rost-empty" style="padding:12px 4px">אין ראיות שהוגשו לאירוע זה.<br><span style="color:#6d7893">ראיות שאזרחים מצרפים (בהסכמה) יופיעו כאן.</span></div>'; }
   var list=items.map(function(it){return '<div class="evid-item"><span class="evid-ic">'+it.i+'</span><div class="evid-tx"><b>'+it.t+'</b><span>'+it.meta+'</span></div><span class="evid-ok">✓</span></div>';}).join("");
-  return list+'<button class="resp-send" style="margin-top:10px;background:linear-gradient(135deg,#1d6fd6,#3f8ae0);color:#fff" onclick="evidenceHandoff(\''+id+'\')">⚖️ הכנת חבילת העברה חוקית</button>'+(demo?'<div style="font-size:10.5px;color:#6d7893;margin-top:6px;text-align:center">נתוני הדגמה</div>':"");
+  return list+'<button class="resp-send" style="margin-top:10px;color:#fff" onclick="evidenceHandoff(\''+id+'\')">⚖️ הכנת חבילת העברה חוקית</button>'+(demo?'<div style="font-size:10.5px;color:#6d7893;margin-top:6px;text-align:center">נתוני הדגמה</div>':"");
 }
 function evidenceHandoff(id){
   var box=document.getElementById("resp-evid"); if(!box)return;
