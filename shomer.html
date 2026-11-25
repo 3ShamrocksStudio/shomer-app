@@ -533,6 +533,12 @@ body.sheet-open .diag-panel{display:none;}
 .sos-strip.on{display:flex;}
 /* Anonymized SHOMER presence marker (other active SHOMERs nearby) */
 .pres-mk{background:none!important;border:none!important;}
+/* v423: an anonymous nearby SHOMER is NOT one of yours, and it used to be the identical solid
+   gold dot - same pixels, two very different meanings. Hollow now: solid gold = a SHOMER in
+   your circle, named and precisely located; hollow gold = someone else's, anonymous and coarse.
+   Same family on purpose - both are SHOMERs - but never confusable. */
+.pres-mk .oth-dot{background:transparent;border:2.5px solid #E0A828;box-shadow:0 0 0 1px rgba(10,22,40,.85),0 0 8px rgba(224,168,40,.3);}
+.pres-mk .oth-ring{opacity:.22;}
 .pres-dot{position:relative;width:26px;height:26px;display:flex;align-items:center;justify-content:center;border-radius:50%;background:radial-gradient(circle,#3f6ac4 0%,#2350a8 70%);box-shadow:0 2px 7px rgba(0,0,0,.5);}
 .pres-ring{position:absolute;inset:0;border-radius:50%;background:rgba(63,106,196,.45);animation:presPulse 2.4s ease-out infinite;}
 @keyframes presPulse{0%{transform:scale(.7);opacity:.7}100%{transform:scale(2.2);opacity:0}}
@@ -548,7 +554,12 @@ body.sheet-open .diag-panel{display:none;}
      #E0A828  brand gold  = your SHOMERs (.oth-dot)
      #FF1A40  red         = anyone in SOS - shared with the SOS event on purpose, because red
                             means emergency everywhere in this app and that is not a clash
-     #7C869C  grey        = a SHOMER whose position is stale, not live
+     #8A7A4E  dim gold    = a SHOMER whose position is stale, not live (same family, dimmed)
+     hollow #E0A828       = an ANONYMOUS nearby SHOMER, not one of yours (.pres-mk)
+   Two layers beyond TYPES also draw on this map and must respect the list: statsColor() paints
+   city crime areas as L.circle (violent #E5484D, property #2962FF, public order #A05CC8, none
+   #7E8CA0) - it used the people-gold until v423 - and presenceIcon() draws the anonymous dot.
+   A colour audit that only reads TYPES will miss both of them.
    The event hues that sit nearest the people palette are stalk #F2B705 and med #16A06A. They
    stay legible against it because they only ever appear inside a teardrop pin, never as a bare
    dot, and the legend now groups the two families under their own headings. Before adding an
@@ -560,8 +571,11 @@ body.sheet-open .diag-panel{display:none;}
 .mk-circle.mk-oth .nm{border-color:#E0A828;}
 @media (prefers-reduced-motion:reduce){.oth-ring{animation:none;opacity:.28}}
 @keyframes othPulse{0%{box-shadow:0 0 0 0 rgba(43,196,126,.55)}70%{box-shadow:0 0 0 13px rgba(43,196,126,0)}100%{box-shadow:0 0 0 0 rgba(43,196,126,0)}}
-.mk-oth:not(.live) .oth-dot{background:#7c869c;animation:none;opacity:.7;}
-.mk-circle.mk-oth:not(.live) .nm{border-color:#7c869c;}
+/* v423: was #7c869c, which sits 7 units from #7E8CA0 - the "unclassified event / no dominant
+   category" grey. Two different meanings, visually the same colour. A stale SHOMER is still a
+   PERSON, so dim the gold rather than grey them out: same family, clearly not live. */
+.mk-oth:not(.live) .oth-dot{background:#8A7A4E;border-color:#0C1B39;animation:none;opacity:.8;box-shadow:none;}
+.mk-circle.mk-oth:not(.live) .nm{border-color:#8A7A4E;}
 @keyframes ssf{0%,100%{background:var(--r3)}50%{background:var(--r2)}}
 .ss-row{display:flex;align-items:center;gap:10px;}
 /* SOS fast event-type picker - classify in one tap, never blocks the SOS */
@@ -1862,7 +1876,7 @@ body.otp-active .ob-steps{display:none!important;}
    <div class="stat-key">
      <span><i class="sk" style="background:#E5484D"></i>נגד גוף</span>
      <span><i class="sk" style="background:#2962FF"></i>רכוש</span>
-     <span><i class="sk" style="background:#E0A828"></i>סדר ציבורי</span>
+     <span><i class="sk" style="background:#A05CC8"></i>סדר ציבורי</span>
    </div>
    <div class="leg-src">הצבע = סוג העבירה הנפוץ ביותר באזור. הגודל = כמות.<br>מקור: data.gov.il · 395,294 רשומות · סטטיסטיקה, לא אירועים חיים</div>
    <button class="leg-stats-btn" id="leg-stats" onclick="statsToggle()"><span id="leg-stats-st"><svg class="eye" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><path d="M2 12s3.6-6.5 10-6.5S22 12 22 12s-3.6 6.5-10 6.5S2 12 2 12Z"/><circle cx="12" cy="12" r="2.6"/></svg></span></button>
@@ -15782,7 +15796,11 @@ function statsColor(cats){
   var top=Object.keys(cats||{})[0]||'';
   if(/גוף|מין/.test(top))   return '#E5484D';   // violent
   if(/רכוש|מרמה/.test(top)) return '#2962FF';   // property
-  if(/סדר/.test(top))       return '#E0A828';   // public order
+  /* v423: was #E0A828 - the reserved people-gold. These stats areas are drawn as L.circle, so
+     the "dot = person, pin = event" rule does not separate them from a SHOMER marker, and the
+     legend showed two identical gold discs four rows apart. Violet is the furthest free hue
+     from everything already on this map (nearest neighbour #7E8CA0, distance 71). */
+  if(/סדר/.test(top))       return '#A05CC8';   // public order
   return '#7E8CA0';
 }
 function statsRadius(total, max){
