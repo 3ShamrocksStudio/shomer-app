@@ -790,6 +790,14 @@ body.sc-emerg #c-recs>#live-strip{flex:0 0 auto}
 
 /* checklist (inside the emergency card) */
 #c-recs.sc-on #recspane{display:none}
+/* v430: .sc-on is set by the demo state machine only, so on the live board the recommendations
+   pane survived into the emergency panel - and _fitRecs() shrank it to nothing, leaving a gold
+   "פעולות מומלצות" heading with no rows under it. Action advice belongs in the flip panel, not
+   here, so the pane is out for the whole emergency state in both views. */
+body.sc-emerg #recspane{display:none}
+/* the recs-mode pill and the drill-down back button belong to that pane - with it hidden they
+   are controls that do nothing, in the one state where nothing on screen should be decorative */
+body.sc-emerg #analysis-pill,body.sc-emerg #recsback{display:none!important}
 .sc-guide{flex:1 1 auto;min-height:0;overflow:auto;padding:6px 10px 10px}
 .scg-h{display:flex;align-items:center;gap:8px;padding:4px 2px 7px;border-bottom:1px solid var(--line);margin-bottom:6px}
 .scg-t{font-weight:800;font-size:14px;color:#fff;white-space:nowrap}
