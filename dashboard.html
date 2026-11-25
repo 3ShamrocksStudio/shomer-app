@@ -658,7 +658,12 @@ body.emg .c-map{animation:emgIn .22s cubic-bezier(.2,.8,.3,1)}
       <label>אימייל ארגוני</label><input id="email" type="email" dir="ltr" placeholder="you@municipality.gov.il">
       <label>סיסמה</label><input id="pass" type="password" dir="ltr" placeholder="••••••••">
       <button class="btn" id="login-btn">כניסה</button>
-      <button class="btn" id="live-btn" style="background:linear-gradient(135deg,#0f7a4a,#16a06a 60%,#2ecc71);color:#042016;margin-top:10px;font-weight:800">🟢  תצוגה חיה · נתוני רשת אמת (PoC)</button>
+<!-- v425: the "תצוגה חיה · נתוני רשת אמת" button is gone. It called liveBoot(), which set
+     demo:false/live:true and hid the gate WITHOUT any credentials - so anyone holding this URL
+     saw the real network view of real users. Verified live before removal: one click produced
+     CLIENT={..."demo":false,"live":true} with the gate hidden and no sign-in. It was a PoC
+     affordance from before this page was something to hand to a customer. The live view is now
+     reached only by signing in, which is what it always should have required. -->
       <button class="btn" id="demo-btn" style="background:transparent;border:1px solid var(--gold);color:var(--gold);margin-top:8px">👁  כניסה לדמו · See a live demo</button>
       <button class="lnk" id="to-signup">אין לך גישה עדיין? <b>בקשת גישת לקוח</b></button>
     </div>
@@ -788,7 +793,9 @@ document.getElementById('signup-btn').onclick=async function(){
 };
 document.getElementById('signout').onclick=async function(){ try{ if(!(CLIENT&&CLIENT.demo)) await sb.auth.signOut(); }catch(e){} location.reload(); };
 document.getElementById('demo-btn').onclick=function(){ location.href='shomer-command/'; };   /* D2/D3: the demo lives on the sample-data-only page */
-(function(){ var lb=document.getElementById('live-btn'); if(lb) lb.onclick=function(){ liveBoot(); }; })();
+/* v425: handler removed with the button. liveBoot() itself is left in place but is now only
+   reachable from code, never from the gate - a credential-free path into the live network view
+   must not be one click away on a page a council is given. */
 (function(){var ex=document.getElementById('export-btn'); if(ex) ex.onclick=function(){ try{exportReport();}catch(e){window.print();} };
  var ac=document.getElementById('acct-btn'); if(ac) ac.onclick=function(){ try{openSettings();}catch(e){} };})();
 (function(){var sp=document.getElementById('spread-btn'); if(sp) sp.onclick=function(){ if(_curCity) toggleSpread(_curCity); };})();
@@ -2116,7 +2123,9 @@ function openRoster(){
  var total=demo?214:"—";
  var maxN=roles.reduce(function(m,r){return Math.max(m,r.n);},1);
  var bars=roles.map(function(r){var w=Math.round(r.n/maxN*100);return '<div class="rost-row"><span class="rost-ic">'+r.i+'</span><span class="rost-nm">'+r.t+'</span><span class="rost-bar"><i style="width:'+w+'%;background:'+r.c+'"></i></span><span class="rost-v">'+r.n+'</span></div>';}).join("");
- var bodyHtml=demo?('<div class="rost-total"><b>'+total+'</b> משתמשי SH✡MER פעילים · '+city+'</div>'+bars+'<div class="rost-note">מצטבר · ללא זיהוי אישי. התפלגות הכישורים מבוססת על דיווח עצמי אנונימי (k-anonymity — תאים קטנים מ-5 מוסתרים). <b style="color:#f0c75a">נתוני הדגמה</b>.</div>'):('<div class="rost-empty">התפלגות מגיבים מצטברת תוצג כאן כאשר משתמשים באזור ידווחו על כישורי מענה.<br><span style="color:#6d7893">מצטבר בלבד · ללא זיהוי אישי · ללא מיקום פרטני.</span></div>');
+ /* v425: same fix as shomer-command/index.html - a demo user count must never be bound to a real
+    authority's name. See the full reasoning there. */
+ var bodyHtml=demo?('<div class="rost-total"><b>'+total+'</b> משתמשים — כך נראית רשת ברשות מאומצת במלואה</div>'+bars+'<div class="rost-note"><b style="color:#ff8089">הדגמה בלבד — אלה אינם משתמשים קיימים ב'+city+'.</b> המספר האמיתי באזור מוצג רק בתצוגה החיה, לאחר התחברות. התפלגות הכישורים כאן היא תרחיש לדוגמה (בתצוגה חיה: מצטבר, ללא זיהוי אישי, k-anonymity — תאים קטנים מ-5 מוסתרים).</div>'):('<div class="rost-empty">התפלגות מגיבים מצטברת תוצג כאן כאשר משתמשים באזור ידווחו על כישורי מענה.<br><span style="color:#6d7893">מצטבר בלבד · ללא זיהוי אישי · ללא מיקום פרטני.</span></div>');
  var ov=document.createElement("div"); ov.id="rost-ov"; ov.className="acct-ov";
  ov.innerHTML='<div class="acct-card"><div class="acct-head"><h3>רשת המגיבים בטריטוריה</h3><button class="acct-x" onclick="closeRoster()">✕</button></div><div class="acct-sub">מי זמין לסייע באזור — לפי כישור, מצטבר</div><div class="rost-wrap">'+bodyHtml+'</div><div class="acct-note">הרשימה אינה חושפת זהות, טלפון או מיקום של אף משתמש. היא משרתת תכנון מענה בלבד.</div></div>';
  document.body.appendChild(ov);
