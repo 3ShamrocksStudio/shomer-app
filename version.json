@@ -1,17 +1,17 @@
 {
-"v": "v419",
+"v": "v420",
 "notes": {
 "he": [
-"תיקון חשוב במסך „מספרי חירום”: 1201 הוא ער״ן - עזרה ראשונה נפשית, אנונימי. קודם הוא הופיע בשם אחר",
-"כפתור שהיה מתויג „אירוע ביטחוני” הוסר - המספר שמאחוריו אינו לאירוע ביטחוני. לאירוע ביטחוני חייגו 100"
+"„עזרה לא-דחופה” ירד מהמפה ועבר לתפריט - פחות אייקונים על מסך המפה",
+"חדש - מסך „עזרה לא-דחופה”: בקשה שקטה לשומרים שלך (בלי אזעקה), ידידים 1230 לרכב תקוע או נעול וחילוץ ממעלית (חינם, ארצי, 24/6 - לא בשבת ובחגים), ער״ן 1201 אם צריך לדבר (חינם, אנונימי, 24/7), ומוקד הרווחה 118"
 ],
 "en": [
-"Important correction on the \"Emergency Numbers\" screen: 1201 is ERAN - emotional first aid, anonymous. It was previously shown under a different name",
-"A button labelled \"security incident\" was removed - the number behind it is not for security incidents. For a security incident, dial 100"
+"\"Non-urgent help\" moved off the map and into the menu - fewer icons on the map screen",
+"New - a \"Non-urgent help\" screen: a quiet ask to your SHOMERs (no alarm), Yedidim 1230 for a stuck or locked car and lift rescue (free, nationwide, 24/6 - not Shabbat or holidays), ERAN 1201 if you need to talk (free, anonymous, 24/7), and the welfare hotline 118"
 ],
 "ar": [
-"تصحيح مهم في شاشة «أرقام الطوارئ»: 1201 هو عيران - إسعاف نفسي أولي، مجهول الهوية. كان معروضًا سابقًا باسم آخر",
-"أُزيل زر كان موسومًا «حادث أمني» - الرقم الذي خلفه ليس للحوادث الأمنية. للحادث الأمني اتصل بـ100"
+"انتقل «مساعدة غير عاجلة» من الخريطة إلى القائمة - أيقونات أقل على شاشة الخريطة",
+"جديد - شاشة «مساعدة غير عاجلة»: طلب هادئ لحُرّاسك (بلا إنذار)، يديديم 1230 لسيارة متعطلة أو مقفلة وإنقاذ من مصعد (مجاني، في كل البلاد، 24/6 - ليس السبت والأعياد)، عيران 1201 إن احتجت للحديث (مجاني، مجهول الهوية، 24/7)، ومركز الرفاه 118"
 ]
 }
 }
