@@ -1,14 +1,14 @@
 {
-"v": "v417",
+"v": "v418",
 "notes": {
 "he": [
-"כפתור „צריך/ה עזרה” חזר להיות עם כיתוב - במקום החדש והבטוח, הרחק מכפתור ה-SOS"
+"„עזרה לא-דחופה?” עבר לשורת הצ׳יפים למעלה, ליד „מחובר” ו„מקרא מפה” - שקט, ולא מתחרה בכפתור ה-SOS"
 ],
 "en": [
-"The \"need a hand\" button has its label back - in its new, safe spot, well away from the SOS button"
+"\"Non-urgent help?\" moved up to the chip row beside \"connected\" and the legend - quiet, and no longer competing with the SOS button"
 ],
 "ar": [
-"عاد زر «أحتاج مساعدة» بنصّه - في مكانه الجديد الآمن، بعيدًا عن زر الاستغاثة"
+"انتقل «مساعدة غير عاجلة؟» إلى صف الشارات في الأعلى بجانب «متصل» والمفتاح - هادئ، ولم يعد ينافس زر الاستغاثة"
 ]
 }
 }
