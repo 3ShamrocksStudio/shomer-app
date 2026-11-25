@@ -276,20 +276,43 @@
    a 380px drawer competing with them - which is why the response centre "disappeared into the
    noise". In an emergency the screen now answers one question: this incident. Everything that
    is not the map or the incident is removed, fast, and comes straight back on close. */
-body.emg-out .card:not(.c-map){opacity:0;transform:scale(.97);transition:opacity .15s ease,transform .15s ease}
+/* v427: the cards turn over instead of dissolving, so the board visibly FLIPS to the incident
+   rather than having a panel appear over it. Staggered a touch so it reads as one surface
+   turning, not nine things vanishing at once. */
+.cmd-grid{perspective:1600px;perspective-origin:50% 40%}
+body.emg-out .card:not(.c-map){opacity:0;transform:rotateY(-82deg) scale(.94);
+  transition:opacity .26s ease,transform .3s cubic-bezier(.45,0,.55,1)}
 body.emg .card:not(.c-map){display:none!important}
 body.emg .cmd-grid{grid-template-columns:minmax(0,1fr)!important;grid-template-rows:minmax(0,1fr)!important;
-  grid-template-areas:"map"!important;padding-inline-start:calc(380px + 20px)!important}
+  grid-template-areas:"map"!important;padding-inline-start:calc(460px + 20px)!important}
 body.emg .c-map{animation:emgIn .22s cubic-bezier(.2,.8,.3,1)}
 @keyframes emgIn{from{opacity:.35;transform:scale(.985)}to{opacity:1;transform:none}}
 /* a thin standing reminder that the board is in emergency mode and what will come back */
 /* The "where did my dashboard go" answer lives at the foot of the panel, in the scroll flow.
    As an overlay it covered either the header clock or the map's own layer toggles. */
+/* v427: the end of the flow gets real weight - it is the one green action in a red panel. */
+.rfin{margin:14px 0 6px;padding-top:14px;border-top:1px solid rgba(255,255,255,.09)}
+.rfin-btn{width:100%;padding:14px;border:0;border-radius:12px;cursor:pointer;font-family:inherit;
+  font-weight:900;font-size:14.5px;color:#06240f;
+  background:linear-gradient(135deg,#2BC47E,#16A06A);
+  box-shadow:0 6px 20px rgba(22,160,106,.35);transition:transform .12s,box-shadow .15s}
+.rfin-btn:hover{box-shadow:0 8px 26px rgba(22,160,106,.5)}
+.rfin-btn:active{transform:scale(.985)}
+.rfin-h{margin-top:7px;text-align:center;font-size:10.5px;color:#6d7893;line-height:1.5}
 .remg{margin-top:4px;text-align:center;font-size:10.5px;color:#6d7893;line-height:1.5}
 @media (max-width:1100px){ body.emg .cmd-grid{padding-inline-start:16px!important} }
-.resp{position:fixed;top:0;inset-inline-start:0;height:100vh;width:380px;max-width:92vw;z-index:99991;background:linear-gradient(180deg,#141a27,#0f1218);border-inline-end:1px solid #2a3450;box-shadow:0 0 50px rgba(0,0,0,.55);display:flex;flex-direction:column;transform:translateX(-102%);transition:transform .28s ease;font-family:Alef,system-ui,sans-serif}
-[dir=rtl] .resp{inset-inline-start:auto;inset-inline-end:0;border-inline-end:0;border-inline-start:1px solid #2a3450;transform:translateX(102%)}
-.resp.on{transform:none!important}
+/* v427: this used to slide in from the edge as a drawer ON TOP of the board, which is why it
+   read as a popup. It now FLIPS in on the Y axis as the cards flip out, so the board turns over
+   and the incident panel is what is there instead - one movement, one place to look. Wider too
+   (460px): a drawer sits over your work, a panel replaces it. */
+.resp{position:fixed;top:0;inset-inline-start:0;height:100vh;width:460px;max-width:94vw;z-index:99991;
+  background:linear-gradient(180deg,#141a27,#0f1218);border-inline-end:1px solid #2a3450;
+  box-shadow:0 0 60px rgba(0,0,0,.6);display:flex;flex-direction:column;
+  transform:perspective(1500px) rotateY(-92deg);transform-origin:left center;opacity:0;
+  transition:transform .42s cubic-bezier(.2,.9,.25,1),opacity .22s ease;
+  font-family:Alef,system-ui,sans-serif;will-change:transform}
+[dir=rtl] .resp{inset-inline-start:auto;inset-inline-end:0;border-inline-end:0;border-inline-start:1px solid #2a3450;transform:perspective(1500px) rotateY(92deg);transform-origin:right center}
+.resp.on{transform:perspective(1500px) rotateY(0deg)!important;opacity:1}
 .resp-h{padding:14px 16px;border-bottom:1px solid #232c40;display:flex;align-items:center;gap:10px;background:linear-gradient(90deg,rgba(229,72,77,.16),rgba(47,107,255,.08))}
 .resp-h .ic{font-size:22px}
 .resp-h .tt{flex:1}.resp-h .tt b{display:block;font-size:15px;color:#f2f5fb}.resp-h .tt span{font-size:11px;color:#9aa6bd}
@@ -653,6 +676,24 @@ body.emg .c-map{animation:emgIn .22s cubic-bezier(.2,.8,.3,1)}
 .sc-state .sc-tag{flex:none;font-size:11px;font-weight:700;color:var(--gold);border:1px dashed var(--gold-l);border-radius:999px;padding:1px 8px;white-space:nowrap}
 .sc-jump{flex:none;min-height:28px;padding:0 14px;border-radius:999px;border:1.5px solid rgba(255,255,255,.75);background:rgba(0,0,0,.18);color:#fff;font:800 12.5px var(--font);cursor:pointer;white-space:nowrap}
 .sc-state .sc-sp{flex:1}
+/* ══ v427 · THE INCIDENT SIGNAL ════════════════════════════════════════════
+   One element, top edge of the viewport, above everything. Brand red base with a gold light
+   sweeping across it - a scanning instrument, not a police roof light. It reads as "this desk
+   has a live incident" from across a room, it carries the brand's own two colours, and it is
+   the same shape whether there is one incident or six, so it never competes with itself.
+   Continuous sweep rather than on/off: no flash frequency at all, so it sits nowhere near the
+   WCAG 2.3.1 seizure threshold and can be looked at for an hour. */
+#emg-scan{position:fixed;top:0;left:0;right:0;height:4px;z-index:100000;pointer-events:none;
+  display:none;background:linear-gradient(90deg,#8C0A1E,#C8102E 35%,#C8102E 65%,#8C0A1E);
+  box-shadow:0 2px 18px rgba(200,16,46,.55)}
+body.sc-emerg #emg-scan,body.emg #emg-scan{display:block}
+#emg-scan::after{content:"";position:absolute;inset:0;
+  background:linear-gradient(90deg,transparent 0%,transparent 38%,rgba(224,168,40,.0) 42%,
+    rgba(224,168,40,.95) 50%,rgba(255,232,170,1) 52%,rgba(224,168,40,.95) 54%,
+    rgba(224,168,40,0) 62%,transparent 66%,transparent 100%);
+  background-size:260% 100%;animation:emgScan 2.6s linear infinite}
+@keyframes emgScan{from{background-position:130% 0}to{background-position:-130% 0}}
+@media (prefers-reduced-motion:reduce){#emg-scan::after{animation:none;background:linear-gradient(90deg,transparent,rgba(224,168,40,.7),transparent)}}
 .sc-state.sc-emerg{color:#fff;background:#c8102e;border-bottom-color:rgba(224,168,40,.9);animation:scBan 2.4s ease-in-out infinite}
 .sc-state.sc-emerg .sc-msg{color:#fff}
 .sc-state.sc-emerg .sc-dot{background:#fff;box-shadow:0 0 0 3px rgba(255,255,255,.35)}
@@ -665,10 +706,11 @@ body.emg .c-map{animation:emgIn .22s cubic-bezier(.2,.8,.3,1)}
 .sc-state.sc-after{color:#fff;background:linear-gradient(90deg,rgba(250,172,34,.26),rgba(250,172,34,.08));border-bottom-color:var(--gold-l)}
 .sc-state.sc-after .sc-dot{background:var(--gold);box-shadow:0 0 0 3px var(--gold-s)}
 .sc-state.sc-after .sc-msg{color:#f6e3bd}
-/* v426: this put the strobe on EVERY card at once - the real reason the whole screen blinked.
-   An emergency does not need nine panels flashing; it needs one unmistakable signal and eight
-   calm surfaces you can actually read while working. The cards now hold a steady red edge. */
-body.sc-emerg .cmd-grid>.card{border-color:rgba(224,26,60,.85);box-shadow:0 0 0 1px rgba(224,26,60,.55),0 0 22px rgba(200,16,46,.20)}
+/* v427: the cards carry NO emergency marking at all now. v426 replaced a nine-panel strobe with
+   nine frozen red frames, which is the same mistake standing still - red on every surface is red
+   on nothing, and it buries the one thing that actually matters. The incident owns exactly one
+   signal: the scan bar at the top of the viewport. Everything else stays a calm, readable
+   surface, because an operator has to READ these panels while working the event. */
 
 /* checklist (inside the emergency card) */
 #c-recs.sc-on #recspane{display:none}
@@ -715,6 +757,7 @@ body.sc-emerg .cmd-grid>.card{border-color:rgba(224,26,60,.85);box-shadow:0 0 0 
 </style>
 </head>
 <body>
+<div id="emg-scan" aria-hidden="true"></div>
 <style>@media(max-width:820px){.topbar{flex-wrap:wrap;height:auto!important;row-gap:8px;padding-block:8px}.topbar .tbtn{min-height:36px}}</style><div id="sc-demo-flag" dir="rtl" style="position:fixed;bottom:14px;left:14px;z-index:99999;background:#c62828;color:#fff;font:700 13px/1 system-ui,sans-serif;padding:9px 14px;border-radius:999px;box-shadow:0 4px 14px rgba(0,0,0,.35);pointer-events:none">הדגמה · נתונים לדוגמה</div>
 
 <!-- AUTH GATE -->
@@ -1278,7 +1321,21 @@ function respStep(n){
    the rest of the session. Opening the incident is the acknowledgement; from then on the strip
    stays red and present, but still. */
 function stripCalm(){ try{ var st=document.getElementById('live-strip'); if(st) st.classList.add('calm'); }catch(e){} }
-function closeResponse(){ try{ emgLeave(); stripCalm(); }catch(_){} var p=document.getElementById('resp'); if(p){ p.classList.remove('on'); setTimeout(function(){try{p.remove();}catch(e){}},300); } try{ if(_respCircle){MAP.removeLayer(_respCircle);_respCircle=null;} }catch(e){} try{ var _rc=document.getElementById('rad-chip'); if(_rc)_rc.remove(); }catch(e){} }
+/* v427: closes the incident properly - writes the closure to the log, marks it handled so the
+   signal bar and the feed stop treating it as open, then flips the board back. */
+function respFinish(id){
+  try{
+    var o=_liveEvents&&_liveEvents[id];
+    try{ respLog(id,'האירוע נסגר ע״י המוקדן · הועבר ליומן'); }catch(e){}
+    try{ if(o) o.closed=true; }catch(e){}
+    try{ var st=document.getElementById('live-strip'); if(st){ st.classList.add('attended'); st.style.display='none'; } }catch(e){}
+    try{ document.body.classList.remove('sc-emerg'); }catch(e){}
+    try{ stopAlarm(); }catch(e){}
+    try{ toast && toast('האירוע נסגר · הלוח חזר'); }catch(e){}
+  }catch(e){}
+  try{ closeResponse(); }catch(e){}
+}
+function closeResponse(){ try{ emgLeave(); stripCalm(); }catch(_){} var p=document.getElementById('resp'); if(p){ p.classList.remove('on'); setTimeout(function(){try{p.remove();}catch(e){}},460); } try{ if(_respCircle){MAP.removeLayer(_respCircle);_respCircle=null;} }catch(e){} try{ var _rc=document.getElementById('rad-chip'); if(_rc)_rc.remove(); }catch(e){} }
 function stripGeocode(lat,lng){
  var box=document.getElementById('ls-addr-txt'); if(!box)return;
  if(CLIENT&&CLIENT.demo){ box.textContent='כתובת לדוגמה · '+lat.toFixed(3)+', '+lng.toFixed(3); return; }   /* demo: no outside geocoder call */
@@ -1336,7 +1393,7 @@ function silenceAlarm(){ _alarmSilenced=true; stopAlarm(); var st=document.getEl
 function emgEnter(){ try{ if(document.body.classList.contains('emg')) return;
   document.body.classList.add('emg-out');
   setTimeout(function(){ try{ document.body.classList.add('emg'); document.body.classList.remove('emg-out');
-    if(window.MAP&&MAP.invalidateSize) setTimeout(function(){ try{MAP.invalidateSize(true);}catch(_){} },60); }catch(_){} },150);
+    if(window.MAP&&MAP.invalidateSize) setTimeout(function(){ try{MAP.invalidateSize(true);}catch(_){} },60); }catch(_){} },300);
  }catch(e){} }
 function emgLeave(){ try{ document.body.classList.remove('emg','emg-out');
   if(window.MAP&&MAP.invalidateSize) setTimeout(function(){ try{MAP.invalidateSize(true);}catch(_){} },60);
@@ -1412,7 +1469,13 @@ function openResponse(id){
    +'      <div id="resp-evid">'+_evidenceHtml(o,id)+'</div>'
    +'      <div class="resp-nat" style="margin-top:9px">⚖️ העברת ראיות לאכיפה ('+(isIntl(curC())?'רשויות האכיפה המקומיות':'משטרה 100 / פרקליטות')+') מתבצעת ידנית ע״י הרשות, עם בסיס חוקי ותיעוד מלא. <span style="color:#f0c75a">אין שיגור אוטומטי.</span> העברה לגורמי ביטחון לאומי — בערוצים משפטיים פורמליים בלבד, לא דרך כלי זה.</div>'
    +'    </div></div>'
-   +'  <div class="remg">מצב אירוע · לוח הנתונים המלא חוזר עם סגירת האירוע</div>'
+   /* v427: the flow used to stop dead at step 4 - nothing closed the event, nothing brought the
+      board back, so the operator was left sitting inside an incident with no way out except the
+      X. An event has a beginning and an end; this is the end. */
+   +'  <div class="rfin">'
+   +'    <button class="rfin-btn" onclick="respFinish(\''+id+'\')">✓ סגור אירוע וחזור ללוח</button>'
+   +'    <div class="rfin-h">הסגירה תירשם ביומן האירוע · הלוח המלא יחזור</div>'
+   +'  </div>'
    +'</div>';
   document.body.appendChild(p);
   setTimeout(function(){ p.classList.add('on'); respSetRadius(1.5); try{respGeocode(lat,lng,o.demo);}catch(e){} },20);
