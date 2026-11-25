@@ -1948,17 +1948,12 @@ function renderLive(c,list,opts){
              }).join('');
          }
        }catch(e){}
-       /* v430: the live board had no emergency state at all - 'sc-emerg' was only ever set by the
-          demo's state machine, so the merged event panel, the folded feed and the reduced-motion
-          rules were unreachable CSS here. The real signal is this branch: an SOS that no one has
-          marked handled or closed. 'emg' stays what it was - the operator opening the flip panel. */
-       try{ document.body.classList.add('sc-emerg'); }catch(e){}
        try{ stripGeocode(+e0.lat,+e0.lng); }catch(e){}
        strip.onclick=function(){ try{ openResponse(id0); }catch(e){} };
        _sosFocusLock=true;
        if((id0+'@'+(e0.ts||0))!==_alarmId){ _alarmId=id0+'@'+(e0.ts||0); _alarmSilenced=false; strip.style.animation=''; strip.style.background=''; strip.style.boxShadow=''; strip.classList.remove('attended'); startAlarm(); try{ flyToLive(+e0.lat,+e0.lng,id0); }catch(_f){} }
        else if(!_alarmSilenced){ startAlarm(); }
-     } else { strip.style.display='none'; strip.innerHTML=''; try{ document.body.classList.remove('sc-emerg'); }catch(e){} try{var _h=document.getElementById('emg-silence'); if(_h) _h.remove(); var _fx=document.getElementById('emg-facts'); if(_fx) _fx.remove(); var _ot=document.getElementById('emg-others'); if(_ot) _ot.remove(); var _t2=document.getElementById('recs-ttl'); if(_t2) _t2.textContent='המלצות לפעולה';}catch(e){} stopAlarm(); _alarmId=null; }
+     } else { strip.style.display='none'; strip.innerHTML=''; try{var _h=document.getElementById('emg-silence'); if(_h) _h.remove(); var _fx=document.getElementById('emg-facts'); if(_fx) _fx.remove(); var _ot=document.getElementById('emg-others'); if(_ot) _ot.remove(); var _t2=document.getElementById('recs-ttl'); if(_t2) _t2.textContent='המלצות לפעולה';}catch(e){} stopAlarm(); _alarmId=null; }
    }
  }catch(e){}
  if(newSos){ _liveBeep(); flyToLive(newSos.lat,newSos.lng,newSos.id); bigSosAlert(newSos.id); }

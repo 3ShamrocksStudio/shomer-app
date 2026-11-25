@@ -1440,6 +1440,16 @@ function respStep(n){
 function stripCalm(){ try{ var st=document.getElementById('live-strip'); if(st) st.classList.add('calm'); }catch(e){} }
 /* v427: closes the incident properly - writes the closure to the log, marks it handled so the
    signal bar and the feed stop treating it as open, then flips the board back. */
+/* v430: the banner text lives in the demo's _scBanner(), which was held back, so the live board
+   kept reading "no open emergency" during an open SOS. Three places decide that state - the live
+   renderer's two branches and respFinish - so they share one writer and cannot disagree. */
+function _scLiveBanner(on){ try{
+  var el=document.getElementById('sc-state'); if(!el) return;
+  var sig=on?'emerg':'ok'; if(el._sig===sig) return; el._sig=sig;
+  el.className='sc-state '+(on?'sc-emerg':'sc-ok');
+  el.innerHTML='<span class="sc-dot"></span><b>'+(on?'\u05de\u05e6\u05d1 \u05d7\u05d9\u05e8\u05d5\u05dd':'\u05de\u05e6\u05d1 \u05e8\u05d2\u05d9\u05dc')+'</b>'
+   +'<span class="sc-msg">'+(on?'\u05e7\u05e8\u05d9\u05d0\u05ea SOS \u05e4\u05ea\u05d5\u05d7\u05d4. \u05dc\u05d7\u05e6\u05d5 \u201c\u05e0\u05d9\u05d4\u05d5\u05dc \u05d0\u05d9\u05e8\u05d5\u05e2\u201d \u05dc\u05e8\u05e9\u05d9\u05de\u05ea \u05d4\u05e6\u05e2\u05d3\u05d9\u05dd.':'\u05d0\u05d9\u05df \u05d0\u05d9\u05e8\u05d5\u05e2 \u05d7\u05d9\u05e8\u05d5\u05dd \u05e4\u05ea\u05d5\u05d7. \u05d4\u05dc\u05d5\u05d7 \u05d1\u05de\u05e2\u05e7\u05d1.')+'</span>';
+}catch(e){} }
 function respFinish(id){
   try{
     var o=_liveEvents&&_liveEvents[id];
@@ -1447,6 +1457,7 @@ function respFinish(id){
     try{ if(o) o.closed=true; }catch(e){}
     try{ var st=document.getElementById('live-strip'); if(st){ st.classList.add('attended'); st.style.display='none'; } }catch(e){}
     try{ document.body.classList.remove('sc-emerg'); }catch(e){}
+    try{ _scLiveBanner(false); }catch(e){}
     try{ stopAlarm(); }catch(e){}
     try{ _playResolveTone(); }catch(e){}
     try{ toast && toast('האירוע נסגר · הלוח חזר'); }catch(e){}
@@ -1963,12 +1974,13 @@ function renderLive(c,list,opts){
           rules were unreachable CSS here. The real signal is this branch: an SOS that no one has
           marked handled or closed. 'emg' stays what it was - the operator opening the flip panel. */
        try{ document.body.classList.add('sc-emerg'); }catch(e){}
+       try{ _scLiveBanner(true); }catch(e){}
        try{ stripGeocode(+e0.lat,+e0.lng); }catch(e){}
        strip.onclick=function(){ try{ openResponse(id0); }catch(e){} };
        _sosFocusLock=true;
        if((id0+'@'+(e0.ts||0))!==_alarmId){ _alarmId=id0+'@'+(e0.ts||0); _alarmSilenced=false; strip.style.animation=''; strip.style.background=''; strip.style.boxShadow=''; strip.classList.remove('attended'); startAlarm(); try{ flyToLive(+e0.lat,+e0.lng,id0); }catch(_f){} }
        else if(!_alarmSilenced){ startAlarm(); }
-     } else { strip.style.display='none'; strip.innerHTML=''; try{ document.body.classList.remove('sc-emerg'); }catch(e){} try{var _h=document.getElementById('emg-silence'); if(_h) _h.remove(); var _fx=document.getElementById('emg-facts'); if(_fx) _fx.remove(); var _ot=document.getElementById('emg-others'); if(_ot) _ot.remove(); var _t2=document.getElementById('recs-ttl'); if(_t2) _t2.textContent='המלצות לפעולה';}catch(e){} stopAlarm(); _alarmId=null; }
+     } else { strip.style.display='none'; strip.innerHTML=''; try{ document.body.classList.remove('sc-emerg'); }catch(e){} try{ _scLiveBanner(false); }catch(e){} try{var _h=document.getElementById('emg-silence'); if(_h) _h.remove(); var _fx=document.getElementById('emg-facts'); if(_fx) _fx.remove(); var _ot=document.getElementById('emg-others'); if(_ot) _ot.remove(); var _t2=document.getElementById('recs-ttl'); if(_t2) _t2.textContent='המלצות לפעולה';}catch(e){} stopAlarm(); _alarmId=null; }
    }
  }catch(e){}
  if(newSos){ _liveBeep(); flyToLive(newSos.lat,newSos.lng,newSos.id); bigSosAlert(newSos.id); }
