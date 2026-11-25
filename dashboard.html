@@ -251,9 +251,10 @@
 <style id="live-css">
 .sos-div{background:none;border:0}
 .sos-beacon{position:relative;width:44px;height:44px;cursor:pointer}
-.sos-beacon .core{position:absolute;top:50%;left:50%;width:20px;height:20px;border-radius:50%;transform:translate(-50%,-50%);z-index:3;animation:sosflash .9s steps(1,end) infinite}
+.sos-beacon .core{position:absolute;top:50%;left:50%;width:20px;height:20px;border-radius:50%;transform:translate(-50%,-50%);z-index:3;animation:sosflash 1.8s ease-in-out infinite}
 .sos-beacon .halo{position:absolute;top:50%;left:50%;width:20px;height:20px;border-radius:50%;transform:translate(-50%,-50%);z-index:2;animation:soshalo 1.5s ease-out infinite}
-@keyframes sosflash{0%{background:#FF2D2D;box-shadow:0 0 10px 3px rgba(255,45,45,.95),0 0 0 2px #fff}50%{background:#2f6bff;box-shadow:0 0 10px 3px rgba(47,107,255,.95),0 0 0 2px #fff}}
+/* v426: red/blue snap -> brand red breathing behind a gold rim. Same job, no police strobe. */
+@keyframes sosflash{0%,100%{background:#C8102E;box-shadow:0 0 9px 2px rgba(200,16,46,.85),0 0 0 2px rgba(224,168,40,.95)}50%{background:#FF2D4A;box-shadow:0 0 16px 5px rgba(255,45,74,.95),0 0 0 2px rgba(224,168,40,1)}}
 @keyframes soshalo{0%{box-shadow:0 0 0 0 rgba(255,45,45,.55)}70%{box-shadow:0 0 0 24px rgba(255,45,45,0)}100%{box-shadow:0 0 0 0 rgba(255,45,45,0)}}
 .feed .item{cursor:pointer;transition:background .12s}
 .feed .item:hover{background:rgba(255,255,255,.04)}
@@ -261,17 +262,17 @@
 .feed .item.flash{animation:feedflash 1.1s ease-out 2}
 @keyframes feedflash{0%{background:rgba(229,72,77,.32)}100%{background:rgba(229,72,77,.07)}}
 .feed .live-go{color:var(--tx3);font-size:14px;align-self:center;flex:0 0 auto;opacity:.6}
-.live-alert{position:absolute;top:8px;left:8px;right:8px;z-index:30;background:linear-gradient(90deg,#FF2D2D,#2f6bff);color:#fff;font-weight:800;font-size:12px;padding:8px 12px;border-radius:9px;display:flex;align-items:center;gap:8px;box-shadow:0 6px 20px rgba(0,0,0,.4);animation:laIn .3s ease}
+.live-alert{position:absolute;top:8px;left:8px;right:8px;z-index:30;background:linear-gradient(90deg,#FF2D4A,#8C0A1E);color:#fff;font-weight:800;font-size:12px;padding:8px 12px;border-radius:9px;display:flex;align-items:center;gap:8px;box-shadow:0 6px 20px rgba(0,0,0,.4);animation:laIn .3s ease}
 @keyframes laIn{from{opacity:0;transform:translateY(-8px)}to{opacity:1;transform:none}}
 </style>
 <style id="resp-css">
 .sos-pop{position:fixed;inset:0;z-index:99990;display:flex;align-items:center;justify-content:center;background:rgba(6,11,22,.55);font-family:Alef,system-ui,sans-serif;animation:rpf .2s ease}
 @keyframes rpf{from{opacity:0}to{opacity:1}}
 .sos-pop-card{width:100%;max-width:340px;background:linear-gradient(180deg,#1a2131,#12151d);border:1px solid #3a2730;border-radius:20px;padding:22px;text-align:center;box-shadow:0 24px 70px rgba(0,0,0,.6)}
-.sos-pop-ring{width:58px;height:58px;margin:0 auto 12px;border-radius:50%;background:#FF2D2D;animation:sosflash .9s steps(1,end) infinite;display:flex;align-items:center;justify-content:center;font-size:28px}
+.sos-pop-ring{width:58px;height:58px;margin:0 auto 12px;border-radius:50%;background:#FF2D2D;animation:sosflash 1.8s ease-in-out infinite;display:flex;align-items:center;justify-content:center;font-size:28px}
 .sos-pop-card h3{color:#fff;font-size:20px;font-weight:800;margin:0 0 4px}
 .sos-pop-card p{color:#9aa6bd;font-size:13px;margin:0 0 16px}
-.sos-pop-go{width:100%;height:48px;border:0;border-radius:12px;background:linear-gradient(135deg,#e5484d,#2f6bff);color:#fff;font-weight:800;font-size:15px;cursor:pointer;font-family:inherit}
+.sos-pop-go{width:100%;height:48px;border:0;border-radius:12px;background:linear-gradient(135deg,#FF2D4A,#A8102C);color:#fff;font-weight:800;font-size:15px;cursor:pointer;font-family:inherit}
 .sos-pop-x{margin-top:9px;background:none;border:0;color:#8a93a6;font-size:13px;cursor:pointer;font-family:inherit}
 /* ══════════ v412 · EMERGENCY MODE ══════════
    A duty officer with a live SOS does not need the crime-mix donut, the 12-month graph, the
@@ -279,20 +280,44 @@
    a 380px drawer competing with them - which is why the response centre "disappeared into the
    noise". In an emergency the screen now answers one question: this incident. Everything that
    is not the map or the incident is removed, fast, and comes straight back on close. */
-body.emg-out .card:not(.c-map){opacity:0;transform:scale(.97);transition:opacity .15s ease,transform .15s ease}
+/* v427: the cards turn over instead of dissolving, so the board visibly FLIPS to the incident
+   rather than having a panel appear over it. Staggered a touch so it reads as one surface
+   turning, not nine things vanishing at once. */
+.cmd-grid{perspective:1600px;perspective-origin:50% 40%}
+body.emg-out .card:not(.c-map){opacity:0;transform:rotateY(-82deg) scale(.94);
+  transition:opacity .26s ease,transform .3s cubic-bezier(.45,0,.55,1)}
 body.emg .card:not(.c-map){display:none!important}
 body.emg .cmd-grid{grid-template-columns:minmax(0,1fr)!important;grid-template-rows:minmax(0,1fr)!important;
-  grid-template-areas:"map"!important;padding-inline-start:calc(380px + 20px)!important}
+  grid-template-areas:"map"!important;padding-inline-start:calc(460px + 20px)!important}
 body.emg .c-map{animation:emgIn .22s cubic-bezier(.2,.8,.3,1)}
 @keyframes emgIn{from{opacity:.35;transform:scale(.985)}to{opacity:1;transform:none}}
 /* a thin standing reminder that the board is in emergency mode and what will come back */
 /* The "where did my dashboard go" answer lives at the foot of the panel, in the scroll flow.
    As an overlay it covered either the header clock or the map's own layer toggles. */
+/* v427: the end of the flow gets real weight - it is the one green action in a red panel. */
+.rfin{margin:14px 0 6px;padding-top:14px;border-top:1px solid rgba(255,255,255,.09)}
+.rfin-btn{width:100%;padding:14px;border:0;border-radius:12px;cursor:pointer;font-family:inherit;
+  font-weight:900;font-size:14.5px;color:#06240f;
+  background:linear-gradient(135deg,#2BC47E,#16A06A);
+  box-shadow:0 6px 20px rgba(22,160,106,.35);transition:transform .12s,box-shadow .15s}
+.rfin-btn:hover{box-shadow:0 8px 26px rgba(22,160,106,.5)}
+.rfin-btn:active{transform:scale(.985)}
+.rfin-h{margin-top:7px;text-align:center;font-size:10.5px;color:#6d7893;line-height:1.5}
 .remg{margin-top:4px;text-align:center;font-size:10.5px;color:#6d7893;line-height:1.5}
 @media (max-width:1100px){ body.emg .cmd-grid{padding-inline-start:16px!important} }
-.resp{position:fixed;top:0;inset-inline-start:0;height:100vh;width:380px;max-width:92vw;z-index:99991;background:linear-gradient(180deg,#141a27,#0f1218);border-inline-end:1px solid #2a3450;box-shadow:0 0 50px rgba(0,0,0,.55);display:flex;flex-direction:column;transform:translateX(-102%);transition:transform .28s ease;font-family:Alef,system-ui,sans-serif}
-[dir=rtl] .resp{inset-inline-start:auto;inset-inline-end:0;border-inline-end:0;border-inline-start:1px solid #2a3450;transform:translateX(102%)}
-.resp.on{transform:none!important}
+@media (max-width:900px){ .emg-facts{grid-template-columns:repeat(2,minmax(0,1fr))} }
+/* v427: this used to slide in from the edge as a drawer ON TOP of the board, which is why it
+   read as a popup. It now FLIPS in on the Y axis as the cards flip out, so the board turns over
+   and the incident panel is what is there instead - one movement, one place to look. Wider too
+   (460px): a drawer sits over your work, a panel replaces it. */
+.resp{position:fixed;top:0;inset-inline-start:0;height:100vh;width:460px;max-width:94vw;z-index:99991;
+  background:linear-gradient(180deg,#141a27,#0f1218);border-inline-end:1px solid #2a3450;
+  box-shadow:0 0 60px rgba(0,0,0,.6);display:flex;flex-direction:column;
+  transform:perspective(1500px) rotateY(-92deg);transform-origin:left center;opacity:0;
+  transition:transform .42s cubic-bezier(.2,.9,.25,1),opacity .22s ease;
+  font-family:Alef,system-ui,sans-serif;will-change:transform}
+[dir=rtl] .resp{inset-inline-start:auto;inset-inline-end:0;border-inline-end:0;border-inline-start:1px solid #2a3450;transform:perspective(1500px) rotateY(92deg);transform-origin:right center}
+.resp.on{transform:perspective(1500px) rotateY(0deg)!important;opacity:1}
 .resp-h{padding:14px 16px;border-bottom:1px solid #232c40;display:flex;align-items:center;gap:10px;background:linear-gradient(90deg,rgba(229,72,77,.16),rgba(47,107,255,.08))}
 .resp-h .ic{font-size:22px}
 .resp-h .tt{flex:1}.resp-h .tt b{display:block;font-size:15px;color:#f2f5fb}.resp-h .tt span{font-size:11px;color:#9aa6bd}
@@ -310,8 +335,16 @@ body.emg .c-map{animation:emgIn .22s cubic-bezier(.2,.8,.3,1)}
 .resp-bc{background:#101a2e;border:1px solid #378ADD;color:#8ab4ff}
 .resp-send{background:linear-gradient(135deg,#b8841c,#e0a828 60%,#f3cf6a);color:#23180a;border:0;border-radius:11px;padding:12px;text-align:center;font-size:14px;font-weight:800;cursor:pointer;width:100%;font-family:inherit}
 .resp-nat{background:rgba(255,255,255,.03);border:1px dashed #3a4a63;border-radius:10px;padding:10px 12px;font-size:11px;color:#9aa6bd;line-height:1.6}
-.resp-log{font-size:11.5px;color:#9aa6bd;line-height:1.9}
+.resp-log{font-size:11.5px;color:#9aa6bd;line-height:1.5;max-height:230px;overflow:auto}
 .resp-log b{color:#6ee7a8}
+.rl-row{display:grid;grid-template-columns:8px 42px 1fr auto;align-items:baseline;gap:8px;
+  padding:7px 2px;border-bottom:1px solid rgba(255,255,255,.05)}
+.rl-row:last-child{border-bottom:0}
+.rl-dot{width:7px;height:7px;border-radius:50%;align-self:center}
+.rl-kind{font-size:9.5px;font-weight:900;letter-spacing:.04em}
+.rl-tx{color:#c8d2e4;font-size:11.5px;line-height:1.5}
+.rl-t{font-size:10px;color:#5f6b82;white-space:nowrap;font-variant-numeric:tabular-nums}
+.rl-empty{color:#5f6b82;font-size:11px;padding:8px 2px}
 .resp-live{color:#ff5a5f;font-weight:800;animation:respBlink 1s steps(2,end) infinite}
 @keyframes respBlink{50%{opacity:.25}}
 .rsec{border:1px solid #232c40;border-radius:13px;padding:12px 13px;background:rgba(255,255,255,.015)}
@@ -448,11 +481,11 @@ body.emg .c-map{animation:emgIn .22s cubic-bezier(.2,.8,.3,1)}
 @keyframes lbpulse2{0%,100%{box-shadow:inset 4px 0 0 #e5484d}50%{box-shadow:inset 4px 0 0 #ff6b78,0 0 16px rgba(229,72,77,.3)}}
 .live-banner .lb-t{font-size:13px;font-weight:800}
 .live-banner .lb-m{font-size:11px;color:#f2c7cb;margin-top:2px}
-.live-banner .lb-go{margin-top:7px;background:linear-gradient(135deg,#FF2D2D,#2f6bff);color:#fff;font-weight:800;font-size:11px;border:0;border-radius:8px;padding:6px 13px;cursor:pointer;font-family:inherit}
+.live-banner .lb-go{margin-top:7px;background:linear-gradient(135deg,#FF2D4A,#A8102C);color:#fff;font-weight:800;font-size:11px;border:0;border-radius:8px;padding:6px 13px;cursor:pointer;font-family:inherit}
 #live-banner{display:none}
 /* ops row spans the exact console width; strip + user panel fill it, no dead space */
 .ops-row{display:flex;gap:14px;padding:14px 18px 0;align-items:stretch}
-.live-strip{flex:2 1 0;min-width:0;border-radius:16px;cursor:pointer;display:flex;align-items:center;justify-content:space-between;gap:18px;padding:12px 18px;animation:lspulse 1.1s steps(1,end) infinite;position:relative;overflow:hidden}
+.live-strip{flex:2 1 0;min-width:0;border-radius:16px;cursor:pointer;display:flex;align-items:center;justify-content:space-between;gap:18px;padding:12px 18px;animation:lspulse 2.4s ease-in-out infinite;position:relative;overflow:hidden}
 .user-panel{flex:1 1 0;min-width:250px;background:linear-gradient(160deg,rgba(26,34,52,.92),rgba(14,20,34,.94));border:1px solid var(--db);border-radius:16px;padding:12px 15px;display:flex;flex-direction:column;justify-content:center;gap:9px}
 .user-panel .up-head{display:flex;align-items:center;gap:10px}
 .user-panel .up-emblem{flex:0 0 auto;width:34px;height:34px;border-radius:10px;background:linear-gradient(135deg,#E0A828,#F5C840);display:flex;align-items:center;justify-content:center;box-shadow:0 2px 8px rgba(224,168,40,.3)}
@@ -480,7 +513,23 @@ body.emg .c-map{animation:emgIn .22s cubic-bezier(.2,.8,.3,1)}
 .set-tg.on{background:linear-gradient(135deg,#16a06a,#1fc285)}
 .set-tg.on i{inset-inline-start:21px}
 .set-btn{flex:0 0 auto;background:linear-gradient(135deg,#b8841c,#e0a828 60%,#f3cf6a);color:#23180a;border:none;border-radius:9px;padding:8px 14px;font:800 12.5px Alef,sans-serif;cursor:pointer}
-@keyframes lspulse{0%,100%{background:linear-gradient(90deg,rgba(255,26,64,.96),rgba(214,20,40,.93));box-shadow:0 10px 30px rgba(204,20,38,.5),0 0 0 1px rgba(255,130,140,.7) inset}50%{background:linear-gradient(90deg,rgba(43,98,255,.93),rgba(20,70,210,.92));box-shadow:0 10px 36px rgba(30,90,220,.55),0 0 0 1px rgba(140,175,255,.8) inset}}
+/* v426: was a hard red/blue snap - steps(1,end) at 1.1s, i.e. a police strobe twice a second.
+   It read as a toy, it is close to the WCAG 2.3.1 flash threshold, and it is exhausting to sit
+   in front of for the length of a real incident. SH✡MER's palette is navy, gold and one red;
+   blue belongs to no part of it. This breathes the brand red and brightens a gold hairline on
+   the inside edge - still unmistakably "emergency, look here", but something an operator can
+   work next to for an hour. Slower (2.4s) and eased, so it reads as a heartbeat, not a siren. */
+@keyframes lspulse{
+ 0%,100%{background:linear-gradient(90deg,rgba(186,16,44,.97),rgba(140,10,30,.95));
+         box-shadow:0 10px 28px rgba(150,14,36,.42),0 0 0 1px rgba(224,168,40,.30) inset}
+ 50%    {background:linear-gradient(90deg,rgba(255,40,74,.99),rgba(190,14,42,.97));
+         box-shadow:0 14px 40px rgba(220,30,60,.60),0 0 0 1px rgba(224,168,40,.85) inset}
+}
+/* Once the operator has opened the incident the strobe has done its job - it exists to pull a
+   head up from another screen, not to keep shouting at someone already working the event. */
+.live-strip.calm{animation:none!important;
+  background:linear-gradient(90deg,rgba(176,14,42,.96),rgba(132,10,30,.94))!important;
+  box-shadow:0 8px 24px rgba(140,12,34,.38),0 0 0 1px rgba(224,168,40,.45) inset!important}
 .live-strip .ls-go{flex:0 0 auto}
 .live-strip .ls-go button{background:rgba(10,16,30,.5);color:#fff;font-weight:800;font-size:13px;border:1px solid rgba(255,255,255,.4);border-radius:11px;padding:11px 16px;cursor:pointer;font-family:inherit;white-space:nowrap;transition:background .15s}
 .live-strip .ls-go button:hover{background:rgba(10,16,30,.75)}
@@ -513,10 +562,18 @@ body.emg .c-map{animation:emgIn .22s cubic-bezier(.2,.8,.3,1)}
 .live-strip .ls-beacon{flex:0 0 auto;display:flex;align-items:center}
 .live-strip .ls-live{display:inline-flex;align-items:center;gap:5px;background:rgba(10,16,30,.55);color:#fff;font-weight:900;font-size:12px;letter-spacing:.08em;padding:7px 12px;border-radius:999px;border:1px solid rgba(255,255,255,.5);white-space:nowrap}
 .live-strip.attended .ls-live{opacity:.6}
-.ls-silence{margin-inline-start:10px;display:inline-flex;align-items:center;gap:8px;
-  background:#fff;color:#0A1428;font-weight:800;font-size:12.5px;border:0;
-  border-radius:10px;padding:8px 14px;cursor:pointer;font-family:inherit;white-space:nowrap;
-  box-shadow:0 2px 10px rgba(0,0,0,.35);transition:transform .12s,box-shadow .15s}
+/* v426: still being missed. White-on-red was right but it was a 12.5px chip among six other
+   things on a strobing bar - the eye had nowhere to land. Bigger, a real 44px target, and a gold
+   ring so it reads as the one thing on this bar you are meant to press. */
+.ls-silence{margin-inline-start:12px;display:inline-flex;align-items:center;gap:9px;
+  background:#fff;color:#0A1428;font-weight:900;font-size:14px;
+  border:2px solid rgba(224,168,40,.95);
+  border-radius:12px;padding:10px 18px;min-height:44px;cursor:pointer;font-family:inherit;white-space:nowrap;
+  box-shadow:0 4px 18px rgba(0,0,0,.45),0 0 0 4px rgba(224,168,40,.18);transition:transform .12s,box-shadow .15s}
+.rstep-next{display:block;width:100%;margin-top:10px;background:transparent;border:1px solid rgba(224,168,40,.45);
+  color:#E0A828;font-family:inherit;font-weight:800;font-size:12.5px;border-radius:10px;padding:9px 12px;cursor:pointer;
+  transition:background .14s}
+.rstep-next:hover{background:rgba(224,168,40,.10)}
 .ls-silence:hover{box-shadow:0 4px 16px rgba(0,0,0,.45)}
 .ls-silence:active{transform:scale(.96)}
 /* The old control was a dim outline on a red strip that strobes - it read as decoration, and
@@ -524,8 +581,8 @@ body.emg .c-map{animation:emgIn .22s cubic-bezier(.2,.8,.3,1)}
    contrast so it is the one solid object on a moving background, and the second line answers
    the question that stopped people pressing it. */
 .ls-silence .lsx{display:flex;flex-direction:column;align-items:flex-start;line-height:1.15}
-.ls-silence .lsx b{font-size:12.5px}
-.ls-silence .lsx i{font-style:normal;font-size:10px;font-weight:700;color:#5A6B86}
+.ls-silence .lsx b{font-size:14px}
+.ls-silence .lsx i{font-style:normal;font-size:11px;font-weight:700;color:#5A6B86}
 .ls-silence.done .lsx i{color:#8FA0BA}
 .ls-silence.done{background:rgba(60,72,96,.5);border-color:rgba(255,255,255,.2);color:#aeb7c7;cursor:default}
 .live-strip .ls-dot{position:absolute;inset:0;margin:auto;width:20px;height:20px;border-radius:50%;background:#fff;box-shadow:0 0 0 0 rgba(255,255,255,.85);animation:lsdot 1s ease-out infinite}
@@ -646,8 +703,169 @@ body.emg .c-map{animation:emgIn .22s cubic-bezier(.2,.8,.3,1)}
 .intl-note{display:flex;flex-direction:column;justify-content:center;height:100%;gap:6px;padding:4px 6px;color:var(--tx2);font-size:12.5px;line-height:1.55}
 .intl-note b{color:var(--tx);font-size:14px}
 </style>
+<style id="sc-guide-css">
+/* NORMAL / EMERGENCY state + guided response checklist. Flashing is 1 cycle per second (2 colour changes/s),
+   inside the 3-flashes-per-second photosensitivity limit; prefers-reduced-motion gets no card border at all (v428 removed the red/blue one). */
+.sc-state{flex:0 0 auto;display:flex;align-items:center;gap:10px;min-height:36px;padding:6px 16px;font-size:13.5px;line-height:1.35;color:#eaf7f0;background:linear-gradient(90deg,rgba(43,196,126,.18),rgba(43,196,126,.05));border-bottom:1px solid rgba(43,196,126,.4)}
+.sc-state b{font-weight:800;letter-spacing:.02em;white-space:nowrap}
+.sc-state .sc-msg{color:var(--tx2);min-width:0}
+.sc-dot{flex:none;width:10px;height:10px;border-radius:50%;background:var(--ok);box-shadow:0 0 0 3px rgba(43,196,126,.25)}
+.sc-state .sc-tag{flex:none;font-size:11px;font-weight:700;color:var(--gold);border:1px dashed var(--gold-l);border-radius:999px;padding:1px 8px;white-space:nowrap}
+.sc-jump{flex:none;min-height:28px;padding:0 14px;border-radius:999px;border:1.5px solid rgba(255,255,255,.75);background:rgba(0,0,0,.18);color:#fff;font:800 12.5px var(--font);cursor:pointer;white-space:nowrap}
+.sc-state .sc-sp{flex:1}
+/* ══ v427 · THE INCIDENT SIGNAL ════════════════════════════════════════════
+   One element, top edge of the viewport, above everything. Brand red base with a gold light
+   sweeping across it - a scanning instrument, not a police roof light. It reads as "this desk
+   has a live incident" from across a room, it carries the brand's own two colours, and it is
+   the same shape whether there is one incident or six, so it never competes with itself.
+   Continuous sweep rather than on/off: no flash frequency at all, so it sits nowhere near the
+   WCAG 2.3.1 seizure threshold and can be looked at for an hour. */
+#emg-scan{position:fixed;top:0;left:0;right:0;height:4px;z-index:100000;pointer-events:none;
+  display:none;background:linear-gradient(90deg,#8C0A1E,#C8102E 35%,#C8102E 65%,#8C0A1E);
+  box-shadow:0 2px 18px rgba(200,16,46,.55)}
+body.sc-emerg #emg-scan,body.emg #emg-scan{display:block}
+#emg-scan::after{content:"";position:absolute;inset:0;
+  background:linear-gradient(90deg,transparent 0%,transparent 38%,rgba(224,168,40,.0) 42%,
+    rgba(224,168,40,.95) 50%,rgba(255,232,170,1) 52%,rgba(224,168,40,.95) 54%,
+    rgba(224,168,40,0) 62%,transparent 66%,transparent 100%);
+  background-size:260% 100%;animation:emgScan 2.6s linear infinite}
+@keyframes emgScan{from{background-position:130% 0}to{background-position:-130% 0}}
+@media (prefers-reduced-motion:reduce){#emg-scan::after{animation:none;background:linear-gradient(90deg,transparent,rgba(224,168,40,.7),transparent)}}
+.sc-state.sc-emerg{color:#fff;background:#c8102e;border-bottom-color:rgba(224,168,40,.9);animation:scBan 2.4s ease-in-out infinite}
+.sc-state.sc-emerg .sc-msg{color:#fff}
+.sc-state.sc-emerg .sc-dot{background:#fff;box-shadow:0 0 0 3px rgba(255,255,255,.35)}
+.sc-state.sc-emerg b{font-size:15px}
+.sc-state.sc-emerg .sc-tag{color:#fff;border-color:rgba(255,255,255,.7)}
+/* v426: was a 1s hard snap between #c8102e and #1f4fd6 - the whole banner flipping red/blue
+   twice a second. Blue is not in this palette; the snap is what made it feel cheap and made the
+   screen "blink irregularly". Breathes the brand red instead, eased over 2.4s. */
+@keyframes scBan{0%,100%{background:#A8102C}50%{background:#E01A3C}}
+.sc-state.sc-after{color:#fff;background:linear-gradient(90deg,rgba(250,172,34,.26),rgba(250,172,34,.08));border-bottom-color:var(--gold-l)}
+.sc-state.sc-after .sc-dot{background:var(--gold);box-shadow:0 0 0 3px var(--gold-s)}
+.sc-state.sc-after .sc-msg{color:#f6e3bd}
+/* v427: the cards carry NO emergency marking at all now. v426 replaced a nine-panel strobe with
+   nine frozen red frames, which is the same mistake standing still - red on every surface is red
+   on nothing, and it buries the one thing that actually matters. The incident owns exactly one
+   signal: the scan bar at the top of the viewport. Everything else stays a calm, readable
+   surface, because an operator has to READ these panels while working the event. */
+
+/* ══ v428 · ONE EVENT PANEL ════════════════════════════════════════════════
+   In normal state the middle column is two cards: the events board and the recommendations.
+   During an incident they stop being two things. The recommendations card takes the whole
+   middle span and becomes the EVENT MESSAGE - what happened, where, who is near - and the
+   events board is folded away, because a second list of the same incident next to the first
+   is just the operator reading twice.
+   The step-by-step does NOT appear here either: that is the entire job of the flip panel, and
+   duplicating it was the "loaded with repeating information" problem. */
+body.sc-emerg .cmd-grid{grid-template-areas:"rank crime net prof" "recs recs recs map" "graph graph donut map"!important;
+  /* v430: in an open emergency the event panel is the job, so it takes the height from the
+     trend charts rather than hiding the other open events below a fold. Base is 15/46/39. */
+  grid-template-rows:minmax(0,13fr) minmax(0,60fr) minmax(0,27fr)!important}
+/* v430: #c-recs clipped 156px with overflow:hidden - the list said "5 more open" and showed one.
+   The card scrolls now, and the silence control stays pinned at the top of it where it belongs. */
+body.sc-emerg #c-recs{overflow-y:auto}
+.emg-silence{position:sticky;top:0;z-index:3}
+body.sc-emerg .c-feed{display:none!important}
+body.sc-emerg #c-recs{border-color:rgba(224,26,60,.55);box-shadow:0 0 0 1px rgba(224,26,60,.35),0 10px 34px rgba(160,12,36,.18)}
+body.sc-emerg #c-recs .ch{border-bottom-color:rgba(224,26,60,.35)}
+#c-recs.sc-on .sc-guide{display:none}
+
+/* the facts under the strip - two tidy columns, aligned baselines, no decoration */
+/* exactly three columns: six facts make two full rows. auto-fit chose four and left two
+   empty cells hanging, which is precisely the kind of ragged edge that makes a board look
+   unfinished. */
+.emg-facts{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:1px;flex:0 0 auto;
+  margin-top:12px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.08);
+  border-radius:12px;overflow:hidden}
+.ef-i{display:flex;align-items:baseline;justify-content:space-between;gap:12px;
+  padding:12px 14px;background:#121a2b}
+.ef-k{font-size:11.5px;color:#6d7893;font-weight:700;white-space:nowrap}
+.ef-v{font-size:13px;color:#dbe3f2;font-weight:800;text-align:end;
+  font-variant-numeric:tabular-nums;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.emg-others{flex:0 0 auto;margin-top:9px;border:1px solid rgba(255,255,255,.08);border-radius:12px;overflow:hidden}
+.eo-h{padding:7px 14px;font-size:11px;font-weight:800;letter-spacing:.06em;color:#6d7893;
+  background:rgba(255,255,255,.04);border-bottom:1px solid rgba(255,255,255,.07)}
+.eo-i{display:flex;align-items:center;gap:10px;width:100%;padding:8px 14px;background:#121a2b;
+  border:0;border-bottom:1px solid rgba(255,255,255,.05);cursor:pointer;font-family:inherit;
+  text-align:start;transition:background .13s}
+.eo-i:last-child{border-bottom:0}
+.eo-i:hover{background:#162034}
+.eo-d{width:7px;height:7px;border-radius:50%;flex:0 0 7px}
+.eo-t{flex:1;min-width:0;font-size:12.5px;font-weight:700;color:#dbe3f2;
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.eo-w{font-size:11px;color:#6d7893;white-space:nowrap;font-variant-numeric:tabular-nums}
+/* the panel holds its content at the top rather than stretching it down the column */
+body.sc-emerg #c-recs .cb,body.sc-emerg #c-recs{align-content:start}
+body.sc-emerg #c-recs{display:flex;flex-direction:column}
+body.sc-emerg #c-recs>#live-strip{flex:0 0 auto}
+/* v428: flex children shrink by default, which clipped the second row of facts to a
+   sliver - 6 cells present, 46px of room for 84px of rows. Nothing in this panel shrinks. */
+
+/* the silence control: top of the panel, full width, impossible to hunt for */
+.emg-silence{display:flex;align-items:center;justify-content:center;gap:10px;width:100%;flex:0 0 auto;
+  margin:0 0 12px;padding:15px 18px;min-height:52px;cursor:pointer;font-family:inherit;
+  background:#fff;color:#0A1428;font-weight:900;font-size:15.5px;
+  border:2px solid rgba(224,168,40,.95);border-radius:13px;
+  box-shadow:0 6px 22px rgba(0,0,0,.45),0 0 0 4px rgba(224,168,40,.16);
+  transition:transform .12s,box-shadow .15s}
+.emg-silence:hover{box-shadow:0 8px 28px rgba(0,0,0,.5),0 0 0 5px rgba(224,168,40,.22)}
+.emg-silence:active{transform:scale(.99)}
+.emg-silence .es-x{display:flex;flex-direction:column;align-items:flex-start;line-height:1.2}
+.emg-silence .es-x b{font-size:15.5px}
+.emg-silence .es-x i{font-style:normal;font-size:11px;font-weight:700;color:#5A6B86}
+.emg-silence.done{background:rgba(60,72,96,.5);border-color:rgba(255,255,255,.18);color:#aeb7c7;cursor:default;box-shadow:none}
+.emg-silence.done .es-x i{color:#8FA0BA}
+
+/* checklist (inside the emergency card) */
+#c-recs.sc-on #recspane{display:none}
+.sc-guide{flex:1 1 auto;min-height:0;overflow:auto;padding:6px 10px 10px}
+.scg-h{display:flex;align-items:center;gap:8px;padding:4px 2px 7px;border-bottom:1px solid var(--line);margin-bottom:6px}
+.scg-t{font-weight:800;font-size:14px;color:#fff;white-space:nowrap}
+.scg-ev{flex:1;min-width:0;font-size:12px;color:var(--tx2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.scg-n{flex:none;font:700 12px var(--num);color:var(--gold);background:var(--gold-s);border:1px solid var(--gold-l);border-radius:999px;padding:1px 9px;direction:ltr}
+.scg-list{list-style:none;display:flex;flex-direction:column;gap:3px}
+.scg-s{display:grid;grid-template-columns:26px 1fr;gap:9px;align-items:start;padding:5px 8px;border-radius:10px;border:1px solid transparent}
+.scg-num{width:26px;height:26px;border-radius:50%;display:grid;place-items:center;font:800 13px var(--num);background:rgba(255,255,255,.05);color:var(--tx3);border:1px solid var(--line-2)}
+.scg-st{display:flex;align-items:center;gap:8px;min-height:26px;font-size:13.5px;font-weight:700;color:var(--tx3)}
+.scg-s.done .scg-num{background:var(--ok);border-color:var(--ok);color:#06210f}
+.scg-s.done .scg-st{color:var(--tx2)}
+.scg-time{margin-inline-start:auto;font:600 11.5px var(--num);color:var(--tx3)}
+.scg-s.on{background:rgba(250,172,34,.08);border-color:var(--gold-l)}
+.scg-s.on .scg-num{background:#FC9918;border-color:#FC9918;color:#fff}
+.scg-s.on .scg-st{color:#fff;font-size:14.5px}
+.scg-s.wait{opacity:.6}
+.scg-d{margin-top:1px;font-size:12.5px;line-height:1.5;color:var(--tx)}
+.scg-btns{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}
+.scg-go{min-height:36px;padding:0 18px;border-radius:999px;border:0;background:#FC9918;color:#fff;font:800 13.5px var(--font);cursor:pointer;box-shadow:0 6px 16px rgba(252,153,24,.28)}
+.scg-go:hover{background:#E8850F}
+.scg-alt{min-height:36px;padding:0 14px;border-radius:999px;border:1px solid var(--line-2);background:transparent;color:var(--tx);font:700 13px var(--font);cursor:pointer}
+.scg-alt:hover{border-color:var(--gold);color:var(--gold)}
+.scg-go:focus-visible,.scg-alt:focus-visible,.sc-jump:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
+.scg-done{margin-top:8px;padding:10px 12px;border-radius:10px;background:rgba(43,196,126,.1);border:1px solid rgba(43,196,126,.35);font-size:12.5px;color:var(--tx2)}
+.scg-done b{display:block;font-size:14px;color:#5fdca2;margin-bottom:2px}
+.sc-rep-card{max-width:480px!important;max-height:calc(100vh - 32px);overflow:auto}
+.sc-rep-card .acct-sub{margin-bottom:2px}
+.sc-err{min-height:16px;margin-top:6px;font-size:12.5px;color:#ff8f98}
+@media(max-width:700px){#sc-report{align-items:flex-start;padding:12px}.sc-state .sc-tag{display:none}}
+@media(max-width:1100px){
+  .sc-state{position:sticky;top:0;z-index:1100;flex-wrap:wrap;row-gap:4px}
+  body.sc-emerg .cmd-grid,body.sc-after .cmd-grid{grid-template-areas:"recs" "map" "feed" "net" "crime" "prof" "graph" "donut" "rank"}
+  .scg-go,.scg-alt,.sc-jump{min-height:44px}
+}
+@media (prefers-reduced-motion:reduce){
+  /* v428: with Reduce Motion on, every card was getting a red border - the same nine-signals
+     mistake, just reached by a different route. One signal here too. The scan bar loses its
+     sweep, so it gets a solid gold core instead: still unmistakably live, no motion. */
+  .sc-state.sc-emerg{animation:none;background:#c8102e;border-bottom:4px solid rgba(224,168,40,.9)}
+  body.sc-emerg .cmd-grid>.card{animation:none}
+  #emg-scan{background:linear-gradient(90deg,#8C0A1E,#C8102E 20%,#E0A828 50%,#C8102E 80%,#8C0A1E)}
+  .live-strip{animation:none!important;background:linear-gradient(90deg,#B00E2A,#8C0A1E)}
+  .sos-beacon .core,.sos-beacon .halo,.sos-pop-ring,.resp-live,.feed .item.sos,.live-banner.active{animation:none!important}
+}
+</style>
 </head>
 <body>
+<div id="emg-scan" aria-hidden="true"></div>
 
 <!-- AUTH GATE -->
 <div id="gate" class="gate">
@@ -693,6 +911,7 @@ body.emg .c-map{animation:emgIn .22s cubic-bezier(.2,.8,.3,1)}
     <span class="plan-badge" id="plan-badge" title="סטטוס המוצר">גרסת בטא</span><button class="tbtn" id="trends-btn" onclick="openTrends()">📈 מגמות</button><button class="tbtn" id="team-btn" onclick="openTeam()">👥 צוות שומרים</button><button class="tbtn" id="acct-btn">⚙ חשבון</button><button class="tbtn" id="export-btn">⤓ ייצוא</button>
     <button class="tbtn" id="signout">יציאה</button>
   </div>
+  <div id="sc-state" class="sc-state sc-ok" role="status" aria-live="assertive"><span class="sc-dot"></span><b>מצב רגיל</b><span class="sc-msg">אין אירוע חירום פתוח. הלוח במעקב.</span></div>
   <!-- Physical layout (viewer's left → right), independent of RTL:
        row 1: ranking | stats | profile        rows 2–3: [emergency+feed / graph | donut] | MAP -->
   <main class="cmd-grid" id="cmd-grid">
@@ -714,18 +933,19 @@ body.emg .c-map{animation:emgIn .22s cubic-bezier(.2,.8,.3,1)}
     </section>
     <!-- ROWS 2 · LEFT: emergency / recommendations / actions  ‖  emergency events panel -->
     <section class="card c-recs ops-recs" id="c-recs">
-      <div class="ch"><span class="t">🚨 חירום · המלצות · פעולות למעקב</span><span class="sp"></span><span class="pill off" id="analysis-pill">לפי הנתונים</span><button class="dd-back" id="recsback" style="display:none" onclick="unfocus()">← הכל</button></div>
+      <div class="ch"><span class="t" id="recs-ttl">המלצות לפעולה</span><span class="sp"></span><span class="pill off" id="analysis-pill">לפי הנתונים</span><button class="dd-back" id="recsback" style="display:none" onclick="unfocus()">← הכל</button></div>
       <div id="live-banner" class="live-banner idle">ממתין לאירוע חי…</div>
       <div id="live-strip" class="live-strip" style="display:none"></div>
+      <div id="sc-guide" class="sc-guide" hidden aria-label="רשימת צעדים לטיפול באירוע"></div>
       <div class="cb recs" id="recspane"></div>
     </section>
     <section class="card c-feed ops-feed" id="c-feed">
-      <div class="ch"><span class="t">⚡ לוח אירועים</span><span class="sp"></span><button class="ch-btn" id="ex-clear" style="display:none" onclick="boardClearExamples()" title="מחיקת כל אירועי הדוגמה מהלוח">נקה דוגמאות</button><span class="pill live" id="feed-src">רשת שומרים</span></div>
+      <div class="ch"><span class="t">לוח אירועים</span><span class="sp"></span><button class="ch-btn" id="ex-clear" style="display:none" onclick="boardClearExamples()" title="מחיקת כל אירועי הדוגמה מהלוח">נקה דוגמאות</button><span class="pill live" id="feed-src">רשת שומרים</span></div>
       <div class="cb feed" id="feed"><div class="empty">מתחבר לרשת SH✡MER…</div></div>
     </section>
     <!-- ROW 3 · LEFT: graph chart -->
     <section class="card c-graph" id="c-graph">
-      <div class="ch"><span class="t" id="analysis-ttl">📊 מגמות · השוואה</span><span class="sp"></span><span class="pill off" id="trend-pill">נתוני אמת</span></div>
+      <div class="ch"><span class="t" id="analysis-ttl">מגמות והשוואה</span><span class="sp"></span><span class="pill off" id="trend-pill">נתוני אמת</span></div>
       <div class="cb" id="analysispane"></div>
     </section>
     <!-- ROW 3 · CENTRE: donut -->
@@ -735,7 +955,7 @@ body.emg .c-map{animation:emgIn .22s cubic-bezier(.2,.8,.3,1)}
     </section>
     <!-- ROWS 2–3 · RIGHT: MAP (hero) -->
     <section class="card c-map" id="c-map">
-      <div class="ch"><span class="t">מפת פשיעה · גבול שיפוט</span><span class="pill off">ציבורי</span><span class="sp"></span><span class="maptools"><button class="mini" id="spread-btn" title="הצג/הסתר שומרים">◉ שומרים</button><button class="mini on" id="tgl-bound" onclick="toggleMapLayer('bound')" title="הצג/הסתר גבול שיפוט">⬠ גבול</button></span></div>
+      <div class="ch"><span class="t">מפת פשיעה</span><span class="pill off">ציבורי</span><span class="sp"></span><span class="maptools"><button class="mini" id="spread-btn" title="הצג/הסתר שומרים">◉ שומרים</button><button class="mini on" id="tgl-bound" onclick="toggleMapLayer('bound')" title="הצג/הסתר גבול שיפוט">⬠ גבול</button></span></div>
       <div class="map-wrap"><div id="map"></div><div class="insp" id="insp"></div></div>
       <div class="legend" id="legend"></div>
     </section>
@@ -891,8 +1111,9 @@ async function boot(){
   else { DATA._custom={city:CLIENT.territory,lat:0,lng:0,total:null,cats:{},noData:true,intl:true,pending:true}; render(-1); setIntlTerritory(CLIENT.territory); }
 }
 function renderLegend(){ var el=document.getElementById('legend'); el.innerHTML=''; Object.keys(CAT_COL).forEach(function(k){ el.innerHTML+='<span><i style="background:'+CAT_COL[k]+'"></i>'+k+'</span>'; }); }
-/* approx CBS 2023 populations (public figures) for per-capita context */
-var POP={'תל אביב יפו':474000,'ירושלים':981000,'חיפה':285000,'ראשון לציון':254000,'פתח תקווה':248000,'אשדוד':225000,'נתניה':221000,'באר שבע':209000,'בני ברק':208000,'חולון':196000,'רמת גן':171000,'בית שמש':146000,'רחובות':149000,'אשקלון':144000,'בת ים':128000,'כפר סבא':100000,'חדרה':100000,'הרצליה':97000,'מודיעין':93000,'לוד':80000,'רמלה':77000,'רעננה':75000,'רהט':75000,'הוד השרון':65000,'גבעתיים':60000,'קרית גת':60000,'קרית אתא':58000,'נהריה':58000,'עפולה':56000,'אילת':52000,'עכו':49000,'טבריה':48000};
+/* CBS population, end of 2024: "קובץ יישובים 2024" (cbs.gov.il/he/publications/doclib/2019/ishuvim/bycode2024.xlsx, column סך הכל אוכלוסייה 2024).
+   Keyed by the crime-data city names; 'מודיעין' is an alias of מודיעין-מכבים-רעות. */
+var POP={'תל אביב יפו':494900,'ירושלים':1050151,'באר שבע':223587,'חיפה':297083,'אשדוד':228562,'ראשון לציון':259275,'נתניה':234812,'פתח תקווה':270403,'אשקלון':166865,'חולון':191829,'בת ים':129495,'רמת גן':172242,'אילת':56004,'רמלה':86052,'לוד':94189,'רחובות':155050,'חדרה':107974,'בני ברק':229995,'רהט':77996,'נצרת':75704,'כפר סבא':99410,'קרית גת':72139,'בית שמש':176786,'עפולה':66362,'טבריה':52122,'עכו':52884,'נוף הגליל':45805,'טמרה':36919,'טייבה':46870,'קרית אתא':62584,'ראש העין':79023,'דימונה':39590,'אום אל-פחם':60210,'שפרעם':43858,'הוד השרון':66398,'רעננה':82963,'מודיעין-מכבים-רעות':100052,'נתיבות':56019,'יבנה':58090,'גבעתיים':58600,'אור יהודה':41130,'שדרות':37239,'טירה':27680,'קרית מלאכי':27957,'קרית ים':41959,'אופקים':39894,'ערערה-בנגב':21259,'ערד':29505,'כרמיאל':47941,'פרדס חנה-כרכור':46601,'סח\'נין':33726,'קרית ביאליק':47072,'ג\'סר א זרקא':15823,'קרית מוצקין':51488,'רמת השרון':48860,'תל שבע':24781,'נס ציונה':47268,'קרית אונו':45048,'הרצליה':110885,'נהריה':67877,'מודיעין':100052};
 function perCap(x){ var p=POP[x.city]; return p?(x.total/p*1000):null; }
 function donutSVG(segs,center,sub){var tot=segs.reduce(function(s,x){return s+x.val;},0)||1,sz=150,r=sz/2-12,cx=sz/2,cy=sz/2,C=2*Math.PI*r,off=0;
  var arcs=segs.map(function(sg){var len=sg.val/tot*C;var el='<circle cx="'+cx+'" cy="'+cy+'" r="'+r+'" fill="none" stroke="'+sg.color+'" stroke-width="18" stroke-dasharray="'+len.toFixed(2)+' '+(C-len).toFixed(2)+'" stroke-dashoffset="'+(-off).toFixed(2)+'" transform="rotate(-90 '+cx+' '+cy+')"/>';off+=len;return el;}).join('');
@@ -1153,7 +1374,34 @@ function respToggle(k,el){ _respSel=_respSel||{}; _respSel[k]=!_respSel[k]; if(e
 function respFitRadius(){ try{ if(_respCircle&&MAP){ MAP.fitBounds(_respCircle.getBounds(),{padding:[40,40]}); } }catch(e){} }
 function _radChip(){ try{ var mc=document.getElementById('map'); if(!mc)return; var ch=document.getElementById('rad-chip'); if(!ch){ ch=document.createElement('div'); ch.id='rad-chip'; ch.style.cssText='position:absolute;top:10px;inset-inline-start:10px;z-index:600;background:rgba(20,26,39,.92);border:1px solid #2a3450;color:#4fc3e8;font:700 12px Alef,system-ui,sans-serif;padding:6px 11px;border-radius:9px;box-shadow:0 4px 14px rgba(0,0,0,.4);pointer-events:none'; mc.appendChild(ch); } ch.textContent='\u05e8\u05d3\u05d9\u05d5\u05e1 \u05d4\u05ea\u05e8\u05d0\u05d4 \u00b7 '+_respRadius.toFixed(1)+' \u05e7"\u05de'; }catch(e){} }
 function respSetRadius(v){ _respRadius=parseFloat(v)||1.5; var rr=document.getElementById('resp-reach'); var rv=document.getElementById('resp-rv'); if(rv)rv.textContent=_respRadius.toFixed(1)+' ק"מ'; if(rr)rr.innerHTML='רדיוס התראה: <b style="color:#eef1f7">'+_respRadius.toFixed(1)+' ק"מ</b>'; try{ if(_respCircle){ _respCircle.setRadius(_respRadius*1000); } }catch(e){} try{ _radChip(); }catch(e){} }
-function respLog(id,txt){ var o=_liveEvents[id]; if(!o)return; if(!o._log){ try{ o._log=(((_boardLoad().reviews||{})[id]||{}).resp||[]).slice(); }catch(e){ o._log=[]; } } o._log.push(ilFull(Date.now())+' — '+txt); try{ var _B=_boardLoad(), _r=_B.reviews[id]||(_B.reviews[id]={}); _r.resp=(_r.resp||[]).concat([o._log[o._log.length-1]]).slice(-50); _boardSave(_B); }catch(e){}   /* kept with the event record - survives a reload */ var el=document.getElementById('resp-log'); if(el)el.innerHTML=o._log.map(function(l){return '<div>• '+l+'</div>';}).join(''); }
+/* v427: the log was a flat run of "time - text" lines, which at six entries reads as a shopping
+   list - no shape, nothing scannable, no way to see at a glance what stage the event is at.
+   Each line is now typed by what it says and rendered as a timeline: a coloured marker for the
+   kind of thing that happened, the text, and the clock pushed to the edge where it belongs.
+   Kind is inferred from the stored line, so existing logs keep working with no migration. */
+function _respLogKind(l){
+  var t=String(l||'');
+  if(/נסגר|סגירה|הועבר ליומן/.test(t))            return ['close','#2BC47E','סגירה'];
+  if(/שיגור|סומן|יוצא לאירוע|כוחות/.test(t))       return ['disp','#E0A828','שיגור'];
+  if(/אותר|מיקום|כתובת|זום|שותף/.test(t))          return ['loc','#4FC3E8','מקום'];
+  if(/ראיה|ראיות|צילום|תיעוד|מסמך/.test(t))        return ['evid','#9A6FD9','ראיות'];
+  if(/התקשר|טלפון|100|101|102|מוקד/.test(t))       return ['call','#FF8A3D','קשר'];
+  return ['stat','#7E8CA0','עדכון'];
+}
+function _respLogHtml(lines){
+  if(!lines||!lines.length) return '<div class="rl-empty">אין עדיין רישומים</div>';
+  return lines.map(function(l){
+    var parts=String(l).split(' — '), tm=parts.length>1?parts.shift():'', tx=parts.join(' — ');
+    var k=_respLogKind(l);
+    return '<div class="rl-row">'
+      +'<span class="rl-dot" style="background:'+k[1]+'"></span>'
+      +'<span class="rl-kind" style="color:'+k[1]+'">'+k[2]+'</span>'
+      +'<span class="rl-tx">'+tx+'</span>'
+      +'<span class="rl-t">'+tm+'</span>'
+      +'</div>';
+  }).join('');
+}
+function respLog(id,txt){ var o=_liveEvents[id]; if(!o)return; if(!o._log){ try{ o._log=(((_boardLoad().reviews||{})[id]||{}).resp||[]).slice(); }catch(e){ o._log=[]; } } o._log.push(ilFull(Date.now())+' — '+txt); try{ var _B=_boardLoad(), _r=_B.reviews[id]||(_B.reviews[id]={}); _r.resp=(_r.resp||[]).concat([o._log[o._log.length-1]]).slice(-50); _boardSave(_B); }catch(e){}   /* kept with the event record - survives a reload */ var el=document.getElementById('resp-log'); if(el)el.innerHTML=_respLogHtml(o._log); }
 function respDispatch(id){
  var sel=Object.keys(_respSel||{}).filter(function(k){return _respSel[k];});
  if(!sel.length){ try{alert('בחר/י לפחות קבוצה אחת לשיגור');}catch(e){} return; }
@@ -1185,7 +1433,27 @@ function respStep(n){
     if(t&&t.scrollIntoView) t.scrollIntoView({block:'nearest',behavior:'smooth'});
   }catch(e){}
 }
-function closeResponse(){ try{ emgLeave(); }catch(_){} var p=document.getElementById('resp'); if(p){ p.classList.remove('on'); setTimeout(function(){try{p.remove();}catch(e){}},300); } try{ if(_respCircle){MAP.removeLayer(_respCircle);_respCircle=null;} }catch(e){} try{ var _rc=document.getElementById('rad-chip'); if(_rc)_rc.remove(); }catch(e){} }
+/* v426: the strobe used to run forever - only silenceAlarm() ever stopped it, so an operator who
+   opened the incident, worked it and closed the panel was left with a flashing bar on screen for
+   the rest of the session. Opening the incident is the acknowledgement; from then on the strip
+   stays red and present, but still. */
+function stripCalm(){ try{ var st=document.getElementById('live-strip'); if(st) st.classList.add('calm'); }catch(e){} }
+/* v427: closes the incident properly - writes the closure to the log, marks it handled so the
+   signal bar and the feed stop treating it as open, then flips the board back. */
+function respFinish(id){
+  try{
+    var o=_liveEvents&&_liveEvents[id];
+    try{ respLog(id,'האירוע נסגר ע״י המוקדן · הועבר ליומן'); }catch(e){}
+    try{ if(o) o.closed=true; }catch(e){}
+    try{ var st=document.getElementById('live-strip'); if(st){ st.classList.add('attended'); st.style.display='none'; } }catch(e){}
+    try{ document.body.classList.remove('sc-emerg'); }catch(e){}
+    try{ stopAlarm(); }catch(e){}
+    try{ _playResolveTone(); }catch(e){}
+    try{ toast && toast('האירוע נסגר · הלוח חזר'); }catch(e){}
+  }catch(e){}
+  try{ closeResponse(); }catch(e){}
+}
+function closeResponse(){ try{ emgLeave(); stripCalm(); }catch(_){} var p=document.getElementById('resp'); if(p){ p.classList.remove('on'); setTimeout(function(){try{p.remove();}catch(e){}},460); } try{ if(_respCircle){MAP.removeLayer(_respCircle);_respCircle=null;} }catch(e){} try{ var _rc=document.getElementById('rad-chip'); if(_rc)_rc.remove(); }catch(e){} }
 function stripGeocode(lat,lng){
  var box=document.getElementById('ls-addr-txt'); if(!box)return;
  if(CLIENT&&CLIENT.demo){ box.textContent='כתובת לדוגמה · '+lat.toFixed(3)+', '+lng.toFixed(3); return; }   /* demo: no outside geocoder call */
@@ -1196,54 +1464,95 @@ function stripGeocode(lat,lng){
    .catch(function(){ box.textContent=lat.toFixed(4)+', '+lng.toFixed(4); });
  }catch(e){}
 }
-function _playAlertTone(){
- try{ var AC=window.AudioContext||window.webkitAudioContext; if(!AC)return; var ctx=_playAlertTone._c||(_playAlertTone._c=new AC()); if(ctx.state==='suspended')ctx.resume();
-  if(window._alarmMuted) return;
-  var t0=ctx.currentTime;
-  /* The previous tone was a 1760/1245 Hz sawtooth tritone - its own comment called it
-     "deliberately irritating". Irritating is the wrong instrument for a control room: the
-     operator cannot turn it off without losing the alert, so it trains them to silence the
-     alarm first and read second, and it makes a municipal product sound like a toy.
+/* ══ v427 · SH✡MER SOUND KIT ═══════════════════════════════════════════════
+   One interval is the whole identity: a PERFECT FOURTH on A. Every sound in the product is that
+   same interval, and nothing else is, which is what makes a set of beeps into a brand.
 
-     This is a measured two-tone in a low register: an authoritative fourth (A3 -> E3), clean
-     triangle with a touch of sine for body, gently low-passed, with a short sub thump under
-     the first note for weight. It carries across a room and reads as serious, which is what a
-     duty officer needs - presence, not panic. Slow enough to repeat indefinitely without
-     fraying nerves. */
-  var notes=[[220,0,0.42],[164.81,0.46,0.52]];
-  notes.forEach(function(n,i){
-    var f0=n[0], t=t0+n[1], dur=n[2];
-    [['triangle',1,0.115],['sine',2,0.05]].forEach(function(v){
-      var o=ctx.createOscillator(), g=ctx.createGain(), lp=ctx.createBiquadFilter();
-      o.type=v[0]; o.frequency.setValueAtTime(f0*v[1],t);
-      lp.type='lowpass'; lp.frequency.value=1800; lp.Q.value=0.6;
-      g.gain.setValueAtTime(0.0001,t);
-      g.gain.linearRampToValueAtTime(v[2],t+0.035);          /* soft attack - no click */
-      g.gain.setValueAtTime(v[2],t+dur-0.14);
-      g.gain.exponentialRampToValueAtTime(0.0008,t+dur);     /* unhurried release */
-      o.connect(lp); lp.connect(g); g.connect(ctx.destination);
-      o.start(t); o.stop(t+dur+0.02);
-    });
-    if(i===0){                                               /* weight under the first note */
-      var sb=ctx.createOscillator(), sg=ctx.createGain();
-      sb.type='sine'; sb.frequency.setValueAtTime(82,t);
-      sg.gain.setValueAtTime(0.0001,t);
-      sg.gain.linearRampToValueAtTime(0.1,t+0.03);
-      sg.gain.exponentialRampToValueAtTime(0.0008,t+0.3);
-      sb.connect(sg); sg.connect(ctx.destination); sb.start(t); sb.stop(t+0.32);
-    }
+     ALERT    A4 -> E4, falling, struck three times, fast          "something is happening"
+     ACK      E4 -> A4, rising, once, warm                         "a human has it"
+     RESOLVE  A4 -> E4 -> A3, falling and settling, slow and soft  "it is over"
+
+   Falling = demand, rising = reassurance, falling-and-settling = closure. Same interval, so they
+   are audibly one family; different direction and pace, so they are never confused for each
+   other across a room.
+
+   Register matters more than loudness. The previous alert sat on A3/E3 (220/165 Hz), which is
+   below where laptop and phone speakers start rolling off - it measured fine and sounded dull
+   and far away, which is why it did not read as urgent. An octave up puts the fundamental where
+   small speakers are actually efficient, so it cuts through at the SAME volume.
+
+   It is still a musical interval rather than a siren: an operator cannot mute this without
+   losing the alert, so a sound engineered to be irritating trains them to silence first and read
+   second. Presence, not panic. */
+var SFX_A4=440, SFX_E4=329.63, SFX_A3=220;
+function _sfxNote(ctx,f0,t,dur,peak,bright){
+  [['triangle',1,peak],['sine',2,peak*0.42]].forEach(function(v){
+    var o=ctx.createOscillator(), g=ctx.createGain(), lp=ctx.createBiquadFilter();
+    o.type=v[0]; o.frequency.setValueAtTime(f0*v[1],t);
+    lp.type='lowpass'; lp.frequency.value=bright||3200; lp.Q.value=0.7;
+    g.gain.setValueAtTime(0.0001,t);
+    g.gain.linearRampToValueAtTime(v[2],t+0.012);              /* quick but click-free */
+    g.gain.setValueAtTime(v[2],t+dur*0.55);
+    g.gain.exponentialRampToValueAtTime(0.0008,t+dur);
+    o.connect(lp); lp.connect(g); g.connect(ctx.destination);
+    o.start(t); o.stop(t+dur+0.02);
   });
+}
+function _sfxSub(ctx,t,f,dur,peak){                            /* weight under the first strike */
+  var o=ctx.createOscillator(), g=ctx.createGain();
+  o.type='sine'; o.frequency.setValueAtTime(f,t);
+  g.gain.setValueAtTime(0.0001,t);
+  g.gain.linearRampToValueAtTime(peak,t+0.02);
+  g.gain.exponentialRampToValueAtTime(0.0008,t+dur);
+  o.connect(g); g.connect(ctx.destination); o.start(t); o.stop(t+dur+0.02);
+}
+function _sfxCtx(){
+  var AC=window.AudioContext||window.webkitAudioContext; if(!AC) return null;
+  var ctx=_sfxCtx._c||(_sfxCtx._c=new AC());
+  if(ctx.state==='suspended'){ try{ctx.resume();}catch(e){} }
+  return ctx;
+}
+function _playAlertTone(){
+ try{
+  if(window._alarmMuted) return;
+  var ctx=_sfxCtx(); if(!ctx) return; var t0=ctx.currentTime;
+  /* three falling fourths, tight - the repeat is what makes it read as an alarm rather than a
+     notification, without ever needing to be shrill */
+  [0,0.30,0.60].forEach(function(off,i){
+    var p=i===2?0.17:0.145;
+    _sfxNote(ctx,SFX_A4,t0+off,      0.135,p,3400);
+    _sfxNote(ctx,SFX_E4,t0+off+0.145,0.165,p,3000);
+  });
+  _sfxSub(ctx,t0,110,0.34,0.10);
+ }catch(e){}
+}
+function _playAckTone(){                                        /* operator picked the event up */
+ try{ var ctx=_sfxCtx(); if(!ctx) return; var t0=ctx.currentTime;
+  _sfxNote(ctx,SFX_E4,t0,     0.14,0.085,2600);
+  _sfxNote(ctx,SFX_A4,t0+0.15,0.26,0.085,2600);
+ }catch(e){}
+}
+function _playResolveTone(){                                    /* event closed */
+ try{ var ctx=_sfxCtx(); if(!ctx) return; var t0=ctx.currentTime;
+  _sfxNote(ctx,SFX_A4,t0,     0.17,0.075,2400);
+  _sfxNote(ctx,SFX_E4,t0+0.19,0.19,0.070,2200);
+  _sfxNote(ctx,SFX_A3,t0+0.40,0.42,0.065,1900);
+  _sfxSub(ctx,t0+0.40,110,0.45,0.05);
  }catch(e){}
 }
 var _alarmTimer=null, _alarmId=null, _alarmSilenced=false;
 function startAlarm(){ if(_alarmTimer)return; try{_playAlertTone();}catch(e){} var _a0=Date.now(); _alarmTimer=setInterval(function(){ var st=document.getElementById('live-strip'); if(!st||st.style.display==='none'||_alarmSilenced){ stopAlarm(); return; } if(window._keepAlarm===false && Date.now()-_a0>60000){ stopAlarm(); return; }   /* v293: "keep alarm until acknowledged" off = the sound stops by itself after 1 minute */ try{_playAlertTone();}catch(e){} },2800); }
 function stopAlarm(){ if(_alarmTimer){clearInterval(_alarmTimer);_alarmTimer=null;} }
-function silenceAlarm(){ _alarmSilenced=true; stopAlarm(); var st=document.getElementById('live-strip'); if(st){ st.style.animation='none'; st.style.background='linear-gradient(90deg,rgba(60,72,96,.6),rgba(36,46,66,.6))'; st.style.boxShadow='0 6px 20px rgba(0,0,0,.4),0 0 0 1px rgba(255,255,255,.12) inset'; st.classList.add('attended'); } var b=document.getElementById('ls-silence'); if(b){ b.innerHTML='<svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 9v6h4l5 4V5L8 9H4Z"/><path d="M17 9l4 6M21 9l-4 6"/></svg><span class="lsx"><b>הותרעה הושתקה</b><i>האירוע עדיין פתוח</i></span>'; b.classList.add('done'); } }
+function silenceAlarm(){ _alarmSilenced=true; stopAlarm();
+ /* v428: the large panel button is the one people press now, so it has to show the result. */
+ try{ var eb=document.getElementById('emg-silence'); if(eb){ eb.className='emg-silence done';
+   eb.innerHTML='<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M4 12.5l5 5L20 6.5"/></svg>'
+     +'<span class="es-x"><b>ההתרעה הושתקה</b><i>האירוע עדיין פתוח</i></span>'; } }catch(e){} var st=document.getElementById('live-strip'); if(st){ st.style.animation='none'; st.style.background='linear-gradient(90deg,rgba(60,72,96,.6),rgba(36,46,66,.6))'; st.style.boxShadow='0 6px 20px rgba(0,0,0,.4),0 0 0 1px rgba(255,255,255,.12) inset'; st.classList.add('attended'); } var b=document.getElementById('ls-silence'); if(b){ b.innerHTML='<svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 9v6h4l5 4V5L8 9H4Z"/><path d="M17 9l4 6M21 9l-4 6"/></svg><span class="lsx"><b>ההתרעה הושתקה</b><i>האירוע עדיין פתוח</i></span>'; b.classList.add('done'); } }
 /* openResponse does NOT stop the alarm — only the user clicking "השתק אזעקה" silences it. */
 function emgEnter(){ try{ if(document.body.classList.contains('emg')) return;
   document.body.classList.add('emg-out');
   setTimeout(function(){ try{ document.body.classList.add('emg'); document.body.classList.remove('emg-out');
-    if(window.MAP&&MAP.invalidateSize) setTimeout(function(){ try{MAP.invalidateSize(true);}catch(_){} },60); }catch(_){} },150);
+    if(window.MAP&&MAP.invalidateSize) setTimeout(function(){ try{MAP.invalidateSize(true);}catch(_){} },60); }catch(_){} },300);
  }catch(e){} }
 function emgLeave(){ try{ document.body.classList.remove('emg','emg-out');
   if(window.MAP&&MAP.invalidateSize) setTimeout(function(){ try{MAP.invalidateSize(true);}catch(_){} },60);
@@ -1251,7 +1560,7 @@ function emgLeave(){ try{ document.body.classList.remove('emg','emg-out');
 function openResponse(id){
  try{
   var o=_liveEvents[id]; if(!o){ return; }
-  try{ emgEnter(); }catch(_){} var e=o.e, m=o.m; _respSel={}; _respRadius=1.5;
+  try{ emgEnter(); stripCalm(); _playAckTone(); }catch(_){} var e=o.e, m=o.m; _respSel={}; _respRadius=1.5;
   var lat=+e.lat, lng=+e.lng;
   try{ flyToLive(lat,lng,id); }catch(_){}
   try{ if(_respCircle){MAP.removeLayer(_respCircle);} _respLatLng=[lat,lng]; _respCircle=L.circle(_respLatLng,{radius:_respRadius*1000,color:'#4fc3e8',weight:2,fillColor:'#4fc3e8',fillOpacity:.08,dashArray:'7 6'}).addTo(MAP); _radChip(); }catch(_e){}
@@ -1277,10 +1586,14 @@ function openResponse(id){
    /* ── STEP 1 · WHERE ─────────────────────────────── */
    +'  <div class="rstep on" id="rstep1"><div class="rstep-h" onclick="respStep(1)"><span class="rstep-n">1</span>אימות מקום וקריאה לשירותי חירום</div>'
    +'    <div class="rstep-b">'
-   +'      <div class="rloc-btns"><button class="rlb rlb-p" onclick="flyToLive('+lat+','+lng+',\''+id+'\')">🗺️ זום לרחוב</button><button class="rlb" onclick="respShareLoc('+lat+','+lng+',\''+id+'\')">📤 שתף מיקום אירוע</button></div>'
+   +'      <div class="rloc-btns"><button class="rlb rlb-p" onclick="flyToLive('+lat+','+lng+',\''+id+'\')">זום לרחוב</button><button class="rlb" onclick="respShareLoc('+lat+','+lng+',\''+id+'\')">שתף מיקום</button></div>'
    +'      '+natBtns
-   +'      <div class="rsec-hint" style="margin:9px 0 0">פרטי האירוע מוכנים להעברה ידנית ע״י המוקדן. אין שיגור אוטומטי לשירותי החירום.</div>'
-   +'      <button class="resp-send" style="margin-top:10px" onclick="respStep(2)">המשך לשיגור ←</button>'
+   +'      <div class="rsec-hint" style="margin:9px 0 0">אין שיגור אוטומטי — ההעברה לשירותי החירום ידנית.</div>'
+   /* v426: this was a full-width primary CTA sitting directly under "שתף מיקום אירוע", so two
+      buttons of equal weight offered what looked like the same thing. Only one of them is an
+      action; this one is just navigation to the next step, so it stops competing and looks like
+      what it is. */
+   +'      <button class="rstep-next" onclick="respStep(2)">המשך לשלב 2 · שיגור ←</button>'
    +'    </div></div>'
 
    /* ── STEP 2 · DISPATCH ──────────────────────────── */
@@ -1290,8 +1603,15 @@ function openResponse(id){
    +'      <input class="resp-slider" type="range" min="0.2" max="5" step="0.1" value="1.5" oninput="respSetRadius(this.value)" onchange="respFitRadius()"><div class="resp-reach" id="resp-reach"></div>'
    +'      <div class="rsec-hint" style="margin-top:11px">2 · למי לשגר:</div>'
    +'      <div class="rg">'+gHtml+'</div>'
-   +'      <button class="resp-send" onclick="respDispatch(\''+id+'\')">⚡ סמן לשיגור · שיגור אוטומטי טרם חובר</button>'
-   +'      <div class="resp-two" style="margin-top:9px"><div class="resp-esc" onclick="respReinforce(\''+id+'\')" title="מרחיב את טווח ההתראה (עדכון אוטומטי לשומרים/למוקד טרם חובר)">⬆️ בקש תגבור</div><div class="resp-bc" onclick="respLog(\''+id+'\',\'הודעה לקבוצה — לא נשלחה (שליחה מהדשבורד טרם חוברה)\')">📢 הודעה לקבוצה</div></div>'
+   /* v426: the button used to be labelled "סמן לשיגור · שיגור אוטומטי טרם חובר" - a primary CTA
+      that admits in its own label that it does nothing. In a live incident an operator presses
+      that and believes forces were sent. Nothing is sent. The button now says what it actually
+      does (records who is going, in the log), and the caveat lives in the hint where it belongs
+      rather than inside the thing you click. "בקש תגבור" was removed outright: its own tooltip
+      said the update "טרם חובר", so it was a button that did nothing at all. */
+   +'      <button class="resp-send" onclick="respDispatch(\''+id+'\')">✓ סמן מי יוצא לאירוע</button>'
+   +'      <div class="rsec-hint" style="margin-top:7px">נרשם ביומן האירוע בלבד. השיגור עצמו נעשה בקשר/בטלפון — אין שיגור אוטומטי.</div>'
+   +'      <div class="resp-two" style="margin-top:9px"><div class="resp-bc" onclick="respLog(\''+id+'\',\'הודעה לקבוצה — לא נשלחה (שליחה מהדשבורד טרם חוברה)\')">📢 הודעה לקבוצה</div></div>'
    +'      <details class="rfold"><summary>מענה מוכח לסוג אירוע זה</summary>'+_respMenim(e,m)+'</details>'
    +'    </div></div>'
 
@@ -1306,9 +1626,15 @@ function openResponse(id){
    +'  <div class="rstep" id="rstep4"><div class="rstep-h" onclick="respStep(4)"><span class="rstep-n">4</span>סגירה והעברה חוקית</div>'
    +'    <div class="rstep-b">'
    +'      <div id="resp-evid">'+_evidenceHtml(o,id)+'</div>'
-   +'      <div class="resp-nat" style="margin-top:9px">⚖️ העברת ראיות לאכיפה ('+(isIntl(curC())?'רשויות האכיפה המקומיות':'משטרה 100 / פרקליטות')+') מתבצעת ידנית ע״י הרשות, עם בסיס חוקי ותיעוד מלא. <span style="color:#f0c75a">אין שיגור אוטומטי.</span> העברה לגורמי ביטחון לאומי — בערוצים משפטיים פורמליים בלבד, לא דרך כלי זה.</div>'
+   +'      <div class="resp-nat" style="margin-top:9px">העברת ראיות לאכיפה ('+(isIntl(curC())?'רשויות האכיפה המקומיות':'משטרה 100 / פרקליטות')+') מתבצעת ידנית ע״י הרשות, עם בסיס חוקי ותיעוד מלא. <span style="color:#f0c75a">אין שיגור אוטומטי.</span> העברה לגורמי ביטחון לאומי — בערוצים משפטיים פורמליים בלבד, לא דרך כלי זה.</div>'
    +'    </div></div>'
-   +'  <div class="remg">מצב אירוע · לוח הנתונים המלא חוזר עם סגירת האירוע</div>'
+   /* v427: the flow used to stop dead at step 4 - nothing closed the event, nothing brought the
+      board back, so the operator was left sitting inside an incident with no way out except the
+      X. An event has a beginning and an end; this is the end. */
+   +'  <div class="rfin">'
+   +'    <button class="rfin-btn" onclick="respFinish(\''+id+'\')">✓ סגור אירוע וחזור ללוח</button>'
+   +'    <div class="rfin-h">הסגירה תירשם ביומן האירוע · הלוח המלא יחזור</div>'
+   +'  </div>'
    +'</div>';
   document.body.appendChild(p);
   setTimeout(function(){ p.classList.add('on'); respSetRadius(1.5); try{respGeocode(lat,lng,o.demo);}catch(e){} },20);
@@ -1337,7 +1663,7 @@ function evidenceConfirm(id){
   var rec=(document.getElementById("evid-rec")||{}).value||"";
   var ok=(document.getElementById("evid-consent")||{}).checked;
   if(!ok){ try{ alert("יש לאשר שההעברה חוקית ומתועדת"); }catch(e){} return; }
-  try{ respLog(id,"⚖️ חבילת ראיות הוכנה · בסיס: "+basis+" · נמען: "+rec+" · ממתין להעברה מאושרת ע״י הרשות"); }catch(e){}
+  try{ respLog(id,"חבילת ראיות הוכנה · בסיס: "+basis+" · נמען: "+rec+" · ממתין להעברה מאושרת ע״י הרשות"); }catch(e){}
   var box=document.getElementById("resp-evid"); if(box){ box.innerHTML='<div class="rost-empty" style="padding:14px 4px;color:#8fe0b0">✓ חבילת ההעברה הוכנה ותועדה ביומן.<br><span style="color:#6d7893">ההעברה בפועל מתבצעת ידנית ע״י מורשה הרשות. אין שיגור אוטומטי.</span></div>'; }
 }
 function _respMenim(e,m){
@@ -1379,7 +1705,7 @@ function respShareLoc(lat,lng,id){
     var chip=function(k,col,lbl){ return '<button class="shr-ck'+(_shareSel[k]?' on':'')+'" style="--cc:'+col+'" onclick="_shareToggle(\''+k+'\',this)"><i></i>'+lbl+'</button>'; };
     var ov=document.createElement('div'); ov.id='share-ov'; ov.className='acct-ov';
     ov.innerHTML='<div class="acct-card" id="share-card" style="max-width:440px">'
-      +'<div class="acct-head"><h3>📤 שיתוף מיקום אירוע · התראה לשומרים</h3><button class="acct-x" onclick="closeShare()">✕</button></div>'
+      +'<div class="acct-head"><h3>שיתוף מיקום אירוע · התראה לשומרים</h3><button class="acct-x" onclick="closeShare()">✕</button></div>'
       +'<div class="acct-sub">שליחת התראה מהדשבורד טרם חוברה — ניתן לבחור נמענים ולתעד ביומן, או להעתיק קישור מפה ולשלוח ידנית.</div>'
       +'<div style="margin:12px 0 6px;font-size:12px;color:#9aa6bd;font-weight:700">נמענים</div>'
       +'<div class="shr-chips">'+chip('shomrim','#E0A828','שומרים')+chip('police','#2962FF','שוטרים')+chip('med','#16A06A','רפואה')+chip('fire','#FF7A1A','כבאות')+chip('all','#ff6b78','כולם')+'</div>'
@@ -1400,7 +1726,7 @@ function respReinforce(id){
     var cur=(typeof _respRadius==='number'?_respRadius:1.5); var nr=Math.min(5,Math.round((cur+1.5)*10)/10);
     var sl=document.querySelector('.resp-slider'); if(sl){ sl.value=nr; }
     try{ respSetRadius(nr); }catch(e){} try{ respFitRadius(); }catch(e){}
-    respLog(id,'⬆️ בקשת תגבור — טווח ההתראה הורחב ל-'+nr.toFixed(1)+' ק"מ (עדכון אוטומטי לשומרים ול'+(isIntl(curC())?'מוקד העירוני':'מוקד 106')+' טרם חובר — יש ליצור קשר ישיר)');
+    respLog(id,'בקשת תגבור — טווח ההתראה הורחב ל-'+nr.toFixed(1)+' ק"מ (עדכון אוטומטי לשומרים ול'+(isIntl(curC())?'מוקד העירוני':'מוקד 106')+' טרם חובר — יש ליצור קשר ישיר)');
   }catch(e){}
 }
 function respGeocode(lat,lng,demo){
@@ -1560,7 +1886,7 @@ function renderLive(c,list,opts){
  try{ renderLegend(); }catch(_l){}
  try{
    var strip=document.getElementById('live-strip');
-   var ss=list.filter(function(e){return _liveMeta(e).sos;});
+   var ss=list.filter(function(e){ if(!_liveMeta(e).sos) return false; var _rv=B.reviews[_evId(e)]; return !(_rv&&(_rv.status==='handled'||_rv.status==='closed')); });   /* a resolved SOS leaves the alarm strip */
    if(strip){
      if(ss.length){
        var e0=ss[0], m0=_liveMeta(e0), id0=_evId(e0), demo=!!opts.demo;
@@ -1568,25 +1894,88 @@ function renderLive(c,list,opts){
        strip.style.display='flex';
        var _chip=function(col,n,lbl){return '<span class="ls-chip"><i style="background:'+col+'"></i><b>'+n+'</b> '+lbl+'</span>';};
        strip.innerHTML=''
-         +'<div class="ls-beacon"><span class="ls-live">● אירוע חי</span><button id="ls-silence" class="ls-silence" onclick="event.stopPropagation();silenceAlarm()" aria-label="השתקת ההתרעה הקולית - האירוע נשאר פתוח"><svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 9v6h4l5 4V5L8 9H4Z"/><path d="M17 9l4 6M21 9l-4 6"/></svg><span class="lsx"><b>השתקת התרעה</b><i>האירוע נשאר פתוח</i></span></button></div>'
+         +'<div class="ls-beacon"><span class="ls-live">● אירוע חי</span></div>'
          +'<div class="ls-main">'
          +'<div class="ls-t">'+m0.i+' '+ESC(m0.t)+'</div>'
          +'<div class="ls-addr"><span id="ls-addr-txt">מאתר כתובת…</span></div>'
-         +'<div class="ls-resp">'+_chip('#E0A828',g,'שומרים זמינים')+_chip('#4fc3e8',(demo?(pol+med+fire):'—'),'מתנדבי חירום')+(demo?'<span class="ls-demo">נתוני הדגמה</span>':'')+'</div>'
+         /* v430: these two counts sat here AND in the facts grid 200px below, labelled better there.
+            The strip is the identity of the event (what/where); the counts are facts, so they live
+            in one place only - the grid. */
+         +'<div class="ls-resp">'+(demo?'<span class="ls-demo">נתוני הדגמה</span>':'')+'</div>'
          +'</div>'
          +'<div class="ls-go"><button onclick="event.stopPropagation();openResponse(\''+_jsq(id0)+'\')">ניהול אירוע ←</button></div>';
+       /* v428: the silence control is the first thing in the panel now, full width. It used to
+          be a chip inside the strip, competing with the title, the address, two counters and the
+          manage button - six things in one bar, which is why it kept being hunted for. */
+       try{
+         var host=document.getElementById('emg-silence');
+         if(!host){
+           host=document.createElement('button'); host.id='emg-silence'; host.className='emg-silence';
+           host.setAttribute('aria-label','השתקת ההתרעה הקולית - האירוע נשאר פתוח');
+           host.onclick=function(ev){ ev.stopPropagation(); silenceAlarm(); };
+           strip.parentNode.insertBefore(host,strip);
+         }
+         if(!_alarmSilenced){
+           host.className='emg-silence';
+           host.innerHTML='<svg viewBox="0 0 24 24" width="21" height="21" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M11 5 6 9H3v6h3l5 4z"/><path d="M17 9l4 6M21 9l-4 6"/></svg>'
+             +'<span class="es-x"><b>השתקת ההתרעה</b><i>האירוע נשאר פתוח</i></span>';
+         }
+       }catch(e){}
+       /* v428: the panel is the EVENT now, so it says so, and the space under the strip carries
+          the facts an operator is asked for on the radio - opened, type, source, coordinates,
+          who is near. Facts only: the what-to-do lives in the flip panel and nowhere else. */
+       try{ var _t=document.getElementById('recs-ttl'); if(_t) _t.textContent='אירוע חי'; }catch(e){}
+       try{
+         var fx=document.getElementById('emg-facts');
+         if(!fx){ fx=document.createElement('div'); fx.id='emg-facts'; fx.className='emg-facts';
+                  strip.parentNode.insertBefore(fx,strip.nextSibling); }
+         var _op=e0.ts?ilFull(+e0.ts):'—';
+         var _f=function(k,v){ return '<div class="ef-i"><span class="ef-k">'+k+'</span><span class="ef-v">'+v+'</span></div>'; };
+         fx.innerHTML=_f('נפתח',_op)
+           +_f('סוג',ESC(m0.t))
+           +_f('מקור',demo?'נתוני הדגמה':'רשת SH✡MER')
+           +_f('נ.צ.',(+e0.lat).toFixed(4)+', '+(+e0.lng).toFixed(4))
+           +_f('שומרים ברדיוס',g)
+           +_f('מתנדבי חירום',(demo?(pol+med+fire):'—'));
+       }catch(e){}
+       /* v428: .c-feed is folded away in this state, so the other open incidents come back here
+          as one compact line each. Without it an operator working one event loses sight of the
+          five others still open - the panel would be calmer and less useful. Facts, not steps. */
+       try{
+         var ot=document.getElementById('emg-others');
+         if(!ot){ ot=document.createElement('div'); ot.id='emg-others'; ot.className='emg-others';
+                  var fxn=document.getElementById('emg-facts'); if(fxn) fxn.parentNode.insertBefore(ot,fxn.nextSibling); }
+         var rest=ss.slice(1).concat(list.filter(function(e){ return !_liveMeta(e).sos; })).slice(0,6);
+         if(!rest.length){ ot.innerHTML=''; ot.style.display='none'; }
+         else{
+           ot.style.display='';
+           ot.innerHTML='<div class="eo-h">אירועים נוספים פתוחים · '+rest.length+'</div>'
+             +rest.map(function(e){ var mm=_liveMeta(e), ii=_evId(e);
+               return '<button class="eo-i" onclick="event.stopPropagation();openResponse(\''+_jsq(ii)+'\')">'
+                 +'<span class="eo-d" style="background:'+(mm.sos?'#FF1A40':'#E0A828')+'"></span>'
+                 +'<span class="eo-t">'+ESC(mm.t)+'</span>'
+                 +'<span class="eo-w">'+(e.ts?_ago(+e.ts):'')+'</span></button>';
+             }).join('');
+         }
+       }catch(e){}
+       /* v430: the live board had no emergency state at all - 'sc-emerg' was only ever set by the
+          demo's state machine, so the merged event panel, the folded feed and the reduced-motion
+          rules were unreachable CSS here. The real signal is this branch: an SOS that no one has
+          marked handled or closed. 'emg' stays what it was - the operator opening the flip panel. */
+       try{ document.body.classList.add('sc-emerg'); }catch(e){}
        try{ stripGeocode(+e0.lat,+e0.lng); }catch(e){}
        strip.onclick=function(){ try{ openResponse(id0); }catch(e){} };
        _sosFocusLock=true;
        if((id0+'@'+(e0.ts||0))!==_alarmId){ _alarmId=id0+'@'+(e0.ts||0); _alarmSilenced=false; strip.style.animation=''; strip.style.background=''; strip.style.boxShadow=''; strip.classList.remove('attended'); startAlarm(); try{ flyToLive(+e0.lat,+e0.lng,id0); }catch(_f){} }
        else if(!_alarmSilenced){ startAlarm(); }
-     } else { strip.style.display='none'; strip.innerHTML=''; stopAlarm(); _alarmId=null; }
+     } else { strip.style.display='none'; strip.innerHTML=''; try{ document.body.classList.remove('sc-emerg'); }catch(e){} try{var _h=document.getElementById('emg-silence'); if(_h) _h.remove(); var _fx=document.getElementById('emg-facts'); if(_fx) _fx.remove(); var _ot=document.getElementById('emg-others'); if(_ot) _ot.remove(); var _t2=document.getElementById('recs-ttl'); if(_t2) _t2.textContent='המלצות לפעולה';}catch(e){} stopAlarm(); _alarmId=null; }
    }
  }catch(e){}
  if(newSos){ _liveBeep(); flyToLive(newSos.lat,newSos.lng,newSos.id); bigSosAlert(newSos.id); }
  /* the board feeds the KPI "אירועים חיים" (demo) and the open-items line in the recommendations */
  try{ buildKPIs(DATA._idx); }catch(e){}
  try{ if(!_focus) buildAnalysis(DATA._idx,null); }catch(e){}
+ try{ scGuideSync(); }catch(e){}
 }
 /* presence row = a device heartbeat. Only status 'v2' rows are counted/drawn: written by app v279+, one per real
    device, never by automated/test browsers. Older rows ('online'/'seen'/missing) can't be verified and are ignored. */
@@ -1613,8 +2002,7 @@ function loadLive(c){
     var netPres=[], netEv=[], outTerr24={};
     var RECENT_PRES=18e5; /* map pins only for users seen in the last 30 min */
     if(obj){ Object.keys(obj).forEach(function(id){
-      var e=obj[id]; if(!e||typeof e!=='object')return;
-      if(!/^[A-Za-z0-9_-]{1,80}$/.test(id) || (e.type!=null && !/^[a-z_]{1,24}$/.test(String(e.type))) || (e.status!=null && !/^[A-Za-z0-9:_-]{1,48}$/.test(String(e.status)))) return;   /* security: the public feed is world-writable by signed-in apps - skip any row that is not in the app's own format */
+      var e=obj[id]; if(!e)return;
       var _lat=e.lat!=null?e.lat:(e.latitude!=null?e.latitude:(e.location&&e.location.lat!=null?e.location.lat:(e.location&&e.location.latitude!=null?e.location.latitude:null)));
       var _lng=e.lng!=null?e.lng:(e.longitude!=null?e.longitude:(e.location&&e.location.lng!=null?e.location.lng:(e.location&&e.location.longitude!=null?e.location.longitude:null)));
       if(_lat==null||_lng==null)return;
@@ -1860,7 +2248,7 @@ function openSettings(){
   +'<div class="set-sec">התראות</div>'
   +row('🔔','צליל אזעקה','צליל אזעקה באירוע SOS חי','_alarmMuted',true)
   +row('🔒','השארת אזעקה עד אישור','דלוק: עד השתקה ידנית · כבוי: נעצרת לבד אחרי דקה','_keepAlarm')
-  +row('🗺️','מיקוד אוטומטי למפה','המפה מתמקדת אוטומטית למיקום האירוע (0.3 ק״מ)','_autoFocus')
+  +row('◎','מיקוד אוטומטי למפה','המפה מתמקדת אוטומטית למיקום האירוע (0.3 ק״מ)','_autoFocus')
   +'<div class="set-sec">טריטוריה ונתונים</div>'
   +'<div class="set-row"><div class="set-ic">📍</div><div class="set-tx"><b>תחום שיפוט</b><span>הטריטוריה המנוטרת כעת</span></div><b style="color:var(--gold);font-size:13px">'+ESC(terr)+'</b></div>'
   +'<div class="set-row"><div class="set-ic">⬇</div><div class="set-tx"><b>יצוא דוח מבצעי</b><span>מסמך מותג להעברה / הדפסה</span></div><button class="set-btn" onclick="closeSettings();exportReport()">יצוא דוח</button></div>'
@@ -1948,7 +2336,7 @@ function buildReportHtml(){
  /* ---------- limitations ---------- */
  var lim=['נתוני המשטרה הם עבירות <b>שנרשמו</b> ברמת העיר לשנת 2025 בלבד; אין בהם נתוני שנה קודמת, פילוח לשכונות או עבירות שלא דווחו.',
   'הדירוג והממוצע הארצי מחושבים בין '+ncit+' הערים שבמאגר בלבד, לא בין כל הרשויות בישראל.',
-  'נתוני אוכלוסייה ("ל-1,000 תושבים") הם הערכת למ״ס מעוגלת, וקיימים ל-'+M.n+' מתוך '+ncit+' הערים.',
+  'נתוני אוכלוסייה ("ל-1,000 תושבים") הם נתוני הלמ״ס לסוף 2024 (קובץ היישובים), וקיימים ל-'+M.n+' מתוך '+ncit+' הערים.',
   'נתוני הרשת משקפים רק מכשירי SH✡MER מאומתים (גרסה v279 ומעלה, נספרים מאז 22.10.2026), אינם מדגם מייצג של התושבים, והמיקום מעוגל לכ-1 ק״מ. "מחובר" = דיווח מיקום ב-90 השניות האחרונות.',
   'מצב האירועים והערות התוצאה נשמרים בדפדפן שממנו הופק הדוח בלבד ואינם מסונכרנים בין מחשבים.',
   'אירועי דוגמה הוחרגו מהדוח'+(demo?'; בדוח הדגמה, אירועים המסומנים "הדגמה" הם מדומים':'')+'.',
@@ -2494,11 +2882,11 @@ function recItems(idx,fk,noEx){
    out.push({cls:'n',i:'✓',t:'מה לעשות',d:ACT_PLAIN[fk]||lev.d,src:lev.s,url:lev.u});
  } else {
    var tc=topCat(c.cats), pct=Math.round(tc.val/c.total*100), tns=natShare(cities,tc.name);
-   out.push({cls:'up',i:'1',t:'הבעיה המרכזית: '+catPlain(tc.name)+' · '+pct+'% מהעבירות',d:'מה לעשות: '+(ACT_PLAIN[tc.name]||''),why:fmt(tc.val)+' מתוך '+fmt(c.total)+' עבירות ב-2025 (בארץ: '+Math.round(tns*100)+'%) · משטרת ישראל',src:HS_SRC.s,url:HS_SRC.u,
+   out.push({cls:'up',i:'1',t:catPlain(tc.name)+' · '+pct+'% מהעבירות',d:'מה לעשות: '+(ACT_PLAIN[tc.name]||''),why:fmt(tc.val)+' מתוך '+fmt(c.total)+' עבירות ב-2025 (בארץ: '+Math.round(tns*100)+'%) · משטרת ישראל',src:HS_SRC.s,url:HS_SRC.u,
      extra:(SOLSET[tc.name]?'<div style="font-weight:700;margin:4px 0 6px">מה עובד לפי מחקר</div>'+SOLSET[tc.name].map(function(o){return '<div style="font-size:12.5px;color:var(--tx2);margin-bottom:6px">• <b style="color:var(--tx)">'+o.t+'</b> — '+o.d+' <a href="'+o.u+'" target="_blank" rel="noopener" style="color:#93b8ff">'+o.s+' ↗</a></div>';}).join(''):'')});
    var pc=perCap(c), M=_medPC();
    if(pc&&M.med){ var r=pc/M.med;
-     out.push({cls:r>=1.2?'up':'info',i:'#',t:'עבירות לכל 1,000 תושבים: '+pc.toFixed(1),d:(r>=1.2?'פי '+r.toFixed(1)+' מהעיר האמצעית בארץ ('+M.med.toFixed(1)+') — נימוק לבקשת תקציב וכוח אדם.':r<=0.9?'פחות מהעיר האמצעית בארץ ('+M.med.toFixed(1)+') — לשמור על המגמה.':'קרוב לעיר האמצעית בארץ ('+M.med.toFixed(1)+') — להמשיך מעקב.'),why:'משטרת ישראל 2025 · אוכלוסייה: הערכת למ״ס · השוואה ל-'+M.n+' ערים עם נתון אוכלוסייה'}); }
+     out.push({cls:r>=1.2?'up':'info',i:'#',t:'עבירות ל-1,000 תושבים · '+pc.toFixed(1),d:(r>=1.2?'פי '+r.toFixed(1)+' מהעיר האמצעית בארץ ('+M.med.toFixed(1)+') — נימוק לבקשת תקציב וכוח אדם.':r<=0.9?'פחות מהעיר האמצעית בארץ ('+M.med.toFixed(1)+') — לשמור על המגמה.':'קרוב לעיר האמצעית בארץ ('+M.med.toFixed(1)+') — להמשיך מעקב.'),why:'משטרת ישראל 2025 · אוכלוסייה: הערכת למ״ס · השוואה ל-'+M.n+' ערים עם נתון אוכלוסייה'}); }
    var ranked=Object.keys(c.cats).filter(function(k){return k!==tc.name;}).map(function(k){var a=c.cats[k]/c.total,b=natShare(cities,k);return{k:k,cs:a,ns:b,r:b?a/b:0};}).sort(function(a,b){return b.r-a.r;});
    var sec=ranked[0];
    if(sec&&sec.r>1.12&&sec.cs>=0.05) out.push({cls:'flag',i:'▲',t:catPlain(sec.k)+' — יותר מהממוצע בארץ',d:Math.round(sec.cs*100)+'% כאן לעומת '+Math.round(sec.ns*100)+'% בארץ. '+(ACT_PLAIN[sec.k]||''),why:'משטרת ישראל 2025'});
@@ -2517,7 +2905,11 @@ function buildAnalysis(idx,fk){
  var c=cityAt(idx); if(!c)return;
  var items=recItems(idx,fk||null); window._recItems=items;
  window._recFoot='מבוסס על נתוני משטרת ישראל 2025 ועל נתוני רשת SH✡MER. המלצות כלליות מבוססות-מחקר — אין זו המלצה משפטית מחייבת.';
- function ri(o,i){ return '<div class="ri fi" onclick="'+(o.go||('openRecDetail('+i+')'))+'" title="'+ESC(o.t+' — '+_plain(o.d))+'"><div class="ic '+o.cls+'">'+o.i+'</div><div class="tx"><div class="tt">'+ESC(o.t)+'</div><div class="ph1">'+ESC(_plain(o.d))+'</div></div><span class="chev">‹</span></div>'; }
+ /* v429: each row carried its full explanation inline, so the card was three paragraphs
+    stacked and every item repeated context the one above had already given. One short line per
+    item now; the whole explanation is one tap away in openRecDetail(), which already existed and
+    was only reachable past a wall of text. */
+ function ri(o,i){ return '<div class="ri fi" onclick="'+(o.go||('openRecDetail('+i+')'))+'" title="'+ESC(o.t+' — '+_plain(o.d))+'"><div class="ic '+o.cls+'">'+o.i+'</div><div class="tx"><div class="tt">'+ESC(o.t)+'</div></div><span class="chev">‹</span></div>'; }
  var head=fk?'ניתוח ממוקד · <b>'+catPlain(fk)+' · '+ESC(c.city)+'</b>':'פעולות מומלצות · <b>'+ESC(c.city)+'</b>';
  var rp=document.getElementById('recspane'); if(rp){ rp.innerHTML='<div class="rh">'+head+'</div>'+items.map(ri).join(''); _fitRecs(); }
 }
