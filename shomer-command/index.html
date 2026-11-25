@@ -330,8 +330,16 @@ body.emg .c-map{animation:emgIn .22s cubic-bezier(.2,.8,.3,1)}
 .resp-bc{background:#101a2e;border:1px solid #378ADD;color:#8ab4ff}
 .resp-send{background:linear-gradient(135deg,#b8841c,#e0a828 60%,#f3cf6a);color:#23180a;border:0;border-radius:11px;padding:12px;text-align:center;font-size:14px;font-weight:800;cursor:pointer;width:100%;font-family:inherit}
 .resp-nat{background:rgba(255,255,255,.03);border:1px dashed #3a4a63;border-radius:10px;padding:10px 12px;font-size:11px;color:#9aa6bd;line-height:1.6}
-.resp-log{font-size:11.5px;color:#9aa6bd;line-height:1.9}
+.resp-log{font-size:11.5px;color:#9aa6bd;line-height:1.5;max-height:230px;overflow:auto}
 .resp-log b{color:#6ee7a8}
+.rl-row{display:grid;grid-template-columns:8px 42px 1fr auto;align-items:baseline;gap:8px;
+  padding:7px 2px;border-bottom:1px solid rgba(255,255,255,.05)}
+.rl-row:last-child{border-bottom:0}
+.rl-dot{width:7px;height:7px;border-radius:50%;align-self:center}
+.rl-kind{font-size:9.5px;font-weight:900;letter-spacing:.04em}
+.rl-tx{color:#c8d2e4;font-size:11.5px;line-height:1.5}
+.rl-t{font-size:10px;color:#5f6b82;white-space:nowrap;font-variant-numeric:tabular-nums}
+.rl-empty{color:#5f6b82;font-size:11px;padding:8px 2px}
 .resp-live{color:#ff5a5f;font-weight:800;animation:respBlink 1s steps(2,end) infinite}
 @keyframes respBlink{50%{opacity:.25}}
 .rsec{border:1px solid #232c40;border-radius:13px;padding:12px 13px;background:rgba(255,255,255,.015)}
@@ -820,7 +828,7 @@ body.sc-emerg #emg-scan,body.emg #emg-scan{display:block}
     </section>
     <!-- ROWS 2 · LEFT: emergency / recommendations / actions  ‖  emergency events panel -->
     <section class="card c-recs ops-recs" id="c-recs">
-      <div class="ch"><span class="t">🚨 חירום · המלצות · פעולות למעקב</span><span class="sp"></span><span class="pill off" id="analysis-pill">לפי הנתונים</span><button class="dd-back" id="recsback" style="display:none" onclick="unfocus()">← הכל</button></div>
+      <div class="ch"><span class="t" id="recs-ttl">המלצות · פעולות</span><span class="sp"></span><span class="pill off" id="analysis-pill">לפי הנתונים</span><button class="dd-back" id="recsback" style="display:none" onclick="unfocus()">← הכל</button></div>
       <div id="live-banner" class="live-banner idle">ממתין לאירוע חי…</div>
       <div id="live-strip" class="live-strip" style="display:none"></div>
       <div id="sc-guide" class="sc-guide" hidden aria-label="רשימת צעדים לטיפול באירוע"></div>
@@ -1284,7 +1292,34 @@ function respToggle(k,el){ _respSel=_respSel||{}; _respSel[k]=!_respSel[k]; if(e
 function respFitRadius(){ try{ if(_respCircle&&MAP){ MAP.fitBounds(_respCircle.getBounds(),{padding:[40,40]}); } }catch(e){} }
 function _radChip(){ try{ var mc=document.getElementById('map'); if(!mc)return; var ch=document.getElementById('rad-chip'); if(!ch){ ch=document.createElement('div'); ch.id='rad-chip'; ch.style.cssText='position:absolute;top:10px;inset-inline-start:10px;z-index:600;background:rgba(20,26,39,.92);border:1px solid #2a3450;color:#4fc3e8;font:700 12px Alef,system-ui,sans-serif;padding:6px 11px;border-radius:9px;box-shadow:0 4px 14px rgba(0,0,0,.4);pointer-events:none'; mc.appendChild(ch); } ch.textContent='\u05e8\u05d3\u05d9\u05d5\u05e1 \u05d4\u05ea\u05e8\u05d0\u05d4 \u00b7 '+_respRadius.toFixed(1)+' \u05e7"\u05de'; }catch(e){} }
 function respSetRadius(v){ _respRadius=parseFloat(v)||1.5; var rr=document.getElementById('resp-reach'); var rv=document.getElementById('resp-rv'); if(rv)rv.textContent=_respRadius.toFixed(1)+' ק"מ'; if(rr)rr.innerHTML='רדיוס התראה: <b style="color:#eef1f7">'+_respRadius.toFixed(1)+' ק"מ</b>'; try{ if(_respCircle){ _respCircle.setRadius(_respRadius*1000); } }catch(e){} try{ _radChip(); }catch(e){} }
-function respLog(id,txt){ var o=_liveEvents[id]; if(!o)return; if(!o._log){ try{ o._log=(((_boardLoad().reviews||{})[id]||{}).resp||[]).slice(); }catch(e){ o._log=[]; } } o._log.push(ilFull(Date.now())+' — '+txt); try{ var _B=_boardLoad(), _r=_B.reviews[id]||(_B.reviews[id]={}); _r.resp=(_r.resp||[]).concat([o._log[o._log.length-1]]).slice(-50); _boardSave(_B); }catch(e){}   /* kept with the event record - survives a reload */ var el=document.getElementById('resp-log'); if(el)el.innerHTML=o._log.map(function(l){return '<div>• '+l+'</div>';}).join(''); }
+/* v427: the log was a flat run of "time - text" lines, which at six entries reads as a shopping
+   list - no shape, nothing scannable, no way to see at a glance what stage the event is at.
+   Each line is now typed by what it says and rendered as a timeline: a coloured marker for the
+   kind of thing that happened, the text, and the clock pushed to the edge where it belongs.
+   Kind is inferred from the stored line, so existing logs keep working with no migration. */
+function _respLogKind(l){
+  var t=String(l||'');
+  if(/נסגר|סגירה|הועבר ליומן/.test(t))            return ['close','#2BC47E','סגירה'];
+  if(/שיגור|סומן|יוצא לאירוע|כוחות/.test(t))       return ['disp','#E0A828','שיגור'];
+  if(/אותר|מיקום|כתובת|זום|שותף/.test(t))          return ['loc','#4FC3E8','מקום'];
+  if(/ראיה|ראיות|צילום|תיעוד|מסמך/.test(t))        return ['evid','#9A6FD9','ראיות'];
+  if(/התקשר|טלפון|100|101|102|מוקד/.test(t))       return ['call','#FF8A3D','קשר'];
+  return ['stat','#7E8CA0','עדכון'];
+}
+function _respLogHtml(lines){
+  if(!lines||!lines.length) return '<div class="rl-empty">אין עדיין רישומים</div>';
+  return lines.map(function(l){
+    var parts=String(l).split(' — '), tm=parts.length>1?parts.shift():'', tx=parts.join(' — ');
+    var k=_respLogKind(l);
+    return '<div class="rl-row">'
+      +'<span class="rl-dot" style="background:'+k[1]+'"></span>'
+      +'<span class="rl-kind" style="color:'+k[1]+'">'+k[2]+'</span>'
+      +'<span class="rl-tx">'+tx+'</span>'
+      +'<span class="rl-t">'+tm+'</span>'
+      +'</div>';
+  }).join('');
+}
+function respLog(id,txt){ var o=_liveEvents[id]; if(!o)return; if(!o._log){ try{ o._log=(((_boardLoad().reviews||{})[id]||{}).resp||[]).slice(); }catch(e){ o._log=[]; } } o._log.push(ilFull(Date.now())+' — '+txt); try{ var _B=_boardLoad(), _r=_B.reviews[id]||(_B.reviews[id]={}); _r.resp=(_r.resp||[]).concat([o._log[o._log.length-1]]).slice(-50); _boardSave(_B); }catch(e){}   /* kept with the event record - survives a reload */ var el=document.getElementById('resp-log'); if(el)el.innerHTML=_respLogHtml(o._log); }
 function respDispatch(id){
  var sel=Object.keys(_respSel||{}).filter(function(k){return _respSel[k];});
  if(!sel.length){ try{alert('בחר/י לפחות קבוצה אחת לשיגור');}catch(e){} return; }
@@ -1331,6 +1366,7 @@ function respFinish(id){
     try{ var st=document.getElementById('live-strip'); if(st){ st.classList.add('attended'); st.style.display='none'; } }catch(e){}
     try{ document.body.classList.remove('sc-emerg'); }catch(e){}
     try{ stopAlarm(); }catch(e){}
+    try{ _playResolveTone(); }catch(e){}
     try{ toast && toast('האירוע נסגר · הלוח חזר'); }catch(e){}
   }catch(e){}
   try{ closeResponse(); }catch(e){}
@@ -1346,43 +1382,80 @@ function stripGeocode(lat,lng){
    .catch(function(){ box.textContent=lat.toFixed(4)+', '+lng.toFixed(4); });
  }catch(e){}
 }
-function _playAlertTone(){
- try{ var AC=window.AudioContext||window.webkitAudioContext; if(!AC)return; var ctx=_playAlertTone._c||(_playAlertTone._c=new AC()); if(ctx.state==='suspended')ctx.resume();
-  if(window._alarmMuted) return;
-  var t0=ctx.currentTime;
-  /* The previous tone was a 1760/1245 Hz sawtooth tritone - its own comment called it
-     "deliberately irritating". Irritating is the wrong instrument for a control room: the
-     operator cannot turn it off without losing the alert, so it trains them to silence the
-     alarm first and read second, and it makes a municipal product sound like a toy.
+/* ══ v427 · SH✡MER SOUND KIT ═══════════════════════════════════════════════
+   One interval is the whole identity: a PERFECT FOURTH on A. Every sound in the product is that
+   same interval, and nothing else is, which is what makes a set of beeps into a brand.
 
-     This is a measured two-tone in a low register: an authoritative fourth (A3 -> E3), clean
-     triangle with a touch of sine for body, gently low-passed, with a short sub thump under
-     the first note for weight. It carries across a room and reads as serious, which is what a
-     duty officer needs - presence, not panic. Slow enough to repeat indefinitely without
-     fraying nerves. */
-  var notes=[[220,0,0.42],[164.81,0.46,0.52]];
-  notes.forEach(function(n,i){
-    var f0=n[0], t=t0+n[1], dur=n[2];
-    [['triangle',1,0.115],['sine',2,0.05]].forEach(function(v){
-      var o=ctx.createOscillator(), g=ctx.createGain(), lp=ctx.createBiquadFilter();
-      o.type=v[0]; o.frequency.setValueAtTime(f0*v[1],t);
-      lp.type='lowpass'; lp.frequency.value=1800; lp.Q.value=0.6;
-      g.gain.setValueAtTime(0.0001,t);
-      g.gain.linearRampToValueAtTime(v[2],t+0.035);          /* soft attack - no click */
-      g.gain.setValueAtTime(v[2],t+dur-0.14);
-      g.gain.exponentialRampToValueAtTime(0.0008,t+dur);     /* unhurried release */
-      o.connect(lp); lp.connect(g); g.connect(ctx.destination);
-      o.start(t); o.stop(t+dur+0.02);
-    });
-    if(i===0){                                               /* weight under the first note */
-      var sb=ctx.createOscillator(), sg=ctx.createGain();
-      sb.type='sine'; sb.frequency.setValueAtTime(82,t);
-      sg.gain.setValueAtTime(0.0001,t);
-      sg.gain.linearRampToValueAtTime(0.1,t+0.03);
-      sg.gain.exponentialRampToValueAtTime(0.0008,t+0.3);
-      sb.connect(sg); sg.connect(ctx.destination); sb.start(t); sb.stop(t+0.32);
-    }
+     ALERT    A4 -> E4, falling, struck three times, fast          "something is happening"
+     ACK      E4 -> A4, rising, once, warm                         "a human has it"
+     RESOLVE  A4 -> E4 -> A3, falling and settling, slow and soft  "it is over"
+
+   Falling = demand, rising = reassurance, falling-and-settling = closure. Same interval, so they
+   are audibly one family; different direction and pace, so they are never confused for each
+   other across a room.
+
+   Register matters more than loudness. The previous alert sat on A3/E3 (220/165 Hz), which is
+   below where laptop and phone speakers start rolling off - it measured fine and sounded dull
+   and far away, which is why it did not read as urgent. An octave up puts the fundamental where
+   small speakers are actually efficient, so it cuts through at the SAME volume.
+
+   It is still a musical interval rather than a siren: an operator cannot mute this without
+   losing the alert, so a sound engineered to be irritating trains them to silence first and read
+   second. Presence, not panic. */
+var SFX_A4=440, SFX_E4=329.63, SFX_A3=220;
+function _sfxNote(ctx,f0,t,dur,peak,bright){
+  [['triangle',1,peak],['sine',2,peak*0.42]].forEach(function(v){
+    var o=ctx.createOscillator(), g=ctx.createGain(), lp=ctx.createBiquadFilter();
+    o.type=v[0]; o.frequency.setValueAtTime(f0*v[1],t);
+    lp.type='lowpass'; lp.frequency.value=bright||3200; lp.Q.value=0.7;
+    g.gain.setValueAtTime(0.0001,t);
+    g.gain.linearRampToValueAtTime(v[2],t+0.012);              /* quick but click-free */
+    g.gain.setValueAtTime(v[2],t+dur*0.55);
+    g.gain.exponentialRampToValueAtTime(0.0008,t+dur);
+    o.connect(lp); lp.connect(g); g.connect(ctx.destination);
+    o.start(t); o.stop(t+dur+0.02);
   });
+}
+function _sfxSub(ctx,t,f,dur,peak){                            /* weight under the first strike */
+  var o=ctx.createOscillator(), g=ctx.createGain();
+  o.type='sine'; o.frequency.setValueAtTime(f,t);
+  g.gain.setValueAtTime(0.0001,t);
+  g.gain.linearRampToValueAtTime(peak,t+0.02);
+  g.gain.exponentialRampToValueAtTime(0.0008,t+dur);
+  o.connect(g); g.connect(ctx.destination); o.start(t); o.stop(t+dur+0.02);
+}
+function _sfxCtx(){
+  var AC=window.AudioContext||window.webkitAudioContext; if(!AC) return null;
+  var ctx=_sfxCtx._c||(_sfxCtx._c=new AC());
+  if(ctx.state==='suspended'){ try{ctx.resume();}catch(e){} }
+  return ctx;
+}
+function _playAlertTone(){
+ try{
+  if(window._alarmMuted) return;
+  var ctx=_sfxCtx(); if(!ctx) return; var t0=ctx.currentTime;
+  /* three falling fourths, tight - the repeat is what makes it read as an alarm rather than a
+     notification, without ever needing to be shrill */
+  [0,0.30,0.60].forEach(function(off,i){
+    var p=i===2?0.17:0.145;
+    _sfxNote(ctx,SFX_A4,t0+off,      0.135,p,3400);
+    _sfxNote(ctx,SFX_E4,t0+off+0.145,0.165,p,3000);
+  });
+  _sfxSub(ctx,t0,110,0.34,0.10);
+ }catch(e){}
+}
+function _playAckTone(){                                        /* operator picked the event up */
+ try{ var ctx=_sfxCtx(); if(!ctx) return; var t0=ctx.currentTime;
+  _sfxNote(ctx,SFX_E4,t0,     0.14,0.085,2600);
+  _sfxNote(ctx,SFX_A4,t0+0.15,0.26,0.085,2600);
+ }catch(e){}
+}
+function _playResolveTone(){                                    /* event closed */
+ try{ var ctx=_sfxCtx(); if(!ctx) return; var t0=ctx.currentTime;
+  _sfxNote(ctx,SFX_A4,t0,     0.17,0.075,2400);
+  _sfxNote(ctx,SFX_E4,t0+0.19,0.19,0.070,2200);
+  _sfxNote(ctx,SFX_A3,t0+0.40,0.42,0.065,1900);
+  _sfxSub(ctx,t0+0.40,110,0.45,0.05);
  }catch(e){}
 }
 var _alarmTimer=null, _alarmId=null, _alarmSilenced=false;
@@ -1401,7 +1474,7 @@ function emgLeave(){ try{ document.body.classList.remove('emg','emg-out');
 function openResponse(id){
  try{
   var o=_liveEvents[id]; if(!o){ return; }
-  try{ emgEnter(); stripCalm(); }catch(_){} var e=o.e, m=o.m; _respSel={}; _respRadius=1.5;
+  try{ emgEnter(); stripCalm(); _playAckTone(); }catch(_){} var e=o.e, m=o.m; _respSel={}; _respRadius=1.5;
   var lat=+e.lat, lng=+e.lng;
   try{ flyToLive(lat,lng,id); }catch(_){}
   try{ if(_respCircle){MAP.removeLayer(_respCircle);} _respLatLng=[lat,lng]; _respCircle=L.circle(_respLatLng,{radius:_respRadius*1000,color:'#4fc3e8',weight:2,fillColor:'#4fc3e8',fillOpacity:.08,dashArray:'7 6'}).addTo(MAP); _radChip(); }catch(_e){}
