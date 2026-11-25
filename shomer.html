@@ -6533,19 +6533,31 @@ function nativeStaleNotice(){
   try{
     if(_staleShown || !nativeTooOld()) return;
     _staleShown=true;
-    var he='גרסת האנדרואיד שלכם ישנה.\n\nבגרסה הזו: ניעור לבד עלול להפעיל SOS, ולחיצה+ניעור שולחת הודעה בלי צפירה ובלי להתריע לשומרים.\n\nעדכנו מגוגל פליי, או התקינו מ-shomer-app.co.il/SHOMER.apk';
-    var en='Your Android build is out of date.\n\nOn this build a shake alone can start an SOS, and a button + shake sends a message with no siren and no alert to your SHOMERs.\n\nUpdate from Google Play, or install from shomer-app.co.il/SHOMER.apk';
-    var ar='إصدار أندرويد لديك قديم.\n\nفي هذا الإصدار: الهزّ وحده قد يُطلق استغاثة، ومفتاح+هزّ يرسل رسالة بلا صفّارة وبلا تنبيه لحُرّاسك.\n\nحدِّث من Google Play أو ثبّت من shomer-app.co.il/SHOMER.apk';
+    var he='גרסת האנדרואיד שלכם ישנה.\n\nבגרסה הזו: ניעור לבד עלול להפעיל SOS, ולחיצה+ניעור שולחת הודעה בלי צפירה ובלי להתריע לשומרים.\n\nהתקינו את הגרסה העדכנית - ההתקנה תעדכן את האפליקציה הקיימת.';
+    var en='Your Android build is out of date.\n\nOn this build a shake alone can start an SOS, and a button + shake sends a message with no siren and no alert to your SHOMERs.\n\nInstall the current build - it updates the app you already have.';
+    var ar='إصدار أندرويد لديك قديم.\n\nفي هذا الإصدار: الهزّ وحده قد يُطلق استغاثة، ومفتاح+هزّ يرسل رسالة بلا صفّارة وبلا تنبيه لحُرّاسك.\n\nثبّت الإصدار الحالي - سيحدّث التطبيق الموجود لديك.';
     var msg=currentLang==='en'?en:currentLang==='ar'?ar:he;
     var shown=false;
-    try{ if(typeof importantShow==='function') shown=!!importantShow({he:he,en:en,ar:ar}); }catch(e){}
+    /* v434: the only action this warning ever offered was a URL inside its own body text, which
+       wrapped mid-domain and could not be tapped. On a build whose SOS does not sound, the fix has
+       to be one tap. Direct download first - everyone seeing this sideloaded, and a Play install
+       refuses an APK signed with the upload key - with Play underneath for whoever came from there. */
+    var _cta=[{label:{he:'הורדת הגרסה העדכנית',ar:'تنزيل الإصدار الحالي',en:'Download the current build'},
+               href:'https://www.shomer-app.co.il/SHOMER.apk', dl:true},
+              {label:{he:'עדכון דרך גוגל פליי',ar:'التحديث عبر Google Play',en:'Update on Google Play'},
+               href:'https://play.google.com/store/apps/details?id=com.shamrocks.shomer'}];
+    try{ if(typeof importantShow==='function') shown=!!importantShow({he:he,en:en,ar:ar,cta:_cta}); }catch(e){}
     /* the modal takes the session's single popup slot and can decline. A refused warning about a
        build that cannot sound its siren must not vanish, so fall back to a toast, and leave the
        version row amber either way. */
     /* v424: a toast is a consolation prize for the most important message this app can show, and
        nothing ever re-tried it - _staleShown went back to false and no one called again, so the
        warning died with that one toast. Keep asking until it actually renders as the modal. */
-    if(!shown){ try{ toast(msg.split('\n')[0],'amb'); }catch(e){} _staleShown=false;
+    /* v434: the retry called straight back into here, and each pass fired another toast - two
+       identical amber banners on screen and a new one every 20s until the modal finally won.
+       Warn once; the retry from then on only tries for the modal. */
+    if(!shown){ if(!window._staleToasted){ window._staleToasted=true; try{ toast(msg.split('\n')[0],'amb'); }catch(e){} }
+      _staleShown=false;
       try{ if(!window._staleRetry){ window._staleRetry=setInterval(function(){
              try{ if(!nativeTooOld()){ clearInterval(window._staleRetry); window._staleRetry=null; return; }
                   if(_staleShown){ clearInterval(window._staleRetry); window._staleRetry=null; return; }
@@ -8778,6 +8790,11 @@ function importantShow(it){
   +'<svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true" style="flex:0 0 auto"><circle cx="12" cy="12" r="9" fill="none" stroke="#E0A828" stroke-width="2"/><path d="M12 7.6v5" stroke="#E0A828" stroke-width="2" stroke-linecap="round"/><path d="M12 16.2h.01" stroke="#E0A828" stroke-width="2" stroke-linecap="round"/></svg>'
   +'<div style="font-weight:700;font-size:17px;color:#E0A828">'+(he?'חשוב לדעת':L==='ar'?'مهم أن تعرف':'Important to know')+'</div></div>'
   +'<div style="font-size:15px;line-height:1.6;margin-bottom:18px">'+txt+'</div>'
+  +(it.cta?('<div style="display:flex;flex-direction:column;gap:8px;margin:-6px 0 14px">'
+      +it.cta.map(function(c,i){ var lb=(c.label&&(c.label[L]||c.label.he))||'';
+        return '<a href="'+c.href+'"'+(c.dl?' download':'')+' target="_blank" rel="noopener" class="imp-cta" style="display:block;text-align:center;padding:13px 12px;border-radius:12px;text-decoration:none;font:inherit;font-weight:'+(i===0?'800':'600')+';'
+          +(i===0?'background:linear-gradient(135deg,#C09020,#E0A828,#F5C840);color:#101722;border:0':'background:transparent;color:#E8EDF6;border:1px solid rgba(232,237,246,.26)')+'">'+lb+'</a>'; }).join('')
+      +'</div>'):'')
   +'<div style="display:flex;gap:10px">'
   +'<button type="button" id="imp-howto" style="flex:1;padding:12px;border-radius:12px;border:1px solid rgba(232,237,246,.26);background:transparent;color:#E8EDF6;font:inherit;font-weight:600;cursor:pointer">'+(he?'איך משתמשים':L==='ar'?'كيف نستخدم':'How to use')+'</button>'
   +'<button type="button" id="imp-ok" style="flex:1;padding:12px;border-radius:12px;border:0;background:#E0A828;color:#101722;font:inherit;font-weight:700;cursor:pointer">'+(he?'הבנתי':L==='ar'?'فهمت':'Got it')+'</button>'
@@ -8785,6 +8802,7 @@ function importantShow(it){
  document.body.appendChild(ov);
  var close=function(){ try{ ov.remove(); }catch(e){}
    try{ var seen=importantSeen(); if(seen.indexOf(it.id)<0){ seen.push(it.id); SS._impSeen=seen.slice(-20).join(','); saveStore(); } }catch(e){} };
+ try{ Array.prototype.forEach.call(ov.querySelectorAll('.imp-cta'),function(a){ a.addEventListener('click',function(){ setTimeout(close,80); }); }); }catch(e){}
  try{ document.getElementById('imp-ok').onclick=close;
       document.getElementById('imp-howto').onclick=function(){ close(); openHowTo(); };
       ov.addEventListener('click',function(e){ if(e.target===ov) close(); }); }catch(e){}
@@ -12984,7 +13002,7 @@ try{ hydrateIcons(document); }catch(e){}
 /* Loaded-build version - shown in the diagnostic panel so a phone can prove
    whether it's on the latest build or a STALE cached one. Keep in lock-step
    with sw.js SW_VERSION on every deploy. */
-var APP_VER='v433';
+var APP_VER='v434';
 var FB={ready:false,uid:null,db:null,_presTimer:null,connected:false,listening:false,pushState:'default',near:0,swVer:'?',
   authState:'connecting',sdkLoaded:false,persist:'',permErr:null,err:null,wsProbe:'',csp:''};
 /* Always log connection diagnostics to the console so the real failure can be SEEN in Chrome. */

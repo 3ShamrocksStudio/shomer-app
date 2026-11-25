@@ -2,6 +2,11 @@ name: Build SHOMER Android APK
 
 on:
   workflow_dispatch:
+    inputs:
+      publish_play:
+        description: 'Also upload this build to the Google Play INTERNAL testing track'
+        type: boolean
+        default: false
   push:
     tags:
       - 'android-*'
@@ -257,3 +262,29 @@ jobs:
           name: shomer-release-aab
           path: native/android/app/build/outputs/bundle/release/app-release.aab
           if-no-files-found: warn
+
+      # The AAB was built on every run and then only ever kept as a GitHub artifact, so Play only
+      # ever had whatever was last uploaded by hand. Testers on Play therefore sat on an old shell
+      # while the website APK moved with every commit - and the in-app warning told them to
+      # "update from Google Play", where there was nothing newer to get.
+      #
+      # Deliberately NOT automatic. This touches Dave's real Play account, so it runs only when a
+      # dispatch explicitly asks for it, and only to the INTERNAL track - never production, and
+      # never the closed test, whose 14-day continuous-testing clock a surprise release could
+      # disturb. Skips cleanly when the service-account secret is absent.
+      - name: Check Play credentials
+        id: playcred
+        if: ${{ github.event_name == 'workflow_dispatch' && inputs.publish_play }}
+        run: |
+          if [ -n "${{ secrets.PLAY_SERVICE_ACCOUNT_JSON }}" ]; then echo "ok=yes" >> $GITHUB_OUTPUT
+          else echo "ok=no" >> $GITHUB_OUTPUT; echo "::warning::PLAY_SERVICE_ACCOUNT_JSON is not set - skipping the Play upload."; fi
+
+      - name: Upload to Play (internal track)
+        if: ${{ steps.playcred.outputs.ok == 'yes' }}
+        uses: r0adkll/upload-google-play@935ef9c68bb393a8e6116b1575626a7f5be3a7fb  # v1.1.3
+        with:
+          serviceAccountPlainText: ${{ secrets.PLAY_SERVICE_ACCOUNT_JSON }}
+          packageName: com.shamrocks.shomer
+          releaseFiles: native/android/app/build/outputs/bundle/release/app-release.aab
+          track: internal
+          status: completed

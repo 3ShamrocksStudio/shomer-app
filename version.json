@@ -1,19 +1,22 @@
 {
-"v": "v433",
+"v": "v434",
 "notes": {
 "he": [
+"אזהרת „גרסת אנדרואיד ישנה” כוללת עכשיו כפתור הורדה ישיר לגרסה העדכנית - בלחיצה אחת, במקום כתובת שנשברה באמצע ואי אפשר היה ללחוץ עליה. ההתקנה מעדכנת את האפליקציה הקיימת. בנוסף: האזהרה מופיעה פעם אחת ולא נערמת כל 20 שניות.",
 "בתפריט: „עזרה לא-דחופה” קיבלה צבע משלה - לא אדום של חירום ולא זהב של פעולה רגילה.",
 "בקשת עזרה שקטה לשומרים שלך אפשר עכשיו לסמן בסיבה: תקר, הרכב לא מניע, טרמפ, איבדתי את הדרך, לא מרגיש/ה בנוח, או סתם צריך/ה יד.",
 "אצל מי שמקבל את הבקשה: צליל רך ויורד (לא אזעקה), רטט קצר אחד, והנקודה של מי שביקש מקבלת במפה טבעת מקווקוות בצבע תכלת עם הסיבה מתחת לשם - אי אפשר להתבלבל בינה לבין SOS אדום, והסימון „LIVE” נשאר גלוי. הבקשה נמחקת מעצמה אחרי שעה.",
 "בקשת עזרה שנשלחה לכמה שומרים נסגרת עכשיו אצל כולם ברגע שמישהו אומר „אני בדרך”, ואפשר לבטל אותה ידנית מתוך „עזרה לא-דחופה”. אם מי שביקש עזרה לוחץ SOS אמיתי - הבקשה הלא-דחופה נמחקת מיד."
 ],
 "en": [
+"The \"old Android build\" warning now carries a direct download button for the current build - one tap, instead of an address that broke mid-domain and could not be tapped. Installing it updates the app you already have. The warning also appears once now instead of stacking every 20 seconds.",
 "In the menu, \"Non-urgent help\" now has a colour of its own - not emergency red, not the gold of an ordinary action.",
 "A quiet ask to your SHOMERs can now carry a reason: flat tyre, car won't start, need a lift, lost my way, don't feel right here, or just need a hand.",
 "For whoever receives it: a soft falling tone (not the alarm), one short buzz, and the asker's dot on the map picks up a dashed cyan ring with the reason under their name - it cannot be confused with a red SOS, and the LIVE marker stays visible. The ask clears itself after an hour.",
 "An ask sent to several SHOMERs now closes for all of them the moment one says they are on the way, and can be cancelled by hand from \"Non-urgent help\". If the person asking then raises a real SOS, the non-urgent ask is dropped at once."
 ],
 "ar": [
+"يحتوي تحذير «إصدار أندرويد قديم» الآن على زر تنزيل مباشر للإصدار الحالي - بنقرة واحدة، بدل عنوان كان ينكسر في منتصفه ولا يمكن الضغط عليه. التثبيت يحدّث التطبيق الموجود لديك. كما يظهر التحذير مرة واحدة بدل أن يتراكم كل 20 ثانية.",
 "في القائمة: صار لـ«مساعدة غير عاجلة» لون خاص بها - ليس أحمر الطوارئ ولا ذهب الإجراء العادي.",
 "يمكن الآن إرفاق سبب بالطلب الهادئ لحُرّاسك: إطار مثقوب، السيارة لا تعمل، بحاجة لتوصيلة، تهت عن الطريق، لا أشعر بالارتياح هنا، أو بحاجة إلى مساعدة.",
 "لدى من يستلم الطلب: نغمة هادئة هابطة (ليست إنذارًا)، اهتزاز قصير واحد، وتظهر نقطة صاحب الطلب على الخريطة بحلقة متقطّعة سماويّة مع السبب أسفل الاسم - لا يمكن الخلط بينها وبين استغاثة حمراء، ويبقى مؤشّر «LIVE» ظاهرًا. يختفي الطلب تلقائيًا بعد ساعة.",
