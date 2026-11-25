@@ -665,6 +665,9 @@ body.emg .c-map{animation:emgIn .22s cubic-bezier(.2,.8,.3,1)}
      affordance from before this page was something to hand to a customer. The live view is now
      reached only by signing in, which is what it always should have required. -->
       <button class="btn" id="demo-btn" style="background:transparent;border:1px solid var(--gold);color:var(--gold);margin-top:8px">👁  כניסה לדמו · See a live demo</button>
+      <!-- v426: there was no way back in if you forgot the password. The live view is the paid
+           product, so a locked-out customer had no self-service route at all. -->
+      <button class="lnk" id="to-reset">שכחת סיסמה? <b>שלח קישור איפוס</b></button>
       <button class="lnk" id="to-signup">אין לך גישה עדיין? <b>בקשת גישת לקוח</b></button>
     </div>
     <div id="view-signup" class="hidden">
@@ -776,6 +779,19 @@ function gerr(m){document.getElementById('gate-err').textContent=m||'';}
 /* ---- auth UI ---- */
 document.getElementById('to-signup').onclick=function(){document.getElementById('view-login').classList.add('hidden');document.getElementById('view-signup').classList.remove('hidden');gerr('');};
 document.getElementById('to-login').onclick=function(){document.getElementById('view-signup').classList.add('hidden');document.getElementById('view-login').classList.remove('hidden');gerr('');};
+/* v426: password reset. Sends a Supabase recovery mail to whatever is typed in the email box. */
+document.getElementById('to-reset').onclick=async function(){
+  var el=document.getElementById('email'), em=(el&&el.value||'').trim();
+  if(!em){ if(el) el.focus(); gerr('הקלד/י קודם את האימייל, ואז לחץ/י שוב'); return; }
+  this.disabled=true; var old=this.innerHTML; this.innerHTML='שולח…';
+  try{
+    var r=await sb.auth.resetPasswordForEmail(em,{redirectTo:location.origin+location.pathname+'?login=1'});
+    /* Supabase does not say whether the address exists, and neither do we - telling a stranger
+       which emails are registered is an account-enumeration leak. */
+    gerr(r&&r.error ? ('שגיאה: '+r.error.message) : 'אם הכתובת רשומה, נשלח אליה קישור לאיפוס סיסמה. בדוק/י גם בספאם.');
+  }catch(e){ gerr('שגיאה בשליחה, נסה/י שוב'); }
+  this.disabled=false; this.innerHTML=old;
+};
 document.getElementById('login-btn').onclick=async function(){
   gerr(''); var e=document.getElementById('email').value.trim(), p=document.getElementById('pass').value;
   if(!e||!p){gerr('הזן אימייל וסיסמה');return;}
