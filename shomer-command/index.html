@@ -328,7 +328,10 @@ body.emg .c-map{animation:emgIn .22s cubic-bezier(.2,.8,.3,1)}
 .resp-two{display:flex;gap:8px}
 .resp-two div{flex:1;border-radius:10px;padding:9px;text-align:center;font-size:12px;font-weight:700;cursor:pointer}
 .resp-esc{background:#241a10;border:1px solid #BA7517;color:#f0c75a}
-.resp-bc{background:#101a2e;border:1px solid #378ADD;color:#8ab4ff}
+/* v430: these two sat in the open response panel in cornflower blue - the one colour that is
+   not in this brand and the one an operator reads as "police". Gold, like every other
+   secondary action on this board. */
+.resp-bc{background:#101a2e;border:1px solid rgba(224,168,40,.55);color:#E0A828}
 .resp-send{background:linear-gradient(135deg,#b8841c,#e0a828 60%,#f3cf6a);color:#23180a;border:0;border-radius:11px;padding:12px;text-align:center;font-size:14px;font-weight:800;cursor:pointer;width:100%;font-family:inherit}
 .resp-nat{background:rgba(255,255,255,.03);border:1px dashed #3a4a63;border-radius:10px;padding:10px 12px;font-size:11px;color:#9aa6bd;line-height:1.6}
 .resp-log{font-size:11.5px;color:#9aa6bd;line-height:1.5;max-height:230px;overflow:auto}
@@ -604,7 +607,9 @@ body.emg .c-map{animation:emgIn .22s cubic-bezier(.2,.8,.3,1)}
 /* overlays: navy */
 .acct-card,.resp,.sos-pop-card{background:linear-gradient(180deg,#13284f,#0c1b39)!important;border-color:var(--blue)!important;font-family:var(--font)}
 .acct-ov,.sos-pop,.resp{font-family:var(--font)}
-.resp-h{background:linear-gradient(90deg,rgba(239,72,83,.16),rgba(30,49,95,.5))}
+/* v430: this is the .resp-h that wins - the one in resp-css above it has equal specificity and
+   loses on order, so recolouring that one alone did nothing. Brand gold, not navy. */
+.resp-h{background:linear-gradient(90deg,rgba(239,72,83,.16),rgba(224,168,40,.10))}
 .rsec{border-color:var(--blue)}
 .rsec-n,.resp-send,.set-btn{background:var(--gold)!important;color:#1a1204!important}
 .rg b{background:var(--navy-2);border-color:var(--blue-2)}
@@ -1443,11 +1448,25 @@ function respFinish(id){
     var o=_liveEvents&&_liveEvents[id];
     try{ respLog(id,'האירוע נסגר ע״י המוקדן · הועבר ליומן'); }catch(e){}
     try{ if(o) o.closed=true; }catch(e){}
+    /* v430: same defect the live board had - the close filed no status. _scSync derives
+       cur.at.resolve from B.reviews[id].status, so with nothing filed it recomputed 'emerg' on
+       the next boardRefresh and the checklist and this button disagreed about what closing an
+       event means. Filing the status settles both from one place. */
+    try{ var _B=_boardLoad(); _B.reviews=_B.reviews||{};
+      var _pv=_B.reviews[id]||{}, _lg=(_pv.log||[]).slice(-49);
+      if(_pv.status!=='handled') _lg.push({ts:Date.now(),st:'handled',note:_pv.note||''});
+      _B.reviews[id]={status:'handled',note:_pv.note||'',at:Date.now(),log:_lg,resp:(o&&o._log?o._log.slice(-50):_pv.resp)};
+      _boardSave(_B); }catch(e){}
+    try{ _alarmId=null; _alarmSilenced=false; }catch(e){}
+    try{ boardRefresh(); }catch(e){}
     try{ var st=document.getElementById('live-strip'); if(st){ st.classList.add('attended'); st.style.display='none'; } }catch(e){}
     try{ document.body.classList.remove('sc-emerg'); }catch(e){}
     try{ stopAlarm(); }catch(e){}
     try{ _playResolveTone(); }catch(e){}
-    try{ toast && toast('האירוע נסגר · הלוח חזר'); }catch(e){}
+    /* v430: this called toast(), which is defined nowhere in this file - a ReferenceError into
+       the catch on every close, so the confirmation never appeared. The close already states
+       itself: the banner returns to מצב רגיל, the strip goes, the resolve tone plays and the
+       log records it. Dead call removed rather than a new toast component built for it. */
   }catch(e){}
   try{ closeResponse(); }catch(e){}
 }
