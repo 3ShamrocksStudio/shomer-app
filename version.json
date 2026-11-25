@@ -1,14 +1,17 @@
 {
-"v": "v418",
+"v": "v419",
 "notes": {
 "he": [
-"„עזרה לא-דחופה?” עבר לשורת הצ׳יפים למעלה, ליד „מחובר” ו„מקרא מפה” - שקט, ולא מתחרה בכפתור ה-SOS"
+"תיקון חשוב במסך „מספרי חירום”: 1201 הוא ער״ן - עזרה ראשונה נפשית, אנונימי. קודם הוא הופיע בשם אחר",
+"כפתור שהיה מתויג „אירוע ביטחוני” הוסר - המספר שמאחוריו אינו לאירוע ביטחוני. לאירוע ביטחוני חייגו 100"
 ],
 "en": [
-"\"Non-urgent help?\" moved up to the chip row beside \"connected\" and the legend - quiet, and no longer competing with the SOS button"
+"Important correction on the \"Emergency Numbers\" screen: 1201 is ERAN - emotional first aid, anonymous. It was previously shown under a different name",
+"A button labelled \"security incident\" was removed - the number behind it is not for security incidents. For a security incident, dial 100"
 ],
 "ar": [
-"انتقل «مساعدة غير عاجلة؟» إلى صف الشارات في الأعلى بجانب «متصل» والمفتاح - هادئ، ولم يعد ينافس زر الاستغاثة"
+"تصحيح مهم في شاشة «أرقام الطوارئ»: 1201 هو عيران - إسعاف نفسي أولي، مجهول الهوية. كان معروضًا سابقًا باسم آخر",
+"أُزيل زر كان موسومًا «حادث أمني» - الرقم الذي خلفه ليس للحوادث الأمنية. للحادث الأمني اتصل بـ100"
 ]
 }
 }

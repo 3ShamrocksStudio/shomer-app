@@ -2614,8 +2614,7 @@ body.otp-active .ob-steps{display:none!important;}
  </button>
  <button class="call-btn" onclick="callNum(ambulanceNum())"><div class="cc-ic"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 17V9a2 2 0 0 1 2-2h7l4 3.5V17" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><circle cx="8" cy="18" r="2" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="16" cy="18" r="2" fill="none" stroke="currentColor" stroke-width="2"/><path d="M10.5 11v3M9 12.5h3" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></div><div><div class="cc-nm" data-he="101 - מד&quot;א" data-en="101 - Magen David Adom">101 - מד"א</div><div class="cc-sb" data-he="דחיפות רפואית" data-en="Medical emergency">דחיפות רפואית</div></div></button>
  <button class="call-btn" onclick="callNum(fireNum())"><div class="cc-ic"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3s5 4 5 9a5 5 0 0 1-10 0c0-1.6.7-2.8 1.5-3.6C8.7 10.2 9 12 10 12.5c0-2.2 1-4 2-6 .2 1.4 0 2.5 0 2.5S12 5 12 3Z" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linejoin="round"/></svg></div><div><div class="cc-nm" data-he="102 - כבאות" data-en="102 - Fire & Rescue">102 - כבאות</div><div class="cc-sb" data-he="שריפה / חילוץ" data-en="Fire / rescue">שריפה / חילוץ</div></div></button>
- <button class="call-btn" onclick="callNum('1201')"><div class="cc-ic"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3l2.6 5.6 6 .7-4.5 4.1 1.2 6L12 16.6 6.7 19.5l1.2-6L3.4 9.3l6-.7Z" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linejoin="round"/></svg></div><div><div class="cc-nm">1201 - ZAKA</div><div class="cc-sb" data-he="תאונות ואסונות" data-en="Accidents & disasters">תאונות ואסונות</div></div></button>
- <button class="call-btn" onclick="callNum('1202')"><div class="cc-ic"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3l7 3v5c0 5-3.4 8.5-7 10-3.6-1.5-7-5-7-10V6Z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></svg></div><div><div class="cc-nm" data-he="1202 - שב&quot;כ" data-en="1202 - Shin Bet">1202 - שב"כ</div><div class="cc-sb" data-he="אירוע ביטחוני" data-en="Security incident">אירוע ביטחוני</div></div></button>
+ <button class="call-btn" onclick="callNum('1201')"><div class="cc-ic"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3l2.6 5.6 6 .7-4.5 4.1 1.2 6L12 16.6 6.7 19.5l1.2-6L3.4 9.3l6-.7Z" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linejoin="round"/></svg></div><div><div class="cc-nm" data-he="1201 - ער״ן" data-en="1201 - ERAN">1201 - ער״ן</div><div class="cc-sb" data-he="עזרה ראשונה נפשית - אנונימי" data-en="Emotional first aid - anonymous">עזרה ראשונה נפשית - אנונימי</div></div></button>
  <div class="lock-card">
  <div class="lc-t"><svg class="ic" style="color:var(--g3)" viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="11" width="14" height="9" rx="2" fill="none" stroke="currentColor" stroke-width="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3" fill="none" stroke="currentColor" stroke-width="2"/></svg> <span data-he="SOS מנעילת מסך - ללא פתיחת אפליקציה" data-en="SOS from the lock screen - no need to open the app">SOS מנעילת מסך - ללא פתיחת אפליקציה</span></div>
  <div class="lc-b" data-i18n-html="1" data-he="<strong>iPhone:</strong> לחץ 3× על כפתור הצד → Emergency SOS.<br><strong>Android:</strong> לחץ 5× על כפתור ההפעלה → Emergency SOS.<br><strong>ניעור ל-SOS:</strong> צריך לחיצה על כפתור העוצמה יחד עם ניעור חזק. תמיד יש 10 שניות לבטל.<br>הגדר 100 כאיש קשר חירום ראשון בטלפון." data-en="<strong>iPhone:</strong> press the side button 3× → Emergency SOS.<br><strong>Android:</strong> press the power button 5× → Emergency SOS.<br><strong>Shake-to-SOS:</strong> press the volume key while you shake. A shake alone does nothing. You always get 10 seconds to cancel.<br>Set 100 as your phone's primary emergency contact.">
@@ -3352,7 +3351,7 @@ const AR={
  '100 - Israel Police':'100 - الشرطة الإسرائيلية'/*SAFETY*/,'Direct call on speaker':'اتصال مباشر عبر مكبر الصوت'/*SAFETY*/,
  '101 - Magen David Adom':'101 - نجمة داوود الحمراء (إسعاف)'/*SAFETY*/,'Medical emergency':'طوارئ طبية'/*SAFETY*/,
  '102 - Fire & Rescue':'102 - الإطفاء والإنقاذ'/*SAFETY*/,'Fire / rescue':'حريق / إنقاذ'/*SAFETY*/,
- '1201 - ZAKA':'1201 - زاكا'/*SAFETY*/,'Accidents & disasters':'حوادث وكوارث'/*SAFETY*/,'1202 - Shin Bet':'1202 - الشاباك'/*SAFETY*/,'Security incident':'حادث أمني'/*SAFETY*/,
+ '1201 - ERAN':'1201 - عيران'/*SAFETY*/,'Emotional first aid - anonymous':'إسعاف نفسي أولي - مجهول الهوية'/*SAFETY*/,
  'SOS from the lock screen - no need to open the app':'استغاثة من شاشة القفل - دون فتح التطبيق'/*SAFETY*/,
  '<strong>iPhone:</strong> press the side button 3× → Emergency SOS.<br><strong>Android:</strong> press the power button 5× → Emergency SOS.<br><strong>Shake-to-SOS:</strong> press the volume key while you shake. A shake alone does nothing. You always get 10 seconds to cancel.<br>Set 100 as your phone\'s primary emergency contact.':'<strong>آيفون:</strong> اضغط الزر الجانبي 3 مرات ← استغاثة طارئة.<br><strong>أندرويد:</strong> اضغط زر التشغيل 5 مرات ← استغاثة طارئة.<br><strong>الهزّ للاستغاثة:</strong> اضغط زرّ الصوت أثناء الهزّ. الهزّ وحده لا يفعل شيئًا. لديك دائمًا 10 ثوانٍ للإلغاء.<br>اجعل 100 جهة الطوارئ الأساسية في هاتفك.'/*SAFETY*/,
  // ── Settings long-tail (deep labels) ──
@@ -11501,7 +11500,7 @@ function emApplyCountry(){
     for(var i=0;i<btns.length;i++){
       var b=btns[i], nm=b.querySelector('.cc-nm'); if(!nm) continue;
       if(!nm.hasAttribute('data-he0')){ nm.setAttribute('data-he0',nm.getAttribute('data-he')||nm.textContent); nm.setAttribute('data-en0',nm.getAttribute('data-en')||nm.textContent); nm.setAttribute('data-ar0',nm.getAttribute('data-ar')||''); b.setAttribute('data-al0',b.getAttribute('aria-label')||''); }
-      if(i>2){ b.style.display=il?'':'none'; continue; }   /* 1201 / 1202 are Israel-only services */
+      if(i>2){ b.style.display=il?'':'none'; continue; }   /* 1201 (ER"AN) is an Israel-only service */
       var d=defs[i];
       if(il){ nm.setAttribute('data-he',nm.getAttribute('data-he0')); nm.setAttribute('data-en',nm.getAttribute('data-en0')); if(nm.getAttribute('data-ar0')) nm.setAttribute('data-ar',nm.getAttribute('data-ar0')); else nm.removeAttribute('data-ar'); }
       else { nm.setAttribute('data-he',d[0]+' - '+d[4]+cn); nm.setAttribute('data-en',d[0]+' - '+d[2]+cn); nm.setAttribute('data-ar',d[0]+' - '+d[3]+cn);
@@ -12703,7 +12702,7 @@ try{ hydrateIcons(document); }catch(e){}
 /* Loaded-build version - shown in the diagnostic panel so a phone can prove
    whether it's on the latest build or a STALE cached one. Keep in lock-step
    with sw.js SW_VERSION on every deploy. */
-var APP_VER='v418';
+var APP_VER='v419';
 var FB={ready:false,uid:null,db:null,_presTimer:null,connected:false,listening:false,pushState:'default',near:0,swVer:'?',
   authState:'connecting',sdkLoaded:false,persist:'',permErr:null,err:null,wsProbe:'',csp:''};
 /* Always log connection diagnostics to the console so the real failure can be SEEN in Chrome. */
