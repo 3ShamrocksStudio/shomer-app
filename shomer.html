@@ -120,7 +120,9 @@
 /* Icon sizing/colour per context (replacing former emoji) */
 .hdr-menu .ic{width:22px;height:22px;color:var(--p4);}
 .hdr-bell .ic{width:22px;height:22px;color:var(--g3);}
-.loc-fab .ic{width:22px;height:22px;color:#19A8FF;}
+/* v422: green, not iOS blue - this button finds "my location", and my location is now a green
+   dot. A blue control pointing at a green marker is the same mismatch as the legend had. */
+.loc-fab .ic{width:22px;height:22px;color:#2BC47E;}
 .ff-fab .ic{width:22px;height:22px;color:#16A06A;}
 .ropt-ic .ic{width:26px;height:26px;color:var(--g3);}
 /* Semantic event colours (the crime-type / map-icon palette) brought into the UI, not just markers */
@@ -1812,7 +1814,9 @@ body.otp-active .ob-steps{display:none!important;}
  <div class="leg"><div class="ldc" style="background:#2962FF" aria-hidden="true"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="11" width="14" height="9" rx="2" fill="none" stroke="currentColor" stroke-width="2"/><path d="M8 11V8a4 4 0 0 1 7.5-2" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></div><span id="l4">גנבה / רכוש</span></div>
  <div class="leg"><div class="ldc" style="background:#18C29C" aria-hidden="true"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="8" width="18" height="8" rx="4" fill="none" stroke="currentColor" stroke-width="2"/><path d="M12 8v8" fill="none" stroke="currentColor" stroke-width="2"/></svg></div><span id="l5">סמים</span></div>
  <div class="leg"><div class="ldc" style="background:#16A06A" aria-hidden="true"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="4" width="16" height="16" rx="4" fill="none" stroke="currentColor" stroke-width="2"/><path d="M12 8v8M8 12h8" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg></div><span id="l6">רפואי</span></div>
- <div class="leg"><div class="ldc" style="background:#19A8FF;border-color:#fff" aria-hidden="true"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 4 L17 18.5 L12 15.2 L7 18.5 Z" fill="#fff"/></svg></div><span id="l8">המיקום שלי</span></div>
+ <!-- v422: legend key follows the marker. It was a blue #19A8FF arrow while the marker is now a
+      green dot, so the legend and the map disagreed about what "my location" looks like. -->
+ <div class="leg"><div class="ldc" style="background:#2BC47E;border-color:#0C1B39" aria-hidden="true"></div><span id="l8">המיקום שלי</span></div>
  <div class="legend-foot" id="legend-foot">צבעים = קטגוריה. סמני ערים = סקירה סטטיסטית מצרפית, לא אירוע ספציפי.</div></div></div>
      <div class="leg-sec" id="leg-past-sec"><div class="leg-past-row"><span data-he="אירועי עבר" data-en="Past events" data-ar="أحداث سابقة">אירועי עבר</span><div class="tog" id="leg-past-tog" role="switch" aria-checked="false" onclick="togglePastEvents();this.classList.toggle('on');this.setAttribute('aria-checked',this.classList.contains('on'))"></div></div></div>
      <div class="leg-sec" id="leg-ess">
@@ -13669,7 +13673,9 @@ function fbDashBeat(hide, lat, lng){
     st.gone=false;
     var _hb={type:'presence',lat:lat,lng:lng,ts:Date.now(),status:((st.mode==='new'&&fbDayTag())?'v2:'+fbDayTag():'v2')};   /* 'v2' = real (non-automated) app; v280 adds today's anonymous tag */
     if(st.mode!=='new') return;   /* without an anonymous key, skip the public feed rather than name my account */
-    var _fd=false; try{ _fd=isFounder(); }catch(_f){}
+    /* v422: a dead `_fd = isFounder()` sat here, computed and never used. It leaked nothing, but
+       an unused founder flag one line above the public-feed write is a loaded gun - the next
+       person to add a field to _hb has it sitting right there. Removed. */
     fbRestWrite('PUT','dashfeed/'+key,_hb).catch(function(){});   /* v300: no founder flag in the public feed - it pinpointed the founder's live area */
     if(st.mode==='new') fbNativeBeat({on:true,key:key,lat:lat,lng:lng});   /* v299: the background service keeps this row alive while the app is off-screen */
     try{ fbDayMark(lat,lng); }catch(e){}
