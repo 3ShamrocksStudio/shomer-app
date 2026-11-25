@@ -6503,7 +6503,15 @@ function nativeStaleNotice(){
     /* the modal takes the session's single popup slot and can decline. A refused warning about a
        build that cannot sound its siren must not vanish, so fall back to a toast, and leave the
        version row amber either way. */
-    if(!shown){ try{ toast(msg.split('\n')[0],'amb'); }catch(e){} _staleShown=false; }
+    /* v424: a toast is a consolation prize for the most important message this app can show, and
+       nothing ever re-tried it - _staleShown went back to false and no one called again, so the
+       warning died with that one toast. Keep asking until it actually renders as the modal. */
+    if(!shown){ try{ toast(msg.split('\n')[0],'amb'); }catch(e){} _staleShown=false;
+      try{ if(!window._staleRetry){ window._staleRetry=setInterval(function(){
+             try{ if(!nativeTooOld()){ clearInterval(window._staleRetry); window._staleRetry=null; return; }
+                  if(_staleShown){ clearInterval(window._staleRetry); window._staleRetry=null; return; }
+                  nativeStaleNotice(); }catch(e){} }, 20000); } }catch(e){}
+    }
     try{ console.warn('[SHOMER] native build too old:',window._nativePluginVer,'<',NATIVE_MIN); }catch(e){}
   }catch(e){}
 }
@@ -12848,7 +12856,7 @@ try{ hydrateIcons(document); }catch(e){}
 /* Loaded-build version - shown in the diagnostic panel so a phone can prove
    whether it's on the latest build or a STALE cached one. Keep in lock-step
    with sw.js SW_VERSION on every deploy. */
-var APP_VER='v423';
+var APP_VER='v424';
 var FB={ready:false,uid:null,db:null,_presTimer:null,connected:false,listening:false,pushState:'default',near:0,swVer:'?',
   authState:'connecting',sdkLoaded:false,persist:'',permErr:null,err:null,wsProbe:'',csp:''};
 /* Always log connection diagnostics to the console so the real failure can be SEEN in Chrome. */
@@ -16536,6 +16544,12 @@ function updNotesFor(notes){
   }catch(e){ return []; }
 }
 function updShowBanner(pubV,done,notes){
+  /* v424: a stale Android build outranks the changelog, always. importantShow() refuses to open
+     while #upd-modal exists, so every version bump was burying the "your siren will not sound"
+     warning down into a toast - and the warning describes the exact failure the user is living
+     with (bare shake vibrates, button+shake sends nothing). What is new in this release is never
+     more urgent than a build whose SOS does not work. Stand down and come back later. */
+  try{ if(typeof nativeTooOld==='function' && nativeTooOld()){ setTimeout(function(){ updShowBanner(pubV,done,notes); }, 30000); return; } }catch(e){}
   if(document.getElementById('upd-modal')) return;
   /* v390: nor on top of the important notice - both sit at z-index 99998, so the later one
      simply paints over the earlier and the user loses whichever mattered more. */

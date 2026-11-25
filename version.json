@@ -1,20 +1,17 @@
 {
-"v": "v423",
+"v": "v424",
 "notes": {
 "he": [
-"חדש: סיור קצר שמסביר את האפליקציה בפעם הראשונה - מה הכפתור האדום עושה, למה חייבים להוסיף שומרים, ומה רואים על המפה. אפשר להריץ אותו שוב בכל רגע מהתפריט, תחת „איך משתמשים”",
-"השומרים שלכם מופיעים עכשיו על המפה כנקודה פועמת בזהב המותג, בדיוק כמו הנקודה הירוקה שלכם. ירוק = אתם, זהב = השומרים שלכם, סיכות צבעוניות = אירועים. המקרא מחולק עכשיו ל„אנשים” ו„אירועים”",
-"סימן השאלה ירד ממסך המפה - פחות אייקונים, וההסבר עבר לסיור"
+"אזהרת „גרסת אנדרואיד ישנה” קופצת עכשיו לפני חלון „מה חדש”, ולא נעלמת. קודם כל עדכון גרסה היה מסתיר אותה, והיא בדיוק זו שמסבירה למה ניעור לבד מרטיט ולמה לחיצה+ניעור לא מפעילה צפירה",
+"אם האפליקציה מתריעה שהגרסה ישנה - צריך להתקין את הגרסה העדכנית. בגרסה ישנה ה-SOS לא עובד כמו שצריך"
 ],
 "en": [
-"New: a short tour that explains the app the first time you open it - what the red button does, why you must add SHOMERs, and what you are looking at on the map. You can replay it any time from the menu under \"How to use\"",
-"Your SHOMERs now appear on the map as a beaming dot in the brand gold, exactly like your own green one. Green = you, gold = your SHOMERs, coloured pins = events. The legend is now split into \"People\" and \"Events\"",
-"The question mark is off the map screen - fewer icons, and the explaining moved into the tour"
+"The \"your Android build is out of date\" warning now comes before the \"what's new\" card instead of being buried under it, and it no longer disappears after one toast. That warning is the one that explains why a bare shake buzzes and why button+shake raises no siren",
+"If the app says your build is out of date, install the current build. On an old build SOS does not work properly"
 ],
 "ar": [
-"جديد: جولة قصيرة تشرح التطبيق عند فتحه أوّل مرّة - ماذا يفعل الزر الأحمر، ولماذا يجب إضافة حُرّاس، وما الذي تراه على الخريطة. يمكنك إعادتها متى شئت من القائمة تحت «كيف نستخدم»",
-"يظهر حُرّاسك الآن على الخريطة كنقطة نابضة بذهبي العلامة، تمامًا مثل نقطتك الخضراء. أخضر = أنت، ذهبي = حُرّاسك، دبابيس ملوّنة = أحداث. وقُسّم المفتاح الآن إلى «أشخاص» و«أحداث»",
-"أُزيلت علامة الاستفهام من شاشة الخريطة - أيقونات أقل، والشرح انتقل إلى الجولة"
+"صار تحذير «إصدار أندرويد قديم» يظهر قبل بطاقة «ما الجديد» بدل أن يُدفن تحتها، ولم يعد يختفي بعد إشعار واحد. هذا التحذير يشرح لماذا يهتزّ الهاتف عند الهزّ وحده ولماذا لا تنطلق الصفّارة مع مفتاح+هزّ",
+"إذا قال التطبيق إنّ إصدارك قديم فثبّت الإصدار الحالي. في الإصدار القديم لا تعمل الاستغاثة كما يجب"
 ]
 }
 }
