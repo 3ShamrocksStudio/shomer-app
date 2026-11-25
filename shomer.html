@@ -587,6 +587,7 @@ body.sheet-open .diag-panel{display:none;}
 .mk-circle.asking .ask-ring{position:absolute;left:50%;top:19px;width:34px;height:34px;border-radius:50%;
   border:2px dashed #4FB3C4;transform:translate(-50%,-50%);opacity:.85;animation:askBreathe 3.4s ease-in-out infinite;z-index:1}
 .mk-circle.asking .ask-bdg{position:absolute;left:50%;top:-11px;transform:translateX(-50%);z-index:4;   /* above the ring: the name pill owns top:38px */
+  max-width:68px;overflow:hidden;text-overflow:ellipsis;   /* the longest he/ar shorts ran ~7px past the marker box on each side */
   
   background:#4FB3C4;color:#06212B;font-size:9px;font-weight:900;line-height:1;padding:2px 5px;border-radius:7px;
   border:1.5px solid #0C1B39;white-space:nowrap;letter-spacing:.02em}
@@ -2731,6 +2732,10 @@ body.otp-active .ob-steps{display:none!important;}
   <div><div class="cc-nm" data-he="בקשה שקטה לשומרים שלי" data-en="Quiet ask to my SHOMERs" data-ar="طلب هادئ لحُرّاسي">בקשה שקטה לשומרים שלי</div><div class="cc-sb" data-he="בלי אזעקה ובלי צופר · רק המעגל שלך רואה" data-en="No alarm, no siren · only your own circle sees it" data-ar="بلا إنذار وبلا صافرة · دائرتك وحدها تراه">בלי אזעקה ובלי צופר · רק המעגל שלך רואה</div></div>
  </button>
 
+ <button class="call-btn" id="ask-cancel" style="display:none" onclick="assistStandDown()">
+  <div class="cc-ic" style="color:#4FB3C4"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M5 12h14"/></svg></div>
+  <div><div class="cc-nm" data-he="כבר הסתדרתי - בטל/י את הבקשה" data-en="Sorted - cancel the ask" data-ar="تدبّرت الأمر - ألغِ الطلب">כבר הסתדרתי - בטל/י את הבקשה</div><div class="cc-sb" data-he="השומרים שקיבלו אותה יעודכנו" data-en="Everyone who got it will be told" data-ar="سيتم إبلاغ كل من استلمه">השומרים שקיבלו אותה יעודכנו</div></div>
+ </button>
  <div id="help-lines-h" style="font-size:11px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:var(--g3);margin:18px 0 8px" data-he="מספרים שיכולים לעזור עכשיו" data-en="Lines that can help right now" data-ar="خطوط يمكنها المساعدة الآن">מספרים שיכולים לעזור עכשיו</div>
  <button class="call-btn il-only" onclick="callNum('1230')">
   <div class="cc-ic"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 17V9a2 2 0 0 1 2-2h8l4 4v6" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><circle cx="8" cy="18" r="1.9" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="16" cy="18" r="1.9" fill="none" stroke="currentColor" stroke-width="2"/></svg></div>
@@ -10821,9 +10826,13 @@ var ASSIST_WHY={
   hand:  {he:'צריך/ה יד',            ar:'بحاجة إلى مساعدة',     en:'Need a hand',
           sHe:'יד',     sAr:'مساعدة',   sEn:'Hand'}
 };
-function assistWhyLong(k){ var o=ASSIST_WHY[k]; if(!o) return gaT('צריך/ה יד','بحاجة إلى مساعدة','Needs a hand');
+/* v431.1: `why` arrives from a linked peer, and ASSIST_WHY is an object literal - so a key like
+   'constructor' passed the `if(!o)` guard and rendered the string "undefined" on the map badge,
+   the toast and the push. Own-property only. */
+function _whyOk(k){ return !!(k && Object.prototype.hasOwnProperty.call(ASSIST_WHY,k)); }
+function assistWhyLong(k){ var o=_whyOk(k)?ASSIST_WHY[k]:null; if(!o) return gaT('צריך/ה יד','بحاجة إلى مساعدة','Needs a hand');
   return gaT(o.he,o.ar,o.en); }
-function assistWhyShort(k){ var o=ASSIST_WHY[k]; if(!o) return gaT('עזרה','مساعدة','Help');
+function assistWhyShort(k){ var o=_whyOk(k)?ASSIST_WHY[k]:null; if(!o) return gaT('עזרה','مساعدة','Help');
   return gaT(o.sHe,o.sAr,o.sEn); }
 /* who on my map is currently asking, so the marker can carry it: {uid:{why,ts}} */
 var ASKING={};
@@ -10843,7 +10852,7 @@ function assistClearAsking(puid){ try{ if(ASKING[puid]){ delete ASKING[puid]; re
 function assistSweepAsking(){ try{ var n=Date.now(), ch=false;
   Object.keys(ASKING).forEach(function(u){ if(n-(ASKING[u].ts||0)>ASSIST_TTL){ delete ASKING[u]; ch=true; } });
   if(ch) renderCircles(); }catch(e){} }
-try{ setInterval(assistSweepAsking, 60000); }catch(e){}
+try{ if(window._askSweepT) clearInterval(window._askSweepT); window._askSweepT=setInterval(assistSweepAsking, 60000); }catch(e){}
 function assistNearby(){
   var out=[];
   try{
@@ -10869,6 +10878,8 @@ function assistNearby(){
 function helpCountry(){
   try{
     var sh=document.getElementById('sh-help'); if(!sh) return;
+    try{ var _c=document.getElementById('ask-cancel');
+      if(_c){ var _o=SS.assistOut; _c.style.display=(_o&&_o.id&&(Date.now()-(_o.ts||0))<ASSIST_TTL)?'':'none'; } }catch(e){}
     try{ window._assistWhy='hand'; var _b=document.getElementById('ask-why');
       if(_b) Array.prototype.forEach.call(_b.querySelectorAll('.awc'),function(x){ x.classList.toggle('on', x.getAttribute('data-why')==='hand'); }); }catch(e){}
     var il=(typeof emIsIL==='function')?emIsIL():true;
@@ -10877,7 +10888,7 @@ function helpCountry(){
   }catch(e){}
 }
 function assistAsk(wide,why){
-  why=(why&&ASSIST_WHY[why])?why:(window._assistWhy&&ASSIST_WHY[window._assistWhy]?window._assistWhy:'hand');
+  why=_whyOk(why)?why:(_whyOk(window._assistWhy)?window._assistWhy:'hand');
   var he=currentLang==='he', ar=currentLang==='ar';
   if(typeof FB==='undefined'||!FB.ready||!FB.uid){ toast(gaT('אין חיבור - נסה/י שוב','لا اتصال - حاول مجددًا','No connection - try again'),'amb'); return; }
   try{ if(isReviewAccount()){ toast(gaT('חשבון בדיקה - לא נשלח','حساب تجريبي - لم يُرسل','Test account - not sent'),'amb'); return; } }catch(e){}
@@ -10928,8 +10939,23 @@ function assistAsk(wide,why){
          if(!(_o && (_o.level==='alert'||_o.level==='alarm'||_o.level==='check') && _o.st==='sent'))
            gaOut()[m.partnerUid]={id:id,level:'assist',ts:now,st:'sent',name:m.name||''}; }catch(e){}
   });
-  try{ SS.assistOut={id:id,ts:now,n:list.length,wide:!!wide}; saveStore(); }catch(e){}
+  try{ SS.assistOut={id:id,ts:now,n:list.length,wide:!!wide,why:why,
+        to:list.map(function(m){ return m.partnerUid; }).filter(Boolean)}; saveStore(); }catch(e){}
   try{ renderCircles(); }catch(e){}
+}
+/* v431.1: the ask fanned out to several SHOMERs but only the one who answered was ever told it
+   was over - the rest kept the ring for the full hour, for a tyre that was changed ten minutes
+   in. Standing down tells everyone who got it. Called when the first helper says they are on the
+   way, and from the sheet if the asker sorts it out themselves. */
+function assistStandDown(quiet){
+  var out=null; try{ out=SS.assistOut; }catch(e){}
+  if(!out||!out.id) return false;
+  var to=(out.to||[]).slice(), id=out.id;
+  try{ delete SS.assistOut; saveStore(); }catch(e){}
+  to.forEach(function(uid){ try{ gaWrite(uid,{name:gaMyName(),ts:Date.now(),level:'stop',id:id}).catch(function(){}); }catch(e){} });
+  if(!quiet) try{ toast(gaT('\u2713 הבקשה בוטלה · השומרים שלך עודכנו','\u2713 أُلغي الطلب · تم تحديث حُرّاسك','\u2713 Ask cancelled \u00b7 your SHOMERs were told'),'grn'); }catch(e){}
+  try{ var b=document.getElementById('ask-cancel'); if(b) b.style.display='none'; }catch(e){}
+  return true;
 }
 /* receiver side - deliberately undramatic */
 function assistShow(from,v){
@@ -10937,7 +10963,7 @@ function assistShow(from,v){
   var he=currentLang==='he', ar=currentLang==='ar';
   /* v411: no ESC - both sinks below set textContent, so escaping only mangles an apostrophe */
   var nm=(v.name||gaT('שומר/ת שלך','حارسك','Your SHOMER'));
-  var why=(v&&v.why&&ASSIST_WHY[v.why])?v.why:'hand';
+  var why=(v&&_whyOk(v.why))?v.why:'hand';
   var msg=nm+' \u00b7 '+assistWhyLong(why)+' \u00b7 '+gaT('לא חירום','ليست حالة طوارئ','not an emergency');
   /* v431: the ask gets its own voice. Not the alarm, not silence: one soft falling cue, one
      short buzz, and the asker's dot picks up a dashed cyan ring with the reason on it so you
@@ -10975,6 +11001,7 @@ function gaHandle(from,v){
     var msg=v.level==='help'?gaT('🆘 '+nm+' ביקש/ה עזרה!','🆘 '+nm+' طلب المساعدة!','🆘 '+nm+' asked for help!')
       :v.level==='coded'?gaT('✓ '+nm+' עצר/ה את ההתראה בקוד הביטול - הכל בסדר','✓ أوقف '+nm+' التنبيه برمز الإلغاء - كل شيء بخير','✓ '+nm+' stopped the alert with their code - all good')
       :o.level==='assist'?gaT('✓ '+nm+' בדרך אליך','✓ '+nm+' في الطريق إليك','✓ '+nm+' is on the way')
+        +(function(){ try{ if(o.level==='assist') assistStandDown(true); }catch(e){} return ''; })()
       :gaT('✓ '+nm+': הכל טוב','✓ '+nm+': كل شيء بخير','✓ '+nm+': all good');
     toast(msg,v.level==='help'?'red':'grn'); try{ pushNotify('SH✡MER',msg,'ga-ans'); }catch(e){}
     if(v.level==='help'){ try{ playCue('join'); if(navigator.vibrate) navigator.vibrate([400,150,400]); }catch(e){} }
@@ -12936,7 +12963,7 @@ try{ hydrateIcons(document); }catch(e){}
 /* Loaded-build version - shown in the diagnostic panel so a phone can prove
    whether it's on the latest build or a STALE cached one. Keep in lock-step
    with sw.js SW_VERSION on every deploy. */
-var APP_VER='v431';
+var APP_VER='v432';
 var FB={ready:false,uid:null,db:null,_presTimer:null,connected:false,listening:false,pushState:'default',near:0,swVer:'?',
   authState:'connecting',sdkLoaded:false,persist:'',permErr:null,err:null,wsProbe:'',csp:''};
 /* Always log connection diagnostics to the console so the real failure can be SEEN in Chrome. */
@@ -15508,7 +15535,12 @@ function sosWatchPartners(){
     }catch(e){}
   });
 }
+/* v431.1: an SOS supersedes a request for a hand. Without this the ask sat in ASKING for its
+   full hour: circleIcon correctly hides the ring while m.sos is true, but the moment the
+   emergency resolved the cyan "needs a hand" ring came back on a person who had just been
+   through one. Clearing on arrival is also the honest reading - they are past asking. */
 function onPartnerSOS(puid, v, src){
+  try{ assistClearAsking(puid); }catch(e){}
   SOSBUS.src=SOSBUS.src||{}; (SOSBUS.src[puid]=SOSBUS.src[puid]||{})[src||'bus']=1;
   SOSBUS.lastV=SOSBUS.lastV||{};
   if(src!=='rec'||!SOSBUS.lastV[puid]||(!isFinite(SOSBUS.lastV[puid].lat)&&isFinite(v.lat))) SOSBUS.lastV[puid]=v;   /* position updates while the alert is open (the bus has the freshest; a located record beats an unlocated one) */
