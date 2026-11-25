@@ -318,7 +318,7 @@ body.emg .c-map{animation:emgIn .22s cubic-bezier(.2,.8,.3,1)}
   font-family:Alef,system-ui,sans-serif;will-change:transform}
 [dir=rtl] .resp{inset-inline-start:auto;inset-inline-end:0;border-inline-end:0;border-inline-start:1px solid #2a3450;transform:perspective(1500px) rotateY(92deg);transform-origin:right center}
 .resp.on{transform:perspective(1500px) rotateY(0deg)!important;opacity:1}
-.resp-h{padding:14px 16px;border-bottom:1px solid #232c40;display:flex;align-items:center;gap:10px;background:linear-gradient(90deg,rgba(229,72,77,.16),rgba(47,107,255,.08))}
+.resp-h{padding:14px 16px;border-bottom:1px solid #232c40;display:flex;align-items:center;gap:10px;background:linear-gradient(90deg,rgba(229,72,77,.16),rgba(224,168,40,.10))}
 .resp-h .ic{font-size:22px}
 .resp-h .tt{flex:1}.resp-h .tt b{display:block;font-size:15px;color:#f2f5fb}.resp-h .tt span{font-size:11px;color:#9aa6bd}
 .resp-x{background:none;border:0;color:#9aa6bd;font-size:20px;cursor:pointer}
@@ -477,7 +477,7 @@ body.emg .c-map{animation:emgIn .22s cubic-bezier(.2,.8,.3,1)}
 .brand .logo-img{height:40px;width:auto;display:block;flex:0 0 auto}
 .live-banner{padding:10px 15px;font-size:12.5px;border-bottom:1px solid rgba(255,255,255,.06);transition:.2s;flex:0 0 auto}
 .live-banner.idle{color:#5f6b82;background:rgba(255,255,255,.02);text-align:center;font-size:11px;letter-spacing:.02em}
-.live-banner.active{background:linear-gradient(90deg,rgba(255,45,45,.22),rgba(47,107,255,.10));border-inline-start:4px solid #FF2D2D;color:#fff;animation:lbpulse2 1.5s ease-in-out infinite}
+.live-banner.active{background:linear-gradient(90deg,rgba(255,45,45,.22),rgba(168,16,44,.16));border-inline-start:4px solid #FF2D2D;color:#fff;animation:lbpulse2 1.5s ease-in-out infinite}
 @keyframes lbpulse2{0%,100%{box-shadow:inset 4px 0 0 #e5484d}50%{box-shadow:inset 4px 0 0 #ff6b78,0 0 16px rgba(229,72,77,.3)}}
 .live-banner .lb-t{font-size:13px;font-weight:800}
 .live-banner .lb-m{font-size:11px;color:#f2c7cb;margin-top:2px}
@@ -1463,6 +1463,19 @@ function respFinish(id){
     var o=_liveEvents&&_liveEvents[id];
     try{ respLog(id,'האירוע נסגר ע״י המוקדן · הועבר ליומן'); }catch(e){}
     try{ if(o) o.closed=true; }catch(e){}
+    /* v430: the close was cosmetic. It set o.closed in memory, but the signal bar filters on
+       B.reviews[id].status, which only saveEvEdit ever wrote. So 12s later the feed poll still
+       saw an open SOS: it restored the strip, re-armed sc-emerg and fell through to
+       startAlarm() - the siren came back after the operator had closed the event. It files the
+       status now, with the same shape and trail saveEvEdit uses, and drops the alarm id so
+       nothing treats it as a fresh call. */
+    try{ var _B=_boardLoad(); _B.reviews=_B.reviews||{};
+      var _pv=_B.reviews[id]||{}, _lg=(_pv.log||[]).slice(-49);
+      if(_pv.status!=='handled') _lg.push({ts:Date.now(),st:'handled',note:_pv.note||''});
+      _B.reviews[id]={status:'handled',note:_pv.note||'',at:Date.now(),log:_lg,resp:(o&&o._log)||_pv.resp};
+      _boardSave(_B); }catch(e){}
+    try{ _alarmId=null; _alarmSilenced=false; }catch(e){}
+    try{ boardRefresh(); }catch(e){}
     try{ var st=document.getElementById('live-strip'); if(st){ st.classList.add('attended'); st.style.display='none'; } }catch(e){}
     try{ document.body.classList.remove('sc-emerg'); }catch(e){}
     try{ _scLiveBanner(false); }catch(e){}
@@ -1568,12 +1581,15 @@ function silenceAlarm(){ _alarmSilenced=true; stopAlarm();
    eb.innerHTML='<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M4 12.5l5 5L20 6.5"/></svg>'
      +'<span class="es-x"><b>ההתרעה הושתקה</b><i>האירוע עדיין פתוח</i></span>'; } }catch(e){} var st=document.getElementById('live-strip'); if(st){ st.style.animation='none'; st.style.background='linear-gradient(90deg,rgba(60,72,96,.6),rgba(36,46,66,.6))'; st.style.boxShadow='0 6px 20px rgba(0,0,0,.4),0 0 0 1px rgba(255,255,255,.12) inset'; st.classList.add('attended'); } var b=document.getElementById('ls-silence'); if(b){ b.innerHTML='<svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 9v6h4l5 4V5L8 9H4Z"/><path d="M17 9l4 6M21 9l-4 6"/></svg><span class="lsx"><b>ההתרעה הושתקה</b><i>האירוע עדיין פתוח</i></span>'; b.classList.add('done'); } }
 /* openResponse does NOT stop the alarm — only the user clicking "השתק אזעקה" silences it. */
+/* v430: the flip armed an uncancellable 300ms timer. Closing the panel inside that window let
+   'emg' land afterwards with no panel open, and body.emg hides every card but the map - the board
+   wedged to a bare map. emgLeave cancels the pending flip now. */
 function emgEnter(){ try{ if(document.body.classList.contains('emg')) return;
   document.body.classList.add('emg-out');
-  setTimeout(function(){ try{ document.body.classList.add('emg'); document.body.classList.remove('emg-out');
+  clearTimeout(window._emgT); window._emgT=setTimeout(function(){ try{ document.body.classList.add('emg'); document.body.classList.remove('emg-out');
     if(window.MAP&&MAP.invalidateSize) setTimeout(function(){ try{MAP.invalidateSize(true);}catch(_){} },60); }catch(_){} },300);
  }catch(e){} }
-function emgLeave(){ try{ document.body.classList.remove('emg','emg-out');
+function emgLeave(){ try{ clearTimeout(window._emgT); document.body.classList.remove('emg','emg-out');
   if(window.MAP&&MAP.invalidateSize) setTimeout(function(){ try{MAP.invalidateSize(true);}catch(_){} },60);
  }catch(e){} }
 function openResponse(id){
@@ -1995,7 +2011,8 @@ function renderLive(c,list,opts){
  /* the board feeds the KPI "אירועים חיים" (demo) and the open-items line in the recommendations */
  try{ buildKPIs(DATA._idx); }catch(e){}
  try{ if(!_focus) buildAnalysis(DATA._idx,null); }catch(e){}
- try{ scGuideSync(); }catch(e){}
+ /* v430: scGuideSync() belongs to the demo's guide machine and is undefined here - it threw on
+    every render into a silent catch. #recspane is hidden by CSS in this state instead. */
 }
 /* presence row = a device heartbeat. Only status 'v2' rows are counted/drawn: written by app v279+, one per real
    device, never by automated/test browsers. Older rows ('online'/'seen'/missing) can't be verified and are ignored. */
