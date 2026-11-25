@@ -1083,6 +1083,14 @@ body.sos-live .rd-say-fab{display:none}
 .shomer-marker.evpin-sos{animation:evpulse 1.2s ease-in-out infinite;}
 @keyframes evpulse{0%,100%{filter:drop-shadow(0 0 1px rgba(255,26,64,.5)) drop-shadow(0 3px 4px rgba(0,0,0,.5));}50%{filter:drop-shadow(0 0 11px rgba(255,26,64,1)) drop-shadow(0 3px 4px rgba(0,0,0,.5));}}
 .mk-me-wrap{position:relative;width:100%;height:100%;}
+/* v422: own-position marker for every non-founder account - brand green, beaming. Reuses the
+   cPulse ring the circle-member markers already use, so "a live SHOMER position" looks the same
+   whether it is you or someone in your circle. The core carries a white rim plus a dark hairline
+   so it stays legible on both the light and dark map tiles. */
+.mk-me-live{display:block}
+.mk-me-ring{position:absolute;left:50%;top:50%;width:30px;height:30px;border-radius:50%;background:#2BC47E;transform:translate(-50%,-50%);opacity:.5;animation:cPulse 2s ease-out infinite;}
+.mk-me-core{position:absolute;left:50%;top:50%;width:17px;height:17px;border-radius:50%;transform:translate(-50%,-50%);background:#2BC47E;border:3px solid #0C1B39;box-shadow:0 0 0 1px rgba(255,255,255,.22),0 0 10px rgba(43,196,126,.55),0 2px 8px rgba(0,0,0,.55);z-index:2;}
+@media (prefers-reduced-motion:reduce){.mk-me-ring{animation:none;opacity:.32}}
 .mk3-sos{animation:mk3sos 1.25s ease-out infinite;}
 @keyframes mk3sos{0%{filter:drop-shadow(0 0 0 rgba(255,26,64,.7))}70%{filter:drop-shadow(0 0 13px rgba(255,26,64,0))}100%{filter:drop-shadow(0 0 0 rgba(255,26,64,0))}}
 /* Brand-styled popups */
@@ -4583,7 +4591,7 @@ const CITY_STATS=[
 /* Each report type has a DISTINCT hue + glyph so categories read apart at a
  glance. Live SOS (#FF1A40 red) is deliberately unlike sexual-assault
  (#E91E8C magenta) - they must never be confused. */
-/* Each type = a DISTINCT 3D shape (see markerSVG) AND a distinct hue - no
+/* Each type = a DISTINCT 3D shape (see eventPinHTML) AND a distinct hue - no
  shape and no colour repeats, so the map index is instantly readable. */
 /* ONE canonical icon + colour per event type - used IDENTICALLY on the map markers,
  the legend, and the report sheet. `icon` is a sprite symbol id (#i-<icon>). */
@@ -7502,10 +7510,9 @@ function statIcon(color,glyph){return window.L.divIcon({className:'shomer-marker
 function sosIcon(){return window.L.divIcon({className:'shomer-marker',
  html:`<div class="mk-sos"><div class="ring"></div><div class="core"></div></div>`,iconSize:[30,30],iconAnchor:[15,15]});}
 /* ── 3D map marker index - one distinct glossy SVG per type ── */
-function markerSVG(t){
- // The live "me" location marker (blue locating dot). Event pins use eventPinHTML().
- return '<svg viewBox="0 0 60 60"><circle cx="30" cy="30" r="21" fill="#19A8FF" opacity=".22"/><circle cx="30" cy="30" r="14" fill="#19A8FF" stroke="#fff" stroke-width="3"/><path d="M30 21 L36 36 L30 32 L24 36 Z" fill="#fff"/><ellipse cx="25" cy="24" rx="8" ry="4.5" fill="#fff" opacity=".28"/></svg>';
-}
+/* v422: markerSVG() removed - it drew the own-position dot in iOS blue (#19A8FF), which was
+   never a SH✡MER colour. Its one caller now renders .mk-me-live (brand green) instead. Deleted
+   rather than left dead, so nobody reintroduces the blue by reaching for it again. */
 /* Canonical map pin: a clean colour-coded teardrop carrying the SAME glyph the legend +
  report use for this event type. Function over flair - flat, high-contrast, legible. */
 function eventPinHTML(t){
@@ -7526,11 +7533,18 @@ function meIcon(){
  const p=PROFESSIONS[pr];
  // Ghost mode (sharing paused) takes visual priority over the profession badge.
  const badge=SS.circleGhost?`<div class="mk-me-badge" title="ghost">${ic('eye-off')}</div>`:(p?`<div class="mk-me-badge" title="${p.icon}">${ic(p.icon)}</div>`:'');
- var _isF = true;   /* v320: every user's OWN position is the gold ✡ marker - and only their own */
+ /* v422: the ✡ crest is the FOUNDER's own marker, not everyone's. v320 hardcoded this to true,
+    so every account saw the gold crest as its own position - which spent the founder mark on all
+    of them and left no brand-green "you are here" anywhere. Every other user now gets the green
+    beaming dot: brand colour, and the same expanding cPulse ring the circle markers already use.
+    Read from the local phone number, and it only ever styles THIS device's own position, so it
+    marks nobody on any shared or public map - the data policy's "nothing marks a specific person
+    (incl. the founder) on the public map" still holds. */
+ var _isF = false; try{ _isF = isFounder(); }catch(e){}
     return window.L.divIcon({className:'shomer-marker mk3'+(_isF?' mk3-founder':''),
       html: _isF
         ? `<div class="mk-me-wrap mk-me-founder">${founderCrestSVG(40)}${badge}</div>`
-        : `<div class="mk-me-wrap">${markerSVG('me')}${badge}${'' }</div>`,
+        : `<div class="mk-me-wrap mk-me-live"><span class="mk-me-ring" aria-hidden="true"></span><span class="mk-me-core" aria-hidden="true"></span>${badge}</div>`,
       iconSize: _isF?[46,46]:[42,42], iconAnchor: _isF?[23,23]:[21,21]});}
 /* Refresh the live "me" marker icon (e.g. after a profession change). */
 function refreshMeMarker(){ try{ paintHdrFounder(); }catch(e){}if(mapLayers.meMarker)mapLayers.meMarker.setIcon(meIcon());}
@@ -12760,7 +12774,7 @@ try{ hydrateIcons(document); }catch(e){}
 /* Loaded-build version - shown in the diagnostic panel so a phone can prove
    whether it's on the latest build or a STALE cached one. Keep in lock-step
    with sw.js SW_VERSION on every deploy. */
-var APP_VER='v421';
+var APP_VER='v422';
 var FB={ready:false,uid:null,db:null,_presTimer:null,connected:false,listening:false,pushState:'default',near:0,swVer:'?',
   authState:'connecting',sdkLoaded:false,persist:'',permErr:null,err:null,wsProbe:'',csp:''};
 /* Always log connection diagnostics to the console so the real failure can be SEEN in Chrome. */

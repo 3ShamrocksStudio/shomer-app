@@ -1,23 +1,14 @@
 {
-"v": "v421",
+"v": "v422",
 "notes": {
 "he": [
-"תוקן במדריך החירום: מזרק אדרנלין (אפיפן) - להחזיק 3 שניות, לא 10. זו ההנחיה העדכנית של היצרן, וזה גם מה שהתרגיל היומי לימד כל הזמן",
-"תוקן גם בהקראה הקולית בעברית, ששם עדיין נאמר „עשר שניות” - מי שמשתמש בהקראה שמע מספר אחר ממה שהופיע על המסך",
-"תוקן: הפעלת Emergency SOS באייפון - לחיצה ארוכה על כפתור הצד יחד עם כפתור עוצמת הקול (או 5 לחיצות מהירות, אם הופעל בהגדרות). שלוש לחיצות עובד רק בהודו",
-"תוקן בהצהרת הנגישות: ת״י 5568 מבוסס על WCAG 2.0, לא 2.1"
+"סמן המיקום שלך על המפה הוא עכשיו עיגול ירוק פועם בצבע המותג, עם אותה הילה מתרחבת שיש לשומרים שלך. קודם כל משתמש ראה את מגן הדוד המוזהב, וגם לא היה שום סימן „אתה כאן” בצבעי SH✡MER"
 ],
 "en": [
-"Fixed in the Emergency Guide: the adrenaline auto-injector (EpiPen) is held for 3 seconds, not 10. That is the manufacturer's current instruction - and what the daily drill has been teaching all along",
-"Fixed in the Hebrew read-aloud script too, which still said \"ten seconds\" - anyone using read-aloud was hearing a different number from the one on screen",
-"Fixed: how to trigger Emergency SOS on iPhone - press and hold the side button together with a volume button (or 5 rapid presses, if enabled in Settings). Three presses only works in India",
-"Fixed in the accessibility statement: IS 5568 is based on WCAG 2.0, not 2.1"
+"Your position on the map is now a beaming green dot in the brand colour, with the same expanding halo your SHOMERs already have. Before this every user saw the gold ✡ crest, and there was no SH✡MER-coloured \"you are here\" at all"
 ],
 "ar": [
-"تصحيح في دليل الطوارئ: حاقن الأدرينالين (إيبي-بِن) يُثبَّت 3 ثوانٍ لا 10. هذه تعليمات الشركة الحالية، وهي ما يعلّمه التمرين اليومي أصلًا",
-"صُحِّح أيضًا نص القراءة الصوتية بالعبرية الذي كان ما يزال يقول «عشر ثوانٍ» - من يستخدم القراءة الصوتية كان يسمع رقمًا مختلفًا عمّا يظهر على الشاشة",
-"تصحيح: تشغيل استغاثة الطوارئ في آيفون - اضغط مع الاستمرار على الزر الجانبي مع زر الصوت (أو 5 ضغطات سريعة إن فُعّلت في الإعدادات). ثلاث ضغطات تعمل في الهند فقط",
-"تصحيح في بيان إمكانية الوصول: المعيار الإسرائيلي 5568 يستند إلى WCAG 2.0 لا 2.1"
+"صار مؤشّر موقعك على الخريطة دائرة خضراء نابضة بلون العلامة، بالهالة المتوسّعة نفسها التي لحُرّاسك. قبل ذلك كان كل مستخدم يرى نجمة داوود الذهبية، ولم تكن هناك إشارة «أنت هنا» بألوان شومير"
 ]
 }
 }
