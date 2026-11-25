@@ -1,17 +1,23 @@
 {
-"v": "v420",
+"v": "v421",
 "notes": {
 "he": [
-"„עזרה לא-דחופה” ירד מהמפה ועבר לתפריט - פחות אייקונים על מסך המפה",
-"חדש - מסך „עזרה לא-דחופה”: בקשה שקטה לשומרים שלך (בלי אזעקה), ידידים 1230 לרכב תקוע או נעול וחילוץ ממעלית (חינם, ארצי, 24/6 - לא בשבת ובחגים), ער״ן 1201 אם צריך לדבר (חינם, אנונימי, 24/7), ומוקד הרווחה 118"
+"תוקן במדריך החירום: מזרק אדרנלין (אפיפן) - להחזיק 3 שניות, לא 10. זו ההנחיה העדכנית של היצרן, וזה גם מה שהתרגיל היומי לימד כל הזמן",
+"תוקן גם בהקראה הקולית בעברית, ששם עדיין נאמר „עשר שניות” - מי שמשתמש בהקראה שמע מספר אחר ממה שהופיע על המסך",
+"תוקן: הפעלת Emergency SOS באייפון - לחיצה ארוכה על כפתור הצד יחד עם כפתור עוצמת הקול (או 5 לחיצות מהירות, אם הופעל בהגדרות). שלוש לחיצות עובד רק בהודו",
+"תוקן בהצהרת הנגישות: ת״י 5568 מבוסס על WCAG 2.0, לא 2.1"
 ],
 "en": [
-"\"Non-urgent help\" moved off the map and into the menu - fewer icons on the map screen",
-"New - a \"Non-urgent help\" screen: a quiet ask to your SHOMERs (no alarm), Yedidim 1230 for a stuck or locked car and lift rescue (free, nationwide, 24/6 - not Shabbat or holidays), ERAN 1201 if you need to talk (free, anonymous, 24/7), and the welfare hotline 118"
+"Fixed in the Emergency Guide: the adrenaline auto-injector (EpiPen) is held for 3 seconds, not 10. That is the manufacturer's current instruction - and what the daily drill has been teaching all along",
+"Fixed in the Hebrew read-aloud script too, which still said \"ten seconds\" - anyone using read-aloud was hearing a different number from the one on screen",
+"Fixed: how to trigger Emergency SOS on iPhone - press and hold the side button together with a volume button (or 5 rapid presses, if enabled in Settings). Three presses only works in India",
+"Fixed in the accessibility statement: IS 5568 is based on WCAG 2.0, not 2.1"
 ],
 "ar": [
-"انتقل «مساعدة غير عاجلة» من الخريطة إلى القائمة - أيقونات أقل على شاشة الخريطة",
-"جديد - شاشة «مساعدة غير عاجلة»: طلب هادئ لحُرّاسك (بلا إنذار)، يديديم 1230 لسيارة متعطلة أو مقفلة وإنقاذ من مصعد (مجاني، في كل البلاد، 24/6 - ليس السبت والأعياد)، عيران 1201 إن احتجت للحديث (مجاني، مجهول الهوية، 24/7)، ومركز الرفاه 118"
+"تصحيح في دليل الطوارئ: حاقن الأدرينالين (إيبي-بِن) يُثبَّت 3 ثوانٍ لا 10. هذه تعليمات الشركة الحالية، وهي ما يعلّمه التمرين اليومي أصلًا",
+"صُحِّح أيضًا نص القراءة الصوتية بالعبرية الذي كان ما يزال يقول «عشر ثوانٍ» - من يستخدم القراءة الصوتية كان يسمع رقمًا مختلفًا عمّا يظهر على الشاشة",
+"تصحيح: تشغيل استغاثة الطوارئ في آيفون - اضغط مع الاستمرار على الزر الجانبي مع زر الصوت (أو 5 ضغطات سريعة إن فُعّلت في الإعدادات). ثلاث ضغطات تعمل في الهند فقط",
+"تصحيح في بيان إمكانية الوصول: المعيار الإسرائيلي 5568 يستند إلى WCAG 2.0 لا 2.1"
 ]
 }
 }
