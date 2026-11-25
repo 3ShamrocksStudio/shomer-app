@@ -575,6 +575,24 @@ body.sheet-open .diag-panel{display:none;}
    category" grey. Two different meanings, visually the same colour. A stale SHOMER is still a
    PERSON, so dim the gold rather than grey them out: same family, clearly not live. */
 .mk-oth:not(.live) .oth-dot{background:#8A7A4E;border-color:#0C1B39;animation:none;opacity:.8;box-shadow:none;}
+/* ══ v431 · ASKING FOR A HAND - a STATE on a person, not an event ══
+   A non-urgent ask is not an incident, so it must not take an event silhouette (teardrop pin) and
+   must not take an alarm colour. The person asking is still one of your SHOMERs, so they keep the
+   people palette - gold dot, unchanged - exactly as a stale SHOMER keeps dimmed gold. The STATE
+   rides on top as a dashed ring plus a small badge, in the one accent reserved for it:
+     #4FB3C4  soft cyan  = a non-urgent ask (never an event fill, never a bare dot)
+   Dashed, slow and desaturated on purpose: every alarm colour in this app is saturated and every
+   alarm animation is fast, so calm reads as calm at a glance. A red SOS pin and a gold dot with a
+   dashed cyan halo cannot be mistaken for one another at any zoom. */
+.mk-circle.asking .ask-ring{position:absolute;left:50%;top:19px;width:34px;height:34px;border-radius:50%;
+  border:2px dashed #4FB3C4;transform:translate(-50%,-50%);opacity:.85;animation:askBreathe 3.4s ease-in-out infinite;z-index:1}
+.mk-circle.asking .ask-bdg{position:absolute;left:50%;top:-11px;transform:translateX(-50%);z-index:4;   /* above the ring: the name pill owns top:38px */
+  
+  background:#4FB3C4;color:#06212B;font-size:9px;font-weight:900;line-height:1;padding:2px 5px;border-radius:7px;
+  border:1.5px solid #0C1B39;white-space:nowrap;letter-spacing:.02em}
+@keyframes askBreathe{0%,100%{transform:translate(-50%,-50%) scale(1);opacity:.85}50%{transform:translate(-50%,-50%) scale(1.13);opacity:.5}}
+@media (prefers-reduced-motion:reduce){.mk-circle.asking .ask-ring{animation:none;opacity:.9}}
+
 .mk-circle.mk-oth:not(.live) .nm{border-color:#8A7A4E;}
 @keyframes ssf{0%,100%{background:var(--r3)}50%{background:var(--r2)}}
 .ss-row{display:flex;align-items:center;gap:10px;}
@@ -2699,6 +2717,15 @@ body.otp-active .ob-steps{display:none!important;}
  <div style="font-size:11.5px;line-height:1.65;padding:9px 11px;border-radius:10px;border:1px solid rgba(209,0,41,.45);background:rgba(209,0,41,.10);color:#FF8089;margin-bottom:18px" data-he="בסכנה מיידית? אל תשתמש/י בדף הזה - חייג/י 100 או לחץ/י SOS." data-en="In immediate danger? Don't use this page - call 100 or press SOS." data-ar="في خطر مباشر؟ لا تستخدم هذه الصفحة - اتصل بـ100 أو اضغط SOS.">בסכנה מיידית? אל תשתמש/י בדף הזה - חייג/י 100 או לחץ/י SOS.</div>
 
  <div style="font-size:11px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:var(--g3);margin:0 0 8px" data-he="מישהו שאני סומך/ת עליו" data-en="Someone I trust" data-ar="شخص أثق به">מישהו שאני סומך/ת עליו</div>
+ <div style="font-size:11.5px;color:var(--tx2);margin:0 0 7px" data-he="מה קרה?" data-en="What's going on?" data-ar="ما الأمر؟">מה קרה?</div>
+ <div class="ask-why" id="ask-why" role="radiogroup" aria-label="סיבה">
+  <button type="button" class="awc on" data-why="hand"   onclick="assistPickWhy(this)" data-he="צריך/ה יד" data-en="Need a hand" data-ar="بحاجة إلى مساعدة">צריך/ה יד</button>
+  <button type="button" class="awc"    data-why="tire"   onclick="assistPickWhy(this)" data-he="תקר ברכב" data-en="Flat tyre" data-ar="إطار مثقوب">תקר ברכב</button>
+  <button type="button" class="awc"    data-why="stuck"  onclick="assistPickWhy(this)" data-he="הרכב לא מניע" data-en="Car won't start" data-ar="السيارة لا تعمل">הרכב לא מניע</button>
+  <button type="button" class="awc"    data-why="ride"   onclick="assistPickWhy(this)" data-he="צריך/ה טרמפ" data-en="Need a lift" data-ar="بحاجة لتوصيلة">צריך/ה טרמפ</button>
+  <button type="button" class="awc"    data-why="lost"   onclick="assistPickWhy(this)" data-he="איבדתי את הדרך" data-en="Lost my way" data-ar="تهت عن الطريق">איבדתי את הדרך</button>
+  <button type="button" class="awc"    data-why="uneasy" onclick="assistPickWhy(this)" data-he="לא מרגיש/ה בנוח כאן" data-en="Don't feel right here" data-ar="لا أشعر بالارتياح هنا">לא מרגיש/ה בנוח כאן</button>
+ </div>
  <button class="call-btn" onclick="assistAsk()">
   <div class="cc-ic"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 2.6 4.6 5.4v6.1c0 4.6 3.1 8.4 7.4 9.9 4.3-1.5 7.4-5.3 7.4-9.9V5.4z"/><path d="M9.6 12.2v-2.6a1.2 1.2 0 0 1 2.4 0v2.6"/><path d="M12 12v-3a1.2 1.2 0 0 1 2.4 0v3.6"/><path d="M14.4 12.6c0 2-1.1 3.2-2.6 3.2s-2.6-1-2.6-2.8"/></svg></div>
   <div><div class="cc-nm" data-he="בקשה שקטה לשומרים שלי" data-en="Quiet ask to my SHOMERs" data-ar="طلب هادئ لحُرّاسي">בקשה שקטה לשומרים שלי</div><div class="cc-sb" data-he="בלי אזעקה ובלי צופר · רק המעגל שלך רואה" data-en="No alarm, no siren · only your own circle sees it" data-ar="بلا إنذار وبلا صافرة · دائرتك وحدها تراه">בלי אזעקה ובלי צופר · רק המעגל שלך רואה</div></div>
@@ -6160,8 +6187,12 @@ function playCue(kind){
   // join = gentle rising (someone has your back) · event = brighter triad (pay attention) · update = soft two-note
   var seq = kind==='join' ? [[659.3,0,.13],[880,.10,.18]]
           : kind==='event'? [[880,0,.12],[1174.7,.11,.13],[1568,.22,.20]]
+          : kind==='assist'?[[523.3,0,.20],[392.0,.17,.30]]   /* v431: two soft notes FALLING, low and
+             unhurried, at half the volume. Every other cue here rises and every alarm in the app
+             is fast and bright, so a descending pair reads as "someone needs a hand", never as
+             "something is wrong". Plays once, never repeats. */
           : /*update*/       [[740,0,.13],[987.8,.09,.15]];
-  var peak = kind==='event'?.17:.11;
+  var peak = kind==='event'?.17:kind==='assist'?.055:.11;
   var master=ctx.createGain(); master.connect(ctx.destination);
   master.gain.setValueAtTime(.0001,t0);
   master.gain.exponentialRampToValueAtTime(peak,t0+.02);
@@ -10669,7 +10700,7 @@ function circleIcon(m){
  return window.L.divIcon({className:'shomer-marker',
  /* v423: gold, and the same beaming dot the user's own position uses - a SHOMER in your circle
     is a person standing somewhere, exactly like you. SOS keeps the red avatar + fast pulse. */
- html:`<div class="mk-circle${m.sos?' sos':' mk-oth live'}" style="--cc:${m.sos?m.color:'#E0A828'}">${m.sos?('<div class="pulse"></div><div class="av">'+(m.emoji||'')+'</div>'):'<span class="oth-ring" aria-hidden="true"></span><div class="oth-dot"></div>'}<div class="nm">${ESC(m.name)}${m.sos?' ':''}</div></div>`,
+ html:`<div class="mk-circle${m.sos?' sos':' mk-oth live'}${(!m.sos&&_askOf(m))?' asking':''}" style="--cc:${m.sos?m.color:'#E0A828'}">${m.sos?('<div class="pulse"></div><div class="av">'+(m.emoji||'')+'</div>'):'<span class="oth-ring" aria-hidden="true"></span><div class="oth-dot"></div>'}${(!m.sos&&_askOf(m))?('<span class="ask-ring" aria-hidden="true"></span><span class="ask-bdg">'+ESC(assistWhyShort(_askOf(m).why))+'</span>'):''}<div class="nm">${ESC(m.name)}${m.sos?' ':''}</div></div>`,
  iconSize:[38,38],iconAnchor:[19,19],popupAnchor:[0,-20]});
 }
 function clearCircleMarkers(){
@@ -10773,6 +10804,46 @@ var gaCur=null, _gaBeepT=null;
    If nobody is near, the user is told that plainly and offered the wider send - never widened
    behind their back, because "only people nearby" is the promise the button makes. */
 var ASSIST_KM=3, ASSIST_TTL=60*60000;
+/* v431: an ask with no reason makes the SHOMER who gets it guess, and guessing is why people
+   hesitate before acting. Six reasons cover almost every real non-urgent ask; the short form is
+   what rides on the map badge, where there is room for one or two words and no more. */
+var ASSIST_WHY={
+  tire:  {he:'תקר ברכב',            ar:'إطار مثقوب',          en:'Flat tyre',
+          sHe:'תקר',    sAr:'إطار',     sEn:'Tyre'},
+  stuck: {he:'הרכב לא מניע',         ar:'السيارة لا تعمل',      en:"Car won't start",
+          sHe:'רכב תקוע', sAr:'معطلة',   sEn:'Stuck'},
+  ride:  {he:'צריך/ה טרמפ',          ar:'بحاجة لتوصيلة',        en:'Need a lift',
+          sHe:'טרמפ',   sAr:'توصيلة',   sEn:'Lift'},
+  lost:  {he:'איבדתי את הדרך',       ar:'تهت عن الطريق',        en:'Lost my way',
+          sHe:'אבוד/ה',  sAr:'تهت',      sEn:'Lost'},
+  uneasy:{he:'לא מרגיש/ה בנוח כאן',  ar:'لا أشعر بالارتياح هنا', en:"Don't feel right here",
+          sHe:'לא בנוח', sAr:'غير مرتاح', sEn:'Uneasy'},
+  hand:  {he:'צריך/ה יד',            ar:'بحاجة إلى مساعدة',     en:'Need a hand',
+          sHe:'יד',     sAr:'مساعدة',   sEn:'Hand'}
+};
+function assistWhyLong(k){ var o=ASSIST_WHY[k]; if(!o) return gaT('צריך/ה יד','بحاجة إلى مساعدة','Needs a hand');
+  return gaT(o.he,o.ar,o.en); }
+function assistWhyShort(k){ var o=ASSIST_WHY[k]; if(!o) return gaT('עזרה','مساعدة','Help');
+  return gaT(o.sHe,o.sAr,o.sEn); }
+/* who on my map is currently asking, so the marker can carry it: {uid:{why,ts}} */
+var ASKING={};
+/* the marker reads live state rather than a copy on the member record, so an ask that arrives
+   between renders cannot leave a stale ring behind */
+/* v431: remembers the chosen reason for the ask that follows. Deliberately NOT persisted - a
+   reason belongs to one moment, and a stale "flat tyre" on next week's ask would be a lie. */
+function assistPickWhy(el){ try{
+  if(!el) return; window._assistWhy=el.getAttribute('data-why')||'hand';
+  var box=document.getElementById('ask-why'); if(!box) return;
+  Array.prototype.forEach.call(box.querySelectorAll('.awc'),function(b){ b.classList.toggle('on', b===el); });
+}catch(e){} }
+function _askOf(m){ try{ return (m&&m.partnerUid)?ASKING[m.partnerUid]:null; }catch(e){ return null; } }
+function assistMarkAsking(puid,why,ts){ try{ ASKING[puid]={why:why||'hand',ts:ts||Date.now()}; renderCircles(); }catch(e){} }
+function assistClearAsking(puid){ try{ if(ASKING[puid]){ delete ASKING[puid]; renderCircles(); } }catch(e){} }
+/* an ask is not an alarm: it expires by itself, and the ring must go with it */
+function assistSweepAsking(){ try{ var n=Date.now(), ch=false;
+  Object.keys(ASKING).forEach(function(u){ if(n-(ASKING[u].ts||0)>ASSIST_TTL){ delete ASKING[u]; ch=true; } });
+  if(ch) renderCircles(); }catch(e){} }
+try{ setInterval(assistSweepAsking, 60000); }catch(e){}
 function assistNearby(){
   var out=[];
   try{
@@ -10798,12 +10869,15 @@ function assistNearby(){
 function helpCountry(){
   try{
     var sh=document.getElementById('sh-help'); if(!sh) return;
+    try{ window._assistWhy='hand'; var _b=document.getElementById('ask-why');
+      if(_b) Array.prototype.forEach.call(_b.querySelectorAll('.awc'),function(x){ x.classList.toggle('on', x.getAttribute('data-why')==='hand'); }); }catch(e){}
     var il=(typeof emIsIL==='function')?emIsIL():true;
     sh.querySelectorAll('.il-only').forEach(function(b){ b.style.display=il?'':'none'; });
     var h=document.getElementById('help-lines-h'); if(h) h.style.display=il?'':'none';
   }catch(e){}
 }
-function assistAsk(wide){
+function assistAsk(wide,why){
+  why=(why&&ASSIST_WHY[why])?why:(window._assistWhy&&ASSIST_WHY[window._assistWhy]?window._assistWhy:'hand');
   var he=currentLang==='he', ar=currentLang==='ar';
   if(typeof FB==='undefined'||!FB.ready||!FB.uid){ toast(gaT('אין חיבור - נסה/י שוב','لا اتصال - حاول مجددًا','No connection - try again'),'amb'); return; }
   try{ if(isReviewAccount()){ toast(gaT('חשבון בדיקה - לא נשלח','حساب تجريبي - لم يُرسل','Test account - not sent'),'amb'); return; } }catch(e){}
@@ -10817,7 +10891,7 @@ function assistAsk(wide){
       /* honest about the trade before widening: nearby was the promise */
       if(confirm(gaT('אף שומר/ת לא נמצא/ת ברדיוס של '+ASSIST_KM+' ק״מ, או שהמיקום שלהם לא ידוע.\n\nלשלוח לכל השומרים שלך בכל זאת?',
                      'لا يوجد حارس ضمن '+ASSIST_KM+' كم، أو أن موقعهم غير معروف.\n\nهل نرسل إلى كل حُرّاسك رغم ذلك؟',
-                     'No SHOMER is within '+ASSIST_KM+' km, or their location is unknown.\n\nSend to all your SHOMERs anyway?'))) assistAsk(true);
+                     'No SHOMER is within '+ASSIST_KM+' km, or their location is unknown.\n\nSend to all your SHOMERs anyway?'))) assistAsk(true,why);
       return;
     }
     toast(gaT('אין שומרים לשלוח אליהם','لا يوجد حُرّاس للإرسال إليهم','No SHOMERs to send to'),'amb'); return;
@@ -10839,13 +10913,13 @@ function assistAsk(wide){
   };
   list.forEach(function(m){
     try{
-      gaWrite(m.partnerUid,{name:nm,ts:now,level:'help',id:id})
+      gaWrite(m.partnerUid,{name:nm,ts:now,level:'help',id:id,why:why})
         .then(function(){ sent++; done++; _report(); })
         .catch(function(){ done++; _report(); });
       /* tag 'assist' - the fanout picks the quiet channel for anything not starting with 'sos' */
       fbRestWrite('POST','alarms',{fromUid:FB.uid,toUid:m.partnerUid,ts:now,tag:'assist',
         title:'SH✡MER - '+(nm||gaT('שומר/ת','حارس','a SHOMER')),
-        body:gaT('מבקש/ת עזרה - לא חירום','يطلب مساعدة - ليست حالة طوارئ','needs a hand - not an emergency')}).catch(function(){});
+        body:assistWhyLong(why)+' \u00b7 '+gaT('לא חירום','ليست حالة طوارئ','not an emergency')}).catch(function(){});
     }catch(e){}
     /* v411: never overwrite a pending check - and above all never an outstanding alert/alarm,
        because gaStopRemote sends the stop with whatever id is in this slot, and the native ringer
@@ -10863,7 +10937,13 @@ function assistShow(from,v){
   var he=currentLang==='he', ar=currentLang==='ar';
   /* v411: no ESC - both sinks below set textContent, so escaping only mangles an apostrophe */
   var nm=(v.name||gaT('שומר/ת שלך','حارسك','Your SHOMER'));
-  var msg=gaT(nm+' מבקש/ת עזרה - לא חירום',nm+' يطلب مساعدة - ليست حالة طوارئ',nm+' needs a hand - not an emergency');
+  var why=(v&&v.why&&ASSIST_WHY[v.why])?v.why:'hand';
+  var msg=nm+' \u00b7 '+assistWhyLong(why)+' \u00b7 '+gaT('לא חירום','ليست حالة طوارئ','not an emergency');
+  /* v431: the ask gets its own voice. Not the alarm, not silence: one soft falling cue, one
+     short buzz, and the asker's dot picks up a dashed cyan ring with the reason on it so you
+     can see WHO and WHY on the map without opening anything. */
+  try{ playCue('assist'); }catch(e){}
+  try{ assistMarkAsking(from, why, v.ts||Date.now()); }catch(e){}
   try{ pushNotifyQuiet('SH✡MER',msg,'assist'); }catch(e){}
   try{ if(navigator.vibrate) navigator.vibrate(180); }catch(e){}   /* one short buzz, nothing more */
   toast(msg,'amb',function(){
@@ -10900,7 +10980,7 @@ function gaHandle(from,v){
     if(v.level==='help'){ try{ playCue('join'); if(navigator.vibrate) navigator.vibrate([400,150,400]); }catch(e){} }
     try{ renderCircles(); }catch(e){} return;
   }
-  if(v.level==='stop'){ if(gaCur&&gaCur.id===v.id){ gaEnd('remote'); } gaMarkSeen(v.id); return; }
+  if(v.level==='stop'){ if(gaCur&&gaCur.id===v.id){ gaEnd('remote'); } try{ assistClearAsking(from); }catch(e){} gaMarkSeen(v.id); return; }
   if(v.id&&gaSeen(v.id)){ gaNativeHandled(v.id); }   /* handled here already - make sure the background never rings it again */
   if(['check','alert','alarm'].indexOf(v.level)<0) return;
   if(gaSeen(v.id)) return;
@@ -12856,7 +12936,7 @@ try{ hydrateIcons(document); }catch(e){}
 /* Loaded-build version - shown in the diagnostic panel so a phone can prove
    whether it's on the latest build or a STALE cached one. Keep in lock-step
    with sw.js SW_VERSION on every deploy. */
-var APP_VER='v424';
+var APP_VER='v431';
 var FB={ready:false,uid:null,db:null,_presTimer:null,connected:false,listening:false,pushState:'default',near:0,swVer:'?',
   authState:'connecting',sdkLoaded:false,persist:'',permErr:null,err:null,wsProbe:'',csp:''};
 /* Always log connection diagnostics to the console so the real failure can be SEEN in Chrome. */
@@ -17790,6 +17870,13 @@ body.aed-placing #map{cursor:crosshair}
 .ddr-em .dd-ic{color:#E5484D!important}
 .ddr-rep .dd-ic{color:#E0A828!important}
 .ddr-circ .dd-ic{color:#E0A828!important}
+/* v431: the reason chips. Outlined and quiet by default, filled in the assist accent when chosen -
+   deliberately nothing like the SOS button, because choosing a reason is a calm act. */
+.ask-why{display:flex;flex-wrap:wrap;gap:7px;margin:0 0 12px}
+.awc{font:inherit;font-size:12px;font-weight:600;line-height:1;padding:9px 12px;border-radius:999px;cursor:pointer;
+  background:transparent;border:1px solid rgba(79,179,196,.40);color:var(--tx2);transition:background .12s,color .12s,border-color .12s}
+.awc:hover{border-color:rgba(79,179,196,.75)}
+.awc.on{background:#4FB3C4;border-color:#4FB3C4;color:#06212B;font-weight:800}
 
 /* legend must never reach the SOS button zone (bottom 34-128px) */
 
@@ -18033,6 +18120,12 @@ html[dir="rtl"] .sh-back svg{transform:scaleX(-1)}
 .ddr svg,.ddr .ic,.ddr .dd-ic{width:19px!important;height:19px!important;flex:0 0 19px!important;
   color:var(--g3)!important;stroke-width:1.8!important;fill:none!important;
   background:none!important;border:0!important;border-radius:0!important;padding:0!important;box-shadow:none!important}
+/* v431: the rule above paints EVERY menu icon the same var(--g3) gold with !important, which is
+   why the per-row colours further up never showed - the menu is monochrome on purpose. The
+   non-urgent ask is the one row that is neither an emergency nor a gold studio action, so it
+   carries the assist accent, and it has to outrank that rule to do it. The svg takes stroke from
+   currentColor, but .ddr svg is coloured directly above, so both are set here. */
+.ddr.ddr-help .dd-ic,.ddr.ddr-help .dd-ic svg,.ddr.ddr-help .ic{color:#4FB3C4!important;stroke:#4FB3C4!important}
 .ddr span{font-size:13.5px!important;font-weight:600!important}
 .sr-ic,.dd-ic,.sec-ic,.ic-box{background:none!important;border:0!important;border-radius:0!important;box-shadow:none!important}
 

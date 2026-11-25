@@ -1,17 +1,20 @@
 {
-"v": "v424",
+"v": "v431",
 "notes": {
 "he": [
-"אזהרת „גרסת אנדרואיד ישנה” קופצת עכשיו לפני חלון „מה חדש”, ולא נעלמת. קודם כל עדכון גרסה היה מסתיר אותה, והיא בדיוק זו שמסבירה למה ניעור לבד מרטיט ולמה לחיצה+ניעור לא מפעילה צפירה",
-"אם האפליקציה מתריעה שהגרסה ישנה - צריך להתקין את הגרסה העדכנית. בגרסה ישנה ה-SOS לא עובד כמו שצריך"
+"בתפריט: „עזרה לא-דחופה” קיבלה צבע משלה - לא אדום של חירום ולא זהב של פעולה רגילה.",
+"בקשת עזרה שקטה לשומרים שלך אפשר עכשיו לסמן בסיבה: תקר, הרכב לא מניע, טרמפ, איבדתי את הדרך, לא מרגיש/ה בנוח, או סתם צריך/ה יד.",
+"אצל מי שמקבל את הבקשה: צליל רך ויורד (לא אזעקה), רטט קצר אחד, והנקודה שלך במפה מקבלת טבעת מקווקוות בצבע תכלת עם הסיבה עליה - אי אפשר להתבלבל בינה לבין SOS אדום. הבקשה נמחקת מעצמה אחרי שעה."
 ],
 "en": [
-"The \"your Android build is out of date\" warning now comes before the \"what's new\" card instead of being buried under it, and it no longer disappears after one toast. That warning is the one that explains why a bare shake buzzes and why button+shake raises no siren",
-"If the app says your build is out of date, install the current build. On an old build SOS does not work properly"
+"In the menu, \"Non-urgent help\" now has a colour of its own - not emergency red, not the gold of an ordinary action.",
+"A quiet ask to your SHOMERs can now carry a reason: flat tyre, car won't start, need a lift, lost my way, don't feel right here, or just need a hand.",
+"For whoever receives it: a soft falling tone (not the alarm), one short buzz, and your dot on their map picks up a dashed cyan ring with the reason on it - it cannot be confused with a red SOS. The ask clears itself after an hour."
 ],
 "ar": [
-"صار تحذير «إصدار أندرويد قديم» يظهر قبل بطاقة «ما الجديد» بدل أن يُدفن تحتها، ولم يعد يختفي بعد إشعار واحد. هذا التحذير يشرح لماذا يهتزّ الهاتف عند الهزّ وحده ولماذا لا تنطلق الصفّارة مع مفتاح+هزّ",
-"إذا قال التطبيق إنّ إصدارك قديم فثبّت الإصدار الحالي. في الإصدار القديم لا تعمل الاستغاثة كما يجب"
+"في القائمة: صار لـ«مساعدة غير عاجلة» لون خاص بها - ليس أحمر الطوارئ ولا ذهب الإجراء العادي.",
+"يمكن الآن إرفاق سبب بالطلب الهادئ لحُرّاسك: إطار مثقوب، السيارة لا تعمل، بحاجة لتوصيلة، تهت عن الطريق، لا أشعر بالارتياح هنا، أو بحاجة إلى مساعدة.",
+"لدى من يستلم الطلب: نغمة هادئة هابطة (ليست إنذارًا)، اهتزاز قصير واحد، وتظهر نقطتك على خريطته بحلقة متقطّعة لونها سماوي مع السبب عليها - لا يمكن الخلط بينها وبين استغاثة حمراء. يختفي الطلب تلقائيًا بعد ساعة."
 ]
 }
 }
