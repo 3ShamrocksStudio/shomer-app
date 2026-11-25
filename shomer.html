@@ -354,6 +354,10 @@ input[type=range]:focus::-webkit-slider-thumb{box-shadow:0 0 0 4px rgba(224,168,
 .tour-bub h4{font-size:16px;font-weight:800;color:var(--tx0);margin:0 0 6px;display:flex;align-items:center;gap:9px;}
 .tour-bub h4 .tb-ic{width:30px;height:30px;flex-shrink:0;color:var(--g3);padding:5px;border-radius:9px;background:rgba(224,168,40,.12);border:1px solid rgba(224,168,40,.24);box-sizing:border-box;}
 .tour-bub p{font-size:12.5px;line-height:1.55;color:var(--tx2);margin:0 0 12px;}
+/* v423: 65+ outside simple mode - same steps, bigger type. */
+.tour-ov.tour-senior .tour-bub{width:min(330px,92vw);}
+.tour-ov.tour-senior .tour-bub h4{font-size:19px;}
+.tour-ov.tour-senior .tour-bub p{font-size:16px;line-height:1.72;color:var(--tx1,#C7D2E2);}
 .tour-row{display:flex;align-items:center;justify-content:space-between;gap:10px;}
 .tour-dots{display:flex;gap:5px;}
 .tour-dot{width:6px;height:6px;border-radius:50%;background:var(--n5);transition:background .2s;}
@@ -534,9 +538,27 @@ body.sheet-open .diag-panel{display:none;}
 @keyframes presPulse{0%{transform:scale(.7);opacity:.7}100%{transform:scale(2.2);opacity:0}}
 /* v320: every OTHER user = green pulsing dot, same style as the dashboard's live-presence dots
    (dashboard.html: #2bc47e fill, #0c1b39 rim, .leaflet-pulse ring; grey #7c869c when not live). No star, no founder mark. */
-.oth-dot{position:absolute;left:50%;top:50%;width:13px;height:13px;border-radius:50%;background:#2bc47e;border:2px solid #0c1b39;transform:translate(-50%,-50%);z-index:2;animation:othPulse 1.6s infinite;}
+/* ══ v423 · THE MAP COLOUR LAW - people vs events ══
+   SHAPE carries the class. A round beaming dot = a PERSON who is here now. A teardrop pin with a
+   white glyph = an EVENT that happened here. The two silhouettes are never confusable, which is
+   what lets the palettes sit on the same map.
+   COLOUR carries the identity, and the people palette is RESERVED - no event type may ever take
+   these two:
+     #2BC47E  mint green  = you (.mk-me-core)
+     #E0A828  brand gold  = your SHOMERs (.oth-dot)
+     #FF1A40  red         = anyone in SOS - shared with the SOS event on purpose, because red
+                            means emergency everywhere in this app and that is not a clash
+     #7C869C  grey        = a SHOMER whose position is stale, not live
+   The event hues that sit nearest the people palette are stalk #F2B705 and med #16A06A. They
+   stay legible against it because they only ever appear inside a teardrop pin, never as a bare
+   dot, and the legend now groups the two families under their own headings. Before adding an
+   event colour, check it against this list. */
+.oth-ring{position:absolute;left:50%;top:19px;width:28px;height:28px;border-radius:50%;background:#E0A828;transform:translate(-50%,-50%);opacity:.42;animation:cPulse 2s ease-out infinite;}
+.mk-oth:not(.live) .oth-ring{display:none;}
+.oth-dot{position:absolute;left:50%;top:50%;width:15px;height:15px;border-radius:50%;background:#E0A828;border:2.5px solid #0C1B39;transform:translate(-50%,-50%);z-index:2;box-shadow:0 0 0 1px rgba(255,255,255,.2),0 0 9px rgba(224,168,40,.5);}
 .mk-circle.mk-oth .oth-dot{top:19px;}
-.mk-circle.mk-oth .nm{border-color:#2bc47e;}
+.mk-circle.mk-oth .nm{border-color:#E0A828;}
+@media (prefers-reduced-motion:reduce){.oth-ring{animation:none;opacity:.28}}
 @keyframes othPulse{0%{box-shadow:0 0 0 0 rgba(43,196,126,.55)}70%{box-shadow:0 0 0 13px rgba(43,196,126,0)}100%{box-shadow:0 0 0 0 rgba(43,196,126,0)}}
 .mk-oth:not(.live) .oth-dot{background:#7c869c;animation:none;opacity:.7;}
 .mk-circle.mk-oth:not(.live) .nm{border-color:#7c869c;}
@@ -1814,10 +1836,15 @@ body.otp-active .ob-steps{display:none!important;}
  <div class="leg"><div class="ldc" style="background:#2962FF" aria-hidden="true"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="11" width="14" height="9" rx="2" fill="none" stroke="currentColor" stroke-width="2"/><path d="M8 11V8a4 4 0 0 1 7.5-2" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></div><span id="l4">גנבה / רכוש</span></div>
  <div class="leg"><div class="ldc" style="background:#18C29C" aria-hidden="true"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="8" width="18" height="8" rx="4" fill="none" stroke="currentColor" stroke-width="2"/><path d="M12 8v8" fill="none" stroke="currentColor" stroke-width="2"/></svg></div><span id="l5">סמים</span></div>
  <div class="leg"><div class="ldc" style="background:#16A06A" aria-hidden="true"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="4" width="16" height="16" rx="4" fill="none" stroke="currentColor" stroke-width="2"/><path d="M12 8v8M8 12h8" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg></div><span id="l6">רפואי</span></div>
- <!-- v422: legend key follows the marker. It was a blue #19A8FF arrow while the marker is now a
-      green dot, so the legend and the map disagreed about what "my location" looks like. -->
- <div class="leg"><div class="ldc" style="background:#2BC47E;border-color:#0C1B39" aria-hidden="true"></div><span id="l8">המיקום שלי</span></div>
  <div class="legend-foot" id="legend-foot">צבעים = קטגוריה. סמני ערים = סקירה סטטיסטית מצרפית, לא אירוע ספציפי.</div></div></div>
+     <!-- v423: people are not events, so they stop sharing a section with them. The map now reads
+          by shape first: a round beaming dot is a PERSON who is here now, a teardrop pin is an
+          EVENT that happened. Colour then says who - green you, gold your SHOMERs. "My location"
+          used to sit at the bottom of the events list, which quietly taught the opposite. -->
+     <div class="leg-sec" id="leg-people-sec"><div class="leg-sec-h" data-he="אנשים" data-en="People" data-ar="أشخاص">אנשים</div><div class="leg-key">
+ <div class="leg"><div class="ldc" style="background:#2BC47E;border-color:#0C1B39" aria-hidden="true"></div><span id="l8">המיקום שלי</span></div>
+ <div class="leg"><div class="ldc" style="background:#E0A828;border-color:#0C1B39" aria-hidden="true"></div><span id="l9" data-he="השומרים שלי" data-en="My SHOMERs" data-ar="حُرّاسي">השומרים שלי</span></div>
+ </div></div>
      <div class="leg-sec" id="leg-past-sec"><div class="leg-past-row"><span data-he="אירועי עבר" data-en="Past events" data-ar="أحداث سابقة">אירועי עבר</span><div class="tog" id="leg-past-tog" role="switch" aria-checked="false" onclick="togglePastEvents();this.classList.toggle('on');this.setAttribute('aria-checked',this.classList.contains('on'))"></div></div></div>
      <div class="leg-sec" id="leg-ess">
    <button class="leg-sec-tog" id="ess-tog" onclick="essToggleMenu()" aria-expanded="false">
@@ -3986,24 +4013,14 @@ function readAloudRelabel(){
     document.querySelectorAll('.rd-say').forEach(function(b){ b.setAttribute('aria-label',lbl); b.title=lbl; });
   }catch(e){}
 }
+/* v423: the map question mark is gone. It was a read-aloud trigger wearing a "?" , so it read as
+   "explain this screen" and then spoke the screen instead of explaining the app - which is not
+   what anyone pressing a question mark wants. The map screen has a finite icon budget and this
+   was not earning its slot. "Now what?" is answered by the first-run tour instead, and read-aloud
+   still mounts inside every sheet via readAloudMount(). This function now only cleans up the
+   button on devices that still have one from an older version. */
 function readAloudMainMount(){
-  try{
-    /* NOT .hdr-left: it grows leftward into the absolutely-centred wordmark and the button
-       disappeared behind it on every width under 430px. */
-    /* the same parent as the other map-edge FABs, or it sits 6px off the column */
-    var host=document.querySelector('.map-wrap')||document.getElementById('app'); if(!host) return;
-    /* v416: always present. This is the help button, not a setting's satellite. */
-    var ex=document.getElementById('rd-say-main');
-    if(ex){ readAloudRelabel(); return; }
-    var b=document.createElement('button');
-    b.className='rd-say rd-say-fab'; b.id='rd-say-main'; b.type='button'; b.setAttribute('aria-pressed','false');
-    b.setAttribute('aria-label', currentLang==='en'?'Help - read this screen aloud':currentLang==='ar'?'مساعدة - اقرأ هذه الشاشة بصوت':'עזרה - הקראת המסך');
-    b.title=b.getAttribute('aria-label');
-    /* a question mark: "explain this screen to me" - and it does, out loud */
-    b.innerHTML='<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M9.3 9.2a2.8 2.8 0 0 1 5.4.9c0 1.9-2.7 2.3-2.7 4"/><path d="M12 17.4h.01"/></svg>';
-    b.onclick=function(ev){ ev.stopPropagation(); readAloudMainGo(); };
-    host.appendChild(b);
-  }catch(e){}
+  try{ var ex=document.getElementById('rd-say-main'); if(ex) ex.remove(); }catch(e){}
 }
 function readAloudMount(id){
   try{
@@ -5616,6 +5633,7 @@ function enterApp(returning){
  try{ fbInit(); }catch(e){} // connect to Firebase RTDB (presence + cross-device SOS) once in-app
  try{ guardianInit(); }catch(e){}
  try{ fbListenPersonAlerts(); }catch(e){}
+ try{ setTimeout(tourMaybeStart, 1800); }catch(e){}   /* v423: first-run tour - its own path, not the popup queue */
  try{ setTimeout(nudgeMaybeShow, 4500); }catch(e){}
  try{ setTimeout(dykMaybeShow, 5*60000); }catch(e){}  /* DYK tip: show after 5 min of use */
  setTimeout(function(){ try{ tpMaybeShow(); }catch(e){} }, 3500);   /* the daily card (drill + tester mission) - wrapped: it is defined in a later script block */
@@ -8642,9 +8660,37 @@ function howtoRender(){
      +'<div class="sr-ic" style="flex:0 0 auto"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true">'+(HOWTO_IC[c.ic]||'')+'</svg></div>'
      +'<div><div style="font-weight:700;margin-bottom:4px">'+t[0]+'</div><div>'+t[1]+'</div></div></div>';
  }
+ /* v423: replay the guided tour from here. The tour is the thing that actually answers
+    "now what?" - this sheet is the reference you come back to. */
+ var rp = L==='he'?'סיור מודרך על המסך':L==='ar'?'جولة إرشادية على الشاشة':'Guided tour on screen';
+ h = '<button type="button" onclick="cl(\'sh-howto\');setTimeout(function(){try{startFeatureTour(true);}catch(e){}},260)" '
+   + 'style="width:100%;padding:13px;margin-bottom:14px;border-radius:12px;border:1px solid rgba(224,168,40,.5);'
+   + 'background:rgba(224,168,40,.12);color:#E0A828;font:inherit;font-weight:800;font-size:14px;cursor:pointer">'
+   + rp + '</button>' + h;
  b.innerHTML=h;
  var ttl=document.getElementById('howto-ttl');
  if(ttl) ttl.textContent = L==='he'?'איך משתמשים':L==='ar'?'كيف نستخدم':'How to use';
+}
+/* ═══ v423 · why nobody ever saw the tutorial ═══
+   The app has had a finished first-run tour all along: startFeatureTour(), a coached spotlight
+   over the real controls, four steps, he/en/ar, with its own CSS. It was reachable from exactly
+   ONE place - setupDone(silent), and only when `silent` was false. The only caller that passes
+   false is the "Later - to the map" SKIP button. Tapping "Add SHOMERs" or "Set a code" calls
+   setupDone(true), and nothing else in the file called the tour at all.
+   So the tutorial ran only for users who SKIPPED setup, and never for anyone who engaged with
+   it - the exact inverse of what you want, and the reason people kept asking "now what?".
+   It now runs once on first entry whatever path the user took. startFeatureTour() already
+   guards itself with the shomerTourDone flag, so this cannot re-nag anyone, and the How-to
+   sheet gets a button to replay it on demand. */
+function tourSenior(){ try{ var b=(SS.user&&SS.user.ageBand)||''; return b==='65_74'||b==='75p'||(typeof simpleOn==='function'&&simpleOn()); }catch(e){ return false; } }
+function tourMaybeStart(){
+ try{
+   if(!SS.onboarded) return;
+   if(localStorage.getItem('shomerTourDone')==='1') return;
+   /* Wait for a clear screen, but never take the session's single popup slot: the tour is not
+      a nudge, it is the rest of onboarding. */
+   popupWhenClear(function(){ try{ startFeatureTour(); }catch(e){} }, 4000, 25);
+ }catch(e){}
 }
 function openHowTo(){ try{ howtoRender(); }catch(e){} op('sh-howto'); }
 
@@ -9171,7 +9217,8 @@ function tourSteps(){ var he=currentLang==='he', ar=currentLang==='ar'; var P=fu
    b:P({he:'לחיצה שולחת את מיקומך ואזעקה לשומרים בקרבתך ולאנשי הקשר שלך. בחירום אמיתי חייגו גם 100 / 101 / 102.',en:'Press to send your location + an alarm to nearby SHOMERs and your contacts. In a real emergency also call 100 / 101 / 102.',ar:'اضغط لإرسال موقعك وإنذار إلى الحُرّاس القريبين وجهات اتصالك. في الطوارئ اتصل أيضًا بـ100 / 101 / 102.'})},
   {sel:'#map-wrap', ic:'<path d="M9 4 3 6v14l6-2 6 2 6-2V4l-6 2-6-2Z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><path d="M9 4v14M15 6v14" fill="none" stroke="currentColor" stroke-width="2"/>',
    t:P({he:'מפת בטיחות חיה',en:'Live safety map',ar:'خريطة أمان مباشرة'}),
-   b:P({he:'רואים אירועים בקרבתכם ושומרים פעילים בזמן אמת. כשמתקבל SOS מוצג מסלול לאירוע.',en:'See nearby events and active SHOMERs in real time. When an SOS comes in, a route to it appears.',ar:'شاهد الأحداث القريبة والحُرّاس النشطين مباشرة. عند وصول استغاثة يظهر مسار إليها.'})},
+   /* v423: say what the dots actually mean - the map is the screen people stare at first. */
+   b:P({he:'הנקודה הירוקה הפועמת היא אתם. הנקודות הזהובות הן השומרים שלכם. הסיכות הצבעוניות הן אירועים שדווחו - לא אנשים. כשמתקבל SOS מוצג מסלול לאירוע.',en:'The beaming green dot is you. The gold dots are your SHOMERs. The coloured pins are reported events, not people. When an SOS comes in, a route to it appears.',ar:'النقطة الخضراء النابضة هي أنت. النقاط الذهبية هي حُرّاسك. الدبابيس الملوّنة أحداث مُبلّغ عنها، لا أشخاص. وعند وصول استغاثة يظهر مسار إليها.'})},
   {sel:'#menu-btn', ic:'<path d="M9 11a3 3 0 1 0 0-6 3 3 0 0 0 0 6Z" fill="none" stroke="currentColor" stroke-width="2"/><path d="M2.5 20a6.5 6.5 0 0 1 13 0" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M17 7.2a3 3 0 0 1 0 5.6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>',
    t:P({he:'השומרים שלי',en:'My SHOMER',ar:'حُرّاسي'}),
    b:P({he:'בתפריט: חברו אנשים שאתם סומכים עליהם. הם יראו את מיקומכם החי ואתם את שלהם - בהזמנה ובאישור, וניתן לעצור בכל רגע.',en:'In the menu: connect people you trust. They see your live location and you see theirs - by invite + consent, and you can stop anytime.',ar:'في القائمة: اربط أشخاصًا تثق بهم. يرون موقعك المباشر وترى مواقعهم - بدعوة وموافقة، ويمكنك الإيقاف في أي وقت.'})}
@@ -9183,6 +9230,11 @@ function startFeatureTour(force){
  _tour.steps=tourSteps(); _tour.i=0;
  var ov=document.getElementById('tour-ov');
  if(!ov){ ov=document.createElement('div'); ov.id='tour-ov'; ov.className='tour-ov'; ov.innerHTML='<div class="tour-spot" id="tour-spot"></div><div class="tour-bub" id="tour-bub"></div>'; document.body.appendChild(ov); }
+ /* v423: age-oriented. 65+ who are NOT in simple mode still get the full UI, so they get the
+    same four steps in larger type rather than a thinner app - same facts, easier to read.
+    Simple-mode users are excluded by CSS on purpose: their home screen replaces the header,
+    nav and map entirely, so a spotlight over those controls would point at nothing. */
+ try{ ov.classList.toggle('tour-senior', tourSenior()); }catch(e){}
  ov.classList.add('on'); tourShow();
 }
 function tourEnd(){ var ov=document.getElementById('tour-ov'); if(ov)ov.classList.remove('on'); try{ localStorage.setItem('shomerTourDone','1'); }catch(e){} }
@@ -10593,7 +10645,9 @@ function toggleGhost(){ dykUsed('ghost');
 /* ── Circle member map markers (pulsing avatar dots) ── */
 function circleIcon(m){
  return window.L.divIcon({className:'shomer-marker',
- html:`<div class="mk-circle${m.sos?' sos':' mk-oth live'}" style="--cc:${m.sos?m.color:'#2bc47e'}">${m.sos?('<div class="pulse"></div><div class="av">'+(m.emoji||'')+'</div>'):'<div class="oth-dot"></div>'}<div class="nm">${ESC(m.name)}${m.sos?' ':''}</div></div>`,
+ /* v423: gold, and the same beaming dot the user's own position uses - a SHOMER in your circle
+    is a person standing somewhere, exactly like you. SOS keeps the red avatar + fast pulse. */
+ html:`<div class="mk-circle${m.sos?' sos':' mk-oth live'}" style="--cc:${m.sos?m.color:'#E0A828'}">${m.sos?('<div class="pulse"></div><div class="av">'+(m.emoji||'')+'</div>'):'<span class="oth-ring" aria-hidden="true"></span><div class="oth-dot"></div>'}<div class="nm">${ESC(m.name)}${m.sos?' ':''}</div></div>`,
  iconSize:[38,38],iconAnchor:[19,19],popupAnchor:[0,-20]});
 }
 function clearCircleMarkers(){
@@ -11706,7 +11760,9 @@ function gdPos(p){ if(p.lat!=null&&p.lng!=null) return posShowable(p.lat,p.lng,p
 /* ── Map markers ── */
 function guardianIcon(p,live){
  return window.L.divIcon({className:'shomer-marker',
- html:`<div class="mk-circle mk-oth${live?' live':''}">${live?'<div class="tag">LIVE</div>':(p.ts?'<div class="tag stale">'+ESC((currentLang==='he'?'נראה ':'seen ')+agoTxt(p.ts,currentLang==='he'))+'</div>':'')}<div class="oth-dot"></div><div class="nm">${ESC(p.name||(currentLang==='he'?'שומר/ת':'SHOMER'))}</div></div>`,
+ /* v423: same gold beaming dot as circleIcon. The ring is CSS-hidden when not .live, so a stale
+    position shows a quiet grey dot with no beam - "last seen here", not "here now". */
+ html:`<div class="mk-circle mk-oth${live?' live':''}">${live?'<div class="tag">LIVE</div>':(p.ts?'<div class="tag stale">'+ESC((currentLang==='he'?'נראה ':'seen ')+agoTxt(p.ts,currentLang==='he'))+'</div>':'')}<span class="oth-ring" aria-hidden="true"></span><div class="oth-dot"></div><div class="nm">${ESC(p.name||(currentLang==='he'?'שומר/ת':'SHOMER'))}</div></div>`,
  iconSize:[38,38],iconAnchor:[19,19],popupAnchor:[0,-20]});
 }
 /* v393: find the SHOMERs-list member behind a pair, so the card's switch and the map agree. */
@@ -12778,7 +12834,7 @@ try{ hydrateIcons(document); }catch(e){}
 /* Loaded-build version - shown in the diagnostic panel so a phone can prove
    whether it's on the latest build or a STALE cached one. Keep in lock-step
    with sw.js SW_VERSION on every deploy. */
-var APP_VER='v422';
+var APP_VER='v423';
 var FB={ready:false,uid:null,db:null,_presTimer:null,connected:false,listening:false,pushState:'default',near:0,swVer:'?',
   authState:'connecting',sdkLoaded:false,persist:'',permErr:null,err:null,wsProbe:'',csp:''};
 /* Always log connection diagnostics to the console so the real failure can be SEEN in Chrome. */

@@ -1,14 +1,20 @@
 {
-"v": "v422",
+"v": "v423",
 "notes": {
 "he": [
-"סמן המיקום שלך על המפה הוא עכשיו עיגול ירוק פועם בצבע המותג, עם אותה הילה מתרחבת שיש לשומרים שלך. קודם כל משתמש ראה את מגן הדוד המוזהב, וגם לא היה שום סימן „אתה כאן” בצבעי SH✡MER"
+"חדש: סיור קצר שמסביר את האפליקציה בפעם הראשונה - מה הכפתור האדום עושה, למה חייבים להוסיף שומרים, ומה רואים על המפה. אפשר להריץ אותו שוב בכל רגע מהתפריט, תחת „איך משתמשים”",
+"השומרים שלכם מופיעים עכשיו על המפה כנקודה פועמת בזהב המותג, בדיוק כמו הנקודה הירוקה שלכם. ירוק = אתם, זהב = השומרים שלכם, סיכות צבעוניות = אירועים. המקרא מחולק עכשיו ל„אנשים” ו„אירועים”",
+"סימן השאלה ירד ממסך המפה - פחות אייקונים, וההסבר עבר לסיור"
 ],
 "en": [
-"Your position on the map is now a beaming green dot in the brand colour, with the same expanding halo your SHOMERs already have. Before this every user saw the gold ✡ crest, and there was no SH✡MER-coloured \"you are here\" at all"
+"New: a short tour that explains the app the first time you open it - what the red button does, why you must add SHOMERs, and what you are looking at on the map. You can replay it any time from the menu under \"How to use\"",
+"Your SHOMERs now appear on the map as a beaming dot in the brand gold, exactly like your own green one. Green = you, gold = your SHOMERs, coloured pins = events. The legend is now split into \"People\" and \"Events\"",
+"The question mark is off the map screen - fewer icons, and the explaining moved into the tour"
 ],
 "ar": [
-"صار مؤشّر موقعك على الخريطة دائرة خضراء نابضة بلون العلامة، بالهالة المتوسّعة نفسها التي لحُرّاسك. قبل ذلك كان كل مستخدم يرى نجمة داوود الذهبية، ولم تكن هناك إشارة «أنت هنا» بألوان شومير"
+"جديد: جولة قصيرة تشرح التطبيق عند فتحه أوّل مرّة - ماذا يفعل الزر الأحمر، ولماذا يجب إضافة حُرّاس، وما الذي تراه على الخريطة. يمكنك إعادتها متى شئت من القائمة تحت «كيف نستخدم»",
+"يظهر حُرّاسك الآن على الخريطة كنقطة نابضة بذهبي العلامة، تمامًا مثل نقطتك الخضراء. أخضر = أنت، ذهبي = حُرّاسك، دبابيس ملوّنة = أحداث. وقُسّم المفتاح الآن إلى «أشخاص» و«أحداث»",
+"أُزيلت علامة الاستفهام من شاشة الخريطة - أيقونات أقل، والشرح انتقل إلى الجولة"
 ]
 }
 }
