@@ -586,8 +586,11 @@ body.sheet-open .diag-panel{display:none;}
    dashed cyan halo cannot be mistaken for one another at any zoom. */
 .mk-circle.asking .ask-ring{position:absolute;left:50%;top:19px;width:34px;height:34px;border-radius:50%;
   border:2px dashed #4FB3C4;transform:translate(-50%,-50%);opacity:.85;animation:askBreathe 3.4s ease-in-out infinite;z-index:1}
-.mk-circle.asking .ask-bdg{position:absolute;left:50%;top:-11px;transform:translateX(-50%);z-index:4;   /* above the ring: the name pill owns top:38px */
-  max-width:68px;overflow:hidden;text-overflow:ellipsis;   /* the longest he/ar shorts ran ~7px past the marker box on each side */
+.mk-circle.asking .ask-bdg{position:absolute;left:50%;top:54px;transform:translateX(-50%);z-index:4;
+  /* v432.1: -11px put it straight over .tag (LIVE at -12, stale at -16), hiding whether that
+     SHOMER's position is even current - which is exactly what you need before setting off to
+     help them. The stack is now tag / dot / name / reason, with nothing covering anything. */
+  max-width:46px;overflow:hidden;text-overflow:ellipsis;   /* 68px was wider than the widest short form, so it never bit; the marker box is 38px */
   
   background:#4FB3C4;color:#06212B;font-size:9px;font-weight:900;line-height:1;padding:2px 5px;border-radius:7px;
   border:1.5px solid #0C1B39;white-space:nowrap;letter-spacing:.02em}
@@ -10830,6 +10833,13 @@ var ASSIST_WHY={
    'constructor' passed the `if(!o)` guard and rendered the string "undefined" on the map badge,
    the toast and the push. Own-property only. */
 function _whyOk(k){ return !!(k && Object.prototype.hasOwnProperty.call(ASSIST_WHY,k)); }
+/* v432.1: ts comes from a linked peer and gates both acceptance and the one-hour expiry. A
+   non-numeric or absurd value made `Date.now()-ts > TTL` evaluate NaN/false at BOTH gates, so a
+   bad ts was accepted as fresh and then never swept - pinning a ring for the whole session and
+   defeating the expiry the feature and the privacy policy both rest on. */
+function _askTs(t){ var n=(typeof t==='number'&&isFinite(t))?t:0;
+  if(n<0) n=0; if(n>Date.now()+60000) n=Date.now();   /* no future-dating past a minute of clock skew */
+  return n; }
 function assistWhyLong(k){ var o=_whyOk(k)?ASSIST_WHY[k]:null; if(!o) return gaT('צריך/ה יד','بحاجة إلى مساعدة','Needs a hand');
   return gaT(o.he,o.ar,o.en); }
 function assistWhyShort(k){ var o=_whyOk(k)?ASSIST_WHY[k]:null; if(!o) return gaT('עזרה','مساعدة','Help');
@@ -10846,12 +10856,13 @@ function assistPickWhy(el){ try{
   Array.prototype.forEach.call(box.querySelectorAll('.awc'),function(b){ b.classList.toggle('on', b===el); });
 }catch(e){} }
 function _askOf(m){ try{ return (m&&m.partnerUid)?ASKING[m.partnerUid]:null; }catch(e){ return null; } }
-function assistMarkAsking(puid,why,ts){ try{ ASKING[puid]={why:why||'hand',ts:ts||Date.now()}; renderCircles(); }catch(e){} }
-function assistClearAsking(puid){ try{ if(ASKING[puid]){ delete ASKING[puid]; renderCircles(); } }catch(e){} }
+function assistMarkAsking(puid,why,ts){ try{ ASKING[puid]={why:_whyOk(why)?why:'hand',ts:_askTs(ts)||Date.now()}; renderCircles(); }catch(e){}
+  try{ gdRenderMarkers(); }catch(e){} }   /* the guardian pins are a separate layer */
+function assistClearAsking(puid){ try{ if(ASKING[puid]){ delete ASKING[puid]; renderCircles(); try{ gdRenderMarkers(); }catch(e){} } }catch(e){} }
 /* an ask is not an alarm: it expires by itself, and the ring must go with it */
 function assistSweepAsking(){ try{ var n=Date.now(), ch=false;
-  Object.keys(ASKING).forEach(function(u){ if(n-(ASKING[u].ts||0)>ASSIST_TTL){ delete ASKING[u]; ch=true; } });
-  if(ch) renderCircles(); }catch(e){} }
+  Object.keys(ASKING).forEach(function(u){ if(n-_askTs(ASKING[u].ts)>ASSIST_TTL){ delete ASKING[u]; ch=true; } });
+  if(ch){ renderCircles(); try{ gdRenderMarkers(); }catch(e){} } }catch(e){} }
 try{ if(window._askSweepT) clearInterval(window._askSweepT); window._askSweepT=setInterval(assistSweepAsking, 60000); }catch(e){}
 function assistNearby(){
   var out=[];
@@ -10991,7 +11002,7 @@ function gaHandle(from,v){
   /* v410 ASSIST: a 'help' with no 're' is nobody's answer - it is someone asking for a hand.
      Until now gaHandle dropped it, because help existed only as a reply to a check. */
   if(v.level==='help'&&!v.re){ if(gaSeen(v.id)) return;
-    if(Date.now()-(v.ts||0)>ASSIST_TTL){ gaNativeHandled(v.id); return; }
+    if(Date.now()-_askTs(v.ts)>ASSIST_TTL){ gaNativeHandled(v.id); return; }
     assistShow(from,v); return; }
   if(v.level==='ok'||v.level==='help'||v.level==='coded'){        /* an answer to something I sent */
     var o=gaOut()[from]; if(!o||o.id!==v.re||o.st===v.level) return;
@@ -11007,7 +11018,7 @@ function gaHandle(from,v){
     if(v.level==='help'){ try{ playCue('join'); if(navigator.vibrate) navigator.vibrate([400,150,400]); }catch(e){} }
     try{ renderCircles(); }catch(e){} return;
   }
-  if(v.level==='stop'){ if(gaCur&&gaCur.id===v.id){ gaEnd('remote'); } try{ assistClearAsking(from); }catch(e){} gaMarkSeen(v.id); return; }
+  if(v.level==='stop'){ if(gaCur&&gaCur.id===v.id&&gaCur.from===from){ gaEnd('remote'); }   /* v432.1: scope it to the sender - an id match alone let any peer end another peer's alert */ try{ assistClearAsking(from); }catch(e){} gaMarkSeen(v.id); return; }
   if(v.id&&gaSeen(v.id)){ gaNativeHandled(v.id); }   /* handled here already - make sure the background never rings it again */
   if(['check','alert','alarm'].indexOf(v.level)<0) return;
   if(gaSeen(v.id)) return;
@@ -11887,11 +11898,21 @@ function gdIsLive(p){ return !!p.live && (Date.now()-(p.ts||0)<GD_FRESH); }
 function gdPos(p){ if(p.lat!=null&&p.lng!=null) return posShowable(p.lat,p.lng,p.ts)?[p.lat,p.lng]:null; if(p.demo&&p.simLat!=null) return [p.simLat,p.simLng]; return null; }   /* v280: own, recent, precise - or nothing */
 
 /* ── Map markers ── */
+/* v432.1: the ask ring was built into circleIcon only - but a linked SHOMER is drawn HERE, and a
+   linked SHOMER is the only person who can send an ask (assistAsk filters on partnerUid, gaHandle
+   gates on gaLinked). renderCircleMarkers deliberately refuses to draw a paired member at all, so
+   the ring rendered for nobody. Same guard as circleIcon: never while they are in SOS. */
+function _askOfPair(p){ try{
+  if(!p||!p.partnerUid) return null;
+  if(gdSosNow(memberForPair(p))) return null;      /* an SOS outranks an ask, here as everywhere */
+  return ASKING[p.partnerUid]||null;
+}catch(e){ return null; } }
 function guardianIcon(p,live){
+ var _ask=_askOfPair(p);
  return window.L.divIcon({className:'shomer-marker',
  /* v423: same gold beaming dot as circleIcon. The ring is CSS-hidden when not .live, so a stale
     position shows a quiet grey dot with no beam - "last seen here", not "here now". */
- html:`<div class="mk-circle mk-oth${live?' live':''}">${live?'<div class="tag">LIVE</div>':(p.ts?'<div class="tag stale">'+ESC((currentLang==='he'?'נראה ':'seen ')+agoTxt(p.ts,currentLang==='he'))+'</div>':'')}<span class="oth-ring" aria-hidden="true"></span><div class="oth-dot"></div><div class="nm">${ESC(p.name||(currentLang==='he'?'שומר/ת':'SHOMER'))}</div></div>`,
+ html:`<div class="mk-circle mk-oth${live?' live':''}${_ask?' asking':''}">${live?'<div class="tag">LIVE</div>':(p.ts?'<div class="tag stale">'+ESC((currentLang==='he'?'נראה ':'seen ')+agoTxt(p.ts,currentLang==='he'))+'</div>':'')}<span class="oth-ring" aria-hidden="true"></span><div class="oth-dot"></div>${_ask?('<span class="ask-ring" aria-hidden="true"></span><span class="ask-bdg">'+ESC(assistWhyShort(_ask.why))+'</span>'):''}<div class="nm">${ESC(p.name||(currentLang==='he'?'שומר/ת':'SHOMER'))}</div></div>`,
  iconSize:[38,38],iconAnchor:[19,19],popupAnchor:[0,-20]});
 }
 /* v393: find the SHOMERs-list member behind a pair, so the card's switch and the map agree. */
@@ -12963,7 +12984,7 @@ try{ hydrateIcons(document); }catch(e){}
 /* Loaded-build version - shown in the diagnostic panel so a phone can prove
    whether it's on the latest build or a STALE cached one. Keep in lock-step
    with sw.js SW_VERSION on every deploy. */
-var APP_VER='v432';
+var APP_VER='v433';
 var FB={ready:false,uid:null,db:null,_presTimer:null,connected:false,listening:false,pushState:'default',near:0,swVer:'?',
   authState:'connecting',sdkLoaded:false,persist:'',permErr:null,err:null,wsProbe:'',csp:''};
 /* Always log connection diagnostics to the console so the real failure can be SEEN in Chrome. */
