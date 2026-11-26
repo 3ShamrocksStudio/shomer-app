@@ -61,8 +61,11 @@ exports.alarmFanout = onValueCreated('/alarms/{id}', async (event) => {
         await admin.messaging().send({
           token,
           notification: {title: a.title || 'SH✡MER', body: a.body || ''},
-          data: {tag: a.tag || 'shomer', url: LINK},
-          webpush: {fcmOptions: {link: LINK}, headers: {Urgency: 'high'}},
+          // v438: honour a per-alarm destination. Every push used to carry the same fixed LINK,
+          // so an "update needed" notice could only ever open the app's front door and leave the
+          // reader to find the download themselves. An update alarm now carries the APK url.
+          data: {tag: a.tag || 'shomer', url: a.url || LINK},
+          webpush: {fcmOptions: {link: a.url || LINK}, headers: {Urgency: 'high'}},
           android: {priority: 'high', notification: {channelId: String(a.tag || '').indexOf('sos') === 0 ? 'shomer-sos' : 'shomer-alerts', sound: 'default'}},
           apns: {headers: {'apns-priority': '10'}}
         });

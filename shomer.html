@@ -6561,6 +6561,7 @@ function nativeStaleNotice(){
                href:'https://www.shomer-app.co.il/SHOMER.apk', dl:true},
               {label:{he:'עדכון דרך גוגל פליי',ar:'التحديث عبر Google Play',en:'Update on Google Play'},
                href:'https://play.google.com/store/apps/details?id=com.shamrocks.shomer'}];
+    try{ updateNotify(); }catch(e){}   /* v438: and out of the app, where they will actually see it */
     try{ if(typeof importantShow==='function') shown=!!importantShow({he:he,en:en,ar:ar,cta:_cta}); }catch(e){}
     /* the modal takes the session's single popup slot and can decline. A refused warning about a
        build that cannot sound its siren must not vanish, so fall back to a toast, and leave the
@@ -13017,7 +13018,7 @@ try{ hydrateIcons(document); }catch(e){}
 /* Loaded-build version - shown in the diagnostic panel so a phone can prove
    whether it's on the latest build or a STALE cached one. Keep in lock-step
    with sw.js SW_VERSION on every deploy. */
-var APP_VER='v437';
+var APP_VER='v438';
 var FB={ready:false,uid:null,db:null,_presTimer:null,connected:false,listening:false,pushState:'default',near:0,swVer:'?',
   authState:'connecting',sdkLoaded:false,persist:'',permErr:null,err:null,wsProbe:'',csp:''};
 /* Always log connection diagnostics to the console so the real failure can be SEEN in Chrome. */
@@ -16704,6 +16705,40 @@ function fullVerLabel(cb){ var t=APP_VER; try{ var A=window.Capacitor&&window.Ca
    rows, carries a timestamp so stale entries can be aged out on the 90-day rule like everything
    else, and it exists to answer exactly one operational question: who is running something too
    old for SOS to work. That is the "understand use of the system" case the policy allows. */
+/* ══ v438 · TELL THEM OUTSIDE THE APP ══
+   An update warning that only exists inside the app is useless to the person who needs it: on a
+   build where button+shake is dead, there is nothing drawing them in to see it. This puts it in
+   the phone's notification tray instead, where it sits until it is dealt with.
+
+   Two deliveries, because they fail in different ways. A LOCAL notification fires on the device
+   with no server, no FCM token and no network - and most installs have no push token at all. An
+   alarms/ row goes through FCM so it still lands if the app is killed; the rules already permit
+   toUid === your own uid, so no rule change was needed.
+
+   Tapping it opens the app, which raises the update card with the download button - so the route
+   is tappable end to end and nobody is asked to read a URL off a screen and type it. Once a day
+   at most: a notification that repeats is a notification people learn to swipe away. */
+function updateNotify(){
+  try{
+    if(!nativeTooOld()) return;
+    var last=0; try{ last=+(localStorage.getItem('shomer_upd_notify')||0); }catch(e){}
+    if(Date.now()-last < 86400000) return;
+    try{ localStorage.setItem('shomer_upd_notify',String(Date.now())); }catch(e){}
+    var he=currentLang==='he', ar=currentLang==='ar';
+    var title = he?'SH✡MER · נדרש עדכון' : ar?'SH✡MER · التحديث مطلوب' : 'SH✡MER · update needed';
+    var body  = he?'בגרסה הזו כפתור+ניעור לא מפעיל SOS. הקישו כאן להורדת הגרסה העדכנית.'
+              : ar?'في هذا الإصدار لا يُفعّل زرّ+هزّ الاستغاثة. اضغط هنا لتنزيل الإصدار الحالي.'
+              : 'On this build, button+shake cannot start an SOS. Tap here to get the current build.';
+    try{ pushNotifyQuiet(title, body, 'update'); }catch(e){}
+    try{
+      if(FB&&FB.uid){
+        fbRestWrite('PUT','alarms/'+FB.uid+'_upd_'+Date.now(),
+          {fromUid:FB.uid, toUid:FB.uid, ts:Date.now(), tag:'update',
+           title:title, body:body, url:'https://www.shomer-app.co.il/SHOMER.apk'});
+      }
+    }catch(e){}
+  }catch(e){}
+}
 function reportBuild(){
   try{
     if(!(FB&&FB.uid)) return;
@@ -16713,7 +16748,11 @@ function reportBuild(){
               nat:shomerIsNative()?1:0, at:Date.now() };
     var done=function(){
       try{ localStorage.setItem('shomer_build_rep',String(Date.now())); }catch(e){}
-      try{ fbRestWrite('PUT','builds/'+FB.uid,row); }catch(e){}
+      /* v438: this first went to builds/<uid>, which has no rule in database.rules.json - so it
+         was default-denied and wrote nothing at all. analytics/installs/<uid> already allows a
+         user to write their own row and lets only a founder read the set, which is exactly the
+         shape this needs and needs no rules deploy. */
+      try{ fbRestWrite('PUT','analytics/installs/'+FB.uid,row); }catch(e){}
     };
     var A=window.Capacitor&&window.Capacitor.Plugins&&window.Capacitor.Plugins.App;
     if(A&&A.getInfo){ A.getInfo().then(function(i){ if(i&&i.build) row.b=String(i.build); done(); }).catch(done); }

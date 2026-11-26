@@ -1,7 +1,8 @@
 {
-"v": "v437",
+"v": "v438",
 "notes": {
 "he": [
+"אם האפליקציה שלכם ישנה מדי - תקבלו על כך התראה לטלפון, גם בלי לפתוח את האפליקציה. הקשה עליה פותחת את כרטיס העדכון עם כפתור הורדה ישיר.",
 "בגרסאות אנדרואיד ישנות כפתור+ניעור לא יכול להפעיל SOS - וזה היה קורה בשקט, בלי שום הודעה. עכשיו ניעור כזה אומר את זה במפורש ומציע עדכון בלחיצה אחת.",
 "אזהרת „גרסת אנדרואיד ישנה” כוללת עכשיו כפתור הורדה ישיר לגרסה העדכנית - בלחיצה אחת, במקום כתובת שנשברה באמצע ואי אפשר היה ללחוץ עליה. ההתקנה מעדכנת את האפליקציה הקיימת. בנוסף: האזהרה מופיעה פעם אחת ולא נערמת כל 20 שניות.",
 "בתפריט: „עזרה לא-דחופה” קיבלה צבע משלה - לא אדום של חירום ולא זהב של פעולה רגילה.",
@@ -10,6 +11,7 @@
 "בקשת עזרה שנשלחה לכמה שומרים נסגרת עכשיו אצל כולם ברגע שמישהו אומר „אני בדרך”, ואפשר לבטל אותה ידנית מתוך „עזרה לא-דחופה”. אם מי שביקש עזרה לוחץ SOS אמיתי - הבקשה הלא-דחופה נמחקת מיד."
 ],
 "en": [
+"If your app is too old you now get a notification on the phone, without opening the app. Tapping it opens the update card with a direct download button.",
 "On old Android builds, button+shake cannot start an SOS - and it used to fail silently, with no message at all. Such a shake now says so plainly and offers the update in one tap.",
 "The \"old Android build\" warning now carries a direct download button for the current build - one tap, instead of an address that broke mid-domain and could not be tapped. Installing it updates the app you already have. The warning also appears once now instead of stacking every 20 seconds.",
 "In the menu, \"Non-urgent help\" now has a colour of its own - not emergency red, not the gold of an ordinary action.",
@@ -18,6 +20,7 @@
 "An ask sent to several SHOMERs now closes for all of them the moment one says they are on the way, and can be cancelled by hand from \"Non-urgent help\". If the person asking then raises a real SOS, the non-urgent ask is dropped at once."
 ],
 "ar": [
+"إذا كان تطبيقك قديمًا جدًا ستصلك الآن إشعار على الهاتف دون فتح التطبيق. الضغط عليه يفتح بطاقة التحديث مع زر تنزيل مباشر.",
 "في إصدارات أندرويد القديمة لا يستطيع زرّ+هزّ تشغيل الاستغاثة - وكان ذلك يحدث بصمت دون أي رسالة. الآن تُعلن الهزّة ذلك صراحةً وتعرض التحديث بنقرة واحدة.",
 "يحتوي تحذير «إصدار أندرويد قديم» الآن على زر تنزيل مباشر للإصدار الحالي - بنقرة واحدة، بدل عنوان كان ينكسر في منتصفه ولا يمكن الضغط عليه. التثبيت يحدّث التطبيق الموجود لديك. كما يظهر التحذير مرة واحدة بدل أن يتراكم كل 20 ثانية.",
 "في القائمة: صار لـ«مساعدة غير عاجلة» لون خاص بها - ليس أحمر الطوارئ ولا ذهب الإجراء العادي.",
