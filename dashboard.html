@@ -1696,37 +1696,30 @@ function _sfxCtx(){
   if(ctx.state==='suspended'){ try{ctx.resume();}catch(e){} }
   return ctx;
 }
-/* ══ v443 · THE ALARM SPELLS SOS ══
-   The board's alarm was three falling fourths - urgent enough, but it was a sound this product
-   invented and nothing more. The app already flashes · · · — — — · · · on the torch during an
-   SOS, so the dashboard spelling the same letters makes one identity instead of two unrelated
-   noises, and an operator who hears it once never has to be told what it means.
+/* ══ v444 · THE ALARM ══
+   This was Morse SOS before - correct Morse, and too clever. Nine elements at 880Hz over 2.4
+   seconds chatters; it reads as a telegraph, not as a room where something has gone wrong. A
+   console alarm is not a place to be interesting.
 
-   Real Morse timing, not an impression of it: a dit is one unit, a dah is three, elements inside
-   a letter are separated by one and letters by three. SOS is 27 units end to end. At 90ms that is
-   2.43s, which lands inside the existing 2.8s alarm loop and leaves a short silence before it
-   repeats - the silence is what keeps a repeating alarm legible instead of a wall of sound.
+   Two notes, falling, low. It is the interval every emergency service already owns, which means
+   nobody has to be taught what it is, and two events give an operator nothing to decode. Falling
+   matters: a rising pair reads as a notification arriving, a falling pair reads as a situation.
 
-   One pitch throughout, because Morse stops reading as Morse the moment the pitch moves. A5 at
-   880Hz: high enough to cut through a room, two octaves above the sound kit's own A3, so it
-   belongs to the same family as every other sound in this product. The three dahs - the O, the
-   long middle - get a quiet 220Hz octave underneath for weight. Same note, so it adds body
-   without adding a second voice. */
-var SOS_MORSE='...---...', MORSE_UNIT=0.09, MORSE_HZ=880;
+   A3 to E3, with each note doubled an octave below. Low on purpose - 880Hz cuts, but it also
+   fatigues, and someone may sit in front of this for the length of a real incident. These sit
+   under a conversation instead of over it, and still carry across a room. One second of sound in
+   a 2.8s loop, so the silence does the work of urgency rather than volume. */
 function _playAlertTone(){
  try{
   if(window._alarmMuted) return;
-  var ctx=_sfxCtx(); if(!ctx) return; var t0=ctx.currentTime, t=0;
-  for(var i=0;i<SOS_MORSE.length;i++){
-    var dah = SOS_MORSE.charAt(i)==='-';
-    var len = (dah?3:1)*MORSE_UNIT;
-    _sfxNote(ctx, MORSE_HZ, t0+t, len, dah?0.165:0.15, 3600);
-    if(dah) _sfxSub(ctx, t0+t, MORSE_HZ/4, len, 0.085);
-    t += len + MORSE_UNIT;                              /* one unit between elements */
-    if(i===2||i===5) t += 2*MORSE_UNIT;                 /* three between letters, one already added */
-  }
+  var ctx=_sfxCtx(); if(!ctx) return; var t0=ctx.currentTime;
+  _sfxNote(ctx, 220.00, t0+0.00, 0.44, 0.17, 2200);   /* A3 */
+  _sfxSub (ctx,         t0+0.00, 110,   0.44, 0.10);
+  _sfxNote(ctx, 164.81, t0+0.52, 0.52, 0.17, 2000);   /* E3 */
+  _sfxSub (ctx,         t0+0.52, 82.4,  0.52, 0.10);
  }catch(e){}
 }
+
 function _playAckTone(){                                        /* operator picked the event up */
  try{ var ctx=_sfxCtx(); if(!ctx) return; var t0=ctx.currentTime;
   _sfxNote(ctx,SFX_E4,t0,     0.14,0.085,2600);
