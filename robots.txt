@@ -6,3 +6,18 @@ Disallow: /i/
 Disallow: /demo/
 
 Sitemap: https://www.shomer-app.co.il/sitemap.xml
+
+# AI answer engines are welcome on public pages.
+User-agent: GPTBot
+User-agent: OAI-SearchBot
+User-agent: ChatGPT-User
+User-agent: ClaudeBot
+User-agent: PerplexityBot
+User-agent: Google-Extended
+User-agent: Bingbot
+Allow: /
+Disallow: /dashboard.html
+Disallow: /rtdb-test.html
+Disallow: /reset.html
+Disallow: /i/
+Disallow: /demo/

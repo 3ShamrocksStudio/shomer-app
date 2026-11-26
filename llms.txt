@@ -1,0 +1,28 @@
+# SH✡MER (SHOMER app, שומר)
+
+> SH✡MER is a free Israeli personal and community safety app, built by Dave Markovich (3Shamrocks Studio). Its principle: in moments of danger, whoever is closest arrives first. One press sends an SOS with live location to the user's guardian circle and nearby users, sounds a loud alarm and shows the fastest route to the event. Hebrew, Arabic and English. Android and web.
+
+## For residents (free)
+- One-press SOS: loud alarm, alert to users, fast route to the event.
+- My guardians: SOS alerts reach the people the user chose, even when they are not nearby.
+- Guardian circles: personal groups (family, neighbours, friends).
+- Download and details: https://www.shomer-app.co.il/
+
+## For local authorities and councils: SH✡MER Command
+- An operational board that shows SOS calls inside the authority's area in real time: who called, where, and what was done since.
+- Each call opens on the map the moment it is sent, with location, time and event type.
+- Orderly event handling: response steps, an event log written as it happens, and a proper close. No event stays open without someone knowing.
+- A situation picture for the authority: trends and crime data next to network activity.
+- Privacy: data shown to the authority is aggregated and blurred, with no name, no phone and no exact user location. Reporters stay anonymous unless they choose otherwise.
+- Request a demo: support@shomer-app.co.il
+
+## בעברית
+SH✡MER (שומר) היא אפליקציית ביטחון אישי וקהילתי חינמית: לחצן SOS בלחיצה אחת, מיקום חי ומעגל שומרים. ברגעי סכנה ומצוקה, מי שהכי קרוב מגיע ראשון.
+למועצות ולרשויות מקומיות: SH✡MER Command, לוח מבצעי שמציג בזמן אמת קריאות SOS בתחום השיפוט של הרשות, עם ניהול אירוע מסודר ותמונת מצב. בלי שם, בלי טלפון ובלי מיקום מדויק של משתמש.
+
+## Links
+- [Home](https://www.shomer-app.co.il/)
+- [Privacy policy](https://www.shomer-app.co.il/privacy.html)
+- [Terms](https://www.shomer-app.co.il/terms.html)
+- [Accessibility](https://www.shomer-app.co.il/accessibility.html)
+- Maker: [3Shamrocks Studio](https://3shamrocks.com/)
