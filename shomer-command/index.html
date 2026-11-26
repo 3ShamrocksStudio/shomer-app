@@ -512,7 +512,7 @@ body.emg .c-map{animation:emgIn .22s cubic-bezier(.2,.8,.3,1)}
   background:linear-gradient(90deg,rgba(176,14,42,.96),rgba(132,10,30,.94))!important;
   box-shadow:0 8px 24px rgba(140,12,34,.38),0 0 0 1px rgba(224,168,40,.45) inset!important}
 .live-strip .ls-go{flex:0 0 auto}
-.live-strip .ls-go button{background:rgba(10,16,30,.5);color:#fff;font-weight:800;font-size:13px;border:1px solid rgba(255,255,255,.4);border-radius:11px;padding:11px 16px;cursor:pointer;font-family:inherit;white-space:nowrap;transition:background .15s}
+.live-strip .ls-go button{background:#fff;color:#8C0A1E;font-weight:900;font-size:15px;border:1px solid #fff;border-radius:11px;padding:14px 22px;box-shadow:0 4px 18px rgba(0,0,0,.35);cursor:pointer;font-family:inherit;white-space:nowrap;transition:background .15s}
 .live-strip .ls-go button:hover{background:rgba(10,16,30,.75)}
 .live-strip .ls-main{flex:1;min-width:0;color:#fff;text-align:center}
 .live-strip .ls-t{font-size:21px;font-weight:900;letter-spacing:.3px;line-height:1.1;text-shadow:0 1px 6px rgba(0,0,0,.4)}
@@ -586,7 +586,7 @@ body.emg .c-map{animation:emgIn .22s cubic-bezier(.2,.8,.3,1)}
 .live-strip .ls-beacon{flex-direction:column;gap:5px}
 .live-strip .ls-live{font-size:10px;padding:4px 8px}
 .ls-silence{margin:0;font-size:10.5px;padding:4px 9px}
-.live-strip .ls-go button{font-size:11.5px;padding:7px 10px;border-radius:8px}
+.live-strip .ls-go button{font-size:13px;padding:10px 14px;border-radius:9px}
 .ls-chip{font-size:10.5px;padding:2px 7px}
 /* profile card */
 .user-panel{background:none;border:0;border-radius:0;padding:9px 14px;display:flex;flex-direction:column;justify-content:space-between;gap:6px;min-width:0}
@@ -746,7 +746,34 @@ body.sc-emerg .cmd-grid{grid-template-areas:"rank crime net prof" "recs recs rec
 /* v430: #c-recs clipped 156px with overflow:hidden - the list said "5 more open" and showed one.
    The card scrolls now, and the silence control stays pinned at the top of it where it belongs. */
 body.sc-emerg #c-recs{overflow-y:auto}
-.emg-silence{position:sticky;top:0;z-index:3}
+/* ══ v436 · EVERYTHING ELSE RECEDES ══
+   An operator has to find one panel in under a second. Marking the event panel harder does not
+   do that - the eye still has eleven coloured cards competing with it. So the rest of the board
+   steps back instead: desaturated, dimmed, their text to plain white, and breathing between the
+   brand red and the board's own navy. The event panel is then the only thing on screen in full
+   colour at full contrast, and it wins without having to shout.
+
+   Not the police strobe this replaces. That was #FF2D2D snapping to #2f6bff on steps(1,end) at
+   1.1s - a hard two-per-second flip, in a blue this brand does not own, close enough to the WCAG
+   2.3.1 three-flashes-per-second threshold to matter on a screen someone sits in front of for an
+   hour. This breathes the two colours the product already has, eased, over 2.4s - about 0.4Hz,
+   an eighth of the threshold - and it never touches the event panel or the map.
+
+   The map keeps its colour on purpose: the SOS marker is red, and a greyed map is a map that
+   hides where the incident is. */
+body.sc-emerg .cmd-grid>.card:not(#c-recs):not(.c-map){
+  filter:grayscale(1) brightness(.78);opacity:.46;
+  animation:recede 2.4s ease-in-out infinite;
+  transition:opacity .35s ease,filter .35s ease}
+body.sc-emerg .cmd-grid>.card:not(#c-recs):not(.c-map) *{color:#fff!important;fill:#fff!important}
+@keyframes recede{
+  0%,100%{box-shadow:inset 0 0 0 1px rgba(200,16,46,.60),0 0 0 1px rgba(200,16,46,.30)}
+  50%    {box-shadow:inset 0 0 0 1px rgba(32,62,138,.85),0 0 0 1px rgba(32,62,138,.45)}}
+/* the map steps back only slightly - it still has to be readable */
+body.sc-emerg .cmd-grid>.c-map{opacity:.88;transition:opacity .35s ease}
+/* and the event panel sits forward of all of it */
+body.sc-emerg #c-recs{position:relative;z-index:3;filter:none!important;opacity:1!important}
+
 body.sc-emerg .c-feed{display:none!important}
 body.sc-emerg #c-recs{border-color:rgba(224,26,60,.55);box-shadow:0 0 0 1px rgba(224,26,60,.35),0 10px 34px rgba(160,12,36,.18)}
 body.sc-emerg #c-recs .ch{border-bottom-color:rgba(224,26,60,.35)}
@@ -761,8 +788,8 @@ body.sc-emerg #c-recs .ch{border-bottom-color:rgba(224,26,60,.35)}
   border-radius:12px;overflow:hidden}
 .ef-i{display:flex;align-items:baseline;justify-content:space-between;gap:12px;
   padding:12px 14px;background:#121a2b}
-.ef-k{font-size:11.5px;color:#6d7893;font-weight:700;white-space:nowrap}
-.ef-v{font-size:13px;color:#dbe3f2;font-weight:800;text-align:end;
+.ef-k{font-size:12px;color:#8793ad;font-weight:700;white-space:nowrap}
+.ef-v{font-size:16px;color:#fff;font-weight:800;text-align:end;letter-spacing:.01em;
   font-variant-numeric:tabular-nums;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .emg-others{flex:0 0 auto;margin-top:9px;border:1px solid rgba(255,255,255,.08);border-radius:12px;overflow:hidden}
 .eo-h{padding:7px 14px;font-size:11px;font-weight:800;letter-spacing:.06em;color:#6d7893;
@@ -784,21 +811,6 @@ body.sc-emerg #c-recs>#live-strip{flex:0 0 auto}
    sliver - 6 cells present, 46px of room for 84px of rows. Nothing in this panel shrinks. */
 
 /* the silence control: top of the panel, full width, impossible to hunt for */
-/* v435: this was a 100%-wide white slab - it ran most of the panel's width for a control whose
-   whole job is "make the noise stop". Width is not hierarchy. A mute is a secondary action, so it
-   is sized to its label and found by POSITION (the card header, where the eye already goes) and
-   by CONTRAST (the only gold object on a red panel), not by area. 44px tall keeps it a real
-   target under stress; the reassurance that the event stays open moved to the tooltip, because
-   the panel already says the event is live in three other places. */
-.emg-silence{display:inline-flex;align-items:center;justify-content:center;gap:8px;flex:0 0 auto;
-  margin:0;padding:0 14px;height:36px;cursor:pointer;font-family:inherit;white-space:nowrap;
-  background:rgba(224,168,40,.14);color:#F0C65A;font-weight:800;font-size:12.5px;letter-spacing:.01em;
-  border:1.5px solid rgba(224,168,40,.75);border-radius:9px;
-  transition:background .12s,border-color .12s,color .12s}
-.emg-silence:hover{background:rgba(224,168,40,.24);border-color:#E0A828;color:#FFD97A}
-.emg-silence:active{transform:translateY(1px)}
-.emg-silence:focus-visible{outline:2px solid #E0A828;outline-offset:2px}
-.emg-silence.done{background:transparent;border-color:rgba(255,255,255,.16);color:#8FA0BA;cursor:default}
 
 /* checklist (inside the emergency card) */
 #c-recs.sc-on #recspane{display:none}
@@ -849,7 +861,15 @@ body.sc-emerg #analysis-pill,body.sc-emerg #recsback{display:none!important}
      mistake, just reached by a different route. One signal here too. The scan bar loses its
      sweep, so it gets a solid gold core instead: still unmistakably live, no motion. */
   .sc-state.sc-emerg{animation:none;background:#c8102e;border-bottom:4px solid rgba(224,168,40,.9)}
-  body.sc-emerg .cmd-grid>.card{animation:none}
+  /* v436: Reduce Motion is where this went wrong before - the no-animation branch painted a red
+     border on every card, so the board filled with frozen red frames and said nothing. The point
+     of the pulse is that everything except the event recedes, and recession does not need motion:
+     keep the dim and the desaturation, drop the breathing, and give the cards one still navy edge
+     instead of a red one. */
+  body.sc-emerg .cmd-grid>.card{animation:none!important}
+  body.sc-emerg .cmd-grid>.card:not(#c-recs):not(.c-map){
+    filter:grayscale(1) brightness(.78);opacity:.46;
+    box-shadow:inset 0 0 0 1px rgba(32,62,138,.75)}
   #emg-scan{background:linear-gradient(90deg,#8C0A1E,#C8102E 20%,#E0A828 50%,#C8102E 80%,#8C0A1E)}
   .live-strip{animation:none!important;background:linear-gradient(90deg,#B00E2A,#8C0A1E)}
   .sos-beacon .core,.sos-beacon .halo,.sos-pop-ring,.resp-live,.feed .item.sos,.live-banner.active{animation:none!important}
@@ -1380,7 +1400,8 @@ function _respGroups(e){
  if(t==='abduct'||t==='missing'){ g.push({k:'command',i:'📢',t:'פיקוד/תיאום רשויות'}); }
  return g;
 }
-function respToggle(k,el){ _respSel=_respSel||{}; _respSel[k]=!_respSel[k]; if(el)el.classList.toggle('on'); }
+function respToggle(k,el){ _respSel=_respSel||{}; _respSel[k]=!_respSel[k]; if(el)el.classList.toggle('on');
+  try{ _respSaveProgress(_respOpenId,_respSel); }catch(e){} }
 function respFitRadius(){ try{ if(_respCircle&&MAP){ MAP.fitBounds(_respCircle.getBounds(),{padding:[40,40]}); } }catch(e){} }
 function _radChip(){ try{ var mc=document.getElementById('map'); if(!mc)return; var ch=document.getElementById('rad-chip'); if(!ch){ ch=document.createElement('div'); ch.id='rad-chip'; ch.style.cssText='position:absolute;top:10px;inset-inline-start:10px;z-index:600;background:rgba(20,26,39,.92);border:1px solid #2a3450;color:#4fc3e8;font:700 12px Alef,system-ui,sans-serif;padding:6px 11px;border-radius:9px;box-shadow:0 4px 14px rgba(0,0,0,.4);pointer-events:none'; mc.appendChild(ch); } ch.textContent='\u05e8\u05d3\u05d9\u05d5\u05e1 \u05d4\u05ea\u05e8\u05d0\u05d4 \u00b7 '+_respRadius.toFixed(1)+' \u05e7"\u05de'; }catch(e){} }
 function respSetRadius(v){ _respRadius=parseFloat(v)||1.5; var rr=document.getElementById('resp-reach'); var rv=document.getElementById('resp-rv'); if(rv)rv.textContent=_respRadius.toFixed(1)+' ק"מ'; if(rr)rr.innerHTML='רדיוס התראה: <b style="color:#eef1f7">'+_respRadius.toFixed(1)+' ק"מ</b>'; try{ if(_respCircle){ _respCircle.setRadius(_respRadius*1000); } }catch(e){} try{ _radChip(); }catch(e){} }
@@ -1466,6 +1487,7 @@ function respFinish(id){
       _B.reviews[id]={status:'handled',note:_pv.note||'',at:Date.now(),log:_lg,resp:(o&&o._log?o._log.slice(-50):_pv.resp)};
       _boardSave(_B); }catch(e){}
     try{ _alarmId=null; _alarmSilenced=false; }catch(e){}
+    try{ _respClearProgress(id); _respOpenId=null; }catch(e){}
     try{ boardRefresh(); }catch(e){}
     try{ var st=document.getElementById('live-strip'); if(st){ st.classList.add('attended'); st.style.display='none'; } }catch(e){}
     try{ document.body.classList.remove('sc-emerg'); }catch(e){}
@@ -1478,7 +1500,72 @@ function respFinish(id){
   }catch(e){}
   try{ closeResponse(); }catch(e){}
 }
-function closeResponse(){ try{ emgLeave(); stripCalm(); }catch(_){} var p=document.getElementById('resp'); if(p){ p.classList.remove('on'); setTimeout(function(){try{p.remove();}catch(e){}},460); } try{ if(_respCircle){MAP.removeLayer(_respCircle);_respCircle=null;} }catch(e){} try{ var _rc=document.getElementById('rad-chip'); if(_rc)_rc.remove(); }catch(e){} }
+/* ══ v436 · AN EVENT IS NEVER LEFT HALF-MANAGED ══
+   The response panel could be opened, worked halfway and closed again, and the board said
+   nothing. The event went back to looking exactly like one nobody had touched, the partial work
+   vanished, and on a busy desk that is how an incident ends up with everyone assuming someone
+   else had it.
+
+   It does NOT force completion. On an emergency console you cannot trap someone in a modal: a
+   dispatcher may have an entirely good reason to leave - wrong event, moving to the radio,
+   handing over. Blocking the exit during a live incident is more dangerous than the problem.
+
+   So the system insists instead of forcing. Leaving half-done is allowed, but it is never silent,
+   never invisible and never costly to undo: you are told what is unfinished, the event is filed
+   as "בטיפול · לא הושלם" rather than reverting to untouched, it keeps the board in the emergency
+   state, your ticks are still there when you come back, and it keeps reminding you until someone
+   actually closes it. */
+var _respOpenId=null, _respNagT=null;
+function _respProgKey(id){ return 'p_'+String(id||''); }
+function _respSaveProgress(id,sel){ if(!id) return;
+  try{ var B=_boardLoad(); B.prog=B.prog||{}; B.prog[_respProgKey(id)]={sel:sel||{},at:Date.now()}; _boardSave(B); }catch(e){} }
+function _respLoadProgress(id){ if(!id) return null;
+  try{ var B=_boardLoad(); return ((B.prog||{})[_respProgKey(id)]||{}).sel||null; }catch(e){ return null; } }
+function _respClearProgress(id){ if(!id) return;
+  try{ var B=_boardLoad(); if(B.prog){ delete B.prog[_respProgKey(id)]; _boardSave(B); } }catch(e){} }
+/* how much of the checklist is actually done */
+function _respDone(sel){ try{ return Object.keys(sel||{}).filter(function(k){ return sel[k]; }).length; }catch(e){ return 0; } }
+/* file it as started-but-open, so it can never look untouched again */
+function _respMarkInProgress(id,sel){ if(!id) return;
+  try{ var B=_boardLoad(); B.reviews=B.reviews||{};
+    var pv=B.reviews[id]||{}; if(pv.status==='handled'||pv.status==='closed') return;
+    var lg=(pv.log||[]).slice(-49);
+    if(pv.status!=='inprog') lg.push({ts:Date.now(),st:'inprog',note:'נפתח ולא הושלם'});
+    B.reviews[id]={status:'inprog',note:pv.note||'',at:Date.now(),log:lg,resp:pv.resp};
+    _boardSave(B); }catch(e){}
+  try{ boardRefresh(); }catch(e){}
+  _respNagArm();
+}
+/* and keep asking. Quiet, once a minute, never a sound - the siren is for the incident itself. */
+function _respNagArm(){ try{ if(_respNagT) return;
+  _respNagT=setInterval(function(){ try{
+    var B=_boardLoad(), rv=B.reviews||{};
+    var open=Object.keys(rv).filter(function(k){ return rv[k] && rv[k].status==='inprog'; });
+    if(!open.length){ clearInterval(_respNagT); _respNagT=null; return; }
+    if(document.getElementById('resp')) return;        /* already back inside one */
+    toast(open.length===1 ? 'אירוע נפתח ולא הושלם · חזרו אליו דרך ״ניהול אירוע״'
+                          : open.length+' אירועים נפתחו ולא הושלמו · חזרו אליהם דרך ״ניהול אירוע״','amb');
+  }catch(e){} }, 60000); }catch(e){} }
+try{ setTimeout(_respNagArm,4000); }catch(e){}
+function closeResponse(abandonOk){
+  /* leaving with work started and nothing finished is the case worth stopping on */
+  try{
+    var id=_respOpenId, done=_respDone(_respSel);
+    if(id && !abandonOk){
+      var B=_boardLoad(), st=((B.reviews||{})[id]||{}).status;
+      if(st!=='handled' && st!=='closed'){
+        var _n = done===1 ? 'סומן צעד אחד' : 'סומנו '+done+' צעדים';
+        var msg = done
+          ? 'האירוע לא נסגר.\n\n'+_n+', אבל לא בוצעה סגירת אירוע.\nהוא יישאר פתוח בלוח ומסומן ״בטיפול · לא הושלם״, והצעדים שסימנתם יישמרו.\n\nלחזור לאירוע?'
+          : 'האירוע לא נסגר ולא בוצע בו דבר.\n\nהוא יישאר פתוח בלוח ומסומן ״בטיפול · לא הושלם״.\n\nלחזור לאירוע?';
+        if(confirm(msg)) return;                       /* back to the panel, nothing torn down */
+        _respSaveProgress(id,_respSel);
+        _respMarkInProgress(id,_respSel);
+      }
+    }
+  }catch(e){}
+  _respOpenId=null;
+  try{ emgLeave(); stripCalm(); }catch(_){} var p=document.getElementById('resp'); if(p){ p.classList.remove('on'); setTimeout(function(){try{p.remove();}catch(e){}},460); } try{ if(_respCircle){MAP.removeLayer(_respCircle);_respCircle=null;} }catch(e){} try{ var _rc=document.getElementById('rad-chip'); if(_rc)_rc.remove(); }catch(e){} }
 function stripGeocode(lat,lng){
  var box=document.getElementById('ls-addr-txt'); if(!box)return;
  if(CLIENT&&CLIENT.demo){ box.textContent='כתובת לדוגמה · '+lat.toFixed(3)+', '+lng.toFixed(3); return; }   /* demo: no outside geocoder call */
@@ -1570,9 +1657,7 @@ function startAlarm(){ if(_alarmTimer)return; try{_playAlertTone();}catch(e){} v
 function stopAlarm(){ if(_alarmTimer){clearInterval(_alarmTimer);_alarmTimer=null;} }
 function silenceAlarm(){ _alarmSilenced=true; stopAlarm();
  /* v428: the large panel button is the one people press now, so it has to show the result. */
- try{ var eb=document.getElementById('emg-silence'); if(eb){ eb.className='emg-silence done';
-   eb.innerHTML='<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M4 12.5l5 5L20 6.5"/></svg>'
-     +'<span>ההתרעה הושתקה</span>'; } }catch(e){} var st=document.getElementById('live-strip'); if(st){ st.style.animation='none'; st.style.background='linear-gradient(90deg,rgba(60,72,96,.6),rgba(36,46,66,.6))'; st.style.boxShadow='0 6px 20px rgba(0,0,0,.4),0 0 0 1px rgba(255,255,255,.12) inset'; st.classList.add('attended'); } var b=document.getElementById('ls-silence'); if(b){ b.innerHTML='<svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 9v6h4l5 4V5L8 9H4Z"/><path d="M17 9l4 6M21 9l-4 6"/></svg><span class="lsx"><b>ההתרעה הושתקה</b><i>האירוע עדיין פתוח</i></span>'; b.classList.add('done'); } }
+     var st=document.getElementById('live-strip'); if(st){ st.style.animation='none'; st.style.background='linear-gradient(90deg,rgba(60,72,96,.6),rgba(36,46,66,.6))'; st.style.boxShadow='0 6px 20px rgba(0,0,0,.4),0 0 0 1px rgba(255,255,255,.12) inset'; st.classList.add('attended'); } var b=document.getElementById('ls-silence'); if(b){ b.innerHTML='<svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 9v6h4l5 4V5L8 9H4Z"/><path d="M17 9l4 6M21 9l-4 6"/></svg><span class="lsx"><b>ההתרעה הושתקה</b><i>האירוע עדיין פתוח</i></span>'; b.classList.add('done'); } }
 /* openResponse does NOT stop the alarm — only the user clicking "השתק אזעקה" silences it. */
 /* v430: the flip armed an uncancellable 300ms timer. Closing the panel inside that window let
    'emg' land afterwards with no panel open, and body.emg hides every card but the map - the board
@@ -1588,7 +1673,16 @@ function emgLeave(){ try{ clearTimeout(window._emgT); document.body.classList.re
 function openResponse(id){
  try{
   var o=_liveEvents[id]; if(!o){ return; }
-  try{ emgEnter(); stripCalm(); _playAckTone(); }catch(_){} var e=o.e, m=o.m; _respSel={}; _respRadius=1.5;
+  /* v436: the separate mute is gone. Acknowledging an incident and silencing it are the same
+     act, and a board offering both invites the one that stops the noise without anyone taking
+     the event - the quiet failure mode on a dispatch desk. Opening the response panel is now
+     the only thing that quiets it. */
+  try{ emgEnter(); stripCalm(); silenceAlarm(); _playAckTone(); }catch(_){} var e=o.e, m=o.m;
+  /* v436: _respSel was wiped on every open, so anyone who stepped away came back to a blank
+     checklist and had to redo the work they had already done. That is the single biggest reason a
+     half-managed event never gets finished. Progress is restored and it is persisted, so leaving
+     and returning costs nothing. */
+  _respOpenId=id; _respSel=_respLoadProgress(id)||{}; _respRadius=1.5;
   var lat=+e.lat, lng=+e.lng;
   try{ flyToLive(lat,lng,id); }catch(_){}
   try{ if(_respCircle){MAP.removeLayer(_respCircle);} _respLatLng=[lat,lng]; _respCircle=L.circle(_respLatLng,{radius:_respRadius*1000,color:'#4fc3e8',weight:2,fillColor:'#4fc3e8',fillOpacity:.08,dashArray:'7 6'}).addTo(MAP); _radChip(); }catch(_e){}
@@ -1780,7 +1874,7 @@ function respGeocode(lat,lng,demo){
 /* ===== events board · examples + operator review (status / outcome note) =====
    Stored ONLY in this browser (localStorage, every access in try/catch) — never written to Firebase.
    Examples are clearly tagged "דוגמה", editable/removable, and excluded from the exported report. */
-var BOARD_KEY='shomer_dash_board_v1', ST_LBL={open:'פתוח',handled:'טופל',closed:'נסגר'};
+var BOARD_KEY='shomer_dash_board_v1', ST_LBL={open:'פתוח',inprog:'בטיפול · לא הושלם',handled:'טופל',closed:'נסגר'};
 function _boardSeed(){ var now=Date.now(),H=36e5,D=864e5;
  return [
   {id:'ex1',type:'event',t:'עבירות סדר ציבורי',nm:'רעש והתקהלות בגינה ציבורית',ts:now-20*H,status:'open',note:''},
@@ -1932,29 +2026,6 @@ function renderLive(c,list,opts){
          +'<div class="ls-resp">'+(demo?'<span class="ls-demo">נתוני הדגמה</span>':'')+'</div>'
          +'</div>'
          +'<div class="ls-go"><button onclick="event.stopPropagation();openResponse(\''+_jsq(id0)+'\')">ניהול אירוע ←</button></div>';
-       /* v428: the silence control is the first thing in the panel now, full width. It used to
-          be a chip inside the strip, competing with the title, the address, two counters and the
-          manage button - six things in one bar, which is why it kept being hunted for. */
-       try{
-         var host=document.getElementById('emg-silence');
-         if(!host){
-           host=document.createElement('button'); host.id='emg-silence'; host.className='emg-silence';
-           host.setAttribute('aria-label','השתקת ההתרעה הקולית - האירוע נשאר פתוח');
-           host.onclick=function(ev){ ev.stopPropagation(); silenceAlarm(); };
-           host.title='השתקת ההתרעה הקולית · האירוע נשאר פתוח';
-           /* v435: it used to sit above the strip as its own full-width row, which is what made it
-              a slab. The card header already has a spacer and its right side is empty in this
-              state (the recs pill and back button are hidden), so the control lands there: one
-              row, title on one side, mute on the other, nothing stretched. */
-           var _hd=document.querySelector('#c-recs .ch');
-           if(_hd) _hd.appendChild(host); else strip.parentNode.insertBefore(host,strip);
-         }
-         if(!_alarmSilenced){
-           host.className='emg-silence';
-           host.innerHTML='<svg viewBox="0 0 24 24" width="21" height="21" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M11 5 6 9H3v6h3l5 4z"/><path d="M17 9l4 6M21 9l-4 6"/></svg>'
-             +'<span>השתק התרעה</span>';
-         }
-       }catch(e){}
        /* v428: the panel is the EVENT now, so it says so, and the space under the strip carries
           the facts an operator is asked for on the radio - opened, type, source, coordinates,
           who is near. Facts only: the what-to-do lives in the flip panel and nowhere else. */
@@ -1997,7 +2068,7 @@ function renderLive(c,list,opts){
        _sosFocusLock=true;
        if((id0+'@'+(e0.ts||0))!==_alarmId){ _alarmId=id0+'@'+(e0.ts||0); _alarmSilenced=false; strip.style.animation=''; strip.style.background=''; strip.style.boxShadow=''; strip.classList.remove('attended'); startAlarm(); try{ flyToLive(+e0.lat,+e0.lng,id0); }catch(_f){} }
        else if(!_alarmSilenced){ startAlarm(); }
-     } else { strip.style.display='none'; strip.innerHTML=''; try{var _h=document.getElementById('emg-silence'); if(_h) _h.remove(); var _fx=document.getElementById('emg-facts'); if(_fx) _fx.remove(); var _ot=document.getElementById('emg-others'); if(_ot) _ot.remove(); var _t2=document.getElementById('recs-ttl'); if(_t2) _t2.textContent='המלצות לפעולה';}catch(e){} stopAlarm(); _alarmId=null; }
+     } else { strip.style.display='none'; strip.innerHTML=''; try{var _fx=document.getElementById('emg-facts'); if(_fx) _fx.remove(); var _ot=document.getElementById('emg-others'); if(_ot) _ot.remove(); var _t2=document.getElementById('recs-ttl'); if(_t2) _t2.textContent='המלצות לפעולה';}catch(e){} stopAlarm(); _alarmId=null; }
    }
  }catch(e){}
  if(newSos){ _liveBeep(); flyToLive(newSos.lat,newSos.lng,newSos.id); bigSosAlert(newSos.id); }
