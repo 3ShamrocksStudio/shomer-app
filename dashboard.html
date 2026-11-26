@@ -1069,9 +1069,8 @@ document.getElementById('signup-btn').onclick=async function(){
 };
 document.getElementById('signout').onclick=async function(){ try{ if(!(CLIENT&&CLIENT.demo)) await sb.auth.signOut(); }catch(e){} location.reload(); };
 document.getElementById('demo-btn').onclick=function(){ location.href='shomer-command/'; };   /* D2/D3: the demo lives on the sample-data-only page */
-/* v425: handler removed with the button. liveBoot() itself is left in place but is now only
-   reachable from code, never from the gate - a credential-free path into the live network view
-   must not be one click away on a page a council is given. */
+/* v425: handler removed with the button. v439: and the function itself is gone too - "reachable
+   only from code" still meant reachable from the console on a page a council is given. */
 (function(){var ex=document.getElementById('export-btn'); if(ex) ex.onclick=function(){ try{exportReport();}catch(e){window.print();} };
  var ac=document.getElementById('acct-btn'); if(ac) ac.onclick=function(){ try{openSettings();}catch(e){} };})();
 (function(){var sp=document.getElementById('spread-btn'); if(sp) sp.onclick=function(){ if(_curCity) toggleSpread(_curCity); };})();
@@ -1108,24 +1107,10 @@ function demoLive(c){
    100% real, read-only, PII-free (coarse coords, no names). Boots straight into the live
    network view; loadLive() (non-demo branch) streams real events for the chosen territory.
    When no events exist yet it shows an honest "awaiting data" state — never fabricated. */
-async function liveBoot(){
-  await loadData();
-  CLIENT={org:'רשת SH✡MER · תצוגה חיה', territory:DATA._sorted[0].city, email:'live', demo:false, live:true};try{var _pb=document.getElementById('plan-badge');if(_pb)_pb.textContent='גרסת בטא';}catch(_e){};
-  document.getElementById('gate').classList.add('hidden');
-  document.getElementById('app').classList.remove('hidden');
-  document.getElementById('terr-name').textContent=CLIENT.territory;
-  document.getElementById('org-name').textContent=CLIENT.org;
-  document.getElementById('terr-static').classList.add('hidden'); document.getElementById('terr-sel').classList.remove('hidden');
-  if(!MAP) initMap(); renderLegend();
-  var sel=document.getElementById('terr-sel'); if(sel){ sel.onchange=onTerrChange; }
-  var idx=DATA._sorted.findIndex(function(c){return c.city===CLIENT.territory;});
-  render(idx>=0?idx:0);
-  _applyTerrParam();
-}
-
-/* ---- boot: load data + client, route ---- */
-async function loadData(){ if(DATA)return DATA; var r=await fetch('crime-stats.json?v=3'); DATA=await r.json(); DATA._sorted=DATA.cities.slice().sort(function(a,b){return b.total-a.total;}); return DATA; }
-function fillTerr(sel){ DATA._sorted.forEach(function(c){var o=document.createElement('option');o.value=c.city;o.textContent=c.city;sel.appendChild(o);}); }
+/* v439: liveBoot() is gone. Its button was removed in v425 because one click gave the full live
+   network view with no sign-in, but the function itself was left behind - so the bypass was still
+   a console call away from anyone who opened devtools on this page. Dead code that opens a door
+   is not dead code. The signed-in path is the only way in. */
 async function boot(){
   await loadData();
   if(!document.getElementById('su-terr').options.length) fillTerr(document.getElementById('su-terr'));
@@ -1141,7 +1126,25 @@ async function boot(){
   document.getElementById('app').classList.remove('hidden');
   document.getElementById('terr-name').textContent=CLIENT.territory;
   document.getElementById('org-name').textContent=CLIENT.org||'';
-  document.getElementById('terr-sel').classList.add('hidden');document.getElementById('terr-static').classList.remove('hidden');
+  /* v439: an owner account may hold `all:true` in its metadata, which unlocks the territory
+     picker instead of pinning the board to one city. Everyone else stays pinned to the single
+     territory their account carries - the selector is not rendered for them at all.
+     To be clear about what this flag is and is not: it widens what this SCREEN will draw. It
+     grants no new read access, because there is none to grant - a council's board is drawn from
+     dashfeed, which is deliberately public, coarse (~11 km) and carries no name, id, phone or
+     precise point. Everything that is actually private - a user's real location, their SOS, their
+     push token, their profile - is locked server-side in database.rules.json to that user and the
+     SHOMERs they approved, and no dashboard account of any kind can read it. */
+  var _all = !!(md && (md.all===true || md.all==='true'));
+  if(_all){
+    document.getElementById('terr-static').classList.add('hidden');
+    document.getElementById('terr-sel').classList.remove('hidden');
+    var _ts=document.getElementById('terr-sel');
+    if(_ts && !_ts.options.length) fillTerr(_ts);
+    if(_ts){ _ts.value=CLIENT.territory; _ts.onchange=onTerrChange; }
+  } else {
+    document.getElementById('terr-sel').classList.add('hidden');document.getElementById('terr-static').classList.remove('hidden');
+  }
   if(!MAP) initMap();
   renderLegend();
   var idx=DATA._sorted.findIndex(function(c){return c.city===CLIENT.territory;});
