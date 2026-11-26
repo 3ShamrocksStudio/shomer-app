@@ -1039,13 +1039,47 @@ function gerr(m){document.getElementById('gate-err').textContent=m||'';}
 /* ---- auth UI ---- */
 document.getElementById('to-signup').onclick=function(){document.getElementById('view-login').classList.add('hidden');document.getElementById('view-signup').classList.remove('hidden');gerr('');};
 document.getElementById('to-login').onclick=function(){document.getElementById('view-signup').classList.add('hidden');document.getElementById('view-login').classList.remove('hidden');gerr('');};
+/* ══ v440 · THE RESET LINK HAD NOWHERE TO LAND ══
+   v426 added the "forgot password" button and it did send the mail - but nothing anywhere
+   handled the user coming BACK. Supabase returns them with #access_token=...&type=recovery in
+   the URL, and this page simply ignored it: the gate rendered as normal, the session the link
+   established was invisible, and there was no way to set a new password. Sending a reset mail
+   with no page to land on is worse than having no reset at all, because the user believes the
+   problem is them. This catches the recovery return and asks for the new password. */
+async function recoveryCatch(){
+  try{
+    var h=(location.hash||'')+'&'+(location.search||'');
+    if(h.indexOf('type=recovery')<0) return false;
+    var box=document.getElementById('view-login'); if(!box) return false;
+    document.getElementById('view-signup').classList.add('hidden');
+    box.classList.remove('hidden');
+    box.innerHTML='<div style="font-size:14px;color:var(--tx2);margin-bottom:12px">בחר/י סיסמה חדשה לחשבון שלך</div>'
+      +'<input id="np1" type="password" placeholder="סיסמה חדשה (8 תווים לפחות)" autocomplete="new-password">'
+      +'<input id="np2" type="password" placeholder="שוב, לאימות" autocomplete="new-password">'
+      +'<button class="btn" id="np-go">עדכון סיסמה וכניסה</button>';
+    document.getElementById('np-go').onclick=async function(){
+      var a=(document.getElementById('np1').value||''), b=(document.getElementById('np2').value||'');
+      if(a.length<8){ gerr('סיסמה של 8 תווים לפחות'); return; }
+      if(a!==b){ gerr('הסיסמאות לא זהות'); return; }
+      this.disabled=true; this.textContent='מעדכן…'; gerr('');
+      try{
+        var r=await sb.auth.updateUser({password:a});
+        if(r&&r.error){ gerr('שגיאה: '+r.error.message); this.disabled=false; this.textContent='עדכון סיסמה וכניסה'; return; }
+        try{ history.replaceState(null,'',location.pathname+'?login=1'); }catch(e){}
+        boot();
+      }catch(e){ gerr('שגיאה, נסה/י שוב'); this.disabled=false; this.textContent='עדכון סיסמה וכניסה'; }
+    };
+    return true;
+  }catch(e){ return false; }
+}
+
 /* v426: password reset. Sends a Supabase recovery mail to whatever is typed in the email box. */
 document.getElementById('to-reset').onclick=async function(){
   var el=document.getElementById('email'), em=(el&&el.value||'').trim();
   if(!em){ if(el) el.focus(); gerr('הקלד/י קודם את האימייל, ואז לחץ/י שוב'); return; }
   this.disabled=true; var old=this.innerHTML; this.innerHTML='שולח…';
   try{
-    var r=await sb.auth.resetPasswordForEmail(em,{redirectTo:location.origin+location.pathname+'?login=1'});
+    var r=await sb.auth.resetPasswordForEmail(em,{redirectTo:location.origin+'/dashboard.html?login=1'});
     /* Supabase does not say whether the address exists, and neither do we - telling a stranger
        which emails are registered is an account-enumeration leak. */
     gerr(r&&r.error ? ('שגיאה: '+r.error.message) : 'אם הכתובת רשומה, נשלח אליה קישור לאיפוס סיסמה. בדוק/י גם בספאם.');
@@ -1112,6 +1146,7 @@ function demoLive(c){
    a console call away from anyone who opened devtools on this page. Dead code that opens a door
    is not dead code. The signed-in path is the only way in. */
 async function boot(){
+  try{ if(await recoveryCatch()) return; }catch(e){}   /* v440: a recovery return owns the page */
   await loadData();
   if(!document.getElementById('su-terr').options.length) fillTerr(document.getElementById('su-terr'));
   var u=(await sb.auth.getUser()).data.user;
