@@ -1696,18 +1696,35 @@ function _sfxCtx(){
   if(ctx.state==='suspended'){ try{ctx.resume();}catch(e){} }
   return ctx;
 }
+/* ══ v443 · THE ALARM SPELLS SOS ══
+   The board's alarm was three falling fourths - urgent enough, but it was a sound this product
+   invented and nothing more. The app already flashes · · · — — — · · · on the torch during an
+   SOS, so the dashboard spelling the same letters makes one identity instead of two unrelated
+   noises, and an operator who hears it once never has to be told what it means.
+
+   Real Morse timing, not an impression of it: a dit is one unit, a dah is three, elements inside
+   a letter are separated by one and letters by three. SOS is 27 units end to end. At 90ms that is
+   2.43s, which lands inside the existing 2.8s alarm loop and leaves a short silence before it
+   repeats - the silence is what keeps a repeating alarm legible instead of a wall of sound.
+
+   One pitch throughout, because Morse stops reading as Morse the moment the pitch moves. A5 at
+   880Hz: high enough to cut through a room, two octaves above the sound kit's own A3, so it
+   belongs to the same family as every other sound in this product. The three dahs - the O, the
+   long middle - get a quiet 220Hz octave underneath for weight. Same note, so it adds body
+   without adding a second voice. */
+var SOS_MORSE='...---...', MORSE_UNIT=0.09, MORSE_HZ=880;
 function _playAlertTone(){
  try{
   if(window._alarmMuted) return;
-  var ctx=_sfxCtx(); if(!ctx) return; var t0=ctx.currentTime;
-  /* three falling fourths, tight - the repeat is what makes it read as an alarm rather than a
-     notification, without ever needing to be shrill */
-  [0,0.30,0.60].forEach(function(off,i){
-    var p=i===2?0.17:0.145;
-    _sfxNote(ctx,SFX_A4,t0+off,      0.135,p,3400);
-    _sfxNote(ctx,SFX_E4,t0+off+0.145,0.165,p,3000);
-  });
-  _sfxSub(ctx,t0,110,0.34,0.10);
+  var ctx=_sfxCtx(); if(!ctx) return; var t0=ctx.currentTime, t=0;
+  for(var i=0;i<SOS_MORSE.length;i++){
+    var dah = SOS_MORSE.charAt(i)==='-';
+    var len = (dah?3:1)*MORSE_UNIT;
+    _sfxNote(ctx, MORSE_HZ, t0+t, len, dah?0.165:0.15, 3600);
+    if(dah) _sfxSub(ctx, t0+t, MORSE_HZ/4, len, 0.085);
+    t += len + MORSE_UNIT;                              /* one unit between elements */
+    if(i===2||i===5) t += 2*MORSE_UNIT;                 /* three between letters, one already added */
+  }
  }catch(e){}
 }
 function _playAckTone(){                                        /* operator picked the event up */
@@ -1730,7 +1747,8 @@ function stopAlarm(){ if(_alarmTimer){clearInterval(_alarmTimer);_alarmTimer=nul
 function silenceAlarm(){ _alarmSilenced=true; stopAlarm();
  /* v428: the large panel button is the one people press now, so it has to show the result. */
      var st=document.getElementById('live-strip'); if(st){ st.style.animation='none'; st.style.background='linear-gradient(90deg,rgba(60,72,96,.6),rgba(36,46,66,.6))'; st.style.boxShadow='0 6px 20px rgba(0,0,0,.4),0 0 0 1px rgba(255,255,255,.12) inset'; st.classList.add('attended'); } var b=document.getElementById('ls-silence'); if(b){ b.innerHTML='<svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 9v6h4l5 4V5L8 9H4Z"/><path d="M17 9l4 6M21 9l-4 6"/></svg><span class="lsx"><b>ההתרעה הושתקה</b><i>האירוע עדיין פתוח</i></span>'; b.classList.add('done'); } }
-/* openResponse does NOT stop the alarm — only the user clicking "השתק אזעקה" silences it. */
+/* v436: openResponse IS what stops the alarm now - the separate mute button was removed,
+   because acknowledging an incident and silencing it are the same act. */
 /* v430: the flip armed an uncancellable 300ms timer. Closing the panel inside that window let
    'emg' land afterwards with no panel open, and body.emg hides every card but the map - the board
    wedged to a bare map. emgLeave cancels the pending flip now. */
