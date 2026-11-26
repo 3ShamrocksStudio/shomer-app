@@ -1190,6 +1190,14 @@ async function boot(){
      worldwide and shown without crime stats — never silently replaced by another city's data */
   if(idx>=0) render(idx);
   else { DATA._custom={city:CLIENT.territory,lat:0,lng:0,total:null,cats:{},noData:true,intl:true,pending:true}; render(-1); setIntlTerritory(CLIENT.territory); }
+  /* v441: ?terr= was honoured by demoBoot only, so a signed-in account could not be pointed at a
+     territory at all - including a regional council, which is most of this country by area and
+     none of which are in the 60-city crime dataset. It works on the signed-in path now, but only
+     for an all:true account. A council account must not be able to type another territory into
+     the URL and look at it; for them the territory their account carries is the only one.
+     Territories outside the dataset geocode through setIntlTerritory with real boundaries and
+     noData:true - no crime figures are shown rather than a neighbour's figures borrowed. */
+  try{ if(_all) _applyTerrParam(); }catch(e){}
 }
 function renderLegend(){ var el=document.getElementById('legend'); el.innerHTML=''; Object.keys(CAT_COL).forEach(function(k){ el.innerHTML+='<span><i style="background:'+CAT_COL[k]+'"></i>'+k+'</span>'; }); }
 /* CBS population, end of 2024: "קובץ יישובים 2024" (cbs.gov.il/he/publications/doclib/2019/ishuvim/bycode2024.xlsx, column סך הכל אוכלוסייה 2024).
