@@ -5,7 +5,7 @@
 ## For residents (free)
 - One-press SOS: loud alarm, alert to users, fast route to the event.
 - My guardians: SOS alerts reach the people the user chose, even when they are not nearby.
-- Guardian circles: personal groups (family, neighbours, friends).
+- Guardian circles: groups the user sets up personally.
 - Download and details: https://www.shomer-app.co.il/
 
 ## For local authorities and councils: SH✡MER Command
