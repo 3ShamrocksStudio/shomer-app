@@ -1141,6 +1141,9 @@ function demoLive(c){
    100% real, read-only, PII-free (coarse coords, no names). Boots straight into the live
    network view; loadLive() (non-demo branch) streams real events for the chosen territory.
    When no events exist yet it shows an honest "awaiting data" state — never fabricated. */
+async function loadData(){ if(DATA)return DATA; var r=await fetch('crime-stats.json?v=3'); DATA=await r.json(); DATA._sorted=DATA.cities.slice().sort(function(a,b){return b.total-a.total;}); return DATA; }
+function fillTerr(sel){ DATA._sorted.forEach(function(c){var o=document.createElement('option');o.value=c.city;o.textContent=c.city;sel.appendChild(o);}); }
+
 /* v439: liveBoot() is gone. Its button was removed in v425 because one click gave the full live
    network view with no sign-in, but the function itself was left behind - so the bypass was still
    a console call away from anyone who opened devtools on this page. Dead code that opens a door
