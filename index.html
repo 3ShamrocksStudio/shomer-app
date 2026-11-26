@@ -455,6 +455,19 @@ header.bar{border-bottom:1px solid rgba(250,172,34,.14)}
   .hero-phone{order:2!important;position:relative!important;left:auto!important;bottom:auto!important;margin:30px auto -56px!important;width:min(56vw,224px)!important;z-index:6}
 }
 
+/* SHOMER Command section */
+.cmd-sec{background:linear-gradient(180deg,#0B1529,#0C1B39);padding:74px 0;border-top:1px solid rgba(224,168,40,.18)}
+.cmd-kicker{font-size:12px;font-weight:800;letter-spacing:.16em;color:#E0A828;text-transform:uppercase;margin-bottom:10px}
+.cmd-sec h2{font-size:clamp(28px,4.4vw,44px);color:#fff;margin:0 0 14px}
+.cmd-lead{font-size:clamp(16px,2vw,19px);color:#c7d2e6;max-width:62ch;line-height:1.6;margin:0 0 34px}
+.cmd-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:26px;margin-bottom:28px}
+.cmd-col h3{font-size:17px;color:#E0A828;margin:0 0 8px;font-weight:800}
+.cmd-col p{font-size:15px;color:#b6c2d8;line-height:1.65;margin:0}
+.cmd-note{font-size:13.5px;color:#8fa0ba;line-height:1.65;border-inline-start:2px solid rgba(224,168,40,.5);padding-inline-start:14px;max-width:72ch;margin-bottom:30px}
+.cmd-cta{display:flex;flex-wrap:wrap;gap:14px}
+.cmd-btn{background:linear-gradient(135deg,#C09020,#E0A828,#F5C840);color:#101722!important;font-weight:900}
+.cmd-btn2{background:transparent;color:#E8EDF6!important;border:1px solid rgba(232,237,246,.3)}
+@media(max-width:640px){.cmd-sec{padding:52px 0}}
 </style>
 </head>
 <body>
@@ -546,6 +559,29 @@ header.bar{border-bottom:1px solid rgba(250,172,34,.14)}
     <h2 data-i="screens">”שומר אחי אנוכי“</h2>
     <div class="car"><div class="car-track" id="cartrack"><div class="shot"><img src="app-shots-map-v2.jpg" alt="מפה חיה עם כפתור SOS" loading="lazy"></div><div class="shot"><img src="app-shots-circles-v2.jpg" alt="מעגלי השומרים שלי" loading="lazy"></div><div class="shot"><img src="app-shots-guide-v2.jpg" alt="מדריך חירום" loading="lazy"></div><div class="shot"><img src="app-shots-profile-v2.jpg" alt="הפרופיל שלי" loading="lazy"></div></div><div class="car-dots" id="cardots"></div></div></div></section>
 
+<!-- ══ SHOMER COMMAND · for local authorities ══
+     The product Dave actually sells had no presence on this site at all. A security officer at a
+     council who looks SHOMER up landed on a consumer download page and found no sign that there
+     is a municipal side, let alone a way to see it. Every claim here is one the live board can
+     back today - no customer counts, no "proven", no numbers that are not real. -->
+<section class="cmd-sec">
+  <div class="wrap">
+    <div class="cmd-kicker">לרשויות מקומיות ומועצות</div>
+    <h2><span class="wordmark">SH<span class="star">✡</span>MER</span> Command</h2>
+    <p class="cmd-lead">לוח מבצעי שמציג בזמן אמת קריאות SOS בתחום השיפוט של הרשות - מי קרא, איפה, ומה נעשה מאז.</p>
+    <div class="cmd-grid">
+      <div class="cmd-col"><h3>קריאה חיה על המפה</h3><p>קריאת SOS נפתחת על הלוח ברגע שהיא נשלחת, עם מיקום, שעה וסוג האירוע.</p></div>
+      <div class="cmd-col"><h3>ניהול אירוע מסודר</h3><p>רשימת צעדים לתגובה, יומן אירוע שנכתב תוך כדי, וסגירת אירוע מסודרת. אירוע לא נשאר פתוח בלי שמישהו ידע.</p></div>
+      <div class="cmd-col"><h3>תמונת מצב לרשות</h3><p>מגמות ונתוני פשיעה לצד הפעילות ברשת, כדי להבין מה קורה בשטח לאורך זמן.</p></div>
+    </div>
+    <div class="cmd-note">הנתונים שמוצגים לרשות הם מצטברים ומטושטשים - בלי שם, בלי טלפון ובלי מיקום מדויק של משתמש. מי שמדווח נשאר אנונימי אלא אם בחר אחרת.</div>
+    <div class="cmd-cta">
+      <a class="btn cmd-btn" href="shomer-command/">לצפייה בלוח לדוגמה</a>
+      <a class="btn cmd-btn2" href="mailto:support@shomer-app.co.il?subject=SHOMER%20Command%20-%20פנייה%20מרשות">לתיאום הדגמה</a>
+    </div>
+  </div>
+</section>
+
 <!-- ══ CLOSING CTA ══ -->
 <section class="close-cta">
   <div class="wrap">
@@ -579,6 +615,9 @@ header.bar{border-bottom:1px solid rgba(250,172,34,.14)}
       <a href="shomer.html" data-i="fl0">פתחו את האפליקציה</a>
       <a href="privacy.html" data-i="fl1">פרטיות</a>
       <a href="terms.html" data-i="fl2">תנאים</a>
+      <!-- the live board had no route from anywhere on this site, so the only way in was to
+           already know the URL. Sign-in gated, so linking it exposes nothing. -->
+      <a href="dashboard.html?login=1">כניסת רשויות</a>
       <a href="accessibility.html" data-i="fl3">הצהרת נגישות</a>
       <a href="mailto:support@shomer-app.co.il" data-i="fl4">כתבו לנו</a>
       </div>

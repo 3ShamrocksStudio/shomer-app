@@ -6000,6 +6000,21 @@ function startShakeDetection(){
         true) precisely so no stored value can reopen it; the web side still read SS.shake.btnGate,
         so one bad migration or a hand-edited store could let a bare shake fire an SOS. Button+shake
         is a rule, not a setting, and the in-app detector never fires on its own. */
+     /* v437: it still never fires - but on a shell too old to see a volume key it no longer dies
+        silently. On those builds the native service cannot do button+shake and this handler is
+        forbidden from standing in for it, so the gesture is simply dead, and the only thing the
+        user experiences is a shake that does nothing. That is indistinguishable from a broken app.
+        Say it out loud instead, once a minute at most, and put the fix one tap away. Fires no SOS,
+        starts no countdown - it only explains. */
+     try{
+       if(nativeTooOld() && (!window._shakeDeadAt || Date.now()-window._shakeDeadAt>60000)){
+         window._shakeDeadAt=Date.now();
+         try{ nativeStaleNotice(); }catch(e){}
+         try{ toast(gaT('ניעור זוהה · בגרסה הזו כפתור+ניעור לא מפעיל SOS. עדכנו את האפליקציה.',
+                        'تمّ رصد هزّة · في هذا الإصدار لا يُفعّل زرّ+هزّ الاستغاثة. حدّث التطبيق.',
+                        'Shake detected - on this build, button+shake cannot start an SOS. Update the app.'),'amb'); }catch(e){}
+       }
+     }catch(e){}
      return;
      /* v364: the test branch only while nothing real is running. Three separate places now close
         the test card when an SOS starts, so this cannot trigger today - but a shake must never be
@@ -16678,6 +16693,34 @@ function updNum(v){ try{ return parseInt(String(v).replace(/\D/g,''),10)||0; }ca
 var PUBLIC_VER='1.0';
 function pubVerLabel(){ var he=currentLang==='he',ar=currentLang==='ar'; return PUBLIC_VER+' \u00b7 '+(he?'\u05d1\u05d8\u05d0':ar?'\u062a\u062c\u0631\u064a\u0628\u064a':'Beta'); }
 function fullVerLabel(cb){ var t=APP_VER; try{ var A=window.Capacitor&&window.Capacitor.Plugins&&window.Capacitor.Plugins.App; if(A&&A.getInfo){ A.getInfo().then(function(i){ cb(t+(i&&i.build?' \u00b7 build '+i.build:'')); }).catch(function(){ cb(t); }); return; } }catch(e){} cb(t); }
+/* ══ v437 · WHICH BUILD IS EACH INSTALL ACTUALLY ON ══
+   "Make sure every user and tester is on the latest" was unanswerable: nothing reported a build
+   number anywhere, so the only way to learn that a phone was on build 57 was for its owner to
+   read it off a banner and say so. Now each install records its own version numbers once a day.
+
+   Checked against the data policy before writing: this is information about the SOFTWARE, not
+   about the person - the native build, the plugin version and the web version. No location, no
+   name, no phone, no contacts. It is keyed by the account id that already keys this user's other
+   rows, carries a timestamp so stale entries can be aged out on the 90-day rule like everything
+   else, and it exists to answer exactly one operational question: who is running something too
+   old for SOS to work. That is the "understand use of the system" case the policy allows. */
+function reportBuild(){
+  try{
+    if(!(FB&&FB.uid)) return;
+    var last=0; try{ last=+(localStorage.getItem('shomer_build_rep')||0); }catch(e){}
+    if(Date.now()-last < 86400000) return;              /* once a day is plenty */
+    var row={ w:APP_VER, nv:(typeof window._nativePluginVer==='number'?window._nativePluginVer:-1),
+              nat:shomerIsNative()?1:0, at:Date.now() };
+    var done=function(){
+      try{ localStorage.setItem('shomer_build_rep',String(Date.now())); }catch(e){}
+      try{ fbRestWrite('PUT','builds/'+FB.uid,row); }catch(e){}
+    };
+    var A=window.Capacitor&&window.Capacitor.Plugins&&window.Capacitor.Plugins.App;
+    if(A&&A.getInfo){ A.getInfo().then(function(i){ if(i&&i.build) row.b=String(i.build); done(); }).catch(done); }
+    else done();
+  }catch(e){}
+}
+try{ setTimeout(reportBuild, 12000); }catch(e){}
 function updSetBadge(txt,stale){
  try{ window._verBadgeTxt=txt; window._verBadgeStale=!!stale; }catch(e){}   /* v414: so it can be repainted */
  try{ if(nativeTooOld()) stale=true; }catch(e){}   /* v414: an old Android shell is stale too */
