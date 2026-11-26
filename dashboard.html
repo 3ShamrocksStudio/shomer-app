@@ -1696,29 +1696,48 @@ function _sfxCtx(){
   if(ctx.state==='suspended'){ try{ctx.resume();}catch(e){} }
   return ctx;
 }
-/* ══ v444 · THE ALARM ══
-   This was Morse SOS before - correct Morse, and too clever. Nine elements at 880Hz over 2.4
-   seconds chatters; it reads as a telegraph, not as a room where something has gone wrong. A
-   console alarm is not a place to be interesting.
+/* ══ v445 · THE ALARM ══
+   Three attempts at this were wrong in the same way: they were designed to be distinctive. An
+   alarm has no business being distinctive. It has one job - a person who has never been trained
+   on this product hears it and knows immediately that something needs them now - and the way to
+   do that is to use the sound people already know, not to invent one.
 
-   Two notes, falling, low. It is the interval every emergency service already owns, which means
-   nobody has to be taught what it is, and two events give an operator nothing to decode. Falling
-   matters: a rising pair reads as a notification arriving, a falling pair reads as a situation.
+   So this is the IEC 60601-1-8 high-priority alarm: five pulses in a burst, grouped three then
+   two, repeating. It is the pattern hospital equipment uses worldwide for the top severity, and
+   it is the reason a nurse can walk into an unfamiliar room and know what kind of trouble it is.
+   The grouping is what carries the urgency - three insistent pulses, a gap just long enough to
+   notice, then two more that refuse to let it go. Nothing melodic, nothing clever.
 
-   A3 to E3, with each note doubled an octave below. Low on purpose - 880Hz cuts, but it also
-   fatigues, and someone may sit in front of this for the length of a real incident. These sit
-   under a conversation instead of over it, and still carry across a room. One second of sound in
-   a 2.8s loop, so the silence does the work of urgency rather than volume. */
+   The voice changed too, and that is why the earlier ones sounded strange. _sfxNote is a soft
+   triangle-and-sine through a lowpass, built for gentle cues - the wrong instrument entirely. An
+   alarm pulse needs harmonics to carry across a room, a fast attack, a flat body and an abrupt
+   end. Five partials, 6ms attack, no decay tail. C5 at 523Hz: the band alarms live in, high
+   enough to cut through a room and through a conversation, low enough not to shred over an hour.
+   700ms of sound in a 2.6s loop - the silence between bursts is what keeps it urgent instead of
+   just loud. */
+function _alarmPulse(ctx,f,t,dur,peak){
+  [[1,1.0],[2,0.55],[3,0.38],[4,0.20],[5,0.12]].forEach(function(h){
+    var o=ctx.createOscillator(), g=ctx.createGain();
+    o.type='sine'; o.frequency.setValueAtTime(f*h[0],t);
+    g.gain.setValueAtTime(0.0001,t);
+    g.gain.linearRampToValueAtTime(peak*h[1],t+0.006);
+    g.gain.setValueAtTime(peak*h[1],t+dur-0.012);
+    g.gain.linearRampToValueAtTime(0.0001,t+dur);
+    o.connect(g); g.connect(ctx.destination); o.start(t); o.stop(t+dur+0.02);
+  });
+}
 function _playAlertTone(){
  try{
   if(window._alarmMuted) return;
   var ctx=_sfxCtx(); if(!ctx) return; var t0=ctx.currentTime;
-  _sfxNote(ctx, 220.00, t0+0.00, 0.44, 0.17, 2200);   /* A3 */
-  _sfxSub (ctx,         t0+0.00, 110,   0.44, 0.10);
-  _sfxNote(ctx, 164.81, t0+0.52, 0.52, 0.17, 2000);   /* E3 */
-  _sfxSub (ctx,         t0+0.52, 82.4,  0.52, 0.10);
+  var pd=0.14, gap=0.20;
+  /* 3 + 2, per IEC 60601-1-8 high priority */
+  [0, gap, gap*2, gap*2+pd+gap*2.2, gap*3+pd+gap*2.2].forEach(function(off,i){
+    _alarmPulse(ctx, 523.25, t0+off, pd, i>=3?0.21:0.19);
+  });
  }catch(e){}
 }
+
 
 function _playAckTone(){                                        /* operator picked the event up */
  try{ var ctx=_sfxCtx(); if(!ctx) return; var t0=ctx.currentTime;
@@ -1735,7 +1754,7 @@ function _playResolveTone(){                                    /* event closed 
  }catch(e){}
 }
 var _alarmTimer=null, _alarmId=null, _alarmSilenced=false;
-function startAlarm(){ if(_alarmTimer)return; try{_playAlertTone();}catch(e){} var _a0=Date.now(); _alarmTimer=setInterval(function(){ var st=document.getElementById('live-strip'); if(!st||st.style.display==='none'||_alarmSilenced){ stopAlarm(); return; } if(window._keepAlarm===false && Date.now()-_a0>60000){ stopAlarm(); return; }   /* v293: "keep alarm until acknowledged" off = the sound stops by itself after 1 minute */ try{_playAlertTone();}catch(e){} },2800); }
+function startAlarm(){ if(_alarmTimer)return; try{_playAlertTone();}catch(e){} var _a0=Date.now(); _alarmTimer=setInterval(function(){ var st=document.getElementById('live-strip'); if(!st||st.style.display==='none'||_alarmSilenced){ stopAlarm(); return; } if(window._keepAlarm===false && Date.now()-_a0>60000){ stopAlarm(); return; }   /* v293: "keep alarm until acknowledged" off = the sound stops by itself after 1 minute */ try{_playAlertTone();}catch(e){} },2600); }
 function stopAlarm(){ if(_alarmTimer){clearInterval(_alarmTimer);_alarmTimer=null;} }
 function silenceAlarm(){ _alarmSilenced=true; stopAlarm();
  /* v428: the large panel button is the one people press now, so it has to show the result. */
